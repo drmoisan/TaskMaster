@@ -562,7 +562,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
 
 ## Acceptance Criteria
 
-- [ ] AC1: Each of the seven Should-fix findings is resolved as this spec specifies — C10 (sentinel
+- [x] AC1: Each of the seven Should-fix findings is resolved as this spec specifies — C10 (sentinel
       obtained on a dedicated STA thread and shut down in a `finally`, populated-branch test
       retained), C02 (getter reads the backing field exactly once), C18 (order-independence guard
       reads through `UiThreadDispatcherFixture.Current`), C19 (the P27-T2 docstring, Act comment, and
@@ -572,7 +572,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       form, row 3.1 amended, Appendix B labelled as a reference command, section 8 gap entry added).
       **Evidence:** the branch diff for each named file, plus a passing run of `UtilitiesCS.Test` and
       `QuickFiler.Test` recorded under this feature's evidence/qa-gates/ sub-path.
-- [ ] AC2: Each of the fourteen in-scope code and test nits — C03, C05, C06, C08, C09 (message half),
+- [x] AC2: Each of the fourteen in-scope code and test nits — C03, C05, C06, C08, C09 (message half),
       C11, C12, C13, C14, C15, C21, C25, C26, S2-1 — is resolved, or its omission is recorded with a
       stated reason in this delivery's code-review artifact. The C03 clause is
       satisfied through AC2's omission branch: the delivery makes no change to the
@@ -581,7 +581,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       re-arm line, and that the retry semantics C03 asks for are promoted as a separate follow-up
       entry. **Evidence:** one diff hunk per identifier, mapped
       by the traceability table; the code-review artifact for any omission.
-- [ ] AC3: Each of the eight in-scope documentation and evidence nits is resolved in the #584 feature
+- [x] AC3: Each of the eight in-scope documentation and evidence nits is resolved in the #584 feature
       folder, with these amendments: S3-5 is applied to all fifteen files in the S3-5 member set
       above, not only the three named in issue.md (SD3); S3-9's note cites C12/C13 as the discharging
       item and records that the follow-up was never promoted (SD9); S3-7 states 49 live reads across
@@ -592,14 +592,14 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       over the #584 folder listing exactly the files named in the Write Set sections above; a grep
       over the four audit artifacts returning zero occurrences of the six evaluative spans S3-8
       names.
-- [ ] AC4: The two optional refuted-item cleanups are applied. `TaskMaster/Ribbon/RibbonViewer.EngineCommands.cs`
+- [x] AC4: The two optional refuted-item cleanups are applied. `TaskMaster/Ribbon/RibbonViewer.EngineCommands.cs`
       contains no `dispatcher != null` comparison and its two XML-doc mentions of `UiThread.Dispatcher`
       are unchanged; `UtilitiesCS/Threading/ProgressTracker.cs` and
       `UtilitiesCS/Threading/ProgressTrackerAsync.cs` each pass the captured `UiDispatcher` local into
       the marshalling lambda and no longer re-read the static inside it. **Evidence:** the diff for
       the three files, plus a grep confirming zero remaining `UiThread.Dispatcher` reads inside those
       two lambdas.
-- [ ] AC5: `UtilitiesCS.Test` contains exactly one acquisition of a `FieldInfo` for
+- [x] AC5: `UtilitiesCS.Test` contains exactly one acquisition of a `FieldInfo` for
       `UiThread._dispatcher`, in `UtilitiesCS.Test/TestHelpers/UiThreadDispatcherScope.cs`, and the
       four former sites listed in the migrating-sites table all use that scope.
       `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs` contains no `FieldInfo` for
@@ -611,7 +611,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       `GetField("_dispatcher"` is not used as the evidence method, because CSharpier wraps every
       acquisition so that `GetField(` and `"_dispatcher",` never share a line, and a line-oriented
       search for the conjunction therefore returns zero lines whatever the executor does.
-- [ ] AC6: `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` and
+- [x] AC6: `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` and
       `UtilitiesCS.Test/Threading/ProgressTracker_ReportAndViewerTests.cs` are each strictly under 500
       lines, both are registered as exactly one `<Compile Include>` entry in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj`, both declare the same `partial class` with the
@@ -619,7 +619,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       every test method that existed in the pre-split file is still discovered and passing under its
       original fully-qualified name. **Evidence:** a line-count artifact for both files; the csproj
       diff; a before-and-after test-name list from the `UtilitiesCS.Test` run.
-- [ ] AC7: Three new tests exist and each fails if its corresponding throw is removed and passes on
+- [x] AC7: Three new tests exist and each fails if its corresponding throw is removed and passes on
       the current code — the C21 test that reaches the production fallback provider from a dedicated
       fresh thread with no dispatcher, the C26 asynchronous test asserting
       `ThrowAsync<InvalidOperationException>` from `ProgressTrackerAsync.InitializeAsync`, and the
@@ -634,13 +634,13 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       fixed in this repository. **Evidence:** the promoted entry file plus its issue URL, and the
       upstream follow-up record in this delivery's artifacts; plus a `git diff --stat` showing zero
       changed files under .claude/.
-- [ ] AC9: The full C# toolchain passes in a single final pass — CSharpier format then check,
+- [x] AC9: The full C# toolchain passes in a single final pass — CSharpier format then check,
       analyzer build, nullable build, and the test run with coverage over the named assemblies — and
       changed-line coverage does not decrease. A package-level coverage summary is committed under
       this feature's evidence/qa-gates/ sub-path; artifacts/csharp/coverage.xml is not produced
       (SD1). **Evidence:** one gate artifact per toolchain step with its exact command and exit code,
       plus the changed-line coverage figure with its derivation.
-- [ ] AC10: `UtilitiesCS/Threading/UiThread.cs` declares exactly one `internal const string` message
+- [x] AC10: `UtilitiesCS/Threading/UiThread.cs` declares exactly one `internal const string` message
       constant whose value is the text stated in the Behavioral Contract section; both throw sites —
       the one in that file and the one in `UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs` —
       reference it, and no `InvalidOperationException` message literal for this precondition remains
@@ -652,7 +652,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       "before yielding folder tree work" returning zero hits in `UtilitiesCS`; a grep for
       `UiThread.Initialize()` returning zero hits in any message literal or assertion; the passing
       `WithMessage` assertion.
-- [ ] AC11: The test method `Dispatcher_WhenBackingFieldIsNull_ThrowsInvalidOperationExceptionNamingInitialize`
+- [x] AC11: The test method `Dispatcher_WhenBackingFieldIsNull_ThrowsInvalidOperationExceptionNamingInitialize`
       in `UtilitiesCS.Test/Threading/UiThread_Tests.cs` retains that exact name while its assertion
       changes to `*UiThread.Init()*`, and this delivery's code-review artifact records the residual
       naming inaccuracy and the reason the name is retained: the fully-qualified name is quoted inside
@@ -660,7 +660,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       make that recorded command resolve to zero tests (SD4). **Evidence:** a grep confirming the
       method name is unchanged and the asserted wildcard is `*UiThread.Init()*`; the code-review
       artifact entry.
-- [ ] AC12: Neither of the two items listed under "Items Requiring Re-derivation at Planning Time" is
+- [x] AC12: Neither of the two items listed under "Items Requiring Re-derivation at Planning Time" is
       asserted in any artifact without a fresh derivation recorded in this delivery's evidence —
       specifically the #584 spec document's acceptance-criteria block state used by S3-6, and the two line
       references into the #584 plan file used by the S3-2 section 8 entry and the C16 rationale. If a

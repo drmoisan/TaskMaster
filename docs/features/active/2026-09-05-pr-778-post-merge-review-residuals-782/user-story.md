@@ -72,13 +72,13 @@ Observable, in this order:
 
 - [ ] AC-U1: One branch and one pull request deliver all in-scope findings; the pull request body
       maps every finding identifier to the file that changed or to the recorded reason it did not.
-- [ ] AC-U2: The delivery introduces no production behavior change other than the text of the
+- [x] AC-U2: The delivery introduces no production behavior change other than the text of the
       `InvalidOperationException` message and the retry-after-failed-initialization behavior of
       `UiThread.Init()`, both of which are stated in the specification's Behavioral Contract.
-- [ ] AC-U3: The #584 feature folder can be archived with no unrecorded residual: every review
+- [x] AC-U3: The #584 feature folder can be archived with no unrecorded residual: every review
       finding is resolved, promoted, recorded as an upstream follow-up, or recorded as needing no
       action.
-- [ ] AC-U4: A reader of the #584 audit artifacts can verify every command, count, and ordering claim
+- [x] AC-U4: A reader of the #584 audit artifacts can verify every command, count, and ordering claim
       they contain against the committed evidence without re-deriving it.
-- [ ] AC-U5: The full C# toolchain passes in a single final pass and changed-line coverage does not
+- [x] AC-U5: The full C# toolchain passes in a single final pass and changed-line coverage does not
       decrease.
