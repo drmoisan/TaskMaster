@@ -1,0 +1,775 @@
+---
+parallel: "bugs-2026-09-02"
+mode: "open"
+max_concurrency: 16
+created_at: "2026-09-02T20:45:00Z"
+items:
+  - issue_num: 564
+    feature_folder: "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".github/workflows/_build-analyzers.yml"
+        - ".github/workflows/_build-nullable.yml"
+        - ".github/workflows/_format-check.yml"
+        - ".github/workflows/ci.yml"
+        - "CLAUDE.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/**"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/baseline/claude-md-citations-baseline.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/baseline/phase0-instructions-read.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/baseline/scope-boundary-declarations.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac1.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac2.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac3.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac4.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/final-qa-summary.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/line-scope-verification-ac7.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac5.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac6.2026-09-02T08-58.md"
+        - "docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 565
+    feature_folder: "docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "config/poshqc-scan.json"
+        - "docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/**"
+        - "docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/issue.md"
+        - "docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/research/invoke-mstestwithcoverage-ordering-fix.2026-09-02T09-00.md"
+        - "docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/spec.md"
+        - "scripts/vscode/Invoke-MSTestWithCoverage.ps1"
+        - "tests/**/*.Tests.ps1"
+        - "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"
+      modules:
+        - "config"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 584
+    feature_folder: "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "Threading/UiThread.cs"
+        - "UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs"
+        - "UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs:144"
+        - "UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs:28"
+        - "UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs"
+        - "UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs:13"
+        - "UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs:138"
+        - "UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs"
+        - "UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs:14"
+        - "UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs:422"
+        - "UtilitiesCS.Test/Threading/UiThread_Tests.cs"
+        - "UtilitiesCS.Test/Threading/UiThread_Tests.cs:8"
+        - "UtilitiesCS/Threading/UiThread.cs"
+        - "coverage/p0-t10.cobertura.xml"
+        - "coverage/p4-t5.cobertura.xml"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/**"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t10-utilitiescs-tests-coverage.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t11-quickfiler-tests.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t12-threshold-reconciliation.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t13-parallel-bucket-census.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t2-uithread-rederivation.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t3-progresstrackerasync-rederivation.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t4-test-rederivation.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t5-toolchain-resolution.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t6-mcp-probe.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t7-csharpier-check.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t8-analyzer-build.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t9-nullable-build.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/issue-updates/issue-584.2026-09-02T09-02.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/other/p3-t4-progresstrackerasync-unmodified.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/other/p5-t10-footprint.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/other/p5-t12-ac-status-summary.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p1-t5-donotparallelize.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p2-t2-nullforgiving-removed.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p2-t3-file-size.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p3-t1-analyzer-build.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p3-t5-no-timing-tokens.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t1-format.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t2-format-check.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t3-analyzer-build.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t4-nullable-build.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t5-utilitiescs-tests.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t6-quickfiler-tests.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t7-coverage-delta.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t8-loop-closure.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/regression-testing/p1-t3-build-before-fix.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/regression-testing/p1-t4-expect-fail.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/regression-testing/p3-t2-regression-green.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/regression-testing/p3-t3-at-risk-tests.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/regression-testing/p3-t6-quickfiler-wpfuidispatcher.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/issue.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/plan.2026-09-02T09-02.md"
+        - "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md"
+        - "evidence/baseline/p0-t10-utilitiescs-tests-coverage.md"
+        - "evidence/other/p3-t4-progresstrackerasync-unmodified.md"
+        - "evidence/other/p5-t10-footprint.md"
+        - "evidence/qa-gates/p1-t5-donotparallelize.md"
+        - "evidence/qa-gates/p2-t2-nullforgiving-removed.md"
+        - "evidence/qa-gates/p3-t5-no-timing-tokens.md"
+        - "evidence/qa-gates/p4-t1-format.md"
+        - "evidence/qa-gates/p4-t2-format-check.md"
+        - "evidence/qa-gates/p4-t3-analyzer-build.md"
+        - "evidence/qa-gates/p4-t4-nullable-build.md"
+        - "evidence/qa-gates/p4-t5-utilitiescs-tests.md"
+        - "evidence/qa-gates/p4-t6-quickfiler-tests.md"
+        - "evidence/qa-gates/p4-t7-coverage-delta.md"
+        - "evidence/qa-gates/p4-t8-loop-closure.md"
+        - "evidence/regression-testing/p1-t4-expect-fail.md"
+        - "evidence/regression-testing/p3-t2-regression-green.md"
+        - "evidence/regression-testing/p3-t3-at-risk-tests.md"
+        - "evidence/regression-testing/p3-t6-quickfiler-wpfuidispatcher.md"
+      modules:
+        - "UtilitiesCS"
+        - "UtilitiesCS.Test"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 645
+    feature_folder: "docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".../research/2026-09-02T08-47-twelve-hour-time-format-research.md"
+        - ".../spec.md"
+        - ".claude/rules/*.md"
+        - "QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs"
+        - "QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs:25"
+        - "QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs:53"
+        - "QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs"
+        - "QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs:227"
+        - "QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs:243"
+        - "QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs:265"
+        - "QuickFiler.Test/QuickFiler.Test.csproj"
+        - "QuickFiler/Controllers/EfcHomeController.Metrics.cs"
+        - "QuickFiler/Controllers/EfcHomeController.Metrics.cs:119"
+        - "QuickFiler/Controllers/EfcHomeController.Metrics.cs:96"
+        - "QuickFiler/Controllers/QfcHomeController.Metrics.cs"
+        - "QuickFiler/Controllers/QfcHomeController.Metrics.cs:127"
+        - "QuickFiler/Controllers/QfcHomeController.Metrics.cs:46"
+        - "QuickFiler/Controllers/QfcHomeController.Metrics.cs:48"
+        - "docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/**"
+        - "docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/issue.md"
+        - "docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/spec.md"
+        - "docs/features/potential/promoted/2026-09-02-quickfiler-date-time-format-missing-invariant-culture.md"
+        - "research/2026-09-02T08-47-twelve-hour-time-format-research.md"
+      modules:
+        - "QuickFiler"
+        - "QuickFiler.Test"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 707
+    feature_folder: "docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "Depricate/FileIO2.cs"
+        - "docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707/**"
+        - "docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707/evidence/baseline/phase0-instructions-read.md"
+        - "evidence/baseline/p0-t10-dotnet-tool-restore.md"
+        - "evidence/baseline/p0-t11-nuget-restore.md"
+        - "evidence/baseline/p0-t12-analyzer-package-check.md"
+        - "evidence/baseline/p0-t13-dotnet-coverage-tool.md"
+        - "evidence/baseline/p0-t14-csharpier-check.md"
+        - "evidence/baseline/p0-t15-analyzer-build.md"
+        - "evidence/baseline/p0-t16-nullable-build.md"
+        - "evidence/baseline/p0-t17-utilitiescs-coverage.md"
+        - "evidence/baseline/p0-t18-coverage-figures.md"
+        - "evidence/baseline/p0-t19-fileio2-coverage.md"
+        - "evidence/baseline/p0-t20-baseline-failure-set.md"
+        - "evidence/baseline/p0-t7-base-ref.md"
+        - "evidence/baseline/p0-t8-file-line-counts.md"
+        - "evidence/baseline/p0-t9-dotnet-sdk-bootstrap.md"
+        - "evidence/baseline/p1-t1-pre-change-catch-shape.md"
+        - "evidence/baseline/p1-t2-internalsvisibleto.md"
+        - "evidence/baseline/p1-t3-pre-change-test-baseline.md"
+        - "evidence/baseline/phase0-instructions-read.md"
+        - "evidence/qa-gates/p5-t1-format.md"
+        - "evidence/qa-gates/p5-t2-format-check.md"
+        - "evidence/qa-gates/p5-t3-analyzer-build.md"
+        - "evidence/qa-gates/p5-t4-nullable-build.md"
+        - "evidence/qa-gates/p5-t5-utilitiescs-coverage.md"
+        - "evidence/qa-gates/p5-t6-coverage-figures.md"
+        - "evidence/qa-gates/p5-t7-fileio2-coverage.md"
+        - "evidence/qa-gates/p5-t8-coverage-delta.md"
+        - "evidence/qa-gates/p5-t9-loop-closure.md"
+        - "evidence/qa-gates/p6-t10-acceptance-summary.md"
+        - "evidence/qa-gates/p6-t7-pathtoolongexception-absence.md"
+        - "evidence/qa-gates/p6-t8-ac8-caller-scope.md"
+        - "evidence/qa-gates/p7-t1-commit.md"
+        - "evidence/qa-gates/p7-t2-commit-verification.md"
+        - "evidence/qa-gates/p7-t3-final-evidence-commit.md"
+        - "evidence/regression-testing/p2-t2-precompile.md"
+        - "evidence/regression-testing/p2-t3-missingdirectory-fail-before.md"
+        - "evidence/regression-testing/p4-t1-postfix-nullable-build.md"
+        - "evidence/regression-testing/p4-t2-fileio2-tests-postfix.md"
+        - "research/2026-09-02T09-15-narrow-fileio2-retryable-exception-set-research.md"
+        - "UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs"
+        - "UtilitiesCS/To Depricate/FileIO2.cs"
+      modules:
+        - "UtilitiesCS"
+        - "UtilitiesCS.Test"
+      shared_surfaces: []
+      contracts:
+        - "Exception)"
+        - "WriteTextFileAsync"
+        - "log4net.ILog.Error(object,"
+        - "logger.Error"
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 729
+    feature_folder: "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "2026-08-07-efcviewer-missing-lineage-and-segment-navigation-439/evidence/qa-gates/issue-439-final.cobertura.xml"
+        - "2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/baseline/r3-csharp-coverage.2026-08-25T13-32.cobertura.xml"
+        - "2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/qa-gates/r1-csharp-coverage.2026-08-25T12-33.cobertura.xml"
+        - "config/blast-radius.json"
+        - "config/orchestration-routing.json"
+        - "DASL/DASLFilterParserTests.cs"
+        - "docs/features/active/2026-08-07-efcviewer-missing-lineage-and-segment-navigation-439/evidence/qa-gates/issue-439-final.cobertura.xml"
+        - "docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/baseline/r3-csharp-coverage.2026-08-25T13-32.cobertura.xml"
+        - "docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/qa-gates/r1-csharp-coverage.2026-08-25T12-33.cobertura.xml"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/**"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/analyzer-path-audit.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/base-ref.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/citation-verification.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/coverage-baseline.cobertura.xml"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/csharpier-check.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/dotnet-coverage-tool.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/dotnet-sdk-bootstrap.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/dotnet-tool-restore.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/msbuild-analyzers.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/msbuild-nullable.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/mstest-coverage.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/nonblockingdelay-coverage-baseline.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/nuget-restore.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/phase0-instructions-read.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/baseline/preexisting-worktree-state.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/other/changed-file-inventory.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/other/delivery-record.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/other/no-fail-before-rationale.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/other/scope-recap.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/other/spec-block-l-insertion.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/build-taskmaster-test.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/coverage-delta.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/coverage-final.cobertura.xml"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/csharpier-check.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/csharpier-format.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/file-size-audit.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/host-path-sanitisation.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/msbuild-analyzers.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/msbuild-nullable.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/mstest-coverage.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/nuget-restore-after-package-edit.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/scope-boundary-ac17.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/scope-boundary-ac18.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/scope-boundary-ac19.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/scope-boundary-ac20.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/seam-build-analyzers.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/qa-gates/toolchain-single-pass.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/donotparallelize-classes.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/donotparallelize-diff.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/fail-before-exception.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/nonblockingdelay-tests.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/svgcontrol-build-after.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/svgcontrol-build-before.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/svgcontrol-guard-fail-before.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/svgcontrol-guard-pass-after.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/utilitiescs-build.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/utilitiescs-guard-pass.2026-09-02T10-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/issue.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/plan.2026-09-02T08-59.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/research/research-729.2026-09-02T09-30.md"
+        - "docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/spec.md"
+        - "docs/features/potential/promoted/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam.md"
+        - "QuickFiler.Test/NoLiveFormInTestAssemblyTests.cs"
+        - "research/research-729.2026-09-02T09-30.md"
+        - "SVGControl.Test/Form1.cs"
+        - "SVGControl.Test/Form1.Designer.cs"
+        - "SVGControl.Test/Form1.resx"
+        - "SVGControl.Test/Form2.cs"
+        - "SVGControl.Test/Form2.Designer.cs"
+        - "SVGControl.Test/Form2.resx"
+        - "SVGControl.Test/NoLiveFormInTestAssemblyTests.cs"
+        - "SVGControl.Test/SVGControl.Test.csproj"
+        - "TaskMaster.Test/AppGlobals/NonBlockingDelayTests.cs"
+        - "TaskMaster.Test/packages.config"
+        - "TaskMaster.Test/TaskMaster.Test.csproj"
+        - "TaskMaster/AppGlobals/AppEvents.cs"
+        - "TaskMaster/AppGlobals/NonBlockingDelay.cs"
+        - "TaskMaster/AppGlobals/StoreRehookCoordinator.cs"
+        - "UtilitiesCS.Test/Form1.cs"
+        - "UtilitiesCS.Test/Form1.Designer.cs"
+        - "UtilitiesCS.Test/Form1.resx"
+        - "UtilitiesCS.Test/Form2.cs"
+        - "UtilitiesCS.Test/Form2.Designer.cs"
+        - "UtilitiesCS.Test/Form2.resx"
+        - "UtilitiesCS.Test/Form3.cs"
+        - "UtilitiesCS.Test/Form3.Designer.cs"
+        - "UtilitiesCS.Test/Form3.resx"
+        - "UtilitiesCS.Test/NoLiveFormInTestAssemblyTests.cs"
+        - "UtilitiesCS.Test/OutlookObjects/DASLFilterParser_Tests.cs"
+        - "UtilitiesCS.Test/OutlookObjects/Filter DASL/DASLFilterParserTests.cs"
+        - "UtilitiesCS.Test/ResourceTests.cs"
+        - "UtilitiesCS.Test/ResourceTests.cs:20"
+        - "UtilitiesCS.Test/ReusableTypeClasses/StackGeek_Tests.cs"
+        - "UtilitiesCS.Test/UtilitiesCS.Test.csproj"
+        - "UtilitiesCS/Threading/ThreadMonitor.cs"
+      modules:
+        - "config"
+        - "QuickFiler.Test"
+        - "SVGControl.Test"
+        - "TaskMaster"
+        - "TaskMaster.Test"
+        - "UtilitiesCS"
+        - "UtilitiesCS.Test"
+      shared_surfaces:
+        - "config/blast-radius.json"
+        - "config/orchestration-routing.json"
+      contracts:
+        - "NonBlockingDelay"
+        - "[DoNotParallelize]"
+        - "internal"
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 730
+    feature_folder: "docs/features/active/2026-09-02-ci-build-infra-debt-730"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".github/workflows/_build-analyzers.yml"
+        - ".github/workflows/_build-analyzers.yml:40"
+        - ".github/workflows/_build-nullable.yml"
+        - ".github/workflows/_build-nullable.yml:40"
+        - ".github/workflows/_mstest-coverage.yml"
+        - ".github/workflows/_mstest-coverage.yml:40"
+        - "Directory.Build.props"
+        - "docs/features/active/2026-09-02-ci-build-infra-debt-730/**"
+        - "docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/phase0-instructions-read.md"
+        - "docs/features/active/2026-09-02-ci-build-infra-debt-730/issue.md"
+        - "docs/features/active/2026-09-02-ci-build-infra-debt-730/plan.2026-09-02T08-57.md"
+        - "docs/features/active/2026-09-02-ci-build-infra-debt-730/research/research.2026-09-02T09-15.md"
+        - "docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md"
+        - "research/research.2026-09-02T09-15.md"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 731
+    feature_folder: "docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/agent-memory/*/MEMORY.md"
+        - ".github/workflows/_build-analyzers.yml:45"
+        - ".github/workflows/_build-nullable.yml:45"
+        - ".github/workflows/_mstest-coverage.yml:45"
+        - "Classes/EmailMoveMonitor.cs"
+        - "EVIDENCE/baseline/csharpier-check.md"
+        - "EVIDENCE/baseline/dotnet-tool-restore.md"
+        - "EVIDENCE/baseline/msbuild-analyzers.md"
+        - "EVIDENCE/baseline/msbuild-nullable.md"
+        - "EVIDENCE/baseline/mstest-coverage.md"
+        - "EVIDENCE/baseline/phase0-instructions-read.md"
+        - "EVIDENCE/baseline/tree-invariants.md"
+        - "EVIDENCE/qa-gates/ac-traceability.md"
+        - "EVIDENCE/qa-gates/coverage-delta.md"
+        - "EVIDENCE/qa-gates/csharpier-check.md"
+        - "EVIDENCE/qa-gates/csharpier-format.md"
+        - "EVIDENCE/qa-gates/file-size-audit.md"
+        - "EVIDENCE/qa-gates/msbuild-analyzers.md"
+        - "EVIDENCE/qa-gates/msbuild-nullable.md"
+        - "EVIDENCE/qa-gates/mstest-coverage.md"
+        - "EVIDENCE/qa-gates/scope-boundary.md"
+        - "EVIDENCE/qa-gates/setupdisposal-coverage.md"
+        - "EVIDENCE/regression-testing/fail-before-exception.finding1-topology-pin.md"
+        - "EVIDENCE/regression-testing/finding1-topology-pin-pass.md"
+        - "EVIDENCE/regression-testing/finding2-cleanup-fail-before.md"
+        - "EVIDENCE/regression-testing/finding2-cleanup-pass-after.md"
+        - "EVIDENCE/regression-testing/finding3-admission-pin-fail-before.md"
+        - "EVIDENCE/regression-testing/finding3-admission-pin-pass-after.md"
+        - "EVIDENCE/regression-testing/finding4-volatile-fail-before.md"
+        - "EVIDENCE/regression-testing/finding4-volatile-pass-after.md"
+        - "QuickFiler.Test/Controllers/QfcCollectionControllerDefects468Tests.Volatile.cs"
+        - "QuickFiler.Test/Controllers/QfcCollectionControllerDefects468Tests.cs"
+        - "QuickFiler.Test/Controllers/QfcCollectionControllerDefects468Tests.cs:165"
+        - "QuickFiler.Test/Controllers/QfcDatamodelTests.cs"
+        - "QuickFiler.Test/Controllers/QfcFormControllerCleanupTests.cs"
+        - "QuickFiler.Test/Controllers/QfcFormControllerSeamTests.cs"
+        - "QuickFiler.Test/Controllers/QfcMoveMonitorTopologyTests.cs"
+        - "QuickFiler.Test/QuickFiler.Test.csproj"
+        - "QuickFiler.Test/QuickFiler.Test.csproj:34"
+        - "QuickFiler/Controllers/IQfcQueue.cs"
+        - "QuickFiler/Controllers/QfcCollectionController.cs"
+        - "QuickFiler/Controllers/QfcDatamodel.cs"
+        - "QuickFiler/Controllers/QfcFormController.SetupDisposal.cs"
+        - "QuickFiler/Controllers/QfcFormController.SetupDisposal.cs:218"
+        - "QuickFiler/Controllers/QfcQueue.cs"
+        - "QuickFiler/Controllers/QfcRemainingQueueAdmission.cs"
+        - "QuickFiler/Interfaces/IQfcCollectionController.cs"
+        - "QuickFiler/Interfaces/IQfcDatamodel.cs"
+        - "docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731/**"
+        - "docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731/issue.md:12"
+        - "docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731/research/2026-09-02T13-10-controller-lifecycle-disposal-fix-design-research.md"
+        - "docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731/spec.md"
+        - "docs/features/potential/promoted/2026-08-28-qfcformcontroller-setupdisposal-coverage-debt.md"
+      modules:
+        - "QuickFiler"
+        - "QuickFiler.Test"
+      shared_surfaces: []
+      contracts:
+        - "internal"
+        - "sealed"
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 732
+    feature_folder: "docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".claude/worktrees/agent-*"
+        - "TaskMaster.Test/AppGlobals/AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs"
+        - "TaskMaster/AppGlobals/AppFileSystemFolderPaths.cs"
+        - "UtilitiesCS.Test/OutlookExtensions/FolderConverter_Tests.cs"
+        - "UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs"
+        - "UtilitiesCS.Test/UtilitiesCS.Test.csproj"
+        - "UtilitiesCS/EmailIntelligence/FolderConverter.cs"
+        - "UtilitiesCS/OutlookObjects/Folder/FolderConverter.cs"
+        - "UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs"
+        - "UtilitiesCS/UtilitiesCS.csproj"
+        - "docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732/**"
+        - "docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732/evidence/baseline/coverage-baseline.cobertura.xml"
+        - "docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732/evidence/qa-gates/coverage-final.cobertura.xml"
+        - "docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732/issue.md"
+        - "docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732/plan.2026-09-02T12-01.md"
+        - "docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732/spec.md"
+      modules:
+        - "TaskMaster"
+        - "TaskMaster.Test"
+        - "UtilitiesCS"
+        - "UtilitiesCS.Test"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 733
+    feature_folder: "docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733/**"
+        - "docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733/issue.md"
+        - "scripts/vscode/Invoke-MSTest.ps1"
+        - "scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1"
+        - "scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1"
+        - "scripts/vscode/Invoke-MSTestWithCoverage.PackageRate.ps1"
+        - "scripts/vscode/Invoke-MSTestWithCoverage.ps1"
+        - "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"
+        - "tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Tests.ps1"
+        - "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"
+        - "tests/scripts/vscode/Invoke-MSTestWithCoverage.PackageRate.Tests.ps1"
+      modules: []
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 735
+    feature_folder: "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs"
+        - "TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs"
+        - "TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs"
+        - "TaskMaster.Test/Ribbon/SpamManagerResetGateTests.cs"
+        - "TaskMaster.Test/TaskMaster.Test.csproj"
+        - "TaskMaster/Ribbon/EngineToggleStateCoordinator.cs"
+        - "TaskMaster/Ribbon/RibbonController.Intelligence.cs"
+        - "TaskMaster/Ribbon/RibbonExplorer.xml"
+        - "TaskMaster/Ribbon/SpamManagerResetGate.cs"
+        - "TaskMaster/TaskMaster.csproj"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/**"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/base-ref.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.cobertura.xml"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/csharpier-check.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/file-line-counts.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-analyzer.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-nullable.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/nuget-restore.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/phase0-instructions-read.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/ribbon-tests.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/scope-and-write-set.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/toolchain-bootstrap.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/issue-updates/ac-status.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/manual-verification-clear-spam-manager.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/reduced-audit-handoff.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-callsite.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-finding1.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-class.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-tests.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-race-fix.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-before-race-fix.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/callsite-edit-scope.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coordinator-size-contingency.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-delta.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-final.2026-09-02T12-04.cobertura.xml"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-check-final.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-format.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-xml-format.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-completeness.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-sanitization.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/file-line-counts.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/footprint-scope.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/gate-class-constraints.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-analyzer.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-nullable.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/no-new-exemption.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/partial-keyword-edit.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/toolchain-loop-closure.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/vstest-coverage-run.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/xml-edit-scope.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/coordinator-fixture-after-fix.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-exception.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding1.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding3.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/gate-tests.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding1.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding3.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/ribbon-fixtures-after-finding1.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/issue.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/plan.2026-09-02T12-04.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/research/2026-09-02T09-15-ribbon-engine-toggle-defects-research.md"
+        - "docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md"
+      modules:
+        - "TaskMaster"
+        - "TaskMaster.Test"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 736
+    feature_folder: "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - ".axoCover/settings.json"
+        - ".claude/**"
+        - "QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs"
+        - "QuickFiler.Test/Controllers/EfcFormControllerTests.Part2.cs"
+        - "QuickFiler.Test/Controllers/EfcFormControllerTests.cs"
+        - "QuickFiler.Test/QuickFiler.Test.csproj"
+        - "QuickFiler/Controllers/EfcDataModel.cs"
+        - "QuickFiler/Controllers/EfcFormController.cs"
+        - "TaskMaster.Test/AppGlobals/AppOlObjectsArchiveRootComGuardTests.cs"
+        - "TaskMaster.Test/TaskMaster.Test.csproj"
+        - "TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs"
+        - "TaskMaster/AppGlobals/AppOlObjects.cs"
+        - "TaskMaster/TaskMaster.csproj"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/**"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t1-instructions-read.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t2-tree-baseline.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t3-csharpier-check.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t4-analyzer-rebuild.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t5-nullable-rebuild.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t6-coverage.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t7-affected-classes.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t8-file-sizes.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t9-preexisting-counts.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/issue-updates/p7-t18-issue-736.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/other/p6-t12-sanitisation.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/other/p7-t1-delivery-report.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/other/p7-t19-final-commit.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/other/p7-t2-commit.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t1-format.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t10-olancestor-coverage.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t11-frozen-contracts.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t2-format-check.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t3-file-sizes.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t4-analyzer-rebuild.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t4-analyzer.min.log.txt"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t5-nullable-rebuild.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t5-nullable.min.log.txt"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t6-coverage.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t7-coverage-delta.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t8-newfile-coverage.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t9-changed-line-coverage.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p7-t3-scope-containment.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p7-t4-exclusions.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p1-t10-frozen-contracts.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p1-t4-seam-build.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p1-t7-finding1-red.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p1-t9-finding1-green.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t10-finding2-green.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t4-finding2-red.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t6-seam-build.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t8-finding2-red.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p3-t2-finding5-red.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p3-t4-finding5-green.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p4-t2-seam-build.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p4-t4-finding4-red.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p4-t6-finding4-green.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p4-t7-controller-class-green.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t2-finding6-red.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t5-finding6-green.md"
+        - "docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t6-com-propagation-unchanged.md"
+      modules:
+        - "QuickFiler"
+        - "QuickFiler.Test"
+        - "TaskMaster"
+        - "TaskMaster.Test"
+      shared_surfaces: []
+      contracts:
+        - "<Compile"
+        - "COMException"
+        - "Include=...>"
+        - "InnerException"
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+  - issue_num: 737
+    feature_folder: "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737"
+    kind: "bug"
+    state: "prepared"
+    blast_radius:
+      paths:
+        - "./CLAUDE.md"
+        - "QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs"
+        - "UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbHtmlRendererTests.cs"
+        - "UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterInFlightTests.cs"
+        - "UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs"
+        - "UtilitiesCS/OutlookObjects/Folder/BreadcrumbDocumentAssets.cs"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/**"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-analyzer-rebuild.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-coverage-fullrepo.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-csharpier-check.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-nuget-restore.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-nullable-rebuild.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-sdk-bootstrap.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-tool-restore.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/baseline-vstest-scoped.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/baseline/phase0-instructions-read.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-analyzer-rebuild.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-build-phase3.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-build-phase4.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-coverage-delta.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-coverage-fullrepo.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-csharpier-check.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-csharpier-format.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-csharpier-pre-format-hashes.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-nullable-rebuild.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-post-commit-verification.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-scope-check.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-vstest-phase3-new-test.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-vstest-phase4-modified-test.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-vstest-phase4-sibling-test.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/evidence/qa-gates/qa-vstest-scoped.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/plan.2026-09-02T00-00.md"
+        - "docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/spec.md"
+      modules:
+        - "QuickFiler"
+        - "UtilitiesCS"
+        - "UtilitiesCS.Test"
+      shared_surfaces: []
+      contracts: []
+      source: "declared"
+      computed_at: "2026-09-02T21:29:52Z"
+expected_conflict_components:
+  - name: coverage-script-lane
+    members:
+      - 565
+      - 733
+  - name: ci-workflow-lane
+    members:
+      - 564
+      - 730
+---
+
+# Parallel Run: bugs-2026-09-02
+
+Thirteen thematically unrelated open bug issues, planned as one parallel run.
+Twenty issues carried the bug label; seven were excluded because their fix sites
+are wholly upstream, because they are explicitly sequenced behind a maintainer
+threshold decision the parallel surface cannot express, or because their scope
+spans both in-repo and upstream halves.
+
+## Items
+
+| issue_num | kind | complexity | branch | cohort |
+| --- | --- | --- | --- | --- |
+| 564 | bug | C1 | `bug/claude-md-cites-ciyml-for-moved-toolchain-commands-564` | 0 |
+| 565 | bug | C1 | `bug/invoke-mstestwithcoverage-threshold-before-setcontent-565` | 1 |
+| 584 | bug | C2 | `bug/uithread-dispatcher-null-race-progresstrackerasync-584` | 3 |
+| 645 | bug | C1 | `bug/quickfiler-session-metrics-twelve-hour-time-format-645` | 2 |
+| 707 | bug | C2 | `bug/narrow-fileio2-retryable-exception-set-707` | 4 |
+| 729 | bug | C3 | `bug/test-determinism-and-hygiene-debt-729` | 0 |
+| 730 | bug | C2 | `bug/ci-build-infra-debt-730` | 1 |
+| 731 | bug | C4 | `bug/quickfiler-controller-lifecycle-disposal-defects-731` | 4 |
+| 732 | bug | C2 | `bug/folderconverter-folderpredictor-dead-code-and-bugs-732` | 2 |
+| 733 | bug | C3 | `bug/coverage-cobertura-mstest-powershell-tooling-defects-733` | 0 |
+| 735 | bug | C3 | `bug/ribbon-engine-toggle-defects-735` | 1 |
+| 736 | bug | C3 | `bug/efc-archiveroot-boundary-sink-defects-736` | 3 |
+| 737 | bug | C2 | `bug/breadcrumb-bridge-keyboard-navigation-defects-737` | 1 |
+
+## Scheduling
+
+Twenty-six of the seventy-eight unordered pairs conflict, a graph density of
+0.333, and the generation-0 cohort table is five cohorts with a mean width of
+2.6 items. The dominant edge source is `module_overlap` at the assembly level:
+this corpus concentrates in `UtilitiesCS`, `UtilitiesCS.Test`, `QuickFiler`,
+`QuickFiler.Test`, `TaskMaster`, and `TaskMaster.Test`, so items that share no
+file still contend because they share an assembly and therefore a `.csproj`
+compile-entry list.
+
+Two edges are file-level and were recovered only by an explicit planner
+hand-append, because `config/blast-radius.json` lists `scripts/vscode/**` as a
+`mandate_reads` exclusion:
+
+- 565 and 733 both rewrite `scripts/vscode/Invoke-MSTestWithCoverage.ps1`.
+  Without the hand-append neither radius named the file, the pair reported no
+  conflict, and the two items would have been co-scheduled onto the same file.
+- 564 rewrites `CLAUDE.md` prose that cites the reusable workflow files, and 730
+  rewrites those files themselves. The resulting edge is genuine coupling.
+
+`max_concurrency` is 16, which exceeds the item count, so it throttles nothing
+in this run. It was recorded at 7 for preparation fan-out and raised to 16 on
+2026-09-02 by operator instruction so that no batch split can occur at any
+cohort width. Raising it cannot widen the run; only a less contended item set can.
+
+## Residual Over-Reporting
+
+Three items carry `.claude` path claims that are not write claims, and item 729
+carries `config/blast-radius.json`, `config/orchestration-routing.json`, and one
+model-source citation in `QuickFiler.Test`. All are retained rather than
+narrowed: the prohibition on narrowing a radius to suppress a conflict edge is
+unconditional, and the relation is required to fail closed.
+
+Their measured scheduling cost is zero. Every pair the `.claude` claims join
+already conflicts on a genuine `module_overlap`, and recomputing the cohort
+table with item 729's two false edges removed yields five cohorts as well.
