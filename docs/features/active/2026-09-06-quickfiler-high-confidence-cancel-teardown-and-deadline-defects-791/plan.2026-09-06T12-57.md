@@ -653,16 +653,16 @@ re-derived in this pass:
   can carry a Cobertura `line` element. The file can still report a class element, because the struct
   does, which is why the marker is keyed on the absence of a `line` element for the specific changed
   line rather than on the file-level determination.
-- [P0-T12] re-checked: it reports one `MEASURABLE:`/`UNMEASURABLE:` line per production path from a
+- Task [P0-T12] re-checked: it reports one `MEASURABLE:`/`UNMEASURABLE:` line per production path from a
   class-element count. That determination is file-level and remains correct; the new marker operates one
   level below it, per changed line, and the two do not contradict.
 - D1 re-checked and left unchanged: it states that the two `QfcDatamodel` partials are excluded from
   measurement by the type-level attribute. It makes no claim about `IQfcDatamodel.cs`, so the new
   non-executable case neither extends nor invalidates it. The two mechanisms are distinct — an excluded
   type versus a changed line that emits no IL — and are kept distinct in the plan text.
-- [P3-T8] re-checked: it consumes "the new/changed-code coverage determination from [P3-T7]" and states
+- Task [P3-T8] re-checked: it consumes "the new/changed-code coverage determination from [P3-T7]" and states
   no per-line count of its own, so the added marker does not reach it.
-- [P3-T14] and the AC4 `AC-MAPPING` entry re-checked: both cite the [P3-T7] artifact by path and assert
+- Task [P3-T14] and the AC4 `AC-MAPPING` entry re-checked: both cite the [P3-T7] artifact by path and assert
   nothing about its internal counts.
 - Delta self-check: the inserted prose states a structural fact about Cobertura output and names the
   file it reaches, in neutral language, and the replaced acceptance remains falsifiable — a changed
