@@ -27,6 +27,27 @@ merge base `9b6aff2e` vs `origin/main` `2b85134b` differed by 77 files including
 gates stayed correct. Relates to [[baseline-sha-diff-conflates-merged-base]] and
 [[preflight-mergebase-diff-gates-need-commit-cadence]].
 
+**Run the inertness test once per gate SCOPE, not once per plan.** The outcome is routinely mixed
+within a single plan, so a single measurement generalised to the whole plan is wrong in one
+direction or the other. Measured on #584, 2026-09-02, after an orchestrator merged `origin/main`
+into the branch post-authoring: of five spans anchored to the plan's stale BASE `5ebaaf10`, the
+three *per-file* spans (`-- UtilitiesCS/Threading/UiThread.cs`,
+`-- UtilitiesCS/Threading/ProgressTrackerAsync.cs`) were inert because the merge never touched those
+files; the *two-directory* span (`-- UtilitiesCS UtilitiesCS.Test`) picked up 18 merge-induced paths
+but was still inert *for its own assertion*, because that gate greps added lines for seven timing
+tokens and the merge delta contained none of them; and only the *unscoped* span
+(`git diff --name-status <BASE>..HEAD`) was unsatisfiable, because its acceptance enumerates an
+exact five-path set and the delta carried ~40 foreign source paths plus `.claude/agent-memory/**`,
+which a second clause separately forbids. So the test has three tiers, not two: paths untouched,
+paths touched but assertion-inert, and assertion-broken. Only the third blocks.
+
+**Corollary — an assertion-inert directory span still degrades.** That same `-- UtilitiesCS
+UtilitiesCS.Test` gate also required its diff to be *non-empty*, justified in the plan as "an empty
+diff means the gate had nothing to inspect". Post-merge that clause is satisfied by foreign content
+regardless of what the executor writes, so it stops proving the change exists. Report it as a
+degraded-but-passing gate and fold the re-anchor into the delta; do not silently re-anchor it
+yourself, per [[baseline-sha-diff-conflates-merged-base]].
+
 ## Better remedy: make the inertness test a task the executor runs
 
 Do not settle for a preflight-time measurement plus a plan sentence asserting the result. The

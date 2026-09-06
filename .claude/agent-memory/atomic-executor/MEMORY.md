@@ -107,3 +107,23 @@
 - [Self-test probe literal trips the NEXT sweep pass](project_selftest_probe_literal_trips_the_next_sweep_pass.md) — describe probes, never quote them
 - [TRX sanitisation must be case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) · [TRX/msbuild evidence needs a sanitisation micro-action](project_vstest_trx_evidence_needs_sanitisation_task.md)
 - [PowerShell budget hook blocks scratch .ps1 helpers](project_powershell_scratch_script_budget_hook_blocks_helpers.md) — cap counts others
+- [Appending a 2nd pass must not qualify schema fields](project_appending_a_second_pass_must_not_qualify_schema_fields.md) — `Output Summary (pass 1):` deletes the field
+- [Agent Bash resets cwd; use `env -C`](project_bash_cwd_resets_use_env_dash_c.md) — standalone `cd` does not persist; dotnet reads the wrong global.json
+- [Changed-line coverage branch gate invalidated by the fix](project_changed_line_coverage_branch_gate_invalidated_by_the_fix.md) — the fix makes the line analyzable; baseline-keyed branch is unsatisfiable
+- [CSharpier forces a blank line before a comment](project_csharpier_requires_blank_line_before_comment_breaking_numstat_bounds.md) — one comment line costs 2 insertions; breaks a "1 insertion" numstat bound
+- [dotnet global.json cwd-search vs no-cd Bash discipline](project_dotnet_global_json_cwd_search_vs_bash_discipline.md) — invoke pinned SDK exe by absolute path + `--tool-manifest`
+- [ExcludeFromCodeCoverage misses `this`-capturing lambdas](project_excludefromcodecoverage_misses_this_capturing_lambdas.md) — lifted beside the member, stay at hits=0; prefix is entity-encoded in the XML
+- [FakeTimeProvider zero due time fires at creation](project_faketimeprovider_zero_duetime_fires_at_creation.md) — "not completed before Advance" is false at TimeSpan.Zero
+- [Koverage -RepoRoot needs native separators](project_koverage_reporoot_needs_native_separators.md) — a forward-slash root strips nothing; the "processed" doc stays raw
+- [MSBuild logs leak TWO absolute roots](project_msbuild_log_has_two_absolute_path_leak_classes.md) — `/analyzerconfig:` hits the ancestor checkout; sanitise worktree root FIRST
+- [MSTest Deploy_ dir leaks tokens on FAILING runs only](project_mstest_deploy_dir_leaks_tokens_on_failing_runs.md) — breaks "exactly one TRX" + the name gate
+- [Plan-mandated .ps1 helpers hit the budget cap + a frozen porcelain gate](project_plan_mandated_ps1_helpers_collide_with_budget_cap_and_frozen_porcelain_gate.md) — fix ONE gitignored path
+- [pwsh -File starts in the SESSION root](project_pwsh_file_starts_in_session_root_needs_workingdirectory.md) — script's own `git rev-parse` hits the wrong worktree; pass `-WorkingDirectory`
+- [pwsh stdin is a REPL; non-ASCII mangled](project_pwsh_stdin_repl_mode_and_nonascii_mangling.md) — multi-line blocks output NOTHING; em-dash searches read false 0
+- [Reflective property read escapes a member-expression grep](project_reflective_property_read_escapes_member_expression_grep.md) — `GetProperty("X")` is invisible to `git grep "Type.X"`; a new throwing guard broke 8 cleared tests
+- [vstest leaves TWO .coverage files per run](project_vstest_emits_two_coverage_files_per_run.md) — an "exactly one attachment" gate is unsatisfiable by construction
+- [ExpectedExitCode keyed off the baseline, not this run](project_expectedexitcode_declared_from_baseline_not_observed_run.md) — vacuous toward
+- [Preparation mode flips anchored-diff membership](project_preparation_mode_flips_anchored_diff_gate_membership.md) — feature folder
+- [FluentAssertions BeEmpty names only the first item](project_fluentassertions_beempty_names_only_first_item.md) — a gate demanding two type names in the BeEmpty failure text is unsatisfiable
+- [vstest success run prints no Failed/Skipped line; TRX notExecuted is hard-coded 0](project_vstest_success_run_prints_no_failed_or_skipped_line.md) — derive Skipped as total minus executed; a gate that greps a Skipped: line on a green run is unsatisfiable
+- [Worktree-isolation guard refuses pwsh launched from Bash in two shapes](project_worktree_isolation_guard_refuses_pwsh_from_bash.md) — a quoted absolute path as the command name is refused too; use a PATH= prefix and bootstrap the SDK from POSIX paths

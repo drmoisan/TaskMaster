@@ -29,4 +29,15 @@ control.
 Observed 2026-08-28 on #677; the three files filling the cap belonged to worktree
 `2026-08-23T22-51`, which this session never touched.
 
+**CORRECTED 2026-09-03 (worktree `prep-752`): the cross-worktree spend is FIXED upstream.**
+`enforce-powershell-batch-budget.ps1` now runs every persisted entry through
+`Test-PowerShellBatchBudgetPathInRoot` at rehydration and DROPS any absolute path that does not
+sit under the current worktree root, so the three scratchpad entries still sitting in the tracked
+`.claude/state/powershell-batch-budget.default.json` no longer spend any other worktree's budget.
+The state file is also per-session (`powershell-batch-budget.<CLAUDE_SESSION_ID>.json`), and the
+tracked `.default.json` is only read when the session id literally resolves to `default`.
+Practical effect: do not report "the PowerShell budget is already full" from reading that JSON at
+preflight — read the hook's containment filter first. A relative path in the state file is still
+admitted by design, so a relative scratch entry can still spend a slot.
+
 Related: [[project_pwsh_command_quoting_from_bash]], [[project_long_runs_need_detached_process]]

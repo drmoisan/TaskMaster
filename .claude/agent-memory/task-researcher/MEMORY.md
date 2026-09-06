@@ -63,3 +63,4 @@
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
+- [terminal-hook-barrier-751](project_terminal_hook_barrier_751.md) — #751: notify runs AFTER the terminal TrySet on another thread; ReleaseAsync is a no-op and there is no queue to pump; `run.Terminal` is the existing barrier 6 siblings use; both test files ~490/500 lines (2026-09-03)

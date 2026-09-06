@@ -23,6 +23,21 @@ Checkpoint delegation_receipts object contains unsupported key: followups
 Put anything else (follow-up issue lists, review verdicts, finding dispositions) at the checkpoint's
 TOP level under your own key, not inside `delegation_receipts`. Top-level keys are not enum-checked.
 
+### Corollary: a PRE-SATISFIED promotion has nowhere to go inside the namespace
+
+On a resume where the issue already exists, you must NOT call `potential_to_issue` — it always mints a
+NEW issue, so calling it duplicates the one you already have (see
+[[potential-to-issue-creates-github-issue]]). That leaves `potential_entry` and `issue` legitimately
+`null`, and the closed key set means the explanation cannot sit beside them:
+`promotion_mcp_invoked`, `pre_satisfied`, `pre_satisfied_note` and `verification` are ALL rejected as
+unsupported keys.
+
+**How to apply:** leave the two receipt fields `null` and record a top-level `promotion_pre_satisfied`
+block carrying `promotion_mcp_invoked: false`, the reason, and the verification commands and their
+output (`gh issue view <N>` plus `git ls-files docs/features/potential/promoted/`). Recording it
+truthfully beats both alternatives — fabricating a receipt, or minting a duplicate issue purely to fill
+a required-looking field.
+
 ## The shared checkpoint can change hands mid-operation
 
 `artifacts/orchestration/orchestrator-state.json` at the session root is shared by every live child.

@@ -10,3 +10,5 @@
 - [Parallel artifact authoring gotchas](reference_parallel_artifact_authoring_gotchas.md) — quote ISO timestamps, no prose in kickoff table sections, validator path is workspace-relative
 - [Worktree lock pid is the session, not the subagent](reference_worktree_lock_pid_is_the_session_not_the_subagent.md) — a live pid on a locked worktree proves nothing; walk your own ancestry first
 - [Default to open mode; expect mid-flight knob changes](feedback_default_to_open_mode_for_parallel_runs.md) — operator wants /parallel-add to stay available; a max_concurrency raise can be honoured immediately
+- [Never backtick exclusion paths in delegation prompts](feedback_never_backtick_exclusion_paths_in_delegation_prompts.md) — children echo them into plans, the extractor reads them as write claims, and V1/V2 cannot see it
+- [Unchanged ref does not prove a dead child](feedback_unchanged_ref_does_not_prove_a_dead_child.md) — after an interruption, check liveness separately before relaunching; always require fast-forward-only pushes

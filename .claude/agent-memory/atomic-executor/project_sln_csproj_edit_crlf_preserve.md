@@ -27,3 +27,14 @@ turns a 9-line change into whole-file churn. Cheapest reliable idiom, run immedi
 sed: `sed -i 's/$/\r/' <plan>.md`, then confirm with `file <plan>.md` (expect "with CRLF line terminators")
 and `git diff --stat` (expect insertions == deletions == number of boxes ticked). Doing this per check-off
 rather than once at the end keeps the diff readable if the run is interrupted.
+
+**Refinement observed 2026-09-03 (issue #584 worktree): for `.md` the churn claim above did not
+reproduce.** `sed -i` on a CRLF plan `.md` did flatten the whole file to LF (`file` flipped from
+"with CRLF line terminators" to none), but `git diff --numstat` still reported only the real content
+delta, and `git add` printed `warning: ... LF will be replaced by CRLF the next time Git touches it`.
+Cause: this repo's `.gitattributes` sets `* text=auto` with `core.autocrlf=true`, so the index stores
+LF and a LF working copy is already normalized — there is nothing for git to see. Before spending a
+re-CRLF pass, check `git diff --numstat <file>` after the first check-off: if it shows only the
+intended delta, the flatten is cosmetic and the `sed -i 's/$/\r/'` repair is unnecessary. Keep using
+the Edit tool for `.cs`/`.sln`, where an editor or MSBuild may care about the working-copy bytes even
+when git does not.

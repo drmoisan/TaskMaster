@@ -50,5 +50,30 @@ actually in the tool surface. It was harmless only because the prompt was a plac
 for an acknowledgement and nothing else. Before composing any continuation, confirm `SendMessage` is
 in the function list; if it is not, do not start composing a "resume" call at all.
 
+**A "correction" prompt must be self-contained, because the correction IS a new agent (#735,
+2026-09-03).** Mid-review I found the diff anchor I had given `feature-review` had gone stale and
+sent a correction that opened with "this supersedes the DIFF ANCHOR section of my original brief" and
+closed with "everything else in my original brief stands unchanged". Both phrases are incoherent to
+the recipient: it was a *fresh* `feature-review` with no knowledge of the original brief, holding only
+the correction text. It nonetheless produced a complete, high-quality review — but only because the
+correction happened to restate the anchor, the artifact paths and the item worktree. Had the
+correction been a terse "use anchor X instead", the new agent would have had no task at all.
+
+Two follow-on facts worth having:
+
+- **Read-only reviewers do not necessarily collide.** Both `feature-review` agents were briefed to
+  write the same three artifact paths, which looked like a guaranteed clobber. They did not collide:
+  each stamped its own timestamp (`09-05` and `06-19`), so two complete sets landed side by side. Do
+  not assume a race; check the filenames before panicking, and note the timestamps are each agent's
+  own clock and are not a sequence.
+- **Two independent passes are worth keeping.** Rather than deleting one set, commit both and say in
+  the message why two exist. The second pass, briefed with the corrected anchor, independently
+  recomputed the callback resolution and coverage and surfaced a latent race the first pass missed.
+  Convergent PASS from two differently-briefed reviewers is stronger evidence than either alone.
+
+Before sending any correction: assume zero shared context, restate the worktree, the artifact paths,
+the requirements sources and the task, and mark plainly which earlier instruction is being replaced.
+
 See [[one-executor-per-worktree]] for why the interleaving is damaging, and
 [[stale-checkpoint-is-not-a-dead-agent]] for the related trap of relaunching against a live worktree.
+Anchor staleness itself is [[three-dot-diff-degenerates-on-ancestor-base]].
