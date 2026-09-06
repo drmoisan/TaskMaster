@@ -195,3 +195,54 @@ on disk.
 Both remaining items are owned by the orchestrator and are performed outside this plan. Neither is
 a delivery gap: each was resolved through its task's explicitly gated Branch B, and each carries its
 verbatim deferral line above.
+
+---
+
+## Orchestrator resolution of AC8 (appended 2026-09-06T07-45)
+
+The deferral above was accurate when the executor recorded it. It is now discharged. The record
+above is retained unedited, because it is the true state at the moment P8-T8 ran; this section
+supersedes it rather than rewriting it.
+
+AC8 has two clauses and both are now satisfied.
+
+**Clause 1, the C09 behavioural follow-up.** Promoted through the MCP promotion lifecycle by the
+orchestrator:
+
+- Potential entry: `docs/features/potential/promoted/2026-09-05-uithread-init-accepts-non-sta-callers.md`
+- Issue: https://github.com/drmoisan/TaskMaster/issues/787
+- Promotion type `bug`, work mode `full-bug`, matching the research recommendation. The defect is a
+  missing precondition check on an existing contract rather than a new capability, and the sibling
+  entry `2026-08-27-wpfuidispatchertests-ungated-static-swap.md` is the same shape.
+
+**Clause 2, the upstream follow-ups for drm-copilot.** Recorded by P6-T2 at
+`evidence/other/upstream-followups-drm-copilot.2026-09-05T23-02.md`, covering both the S4-1 stale
+agent-memory notes and the S3-1 request to define `Timestamp:` semantics. Neither is fixed in this
+repository; `git diff --stat pre-782-base..HEAD -- .claude` returns zero lines, verified by P6-T3.
+
+A second promotion was made in the same pass, beyond AC8's requirement:
+
+- Potential entry: `docs/features/potential/promoted/2026-09-05-uithread-init-latch-not-rearmed-after-failed-initialize.md`
+- Issue: https://github.com/drmoisan/TaskMaster/issues/788
+
+That entry carries finding C03 forward. C03 was withdrawn from this delivery under SD18 after the
+executor measured a reproducible regression and bisected it to the single re-arm line. The entry
+records the measurement, the mechanism, and three candidate approaches, so a future attempt does not
+repeat the naive form. Recording the withdrawal only as prose inside a feature folder would have
+lost it when the folder is archived.
+
+`spec.md` AC8 is changed from `- [ ]` to `- [x]` by the orchestrator, which is the party that
+performed the work the criterion names.
+
+### Acceptance Criteria Status, revised
+
+```
+### Acceptance Criteria Status
+- Source: docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/spec.md and docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/user-story.md
+- Total AC items: 17
+- Checked off (delivered): 16
+- Remaining (unchecked): 1
+- Items remaining: AC-U1 (the pull request body)
+```
+
+AC-U1 remains open by design until the pull request exists, and is checked off after it is opened.

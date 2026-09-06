@@ -627,7 +627,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       **Evidence:** a fail-before / pass-after artifact under this feature's
       evidence/regression-testing/ sub-path recording each test's result with the guard temporarily
       removed and restored.
-- [ ] AC8: The C09 behavioral follow-up (making `UiThread.Init()` reject non-STA callers) is promoted
+- [x] AC8: The C09 behavioral follow-up (making `UiThread.Init()` reject non-STA callers) is promoted
       as its own potential entry through the promotion lifecycle and carries a GitHub issue number;
       and the S4-1 stale agent-memory notes together with the S3-1 request to define `Timestamp:`
       semantics are both recorded as upstream follow-ups for the drm-copilot repository. Neither is
