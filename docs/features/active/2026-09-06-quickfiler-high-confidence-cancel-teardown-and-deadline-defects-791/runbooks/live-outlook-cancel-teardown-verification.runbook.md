@@ -13,7 +13,7 @@ a permitted `exception` and performed by a human.
 - A Windows machine with Microsoft Outlook installed and the TaskMaster VSTO add-in already registered for
   the current user (an HKCU Outlook add-in manifest entry pointing at a `TaskMaster.vsto` deployment).
 - A local checkout of the issue #791 feature branch. The confirmed working deployment path on this
-  machine's registered manifest is `C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\bin\Debug\TaskMaster.vsto`.
+  machine's registered manifest is `<primary-clone-root>\TaskMaster\bin\Debug\TaskMaster.vsto` (read the exact path from `HKCU\SOFTWARE\Microsoft\Office\Outlook\Addins\TaskMaster\Manifest`).
   Either build the feature branch in that exact checkout, or update the HKCU manifest to point at the
   checkout actually used, before testing. Rebuilding a checkout that is already registered updates the
   assembly Outlook loads without any re-registration step (see Source and Citation).
