@@ -267,6 +267,5 @@ namespace UtilitiesCS.Test
         }
 
         #endregion
-
     }
 }
