@@ -70,11 +70,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         );
 
         [TestMethod]
-        public async Task GetAncestorChainAsync_HappyPath_ReturnsRootToLeafSegments()
+        public async Task GetAncestorChainAsync_WithRootAccessor_ReturnsSegmentsBelowTheArchiveRoot_HappyPath()
         {
-            // Arrange
+            // Arrange: configured as production configures it, with a root accessor (#799 AC1).
             var provider = new OutlookFolderHierarchyProvider(
-                ServiceReturning(BuildSnapshot()).Object
+                ServiceReturning(BuildSnapshot()).Object,
+                () => "\\Root"
             );
 
             // Act
@@ -84,7 +85,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             chain
                 .Select(s => s.FolderPath)
                 .Should()
-                .Equal("\\Root", "\\Root\\Clients", "\\Root\\Clients\\Acme");
+                .Equal("\\Root\\Clients", "\\Root\\Clients\\Acme");
             chain.Last().Key.Should().Be(AcmeKey);
             chain.Last().HasChildren.Should().BeFalse();
             chain.First().HasChildren.Should().BeTrue();

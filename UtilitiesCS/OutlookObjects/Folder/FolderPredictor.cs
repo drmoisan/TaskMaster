@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Folder;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
@@ -790,7 +791,11 @@ namespace UtilitiesCS
             if (_globals.AF.RecentsList.Count > 0)
             {
                 folderList.Add("======= RECENT SELECTIONS ========");
-                folderList.AddRange(_globals.AF.RecentsList);
+                // AC5: recents share the suggestion projection; the ! is required (else CS8620).
+                var r = _globals.Ol.ArchiveRootPath;
+                folderList.AddRange(
+                    _globals.AF.RecentsList.Select(x => ArchiveStemProjection.ToDisplayStem(x, r)!)
+                );
             }
         }
 
@@ -847,17 +852,9 @@ namespace UtilitiesCS
 
         private string ProjectSuggestionPath(string folderPath)
         {
-            if (_globals is null)
-            {
-                return folderPath;
-            }
-
-            var archivePrefix = _globals.Ol.ArchiveRootPath + "\\";
-            return
-                folderPath.StartsWith(archivePrefix, StringComparison.OrdinalIgnoreCase)
-                && folderPath.Length > archivePrefix.Length
-                ? folderPath.Substring(archivePrefix.Length)
-                : folderPath;
+            // Null-forgiving: ToDisplayStem returns null only for a null input, which this
+            // non-nullable parameter excludes; unsuppressed the return is CS8603 (#799 AC4).
+            return ArchiveStemProjection.ToDisplayStem(folderPath, _globals?.Ol.ArchiveRootPath)!;
         }
 
         // Row-model mirror of AddRecents: the RECENT SELECTIONS separator (Separator, no score)
@@ -874,9 +871,13 @@ namespace UtilitiesCS
                         null
                     )
                 );
+                // AC5 row-model mirror: projecting one surface only would break the documented
+                // text-parity contract. Null-forgiving as in AddRecents (else CS8604 at FolderRow).
+                var root = _globals.Ol.ArchiveRootPath;
                 foreach (var recent in _globals.AF.RecentsList)
                 {
-                    rows.Add(new FolderRow(recent, FolderRowKind.Recent, null));
+                    var text = ArchiveStemProjection.ToDisplayStem(recent, root)!;
+                    rows.Add(new FolderRow(text, FolderRowKind.Recent, null));
                 }
             }
         }
@@ -954,14 +955,12 @@ namespace UtilitiesCS
         {
             if (includeChildren)
             {
-                if (olAncestor.EndsWith('\\'.ToString()))
-                {
-                    return path.Substring(olAncestor.Length);
-                }
-                else
-                {
-                    return path.Substring(olAncestor.Length + 1);
-                }
+                // #799 verified prefix removal: a non-prefix path now yields the input instead of a
+                // garbage substring, and a path no longer than the ancestor no longer throws. The
+                // contract is root-agnostic despite its parameter name.
+                return ArchiveStemContract.TryMakeArchiveRelative(path, olAncestor, out var stem)
+                    ? stem
+                    : path;
             }
             else
             {
