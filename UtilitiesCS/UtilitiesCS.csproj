@@ -991,6 +991,7 @@
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\DfDeedle.FrameUtilities.cs" />
+    <Compile Include="Extensions\DfDeedle.QfcColumns.cs" />
     <Compile Include="Extensions\DfMLNet.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\DrawingExtensions.cs" />

@@ -37,6 +37,7 @@ namespace TaskMaster
             _controller = Controller;
             _loadFolderFilterAsync = () => _controller.Try.TryLoadFolderFilterAsync();
             _reportFolderFilterInitializationFailure = ReportFolderFilterInitializationFailure;
+            _commandBoundary = CreateCommandBoundary();
         }
 
         internal RibbonViewer(
@@ -51,12 +52,14 @@ namespace TaskMaster
             _reportFolderFilterInitializationFailure =
                 reportFolderFilterInitializationFailure
                 ?? throw new ArgumentNullException(nameof(reportFolderFilterInitializationFailure));
+            _commandBoundary = CreateCommandBoundary();
         }
 
         private Office.IRibbonUI _ribbon;
         private RibbonController _controller;
         private readonly Func<Task> _loadFolderFilterAsync;
         private readonly Action<System.Exception> _reportFolderFilterInitializationFailure;
+        private readonly RibbonCommandBoundary _commandBoundary;
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
@@ -147,16 +150,25 @@ namespace TaskMaster
 
         public async void QuickFiler_Click(Office.IRibbonControl control)
         {
-            await _controller.LoadQuickFilerAsync();
+            await _commandBoundary.RunAsync(
+                nameof(QuickFiler_Click),
+                () => _controller.LoadQuickFilerAsync()
+            );
         }
 
         public async void QuickFilerHighConfidence_Click(Office.IRibbonControl control)
         {
-            await _controller.LoadQuickFilerHighConfidenceAsync();
+            await _commandBoundary.RunAsync(
+                nameof(QuickFilerHighConfidence_Click),
+                () => _controller.LoadQuickFilerHighConfidenceAsync()
+            );
         }
 
         public async void SortEmail_Click(Office.IRibbonControl control) =>
-            await _controller.SortEmailAsync();
+            await _commandBoundary.RunAsync(
+                nameof(SortEmail_Click),
+                () => _controller.SortEmailAsync()
+            );
 
         public async void UndoSort_Click(Office.IRibbonControl control) =>
             await _controller.UndoSortAsync();
@@ -312,6 +324,38 @@ namespace TaskMaster
         {
             logger.Error("Unable to initialize the folder-filter viewer.", exception);
             MessageBox.Show($"Unable to initialize the folder-filter viewer: {exception.Message}");
+        }
+
+        /// <summary>
+        /// Builds the boundary the QuickFiler-family ribbon handlers run their work through.
+        /// </summary>
+        /// <remarks>
+        /// The two sinks are separate delegates because the boundary composes the text it
+        /// presents: the log sink receives the exception object, so nothing is lost from the log,
+        /// while the presentation sink receives the already-rendered message, which carries the
+        /// inner exception detail an <see cref="AggregateException"/> would otherwise hide behind
+        /// "One or more errors occurred." The repository has no non-modal notice surface and the
+        /// TaskMaster assembly has no message-box seam, so the established mechanism is a logger
+        /// call plus a message box, matching
+        /// <see cref="ReportFolderFilterInitializationFailure"/> directly above.
+        /// </remarks>
+        private static RibbonCommandBoundary CreateCommandBoundary() =>
+            new RibbonCommandBoundary(
+                ReportRibbonCommandFailure,
+                message => MessageBox.Show(message)
+            );
+
+        /// <summary>
+        /// Logs a failed ribbon command with its full exception detail.
+        /// </summary>
+        /// <param name="commandName">The ribbon command that failed.</param>
+        /// <param name="exception">The failure, logged whole rather than as a message string.</param>
+        private static void ReportRibbonCommandFailure(
+            string commandName,
+            System.Exception exception
+        )
+        {
+            logger.Error($"Ribbon command '{commandName}' failed.", exception);
         }
 
         public void LoadFolderRemap_Click(Office.IRibbonControl control) =>

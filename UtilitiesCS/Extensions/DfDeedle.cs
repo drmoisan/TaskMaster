@@ -93,6 +93,11 @@ namespace UtilitiesCS
 
             (object[,] data, Dictionary<string, int> columnInfo) = TableEtlInvoker(table);
 
+            // Closes the second set of unchecked dictionary reads, the ones GetEmailDataFromTable
+            // performs on this synchronous path. The asynchronous path never reaches them, so its
+            // guard cannot cover this route.
+            ValidateRequiredEmailColumns(columnInfo, currentFolder?.Name ?? "(unknown folder)");
+
             return GetEmailDataFromTable(storeID, data, columnInfo);
         }
 
@@ -153,9 +158,16 @@ namespace UtilitiesCS
             var currentFolder = activeExplorer.CurrentFolder;
             var storeID = activeExplorer.CurrentFolder.StoreID;
 
+            // The folder name is read once, here on the STA, and the resulting string is what
+            // travels onward. Reading Name from a thread-pool continuation would be a
+            // cross-apartment property read on a live COM object. The null-coalesce is required
+            // rather than defensive: currentFolder?.Name carries maybe-null flow state under this
+            // file's #nullable enable while the validator parameter is a non-nullable string.
+            var folderName = currentFolder?.Name ?? "(unknown folder)";
+
             LogDfTiming(
                 "GetEmailDataInViewAsync explorer/table acquisition complete | explorer/table acquisition",
-                $"folder={currentFolder?.Name}; storeId={storeID}; elapsedMs={getEmailDataStopwatch.ElapsedMilliseconds}"
+                $"folder={folderName}; storeId={storeID}; elapsedMs={getEmailDataStopwatch.ElapsedMilliseconds}"
             );
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(AddQfcColumnsAsync)} ...");
@@ -175,6 +187,12 @@ namespace UtilitiesCS
                 "GetEmailDataInViewAsync table snapshot ready | table snapshot",
                 $"rowCount={tableSnapshot.Item1.GetLength(0)}; columnCount={tableSnapshot.Item1.GetLength(1)}; etlElapsedMs={etlStopwatch.ElapsedMilliseconds}"
             );
+
+            // Guards the row builder's unchecked column indexing. A swallowed column-add timeout
+            // leaves Outlook's five default columns in place, and without this check the first
+            // missing key surfaces two layers away as a KeyNotFoundException naming neither the
+            // folder nor the step that failed.
+            ValidateRequiredEmailColumns(tableSnapshot.Item2, folderName);
             //(PrettyPrinters.ArraytoDatatable(data, columnInfo.Keys.Cast<string>().ToArray())).DisplayDialog();
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(Email2dArrayToDf)} ...");
@@ -291,120 +309,6 @@ namespace UtilitiesCS
             }
 
             return date;
-        }
-
-        private static void AddQfcColumns(Table table, MAPIFolder folder)
-        {
-            if (!EnsureTriageColumnExists(folder))
-            {
-                MessageBoxInvoker(
-                    "Cannot proceed without the required 'Triage' column. Execution will stop.",
-                    "Missing Required Column",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Error
-                );
-
-                throw new InvalidOperationException("Required column 'Triage' does not exist.");
-            }
-
-            table.Columns.Add("SentOn");
-            table.Columns.Add(MAPIFields.Schemas.ConversationId);
-            table.Columns.Add(MAPIFields.Schemas.Triage);
-            table.Columns.Remove("Subject");
-            table.Columns.Remove("CreationTime");
-            table.Columns.Remove("LastModificationTime");
-        }
-
-        private static async Task AddQfcColumnsAsync(
-            Table table,
-            MAPIFolder folder,
-            CancellationToken token,
-            int counter
-        )
-        {
-            try
-            {
-                await Task.Run(() => AddQfcColumns(table, folder), token).TimeoutAfter(3000);
-            }
-            catch (TaskCanceledException)
-            {
-                if (!token.IsCancellationRequested && counter < 2)
-                {
-                    await AddQfcColumnsAsync(table, folder, token, counter + 1);
-                }
-            }
-            catch (TimeoutException)
-            {
-                if (!token.IsCancellationRequested && counter < 2)
-                {
-                    await AddQfcColumnsAsync(table, folder, token, counter + 1);
-                }
-            }
-        }
-
-        private static bool EnsureTriageColumnExists(MAPIFolder folder)
-        {
-            if (folder is null)
-            {
-                return false;
-            }
-
-            if (HasUserDefinedProperty(folder, "Triage"))
-            {
-                return true;
-            }
-
-            var createResult = MessageBoxInvoker(
-                "The required 'Triage' column does not exist in this folder.\nWould you like to create it now?",
-                "Create Required Column",
-                System.Windows.Forms.MessageBoxButtons.YesNo,
-                System.Windows.Forms.MessageBoxIcon.Warning
-            );
-
-            if (createResult != System.Windows.Forms.DialogResult.Yes)
-            {
-                return false;
-            }
-
-            try
-            {
-                folder.UserDefinedProperties.Add(
-                    "Triage",
-                    OlUserPropertyType.olText,
-                    true,
-                    Type.Missing
-                );
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                MessageBoxInvoker(
-                    $"Failed to create 'Triage' column.\n{ex.Message}",
-                    "Column Creation Failed",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Error
-                );
-
-                return false;
-            }
-        }
-
-        private static bool HasUserDefinedProperty(MAPIFolder folder, string propertyName)
-        {
-            if (folder?.UserDefinedProperties is null || string.IsNullOrWhiteSpace(propertyName))
-            {
-                return false;
-            }
-
-            foreach (UserDefinedProperty property in folder.UserDefinedProperties)
-            {
-                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

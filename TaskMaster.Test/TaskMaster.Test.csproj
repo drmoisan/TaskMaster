@@ -321,6 +321,7 @@
     <Compile Include="Ribbon\EngineCommandCatalogTests.cs" />
     <Compile Include="Ribbon\EngineCommandRefreshPlannerTests.cs" />
     <Compile Include="Ribbon\EngineGatedCommandRunnerTests.cs" />
+    <Compile Include="Ribbon\RibbonCommandBoundaryTests.cs" />
     <Compile Include="Ribbon\EngineReadinessGateTests.cs" />
     <Compile Include="Ribbon\EngineToggleCatalogTests.cs" />
     <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.cs" />

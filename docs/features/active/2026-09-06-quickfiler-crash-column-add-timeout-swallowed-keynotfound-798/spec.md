@@ -387,16 +387,16 @@ AC6 is manual. Launch QuickFiler on the "T&E" folder and confirm either a succes
 
 AC1 through AC6 are reproduced verbatim from issue.md as settled with the maintainer on 2026-09-06. They are authoritative and must not be renumbered, reworded, merged, split, or weakened. AC7 through AC14 are supplementary criteria added by this spec; they constrain how AC1 through AC6 are delivered and do not replace any of them.
 
-- [ ] AC1: `AddQfcColumnsAsync` fails loudly after its final timeout (throws a descriptive exception naming the folder and the step) instead of returning normally; the underlying task is cancelled or the retry waits for it, so concurrent COM calls against the same table do not overlap.
-- [ ] AC2: The column-add step logs timing for `HasUserDefinedProperty`, each `Columns.Add`, and each `Columns.Remove`, using the existing `[Table timing]` / `[Df timing]` pattern.
-- [ ] AC3: `Email2dToRecords` (or its caller) validates the presence of every required column before indexing and throws an exception whose message names the missing column(s) and the folder.
-- [ ] AC4: `QfcDatamodel.GetEmailsInViewDfAsync` rethrows with `throw;` so the original stack is preserved.
-- [ ] AC5: `RibbonViewer.QuickFiler_Click`, `QuickFilerHighConfidence_Click`, and `SortEmail_Click` catch exceptions at the boundary, log them with full detail, and show an error dialog; Outlook does not surface an unhandled exception.
+- [x] AC1: `AddQfcColumnsAsync` fails loudly after its final timeout (throws a descriptive exception naming the folder and the step) instead of returning normally; the underlying task is cancelled or the retry waits for it, so concurrent COM calls against the same table do not overlap.
+- [x] AC2: The column-add step logs timing for `HasUserDefinedProperty`, each `Columns.Add`, and each `Columns.Remove`, using the existing `[Table timing]` / `[Df timing]` pattern.
+- [x] AC3: `Email2dToRecords` (or its caller) validates the presence of every required column before indexing and throws an exception whose message names the missing column(s) and the folder.
+- [x] AC4: `QfcDatamodel.GetEmailsInViewDfAsync` rethrows with `throw;` so the original stack is preserved.
+- [x] AC5: `RibbonViewer.QuickFiler_Click`, `QuickFilerHighConfidence_Click`, and `SortEmail_Click` catch exceptions at the boundary, log them with full detail, and show an error dialog; Outlook does not surface an unhandled exception.
 - [ ] AC6: Launching QuickFiler on the "T&E" folder either succeeds or shows the AC1/AC3 error message (manual verification).
 
 Supplementary criteria (added by this spec):
 
-- [ ] AC7: The delivered implementation matches the five-step trace under Proposed Fix. Specifically, the column-add work is started exactly once per call and the timeout is re-applied to that same task instance; a test asserts the injected adder is invoked exactly once across all three deadlines.
+- [x] AC7: The delivered implementation matches the five-step trace under Proposed Fix. Specifically, the column-add work is started exactly once per call and the timeout is re-applied to that same task instance; a test asserts the injected adder is invoked exactly once across all three deadlines.
 - [ ] AC8: The timeout is implemented by re-applying the existing `TimeoutAfter(Task, int, TimeProvider?)` overload. The four existing `TimeoutAfter` overloads are unchanged, no new overload is added, and no `Task.Delay` or `Thread.Sleep` call is introduced; the analyzer step of the toolchain passes.
 - [ ] AC9: The AC3 validator is called from both the asynchronous and the synchronous data-frame entry points, so the duplicate unchecked column indexing on the synchronous path is closed. `Email2dToRecords`, `Email2dArrayToDf` and `GetEmailDataFromTable` keep their current parameter lists, and the fixed-arity reflection tests that pin them continue to pass unmodified.
 - [ ] AC10: AC4 is applied at all three `throw e;` sites in the `QfcDatamodel` partial family. The occurrence in `QfcQueue` is a different type and is left unchanged; the commented-out occurrence in the helper class is left unchanged.
