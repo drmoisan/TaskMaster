@@ -63,6 +63,7 @@
     <Compile Include="Controllers\EfcSelectionGuardTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.Activation.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterScoreJoinTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue637Tests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorSupersessionTests.cs" />

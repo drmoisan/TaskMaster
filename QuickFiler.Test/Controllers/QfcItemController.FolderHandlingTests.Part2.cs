@@ -208,6 +208,12 @@ namespace QuickFiler.Controllers.Tests
         /// path that does not start with the root, a path equal to the root plus a separator with
         /// nothing after it, and a case-differing root are each pinned, so the helper cannot be
         /// simplified into something that mangles a non-archive path.
+        ///
+        /// Retargeted by issue #799 AC4: an EMPTY archive root is now the identity projection.
+        /// The former behaviour formed an archive prefix of a single separator and stripped it,
+        /// which produced a value that was neither a valid full path nor a valid archive-relative
+        /// stem. The other five boundary cases are unchanged, because the shared projection
+        /// reproduces each of them exactly.
         /// </summary>
         [TestMethod]
         public void ProjectPredeterminedFolder_BoundaryCases_MatchFolderPredictorProjection()
@@ -220,9 +226,9 @@ namespace QuickFiler.Controllers.Tests
                 .ProjectPredeterminedFolder(@"\\Archive\Projects\Active", string.Empty)
                 .Should()
                 .Be(
-                    @"\Archive\Projects\Active",
-                    "a non-null globals with an EMPTY archive root gives FolderPredictor an "
-                        + "archivePrefix of one separator, which it strips"
+                    @"\\Archive\Projects\Active",
+                    "AC4 of issue #799 removed the empty-root strip, so an empty archive root "
+                        + "is now the identity projection"
                 );
             QfcItemController
                 .ProjectPredeterminedFolder(null, @"\\Archive")
@@ -243,12 +249,12 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #678, remediation R2. The boundary case the projection previously got wrong: a
-        /// non-null globals whose <c>ArchiveRootPath</c> is EMPTY, with a leading-separator
-        /// suggestion path. <c>FolderPredictor.ProjectSuggestionPath</c> guards only on
-        /// <c>_globals is null</c> and then forms <c>ArchiveRootPath + "\\"</c> unconditionally, so
-        /// in this state its prefix is a single separator and its <c>FolderArray</c> entries ARE
-        /// stripped. The carried <c>PredeterminedFolder</c> must be projected the same way, or
+        /// Issue #678, remediation R2, re-derived against the issue #799 AC4 behaviour: a non-null
+        /// globals whose <c>ArchiveRootPath</c> is EMPTY, with a leading-separator suggestion path.
+        /// The shared projection now leaves BOTH the <c>FolderArray</c> entries and the carried
+        /// <c>PredeterminedFolder</c> unchanged in that state, so the two must agree on the
+        /// unstripped value. The invariant under test is unchanged and is the one that matters:
+        /// the carried value must be projected exactly as the array entries are, or
         /// <c>FolderContains</c> misses and the selection falls back to the index-1 entry — the
         /// exact AC12 defect the change set out to close.
         ///
@@ -261,7 +267,10 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             const string RawSuggestion = @"\Projects\Active";
-            const string ProjectedSuggestion = @"Projects\Active";
+
+            // #799 AC4: an empty archive root is the identity projection, so the projected value
+            // and the raw value are the same string.
+            const string ProjectedSuggestion = RawSuggestion;
 
             var mock = new Mock<IItemViewer>();
             mock.SetupGet(v => v.InvokeRequired).Returns(false);
@@ -288,8 +297,8 @@ namespace QuickFiler.Controllers.Tests
             mock.Verify(
                 v => v.SetFolderSelectedItem(ProjectedSuggestion),
                 Times.Once(),
-                "an empty archive root still strips the leading separator in FolderPredictor, so "
-                    + "the carried value must be stripped the same way to match"
+                "an empty archive root is the identity projection in FolderPredictor, so the "
+                    + "carried value must be carried through the same way to match"
             );
             mock.Verify(
                 v => v.SetFolderSelectedIndex(It.IsAny<int>()),
