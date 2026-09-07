@@ -120,6 +120,39 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        /// <summary>
+        /// Issue #796 (AC3). Scenario: a close is requested against a pending open while a
+        /// selection commit is already in flight for that popup lifetime. Expected outcome: the
+        /// selection is not cancelled, while the anchor focus step still runs.
+        /// <para>
+        /// This is the pending-commit-versus-native-close guard. It is the complement of the two
+        /// retained `CancelCount.Should().Be(1)` assertions above: those two run with no commit in
+        /// flight and still cancel, so together the three show the suppression is conditional on a
+        /// pending commit rather than global.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task CloseWhilePendingOpenAndCommitPending_DoesNotCancelSelection()
+        {
+            // Arrange
+            using (var harness = new PendingHostHarness())
+            {
+                Task<bool> opening = harness.OpenAsync();
+                harness.Host.IsCommitPending = true;
+
+                // Act
+                bool closed = harness.Host.Close(BreadcrumbDropDownCloseReason.Uncommitted);
+                (await opening.ConfigureAwait(false)).Should().BeFalse();
+
+                // Assert
+                closed.Should().BeTrue("pending open work is a closeable selector state");
+                harness
+                    .CancelCount.Should()
+                    .Be(0, "a close racing an in-flight commit must not cancel the selection");
+                harness.FocusAnchorCount.Should().Be(1, "only the cancel step is suppressed");
+            }
+        }
+
         [TestMethod]
         public void ToggleAndEscapeWhileOpenIsPending_EachClosesHostExactlyOnce()
         {
