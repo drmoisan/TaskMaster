@@ -474,6 +474,7 @@
     <Compile Include="ReusableTypeClasses\SmartSerializableLoader_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableNonTyped_Tests.cs" />
     <Compile Include="ReusableTypeClasses\SmartSerializableStatic_Tests.cs" />
+    <Compile Include="ReusableTypeClasses\SmartSerializableSerializeGuardTests.cs" />
     <Compile Include="ReusableTypeClasses\ConfigController_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ConfigGroupBox_Tests.cs" />
     <Compile Include="ReusableTypeClasses\ConfigViewer_Tests.cs" />
@@ -533,6 +534,7 @@
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.ButtonAndPopulate.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.ExcludeStore.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.Launch.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.Display.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\ConfigController_Tests.cs" />

@@ -16,7 +16,7 @@ namespace TaskMaster
     /// <c>AppOlObjects.cs</c> to bring that file under the 500-line cap. Behavior is unchanged
     /// (move-only).
     /// </summary>
-    public partial class AppOlObjects
+    public partial class AppOlObjects : IJunkFolderSelectionSink
     {
         private Folder _junkPotential;
         public Folder JunkPotential => Initializer.GetOrLoad(ref _junkPotential, LoadJunkPotential);
@@ -43,6 +43,18 @@ namespace TaskMaster
             Properties.Settings.Default.Save();
             RefreshJunkFolderSelections();
         }
+
+        /// <summary>
+        /// Explicit implementation of <see cref="IJunkFolderSelectionSink"/> (issue #797, AC5),
+        /// forwarding to the existing internal method with the arguments in the certain-then-
+        /// potential order the interface fixes. The implementation is explicit so the public
+        /// surface of this type does not widen; the internal method keeps its accessibility and its
+        /// body.
+        /// </summary>
+        void IJunkFolderSelectionSink.ApplyJunkFolderSelections(
+            string junkCertainRelativePath,
+            string junkPotentialRelativePath
+        ) => ApplyJunkFolderSelections(junkCertainRelativePath, junkPotentialRelativePath);
 
         internal void RefreshJunkFolderSelections()
         {

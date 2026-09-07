@@ -209,6 +209,88 @@ namespace TaskMaster.Test.AppGlobals
             result.Stores.Single().DisplayName.Should().Be("Mailbox");
         }
 
+        /// <summary>
+        /// A fixed, non-existent AppData-shaped settings path. It is never opened, created or
+        /// probed: both AC1 tests assert on the configuration value the loader carries, so no
+        /// filesystem access occurs and no host path appears in the test.
+        /// </summary>
+        private const string FakeAppDataSettingsPath =
+            @"X:\FakeAppData\TaskMaster\StoresWrapper.json";
+
+        [TestMethod]
+        public async Task LoadStoresAsync_WhenConfigDeserializesToNull_FreshWrapperAdoptsLoaderDiskConfiguration()
+        {
+            // Arrange (issue #797, AC1): the "StoresWrapper" key is present and carries a loader
+            // whose disk configuration holds the resource-defined path, but the deserialize returns
+            // null because the file is absent. The fresh-build branch must adopt that configuration
+            // instead of discarding it, so the first Save has a path to write to.
+            var application = new Mock<OutlookApplication>();
+            var configuration = new ConcurrentDictionary<string, SmartSerializableLoader>();
+            var globals = new StubApplicationGlobals();
+            var loader = new SmartSerializableLoader();
+            loader.Config.Disk.FilePath = FakeAppDataSettingsPath;
+            configuration.TryAdd("StoresWrapper", loader);
+            globals.IntelResInstance = new StubIntelligenceConfig(globals, configuration);
+            var freshWrapper = new StoresWrapper();
+            var smartSerializable = new Mock<ISmartSerializableNonTyped>();
+            smartSerializable
+                .Setup(x =>
+                    x.Deserialize<StoresWrapper, SmartSerializableLoader>(
+                        It.IsAny<SmartSerializable<SmartSerializableLoader>>()
+                    )
+                )
+                .Returns((StoresWrapper)null);
+
+            var sut = new TestableAppOlObjects(
+                application.Object,
+                globals,
+                _ => Task.CompletedTask,
+                freshWrapper
+            )
+            {
+                SmartSerializable = smartSerializable.Object,
+            };
+
+            // Act
+            await sut.LoadStoresAsync();
+
+            // Assert
+            sut.StoresWrapper.Should().BeSameAs(freshWrapper);
+            sut.StoresWrapper.Config.Disk.FilePath.Should()
+                .Be(
+                    FakeAppDataSettingsPath,
+                    "the fresh-build branch must adopt the loader's disk configuration (AC1)."
+                );
+        }
+
+        [TestMethod]
+        public async Task LoadStoresAsync_WhenConfigKeyIsAbsent_FreshWrapperKeepsEmptyDiskPath()
+        {
+            // Arrange (issue #797, AC1 negative case): with no "StoresWrapper" key there is no
+            // loader to adopt, so the fresh build must keep the FilePathHelper default empty path.
+            // That case is deliberately out of AC1's scope and is made visible by AC2's error log.
+            var application = new Mock<OutlookApplication>();
+            var configuration = new ConcurrentDictionary<string, SmartSerializableLoader>();
+            var globals = new StubApplicationGlobals();
+            globals.IntelResInstance = new StubIntelligenceConfig(globals, configuration);
+            var freshWrapper = new StoresWrapper();
+
+            var sut = new TestableAppOlObjects(
+                application.Object,
+                globals,
+                _ => Task.CompletedTask,
+                freshWrapper
+            );
+
+            // Act
+            await sut.LoadStoresAsync();
+
+            // Assert
+            sut.StoresWrapper.Should().BeSameAs(freshWrapper);
+            sut.StoresWrapper.Config.Disk.FilePath.Should()
+                .BeEmpty("there is no loader to adopt on the key-absent branch.");
+        }
+
         private sealed class TestableAppOlObjects : AppOlObjects
         {
             private readonly Func<StoresWrapper, Task> awaitStoreRewireAsync;

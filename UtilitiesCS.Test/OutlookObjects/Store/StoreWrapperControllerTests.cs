@@ -2,8 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using log4net;
+using log4net.Appender;
+using log4net.Core;
+using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -123,8 +128,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         [TestMethod]
         public void PersistJunkFolderSelections_WhenApplyMethodIsMissing_DoesNotThrow()
         {
+            // Retargeted to the typed seam (issue #797, AC5). What is "missing" is no longer a
+            // method discoverable by name but an implementation of IJunkFolderSelectionSink: the
+            // double below declares a matching public method yet does not implement the interface.
             var globals = new Mock<IApplicationGlobals>();
-            globals.SetupGet(x => x.Ol).Returns(new NoApplyOlObjects());
+            globals.SetupGet(x => x.Ol).Returns(new NonSinkOlObjects());
             var controller = new StoreWrapperController(globals.Object)
             {
                 JunkEmail = new FolderMinimalWrapper("Junk", "Inbox\\Junk Email"),
@@ -134,6 +142,121 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             var act = () => controller.PersistJunkFolderSelections();
 
             act.Should().NotThrow();
+        }
+
+        [TestMethod]
+        public void PersistJunkFolderSelections_PassesJunkCertainPathFirst()
+        {
+            // Arrange (issue #797, AC5): the argument order is enforced by nothing except
+            // positional agreement between the call site and the signature, which is exactly the
+            // fragility the typed seam removes. Pin it with distinguishable values.
+            var olObjects = new RecordingOlObjects();
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(x => x.Ol).Returns(olObjects);
+            var controller = new StoreWrapperController(globals.Object)
+            {
+                JunkEmail = new FolderMinimalWrapper("Certain", "Inbox\\Certain Folder"),
+                JunkPotential = new FolderMinimalWrapper("Potential", "Inbox\\Potential Folder"),
+            };
+
+            // Act
+            controller.PersistJunkFolderSelections();
+
+            // Assert
+            olObjects.ApplyCallCount.Should().Be(1);
+            olObjects
+                .AppliedJunkCertainPath.Should()
+                .Be("Inbox\\Certain Folder", "the junk-certain path is supplied first.");
+            olObjects
+                .AppliedJunkPotentialPath.Should()
+                .Be("Inbox\\Potential Folder", "the junk-potential path is supplied second.");
+        }
+
+        [TestMethod]
+        public void PersistJunkFolderSelections_WhenGlobalsAreNotTheTypedSink_LogsErrorAndDoesNotInvoke()
+        {
+            // Arrange (issue #797, AC5): the failure must be loud. The double declares a public
+            // method with the historic name and signature but does not implement the sink
+            // interface, so the reflection lookup would have succeeded while the typed cast fails.
+            var olObjects = new NonSinkOlObjects();
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(x => x.Ol).Returns(olObjects);
+            var controller = new StoreWrapperController(globals.Object)
+            {
+                JunkEmail = new FolderMinimalWrapper("Junk", "Inbox\\Junk Email"),
+                JunkPotential = new FolderMinimalWrapper("Potential", "Inbox\\Junk Potential"),
+            };
+
+            var appender = AttachControllerMemoryAppender(out var restore);
+            try
+            {
+                // Act
+                controller.PersistJunkFolderSelections();
+
+                // Assert: existence, not an exact count. The controller's logger is a static field
+                // shared with every other controller test class in this assembly and the run
+                // settings impose a class-level parallel scope, so a sibling class can only add
+                // events. The paired assertion that the double recorded no invocation is what
+                // attributes the event to this test.
+                SinkErrorEvents(appender)
+                    .Should()
+                    .NotBeEmpty(
+                        "a failed cast to the typed sink must be reported at error level (AC5)."
+                    );
+                olObjects
+                    .ApplyCallCount.Should()
+                    .Be(0, "a double that is not the typed sink must never be invoked.");
+            }
+            finally
+            {
+                restore();
+            }
+        }
+
+        /// <summary>
+        /// Attaches an in-memory appender to the logger the controller writes to. The controller is
+        /// not generic, so its logger name is the full name of the controller type and the appender
+        /// can be attached to that named logger in the ordinary way.
+        /// </summary>
+        /// <param name="restore">
+        /// Receives the action that detaches the appender and restores the logger's previous level
+        /// and the repository's previous configured flag.
+        /// </param>
+        private static MemoryAppender AttachControllerMemoryAppender(out System.Action restore)
+        {
+            var appender = new MemoryAppender();
+            appender.ActivateOptions();
+
+            var controllerType = typeof(StoreWrapperController);
+            var hierarchy = (Hierarchy)LogManager.GetRepository(controllerType.Assembly);
+            var logger = (Logger)hierarchy.GetLogger(controllerType.FullName);
+            var previousLevel = logger.Level;
+            var previousConfigured = hierarchy.Configured;
+
+            logger.Level = Level.Debug;
+            hierarchy.Configured = true;
+            logger.AddAppender(appender);
+
+            restore = () =>
+            {
+                logger.RemoveAppender(appender);
+                logger.Level = previousLevel;
+                hierarchy.Configured = previousConfigured;
+            };
+
+            return appender;
+        }
+
+        private static LoggingEvent[] SinkErrorEvents(MemoryAppender appender)
+        {
+            return appender
+                .GetEvents()
+                .Where(loggingEvent =>
+                    loggingEvent.Level >= Level.Error
+                    && loggingEvent.RenderedMessage != null
+                    && loggingEvent.RenderedMessage.Contains(nameof(IJunkFolderSelectionSink))
+                )
+                .ToArray();
         }
 
         private abstract class OlObjectsStubBase : IOlObjects
@@ -193,7 +316,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             }
         }
 
-        private sealed class RecordingOlObjects : OlObjectsStubBase
+        /// <summary>
+        /// Globals double that implements the typed junk-folder sink (issue #797, AC5) in addition
+        /// to the globals stub base, and records both arguments and the invocation count.
+        /// </summary>
+        private sealed class RecordingOlObjects : OlObjectsStubBase, IJunkFolderSelectionSink
         {
             public string AppliedJunkCertainPath { get; private set; } = string.Empty;
             public string AppliedJunkPotentialPath { get; private set; } = string.Empty;
@@ -211,6 +338,24 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             }
         }
 
-        private sealed class NoApplyOlObjects : OlObjectsStubBase { }
+        /// <summary>
+        /// Globals double that implements only the globals interface while still declaring a public
+        /// method named <c>ApplyJunkFolderSelections</c> with the same two string parameters (issue
+        /// #797, AC5). The historic reflection lookup would bind to that method; the typed cast does
+        /// not, so this double drives the loud-failure branch.
+        /// </summary>
+        private sealed class NonSinkOlObjects : OlObjectsStubBase
+        {
+            public int ApplyCallCount { get; private set; }
+
+            public void ApplyJunkFolderSelections(
+                string junkCertainRelativePath,
+                string junkPotentialRelativePath
+            )
+            {
+                ApplyCallCount++;
+                SetJunkFolders(junkCertainRelativePath, junkPotentialRelativePath);
+            }
+        }
     }
 }
