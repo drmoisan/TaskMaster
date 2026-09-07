@@ -224,10 +224,10 @@ namespace QuickFiler.Controllers
                 // FolderPredictor.ProjectSuggestionPath, while the carried PredeterminedFolder is
                 // the RAW suggestion path the scorer read from Suggestions. Without projecting the
                 // carried value the same way, FolderContains misses every archive-rooted
-                // suggestion and the selection silently falls back to the index-1 entry. The
-                // projection is duplicated here rather than reused because
-                // FolderPredictor.ProjectSuggestionPath is private and lives under UtilitiesCS,
-                // which this change may not modify.
+                // suggestion and the selection silently falls back to the index-1 entry. #799 AC4:
+                // both sides now route through the one shared projection
+                // ArchiveStemProjection.ToDisplayStem, so they agree by construction rather than by
+                // duplication.
                 string predetermined = ProjectPredeterminedFolder(
                     _predeterminedFolder,
                     _globals is null ? null : (_globals.Ol?.ArchiveRootPath ?? string.Empty)
@@ -250,38 +250,21 @@ namespace QuickFiler.Controllers
         }
 
         /// <summary>
-        /// #678 AC12. Projects a raw suggestion path onto the form <c>FolderPredictor.FolderArray</c>
-        /// stores, so a containment probe against the combo box can match: strip
-        /// <paramref name="archiveRootPath"/> plus a trailing separator from the front of
-        /// <paramref name="folderPath"/>, case-insensitively, but only when the remainder is
-        /// non-empty. #678 R2: the projection mirrors <c>FolderPredictor.ProjectSuggestionPath</c>
-        /// for every non-null <paramref name="folderPath"/> and non-null
-        /// <paramref name="archiveRootPath"/>. A NULL <paramref name="archiveRootPath"/> stands for
-        /// that member's <c>_globals is null</c> guard and yields the identity; an EMPTY one does
-        /// not, because that member forms its prefix unconditionally and so strips a single leading
-        /// separator in that state.
-        ///
-        /// Two divergences from that member remain and are deliberate, and both are null-safety
-        /// differences rather than projection differences. First, a null or empty
-        /// <paramref name="folderPath"/> is returned unchanged rather than dereferenced;
-        /// <c>ProjectSuggestionPath</c> does not guard it because its input comes from
-        /// <c>Suggestions</c>. Second, a non-null globals with a null <c>Ol</c> is treated by the
-        /// call site as an empty archive root rather than reproducing that member's null
-        /// dereference.
+        /// #678 AC12, re-derived under #799 AC4. Projects a raw suggestion path onto the form
+        /// <c>FolderPredictor.FolderArray</c> stores, so a containment probe against the combo box
+        /// can match. This member and <c>FolderPredictor.ProjectSuggestionPath</c> now share ONE
+        /// projection, <c>ArchiveStemProjection.ToDisplayStem</c>, so they agree by construction
+        /// rather than by duplication, and the empty-root one-separator strip that used to make
+        /// them diverge was eliminated by AC4: a null, empty, or whitespace-only
+        /// <paramref name="archiveRootPath"/> is now the identity projection, as is a null or empty
+        /// <paramref name="folderPath"/> and any path that is not strictly under the root.
         /// </summary>
         internal static string ProjectPredeterminedFolder(string folderPath, string archiveRootPath)
         {
-            if (string.IsNullOrEmpty(folderPath) || archiveRootPath is null)
-            {
-                return folderPath;
-            }
-
-            string archivePrefix = archiveRootPath + "\\";
-            return
-                folderPath.StartsWith(archivePrefix, StringComparison.OrdinalIgnoreCase)
-                && folderPath.Length > archivePrefix.Length
-                ? folderPath.Substring(archivePrefix.Length)
-                : folderPath;
+            return UtilitiesCS.OutlookObjects.Folder.ArchiveStemProjection.ToDisplayStem(
+                folderPath,
+                archiveRootPath
+            );
         }
 
         /// <summary>

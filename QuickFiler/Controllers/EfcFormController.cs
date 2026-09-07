@@ -1051,7 +1051,8 @@ namespace QuickFiler.Controllers
                 new WebView2CoreInitializer()
             );
             var provider = new UtilitiesCS.OutlookObjects.Folder.OutlookFolderHierarchyProvider(
-                _globals.Ol.FolderTreeService
+                _globals.Ol.FolderTreeService,
+                () => _globals.Ol.ArchiveRootPath
             );
             _router = new BreadcrumbBridgeRouter(
                 provider,
