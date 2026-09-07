@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -64,7 +63,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         ) => new(StoreLaunchReadinessState.Ready, model, displayNames);
     }
 
-    public class StoreWrapperController
+    public partial class StoreWrapperController
     {
         internal static bool RunFolderSelectionDialog(Func<bool> selector)
         {
@@ -276,75 +275,6 @@ namespace UtilitiesCS.OutlookObjects.Store
             return a.Equals(b);
         }
 
-        internal void PopulateWithCurrent()
-        {
-            if (Viewer.InvokeRequired)
-            {
-                Viewer.Invoke(() => PopulateWithCurrent());
-                return;
-            }
-
-            // Mirror the current store into the controller before rendering labels.
-            ArchiveOutlook = Current.ArchiveRoot;
-            ArchiveFS = Current.ArchiveFsRoot;
-            JunkEmail = Current.JunkCertain;
-            JunkPotential = Current.JunkPotential;
-
-            // Populate Form
-            Viewer.Inbox.Text = Current?.Inbox?.FolderPath ?? "Error Loading";
-            Viewer.RootFolder.Text = Current?.RootFolder?.FolderPath ?? "Error Loading";
-            Viewer.UserEmail.Text = Current?.UserEmailAddress ?? "Error Loading";
-            Viewer.ArchiveOutlook.Text = ArchiveOutlook?.RelativePath ?? "Please select an archive";
-            Viewer.ArchiveFS.Text = GetRelativeFsPath();
-            //if (Current.ArchiveFsRoot is not null && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty())
-            //{
-            //    var (specialFolder, relativePath) = FsConverter(Current.ArchiveFsRoot.FolderPath);
-            //    if (specialFolder.IsNullOrEmpty() & relativePath.IsNullOrEmpty())
-            //    {
-            //        Viewer.ArchiveFS.Text = "Please select an archive";
-            //    }
-            //    else
-            //    {
-            //        Viewer.ArchiveFS.Text = $"{string.Join(" -> ", [specialFolder,relativePath]).Trim()}";
-            //    }
-            //}
-            Viewer.JunkEmail.Text = JunkEmail?.RelativePath ?? "Please select a folder";
-            Viewer.JunkPotential.Text = JunkPotential?.RelativePath ?? "Please select a folder";
-            BindExcludeStoreCheckbox();
-        }
-
-        /// <summary>
-        /// Binds the <c>ExcludeStore</c> checkbox to the current store's membership in
-        /// <c>Model.ExcludedStoreIds</c> (issue #328, OrdinalIgnoreCase). When the current store's
-        /// StoreID is unreadable the checkbox is disabled and cleared (fail-safe per AC10) so it can
-        /// neither mislead the user nor mutate the exclusion set.
-        /// </summary>
-        internal void BindExcludeStoreCheckbox()
-        {
-            // Defensive: a viewer that does not expose the checkbox (e.g., a partial test double)
-            // has nothing to bind. Production viewers always supply it.
-            var excludeStore = Viewer?.ExcludeStore;
-            if (excludeStore is null)
-            {
-                return;
-            }
-
-            var storeId = Current?.StoreId;
-            if (string.IsNullOrWhiteSpace(storeId))
-            {
-                excludeStore.Enabled = false;
-                excludeStore.Checked = false;
-                return;
-            }
-
-            excludeStore.Enabled = true;
-            excludeStore.Checked =
-                Model?.ExcludedStoreIds?.Any(id =>
-                    string.Equals(id, storeId, StringComparison.OrdinalIgnoreCase)
-                )
-                ?? false;
-        }
-
         internal void SaveChanges()
         {
             Current.ArchiveRoot = ArchiveOutlook;
@@ -353,7 +283,11 @@ namespace UtilitiesCS.OutlookObjects.Store
             Current.ArchiveFsRoot = ArchiveFS;
             PersistJunkFolderSelections();
             ApplyExcludeStoreSelection();
-            Model.Serialize();
+
+            // why: issue #797 AC4. An explicit Save must not be lost if the host process exits
+            // inside the serializer's three-second deferred-write window, so this call site uses the
+            // guarded synchronous flush. Every other caller keeps the deferred behaviour.
+            Model.SerializeNow();
         }
 
         /// <summary>
@@ -396,25 +330,21 @@ namespace UtilitiesCS.OutlookObjects.Store
                 return;
             }
 
-            var applyMethod = olObjects
-                .GetType()
-                .GetMethod(
-                    "ApplyJunkFolderSelections",
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                    null,
-                    [typeof(string), typeof(string)],
-                    null
-                );
-
-            if (applyMethod is null)
+            // why: issue #797 AC5. This call site previously located the target by reflecting over a
+            // method name, so a rename would have degraded silently to a warn-and-return that no
+            // build or test could catch. The typed cast is compile-checked, and a globals
+            // implementation that does not provide the seam is now reported at error level rather
+            // than as a warning, so the failure is loud.
+            if (olObjects is not IJunkFolderSelectionSink sink)
             {
-                logger.Warn(
-                    "Unable to persist junk-folder selections because the Outlook globals implementation does not expose ApplyJunkFolderSelections."
+                logger.Error(
+                    "Unable to persist junk-folder selections because the Outlook globals "
+                        + $"implementation does not implement {nameof(IJunkFolderSelectionSink)}."
                 );
                 return;
             }
 
-            applyMethod.Invoke(olObjects, [JunkEmail?.RelativePath, JunkPotential?.RelativePath]);
+            sink.ApplyJunkFolderSelections(JunkEmail?.RelativePath, JunkPotential?.RelativePath);
         }
 
         internal virtual FolderMinimalWrapper? SelectFolder()
@@ -451,26 +381,6 @@ namespace UtilitiesCS.OutlookObjects.Store
                 }
             }
             return null;
-        }
-
-        internal string GetRelativeFsPath()
-        {
-            if (
-                Current.ArchiveFsRoot is not null
-                && !Current.ArchiveFsRoot.FolderPath.IsNullOrEmpty()
-            )
-            {
-                var (specialFolder, relativePath) = FsConverter(Current.ArchiveFsRoot.FolderPath);
-                if (specialFolder.IsNullOrEmpty() & relativePath.IsNullOrEmpty())
-                {
-                    return "Please select an archive";
-                }
-                else
-                {
-                    return $"{string.Join(" -> ", [specialFolder, relativePath]).Trim()}";
-                }
-            }
-            return "Please select an archive";
         }
 
         #endregion Methods

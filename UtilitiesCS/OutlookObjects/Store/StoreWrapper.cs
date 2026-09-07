@@ -176,8 +176,43 @@ namespace UtilitiesCS.OutlookObjects.Store
         [JsonIgnore]
         public List<AddressEntry>? GlobalAddressBook { get; internal set; }
 
+        /// <summary>
+        /// The reason the most recent SMTP lookup failed, or null when the last lookup succeeded
+        /// (issue #797, AC6). Not persisted: it describes one runtime lookup, not stored state.
+        /// </summary>
+        [JsonIgnore]
+        internal string? LastSmtpLookupError { get; private set; }
+
+        /// <summary>
+        /// Re-runs the SMTP lookup and republishes the result on
+        /// <see cref="UserEmailAddress"/> (issue #797, AC6). Safe to call when
+        /// <see cref="RootFolder"/> is null.
+        /// </summary>
+        /// <returns>The resolved address, or null when every source failed.</returns>
+        internal string? RefreshUserEmailAddress()
+        {
+            // why: issue #797 AC6. The lookup ran once per Init and was never retried, and the
+            // resolved address carries JsonIgnore so a success is not cached across restarts. The
+            // settings dialog calls this at most once per open, and only when the address is null,
+            // which bounds the added UI-thread latency to the single lookup startup already
+            // performs. Safe when RootFolder is null: the chain's first read is null-conditional,
+            // so the call yields null and records a reason rather than throwing.
+            UserEmailAddress = GetSmtpAddressFromStore();
+            return UserEmailAddress;
+        }
+
         internal string? GetSmtpAddressFromStore()
         {
+            // why: issue #797 AC6. A single outer catch converted every COM failure into null, with
+            // no fallback source, no captured reason and no retry, so the settings dialog rendered a
+            // generic placeholder on every start. Each step below carries its own COM handling, in
+            // the order the specification fixes: the Exchange primary SMTP address; then the address
+            // entry's own address when it contains an at-sign; then the store display name when it
+            // contains an at-sign; then null. This mirrors the ordering the application globals
+            // helper already implements for an address entry.
+            string? capturedError = null;
+            AddressEntry? addressEntry = null;
+
             try
             {
                 var currentUserStopwatch = Stopwatch.StartNew();
@@ -187,7 +222,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 );
 
                 var addressEntryStopwatch = Stopwatch.StartNew();
-                var addressEntry = currentUser?.AddressEntry;
+                addressEntry = currentUser?.AddressEntry;
                 logger.Debug(
                     $"[Startup timing] GetSmtpAddressFromStore '{DisplayName ?? "<null>"}' AddressEntry: {addressEntryStopwatch.ElapsedMilliseconds} ms"
                 );
@@ -204,16 +239,50 @@ namespace UtilitiesCS.OutlookObjects.Store
                     $"[Startup timing] GetSmtpAddressFromStore '{DisplayName ?? "<null>"}' PrimarySmtpAddress: {primarySmtpAddressStopwatch.ElapsedMilliseconds} ms (result={primarySmtpAddress ?? "<null>"})"
                 );
 
-                return primarySmtpAddress;
+                if (!string.IsNullOrEmpty(primarySmtpAddress))
+                {
+                    LastSmtpLookupError = null;
+                    return primarySmtpAddress;
+                }
             }
             catch (COMException e)
             {
+                capturedError = e.Message;
                 logger.Error(
                     $"Error retrieving PrimarySmtpAddress from secondary inbox. {e.Message}",
                     e
                 );
-                return null;
             }
+
+            try
+            {
+                var address = addressEntry?.Address;
+                if (address is not null && address.Contains("@"))
+                {
+                    LastSmtpLookupError = null;
+                    return address;
+                }
+            }
+            catch (COMException e)
+            {
+                capturedError = e.Message;
+                logger.Error(
+                    $"Error retrieving the address entry address for '{DisplayName ?? "<null>"}'. {e.Message}",
+                    e
+                );
+            }
+
+            var displayName = DisplayName;
+            if (displayName is not null && displayName.Contains("@"))
+            {
+                LastSmtpLookupError = null;
+                return displayName;
+            }
+
+            LastSmtpLookupError =
+                capturedError
+                ?? "No Exchange address, address entry address or store display name yielded an SMTP address.";
+            return null;
         }
 
         #endregion Store Properties

@@ -452,14 +452,14 @@ maintainer on 2026-09-06. They are the same criteria, not additional ones. They 
 reordered, dropped, merged, split or reworded. Check-off must be mirrored in issue.md; this file is
 the authoritative source under full-bug work mode.
 
-- [ ] AC1: When `StoresWrapper.json` is absent, the fresh-build path adopts the resource-defined disk configuration so `Config.Disk.FilePath` resolves to `%LocalAppData%\TaskMaster\StoresWrapper.json`, and the first Save creates the file.
-- [ ] AC2: `SmartSerializable<T>.Serialize()` logs an error (not a silent return) when invoked with an empty or null `Config.Disk.FilePath`.
+- [x] AC1: When `StoresWrapper.json` is absent, the fresh-build path adopts the resource-defined disk configuration so `Config.Disk.FilePath` resolves to `%LocalAppData%\TaskMaster\StoresWrapper.json`, and the first Save creates the file.
+- [x] AC2: `SmartSerializable<T>.Serialize()` logs an error (not a silent return) when invoked with an empty or null `Config.Disk.FilePath`.
 - [ ] AC3: A value saved in Folder Settings is present after an Outlook restart (manual verification).
-- [ ] AC4: An explicit Save is not lost if Outlook closes within the 3-second deferred-write window (flush on save or on shutdown).
-- [ ] AC5: The junk-folder double-persistence path is either removed or made to fail loudly; the reflection lookup is replaced by a typed seam.
-- [ ] AC6: User Email shows the SMTP address; on lookup failure it shows a specific message including the reason, falls back to an alternative source (the account SMTP address or the store display name when it is an SMTP address), and the lookup is retried when the dialog opens.
-- [ ] AC7: Inbox and Root Folder are displayed without the leading `\\` (cosmetic).
-- [ ] AC8: A null `Current` store selection renders the placeholder text instead of throwing.
+- [x] AC4: An explicit Save is not lost if Outlook closes within the 3-second deferred-write window (flush on save or on shutdown).
+- [x] AC5: The junk-folder double-persistence path is either removed or made to fail loudly; the reflection lookup is replaced by a typed seam.
+- [x] AC6: User Email shows the SMTP address; on lookup failure it shows a specific message including the reason, falls back to an alternative source (the account SMTP address or the store display name when it is an SMTP address), and the lookup is retried when the dialog opens.
+- [x] AC7: Inbox and Root Folder are displayed without the leading `\\` (cosmetic).
+- [x] AC8: A null `Current` store selection renders the placeholder text instead of throwing.
 
 ### Verification detail per criterion
 
