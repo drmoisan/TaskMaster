@@ -156,6 +156,7 @@
     <Compile Include="Controllers\QfcFormControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcFormControllerCleanupTests.cs" />
     <Compile Include="Controllers\QfcFormControllerDeactivateTests.cs" />
+    <Compile Include="Controllers\QfcItemController.SearchLeaveLatchTests.cs" />
     <Compile Include="Controllers\QfcItemController.CancelBreadcrumbSelectorTests.cs" />
     <Compile Include="Controllers\QfcFormKeyHandlerTests.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />

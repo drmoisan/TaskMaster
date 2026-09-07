@@ -179,6 +179,8 @@ namespace QuickFiler.Controllers
                 objItem: Mail
             );
             _itemViewer.PresentFolderSearchResults(folders);
+            // Issue #796 (AC4): the search box opened this popup, so it owns dismissing it.
+            _searchOwnedDismissal = true;
         }
 
         // Issue #680: one-shot suppression latch for the Down-arrow focus handoff. Single producer:
@@ -187,12 +189,35 @@ namespace QuickFiler.Controllers
         // textbox's Leave, and that one leave must not dismiss the popup the gesture just claimed.
         private bool _searchLeaveHandoffPending;
 
+        // Issue #796 (AC4): the SearchOwnedDismissalLatch. Records that the drop-down currently open
+        // is one this search box opened, so the leave handler below dismisses only a popup the
+        // search box owns and never one a mouse gesture opened. Producers are the two search-driven
+        // open sites in this file; the consumer is TextBoxSearch_Leave. A mouse-driven open never
+        // sets it, which is why the mouse path needs no edit anywhere.
+        //
+        // It cannot reuse _searchLeaveHandoffPending above. That latch is one-shot and consumed
+        // destructively on its first read by design, so it is false again immediately after the
+        // handoff it guards while the popup is still open. Provenance must persist for as long as
+        // the popup is open, which is a different lifetime, and overloading the one-shot field would
+        // break the issue #680 contract.
+        private bool _searchOwnedDismissal;
+
+        /// <summary>
+        /// Issue #796 (AC4): whether the drop-down currently open was opened from this item's folder
+        /// search box rather than by a mouse gesture on the collapsed breadcrumb.
+        /// </summary>
+        internal bool SearchOwnsDropDownDismissal => _searchOwnedDismissal;
+
         internal void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Down)
             {
                 _itemViewer.SetFolderDroppedDown(true);
                 _searchLeaveHandoffPending = true;
+                // Issue #796 (AC4): the Down-arrow gesture is the second search-driven open site,
+                // so it takes dismissal ownership too. The one-shot handoff latch above keeps its
+                // separate meaning and its separate lifetime; this one persists while the popup is.
+                _searchOwnedDismissal = true;
                 _itemViewer.FocusFolderDropDown();
                 e.SuppressKeyPress = true;
                 e.Handled = true;
@@ -204,6 +229,9 @@ namespace QuickFiler.Controllers
                 // drop-down is not open the key falls through untouched, so Escape keeps whatever
                 // meaning it has elsewhere in the form.
                 _itemViewer.SetFolderDroppedDown(false);
+                // Issue #796 (AC4): this dismissal ends the popup the search box owned, so the
+                // provenance latch is released with it.
+                _searchOwnedDismissal = false;
                 e.SuppressKeyPress = true;
                 e.Handled = true;
             }
@@ -223,7 +251,18 @@ namespace QuickFiler.Controllers
                 return;
             }
             if (!_itemViewer.IsFolderDropDownOpen)
+            {
+                // No popup is open, so nothing owns dismissal any more. Releasing here keeps a
+                // stale provenance from surviving a close this controller did not perform.
+                _searchOwnedDismissal = false;
                 return;
+            }
+            // Issue #796 (AC4): dismiss only a popup this search box opened. A mouse gesture on the
+            // collapsed breadcrumb never sets the latch, so the leave it provokes no longer closes
+            // the popup that gesture just opened, which is the defect this criterion names.
+            if (!_searchOwnedDismissal)
+                return;
+            _searchOwnedDismissal = false;
             _itemViewer.SetFolderDroppedDown(false);
         }
 
