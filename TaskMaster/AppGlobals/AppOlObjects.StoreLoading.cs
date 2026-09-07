@@ -36,7 +36,11 @@ namespace TaskMaster
         {
             try
             {
-                if (_globals.IntelRes.Config.TryGetValue("StoresWrapper", out var config))
+                var configFound = _globals.IntelRes.Config.TryGetValue(
+                    "StoresWrapper",
+                    out var config
+                );
+                if (configFound)
                 {
                     var deserialized = SmartSerializable.Deserialize<
                         StoresWrapper,
@@ -62,6 +66,17 @@ namespace TaskMaster
                 // source from which a previously disabled-for-future-sessions store could be
                 // recovered, so a store re-enabled here is expected, not a regression in F1/F5.
                 StoresWrapper = BuildFreshStoresWrapper();
+
+                // why: issue #797 AC1. A freshly built wrapper carries the FilePathHelper default
+                // empty file path, so every later Save returned silently and the settings file was
+                // never created. The loader resolved above already carries the resource-defined
+                // path under the local application data TaskMaster directory, so adopt it here with
+                // a deep copy. The key-absent branch has no loader and deliberately keeps the empty
+                // path; AC2's error log makes that case visible rather than silent.
+                if (configFound && StoresWrapper is not null)
+                {
+                    StoresWrapper.Config.CopyFrom(config.Config, true);
+                }
             }
             catch (Exception e)
             {

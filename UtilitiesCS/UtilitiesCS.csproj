@@ -751,6 +751,7 @@
     <Compile Include="OutlookObjects\Store\StoreWrapperInitClock.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperInitProbe.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController.cs" />
+    <Compile Include="OutlookObjects\Store\StoreWrapperController.Display.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1031,6 +1032,7 @@
     <Compile Include="Interfaces\IGlobals\IApplicationGlobals.cs" />
     <Compile Include="Interfaces\IGlobals\IStoreDisableService.cs" />
     <Compile Include="Interfaces\IGlobals\IStoreRehookService.cs" />
+    <Compile Include="Interfaces\IGlobals\IJunkFolderSelectionSink.cs" />
     <Compile Include="Interfaces\IGlobals\IAppStagingFilenames.cs" />
     <Compile Include="Interfaces\IGlobals\IFileSystemFolderPaths.cs" />
     <Compile Include="Interfaces\IGlobals\IOlObjects.cs" />

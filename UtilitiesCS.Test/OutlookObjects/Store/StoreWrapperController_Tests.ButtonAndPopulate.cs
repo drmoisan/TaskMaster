@@ -127,11 +127,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             controller.Current = null;
             controller.FsConverter = (path) => ("", "");
 
-            // PopulateWithCurrent accesses Current which may be null
-            // This would throw NullReferenceException, verifying we need Current set
+            // Declared AC8 expectation inversion under D6 (issue #797): this test's name always
+            // described the fixed behaviour while its assertion codified the defect. The inverted
+            // assertion is stricter than the original, pinning the specific rendered values rather
+            // than merely an exception type.
             var act = () => controller.PopulateWithCurrent();
 
-            act.Should().Throw<NullReferenceException>();
+            act.Should().NotThrow();
+            mockViewer.Object.ArchiveOutlook.Text.Should().Be("Please select an archive");
+            mockViewer.Object.ArchiveFS.Text.Should().Be("Please select an archive");
+            mockViewer.Object.JunkEmail.Text.Should().Be("Please select a folder");
+            mockViewer.Object.JunkPotential.Text.Should().Be("Please select a folder");
         }
 
         [TestMethod]

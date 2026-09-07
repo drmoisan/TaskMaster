@@ -439,11 +439,35 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #region Serialization
 
+        /// <summary>
+        /// Reports whether a write may proceed, and logs the reason at error level when it may not
+        /// (issue #797, AC2). The previous guard compared only against the empty string, so a null
+        /// file path passed it and reached the write path, and an empty path returned silently with
+        /// no diagnostic at all. Shared by the deferred and the explicit-save entry points so both
+        /// report the same diagnostic and neither fails silently.
+        /// </summary>
+        /// <param name="filePath">Receives the configured file path.</param>
+        /// <returns>True when the configured path is neither null nor empty.</returns>
+        private bool TryGetSerializationPath(out string filePath)
+        {
+            filePath = Config.Disk.FilePath;
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                return true;
+            }
+
+            logger.Error(
+                $"Cannot serialize {typeof(T)}: Config.Disk.FilePath is null or empty "
+                    + $"(value: '{filePath}'), so the instance was not written to disk."
+            );
+            return false;
+        }
+
         public void Serialize()
         {
-            if (Config.Disk.FilePath != "")
+            if (TryGetSerializationPath(out var filePath))
             {
-                RequestSerialization(Config.Disk.FilePath);
+                RequestSerialization(filePath);
             }
         }
 
@@ -451,6 +475,27 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             this.Config.Disk.FilePath = filePath;
             RequestSerialization(filePath);
+        }
+
+        /// <summary>
+        /// Explicit-save entry point (issue #797, AC4). Callers that must not lose a write when the
+        /// host process exits inside the deferred three-second window call this instead of
+        /// <see cref="Serialize()"/>.
+        /// </summary>
+        public void SerializeNow()
+        {
+            // why: issue #797 AC4. The deferred write is raised on a ThreadPool background thread
+            // three seconds after the request, and a background thread is not joined at process
+            // exit, so a save issued inside that window is lost when the host tears down the
+            // AppDomain, with no log entry. An explicit save therefore writes inline through the
+            // existing thread-safe write method, which takes the write lock, writes through the
+            // injectable stream-writer seam, and re-arms the single-shot guard in its finally block.
+            // The AC2 guard is evaluated first so this fix does not substitute one silent failure
+            // for another. Every other caller keeps the unchanged deferred behaviour.
+            if (TryGetSerializationPath(out var filePath))
+            {
+                SerializeThreadSafe(filePath);
+            }
         }
 
         protected ReaderWriterLockSlim _readWriteLock = new();
