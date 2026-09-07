@@ -63,7 +63,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         chain[index].FolderPath,
                         archiveRoot,
                         out var stem
-                    ) && stem.Length == 0;
+                    )
+                    && stem.Length == 0;
 
                 if (!isRootNode)
                 {

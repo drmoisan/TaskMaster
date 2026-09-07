@@ -44,8 +44,12 @@ namespace QuickFiler.Test.Controllers
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
             var host = StrictHost(documents);
             FolderTreeNodeKey key = Key(RootedTarget);
-            SetupChain(provider, RootedTarget, key, TwoSegmentChain(ClientsPath, "Clients",
-                RootedTarget, "North"));
+            SetupChain(
+                provider,
+                RootedTarget,
+                key,
+                TwoSegmentChain(ClientsPath, "Clients", RootedTarget, "North")
+            );
             var router = RouterOver(provider, host);
 
             // Act: presented row is the stem; the score carries the rooted path.
@@ -76,8 +80,12 @@ namespace QuickFiler.Test.Controllers
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
             var host = StrictHost(documents);
             FolderTreeNodeKey key = Key(RootedTarget);
-            SetupChain(provider, RootedTarget, key, TwoSegmentChain(ClientsPath, "Clients",
-                RootedTarget, "North"));
+            SetupChain(
+                provider,
+                RootedTarget,
+                key,
+                TwoSegmentChain(ClientsPath, "Clients", RootedTarget, "North")
+            );
             var router = RouterOver(provider, host);
 
             // Act: presented row and score both carry the rooted path.
@@ -108,8 +116,12 @@ namespace QuickFiler.Test.Controllers
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
             var host = StrictHost(documents);
             FolderTreeNodeKey key = Key(RelativeTarget);
-            SetupChain(provider, RelativeTarget, key, TwoSegmentChain(@"Clients", "Clients",
-                RelativeTarget, "North"));
+            SetupChain(
+                provider,
+                RelativeTarget,
+                key,
+                TwoSegmentChain(@"Clients", "Clients", RelativeTarget, "North")
+            );
             var router = RouterOver(provider, host);
 
             // Act: the public overload, which supplies no archive root at all.
@@ -140,8 +152,12 @@ namespace QuickFiler.Test.Controllers
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
             var host = StrictHost(documents);
             FolderTreeNodeKey key = Key(RootedTarget);
-            SetupChain(provider, RootedTarget, key, TwoSegmentChain(ClientsPath, "Clients",
-                RootedTarget, "North"));
+            SetupChain(
+                provider,
+                RootedTarget,
+                key,
+                TwoSegmentChain(ClientsPath, "Clients", RootedTarget, "North")
+            );
             var router = RouterOver(provider, host);
 
             // Act
@@ -185,10 +201,18 @@ namespace QuickFiler.Test.Controllers
             var host = StrictHost(documents);
             FolderTreeNodeKey suggestionKey = Key(RootedTarget);
             FolderTreeNodeKey searchKey = Key(searchRooted);
-            SetupChain(provider, RootedTarget, suggestionKey, TwoSegmentChain(ClientsPath,
-                "Clients", RootedTarget, "North"));
-            SetupChain(provider, searchRooted, searchKey, TwoSegmentChain(@"\Archive\Search",
-                "Search", searchRooted, "Follow Up"));
+            SetupChain(
+                provider,
+                RootedTarget,
+                suggestionKey,
+                TwoSegmentChain(ClientsPath, "Clients", RootedTarget, "North")
+            );
+            SetupChain(
+                provider,
+                searchRooted,
+                searchKey,
+                TwoSegmentChain(@"\Archive\Search", "Search", searchRooted, "Follow Up")
+            );
             provider
                 .Setup(p =>
                     p.ResolveLeafKeyAsync(@"\Archive\Clients\Stale", It.IsAny<CancellationToken>())
@@ -256,15 +280,25 @@ namespace QuickFiler.Test.Controllers
             FolderTreeNodeKey northKey = Key(RootedTarget);
             FolderTreeNodeKey southKey = Key(vendorsRooted);
             FolderTreeNodeKey vendorsKey = Key(vendorsPath);
-            SetupChain(provider, RootedTarget, northKey, TwoSegmentChain(ClientsPath, "Clients",
-                RootedTarget, "North"));
-            SetupChain(provider, vendorsRooted, southKey, TwoSegmentChain(vendorsPath, "Vendors",
-                vendorsRooted, "South"));
+            SetupChain(
+                provider,
+                RootedTarget,
+                northKey,
+                TwoSegmentChain(ClientsPath, "Clients", RootedTarget, "North")
+            );
+            SetupChain(
+                provider,
+                vendorsRooted,
+                southKey,
+                TwoSegmentChain(vendorsPath, "Vendors", vendorsRooted, "South")
+            );
             provider
                 .Setup(p => p.ResolveLeafKeyAsync(staleRooted, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((FolderTreeNodeKey)null);
             provider
-                .Setup(p => p.GetImmediateSubfoldersAsync(vendorsKey, It.IsAny<CancellationToken>()))
+                .Setup(p =>
+                    p.GetImmediateSubfoldersAsync(vendorsKey, It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(new[] { Segment(vendorsRooted, "South", false) });
             var router = RouterOver(provider, host);
 
@@ -318,8 +352,12 @@ namespace QuickFiler.Test.Controllers
 
             var host = StrictHost(documents);
             FolderTreeNodeKey northKey = Key(RootedTarget);
-            SetupChain(provider, RootedTarget, northKey, TwoSegmentChain(ClientsPath, "Clients",
-                RootedTarget, "North"));
+            SetupChain(
+                provider,
+                RootedTarget,
+                northKey,
+                TwoSegmentChain(ClientsPath, "Clients", RootedTarget, "North")
+            );
             provider
                 .Setup(p => p.ResolveLeafKeyAsync(ambiguousRooted, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((FolderTreeNodeKey)null);

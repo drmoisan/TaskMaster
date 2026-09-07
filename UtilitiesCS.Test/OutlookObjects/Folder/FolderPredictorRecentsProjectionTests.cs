@@ -184,8 +184,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         )
         {
             var folders = new Mock<OutlookFolders>();
-            var enumerableItems =
-                foldersByName?.Values?.ToArray() ?? Array.Empty<OutlookFolder>();
+            var enumerableItems = foldersByName?.Values?.ToArray() ?? Array.Empty<OutlookFolder>();
             var collection = new ArrayList(enumerableItems);
 
             folders

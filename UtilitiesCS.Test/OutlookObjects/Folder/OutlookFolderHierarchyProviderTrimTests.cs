@@ -176,7 +176,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             await provider.ResolveLeafKeyAsync(MissingStem, CancellationToken.None);
 
             // Assert
-            errors.Should().ContainSingle("the gate is once per label per session, not per render");
+            errors
+                .Should()
+                .ContainSingle("the gate is once per label per session, not per render");
             provider.IsAbsentLabel(MissingStem).Should().BeTrue();
         }
 

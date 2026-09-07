@@ -118,7 +118,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return mapped;
             }
 
-            if (ArchiveChainProjection.TryTrimBelowArchiveRoot(mapped, archiveRoot, out var trimmed))
+            if (
+                ArchiveChainProjection.TryTrimBelowArchiveRoot(mapped, archiveRoot, out var trimmed)
+            )
             {
                 return trimmed;
             }

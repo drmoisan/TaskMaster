@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-06T18-40
-- **Status:** Draft
+- **Status:** Implemented
 - **Version:** 1.0
 - **Work Mode:** full-bug. This spec is the sole authoritative acceptance-criteria source. There is no
   user-story.md in this folder, and none is to be created.
@@ -831,14 +831,14 @@ manual verification notes above. It does not gate the automated review.
 
 ## Acceptance Criteria
 
-- [ ] AC1: Suggestion rows and search-result rows in both the QuickFiler item view and the Efc view render the lineage starting at the first segment below the archive root, with the same arrow rendering and clickable ancestor segments for both row kinds. Example: `_Active Projects -> Build RGF Org and Team -> Sales Lead`.
-- [ ] AC2: A resolved chain that does not pass through the archive root node is logged as an error and rendered with the existing single-segment fallback; no row ever shows the mailbox or Archive segment.
-- [ ] AC3: Filing target and score-lookup key remain the archive-relative stem (unchanged #439 constraint); filing to the selected folder still lands correctly.
-- [ ] AC4: `ProjectSuggestionPath` and `ProjectPredeterminedFolder` are replaced by one shared projection built on `ArchiveStemContract.TryMakeArchiveRelative`, and the empty-root one-separator strip is eliminated.
-- [ ] AC5: Recent-folder entries pass through the same projection before display.
-- [ ] AC6: `EfcFormController.BindBreadcrumbRowsAsync` projects the score paths the same way as the rows, so archive-rooted suggestions retain their percentage.
-- [ ] AC7: Persisted suggestion labels that fail hierarchy resolution are rendered distinguishably (or filtered) and logged once per label per session, not once per render.
-- [ ] AC8: The leading-underscore rendering question (`_Active Projects` vs `_ Active Projects`) is verified and, if the renderer alters it, corrected.
+- [x] AC1: Suggestion rows and search-result rows in both the QuickFiler item view and the Efc view render the lineage starting at the first segment below the archive root, with the same arrow rendering and clickable ancestor segments for both row kinds. Example: `_Active Projects -> Build RGF Org and Team -> Sales Lead`.
+- [x] AC2: A resolved chain that does not pass through the archive root node is logged as an error and rendered with the existing single-segment fallback; no row ever shows the mailbox or Archive segment.
+- [x] AC3: Filing target and score-lookup key remain the archive-relative stem (unchanged #439 constraint); filing to the selected folder still lands correctly.
+- [x] AC4: `ProjectSuggestionPath` and `ProjectPredeterminedFolder` are replaced by one shared projection built on `ArchiveStemContract.TryMakeArchiveRelative`, and the empty-root one-separator strip is eliminated.
+- [x] AC5: Recent-folder entries pass through the same projection before display.
+- [x] AC6: `EfcFormController.BindBreadcrumbRowsAsync` projects the score paths the same way as the rows, so archive-rooted suggestions retain their percentage.
+- [x] AC7: Persisted suggestion labels that fail hierarchy resolution are rendered distinguishably (or filtered) and logged once per label per session, not once per render.
+- [x] AC8: The leading-underscore rendering question (`_Active Projects` vs `_ Active Projects`) is verified and, if the renderer alters it, corrected.
 
 Notes for the reviewer, which do not add or weaken any criterion:
 - AC4's site disposition is settled by decision D-A. Four sites convert, three are deliberately left
@@ -899,3 +899,71 @@ Notes for the reviewer, which do not add or weaken any criterion:
 - Links: issue https://github.com/drmoisan/TaskMaster/issues/799; the research record in this feature
   folder under research/; superseded predecessor #439; the archive-stem contract predecessor #614; the
   duplication predecessor #678.
+
+### Outcome
+
+Implemented on branch `bug/breadcrumb-lineage-below-archive-root-799` across three phases of the atomic plan
+`plan.2026-09-06T22-01.md`. The final toolchain loop closed clean in one pass: CSharpier format and check both
+exit 0 at 1601 checked files, the analyzer gate and the nullable gate each exit 0 with 0 Warning(s) and 0
+Error(s), and the coverage-enabled nine-assembly run exits 0 with 7085 tests, 7085 passed, 0 failed and
+`NEWLY-FAILING: NONE`. Evidence is under this feature folder's `evidence/qa-gates/` and
+`evidence/regression-testing/` directories.
+
+The delivered change departs from this specification's own prose in four respects. Each is recorded here by name
+with the reason, so a reviewer reads a deliberate decision rather than an omission.
+
+**1. AC7 row suppression is delivered on the Efc surface only; the QuickFiler surface keeps today's fallback
+rendering.** Decision D-B above requires the planner to escalate rather than edit a sibling-owned file if the
+QuickFiler presented row set proves to be composed only inside the sibling-owned bridge router. It is: the
+QuickFiler drop-down's row set is built as a local list inside `FolderBreadcrumbBridgeRouter.SetSuggestionsAsync`
+at UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs lines 42-86 and swapped into the model under
+the shared lock at lines 88-96, while `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` only hands the
+predictor's row model to the viewer at its lines 212 and 221, at which point no provider resolution has been
+attempted, so the zero-candidate classification does not yet exist there. Producing it would have required a
+second synchronous resolution pass on the UI thread inside `AssignFolderComboBox`, duplicating the router's work
+and changing the very ordering the sibling item owns. The documented fallback was therefore taken. The AC7
+LOGGING half is delivered on BOTH surfaces, because it lives in the hierarchy provider that both surfaces route
+through. The suppression half is pinned on the Efc surface by
+`BindRowsAsync_ZeroCandidateLabel_SuppressesTheRowAndKeepsSegmentKeysAligned` (true arm) and
+`BindRowsAsync_AmbiguousLabel_IsNotSuppressed` (false arm, the zero-candidate restriction).
+
+**2. The AC6 score projection is additive rather than substitutive.** The projected score is ADDED alongside the
+raw score rather than replacing it. `BreadcrumbRowBuilder.BuildProbabilityIndex` assigns through the indexer at
+UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs line 224, so duplicate keys are tolerated and the last
+write wins. A plain substitution would have fixed the stem-presented case and silently broken the
+rooted-presented case that
+QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs lines 118-166
+(`Issue439RootedTargetUsesOriginalPathForProviderLookupCaseInsensitively`) exercises: the score key would have
+become the stem while the presented text stayed rooted, and the percentage would have vanished. That test does not
+assert the percentage, so the regression would have shipped unnoticed.
+`BindRowsAsync_RootedScoreAndRootedRow_StillRendersThePercentage` now pins the case explicitly. A second, smaller
+deviation sits inside the same criterion: the projection is applied in the Efc router rather than at the
+`EfcFormController.BindBreadcrumbRowsAsync` call site the criterion names, because that controller is 1320 lines
+and cannot absorb growth while the router already normalizes the bound root.
+
+**3. The two #439 Efc router test files listed in the Write Set carry no hunk.** Every test in
+QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs and its Activation partial constructs a
+`Mock<IFolderHierarchyProvider>(MockBehavior.Strict)` and supplies the ancestor chain directly through
+`ReturnsAsync`. The AC1/AC2 trim lives inside the provider's `GetAncestorChainAsync`, below that mock boundary, so
+it cannot reach either file. Editing them would also have been actively harmful: the shared `Chain` helper emits a
+leading `\Archive` segment that three tests depend on, and
+`Issue439SlashOnlyArchiveRootPreservesFullHierarchySelection` asserts that activating segment index 0 yields
+`\Archive`, so removing that segment from the fixture would have broken a #614 boundary test unrelated to this
+change while pinning nothing new. All ten tests of that partial class pass unmodified in the final run, which is
+the behavioural confirmation that the no-hunk disposition was correct.
+
+**4. The AC7 absence classification is published through a new small public interface declared in the provider's
+own file, not through a fourth member on the shared hierarchy contract.**
+UtilitiesCS/OutlookObjects/Folder/IFolderHierarchyProvider.cs declares exactly three members. net48 has no default
+interface members, so a fourth member would break every implementer, and every breadcrumb router test constructs
+`new Mock<IFolderHierarchyProvider>(MockBehavior.Strict)`, so a strict mock would throw the first time production
+called the new member. `IFolderLabelAbsenceReport` is instead declared in
+UtilitiesCS/OutlookObjects/Folder/OutlookFolderHierarchyProvider.cs and obtained by the Efc router with an `as`
+cast, so a strict mock simply is not an `IFolderLabelAbsenceReport`, the field is null, and suppression is inert in
+every existing router test. Production is unaffected: no adapter wraps the provider, and both production
+constructions hand the concrete provider straight to the router.
+
+Two further dispositions are recorded in the plan rather than as deviations, because this specification already
+authorises them: the AC4 site disposition (four sites converted, three deliberately left, per decision D-A sites
+5, 6 and 7), and the AC8 outcome (no code change, per decision D-C, verified and recorded in
+`evidence/qa-gates/p3-t12-ac8-verification.md`).
