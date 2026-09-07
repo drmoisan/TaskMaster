@@ -78,7 +78,7 @@ Acceptance criteria settled with the maintainer on 2026-09-06:
 
 - [x] AC1: Opening the list by arrow click or by Down in the search box leaves it open until Escape, Left, a second arrow click, an item selection, or selection of a different QfcItem.
 - [x] AC2: A deactivation of the QuickFiler form caused by the popup taking focus does not cancel the selector session; a deactivation caused by any other window still does (the #677 contract is preserved for genuine deactivation).
-- [x] AC3: A mouse click on a row in the open list selects that row and closes the list; the selection is committed before any auto-close cancel runs.
+- [ ] AC3: A mouse click on a row in the open list selects that row and closes the list; the selection is committed before any auto-close cancel runs.
 - [x] AC4: The #680 leave-handoff latch covers the mouse open path as well as the Down-arrow path.
 - [x] AC5: Row-set refreshes while open (search, late decoration) continue not to close the list (#438 AC-3 regression guard).
 - [x] AC6: The first implementation step instruments `ParkFocusAndCancelSelectors` and `OnDropDownClosed` with debug log lines so the runtime ordering is confirmed before the fix is chosen.
