@@ -187,9 +187,13 @@ The instrumentation step is log-only and independently revertable. The AC2, AC3 
 
 ## Write Set
 
-Every path below is a concrete file the fix's diff will create or modify. Paths are repository-relative, use forward slashes, and contain no spaces. Sixteen paths.
+Every path below is a concrete file the fix's diff will create or modify. Paths are repository-relative, use forward slashes, and contain no spaces. Seventeen paths.
 
-Preflight round 1 proposed a seventeenth path, QuickFiler/Interfaces/IQfcItemController.cs, to carry the per-item selector-open state the AC6 diagnostic reports. That path is written here without backticks on purpose, because it is not a write claim. That proposal was adopted and then withdrawn after the planner established that adding a member to that interface breaks a compiled hand-written implementor outside the write set, on a target framework with no default interface members. The adopted resolution reaches the same value through an internal member on the concrete item controller, whose file is already in the write set, so the write set stays at sixteen paths and no interface changes.
+Two separate questions about an additional path have been settled at different times, and they are recorded separately here so that neither is read as the other.
+
+First, and now closed with no path added: preflight round 1 proposed QuickFiler/Interfaces/IQfcItemController.cs, to carry the per-item selector-open state the AC6 diagnostic reports. That path is written here without backticks on purpose, because it is not a write claim. That proposal was adopted and then withdrawn after the planner established that adding a member to that interface breaks a compiled hand-written implementor outside the write set, on a target framework with no default interface members. The adopted resolution reaches the same value through an internal member on the concrete item controller, whose file is already in the write set, so that proposal added no path and no interface changes.
+
+Second, and the reason the count is now seventeen rather than sixteen: `QuickFiler.Test/Controllers/QfcItemController.SearchDismissalTests.cs` was added after implementation of AC4 surfaced a pre-existing test in that file which asserts the behaviour AC4 deliberately changes. This is a write-set derivation oversight and NOT merge damage: `git log --follow` places the file at commit 660793e5, the original issue #680 fix, which predates the fix branch and both merges of origin/main into it. The write set was derived from the files the fix would edit, and it did not include a pre-existing test asserting the behaviour an acceptance criterion deliberately changes. The path contains no whitespace, so it is expressible as a blast-radius write claim and is backticked here as one; that is the point on which it differs from QuickFiler.Test/Helper Classes/QfcThemeHelperTests.cs, the candidate path recorded in the exclusion paragraph below as rejected because its name contains a space and blast-radius derivation splits on whitespace. The deliberate update to that file is specified under `## Test Strategy` below.
 
 ### Production — modify
 
@@ -211,6 +215,7 @@ Preflight round 1 proposed a seventeenth path, QuickFiler/Interfaces/IQfcItemCon
 
 - `QuickFiler.Test/Controllers/QfcFormControllerDeactivateTests.cs` — modify — AC2: deliberate update of the deactivate contract plus the new self-inflicted negative test. 248 lines, ample room.
 - `QuickFiler.Test/Viewers/BreadcrumbPendingOpenCloseTests.cs` — modify — AC1 and AC3: keep all five existing tests, add the pending-commit-versus-native-close guard. 380 lines.
+- `QuickFiler.Test/Controllers/QfcItemController.SearchDismissalTests.cs` — modify — AC4: deliberate update of `TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent`, the pre-existing issue #680 test that asserts a leave dismisses a drop-down regardless of which gesture opened it. That is precisely the state AC4 requires to stop being dismissed. The method name and its `Times.Once()` assertion are kept; one Arrange line establishing a search-driven open is added; the other five `[TestMethod]` members in the class are unchanged.
 
 ### Test — create
 
@@ -232,7 +237,7 @@ Framework: MSTest, with Moq for mocking and FluentAssertions for assertions. No 
 
 ### Existing tests that pin the current contract
 
-Both files below are deliberately UPDATED, not weakened and not deleted.
+Each of the three files below is deliberately UPDATED, not weakened and not deleted.
 
 **QuickFiler.Test/Controllers/QfcFormControllerDeactivateTests.cs — method `FormDeactivated_CancelsSelectorOnEveryItemController` at line 172.**
 
@@ -254,6 +259,17 @@ The assertions that actually encode cancel precedence are the literal `CancelCou
 The `FocusAnchorCount` assertions at lines 49, 80 and 114 count the focus-anchor delegate and stay at 1 because the harness leaves the may-take-focus predicate at its permissive default. Do not change that default.
 
 The added test is the AC3 fail-before guard: a native-reason close arriving while an activation commit is pending must not cancel. At 380 lines the file has room for one or two added tests; a third harness would require a new file.
+
+**QuickFiler.Test/Controllers/QfcItemController.SearchDismissalTests.cs — method `TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent` at line 74.**
+
+This method arranges an open drop-down with no search-driven open and asserts that the search box's `Leave` routes exactly one close intent. That arrangement is exactly the mouse-driven-open state AC4 requires to stop being dismissed, so the method pins the behaviour AC4 deliberately changes. Narrowing the AC4 fix to keep it green would mean not delivering AC4, and deleting or weakening the method is not available either. The deliberate update is:
+
+1. Keep the method at its current name and keep its `Times.Once()` assertion on `SetFolderDroppedDown(false)`, so the issue #680 dismissal-ownership contract stays visibly pinned for the case that still holds.
+2. Add exactly one Arrange line establishing a search-driven open, so the search box owns the dismissal before the leave is raised.
+3. Amend the method's doc comment to state the search-ownership condition.
+4. The other five `[TestMethod]` members in the class stay unchanged. The class's `[TestMethod]` count stays at 6.
+
+The mouse-driven case that this method no longer covers is covered by `SearchLeaveAfterMouseDrivenOpen_DoesNotCloseDropDown` in `QuickFiler.Test/Controllers/QfcItemController.SearchLeaveLatchTests.cs`, which asserts `Times.Never()` for it, so no coverage is lost by the update.
 
 ### New tests by acceptance criterion
 
@@ -307,12 +323,12 @@ Use the Rebuild target, never Build: MSBuild's up-to-date check does not invalid
 
 ## Acceptance Criteria
 
-- [ ] AC1: Opening the list by arrow click or by Down in the search box leaves it open until Escape, Left, a second arrow click, an item selection, or selection of a different QfcItem.
-- [ ] AC2: A deactivation of the QuickFiler form caused by the popup taking focus does not cancel the selector session; a deactivation caused by any other window still does (the #677 contract is preserved for genuine deactivation).
-- [ ] AC3: A mouse click on a row in the open list selects that row and closes the list; the selection is committed before any auto-close cancel runs.
-- [ ] AC4: The #680 leave-handoff latch covers the mouse open path as well as the Down-arrow path.
-- [ ] AC5: Row-set refreshes while open (search, late decoration) continue not to close the list (#438 AC-3 regression guard).
-- [ ] AC6: The first implementation step instruments `ParkFocusAndCancelSelectors` and `OnDropDownClosed` with debug log lines so the runtime ordering is confirmed before the fix is chosen.
+- [x] AC1: Opening the list by arrow click or by Down in the search box leaves it open until Escape, Left, a second arrow click, an item selection, or selection of a different QfcItem.
+- [x] AC2: A deactivation of the QuickFiler form caused by the popup taking focus does not cancel the selector session; a deactivation caused by any other window still does (the #677 contract is preserved for genuine deactivation).
+- [x] AC3: A mouse click on a row in the open list selects that row and closes the list; the selection is committed before any auto-close cancel runs.
+- [x] AC4: The #680 leave-handoff latch covers the mouse open path as well as the Down-arrow path.
+- [x] AC5: Row-set refreshes while open (search, late decoration) continue not to close the list (#438 AC-3 regression guard).
+- [x] AC6: The first implementation step instruments `ParkFocusAndCancelSelectors` and `OnDropDownClosed` with debug log lines so the runtime ordering is confirmed before the fix is chosen.
 
 ## Verification Conditions
 
