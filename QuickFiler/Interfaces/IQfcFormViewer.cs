@@ -68,5 +68,21 @@ namespace QuickFiler
         /// child window is left holding the Outlook UI thread's Win32 keyboard focus.
         /// </summary>
         void ParkFocusOffWebView2();
+
+        // Seam B — issue #796 (AC2) self-inflicted deactivation intent.
+
+        /// <summary>
+        /// Whether the window that took activation from this form is a breadcrumb popup owned by
+        /// this form, making the deactivation self-inflicted rather than a departure to a foreign
+        /// window.
+        /// </summary>
+        /// <remarks>
+        /// The polarity is load-bearing and must not be inverted: <c>false</c> means GENUINE, that
+        /// is, not self-inflicted. A viewer that reports nothing therefore keeps the issue #677
+        /// contract exactly, and a mock's default <c>bool</c> return of <c>false</c> means the
+        /// existing deactivation suite continues to describe a genuine deactivation without a new
+        /// Arrange line.
+        /// </remarks>
+        bool IsDeactivationSelfInflictedByOwnPopup { get; }
     }
 }

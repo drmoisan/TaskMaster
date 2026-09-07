@@ -210,6 +210,10 @@ namespace QuickFiler
             // IBreadcrumbDropDownHost) keeps the interface unchanged, so mock hosts installed by
             // the injected 3-arg ConfigureBreadcrumbDropDown overload are unaffected.
             host.MayTakeFocus = MayRestoreBreadcrumbFocus;
+            // Issue #796 (AC2): report this popup to the owning form as one that can take activation
+            // from it, so the deactivation handler can tell a self-inflicted deactivation apart from
+            // a genuine one without reading Form.ActiveForm, which was measured to run inverted.
+            (FindForm() as QfcFormViewer)?.SetBreadcrumbPopupOwner(this, () => host.IsOpen);
             ConfigureBreadcrumbDropDown(
                 host,
                 () =>

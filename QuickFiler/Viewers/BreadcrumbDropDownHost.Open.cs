@@ -88,6 +88,26 @@ namespace QuickFiler.Viewers
             return _openLifetime.OpenAsync(anchorScreenBounds, workingArea, desiredSize, takeFocus);
         }
 
+        /// <summary>
+        /// Issue #796 (AC3): whether a selection commit has been requested for the popup lifetime
+        /// that is currently open, so a close arriving with an <c>Uncommitted</c> reason must not
+        /// cancel the selection the commit is in the middle of making.
+        /// </summary>
+        /// <remarks>
+        /// A settable internal property rather than a constructor parameter, matching the issue #677
+        /// may-take-focus precedent, so every constructor keeps its baseline arity and the
+        /// reflection-based constructor binding the existing tests rely on is not disturbed. It is
+        /// declared on this part rather than on the main part because the main part stands close to
+        /// the repository's 500-line ceiling and this one does not.
+        /// <para>
+        /// The lifetime is one popup opening: <see cref="ShowPopup"/> clears it as each fresh native
+        /// show begins, and nothing else clears it. That is deliberate — once a commit has been
+        /// requested for a given open popup, every later uncommitted-reason close of that same popup
+        /// is a close racing the commit, whichever order the two arrive in.
+        /// </para>
+        /// </remarks>
+        internal bool IsCommitPending { get; set; }
+
         // Issue #680: AutoClose == false is the WinForms framework's own opt-out from
         // ModalMenuFilter menu-mode entry. Menu mode retargets every keystroke to the popup's window
         // handle whenever the popup does not contain focus, which is exactly the state a
@@ -97,6 +117,10 @@ namespace QuickFiler.Viewers
         // ordering by statement order.
         internal void ShowPopup(Point location, bool takeFocus)
         {
+            // Issue #796 (AC3): a fresh native show starts a new popup lifetime, which by definition
+            // has no commit in flight yet. Clearing here rather than at a close keeps the latch's
+            // meaning tied to the popup that is open, not to whichever close happened to run last.
+            IsCommitPending = false;
             DropDown.AutoClose = takeFocus;
             _showPopup(DropDown, Anchor, location);
         }

@@ -414,6 +414,7 @@
     <Compile Include="Viewers\IBreadcrumbDropDownHost.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHost.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHost.Open.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownHost.Diagnostics.cs" />
     <Compile Include="Viewers\BreadcrumbCollapsedSurfaceController.cs" />
     <Compile Include="Viewers\BreadcrumbWebViewSurfaceFactory.cs" />
     <Compile Include="Viewers\IWebViewCoreInitializer.cs" />

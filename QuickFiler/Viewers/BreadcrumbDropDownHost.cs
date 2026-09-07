@@ -248,6 +248,12 @@ namespace QuickFiler.Viewers
         {
             if (_disposed)
                 return false;
+            // Issue #796 (AC3): an explicit-commit close is the commit reaching this host, so it is
+            // the point at which a commit becomes in flight for this popup lifetime. Recording it
+            // here rather than at the completion point is what lets a native uncommitted-reason
+            // close that arrives alongside it be recognised as racing the commit.
+            if (reason == BreadcrumbDropDownCloseReason.ExplicitCommit)
+                IsCommitPending = true;
             if (OpenState)
             {
                 _openLifetime.InvalidateAndSchedule(() => CompleteClose(reason, true));
@@ -423,19 +429,6 @@ namespace QuickFiler.Viewers
             }
         }
 
-        private void OnDropDownClosed(object? sender, ToolStripDropDownClosedEventArgs e)
-        {
-            if (_disposed || _programmaticClose || !OpenState)
-                return;
-            _openLifetime.InvalidateAndSchedule(() =>
-            {
-                if (_disposed || _programmaticClose || !OpenState)
-                    return;
-                OpenState = false;
-                FinishClose(BreadcrumbDropDownCloseReason.Uncommitted);
-            });
-        }
-
         private void FinishClose(BreadcrumbDropDownCloseReason reason)
         {
             CompleteAll(
@@ -446,7 +439,12 @@ namespace QuickFiler.Viewers
                 () => DropDown.AutoClose = true,
                 () =>
                 {
-                    if (reason == BreadcrumbDropDownCloseReason.Uncommitted)
+                    // Issue #796 (AC3): an uncommitted-reason close arriving while a commit has
+                    // been requested for this popup lifetime is a close racing the commit, so it
+                    // must not undo it. The suppression is conditional on the latch and is
+                    // therefore scoped: with no commit in flight the cancel still runs, which is
+                    // what the retained BreadcrumbPendingOpenCloseTests cancel assertions pin.
+                    if (reason == BreadcrumbDropDownCloseReason.Uncommitted && !IsCommitPending)
                         _cancelSelection();
                 },
                 // Issue #677: only the focus step is gated; the cancel step above always runs.

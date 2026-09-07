@@ -69,6 +69,12 @@ namespace QuickFiler.Controllers.Tests
         /// <summary>
         /// The search textbox losing focus while the drop-down is open routes exactly one close
         /// intent — the dismissal WinForms menu mode used to provide for a capturing popup.
+        /// <para>
+        /// Issue #796 (AC4) narrowed the condition rather than removing it: the leave dismisses only
+        /// a drop-down this search box itself opened. The Arrange therefore establishes that
+        /// search-driven ownership before the leave is raised. A mouse-driven open carries no
+        /// ownership and is deliberately no longer dismissed by this path.
+        /// </para>
         /// </summary>
         [TestMethod]
         public void TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent()
@@ -76,6 +82,7 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             Mock<IItemViewer> viewer = BuildViewer(isOpen: true);
             HarnessController controller = BuildController(viewer);
+            QfcItemControllerTestSupport.SetField(controller, "_searchOwnedDismissal", true);
 
             // Act
             controller.TextBoxSearch_Leave(null, EventArgs.Empty);
