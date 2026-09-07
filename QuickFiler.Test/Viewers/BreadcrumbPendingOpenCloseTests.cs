@@ -185,6 +185,51 @@ namespace QuickFiler.Test.Viewers
             closeCount.Should().Be(1);
         }
 
+        /// <summary>
+        /// Issue #796 (AC5), the issue #438 AC-3 regression guard. Scenario: the selector is open
+        /// and the row set is replaced twice, as a search refresh or a late decoration does.
+        /// Expected outcome: no <c>Close</c> reaches the host and the session still reports the
+        /// selector open. The guard is meaningful because the session-preserving replacement path
+        /// in UtilitiesCS is deliberately left out of this item's diff, so what is observed here is
+        /// that untouched path. It reuses the headless-viewer plus mocked-host pattern the two
+        /// tests below already use rather than adding a third harness to this file.
+        /// </summary>
+        [TestMethod]
+        public void RowSetRefreshWhileOpen_NeverClosesHost()
+        {
+            // Arrange
+            using (var scope = new ViewerScope())
+            {
+                Rectangle anchor = new Rectangle(0, 0, 300, 25);
+                Rectangle working = new Rectangle(0, 0, 1920, 1040);
+                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                scope.Viewer.InitializeBreadcrumbPipeline(provider.Object);
+                scope.Viewer.BreadcrumbCoordinator.AddItems(new[] { "A", "B" });
+                bool hostOpen = false;
+                var host = new Mock<IBreadcrumbDropDownHost>();
+                host.SetupGet(value => value.IsOpen).Returns(() => hostOpen);
+                host.Setup(value => value.OpenAsync(anchor, working, It.IsAny<Size>()))
+                    .Callback(() => hostOpen = true)
+                    .ReturnsAsync(true);
+                host.Setup(value =>
+                        value.OpenAsync(anchor, working, It.IsAny<Size>(), It.IsAny<bool>())
+                    )
+                    .ReturnsAsync(true);
+                scope.Viewer.ConfigureBreadcrumbDropDown(host.Object, () => anchor, () => working);
+                scope.Viewer.SetBreadcrumbDropDownState(true);
+
+                // Act — two row-set replacements while the selector is open.
+                scope.Viewer.PresentBreadcrumbSearchResults(new[] { @"\\A\one" });
+                scope.Viewer.PresentBreadcrumbSearchResults(new[] { @"\\A\one", @"\\A\two" });
+
+                // Assert
+                host.Verify(v => v.Close(It.IsAny<BreadcrumbDropDownCloseReason>()), Times.Never());
+                scope
+                    .Viewer.BreadcrumbCoordinator.IsSelectorOpen.Should()
+                    .BeTrue("a row-set refresh must not end the selector session");
+            }
+        }
+
         private static int ExercisePendingViewerClose(
             Action<QuickFiler.ItemViewer> close,
             BreadcrumbDropDownCloseReason expectedReason

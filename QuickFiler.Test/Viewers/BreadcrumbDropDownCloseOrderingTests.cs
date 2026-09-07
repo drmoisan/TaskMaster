@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
+using Moq;
 using QuickFiler.Viewers;
 
 namespace QuickFiler.Test.Viewers
@@ -110,6 +111,42 @@ namespace QuickFiler.Test.Viewers
                 harness
                     .CancelCount.Should()
                     .Be(1, "a close with no commit in flight still cancels the selection");
+            }
+        }
+
+        /// <summary>
+        /// Issue #796 (AC1). Scenario: the drop-down is opened by the gesture open path. Expected
+        /// outcome: the open task resolves true, the host reports open, the selection session
+        /// reports the selector open, and no <c>Close</c> reaches the host across the gesture.
+        /// </summary>
+        /// <remarks>
+        /// What is asserted here is the managed seam. The part of AC1 that is NOT automatable is
+        /// that no FRAMEWORK close occurs: no framework drop-down is shown in a headless test, so
+        /// there is no <c>ToolStripDropDown</c> to raise <c>Closed</c> and no framework decision to
+        /// observe. That half of the criterion is covered by the Phase 2 manual observation and is
+        /// stated here rather than asserted, so a later reader does not read this test as proving
+        /// more than it does.
+        /// </remarks>
+        [TestMethod]
+        public async Task GestureOpen_ResolvesOpenAndLeavesHostOpenWithoutClose()
+        {
+            // Arrange
+            using (var harness = new ItemViewerDropDownHarness())
+            {
+                // Act
+                harness.Viewer.SetFolderDroppedDown(true);
+                bool opened = await harness.Viewer.BreadcrumbOpenTask.ConfigureAwait(false);
+
+                // Assert
+                opened.Should().BeTrue("the gesture open path must resolve to an opened popup");
+                harness.Host.Object.IsOpen.Should().BeTrue("the host must still report open");
+                harness
+                    .Viewer.BreadcrumbCoordinator.IsSelectorOpen.Should()
+                    .BeTrue("the selection session must still report the selector open");
+                harness.Host.Verify(
+                    host => host.Close(It.IsAny<BreadcrumbDropDownCloseReason>()),
+                    Times.Never()
+                );
             }
         }
 
