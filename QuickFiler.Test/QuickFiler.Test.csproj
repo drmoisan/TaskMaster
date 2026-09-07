@@ -144,6 +144,7 @@
     <Compile Include="Controllers\QfcCollectionControllerDefects468ConversationTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerLayout.StaTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
+    <Compile Include="Controllers\QfcDatamodelRethrowTests.cs" />
     <Compile Include="Controllers\QfcDatamodelLivenessTests.cs" />
     <Compile Include="Controllers\QfcMoveMonitorTopologyTests.cs" />
     <Compile Include="Controllers\QfcExplorerController.ConversationViewTests.cs" />

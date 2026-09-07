@@ -105,7 +105,7 @@ namespace QuickFiler.Controllers
                 logger.Error(
                     $"{nameof(DfDeedle.GetEmailDataInViewAsync)} Error. \n {e.Message}\n{e.StackTrace}"
                 );
-                throw e;
+                throw;
             }
         }
 

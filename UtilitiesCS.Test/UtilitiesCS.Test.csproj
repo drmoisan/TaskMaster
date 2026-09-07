@@ -187,6 +187,8 @@
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
     <Compile Include="Extensions\DfDeedle_Tests.cs" />
     <Compile Include="Extensions\DfDeedle_COM_Tests.cs" />
+    <Compile Include="Extensions\DfDeedleQfcColumnTimeoutTests.cs" />
+    <Compile Include="Extensions\DfDeedleRequiredColumnValidationTests.cs" />
     <Compile Include="Extensions\DfMLNet_Tests.cs" />
     <Compile Include="Extensions\DictionaryExtensions_Tests.cs" />
     <Compile Include="Extensions\EnumExtensions_Tests.cs" />
