@@ -458,32 +458,32 @@ this plan does not permit a state in which AC1 has landed and AC2 has not.
 
 ### Phase 7 — Scope, size, and inverse-constraint audits
 
-- [ ] [P7-T1] Stage and commit the sixteen write-set paths, including `UtilitiesCS/Extensions/DfDeedle.QfcColumns.cs` and `TaskMaster/Ribbon/RibbonCommandBoundary.cs`, so the anchored diff gates in this phase have a commit to compare against.
+- [x] [P7-T1] Stage and commit the sixteen write-set paths, including `UtilitiesCS/Extensions/DfDeedle.QfcColumns.cs` and `TaskMaster/Ribbon/RibbonCommandBoundary.cs`, so the anchored diff gates in this phase have a commit to compare against.
   - Run git add -A -- . ":(exclude).claude" then `git commit`, with the commit message naming issue #798. Both command spans are written in plain prose because the pathspec names a repository path outside the write set.
   - Acceptance: running git status --porcelain --untracked-files=all -- . ":(exclude).claude" produces no output line whose path lies outside `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/`, and `git rev-parse HEAD` differs from `c431dc32`.
 
-- [ ] [P7-T2] Verify the code diff touches exactly the sixteen write-set paths, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-write-set-diff.md`.
+- [x] [P7-T2] Verify the code diff touches exactly the sixteen write-set paths, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-write-set-diff.md`.
   - Run git add --intent-to-add -A -- . ":(exclude).claude", then git diff --name-only c431dc32 -- . ":(exclude).claude" ":(exclude)docs", then git status --porcelain --untracked-files=all -- . ":(exclude).claude" ":(exclude)docs". All three command spans are written in plain prose because their pathspecs name repository paths outside the write set.
   - The whole-tree csharpier passes mandated by P1-T12, P3-T6, P4-T4, P5-T4, P6-T5, P7-T8 and P8-T1 can add a path to this set only if P0-T5 recorded a non-zero exit and enumerated pre-existing unformatted files. If that happened, the extra paths must be exactly the set P0-T5 enumerated, which is a mechanically derived set and not an executor choice; the artifact then records the observed extra paths against the P0-T5 enumeration and this task is recorded as BLOCKED pending maintainer adjudication, because AC13 fixes the write set at sixteen and this plan may not widen it. If P0-T5 recorded `EXIT_CODE: 0`, no extra path is possible and any extra path is a defect in this change.
   - Acceptance: the diff output set is exactly the sixteen paths enumerated under `## Write Set Under Change`, with no extra path and no missing path, and the porcelain output contains no path outside that set. The artifact lists the observed set verbatim and states the observed count as `16`.
 
-- [ ] [P7-T3] Verify each of the six new `.cs` files — two production and four test — has a `<Compile Include>` entry in its project, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-compile-entries.md`.
+- [x] [P7-T3] Verify each of the six new `.cs` files — two production and four test — has a `<Compile Include>` entry in its project, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-compile-entries.md`.
   - Acceptance: the artifact records one match for each of the six literals `<Compile Include="Extensions\DfDeedle.QfcColumns.cs" />`, `<Compile Include="Ribbon\RibbonCommandBoundary.cs" />`, `<Compile Include="Extensions\DfDeedleQfcColumnTimeoutTests.cs" />`, `<Compile Include="Extensions\DfDeedleRequiredColumnValidationTests.cs" />`, `<Compile Include="Ribbon\RibbonCommandBoundaryTests.cs" />`, `<Compile Include="Controllers\QfcDatamodelRethrowTests.cs" />`, each in its own project file.
 
-- [ ] [P7-T4] Audit the 500-line cap over the eleven write-set `.cs` files, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-line-cap.md`.
+- [x] [P7-T4] Audit the 500-line cap over the eleven write-set `.cs` files, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-line-cap.md`.
   - Formatting changes line counts, so P7-T8 re-runs this audit whenever its format pass rewrites a file, and P8-T9 re-verifies it after the final formatting pass. The counts recorded here are those observed at this position in the sequence; this task is not deferred.
   - Acceptance: the artifact records one `path=count` line per file. Every file other than `UtilitiesCS.Test/Extensions/DfDeedle_COM_Tests.cs` has a count at or below 500. `UtilitiesCS.Test/Extensions/DfDeedle_COM_Tests.cs` has a count strictly below its base-commit value of 882, and the artifact restates the AC13 condition recorded in P0-T12: the file was already over the cap at the base commit, AC13 requires only that its count strictly decrease, and bringing it under the cap would require an additional file outside the sixteen-path write set. The artifact states that this satisfies AC13 and records no deviation.
 
-- [ ] [P7-T5] Verify the AC12 inverse constraints, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac12-inverse-constraints.md`.
+- [x] [P7-T5] Verify the AC12 inverse constraints, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac12-inverse-constraints.md`.
   - Acceptance: running git diff --name-only c431dc32 -- QuickFiler/Controllers/QfcHomeController.cs produces no output lines, and running git status --porcelain --untracked-files=all -- QuickFiler/Controllers/QfcHomeController.cs also produces no output lines, so the narrow cancellation catch in the home controller is provably untouched in both the committed and the working state. A search of the four modified production files `UtilitiesCS/Extensions/DfDeedle.cs`, `QuickFiler/Controllers/QfcDatamodel.cs`, `QuickFiler/Controllers/QfcDatamodel.FrameBuilding.cs` and `TaskMaster/Ribbon/RibbonViewer.cs` shows the count of `catch (System.Exception` occurrences is not greater than the base-commit count for each file, verified by running git diff c431dc32 -- against each of those four paths in turn, one command per path, written as plain prose, and recorded per file in the artifact.
 
-- [ ] [P7-T6] Verify the AC8 overload constraint, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac8-timeoutafter-unchanged.md`.
+- [x] [P7-T6] Verify the AC8 overload constraint, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac8-timeoutafter-unchanged.md`.
   - Acceptance: running git diff --name-only c431dc32 -- UtilitiesCS/Threading/ produces no output lines, and running git status --porcelain --untracked-files=all -- UtilitiesCS/Threading/ also produces no output lines; a repository-wide declaration-anchored search over `*.cs` for lines matching `public static .*TimeoutAfter` returns exactly four matches, all in the threading helper file, two of which are the generic `Task<TResult> TimeoutAfter<TResult>(` declarations whose type-parameter list makes a trailing-parenthesis anchor miss them; and a search of the four modified production files and the new production partial for the literals `Task.Delay` and `Thread.Sleep` returns zero matches for each.
 
-- [ ] [P7-T7] Verify the AC9 fixed-arity constraint, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac9-fixed-arity.md`.
+- [x] [P7-T7] Verify the AC9 fixed-arity constraint, recording the result in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac9-fixed-arity.md`.
   - Acceptance: running git diff c431dc32 -- UtilitiesCS.Test/Extensions/DfDeedle_Tests.cs produces no output lines, running git status --porcelain --untracked-files=all against that same path also produces no output lines, and the artifact records a pass status for `UtilitiesCS.Test.Extensions.DfDeedle_Tests.Email2dArrayToDf_ViaReflection_ValidData_ReturnsFrame`, which invokes `Email2dArrayToDf` reflectively with a three-element argument array, and for `UtilitiesCS.Test.Extensions.DfDeedle_COM_Tests.GetEmailDataFromTable_OneRow_ReturnsFrameWithExpectedFields`, which calls `GetEmailDataFromTable` directly, both read from the P6-T5 test run, which is the last run of the three affected assemblies before this phase. No Phase 8 task may be the evidence source for a Phase 7 gate, and P8-T3 in particular is the nullable build and produces no test result.
 
-- [ ] [P7-T8] Run a final csharpier format-then-check pass over this change's paths and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-csharpier-final.md`.
+- [x] [P7-T8] Run a final csharpier format-then-check pass over this change's paths and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-csharpier-final.md`.
   - Run `dotnet tool run csharpier format .` over the whole tree, then `dotnet tool run csharpier check .`, and record a git status --porcelain --untracked-files=all -- . ":(exclude).claude" observation taken before and after the format pass.
   - Acceptance: the artifact records `EXIT_CODE: 0` for the check command and quotes its success-case summary line, which begins with the literal `Checked ` and ends with the literal `ms.`. If the format command rewrote any file, P7-T4 is re-run afterwards.
 
@@ -494,27 +494,27 @@ this plan does not permit a state in which AC1 has landed and AC2 has not.
 The four toolchain steps run in order in this phase. If any step fails or rewrites a file, the loop
 restarts at P8-T1.
 
-- [ ] [P8-T1] Run the formatting step and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-csharpier.md`.
+- [x] [P8-T1] Run the formatting step and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-csharpier.md`.
   - Run `dotnet tool run csharpier format .` over the whole tree, then `dotnet tool run csharpier check .`, and record a git status --porcelain --untracked-files=all -- . ":(exclude).claude" observation taken before and after the format pass.
   - Acceptance: the artifact records `EXIT_CODE: 0` for the check command and quotes its success-case summary line, which begins with the literal `Checked ` and ends with the literal `ms.`. The artifact additionally states whether the format command rewrote any file, as a before-and-after observation of the tree.
 
-- [ ] [P8-T2] Run the analyzer step over the solution file and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-msbuild-analyzers.md`.
+- [x] [P8-T2] Run the analyzer step over the solution file and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-msbuild-analyzers.md`.
   - Run msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true, written as plain prose because the solution file is outside the write set.
   - Acceptance: the artifact records `EXIT_CODE: 0` and quotes the summary line `0 Error(s)`. The warning count is recorded and compared against the P0-T6 baseline warning count; an increase is enumerated by diagnostic id in the artifact.
 
-- [ ] [P8-T3] Run the type-check step over the solution file and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-msbuild-nullable.md`.
+- [x] [P8-T3] Run the type-check step over the solution file and record it in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-msbuild-nullable.md`.
   - Run msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true, written as plain prose because the solution file is outside the write set.
   - Acceptance: the artifact records `EXIT_CODE: 0` and quotes the summary line `0 Error(s)`. The artifact states explicitly that `/p:Nullable=enable` was not supplied, matching CI.
 
-- [ ] [P8-T4] Run the full-suite test step with coverage and write the Cobertura document to `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/coverage-final.cobertura.xml`.
+- [x] [P8-T4] Run the full-suite test step with coverage and write the Cobertura document to `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/coverage-final.cobertura.xml`.
   - Discover assemblies exactly as in P0-T9, then run dotnet-coverage collect --output coverage\final.cobertura.xml --output-format cobertura --settings coverage.config -- <vstest> <assemblies> /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /Logger:trx /ResultsDirectory:coverage\trx\p8-final /Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None /TestCaseFilter:"TestCategory!=LiveOutlook", written as plain prose because the settings file and the runsettings file are repository paths outside the write set, extending the filter per the P0-T8 verdict, then copy the result to the evidence path above.
   - Acceptance: the evidence Cobertura file exists and is tracked after `git add --intent-to-add`, and `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-vstest-coverage.md` records `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` containing the total, passed, failed and skipped counts with a failed count of 0, and the document-level `line-rate` value as a decimal fraction. A failure of the issue #780 sporadic `TryAddValuesAsync_UpdatesExistingValue` test requires a rerun of this task rather than acceptance.
 
-- [ ] [P8-T5] Extract post-change per-file coverage for the six production write-set paths into `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/per-file-coverage-final.md`.
+- [x] [P8-T5] Extract post-change per-file coverage for the six production write-set paths into `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/per-file-coverage-final.md`.
   - Use the same aggregation rule as P0-T10: match `class` elements by `filename` suffix and count only direct-child `lines/line` elements, never the copies nested under a `method` element. The `filename` attribute is repository-relative and uses backslash separators, so the six suffixes matched are `Extensions\DfDeedle.cs`, `Extensions\DfDeedle.QfcColumns.cs`, `Controllers\QfcDatamodel.FrameBuilding.cs`, `Controllers\QfcDatamodel.cs`, `Ribbon\RibbonCommandBoundary.cs` and `Ribbon\RibbonViewer.cs`. A forward-slash suffix matches no element in this document, records every path as `NOT INSTRUMENTED`, and makes the first two clauses of P8-T6 fail against a correct change.
   - Acceptance: the artifact records a `covered=` integer, a `valid=` integer and a `rate=` decimal fraction for each of the six production paths, and records `NOT INSTRUMENTED` for any path producing no matching class element.
 
-- [ ] [P8-T6] Verify the change-scoped coverage obligations against the baseline, recording the comparison in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/coverage-delta.md`.
+- [x] [P8-T6] Verify the change-scoped coverage obligations against the baseline, recording the comparison in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/coverage-delta.md`.
   - The artifact reports, in this order: the P0-T9 baseline document-level line rate, the P8-T4 post-change document-level line rate, the per-file rate for each new module, and the covered-line comparison for each existing production file.
   - Acceptance, all four clauses required:
     - `UtilitiesCS/Extensions/DfDeedle.QfcColumns.cs` has `rate=` at or above 0.90.
@@ -523,14 +523,14 @@ restarts at P8-T1.
     - The sum of the post-change `covered=` values for `UtilitiesCS/Extensions/DfDeedle.cs` and `UtilitiesCS/Extensions/DfDeedle.QfcColumns.cs` is at or above the P0-T10 baseline `covered=` value for `UtilitiesCS/Extensions/DfDeedle.cs`. This relocation adjustment is required because the source file loses lines to the new partial, so a per-file comparison on it alone would compare different denominators.
   - The artifact additionally states, as a record-and-report obligation and not a blocking gate, the direction of movement of the repository-wide figure, together with the reason no repository-wide floor is asserted for this item: no merge-base repository baseline exists in this feature folder, the repository floor applies to the testable denominator after the COM, VSTO and WinForms exemptions, and this pipeline's repository-wide line rate is not reproducible run-to-run on an identical tree.
 
-- [ ] [P8-T7] Close any coverage gap identified by P8-T6 by extending the owning test files, then re-run P8-T4, P8-T5 and P8-T6.
+- [x] [P8-T7] Close any coverage gap identified by P8-T6 by extending the owning test files, then re-run P8-T4, P8-T5 and P8-T6.
   - Gaps in `UtilitiesCS/Extensions/DfDeedle.QfcColumns.cs` are closed in `UtilitiesCS.Test/Extensions/DfDeedleQfcColumnTimeoutTests.cs` or `UtilitiesCS.Test/Extensions/DfDeedleRequiredColumnValidationTests.cs`. Gaps in `TaskMaster/Ribbon/RibbonCommandBoundary.cs` are closed in `TaskMaster.Test/Ribbon/RibbonCommandBoundaryTests.cs`. The QuickFiler datamodel files are `[ExcludeFromCodeCoverage]`, so no per-file coverage gap can arise in them and none is closed; `QuickFiler.Test/Controllers/QfcDatamodelRethrowTests.cs` is extended only if a behavioural gap is identified. No file outside the write set is added.
   - Acceptance: `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/coverage-delta.md` in its final state satisfies all four clauses of P8-T6, and the artifact records whether any gap-closure test was added and, if so, names each added test by fully-qualified name. If P8-T6 already satisfied all four clauses, the artifact records `GAP CLOSURE: NOT REQUIRED`.
 
-- [ ] [P8-T8] Confirm the loop completed clean in a single pass and record the confirmation in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-toolchain-clean-pass.md`.
+- [x] [P8-T8] Confirm the loop completed clean in a single pass and record the confirmation in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/final-toolchain-clean-pass.md`.
   - Acceptance: the artifact names the four commands in order, records `EXIT_CODE: 0` for each, records that no step rewrote a file during the final pass, and records the pass number of the final pass. If P8-T7 added tests, the four steps are re-run in order after that task and only the final clean pass is recorded here.
 
-- [ ] [P8-T9] Re-verify the write-set diff and the line cap after the final formatting pass, updating `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-write-set-diff.md` and `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-line-cap.md`.
+- [x] [P8-T9] Re-verify the write-set diff and the line cap after the final formatting pass, updating `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-write-set-diff.md` and `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/p7-ac13-line-cap.md`.
   - Acceptance: both artifacts carry a second `Timestamp:` block recording the post-final-pass observation, the write-set count is still `16`, and every file other than `UtilitiesCS.Test/Extensions/DfDeedle_COM_Tests.cs` is at or below 500 lines.
 
 ---
@@ -540,72 +540,72 @@ restarts at P8-T1.
 Each acceptance criterion is checked off in its own task against named evidence. A task may not be
 checked off before its named evidence artifact exists and satisfies the stated condition.
 
-- [ ] [P9-T1] Check off AC1 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T1] Check off AC1 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/regression-testing/p2-ac1-nonoverlap-fail-before.md`, `evidence/regression-testing/p2-ac1-loud-failure-fail-before.md`, `evidence/regression-testing/p3-ac1-ac2-pass-after.md`.
   - Acceptance: the AC1 checkbox in spec.md is `[x]`, and the three artifacts show the two named AC1 tests failing before P3-T1 and P3-T2 and passing after.
 
-- [ ] [P9-T2] Check off AC2 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T2] Check off AC2 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/regression-testing/p2-ac2-timing-fail-before.md`, `evidence/regression-testing/p3-ac1-ac2-pass-after.md`.
   - Acceptance: the AC2 checkbox in spec.md is `[x]`, and the artifacts show both named AC2 tests failing before P3-T3 and P3-T4 and passing after.
 
-- [ ] [P9-T3] Check off AC3 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T3] Check off AC3 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/regression-testing/p2-ac3-negative-fail-before.md`, `evidence/regression-testing/p2-ac3-message-fail-before.md`, `evidence/regression-testing/p4-ac3-pass-after.md`.
   - Acceptance: the AC3 checkbox in spec.md is `[x]`, and the artifacts show the nine named AC3 tests reaching a pass status in P4-T4.
 
-- [ ] [P9-T4] Check off AC4 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T4] Check off AC4 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/regression-testing/p2-ac4-fail-before.md`, `evidence/regression-testing/p5-ac4-pass-after.md`.
   - Acceptance: the AC4 checkbox in spec.md is `[x]`, and the artifacts show the named AC4 test failing before P5-T1 and passing after.
 
-- [ ] [P9-T5] Check off AC5 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T5] Check off AC5 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/regression-testing/p2-ac5-boundary-fail-before.md`, `evidence/regression-testing/p2-ac5-shape-fail-before.md`, `evidence/regression-testing/p6-ac5-pass-after.md`.
   - Acceptance: the AC5 checkbox in spec.md is `[x]`, and the artifacts show the seven named AC5 tests reaching a pass status in P6-T5.
 
-- [ ] [P9-T6] Record the AC6 manual verification handoff in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/other/ac6-manual-verification-handoff.md` and leave the AC6 checkbox in spec.md unchecked.
+- [x] [P9-T6] Record the AC6 manual verification handoff in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/other/ac6-manual-verification-handoff.md` and leave the AC6 checkbox in spec.md unchecked.
   - The artifact states the manual steps: load the debug build, launch QuickFiler on the reproduction folder, confirm either a successful launch or an error dialog naming the folder and the failing step with no unhandled Outlook exception; launch on Inbox as a regression check; and in both cases confirm the debug log contains the per-step column-add timing lines.
   - Acceptance: the artifact exists and the AC6 line in spec.md is byte-identical to its base-commit text, still `[ ]`, with no note added beside it. The pending status is recorded in this task's artifact and in the P9-T15 status summary instead, because spec.md's Authority blockquote forbids rewording AC1 through AC6 and the acceptance-criteria-tracking skill permits changing only `- [ ]` to `- [x]`. AC6 is not checked off by this plan.
 
-- [ ] [P9-T7] Check off AC7 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T7] Check off AC7 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/regression-testing/p3-ac1-ac2-pass-after.md`.
   - Acceptance: the AC7 checkbox in spec.md is `[x]`, and the artifact shows `AddQfcColumnsAsync_ThreeDeadlines_InvokesColumnAdderExactlyOnce` and the three positive-path tests all passing.
 
-- [ ] [P9-T8] Check off AC8 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T8] Check off AC8 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/qa-gates/p3-banned-symbol-and-overload-scope.md`, `evidence/qa-gates/p7-ac8-timeoutafter-unchanged.md`, `evidence/qa-gates/final-msbuild-analyzers.md`.
   - Acceptance: the AC8 checkbox in spec.md is `[x]`, and the artifacts show exactly four `TimeoutAfter` declarations, no diff under the threading directory, no banned symbol in the changed production files, and `0 Error(s)` from the analyzer build.
 
-- [ ] [P9-T9] Check off AC9 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T9] Check off AC9 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/qa-gates/p7-ac9-fixed-arity.md`, `evidence/regression-testing/p4-ac3-pass-after.md`.
   - Acceptance: the AC9 checkbox in spec.md is `[x]`, and the artifacts show two validator call sites in the source file, unchanged arities for the three pinned methods, and a pass status for the fixed-arity tests.
 
-- [ ] [P9-T10] Check off AC10 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T10] Check off AC10 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/qa-gates/p5-ac10-out-of-scope-throws.md`.
   - Acceptance: the AC10 checkbox in spec.md is `[x]`, and the artifact shows zero `throw e;` occurrences in the two `QfcDatamodel` partial files and exactly two remaining occurrences elsewhere in the QuickFiler project, both untouched by the diff.
 
-- [ ] [P9-T11] Check off AC11 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T11] Check off AC11 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/qa-gates/p6-ac11-handler-inventory.md`, `evidence/regression-testing/p6-ac5-pass-after.md`.
   - Acceptance: the AC11 checkbox in spec.md is `[x]`, and the artifacts show 24 `async void` members still present in the ribbon viewer file, a diff confined to the three named handlers plus one field and one sink, no `[ExcludeFromCodeCoverage]` on the boundary type, and a pass status for the inner-exception rendering test.
 
-- [ ] [P9-T12] Check off AC12 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T12] Check off AC12 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/qa-gates/p7-ac12-inverse-constraints.md`.
   - Acceptance: the AC12 checkbox in spec.md is `[x]`, and the artifact shows an empty diff for the QuickFiler home controller file and no increase in `catch (System.Exception` occurrences in any modified production file.
 
-- [ ] [P9-T13] Check off AC13 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T13] Check off AC13 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/qa-gates/p7-ac13-write-set-diff.md`, `evidence/qa-gates/p7-ac13-compile-entries.md`, `evidence/qa-gates/p7-ac13-line-cap.md`, `evidence/baseline/line-cap-preexisting.md`.
   - Acceptance: the AC13 checkbox in spec.md is `[x]`, the diff artifact records exactly 16 paths, the compile-entry artifact records all six entries, the line-cap artifact records every file at or below 500 lines except `UtilitiesCS.Test/Extensions/DfDeedle_COM_Tests.cs`, that file's count is strictly below 882 as AC13 requires for a file already over the cap at base, and P9-T16 has recorded the pre-existing violation as the third follow-up promotion that AC13's final clause requires. No deviation note is added beside the AC13 checkbox: the change satisfies the criterion as written.
 
-- [ ] [P9-T14] Check off AC14 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
+- [x] [P9-T14] Check off AC14 in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md`.
   - Evidence: `evidence/qa-gates/final-toolchain-clean-pass.md`, `evidence/baseline/log4net-capture-probe.md`, `evidence/qa-gates/coverage-delta.md`.
   - Acceptance: the AC14 checkbox in spec.md is `[x]`, the clean-pass artifact records `EXIT_CODE: 0` for all four commands in order in a single pass, and the log-capture artifact records one of the two verdict lines together with the AC2 strategy actually implemented.
 
-- [ ] [P9-T15] Write the acceptance-criteria status summary to `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/issue-updates/ac-status-summary.md`.
+- [x] [P9-T15] Write the acceptance-criteria status summary to `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/issue-updates/ac-status-summary.md`.
   - Acceptance: the artifact lists all 14 criteria with a status of `MET` or `PENDING MANUAL`, names the evidence artifact for each, and records AC6 as `PENDING MANUAL`.
 
-- [ ] [P9-T16] Record the three follow-up promotions in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/other/followup-promotions.md`, matching the three enumerated under Rollout & Follow-up in spec.md.
+- [x] [P9-T16] Record the three follow-up promotions in `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/other/followup-promotions.md`, matching the three enumerated under Rollout & Follow-up in spec.md.
   - The three findings are: the unreachable `catch (TimeoutException)` in the two `repeatAttempts` timeout overloads, whose documented retry never executes because the wrapped call returns a proxy that faults later and never throws synchronously; the unguarded shared-static message-box seam mutation in the existing COM test class under class-level parallelization; and the pre-existing 500-line-cap violation in that same COM test class, which stands at 882 lines at the base commit and is reduced but not brought under the cap by this change.
   - Acceptance: the artifact records all three findings with their locations, records the observed post-change line count of the COM test class for the third, and states that each is to be promoted through the potential-to-issue lifecycle so none is lost when this feature folder is archived. If the promotion route is unavailable in this session, the artifact records that fact explicitly rather than omitting the item. The third entry is required by the final clause of AC13 and P9-T13 may not be checked off until it is present.
 
-- [ ] [P9-T17] Update `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md` status metadata and record the observed final line count of the COM test file.
+- [x] [P9-T17] Update `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md` status metadata and record the observed final line count of the COM test file.
   - Acceptance: the spec Status field reads `Implemented`, the Last Updated field carries the execution timestamp, and the Risks section item covering the reflection-test repair is annotated with the observed post-change line count of the COM test file.
 
-- [ ] [P9-T18] Commit every artifact under `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/` together with the updated `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md` and confirm the worktree is clean.
+- [x] [P9-T18] Commit every artifact under `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/` together with the updated `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/spec.md` and confirm the worktree is clean.
   - Run git add -A -- . ":(exclude).claude" then `git commit`, with the commit message naming issue #798. Both command spans are written in plain prose because the pathspec names a repository path outside the write set.
   - Acceptance: running git status --porcelain --untracked-files=all -- . ":(exclude).claude" produces no output lines, and `git ls-files --error-unmatch` succeeds for `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/baseline/coverage-baseline.cobertura.xml` and for `docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/coverage-final.cobertura.xml`. Both files are excluded from CSharpier by the repository's formatter ignore rules for evidence directories and Cobertura documents, so their presence does not affect the format gate.
