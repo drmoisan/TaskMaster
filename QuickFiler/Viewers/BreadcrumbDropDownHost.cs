@@ -423,19 +423,6 @@ namespace QuickFiler.Viewers
             }
         }
 
-        private void OnDropDownClosed(object? sender, ToolStripDropDownClosedEventArgs e)
-        {
-            if (_disposed || _programmaticClose || !OpenState)
-                return;
-            _openLifetime.InvalidateAndSchedule(() =>
-            {
-                if (_disposed || _programmaticClose || !OpenState)
-                    return;
-                OpenState = false;
-                FinishClose(BreadcrumbDropDownCloseReason.Uncommitted);
-            });
-        }
-
         private void FinishClose(BreadcrumbDropDownCloseReason reason)
         {
             CompleteAll(

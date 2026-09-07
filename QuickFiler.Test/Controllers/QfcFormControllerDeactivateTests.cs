@@ -244,5 +244,31 @@ namespace QuickFiler.Controllers.Tests
             act.Should().NotThrow();
             second.Verify(x => x.CancelBreadcrumbSelector(), Times.Once());
         }
+
+        /// <summary>
+        /// Issue #796 (AC6). Scenario: the pure deactivation formatter is called with a fixed
+        /// argument tuple. Expected outcome: the returned line carries all three discriminating
+        /// field labels and the supplied group count, so the Phase 2 transcript can identify a
+        /// self-inflicted deactivation without inference.
+        /// </summary>
+        [TestMethod]
+        public void FormatDeactivationDiagnostics_IncludesEveryDiscriminatingField()
+        {
+            // Arrange
+            const int GroupCount = 3;
+
+            // Act
+            string line = QfcFormController.FormatDeactivationDiagnostics(
+                webView2Focused: true,
+                activeFormIsNull: true,
+                groupCount: GroupCount
+            );
+
+            // Assert
+            line.Should().Contain("WebView2Focused=");
+            line.Should().Contain("ActiveFormNull=");
+            line.Should().Contain("Groups=");
+            line.Should().Contain(GroupCount.ToString());
+        }
     }
 }

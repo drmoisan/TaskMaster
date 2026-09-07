@@ -36,8 +36,61 @@ namespace QuickFiler.Controllers
         /// reachable there with the viewer already released — a second Cancel, or a Cancel after a
         /// partially failed launch — so the guard is live code rather than defensive padding.
         /// </remarks>
+        /// <summary>
+        /// Issue #796 (AC6): renders the one-line entry diagnostic for
+        /// <see cref="ParkFocusAndCancelSelectors"/>.
+        /// </summary>
+        /// <param name="webView2Focused">Whether a WebView2 child window held focus at entry.</param>
+        /// <param name="activeFormIsNull">
+        /// Whether <c>Form.ActiveForm</c> was null at entry. A <c>ToolStripDropDown</c> is not a
+        /// <c>Form</c>, so a null active form is corroborating evidence of a self-inflicted
+        /// deactivation and a non-null one of a genuine deactivation to a foreign window.
+        /// </param>
+        /// <param name="groupCount">The number of item groups the cancel loop will visit.</param>
+        /// <returns>A single line carrying a sentence prefix and three Key=Value pairs.</returns>
+        /// <remarks>
+        /// Pure and static so the AC6 evidence rests on a deterministic managed-seam assertion
+        /// rather than a source-text scan.
+        /// </remarks>
+        internal static string FormatDeactivationDiagnostics(
+            bool webView2Focused,
+            bool activeFormIsNull,
+            int groupCount
+        ) =>
+            "Issue #796: QfcFormController.ParkFocusAndCancelSelectors entered. "
+            + $"WebView2Focused={webView2Focused} ActiveFormNull={activeFormIsNull} "
+            + $"Groups={groupCount}";
+
+        /// <summary>
+        /// Issue #796 (AC6): renders the one-line per-item diagnostic for the cancel loop in
+        /// <see cref="ParkFocusAndCancelSelectors"/>.
+        /// </summary>
+        /// <param name="itemNumber">The item's own number.</param>
+        /// <param name="selectorWasOpen">
+        /// Whether that item's breadcrumb selector was open, or null when the value could not be
+        /// observed. The parameter is nullable so the unavailable case is produced here rather than
+        /// at the call site, which keeps the per-item log statement a single unconditional call.
+        /// </param>
+        /// <returns>
+        /// A single line carrying a sentence prefix and two Key=Value pairs. An unobserved
+        /// selector state renders as <c>SelectorWasOpen=unavailable</c>, never as a fabricated
+        /// boolean.
+        /// </returns>
+        internal static string FormatItemCancelDiagnostics(int itemNumber, bool? selectorWasOpen) =>
+            "Issue #796: QfcFormController.ParkFocusAndCancelSelectors reached item. "
+            + $"ItemNumber={itemNumber} "
+            + "SelectorWasOpen="
+            + (selectorWasOpen?.ToString() ?? "unavailable");
+
         internal void ParkFocusAndCancelSelectors()
         {
+            logger.Debug(
+                FormatDeactivationDiagnostics(
+                    _formViewer?.IsWebView2Focused == true,
+                    System.Windows.Forms.Form.ActiveForm == null,
+                    _groups?.ItemGroups?.Count ?? 0
+                )
+            );
             if (_formViewer?.IsWebView2Focused == true)
             {
                 _formViewer.ParkFocusOffWebView2();
@@ -51,6 +104,12 @@ namespace QuickFiler.Controllers
 
             foreach (QfcItemGroup group in groups)
             {
+                logger.Debug(
+                    FormatItemCancelDiagnostics(
+                        group.ItemController?.ItemNumber ?? 0,
+                        (group.ItemController as QfcItemController)?.IsBreadcrumbSelectorOpen
+                    )
+                );
                 try
                 {
                     group.ItemController?.CancelBreadcrumbSelector();

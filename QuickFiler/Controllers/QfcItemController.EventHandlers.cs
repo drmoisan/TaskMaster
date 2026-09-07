@@ -227,6 +227,21 @@ namespace QuickFiler.Controllers
             _itemViewer.SetFolderDroppedDown(false);
         }
 
+        /// <summary>
+        /// Issue #796 (AC6): whether this item's breadcrumb selector is currently open.
+        /// </summary>
+        /// <remarks>
+        /// Observational only. Nothing but the form-deactivation diagnostic reads it, and it
+        /// forwards the same <c>IsFolderDropDownOpen</c> expression this file already evaluates in
+        /// <see cref="TextBoxSearch_KeyDown"/> and <see cref="TextBoxSearch_Leave"/>, so it
+        /// introduces no new dependency and no branching of its own. It is declared on the concrete
+        /// controller rather than on <c>IQfcItemController</c> because that interface has a
+        /// compiled hand-written implementor in the test assembly and the target framework offers
+        /// no default interface members, so adding a member there would break that implementor with
+        /// CS0535.
+        /// </remarks>
+        internal bool IsBreadcrumbSelectorOpen => _itemViewer.IsFolderDropDownOpen;
+
         private void TopicThread_ItemSelectionChanged(
             object sender,
             ListViewItemSelectionChangedEventArgs e
