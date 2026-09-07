@@ -356,7 +356,7 @@ namespace QuickFiler.Controllers
                     logger.Error(
                         $"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}"
                     );
-                    throw e;
+                    throw;
                 }
                 await Task.Yield();
             }
@@ -397,7 +397,7 @@ namespace QuickFiler.Controllers
                     logger.Error(
                         $"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}"
                     );
-                    throw e;
+                    throw;
                 }
             }
             return true;
