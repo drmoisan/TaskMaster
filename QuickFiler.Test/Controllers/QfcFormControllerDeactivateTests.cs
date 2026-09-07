@@ -167,11 +167,18 @@ namespace QuickFiler.Controllers.Tests
         /// <summary>
         /// Every item's breadcrumb selector is cancelled, so no open <c>ToolStripDropDown</c> — and
         /// therefore no WinForms modal-menu-mode message filter — can outlive deactivation.
+        /// <para>
+        /// Issue #796 (AC2) made that cancel conditional: it now happens on a GENUINE deactivation
+        /// and not on one this form's own breadcrumb popup caused. The condition is stated
+        /// explicitly in the Arrange block below rather than left to the mock default, so the #677
+        /// contract this test pins remains visible as a contract about the genuine case.
+        /// </para>
         /// </summary>
         [TestMethod]
         public void FormDeactivated_CancelsSelectorOnEveryItemController()
         {
             // Arrange
+            _mockFormViewer.SetupGet(x => x.IsDeactivationSelfInflictedByOwnPopup).Returns(false);
             var first = new Mock<IQfcItemController>();
             var second = new Mock<IQfcItemController>();
             QfcFormController controller = CreateController();
@@ -269,6 +276,30 @@ namespace QuickFiler.Controllers.Tests
             line.Should().Contain("ActiveFormNull=");
             line.Should().Contain("Groups=");
             line.Should().Contain(GroupCount.ToString());
+        }
+
+        /// <summary>
+        /// Issue #796 (AC2). Scenario: the form loses activation because a breadcrumb popup this
+        /// form owns took it. Expected outcome: no item controller's selector is cancelled, so the
+        /// popup the gesture just opened survives its own opening.
+        /// </summary>
+        [TestMethod]
+        public void FormDeactivated_SelfInflictedByOwnPopup_DoesNotCancelAnySelector()
+        {
+            // Arrange
+            _mockFormViewer.SetupGet(x => x.IsDeactivationSelfInflictedByOwnPopup).Returns(true);
+            var first = new Mock<IQfcItemController>();
+            var second = new Mock<IQfcItemController>();
+            QfcFormController controller = CreateController();
+            InjectGroups(controller, first, second);
+            controller.RegisterFormEventHandlers();
+
+            // Act
+            _mockFormViewer.Raise(x => x.FormDeactivated += null, EventArgs.Empty);
+
+            // Assert
+            first.Verify(x => x.CancelBreadcrumbSelector(), Times.Never());
+            second.Verify(x => x.CancelBreadcrumbSelector(), Times.Never());
         }
     }
 }

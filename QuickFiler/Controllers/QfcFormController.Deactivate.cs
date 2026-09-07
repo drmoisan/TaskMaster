@@ -27,24 +27,20 @@ namespace QuickFiler.Controllers
             ParkFocusAndCancelSelectors();
 
         /// <summary>
-        /// Parks focus off any focused WebView2 and cancels every item's breadcrumb selector.
-        /// </summary>
-        /// <remarks>
-        /// Issue #791 added the <c>_formViewer</c> null guard. Before the extraction this routine
-        /// was reachable only through <c>_formViewer.FormDeactivated</c>, so a null-viewer branch
-        /// was unreachable and none was written. The Cancel path now calls it directly, and it is
-        /// reachable there with the viewer already released — a second Cancel, or a Cancel after a
-        /// partially failed launch — so the guard is live code rather than defensive padding.
-        /// </remarks>
-        /// <summary>
         /// Issue #796 (AC6): renders the one-line entry diagnostic for
         /// <see cref="ParkFocusAndCancelSelectors"/>.
         /// </summary>
         /// <param name="webView2Focused">Whether a WebView2 child window held focus at entry.</param>
         /// <param name="activeFormIsNull">
-        /// Whether <c>Form.ActiveForm</c> was null at entry. A <c>ToolStripDropDown</c> is not a
-        /// <c>Form</c>, so a null active form is corroborating evidence of a self-inflicted
-        /// deactivation and a non-null one of a genuine deactivation to a foreign window.
+        /// Whether <c>Form.ActiveForm</c> was null at entry. It was proposed as a discriminator on
+        /// the reasoning that a <c>ToolStripDropDown</c> is not a <c>Form</c>, so a null active form
+        /// would evidence a self-inflicted deactivation. The manual observation recorded for this
+        /// item refutes that reasoning: all three self-inflicted popup gestures reported
+        /// <c>ActiveFormNull=False</c> and the one deactivation caused by focus leaving the form
+        /// reported <c>ActiveFormNull=True</c>, so the values run opposite to the predicted
+        /// direction on all four observations. The field is retained as observed diagnostic data
+        /// only and is not read as evidence in either direction. See the AC2 item-viewer wiring
+        /// line of evidence/other/close-ordering-decision.md.
         /// </param>
         /// <param name="groupCount">The number of item groups the cancel loop will visit.</param>
         /// <returns>A single line carrying a sentence prefix and three Key=Value pairs.</returns>
@@ -82,6 +78,16 @@ namespace QuickFiler.Controllers
             + "SelectorWasOpen="
             + (selectorWasOpen?.ToString() ?? "unavailable");
 
+        /// <summary>
+        /// Parks focus off any focused WebView2 and cancels every item's breadcrumb selector.
+        /// </summary>
+        /// <remarks>
+        /// Issue #791 added the <c>_formViewer</c> null guard. Before the extraction this routine
+        /// was reachable only through <c>_formViewer.FormDeactivated</c>, so a null-viewer branch
+        /// was unreachable and none was written. The Cancel path now calls it directly, and it is
+        /// reachable there with the viewer already released — a second Cancel, or a Cancel after a
+        /// partially failed launch — so the guard is live code rather than defensive padding.
+        /// </remarks>
         internal void ParkFocusAndCancelSelectors()
         {
             logger.Debug(
@@ -98,6 +104,18 @@ namespace QuickFiler.Controllers
 
             List<QfcItemGroup> groups = _groups?.ItemGroups;
             if (groups == null)
+            {
+                return;
+            }
+
+            // Issue #796 (AC2): a deactivation this form's own breadcrumb popup caused must not
+            // cancel the selector the gesture just opened. The guard is scoped to the cancel loop
+            // and deliberately not to the focus-parking step above, because the observation
+            // recorded for this item shows parking did not run on two of the three defective
+            // gestures and so cannot be what produces the defect. A viewer that reports nothing
+            // reports false, which is the genuine case, so the issue #677 contract is unchanged for
+            // every deactivation that is not self-inflicted.
+            if (_formViewer?.IsDeactivationSelfInflictedByOwnPopup == true)
             {
                 return;
             }

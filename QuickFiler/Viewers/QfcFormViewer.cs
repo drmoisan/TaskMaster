@@ -206,6 +206,45 @@ namespace QuickFiler
         /// </summary>
         public void ParkFocusOffWebView2() => this.ActiveControl = _l1v1L2h2_ButtonOK;
 
+        // Issue #796 (AC2): the breadcrumb popups that can take activation away from this form, one
+        // entry per item viewer that owns one. Keyed by the owning item viewer rather than held in a
+        // list so a reconfigured item viewer replaces its own entry instead of accumulating a second.
+        private readonly Dictionary<Control, Func<bool>> _breadcrumbPopupOwners =
+            new Dictionary<Control, Func<bool>>();
+
+        /// <summary>
+        /// Issue #796 (AC2): registers the predicate reporting whether the breadcrumb popup owned by
+        /// <paramref name="itemViewer"/> is currently open, and therefore able to hold activation.
+        /// </summary>
+        /// <param name="itemViewer">The item viewer that owns the popup. Ignored when null.</param>
+        /// <param name="popupIsOpen">The open-state predicate. Ignored when null.</param>
+        /// <remarks>
+        /// Assigned by the item viewer immediately after it constructs its popup host, mirroring the
+        /// issue #677 may-take-focus precedent. Re-registering the same item viewer replaces its
+        /// entry, so repeated configuration passes leave exactly one predicate per item viewer.
+        /// </remarks>
+        internal void SetBreadcrumbPopupOwner(Control itemViewer, Func<bool> popupIsOpen)
+        {
+            if (itemViewer == null || popupIsOpen == null)
+            {
+                return;
+            }
+
+            _breadcrumbPopupOwners[itemViewer] = popupIsOpen;
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// Derived from explicitly registered popup state, never from <c>Form.ActiveForm</c>. The
+        /// issue #796 manual observation measured <c>ActiveFormNull=False</c> on all three
+        /// self-inflicted popup gestures and <c>ActiveFormNull=True</c> on the one deactivation
+        /// caused by focus leaving the form, so that framework read runs opposite to the
+        /// discriminator originally proposed and is not usable here in either direction. A form with
+        /// no registered popup reports false, which is the GENUINE case and preserves issue #677.
+        /// </remarks>
+        public bool IsDeactivationSelfInflictedByOwnPopup =>
+            _breadcrumbPopupOwners.Values.Any(popupIsOpen => popupIsOpen());
+
         // Seam D — collapsed item-viewer template margin
         public Padding ItemViewerTemplateMargin => _QfcItemViewerTemplate?.Margin ?? default;
 
