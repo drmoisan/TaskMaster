@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 
 namespace UtilitiesCS.OutlookObjects.Folder
 {
@@ -40,9 +39,25 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// </returns>
         public static string? ToDisplayStem(string? folderPath, string? archiveRoot)
         {
-            throw new NotImplementedException(
-                "Issue #799: the display projection body is supplied by [P2-T1]."
-            );
+            // The null guard is required, not defensive: ArchiveStemContract.TryMakeArchiveRelative
+            // declares both inputs as non-nullable string, so passing either parameter through
+            // without narrowing is CS8604 under the nullable gate.
+            if (folderPath is null || archiveRoot is null)
+            {
+                return folderPath;
+            }
+
+            // A zero-length stem is the path-equals-root case, which the contract reports as true.
+            // An empty display row is worse than the full path, so it is not projected.
+            if (
+                ArchiveStemContract.TryMakeArchiveRelative(folderPath, archiveRoot, out var stem)
+                && stem.Length > 0
+            )
+            {
+                return stem;
+            }
+
+            return folderPath;
         }
     }
 }

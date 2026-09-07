@@ -46,9 +46,47 @@ namespace UtilitiesCS.OutlookObjects.Folder
         )
         {
             trimmed = Array.Empty<FolderBreadcrumbSegment>();
-            throw new NotImplementedException(
-                "Issue #799: the chain trim body is supplied by [P2-T2]."
-            );
+
+            // The null half of this guard is required, not defensive: ArchiveStemContract declares
+            // both inputs as non-nullable string, so passing archiveRoot through without narrowing
+            // is CS8604 under the nullable gate. A whitespace-only root is rejected by the
+            // contract's own guard, so it needs no separate test here.
+            if (chain is null || chain.Count == 0 || archiveRoot is null)
+            {
+                return false;
+            }
+
+            for (int index = 0; index < chain.Count; index++)
+            {
+                bool isRootNode =
+                    ArchiveStemContract.TryMakeArchiveRelative(
+                        chain[index].FolderPath,
+                        archiveRoot,
+                        out var stem
+                    ) && stem.Length == 0;
+
+                if (!isRootNode)
+                {
+                    continue;
+                }
+
+                // The leaf IS the archive root: there is nothing below it to render.
+                if (index == chain.Count - 1)
+                {
+                    return false;
+                }
+
+                var below = new FolderBreadcrumbSegment[chain.Count - index - 1];
+                for (int offset = 0; offset < below.Length; offset++)
+                {
+                    below[offset] = chain[index + 1 + offset];
+                }
+
+                trimmed = below;
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -23,6 +23,12 @@ namespace QuickFiler.Controllers
         );
 
         private readonly IFolderHierarchyProvider _provider;
+
+        // #799 AC7: obtained by an `as` cast in the constructor, so no constructor signature
+        // changes and no existing test breaks. A Mock&lt;IFolderHierarchyProvider&gt; is not an
+        // IFolderLabelAbsenceReport, so this stays null and suppression is inert in every existing
+        // router test.
+        private readonly IFolderLabelAbsenceReport? _absenceReport;
         private readonly IBreadcrumbWebHost _host;
         private readonly BreadcrumbMessageCodec _codec;
         private readonly BreadcrumbHtmlRenderer _renderer;
@@ -47,6 +53,7 @@ namespace QuickFiler.Controllers
         )
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _absenceReport = provider as IFolderLabelAbsenceReport;
             _host = host ?? throw new ArgumentNullException(nameof(host));
             _codec = codec ?? throw new ArgumentNullException(nameof(codec));
             _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
@@ -104,6 +111,7 @@ namespace QuickFiler.Controllers
             var chains = new Dictionary<string, IReadOnlyList<FolderBreadcrumbSegment>>(
                 StringComparer.OrdinalIgnoreCase
             );
+            HashSet<string>? suppressed = null;
             _boundRoot = string.IsNullOrWhiteSpace(archiveRootPath)
                 ? string.Empty
                 : archiveRootPath.TrimEnd('\\', '/');
@@ -126,15 +134,34 @@ namespace QuickFiler.Controllers
                 if (chain != null)
                 {
                     chains[text] = chain;
+                    continue;
+                }
+
+                // #799 AC7 (Efc surface only, per decision D5). A null chain arising from
+                // cancellation or from a provider fault is NOT suppressed: those rows are not
+                // known-absent, and only the zero-candidate classification is.
+                if (
+                    hierarchyPath != null
+                    && _absenceReport != null
+                    && _absenceReport.IsAbsentLabel(hierarchyPath)
+                )
+                {
+                    suppressed ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    suppressed.Add(text);
                 }
             }
 
+            IReadOnlyList<string> retainedRows = RetainedRows(presentedRows, suppressed);
             _rows = _builder.BuildRows(
-                presentedRows,
+                retainedRows,
                 text => chains.TryGetValue(text, out var chain) ? chain : null,
-                scores
+                WithProjectedScoreKeys(scores)
             );
-            AttachSegmentKeys(presentedRows, chains);
+
+            // The SAME retained list is handed to both calls: AttachSegmentKeys indexes the
+            // presented rows by row index, so an unfiltered list here would mis-align every row
+            // after the suppressed one.
+            AttachSegmentKeys(retainedRows, chains);
             _selectedRowId = null;
 
             // #499: the rows just rebuilt are a new set, so a folder path selected against the
@@ -147,6 +174,82 @@ namespace QuickFiler.Controllers
             }
 
             DeliverDocument();
+        }
+
+        /// <summary>
+        /// AC6: emits every original score UNCHANGED and, additionally, one archive-relative alias
+        /// for each score whose path is archive-rooted. The addition is what makes it safe — a
+        /// substitution would fix the stem-presented case and silently break the rooted-presented
+        /// case — and the row builder's probability index assigns through its indexer, so a
+        /// duplicate key is tolerated rather than throwing.
+        /// </summary>
+        private IEnumerable<FolderScore> WithProjectedScoreKeys(IEnumerable<FolderScore> scores)
+        {
+            // An empty bound root makes the projection the identity, so the public three-argument
+            // overload's callers see no change and allocate nothing. A null sequence is passed
+            // through, null-forgiving, so the row builder keeps raising its own
+            // ArgumentNullException rather than this method raising a different one.
+            if (scores == null || _boundRoot.Length == 0)
+            {
+                return scores!;
+            }
+
+            var joined = new List<FolderScore>();
+            foreach (FolderScore score in scores)
+            {
+                joined.Add(score);
+                if (score.FolderPath == null)
+                {
+                    continue;
+                }
+
+                // Null-forgiving: ToDisplayStem returns null only for a null folderPath, which the
+                // guard above excludes; unsuppressed the construction below is CS8604.
+                string projected = ArchiveStemProjection.ToDisplayStem(
+                    score.FolderPath,
+                    _boundRoot
+                )!;
+                if (!string.Equals(projected, score.FolderPath, StringComparison.Ordinal))
+                {
+                    joined.Add(new FolderScore(projected, score.Score, score.Probability));
+                }
+            }
+
+            return joined;
+        }
+
+        /// <summary>
+        /// AC7: the presented sequence with the known-absent labels removed, filtered BEFORE row
+        /// construction because row ids are assigned as <c>row-&lt;index&gt;</c> over this sequence.
+        /// Returns the original instance when nothing was suppressed.
+        /// </summary>
+        private IReadOnlyList<string> RetainedRows(
+            IReadOnlyList<string> presentedRows,
+            HashSet<string>? suppressed
+        )
+        {
+            if (suppressed == null || suppressed.Count == 0)
+            {
+                return presentedRows;
+            }
+
+            var retained = new List<string>(presentedRows.Count);
+            foreach (string text in presentedRows)
+            {
+                if (!string.IsNullOrEmpty(text) && suppressed.Contains(text))
+                {
+                    continue;
+                }
+
+                // Null-forgiving: a null entry is carried through exactly as the unfiltered list
+                // carried it, so the row builder's handling of it is unchanged.
+                retained.Add(text!);
+            }
+
+            log.Debug(
+                $"#799 AC7: suppressed {suppressed.Count} zero-candidate breadcrumb row(s) of {presentedRows.Count} presented."
+            );
+            return retained;
         }
 
         private string? ToHierarchyPath(string presentedTarget)

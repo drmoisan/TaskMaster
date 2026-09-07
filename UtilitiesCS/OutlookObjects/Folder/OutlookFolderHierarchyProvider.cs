@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -47,6 +48,22 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         private readonly IOutlookFolderTreeService _treeService;
 
+        // Two DISTINCT per-instance structures (#799 D6), not one. The reported set only ever gains
+        // entries, which is what makes the AC7 diagnostic once per label per session rather than
+        // once per render. The absent set also LOSES entries, because a label that becomes
+        // resolvable after a snapshot refresh must stop being suppressed. ConcurrentDictionary
+        // rather than HashSet because ResolveLeafKeyAsync awaits AcquireSnapshotAsync and its
+        // continuations are not guaranteed to resume on one thread; per-instance rather than static
+        // because a static set is process-wide mutable state shared across viewers and across test
+        // methods in a single assembly.
+        private readonly ConcurrentDictionary<string, byte> _reportedLabels = new(
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        private readonly ConcurrentDictionary<string, byte> _absentLabels = new(
+            StringComparer.OrdinalIgnoreCase
+        );
+
         /// <summary>
         /// Creates a provider over the supplied folder-tree service.
         /// </summary>
@@ -91,7 +108,64 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             var snapshot = await AcquireSnapshotAsync(cancellationToken).ConfigureAwait(false);
             var chain = FolderTreeSnapshotQueries.GetAncestorChain(snapshot, leafKey);
-            return MapNodes(chain);
+            var mapped = MapNodes(chain);
+
+            // The trim runs AFTER the snapshot walk and BEFORE the caller sees the chain, so row
+            // order, banner placement and the trash pseudo-row are all untouched (#799 AC1, AC2).
+            string? archiveRoot = TryReadArchiveRoot();
+            if (string.IsNullOrWhiteSpace(archiveRoot))
+            {
+                return mapped;
+            }
+
+            if (ArchiveChainProjection.TryTrimBelowArchiveRoot(mapped, archiveRoot, out var trimmed))
+            {
+                return trimmed;
+            }
+
+            // AC2: a chain that never reaches the archive root is a diagnosable condition. Returning
+            // an empty list routes the Efc surface into the empty-chain single-segment fallback and
+            // the QuickFiler surface into its existing scored fallback.
+            EmitError(
+                $"Resolved ancestor chain does not pass through the configured archive root '{archiveRoot}'; falling back to single-segment rendering."
+            );
+            return Array.Empty<FolderBreadcrumbSegment>();
+        }
+
+        /// <summary>
+        /// Reads the configured archive root through the injected accessor, treating a null
+        /// accessor and any exception from it alike as "no trim configured". The accessor is lazy
+        /// and its faults are swallowed here because the underlying archive-root property throws
+        /// when the root is unresolvable and two of the three construction sites are outside any
+        /// try block, so a propagating read would create a new throw site at those call sites.
+        /// </summary>
+        private string? TryReadArchiveRoot()
+        {
+            var accessor = ArchiveRootAccessor;
+            if (accessor is null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return accessor();
+            }
+            catch (Exception exception)
+            {
+                logger.Debug(
+                    "The archive-root accessor threw; leaving the ancestor chain untrimmed.",
+                    exception
+                );
+                return null;
+            }
+        }
+
+        /// <summary>Emits one diagnostic through log4net and through the injected test sink.</summary>
+        private void EmitError(string message)
+        {
+            logger.Error(message);
+            ErrorSink?.Invoke(message);
         }
 
         /// <inheritdoc />
@@ -126,17 +200,24 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             if (match != null)
             {
+                // The exact-path route returns before the suffix pass is ever reached, so the AC7
+                // absence signal has to be cleared here as well as on the suffix success route.
+                _absentLabels.TryRemove(folderPath, out _);
                 return match.Key;
             }
 
-            return ResolveByUniqueSuffix(snapshot, folderPath);
+            var resolved = ResolveByUniqueSuffix(snapshot, folderPath);
+            if (resolved != null)
+            {
+                _absentLabels.TryRemove(folderPath, out _);
+            }
+
+            return resolved;
         }
 
         /// <inheritdoc />
         public bool IsAbsentLabel(string folderPath) =>
-            throw new NotImplementedException(
-                "Issue #799: the absence report body is supplied by [P2-T6]."
-            );
+            !string.IsNullOrWhiteSpace(folderPath) && _absentLabels.ContainsKey(folderPath);
 
         /// <summary>
         /// Second resolution pass for a relative stem such as <c>Projects\Alpha</c>, which the
@@ -145,8 +226,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// exactly one node qualifies: uniqueness is the safety property that prevents filing into
         /// a same-named folder under a different root. Zero or multiple candidates return null, so
         /// the caller keeps today's single-segment fallback rendering.
+        /// <para>
+        /// An instance member rather than a static one because the AC7 log gate and the absence
+        /// classification are both per-provider-instance state (#799 D6).
+        /// </para>
         /// </summary>
-        private static FolderTreeNodeKey? ResolveByUniqueSuffix(
+        private FolderTreeNodeKey? ResolveByUniqueSuffix(
             FolderTreeSnapshot snapshot,
             string folderPath
         )
@@ -164,11 +249,26 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return candidates[0].Key;
             }
 
-            logger.Error(
-                candidates.Length == 0
-                    ? $"No snapshot node path ends with '{suffix}'; leaving '{folderPath}' unresolved."
-                    : $"Multiple snapshot node paths end with '{suffix}'; leaving '{folderPath}' unresolved."
-            );
+            if (candidates.Length == 0)
+            {
+                // AC7, restricted by decision D-B to the ZERO-candidate cause: the label is absent
+                // from the snapshot. Ambiguity is not absence — the folder does exist — so the
+                // multiple-candidate cause deliberately leaves this signal untouched.
+                _absentLabels[folderPath] = 0;
+            }
+
+            // TryAdd is the AC7 log gate: a label already reported by this provider instance emits
+            // nothing further, so the diagnostic is once per label per session rather than once per
+            // render. The two causes stay distinguishable in the message text.
+            if (_reportedLabels.TryAdd(folderPath, 0))
+            {
+                EmitError(
+                    candidates.Length == 0
+                        ? $"No snapshot node path ends with '{suffix}'; leaving '{folderPath}' unresolved."
+                        : $"Multiple snapshot node paths end with '{suffix}'; leaving '{folderPath}' unresolved."
+                );
+            }
+
             return null;
         }
 
