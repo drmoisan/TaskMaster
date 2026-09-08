@@ -2,7 +2,7 @@
 
 ## Preflight revision seams (per-issue)
 
-- [#810 R1](project_810_teardown_dropdown_residuals_plan_seams.md) — preparation commits void `OUT-OF-WRITE-SET: NONE`; `TokenSource` null before Cleanup too; no `.config/dotnet-tools.json`
+- [#810 R1–R2](project_810_teardown_dropdown_residuals_plan_seams.md) — inherited paths must be a RULE not a list (executor writes agent-memory mid-run); never upper-bound a csharpier checked-file delta; `TokenSource` null before Cleanup too
 - [#791](project_791_hc_deadline_cancel_teardown_plan_seams.md) — `QfcDatamodel` excluded from coverage; no shell var survives between tasks · [#781](project_781_excludefromcodecoverage_guard_plan_seams.md) — `[ExcludeFromCodeCoverage]` makes changed-line coverage unmeasurable
 - [#736 R1–R5](project_736_efc_archiveroot_boundary_sink_plan_seams.md) — 485-line test file voids the Write Set; hardcoded floors; one shared `try`; name-vs-content gates; existence-only `*.log`
 - [#731 R1–R5](project_731_lifecycle_disposal_plan_seams.md) — near-limit files force partial continuation; unbootstrapped worktree; `DebugType=full` leaks paths; `.//line` double-counts
