@@ -184,18 +184,24 @@ namespace UtilitiesCS.Test.Threading
         [TestMethod]
         public void Init_OnMtaThread_ThrowsInvalidOperationExceptionNamingTheObservedApartmentState()
         {
-            // Arrange: confirm the premise, then install a fake so a red run cannot build a form.
-            Thread.CurrentThread.GetApartmentState().Should().Be(ApartmentState.MTA);
+            // Arrange: install a fake so a red run cannot build a real form. The Act runs on a
+            // dedicated MTA thread rather than on the ambient worker, whose apartment was measured
+            // to be STA when this [DoNotParallelize] class shares the serial bucket with an
+            // [STATestClass]; an ambient-apartment test would then assert nothing about MTA.
             using (UiThreadStateScope.Enter())
             {
                 UiThread.SyncContextFormFactory = () => new FakeUiCaptureSource();
 
                 // Act
-                Action act = () => UiThread.Init();
+                Exception observed = ApartmentThreadRunner.RunOnThread(
+                    ApartmentState.MTA,
+                    () => UiThread.Init()
+                );
 
                 // Assert
-                act.Should()
-                    .Throw<InvalidOperationException>()
+                observed
+                    .Should()
+                    .BeOfType<InvalidOperationException>()
                     .Which.Message.Should()
                     .StartWith(UiThread.NonStaInitMessagePrefix)
                     .And.Contain("MTA");
@@ -213,17 +219,21 @@ namespace UtilitiesCS.Test.Threading
                 var clock = new FakeTimeProvider();
                 Action<LockupAttribution> callback = _ => { };
 
-                // Act
-                Action act = () =>
-                    UiThread.Init(
-                        monitorUiThread: true,
-                        onLockupDetected: callback,
-                        timeProvider: clock,
-                        lockupAttributionThresholdMs: 1234
-                    );
-                act.Should().Throw<InvalidOperationException>();
+                // Act: on a dedicated MTA thread, for the reason recorded on the case above.
+                Exception observed = ApartmentThreadRunner.RunOnThread(
+                    ApartmentState.MTA,
+                    () =>
+                        UiThread.Init(
+                            monitorUiThread: true,
+                            onLockupDetected: callback,
+                            timeProvider: clock,
+                            lockupAttributionThresholdMs: 1234
+                        )
+                );
 
-                // Assert: the four monitoring fields and the four capture fields are unchanged.
+                // Assert: it was rejected, and the four monitoring fields and the four capture
+                // fields are unchanged.
+                observed.Should().BeOfType<InvalidOperationException>();
                 UiThreadStateScope.MonitorUiThread.Should().BeFalse();
                 UiThreadStateScope.OnLockupDetected.Should().BeNull();
                 UiThreadStateScope.MonitorTimeProvider.Should().BeNull();

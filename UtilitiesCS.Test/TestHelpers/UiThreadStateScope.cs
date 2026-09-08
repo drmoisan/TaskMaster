@@ -27,7 +27,7 @@ namespace UtilitiesCS.Test
 #nullable enable annotations
     internal sealed class UiThreadStateScope : IDisposable
     {
-        private static readonly FieldInfo LoadedInfo = Resolve("_loaded");
+        private static readonly FieldInfo InitializedInfo = Resolve("_initialized");
         private static readonly FieldInfo UiSyncContextInfo = Resolve("_uiSyncContext");
         private static readonly FieldInfo AutoScaleFactorInfo = Resolve("_autoScaleFactor");
         private static readonly FieldInfo UiThreadIdInfo = Resolve("_uiThreadId");
@@ -58,7 +58,7 @@ namespace UtilitiesCS.Test
         private static FieldInfo[] ControlledFields =>
             new[]
             {
-                LoadedInfo,
+                InitializedInfo,
                 UiSyncContextInfo,
                 AutoScaleFactorInfo,
                 UiThreadIdInfo,

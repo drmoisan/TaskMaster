@@ -86,3 +86,71 @@ Sixteen is twenty-two minus six.
 - `IsCompleted_OnDefaultAwaiterOnAContextFreeThread_ReturnsTrue` — `null == null` is true today and `ReferenceEquals(null, null)` is true after the fix, so the default-instance behaviour is unchanged.
 
 Every assertion in the six failing tests is synchronous, so no async boundary can swallow the failure.
+
+---
+
+# Correction and re-measurement (recorded during [P3-T6])
+
+CORRECTION_TIMESTAMP: 2026-09-08T02-05
+
+The first pass recorded above is superseded in part. Reading the verbatim failure messages out of `p2t10.trx` during [P3-T6] showed that **two of the six rows failed for a reason other than the defect they were written to expose**, so the first pass is not admissible fail-before evidence for those two. The remaining four rows are unaffected and stand as recorded.
+
+## Verbatim failure messages from the first pass (`p2t10.trx`)
+
+| Fully-qualified test | Message |
+|---|---|
+| `Init_OnMtaThread_ThrowsInvalidOperationExceptionNamingTheObservedApartmentState` | `Expected Thread.CurrentThread.GetApartmentState() to be ApartmentState.MTA {value: 1}, but found ApartmentState.STA {value: 0}.` |
+| `Init_OnMtaThread_CapturesNoGlobalStateAndLeavesMonitoringConfigurationUnchanged` | `Expected a <System.InvalidOperationException> to be thrown, but no exception was thrown.` |
+| `Init_ApartmentBoundaryIsStaEqualityNotMtaInequality_RejectsFromMtaAndAcceptsFromSta` | `Expected mtaOutcome to be System.InvalidOperationException, but found <null>.` |
+| `Init_WhenFirstInitializeThrows_SecondInitWithWorkingFactorySucceedsAndPopulatesAllFourCaptureFields` | `Expected working not to be <null>.` |
+| `AutoScaleFactor_ReadFromMtaThreadAfterAFailedInit_ThrowsAndDoesNotReEnterTheFactory` | `Expected InvalidOperationException.Message to be System.InvalidOperationException, but found <null>.` |
+| `IsCompleted_OnOwningUiThreadWithADispatcherContextCapturedInsideAnInvoke_ReturnsTrue` | `Expected result to be True, but found False.` |
+
+## The measured environmental fact
+
+The first message states it directly: the MSTest worker executing the plain `[TestMethod]` cases of `UiThreadInitApartmentContract_Tests` reported `ApartmentState.STA`, not `ApartmentState.MTA`.
+
+Research R4 concluded that a plain `[TestMethod]` runs MTA, and `UtilitiesCS.Test/test.runsettings` does record that global STA execution is intentionally disabled. That premise does not hold for this scheduling arrangement: `UiThreadInitRetryContract_Tests` is `[STATestClass]` and both classes are `[DoNotParallelize]`, so they share one serial execution thread, and the thread that serial bucket runs on was created STA. The ambient apartment of a plain `[TestMethod]` is therefore not a reliable source of an MTA caller in this file.
+
+The consequence for the two affected rows:
+
+- `Init_OnMtaThread_ThrowsInvalidOperationExceptionNamingTheObservedApartmentState` failed on its own Arrange premise and never reached the Act, so it measured nothing about `Init()`.
+- `Init_OnMtaThread_CapturesNoGlobalStateAndLeavesMonitoringConfigurationUnchanged` did reach the Act, but on an STA thread, where the AC1 precondition correctly does **not** throw. It would therefore have stayed red after the fix, for a reason unrelated to the defect.
+
+The four other rows were unaffected because each already drove its Act on a dedicated thread with an explicitly set apartment.
+
+## Remedy
+
+Both methods were re-authored to run the Act on a dedicated MTA thread through `ApartmentThreadRunner.RunOnThread(ApartmentState.MTA, ...)`, which is the mechanism the four unaffected rows already use and which the first pass measured as producing a genuine MTA caller. Neither method was renamed, no method was added or removed, and no assertion was weakened: each now asserts the same contract against a caller whose apartment is known rather than assumed.
+
+## Re-measured fail-before
+
+The re-measurement restored `UtilitiesCS/Threading/UiThread.cs` and `UtilitiesCS.Test/TestHelpers/UiThreadStateScope.cs` to their committed Phase 2 state at `f7294d71`, rebuilt the solution with `/t:Rebuild`, and ran the identical filter against the re-authored tests.
+
+Command:
+
+```
+& $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll '/InIsolation' '/Logger:trx;LogFileName=p2t10b.trx' '/ResultsDirectory:TestResults\809-p2t10b' '/TestCaseFilter:FullyQualifiedName~UtilitiesCS.Test.Threading.UiThreadInitApartmentContract_Tests|FullyQualifiedName~UtilitiesCS.Test.Threading.UiThreadInitRetryContract_Tests|FullyQualifiedName~UtilitiesCS.Test.Threading.SynchronizationContextAwaiter_Tests'
+```
+
+REMEASURED_EXIT_CODE: 1
+REMEASURED_EXPECTED_EXIT_CODE: 1
+
+TRX selected: `p2t10b.trx`, `LastWriteTimeUtc` `2026-09-08T04:50:49.5639685Z`. Counters: `total` 22, `executed` 22, `passed` 16, `failed` 6. Derived skipped count: 0.
+
+The set of `Failed` rows is **the same six**, no more and no fewer, and every one now fails on the defect:
+
+| Fully-qualified test | Re-measured message |
+|---|---|
+| `Init_OnMtaThread_ThrowsInvalidOperationExceptionNamingTheObservedApartmentState` | `Expected observed to be System.InvalidOperationException, but found <null>.` |
+| `Init_OnMtaThread_CapturesNoGlobalStateAndLeavesMonitoringConfigurationUnchanged` | `Expected observed to be System.InvalidOperationException, but found <null>.` |
+| `Init_ApartmentBoundaryIsStaEqualityNotMtaInequality_RejectsFromMtaAndAcceptsFromSta` | `Expected mtaOutcome to be System.InvalidOperationException, but found <null>.` |
+| `Init_WhenFirstInitializeThrows_SecondInitWithWorkingFactorySucceedsAndPopulatesAllFourCaptureFields` | `Expected working not to be <null>.` |
+| `AutoScaleFactor_ReadFromMtaThreadAfterAFailedInit_ThrowsAndDoesNotReEnterTheFactory` | `Expected InvalidOperationException.Message to be System.InvalidOperationException, but found <null>.` |
+| `IsCompleted_OnOwningUiThreadWithADispatcherContextCapturedInsideAnInvoke_ReturnsTrue` | `Expected result to be True, but found False.` |
+
+`found <null>` on the first three is the AC1 defect: pre-fix, `Init()` from a genuine MTA thread returns normally instead of throwing. The remaining sixteen rows were `Passed`, unchanged from the first pass.
+
+`UtilitiesCS/Threading/UiThread.cs` and `UtilitiesCS.Test/TestHelpers/UiThreadStateScope.cs` were restored to their Phase 3 state immediately afterwards, the solution was rebuilt, and [P3-T6] was re-run; that run is recorded in `p3-t6-pass-after.md`.
+
+**This re-measurement is the fail-before evidence of record for all six tests.** The first pass is retained above rather than deleted, because it is what surfaced the environmental fact.
