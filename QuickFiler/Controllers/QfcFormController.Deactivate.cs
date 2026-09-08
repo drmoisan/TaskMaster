@@ -24,7 +24,7 @@ namespace QuickFiler.Controllers
         /// Cancel path can run the same routine.
         /// </remarks>
         internal void FormViewer_Deactivated(object sender, EventArgs e) =>
-            ParkFocusAndCancelSelectors();
+            ParkFocusAndCancelSelectors(honourSelfInflictedGuard: true);
 
         /// <summary>
         /// Issue #796 (AC6): renders the one-line entry diagnostic for
@@ -88,7 +88,7 @@ namespace QuickFiler.Controllers
         /// reachable there with the viewer already released — a second Cancel, or a Cancel after a
         /// partially failed launch — so the guard is live code rather than defensive padding.
         /// </remarks>
-        internal void ParkFocusAndCancelSelectors()
+        internal void ParkFocusAndCancelSelectors(bool honourSelfInflictedGuard)
         {
             logger.Debug(
                 FormatDeactivationDiagnostics(
@@ -115,7 +115,14 @@ namespace QuickFiler.Controllers
             // gestures and so cannot be what produces the defect. A viewer that reports nothing
             // reports false, which is the genuine case, so the issue #677 contract is unchanged for
             // every deactivation that is not self-inflicted.
-            if (_formViewer?.IsDeactivationSelfInflictedByOwnPopup == true)
+            // Issue #810 (AC1): the predicate is meaningful only for a deactivation, so whether to
+            // honour it is a property of the caller rather than of this routine, and it is supplied
+            // as an argument. The teardown path passes false, because a cancel must cancel every
+            // selector whatever opened the popup that took focus.
+            if (
+                honourSelfInflictedGuard
+                && _formViewer?.IsDeactivationSelfInflictedByOwnPopup == true
+            )
             {
                 return;
             }

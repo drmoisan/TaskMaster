@@ -202,12 +202,6 @@ namespace QuickFiler.Controllers
         // break the issue #680 contract.
         private bool _searchOwnedDismissal;
 
-        /// <summary>
-        /// Issue #796 (AC4): whether the drop-down currently open was opened from this item's folder
-        /// search box rather than by a mouse gesture on the collapsed breadcrumb.
-        /// </summary>
-        internal bool SearchOwnsDropDownDismissal => _searchOwnedDismissal;
-
         internal void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Down)

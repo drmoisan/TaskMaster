@@ -141,7 +141,10 @@ namespace QuickFiler.Controllers
                 }
 
                 RunTeardownStage("reset-keyboard", ResetKeyboardActive);
-                RunTeardownStage("park-focus", ParkFocusAndCancelSelectors);
+                RunTeardownStage(
+                    "park-focus",
+                    () => ParkFocusAndCancelSelectors(honourSelfInflictedGuard: false)
+                );
                 RunTeardownStage("unregister-handlers", UnregisterCancelPathHandlers);
                 RunTeardownStage("hide-form", () => _formViewer?.Hide());
 

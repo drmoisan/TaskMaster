@@ -55,5 +55,20 @@ One hazard the mirror creates: it puts a second copy of plan.md on disk. Name th
 path in every delegation prompt and say explicitly that the session-root copy is a decoy, or a
 delegate may edit the mirror and its work is silently discarded.
 
+**Not universal — verify it, do not assume it. 2026-09-08 (#810 preparation).** A preparation-mode
+child launched by `parallel-orchestrator` DID get real worktree isolation: `git rev-parse
+--show-toplevel` from its own Bash tool returned its item worktree
+(`.claude/worktrees/agent-ac28f83f99cbba6b5`), not the session root. Every PreToolUse hook then
+resolved correctly against that worktree, and NO mirroring was needed —
+`enforce-prd-feature-before-planner.ps1` allowed the `atomic-planner` delegation with issue.md and
+spec.md present only in the item worktree.
+
+So the first action of any preparation or execution child is one `git rev-parse --show-toplevel`
+call. If it returns your item worktree, skip the mirroring entirely; the decoy-plan hazard below
+is real and worth avoiding when it buys nothing. If it returns the session root, mirror the whole
+folder as described above. Both topologies are live, and the cost of guessing wrong runs in both
+directions: an unnecessary mirror creates a second plan.md that a delegate may silently edit, and a
+missing mirror produces `PRD_FEATURE_BLOCKED` on a folder that is correct on disk.
+
 See also [[model-routing-hook-reads-canonical-path-only]] for the parallel/epic-mode fix that this
 gap does not share.

@@ -212,52 +212,64 @@ namespace QuickFiler.Controllers
         /// </summary>
         public void Cleanup()
         {
-            if (_globals?.Ol is not null)
-            {
-                _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
-            }
-
-            UnregisterFormEventHandlers();
-            var undoQueue = _undoQueue;
-            var undoConsumer = _undoConsumerTask;
             try
             {
-                undoQueue?.CompleteAdding();
-            }
-            catch (ObjectDisposedException)
-            {
-                // A repeated Cleanup() re-enters here on the already-disposed queue.
-            }
-            if (undoConsumer is null)
-            {
-                undoQueue?.Dispose();
-                _undoQueueDisposal = Task.CompletedTask;
-            }
-            else
-            {
-                _undoQueueDisposal = undoConsumer.ContinueWith(
-                    antecedent =>
-                    {
-                        if (antecedent.Exception is not null)
+                if (_globals?.Ol is not null)
+                {
+                    _globals.Ol.PropertyChanged -= DarkMode_CheckedChanged;
+                }
+
+                UnregisterFormEventHandlers();
+                var undoQueue = _undoQueue;
+                var undoConsumer = _undoConsumerTask;
+                try
+                {
+                    undoQueue?.CompleteAdding();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // A repeated Cleanup() re-enters here on the already-disposed queue.
+                }
+                if (undoConsumer is null)
+                {
+                    undoQueue?.Dispose();
+                    _undoQueueDisposal = Task.CompletedTask;
+                }
+                else
+                {
+                    _undoQueueDisposal = undoConsumer.ContinueWith(
+                        antecedent =>
                         {
-                            logger.Error("Undo consumer faulted.", antecedent.Exception);
-                        }
-                        undoQueue?.Dispose();
-                    },
-                    TaskScheduler.Default
-                );
+                            if (antecedent.Exception is not null)
+                            {
+                                logger.Error("Undo consumer faulted.", antecedent.Exception);
+                            }
+                            undoQueue?.Dispose();
+                        },
+                        TaskScheduler.Default
+                    );
+                }
+                _globals = null;
+                _formViewer?.Dispose();
+                _formViewer = null;
+                _groups = null;
+                _rowStyleTemplate = null;
+                _parent = null;
+                _movedItems = null;
+                WriteMetrics = null;
+                Iterate = null;
             }
-            _globals = null;
-            _formViewer?.Dispose();
-            _formViewer = null;
-            _groups = null;
-            _rowStyleTemplate = null;
-            _parent = null;
-            _movedItems = null;
-            WriteMetrics = null;
-            Iterate = null;
-            _parentCleanup?.Invoke();
-            _parentCleanup = null;
+            finally
+            {
+                // Issue #810 (AC4): read the callback into a local and clear the field before
+                // invoking it. Reading and clearing first is what makes exactly-once
+                // unconditional. A finally that invoked before clearing would close the
+                // earlier-throw hole but not the callback-throws hole, because a callback that
+                // threw would leave the field set for a repeat pass to invoke a second time.
+                System.Action parentCleanup = _parentCleanup;
+                _parentCleanup = null;
+                parentCleanup?.Invoke();
+            }
         }
 
         #endregion

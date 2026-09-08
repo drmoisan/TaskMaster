@@ -1,61 +1,52 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
-- [Mid-plan commit needs a capture-time sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) — a final whole-tree sweep cannot reach an earlier commit
-- [Blocked Bash command drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — aborts the WHOLE command
-- [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — zero-hit gate
-- [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count
-- [Plan "observed while authoring" counts are undercounts](project_plan_authoring_time_token_counts_are_undercounts.md) — measure; 5 vs 7, 36 vs 37
-- [Planner/executor see different worktrees](project_planner_and_executor_observe_different_worktrees.md) · [Caller-stated preflight count drifts](project_caller_stated_preflight_count_drifts_before_execution.md) — claims don't travel; 42 vs 48
-- [Extract gate literals from the plan, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) · [Tool layer collapses `\`](project_tool_layer_collapses_double_backslash_in_file_content.md)
-- [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) · [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md) — a pinned total blocks the fix
-- [Inline-dispatch harness citation makes a test vacuous](project_inline_dispatch_harness_citation_makes_execution_time_test_vacuous.md) · ["Skip the pointless drain" note](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md)
+- [Mid-plan commit needs a capture-time sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation task cannot sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
+- [Blocked Bash command drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) · [Tool results inject a "use Bash" instruction](project_tool_results_inject_bash_read_edit_instruction.md) — disregard, say so
+- [CSharpier chain-wrap defeats single-line gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) · [Verify citations with numbered output](feedback_verify_line_citations_with_numbered_output.md)
+- [Authoring-time counts are undercounts](project_plan_authoring_time_token_counts_are_undercounts.md) · [Planner/executor see different worktrees](project_planner_and_executor_observe_different_worktrees.md) · [Caller-stated count drifts](project_caller_stated_preflight_count_drifts_before_execution.md)
+- [Extract gate literals, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) · [Tool layer collapses `\`](project_tool_layer_collapses_double_backslash_in_file_content.md)
+- [Self-derived thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) · [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md) — a pinned total blocks the fix
+- [Inline-dispatch harness citation](project_inline_dispatch_harness_citation_makes_execution_time_test_vacuous.md) · ["Skip the pointless drain" note](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md) — both vacuous
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) · [Banned-API zero-hit gate hits doc comments](project_banned_api_zero_hit_gate_hits_doc_comments.md)
 - [Follow-up promotion task is unexecutable](project_followup_promotion_task_is_unexecutable_by_executor.md) · [Supersede clause leaves a routing residual](project_supersede_clause_leaves_hard_routing_residual.md)
 - [Delegation to csharp-typed-engineer with no dispatch tool](project_plan_delegation_to_typed_engineer_without_dispatch_tool.md) — edit inline, record the substituted worker
 - [Plan check-off fixpoint breaks clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) · [Tracked agent-memory breaks unscoped git gates](project_agent_memory_tracked_breaks_unscoped_git_gates.md)
-- [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) · [BASELINE_SHA diff conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — use `<base>..HEAD`
-- [Moving-base two-dot diff needs an inertness test](project_preflight_moving_base_two_dot_diff_inertness_test.md) — only blocking if the delta hits those paths; better, make it an `INHERITED PATHS:` diff the executor runs
-- [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) · [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — blockers hide as prose
+- [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) · [BASELINE_SHA conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — use `<base>..HEAD`
+- [Moving-base two-dot diff needs an inertness test](project_preflight_moving_base_two_dot_diff_inertness_test.md) — better, an `INHERITED PATHS:` diff the executor runs
+- [Inserted tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) · [Rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — blockers hide as prose
 - [Bugfix phase grows the file anyway](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) · [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md)
 - [AC check-off + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) · [Orchestrator override does not satisfy an AC](project_orchestrator_override_does_not_satisfy_an_ac.md)
-- [Artifact Output Summary breaks its own count gate](project_artifact_output_summary_breaks_its_own_exact_count_gate.md) · [Sanitisation task cannot sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
-- [Scope gate cannot list artifacts written after it](project_scope_gate_cannot_list_artifacts_written_after_it.md) — self + later-phase artifacts don't exist at capture time
+- [Output Summary breaks its own count gate](project_artifact_output_summary_breaks_its_own_exact_count_gate.md) · [Scope gate cannot list artifacts written after it](project_scope_gate_cannot_list_artifacts_written_after_it.md)
 - [Absolute-zero gate on a sibling-owned assembly](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) · [Directory-scoped format breaks ownership gates](project_directory_scoped_format_breaks_ownership_gates.md)
 - [#207 Hook() redesign breaks AppEventsTests](project_207_hook_redesign_breaks_appeventstests.md) · [C2 capacity budget drifts mid-plan](project_c2_capacity_budget_drifts_mid_plan.md)
-- [ApplicationGlobalsTests.cs at 500-line ceiling](project_appglobalstests_at_500_line_ceiling.md) · [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md) — 5 layers, 3 authorized
+- [ApplicationGlobalsTests.cs at 500-line ceiling](project_appglobalstests_at_500_line_ceiling.md) · [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md)
 - [Swordfish F5 test misclassification](project_swordfish_f5_test_misclassification.md) · [Confirmatory preflight: proportionate bar](feedback_confirmatory_preflight_proportionate_bar.md)
 - [Four recurring C# plan defect classes](project_preflight_recurring_csharp_plan_defect_classes.md) · [msbuild-log grep matches the csc command line](project_msbuild_log_token_search_matches_csc_command_line.md)
-- [Epic integration base invalidates research line counts](project_epic_integration_base_invalidates_research_line_counts.md) · ["Make the citation exist" propagates false facts](project_preflight_citation_match_propagates_false_fact.md)
+- [Epic base invalidates research line counts](project_epic_integration_base_invalidates_research_line_counts.md) · ["Make the citation exist" propagates false facts](project_preflight_citation_match_propagates_false_fact.md)
 - [Check-off cites an artifact a LATER task writes](project_preflight_checkoff_cites_later_task_artifact.md) · [Pre-edit gate cites the post-edit table](project_preedit_gate_cites_postedit_replacement_table.md)
 - [Conjunctive criteria break the one-artifact citation rule](project_preflight_conjunctive_criterion_citation_gap.md) — "cites exactly one"
 
 ## Build / toolchain environment
-- [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — no jq; pwsh won't concatenate `$(git merge-base`
-- [Project Build/Test Env](project_build_test_env.md) — git-bash MSBuild switches, MSYS_NO_PATHCONV, csharpier v1
-- [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) · [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk needs pwsh7
+- [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) · [Project Build/Test Env](project_build_test_env.md) — no jq; MSYS_NO_PATHCONV; csharpier v1
+- [VS18 toolchain paths](project_vs18_build_toolchain_paths.md) · [Repo-local SDK + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk needs pwsh7
 - [Start-Process -ArgumentList strips quoting](project_startprocess_arglist_array_strips_quoting.md) · [Relative paths in pwsh hit the wrong worktree](project_relative_path_in_pwsh_dotnet_io_hits_wrong_worktree.md)
-- [QuickFiler.Test coverage hang + build flags](project_quickfiler_test_coverage_hang_and_build_flags.md) — testhost can hang
-- [Dot-sourcing Invoke-MSTestWithCoverage clobbers $CoverageOutput](project_dotsourcing_invoke_mstest_clobbers_coverageoutput_param.md) — param-block default wins; Cobertura lands at coverage\coverage.cobertura.xml, exit 0
-- [vstest TestCaseFilter: `|` not OR, and `&` binds tighter](project_vstest_testcasefilter_or_operator_and_env_setup.md) · [Test file name != partial class name](project_test_file_name_vs_partial_class_name.md)
+- [QuickFiler.Test coverage hang](project_quickfiler_test_coverage_hang_and_build_flags.md) · [Dot-sourcing Invoke-MSTestWithCoverage clobbers $CoverageOutput](project_dotsourcing_invoke_mstest_clobbers_coverageoutput_param.md)
+- [vstest TestCaseFilter: `|` not OR, `&` binds tighter](project_vstest_testcasefilter_or_operator_and_env_setup.md) · [Test file name != partial class name](project_test_file_name_vs_partial_class_name.md)
 - [Analyzer HintPath skew breaks all four gates](project_analyzer_hintpath_skew_breaks_all_four_gates.md) · [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — CS0006
-- [SecurityCodeScan incompatible with Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) · [Missing VSTO runtime breaks baseline gates](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL
+- [SecurityCodeScan vs Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) · [Missing VSTO runtime breaks baselines](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL
 - [New sln member surfaces MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) · [Legacy csproj: no transitive compile refs](project_legacy_csproj_no_transitive_compile_refs.md) — CS0012
-- [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — `sed -i` strips CRLF; use Edit
-- [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) · [Nullable /t:Build gate is vacuous](project_nullable_build_gate_is_vacuous_incremental.md) — use `/t:Rebuild`
+- [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) · [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) · [Nullable /t:Build is vacuous](project_nullable_build_gate_is_vacuous_incremental.md)
 - [CSharpier skips *.Designer.cs by filename](project_csharpier_skips_designer_cs_by_filename.md) · [CSharpier 1.3.0 formats XML at 100 cols](project_csharpier_formats_xml_print_width.md)
-- [.gitignore `*.log` blocks committed msbuild-log evidence](project_gitignore_star_log_blocks_committed_msbuild_log_evidence.md) — exists-on-disk gate passes, commit lacks it; `git add -N` is the tracked-status discriminator
-- [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) · [Count-idiom pitfalls: csharpier + Measure-Object](project_count_idiom_pitfalls_csharpier_and_measureobject.md)
-- [New .cs files guarantee a format-loop restart](project_new_cs_files_guarantee_a_format_loop_restart.md) · [PowerShell new files need UTF-8 BOM](powershell-bom-required.md)
-- [poshqc test MCP carries no verdict/numbers](project_poshqc_pester_mcp_exit_minus1.md) · [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md)
-- [BOM breaks grep ^; grep also strips CR](project_bom_grep_anchor_false_negative.md) · [StrictMode + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md)
-- [Pester 5 result shape](project_pester5_result_shape_container_tests_and_ci_codecoverage.md) — use TotalCount; `-CI`
-- [Bash heredoc collapses `\\` to `\`](project_bash_heredoc_collapses_doubled_backslashes.md) · [Unquoted backslash in a bash ARG redirects output](project_unquoted_backslash_in_bash_arg_silently_redirects_output.md)
-- [Doubled backslash de-doubles bash->native exe](project_doubled_backslash_dedoubles_bash_to_native_exe.md) — `[\\/]` becomes forward-slash-only
+- [.gitignore `*.log` blocks committed msbuild-log evidence](project_gitignore_star_log_blocks_committed_msbuild_log_evidence.md) — `git add -N` is the tracked-status discriminator
+- [csharpier pipe-files is non-enforcing](project_csharpier_pipefiles_nonenforcing_gate.md) · [Count-idiom pitfalls](project_count_idiom_pitfalls_csharpier_and_measureobject.md) · [New .cs force a format-loop restart](project_new_cs_files_guarantee_a_format_loop_restart.md)
+- [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) · [BOM breaks grep ^](project_bom_grep_anchor_false_negative.md) · [StrictMode + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md)
+- [poshqc test MCP carries no verdict](project_poshqc_pester_mcp_exit_minus1.md) · [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) · [Pester 5 result shape](project_pester5_result_shape_container_tests_and_ci_codecoverage.md)
+- [Bash heredoc collapses `\\`](project_bash_heredoc_collapses_doubled_backslashes.md) · [Unquoted backslash redirects output](project_unquoted_backslash_in_bash_arg_silently_redirects_output.md) · [Doubled backslash de-doubles to native exe](project_doubled_backslash_dedoubles_bash_to_native_exe.md)
 - [Recursive delete: both idioms blocked](project_recursive_delete_idioms_blocked_use_dotnet_api.md) — use `[System.IO.Directory]::Delete(p,$true)`
-- [pwsh -Command quoting + backtick stripping](project_pwsh_command_quoting_from_bash.md) · [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md)
+- [pwsh -Command quoting](project_pwsh_command_quoting_from_bash.md) · [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md)
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) · [Cross-task shell-variable splat gates](project_cross_task_shell_variable_splat_gate.md)
-- [Evidence <TS> collision clobbers artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) · [Shared evidence artifact + floating <ts>](project_shared_evidence_artifact_floating_ts.md)
+- [Evidence <TS> collision clobbers artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) · [Shared artifact + floating <ts>](project_shared_evidence_artifact_floating_ts.md)
 
 ## Test execution & isolation
 - [Long runs need a detached process](project_long_runs_need_detached_process.md) — background runners die at ~1h
@@ -101,29 +92,17 @@
 - [ScoDictionaryNew needs TryAdd not Add](project_scodictionarynew_tryadd_not_add.md) · [FluentAssertions Equal(params) has no because](project_fluentassertions_equal_params_no_because.md)
 
 ## Artifact hygiene
-- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no account or machine name in ANY artifact
-- [Never predict an observation into an artifact](feedback_never_predict_an_observation_into_an_artifact.md) — placeholder, commit, observe, append
-- [Evidence <TS> labels drift ahead of write time](project_evidence_timestamp_labels_drift_ahead_of_write_time.md) — call `date`, don't increment
-- [Self-test probe literal trips the NEXT sweep pass](project_selftest_probe_literal_trips_the_next_sweep_pass.md) — describe probes, never quote them
-- [TRX sanitisation must be case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) · [TRX/msbuild evidence needs a sanitisation micro-action](project_vstest_trx_evidence_needs_sanitisation_task.md)
-- [PowerShell budget hook blocks scratch .ps1 helpers](project_powershell_scratch_script_budget_hook_blocks_helpers.md) — cap counts others
-- [Appending a 2nd pass must not qualify schema fields](project_appending_a_second_pass_must_not_qualify_schema_fields.md) — `Output Summary (pass 1):` deletes the field
-- [Agent Bash resets cwd; use `env -C`](project_bash_cwd_resets_use_env_dash_c.md) — standalone `cd` does not persist; dotnet reads the wrong global.json
-- [Changed-line coverage branch gate invalidated by the fix](project_changed_line_coverage_branch_gate_invalidated_by_the_fix.md) — the fix makes the line analyzable; baseline-keyed branch is unsatisfiable
-- [CSharpier forces a blank line before a comment](project_csharpier_requires_blank_line_before_comment_breaking_numstat_bounds.md) — one comment line costs 2 insertions; breaks a "1 insertion" numstat bound
-- [dotnet global.json cwd-search vs no-cd Bash discipline](project_dotnet_global_json_cwd_search_vs_bash_discipline.md) — invoke pinned SDK exe by absolute path + `--tool-manifest`
-- [ExcludeFromCodeCoverage misses `this`-capturing lambdas](project_excludefromcodecoverage_misses_this_capturing_lambdas.md) — lifted beside the member, stay at hits=0; prefix is entity-encoded in the XML
-- [FakeTimeProvider zero due time fires at creation](project_faketimeprovider_zero_duetime_fires_at_creation.md) — "not completed before Advance" is false at TimeSpan.Zero
-- [Koverage -RepoRoot needs native separators](project_koverage_reporoot_needs_native_separators.md) — a forward-slash root strips nothing; the "processed" doc stays raw
-- [MSBuild logs leak TWO absolute roots](project_msbuild_log_has_two_absolute_path_leak_classes.md) — `/analyzerconfig:` hits the ancestor checkout; sanitise worktree root FIRST
-- [MSTest Deploy_ dir leaks tokens on FAILING runs only](project_mstest_deploy_dir_leaks_tokens_on_failing_runs.md) — breaks "exactly one TRX" + the name gate
-- [Plan-mandated .ps1 helpers hit the budget cap + a frozen porcelain gate](project_plan_mandated_ps1_helpers_collide_with_budget_cap_and_frozen_porcelain_gate.md) — fix ONE gitignored path
-- [pwsh -File starts in the SESSION root](project_pwsh_file_starts_in_session_root_needs_workingdirectory.md) — script's own `git rev-parse` hits the wrong worktree; pass `-WorkingDirectory`
-- [pwsh stdin is a REPL; non-ASCII mangled](project_pwsh_stdin_repl_mode_and_nonascii_mangling.md) — multi-line blocks output NOTHING; em-dash searches read false 0
-- [Reflective property read escapes a member-expression grep](project_reflective_property_read_escapes_member_expression_grep.md) — `GetProperty("X")` is invisible to `git grep "Type.X"`; a new throwing guard broke 8 cleared tests
-- [vstest leaves TWO .coverage files per run](project_vstest_emits_two_coverage_files_per_run.md) — an "exactly one attachment" gate is unsatisfiable by construction
-- [ExpectedExitCode keyed off the baseline, not this run](project_expectedexitcode_declared_from_baseline_not_observed_run.md) — vacuous toward
-- [Preparation mode flips anchored-diff membership](project_preparation_mode_flips_anchored_diff_gate_membership.md) — feature folder
-- [FluentAssertions BeEmpty names only the first item](project_fluentassertions_beempty_names_only_first_item.md) — a gate demanding two type names in the BeEmpty failure text is unsatisfiable
-- [vstest success run prints no Failed/Skipped line; TRX notExecuted is hard-coded 0](project_vstest_success_run_prints_no_failed_or_skipped_line.md) — derive Skipped as total minus executed; a gate that greps a Skipped: line on a green run is unsatisfiable
-- [Worktree-isolation guard refuses pwsh launched from Bash in two shapes](project_worktree_isolation_guard_refuses_pwsh_from_bash.md) — a quoted absolute path as the command name is refused too; use a PATH= prefix and bootstrap the SDK from POSIX paths
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) · [Never predict an observation](feedback_never_predict_an_observation_into_an_artifact.md) — placeholder, observe, append
+- [Evidence <TS> drifts ahead of write time](project_evidence_timestamp_labels_drift_ahead_of_write_time.md) · [Probe literal trips the NEXT sweep](project_selftest_probe_literal_trips_the_next_sweep_pass.md) — describe, never quote
+- [TRX sanitisation is case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) · [TRX/msbuild need a sanitisation micro-action](project_vstest_trx_evidence_needs_sanitisation_task.md) · [MSBuild logs leak TWO roots](project_msbuild_log_has_two_absolute_path_leak_classes.md)
+- [Deploy_ dir leaks tokens on FAILING runs only](project_mstest_deploy_dir_leaks_tokens_on_failing_runs.md) · [vstest leaves TWO .coverage files](project_vstest_emits_two_coverage_files_per_run.md) — "exactly one" is unsatisfiable
+- [PS budget hook blocks scratch .ps1](project_powershell_scratch_script_budget_hook_blocks_helpers.md) · [Plan-mandated .ps1 + frozen porcelain gate](project_plan_mandated_ps1_helpers_collide_with_budget_cap_and_frozen_porcelain_gate.md)
+- [2nd pass must not qualify schema fields](project_appending_a_second_pass_must_not_qualify_schema_fields.md) — `Output Summary (pass 1):` deletes the field
+- [Bash resets cwd; use `env -C`](project_bash_cwd_resets_use_env_dash_c.md) · [global.json cwd-search vs no-cd discipline](project_dotnet_global_json_cwd_search_vs_bash_discipline.md) — absolute SDK exe + `--tool-manifest`
+- [pwsh -File starts in the SESSION root](project_pwsh_file_starts_in_session_root_needs_workingdirectory.md) · [pwsh stdin is a REPL](project_pwsh_stdin_repl_mode_and_nonascii_mangling.md) · [Isolation guard refuses pwsh from Bash](project_worktree_isolation_guard_refuses_pwsh_from_bash.md)
+- [Changed-line branch gate invalidated by the fix](project_changed_line_coverage_branch_gate_invalidated_by_the_fix.md) · [ExpectedExitCode keyed off the baseline](project_expectedexitcode_declared_from_baseline_not_observed_run.md)
+- [CSharpier forces a blank line before a comment](project_csharpier_requires_blank_line_before_comment_breaking_numstat_bounds.md) — breaks a "1 insertion" numstat bound
+- [ExcludeFromCodeCoverage misses `this`-capturing lambdas](project_excludefromcodecoverage_misses_this_capturing_lambdas.md) · [Koverage -RepoRoot needs native separators](project_koverage_reporoot_needs_native_separators.md)
+- [FakeTimeProvider zero due time fires at creation](project_faketimeprovider_zero_duetime_fires_at_creation.md) · [BeEmpty names only the first item](project_fluentassertions_beempty_names_only_first_item.md)
+- [Reflective property read escapes a member grep](project_reflective_property_read_escapes_member_expression_grep.md) — `GetProperty("X")` invisible to `git grep "Type.X"`
+- [Green run prints no Failed/Skipped line](project_vstest_success_run_prints_no_failed_or_skipped_line.md) · [Preparation mode flips anchored-diff membership](project_preparation_mode_flips_anchored_diff_gate_membership.md)
