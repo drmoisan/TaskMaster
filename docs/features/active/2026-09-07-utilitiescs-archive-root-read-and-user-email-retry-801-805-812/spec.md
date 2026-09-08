@@ -532,7 +532,7 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
 
 ## Acceptance Criteria
 
-- [ ] **AC1 — Archive-root degradation across all three display-projection surfaces.** With
+- [x] **AC1 — Archive-root degradation across all three display-projection surfaces.** With
   `IOlObjects.ArchiveRootPath` arranged to throw `InvalidOperationException`, reading `FolderArray` and
   `FolderRowArray` completes without throwing and returns every suggestion and recent entry byte-identical
   to the stored string, in all three population states (recents only, suggestions only, both). Verified
@@ -544,7 +544,7 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
   `ArchiveStemProjectionTests` passing a literally `null` `archiveRoot` and asserting the input is
   returned unchanged.
 
-- [ ] **AC2 — One read and one warning per projection-helper invocation, and only
+- [x] **AC2 — One read and one warning per projection-helper invocation, and only
   `InvalidOperationException` absorbed.** With a throwing `ArchiveRootPath` arranged over 5 suggestions
   and 3 recents, a single `FolderArray` access invokes the `ArchiveRootPath` getter exactly twice
   (`Mock.Verify(..., Times.Exactly(2))` — once for `AddSuggestions`, once for `AddRecents`), and a
@@ -555,7 +555,7 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
   test arranging `ArchiveRootPath` to throw a `COMException` asserts that it propagates out of
   `FolderArray` rather than being absorbed.
 
-- [ ] **AC3 — The five functional reads are not degraded.** After the change,
+- [x] **AC3 — The five functional reads are not degraded.** After the change,
   `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` still contains the expression
   `_globals.Ol.ArchiveRootPath` at exactly five sites — the two `emailSearchRoots` seeds in
   `FindFolder` and `FindFolderRows`, the two `olAncestor` seeds in `CreateFolder` and
@@ -565,7 +565,7 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
   still thrown, pinning the non-degradation. The existing `QuickFiler.Test` and `TaskMaster.Test`
   suites remain green with no edits.
 
-- [ ] **AC4 — The User Email retry is bounded to one attempt per controller instance.** Using
+- [x] **AC4 — The User Email retry is bounded to one attempt per controller instance.** Using
   `CreateControllerWithViewer()` and `CreateDisplayFailingSmtpRootFolder(...)`, new `[TestMethod]`s in
   `StoreWrapperController_Tests` (file `StoreWrapperController_Tests.Display.cs`) assert: two
   consecutive `PopulateWithCurrent()` calls on one controller invoke the mocked
@@ -577,7 +577,7 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
   `StoreWrapperController_Tests.Display.cs:66`, `:88`, and `:111` remain green with no assertion
   changed.
 
-- [ ] **AC5 — Prose at four sites states the bound the code enforces.** Each of the following comments
+- [x] **AC5 — Prose at four sites states the bound the code enforces.** Each of the following comments
   asserts, in its own words, that the retry is attempted at most once per `StoreWrapperController`
   instance and therefore once per dialog open because `RibbonController.FolderStoresSettings`
   constructs a fresh controller per open, and none of them asserts an unqualified "at most once per
@@ -598,7 +598,7 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
   `feature-audit.2026-09-07T22-40.md` — are unmodified, verifiable by their absence from the branch
   diff.
 
-- [ ] **AC6 — File-size and placement constraints hold.** The branch diff shows a new file
+- [x] **AC6 — File-size and placement constraints hold.** The branch diff shows a new file
   `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.ArchiveRoot.cs` declaring
   `public partial class FolderPredictor`; `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` has a
   line count no greater than its pre-change 1002; no file created or modified by this change other than
