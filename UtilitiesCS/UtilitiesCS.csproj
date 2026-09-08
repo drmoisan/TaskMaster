@@ -1097,6 +1097,7 @@
     <Compile Include="Threading\ApplicationIdleTimer.cs" />
     <Compile Include="Threading\AsyncIdleQueue1.cs" />
     <Compile Include="Threading\IdleActionQueue.cs" />
+    <Compile Include="Threading\IUiCaptureSource.cs" />
     <Compile Include="Threading\SyncContextForm.cs">
       <SubType>Form</SubType>
     </Compile>
