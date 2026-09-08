@@ -24,6 +24,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     and _mappings2 are set via reflection to avoid COM access.
     /// </summary>
     [STATestClass]
+    [DoNotParallelize]
     public class FolderRemapViewer_Tests
     {
         // ---------------------------------------------------------------------------
