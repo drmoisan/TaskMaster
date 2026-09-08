@@ -587,14 +587,14 @@ authoritative source for this `full-bug` work mode; the list in `issue.md` mirro
 
 Checkbox form, for the acceptance-criteria-tracking protocol:
 
-- [ ] AC1: The AC2 self-inflicted-deactivation guard is scoped to the `Form.Deactivate` caller only, so the Cancel teardown's `park-focus` stage cancels every open selector synchronously.
-- [ ] AC2: The issue-677 keyboard-lock contract is preserved for a genuine deactivation; no change weakens it.
-- [ ] AC3: `QfcHomeController` no longer leaves a disposed shared `CancellationTokenSource` reachable by later `Cancel()` callers.
-- [ ] AC4: `QfcFormController.Cleanup()` invokes the ribbon-release callback under `finally`, exactly once, regardless of which earlier stage threw.
-- [ ] AC5: The commit-pending latch is cleared on consumption in `BreadcrumbDropDownHost.RestoreAfterOpenFailure`, so it lives for exactly one popup lifetime on every path.
-- [ ] AC6: The stale `FinishClose` comment is corrected and the dead `SearchOwnsDropDownDismissal` accessor is removed.
-- [ ] AC7: The AC2 self-inflicted-deactivation producer has automated test coverage.
-- [ ] AC8: Full C# toolchain pass completed in order (CSharpier, msbuild analyzers, msbuild nullable, vstest with coverage) with no regression.
+- [x] AC1: The AC2 self-inflicted-deactivation guard is scoped to the `Form.Deactivate` caller only, so the Cancel teardown's `park-focus` stage cancels every open selector synchronously.
+- [x] AC2: The issue-677 keyboard-lock contract is preserved for a genuine deactivation; no change weakens it.
+- [x] AC3: `QfcHomeController` no longer leaves a disposed shared `CancellationTokenSource` reachable by later `Cancel()` callers.
+- [x] AC4: `QfcFormController.Cleanup()` invokes the ribbon-release callback under `finally`, exactly once, regardless of which earlier stage threw.
+- [x] AC5: The commit-pending latch is cleared on consumption in `BreadcrumbDropDownHost.RestoreAfterOpenFailure`, so it lives for exactly one popup lifetime on every path.
+- [x] AC6: The stale `FinishClose` comment is corrected and the dead `SearchOwnsDropDownDismissal` accessor is removed.
+- [x] AC7: The AC2 self-inflicted-deactivation producer has automated test coverage.
+- [x] AC8: Full C# toolchain pass completed in order (CSharpier, msbuild analyzers, msbuild nullable, vstest with coverage) with no regression.
 
 ### Numeric assertions and their basis
 

@@ -1,0 +1,20 @@
+# [P7-T20] Acceptance Criteria Status Summary
+
+Timestamp: 2026-09-08T10-32
+
+Work Mode is `full-bug`, so `spec.md` is the sole authoritative acceptance-criteria source and `user-story.md` is intentionally absent. Every criterion below is additionally mirrored in `issue.md`, and both files were checked off by [P7-T12] through [P7-T19].
+
+- AC1 — DELIVERED. The AC2 self-inflicted-deactivation guard is scoped to the `Form.Deactivate` caller only, so the Cancel teardown's `park-focus` stage cancels every open selector synchronously. Evidence: `evidence/regression-testing/p1-t3-ac1-fail-before.md` (fail-before, 1 failed, `CancelBreadcrumbSelector` invoked zero times), `evidence/regression-testing/p1-t8-ac1-pass-after.md` (pass-after, 1 passed).
+- AC2 — DELIVERED. The issue-677 keyboard-lock contract is preserved for a genuine deactivation; no change weakens it. Evidence: `evidence/baseline/p0-t14-ac2-fence-baseline.md` (9 of 9 passing, file byte-unmodified), `evidence/qa-gates/p7-t10-ac2-fence-final.md` (9 of 9 still passing, file still byte-unmodified). Also `evidence/regression-testing/p1-t9-ac2-fence-after-ac1.md` at the midpoint.
+- AC3 — DELIVERED. `QfcHomeController` no longer leaves a disposed shared `CancellationTokenSource` reachable by later `Cancel()` callers. Evidence: `evidence/regression-testing/p2-t3-ac3-fail-before.md` (fail-before, 2 failed), `evidence/regression-testing/p2-t6-ac3-pass-after.md` (pass-after, 3 of 3 passing).
+- AC4 — DELIVERED. `QfcFormController.Cleanup()` invokes the ribbon-release callback under `finally`, exactly once, regardless of which earlier stage threw. Evidence: `evidence/regression-testing/p3-t3-ac4-fail-before.md` (fail-before, callback ran zero times), `evidence/regression-testing/p3-t6-ac4-pass-after.md` (pass-after, 8 of 8 passing including the no-synchronous-wait guard).
+- AC5 — DELIVERED. The commit-pending latch is cleared on consumption, so it lives for exactly one popup lifetime on every path. Evidence: `evidence/regression-testing/p4-t3-ac5-fail-before.md` (fail-before, 2 of 2 failed), `evidence/regression-testing/p4-t12-ac5-pass-after.md` (pass-after, 48 of 48 passing across the three breadcrumb host classes).
+- AC6 — DELIVERED. The stale `FinishClose` comment is corrected and the dead `SearchOwnsDropDownDismissal` accessor is removed. Evidence: `evidence/qa-gates/p5-t2-ac6-analyzer-build.md` (full-solution analyzer rebuild clean after the deletion, `CS0649-OR-CS0169: NONE`), `evidence/qa-gates/p7-t4-msbuild-nullable.md` (nullable gate clean). Also `evidence/regression-testing/p5-t3-search-dismissal-suite.md` (6 of 6 passing, the reflection-based re-pin test unaffected).
+- AC7 — DELIVERED. The AC2 self-inflicted-deactivation producer has automated test coverage. Evidence: `evidence/regression-testing/p6-t8-ac7-pass-after.md` (6 of 6 registry cases passing), `evidence/qa-gates/p7-t9-changed-line-coverage.md` (`NEW-MODULE-COVERAGE: 100.00` against a 90 percent bar). The residual is recorded at `evidence/other/p6-t9-ac7-residual.md` with `RESIDUAL-IN-SCOPE: NO`.
+- AC8 — DELIVERED. Full C# toolchain pass completed in order with no regression. Evidence: `evidence/qa-gates/p7-t6-loop-closure.md` (`LOOP: CLEAN PASS`, all five steps met their declared expectation). Supporting: `evidence/qa-gates/p7-t8-coverage-delta.md` records `NO-REGRESSION: PASS`.
+
+TOTAL: 8 of 8
+
+## Note on the AC8 no-regression clause
+
+`NO-REGRESSION: PASS` is recorded on the coverage comparison: the line rate moved from 84.6332 to 84.6341 percent and the branch rate from 79.3903 to 79.3941 percent, so neither fell. The separate matter of the 85 percent line floor is recorded truthfully in `evidence/qa-gates/p7-t8-coverage-delta.md` as `FLOOR-85: NOT MET` at 84.63 percent, alongside `FLOOR-80: MET` and `FLOOR-75-BRANCH: MET`. That floor was already unmet on the baseline tree captured before any task of this plan edited a source file, so it is a pre-existing repository condition rather than a regression introduced here, and AC8's no-regression clause is satisfied.

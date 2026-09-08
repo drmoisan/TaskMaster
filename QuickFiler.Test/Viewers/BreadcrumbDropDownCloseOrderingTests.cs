@@ -86,6 +86,12 @@ namespace QuickFiler.Test.Viewers
                 harness
                     .CancelCount.Should()
                     .Be(0, "a close racing an in-flight commit must not cancel the selection");
+                harness
+                    .Host.IsCommitPending.Should()
+                    .BeFalse(
+                        "issue #810 AC5: the close that consumed the latch must also clear it, so "
+                            + "the next close cannot inherit it"
+                    );
             }
         }
 
@@ -111,6 +117,47 @@ namespace QuickFiler.Test.Viewers
                 harness
                     .CancelCount.Should()
                     .Be(1, "a close with no commit in flight still cancels the selection");
+            }
+        }
+
+        /// <summary>
+        /// Issue #810 (AC5). Scenario: a commit is requested, a native close consumes the latch
+        /// without cancelling, and the open path then fails so <c>RestoreAfterOpenFailure</c> runs.
+        /// Expected outcome: the restore cancels the selection and leaves the latch clear.
+        /// </summary>
+        /// <remarks>
+        /// Two closes are driven rather than one because the latch read and the latch clear are
+        /// separate operations of the same <c>CompleteAll</c> list, the read being the earlier of
+        /// the two. The clear therefore cannot affect the close that consumed the latch; what it
+        /// fixes is that the latch cannot survive that close and suppress the next one.
+        /// </remarks>
+        [TestMethod]
+        public void RestoreAfterOpenFailure_WithStaleCommitPending_StillCancelsAndClearsLatch()
+        {
+            // Arrange
+            using (var harness = new CloseOrderingHostHarness())
+            {
+                harness.OpenAndSettle();
+                harness.Host.IsCommitPending = true;
+                harness.RaiseNativeClose(ToolStripDropDownCloseReason.AppFocusChange);
+                harness
+                    .CancelCount.Should()
+                    .Be(0, "the close that consumed the latch must not cancel the selection");
+
+                // Act
+                harness.Host.RestoreAfterOpenFailure();
+
+                // Assert
+                harness
+                    .CancelCount.Should()
+                    .Be(
+                        1,
+                        "a restore running after the latch has been consumed must cancel, because "
+                            + "a stale latch must not survive the close that consumed it"
+                    );
+                harness
+                    .Host.IsCommitPending.Should()
+                    .BeFalse("the restore's own close must leave the latch clear");
             }
         }
 

@@ -100,10 +100,12 @@ namespace QuickFiler.Viewers
         /// declared on this part rather than on the main part because the main part stands close to
         /// the repository's 500-line ceiling and this one does not.
         /// <para>
-        /// The lifetime is one popup opening: <see cref="ShowPopup"/> clears it as each fresh native
-        /// show begins, and nothing else clears it. That is deliberate — once a commit has been
-        /// requested for a given open popup, every later uncommitted-reason close of that same popup
-        /// is a close racing the commit, whichever order the two arrive in.
+        /// The lifetime is one popup opening. <see cref="ShowPopup"/> clears it as each fresh
+        /// native show begins, and <c>FinishClose</c>
+        /// also clears it as its final operation, so a latch consumed by one close cannot suppress
+        /// the cancel on a later one. Once a commit has been requested for a given open popup,
+        /// every later uncommitted-reason close of that same popup is a close racing the commit,
+        /// whichever order the two arrive in.
         /// </para>
         /// </remarks>
         internal bool IsCommitPending { get; set; }
@@ -127,5 +129,50 @@ namespace QuickFiler.Viewers
 
         internal void PublishPopupMessengerReady() =>
             PopupMessengerReady?.Invoke(this, EventArgs.Empty);
+
+        private void FinishClose(BreadcrumbDropDownCloseReason reason)
+        {
+            CompleteAll(
+                // Issue #680: restore the AutoClose default first, so every next lifecycle starts
+                // from standard popup semantics. FinishClose is the single completion point for the
+                // programmatic close path (CompleteClose), the native-close path (OnDropDownClosed),
+                // and RestoreAfterOpenFailure, so one restore here covers all three.
+                () => DropDown.AutoClose = true,
+                () =>
+                {
+                    // Issue #796 (AC3): an uncommitted-reason close arriving while a commit has
+                    // been requested for this popup lifetime is a close racing the commit, so it
+                    // must not undo it. The suppression is conditional on the latch and is
+                    // therefore scoped: with no commit in flight the cancel still runs, which is
+                    // what the retained BreadcrumbPendingOpenCloseTests cancel assertions pin.
+                    if (reason == BreadcrumbDropDownCloseReason.Uncommitted && !IsCommitPending)
+                        _cancelSelection();
+                },
+                // Issue #677: only the focus step is gated.
+                // Issue #796 (AC3): the cancel step above is itself gated, on the commit latch.
+                // The two gates are independent
+                FocusAnchorIfPermitted,
+                // Issue #810 (AC5): clear the latch as the final operation, so it cannot survive
+                // the close that consumed it and suppress the next one. It must be an element of
+                // this operation list rather than a statement after the call, because CompleteAll
+                // rethrows the first failing operation and a statement placed after the call would
+                // be skipped by that throw.
+                () => IsCommitPending = false
+            );
+        }
+
+        internal void RestoreAfterOpenFailure()
+        {
+            bool closeNative = OpenState || DropDown.Visible;
+            OpenState = false;
+            CompleteAll(
+                () =>
+                {
+                    if (closeNative)
+                        CloseNative();
+                },
+                () => FinishClose(BreadcrumbDropDownCloseReason.Uncommitted)
+            );
+        }
     }
 }

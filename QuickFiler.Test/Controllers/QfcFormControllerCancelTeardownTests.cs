@@ -204,6 +204,35 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
+        /// Issue #810 (AC1): the Cancel teardown must cancel every breadcrumb selector even when the
+        /// viewer reports the deactivation as self-inflicted by its own popup. That predicate is
+        /// meaningful only for a genuine <c>Form.Deactivate</c>. On the Cancel path the form is going
+        /// away, so honouring it strands an open selector and the keyboard capture that comes with
+        /// it. This is the near-clone of
+        /// <see cref="ActionCancelAsync_ParksFocusAndCancelsBreadcrumbSelectors"/> with the viewer
+        /// predicate turned on.
+        /// </summary>
+        [TestMethod]
+        public async Task ActionCancelAsync_SelfInflictedByOwnPopup_StillCancelsEverySelector()
+        {
+            // Arrange
+            _mockFormViewer.SetupGet(x => x.IsWebView2Focused).Returns(true);
+            _mockFormViewer.SetupGet(x => x.IsDeactivationSelfInflictedByOwnPopup).Returns(true);
+            var first = new Mock<IQfcItemController>();
+            var second = new Mock<IQfcItemController>();
+            QfcFormController controller = CreateController();
+            InjectGroups(controller, first, second);
+
+            // Act
+            await controller.ActionCancelAsync();
+
+            // Assert
+            _mockFormViewer.Verify(x => x.ParkFocusOffWebView2(), Times.Once);
+            first.Verify(x => x.CancelBreadcrumbSelector(), Times.Once);
+            second.Verify(x => x.CancelBreadcrumbSelector(), Times.Once);
+        }
+
+        /// <summary>
         /// AC2 ordering: navigation and form keyboard handlers are unregistered BEFORE the item rows
         /// are removed. Reversed — which is what the code did — the recursive unsubscribe no longer
         /// reaches the item controls' PreviewKeyDown/KeyDown subscriptions, because the controls are
