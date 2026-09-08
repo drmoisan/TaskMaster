@@ -126,7 +126,8 @@ namespace UtilitiesCS
             Store store,
             OlDefaultFolders folderEnum,
             string[] removeColumns,
-            string[] addColumns
+            string[] addColumns,
+            Func<object, (object[,] data, Dictionary<string, int> columnInfo)>? etl = null
         )
         {
             var table = store.GetTable(
@@ -140,7 +141,7 @@ namespace UtilitiesCS
                 return null;
             }
 
-            (var data, var columnInfo) = StoreTableEtlInvoker(table);
+            (var data, var columnInfo) = (etl ?? DefaultTableEtl)(table);
 
             Frame<int, string>? df = FromArray2D(data: data, columnInfo);
 
@@ -151,7 +152,8 @@ namespace UtilitiesCS
             Stores stores,
             OlDefaultFolders folderEnum,
             string[] removeColumns,
-            string[] addColumns
+            string[] addColumns,
+            Func<object, (object[,] data, Dictionary<string, int> columnInfo)>? etl = null
         )
         {
             Frame<string, string>? df = null;
@@ -161,7 +163,8 @@ namespace UtilitiesCS
                     store: store,
                     folderEnum: folderEnum,
                     removeColumns: removeColumns,
-                    addColumns: addColumns
+                    addColumns: addColumns,
+                    etl: etl
                 );
 
                 if (

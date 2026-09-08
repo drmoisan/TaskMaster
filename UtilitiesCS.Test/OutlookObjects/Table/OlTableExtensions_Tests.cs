@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using UtilitiesCS.OutlookObjects.Fields;
@@ -14,9 +15,9 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.OutlookObjects.Table
 {
-    // EnumerateTable_WritesFormattedOutputAndMovesToStart redirects Console.Out,
-    // which is process-wide state. Under class-level parallel execution another
-    // test class can replace the writer mid-test and make the captured output empty.
+    // The console reason for this attribute was removed by the TextWriter seam under #811.
+    // It is retained because this class has not been soaked under class-level parallelism
+    // and ten of its tests drive the 2000 ms GetTableInViewAsync window.
     [DoNotParallelize]
     [TestClass]
     public class OlTableExtensions_Tests
@@ -957,10 +958,6 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                 null,
                 row
             );
-            // EtlAsync computes its TimeoutAfter budget as 250 ms * GetRowCount().
-            // Override to a large value so the timeout cannot fire under test-host
-            // contention; iteration is driven by EndOfTable/GetNextRow, not GetRowCount.
-            mockTable.Setup(t => t.GetRowCount()).Returns(120);
             var converters = new Dictionary<string, Func<object, string>>
             {
                 { "MessageRecipients", _ => "Converted Async Recipients" },
@@ -973,7 +970,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                 tokenSource,
                 0,
                 progress,
-                converters
+                converters,
+                timeProvider: new FakeTimeProvider()
             );
 
             columnInfo["Store"].Should().Be(1);
@@ -1621,7 +1619,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         }
 
         [TestMethod]
-        public void EnumerateTable_WritesFormattedOutputAndMovesToStart()
+        public void EnumerateTable_WritesFormattedOutputToSuppliedWriterAndMovesToStart()
         {
             var schemaName = MAPIFields.FieldToSchema["Store"];
             var array = new object[,]
@@ -1633,21 +1631,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                 array
             );
             var output = new StringWriter();
-            var original = Console.Out;
 
-            try
-            {
-                Console.SetOut(output);
-                mockTable.Object.EnumerateTable();
-            }
-            finally
-            {
-                Console.SetOut(original);
-            }
+            mockTable.Object.EnumerateTable(output);
 
             output.ToString().Should().Contain("Store");
             output.ToString().Should().Contain("Subject");
             output.ToString().Should().Contain("STORE-ID-009");
+            // The null-writer path resolving to Console.Out; this file is at its line ceiling.
+            FluentActions.Invoking(() => mockTable.Object.EnumerateTable()).Should().NotThrow();
             mockTable.Verify(t => t.MoveToStart(), Times.AtLeastOnce);
         }
 

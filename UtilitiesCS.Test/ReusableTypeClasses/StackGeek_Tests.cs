@@ -3,16 +3,10 @@ using System.IO;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
-    // Main_RunsSampleScenarioWithoutThrowing captures and restores Console.Out, which is
-    // process-wide state. Under the class-level parallel scope declared by the Parallelize
-    // attribute at UtilitiesCS.Test/Properties/AssemblyInfo.cs lines 18-21, a sibling test
-    // class's Console.SetOut overrides this class's redirect mid-test and makes the captured
-    // output empty. The assembly attribute, not TaskMaster.runsettings, is what takes effect:
-    // the CI vstest invocation passes no /Settings: argument.
-    [DoNotParallelize]
     [TestClass]
     public class StackGeek_Tests
     {
@@ -143,24 +137,33 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             helper.GetMiddle(stack).Should().BeNull();
         }
 
+        /// <summary>
+        /// Exercises the null-writer default: Main forwards to Run(Console.Out), so this test
+        /// asserts only that the sample scenario completes, with no Console.Out capture.
+        /// </summary>
         [TestMethod]
         public void Main_RunsSampleScenarioWithoutThrowing()
         {
             // Arrange
             var helper = new StackGeekReflectionHelper();
-            var originalOut = Console.Out;
-            using var writer = new StringWriter();
-            Console.SetOut(writer);
 
-            try
-            {
-                // Act
-                helper.InvokeMain(Array.Empty<string>());
-            }
-            finally
-            {
-                Console.SetOut(originalOut);
-            }
+            // Act + Assert
+            FluentActions
+                .Invoking(() => helper.InvokeMain(Array.Empty<string>()))
+                .Should()
+                .NotThrow();
+        }
+
+        /// <summary>
+        /// The TextWriter seam: the scenario writes to a test-owned writer, so the assertion no
+        /// longer depends on process-wide Console.Out and cannot be broken by a sibling class.
+        /// </summary>
+        [TestMethod]
+        public void Run_WritesScenarioToSuppliedWriter()
+        {
+            // Arrange + Act
+            using var writer = new StringWriter();
+            GFG.Run(writer);
 
             // Assert
             writer.ToString().Should().Contain("Middle Element :");

@@ -1,30 +1,30 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
     using System.Data;
     using System.Diagnostics;
-    using System.Text;
     using System.Text.RegularExpressions;
     using System.Windows.Forms;
     using System.Windows.Input;
     using Microsoft.Data.Analysis;
     using Microsoft.Office.Interop.Outlook;
-    using Svg;
 
     /// <summary>
     /// Class written to transform Dataframe objects for printing
     /// </summary>
     public static class PrettyPrinters
     {
-        public static void PrettyPrint(this DataFrame df) => Console.WriteLine(PrettyText(df));
+        public static void PrettyPrint(this DataFrame df, TextWriter? writer = null) =>
+            (writer ?? Console.Out).WriteLine(PrettyText(df));
 
-        public static void PrettyPrint(this DataFrameRow row) => Console.WriteLine(Pretty(row));
+        public static void PrettyPrint(this DataFrameRow row, TextWriter? writer = null) =>
+            (writer ?? Console.Out).WriteLine(Pretty(row));
 
         public static string PrettyText(this DataFrame df) => ToStringArray2D(df).ToFormattedText();
 

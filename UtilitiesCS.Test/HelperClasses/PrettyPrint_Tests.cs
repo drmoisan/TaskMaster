@@ -11,12 +11,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.HelperClasses
 {
-    // [DoNotParallelize] — DataFramePrettyHelpers_RenderRowsMarkdownAndConsoleOutput
-    // captures and restores Console.Out, which is process-wide state. Under the
-    // class-level parallel scope set in TaskMaster.runsettings, a sibling test
-    // class's Console.SetOut overrides this class's redirect mid-test, causing
-    // PrettyPrint's Console.WriteLine output to land in the wrong writer.
-    [DoNotParallelize]
     [TestClass]
     public class PrettyPrint_Tests
     {
@@ -183,7 +177,7 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         [TestMethod]
-        public void DataFramePrettyHelpers_RenderRowsMarkdownAndConsoleOutput()
+        public void DataFramePrettyHelpers_RenderRowsMarkdownAndWriterOutput()
         {
             // Arrange
             var frame = new DataFrame(
@@ -191,32 +185,48 @@ namespace UtilitiesCS.Test.HelperClasses
                 new PrimitiveDataFrameColumn<int>("Count", new[] { 1, 2 })
             );
             var row = frame.Rows[1];
-            var originalOut = Console.Out;
             using var writer = new StringWriter();
-            Console.SetOut(writer);
 
-            try
-            {
-                // Act
-                var prettyText = frame.PrettyText();
-                var prettyRow = row.Pretty();
-                var markdown = frame.ToMarkdown();
-                frame.PrettyPrint();
-                row.PrettyPrint();
+            // Act
+            var prettyText = frame.PrettyText();
+            var prettyRow = row.Pretty();
+            var markdown = frame.ToMarkdown();
+            frame.PrettyPrint(writer);
+            row.PrettyPrint(writer);
 
-                // Assert
-                prettyText.Should().Contain("Name");
-                prettyText.Should().Contain("alpha");
-                prettyRow.Should().Be(" 2");
-                markdown.Should().Contain("Name");
-                markdown.Should().Contain("alpha");
-                writer.ToString().Should().Contain("Name");
-                writer.ToString().Should().Contain(" 2");
-            }
-            finally
-            {
-                Console.SetOut(originalOut);
-            }
+            // Assert
+            prettyText.Should().Contain("Name");
+            prettyText.Should().Contain("alpha");
+            prettyRow.Should().Be(" 2");
+            markdown.Should().Contain("Name");
+            markdown.Should().Contain("alpha");
+            writer.ToString().Should().Contain("Name");
+            writer.ToString().Should().Contain(" 2");
+        }
+
+        /// <summary>
+        /// Exercises the null-writer default of both PrettyPrint overloads, which resolves to
+        /// Console.Out and preserves the behaviour every existing caller relies on.
+        /// </summary>
+        [TestMethod]
+        public void PrettyPrint_NullWriter_WritesToConsoleWithoutThrowing()
+        {
+            // Arrange
+            var frame = new DataFrame(
+                new StringDataFrameColumn("Name", new string[] { "alpha", null }),
+                new PrimitiveDataFrameColumn<int>("Count", new[] { 1, 2 })
+            );
+            var row = frame.Rows[1];
+
+            // Act + Assert
+            FluentActions
+                .Invoking(() =>
+                {
+                    frame.PrettyPrint();
+                    row.PrettyPrint();
+                })
+                .Should()
+                .NotThrow();
         }
 
         [TestMethod]

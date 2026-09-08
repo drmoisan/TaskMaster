@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -378,8 +379,9 @@ namespace UtilitiesCS
             return headers;
         }
 
-        public static void EnumerateTable(this Outlook.Table table)
+        public static void EnumerateTable(this Outlook.Table table, TextWriter? writer = null)
         {
+            var target = writer ?? Console.Out;
             int columnCount = table.Columns.Count;
             int[] charSpacing = Enumerable.Repeat(20, columnCount).ToArray();
             Justify[] justification = Enumerable.Repeat(Justify.Left, columnCount).ToArray();
@@ -420,9 +422,9 @@ namespace UtilitiesCS
             rows.Add(lineDivider);
             string output = string.Join("\n", rows.ToArray());
 
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine(output);
+            target.WriteLine("");
+            target.WriteLine("");
+            target.WriteLine(output);
 
             table.MoveToStart();
         }

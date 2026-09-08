@@ -69,7 +69,10 @@ namespace UtilitiesCS
             CancellationTokenSource tokenSource,
             int counter,
             ProgressTracker? progress,
-            Dictionary<string, Func<object, string>>? objectConverters = null
+            Dictionary<string, Func<object, string>>? objectConverters = null,
+            // A null timeProvider resolves to the system clock, so production timing is unchanged.
+            // Tests inject a FakeTimeProvider to drive the deadline without a wall-clock wait.
+            TimeProvider? timeProvider = null
         )
         {
             token.ThrowIfCancellationRequested();
@@ -79,7 +82,6 @@ namespace UtilitiesCS
 
             var rowCount = table.GetRowCount();
             int milliseconds = 250 * rowCount;
-            var attempts = 3;
             object[,]? data = null;
             var columnDictionary = table.GetColumnDictionary();
 
@@ -101,7 +103,7 @@ namespace UtilitiesCS
                         columnDictionary,
                         token,
                         milliseconds,
-                        attempts,
+                        timeProvider,
                         progress
                     );
                 }
@@ -111,13 +113,13 @@ namespace UtilitiesCS
                             () => table?.GetArray(table.GetRowCount()) as object[,],
                             token
                         )
-                        .TimeoutAfter(milliseconds, attempts);
+                        .TimeoutAfter(milliseconds, timeProvider);
                 }
             }
             catch (TimeoutException)
             {
                 logger.Error(
-                    $"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling"
+                    $"{nameof(EtlAsync)} timed out with a timeout of {milliseconds} milliseconds. Canceling"
                 );
                 tokenSource.Cancel();
             }
@@ -232,7 +234,7 @@ namespace UtilitiesCS
             Dictionary<string, int> columnDictionary,
             CancellationToken token,
             int timeout,
-            int attempts,
+            TimeProvider? timeProvider,
             ProgressTracker? progress = null
         )
         {
@@ -242,7 +244,7 @@ namespace UtilitiesCS
             (var objFields, var objIndices) = GetObjectFields(objectConverters, columnDictionary);
 
             var rows = await Task.Run(() => table.CastToRowArray(progress?.SpawnChild(65)), token)
-                .TimeoutAfter(timeout, attempts);
+                .TimeoutAfter(timeout, timeProvider);
 
             token.ThrowIfCancellationRequested();
             var jagged = await Task.Run(
@@ -256,7 +258,7 @@ namespace UtilitiesCS
                         ),
                     token
                 )
-                .TimeoutAfter(timeout, attempts);
+                .TimeoutAfter(timeout, timeProvider);
 
             var data = jagged.To2D();
             return data;

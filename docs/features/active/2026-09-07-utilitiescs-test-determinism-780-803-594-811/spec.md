@@ -289,11 +289,11 @@ Validation:
 
 
 ## Acceptance Criteria
-- [ ] AC1: `TryAddValuesAsync` no longer cancels on a fixed wall-clock window, or the window is driven by an injected `TimeProvider`; the test passes deterministically under 24-worker parallel coverage runs.
-- [ ] AC2: `DfDeedle_COM_Tests` no longer mutates process-wide static seams in a way another class can observe, and `DfDeedle.cs:186` guards the null snapshot element with a descriptive failure.
-- [ ] AC3: The two `Console.Out` races are removed by eliminating the shared-console dependency.
+- [x] AC1: `TryAddValuesAsync` no longer cancels on a fixed wall-clock window, or the window is driven by an injected `TimeProvider`; the test passes deterministically under 24-worker parallel coverage runs.
+- [x] AC2: `DfDeedle_COM_Tests` no longer mutates process-wide static seams in a way another class can observe, and `DfDeedle.cs:186` guards the null snapshot element with a descriptive failure.
+- [x] AC3: The two `Console.Out` races are removed by eliminating the shared-console dependency.
 - [ ] AC4: A full nine-assembly `/InIsolation` run with `TestCategory!=LiveOutlook` reports zero failures on ten consecutive runs, recorded as evidence.
-- [ ] AC5: No test is stabilized by a sleep, a retry, or a timing tolerance.
+- [x] AC5: No test is stabilized by a sleep, a retry, or a timing tolerance.
 
 ## Risks & Mitigations
 - Technical or operational risks:

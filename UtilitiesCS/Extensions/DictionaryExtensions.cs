@@ -173,10 +173,9 @@ namespace UtilitiesCS
             CancellationToken token
         )
         {
-            var linkedTS = CancellationTokenSource.CreateLinkedTokenSource(token);
-            linkedTS.CancelAfter(500);
-
-            return await Task.Run(() => dictionary.TryAddValues(key, value), linkedTS.Token);
+            // TryAddValues is a bounded compare-and-swap loop that performs no I/O and cannot
+            // hang, so cancellation is governed solely by the caller's token.
+            return await Task.Run(() => dictionary.TryAddValues(key, value), token);
         }
 
         public static Enums.DictionaryResult UpdateOrRemove<TKey, TValue>(

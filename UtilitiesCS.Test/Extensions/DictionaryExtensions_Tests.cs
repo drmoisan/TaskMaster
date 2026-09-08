@@ -248,6 +248,28 @@ namespace UtilitiesCS.Test.Extensions
             dictionary["value"].Should().Be(10);
         }
 
+        /// <summary>
+        /// Locks the surviving cancellation contract after the internal 500 ms window was
+        /// removed: cancellation is governed solely by the caller's token, so a token that is
+        /// already cancelled still yields TaskCanceledException and leaves the value untouched.
+        /// </summary>
+        [TestMethod]
+        public async Task TryAddValuesAsync_PreCancelledToken_ThrowsTaskCanceledAndLeavesValueUnchanged()
+        {
+            // Arrange
+            var dictionary = new ConcurrentDictionary<string, int>();
+            dictionary["value"] = 8;
+            var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            // Act
+            Func<Task> act = () => dictionary.TryAddValuesAsync("value", 2, cts.Token);
+
+            // Assert
+            await act.Should().ThrowAsync<TaskCanceledException>();
+            dictionary["value"].Should().Be(8);
+        }
+
         [TestMethod]
         public void UpdateOrRemove_RemovesOrUpdatesBasedOnCondition()
         {

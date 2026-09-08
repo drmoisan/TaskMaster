@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -94,12 +95,12 @@ namespace UtilitiesCS
         //    return match.Success ? match.Index : -1;
         //}
 
-        public void PrintTree(TreeNode<string> node, int level)
+        public void PrintTree(TreeNode<string> node, int level, TextWriter? writer = null)
         {
-            Console.WriteLine(new string(' ', level * 2) + node.Value);
+            (writer ?? Console.Out).WriteLine(new string(' ', level * 2) + node.Value);
             foreach (var child in node.Children)
             {
-                PrintTree(child, level + 1);
+                PrintTree(child, level + 1, writer);
             }
         }
 

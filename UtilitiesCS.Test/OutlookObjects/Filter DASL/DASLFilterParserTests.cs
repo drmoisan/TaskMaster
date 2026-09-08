@@ -5,13 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.OutlookObjects.FilterDASL
 {
-    // PrintTree_WritesIndentedTreeToConsole captures and restores Console.Out, which is
-    // process-wide state. Under the class-level parallel scope declared by the Parallelize
-    // attribute at UtilitiesCS.Test/Properties/AssemblyInfo.cs lines 18-21, a sibling test
-    // class's Console.SetOut overrides this class's redirect mid-test and makes the captured
-    // output empty. The assembly attribute, not TaskMaster.runsettings, is what takes effect:
-    // the CI vstest invocation passes no /Settings: argument.
-    [DoNotParallelize]
     [TestClass]
     public class DASLFilterParserTests
     {
@@ -99,24 +92,15 @@ namespace UtilitiesCS.Test.OutlookObjects.FilterDASL
         }
 
         [TestMethod]
-        public void PrintTree_WritesIndentedTreeToConsole()
+        public void PrintTree_WritesIndentedTreeToSuppliedWriter()
         {
             // Arrange
             var parser = new DASLFilterParser();
             var tree = parser.Parse("A AND B");
             using var writer = new StringWriter();
-            var originalOut = Console.Out;
-            Console.SetOut(writer);
 
-            try
-            {
-                // Act
-                parser.PrintTree(tree, 0);
-            }
-            finally
-            {
-                Console.SetOut(originalOut);
-            }
+            // Act
+            parser.PrintTree(tree, 0, writer);
 
             // Assert
             writer.ToString().Should().Contain("AND").And.Contain("  A").And.Contain("  B");
