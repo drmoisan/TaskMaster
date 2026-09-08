@@ -10,14 +10,14 @@ using UtilitiesCS.Threading;
 namespace UtilitiesCS.Test.Threading
 {
     /// <summary>
-    /// A capture object that stands in for <c>SyncContextForm</c> so <c>UiThread.Initialize()</c>
-    /// can be driven, and made to fail, without a live WinForms form or an STA host.
+    /// Stands in for <c>SyncContextForm</c> so <c>UiThread.Initialize()</c> can be driven, and
+    /// made to fail, without a live WinForms form or an STA host.
     /// </summary>
     /// <remarks>
     /// It deliberately does not derive from <see cref="System.Windows.Forms.Form"/>, because
     /// <c>UtilitiesCS.Test/NoLiveFormInTestAssemblyTests.cs</c> asserts this assembly compiles no
     /// <c>Form</c>-derived type. <see cref="ConstructionCount"/> is process-global because the
-    /// factory is; each consuming class is <c>[DoNotParallelize]</c> and resets it in its scope.
+    /// factory is; each consuming class is <c>[DoNotParallelize]</c> and resets it.
     /// </remarks>
     internal sealed class FakeUiCaptureSource : IUiCaptureSource
     {
@@ -28,7 +28,6 @@ namespace UtilitiesCS.Test.Threading
         /// <summary>The deterministic auto-scale factor this fake reports.</summary>
         internal static readonly System.Drawing.SizeF DeterministicAutoScaleFactor =
             new System.Drawing.SizeF(2f, 3f);
-
         private static int _constructionCount;
 
         internal FakeUiCaptureSource()
@@ -47,7 +46,7 @@ namespace UtilitiesCS.Test.Threading
 
         /// <summary>
         /// Gets or sets the dispatcher this fake reports after a successful capture. A test
-        /// supplies one owned by a host it shuts down, so no dispatcher is left on a pooled worker.
+        /// supplies one owned by a host it shuts down, leaving none on a pooled worker.
         /// </summary>
         internal Dispatcher DispatcherToCapture { get; set; }
 
@@ -79,10 +78,10 @@ namespace UtilitiesCS.Test.Threading
     /// <summary>Runs a delegate on a dedicated thread in a chosen apartment.</summary>
     internal static class ApartmentThreadRunner
     {
-        /// <summary>Runs <paramref name="action"/> on a dedicated thread in that apartment.</summary>
+        /// <summary>Runs the delegate on a dedicated thread in that apartment.</summary>
         /// <param name="apartment">The apartment state to set before starting the thread.</param>
         /// <param name="action">The delegate to run.</param>
-        /// <returns>The thrown exception, or null when the delegate completed normally.</returns>
+        /// <returns>The thrown exception, or null when it completed normally.</returns>
         internal static Exception RunOnThread(ApartmentState apartment, Action action)
         {
             Exception captured = null;
@@ -105,7 +104,7 @@ namespace UtilitiesCS.Test.Threading
         }
 
         /// <summary>Starts an STA thread that waits on the gate, then calls <c>UiThread.Init()</c>.</summary>
-        /// <param name="gate">The gate both racers wait on before calling.</param>
+        /// <param name="gate">The gate both racers wait on.</param>
         /// <returns>The started thread, for the caller to join.</returns>
         internal static Thread StartStaInitWaiter(ManualResetEventSlim gate)
         {
@@ -128,13 +127,10 @@ namespace UtilitiesCS.Test.Threading
         }
     }
 
-    /// <summary>
-    /// Owns a dedicated STA thread running a real dispatcher frame, and shuts it down on disposal.
-    /// </summary>
+    /// <summary>Owns a dedicated STA thread running a dispatcher frame, shut down on disposal.</summary>
     /// <remarks>
     /// A dedicated thread is required rather than the pooled worker's ambient dispatcher, which
-    /// would never be shut down. See the fuller remarks on the copy in
-    /// <c>UiThread_Dispatcher_Tests</c>.
+    /// would never be shut down. See the fuller remarks in <c>UiThread_Dispatcher_Tests</c>.
     /// </remarks>
     internal sealed class SharedStaDispatcherHost : IDisposable
     {
@@ -173,9 +169,7 @@ namespace UtilitiesCS.Test.Threading
     /// <remarks>
     /// The boundary is <c>== STA</c> rather than <c>!= MTA</c>.
     /// <see cref="ApartmentState.Unknown"/> is not directly constructible under MSTest on this
-    /// host and is recorded as untested rather than asserted; the equality-shaped boundary rejects
-    /// it without a case that produces it. MSTest's default apartment here is MTA, so a plain
-    /// <c>[TestMethod]</c> is the rejection case and <c>[STATestMethod]</c> the acceptance case.
+    /// host and is recorded as untested; the equality-shaped boundary rejects it regardless.
     /// </remarks>
     [TestClass]
     [DoNotParallelize]
@@ -184,10 +178,8 @@ namespace UtilitiesCS.Test.Threading
         [TestMethod]
         public void Init_OnMtaThread_ThrowsInvalidOperationExceptionNamingTheObservedApartmentState()
         {
-            // Arrange: install a fake so a red run cannot build a real form. The Act runs on a
-            // dedicated MTA thread rather than on the ambient worker, whose apartment was measured
-            // to be STA when this [DoNotParallelize] class shares the serial bucket with an
-            // [STATestClass]; an ambient-apartment test would then assert nothing about MTA.
+            // Arrange: the Act runs on a dedicated MTA thread, never on the ambient worker, whose
+            // apartment was measured as STA here; an ambient test would assert nothing about MTA.
             using (UiThreadStateScope.Enter())
             {
                 UiThread.SyncContextFormFactory = () => new FakeUiCaptureSource();
@@ -306,8 +298,8 @@ namespace UtilitiesCS.Test.Threading
     /// </summary>
     /// <remarks>
     /// The class is <c>[STATestClass]</c> because <c>Initialize()</c> must succeed here. The
-    /// anti-regression assertion is a factory invocation count, never a wall-clock duration: a
-    /// duration assertion would be a timing hack and is prohibited by repository policy.
+    /// anti-regression assertion is a factory invocation count, never a wall-clock duration, which
+    /// would be a timing hack and is prohibited by repository policy.
     /// </remarks>
     [STATestClass]
     [DoNotParallelize]
