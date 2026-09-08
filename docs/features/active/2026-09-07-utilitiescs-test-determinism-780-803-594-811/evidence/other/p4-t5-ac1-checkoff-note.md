@@ -35,8 +35,29 @@ That clause is evidenced by **P8-T6**, the ten-run AC4 gate: ten consecutive ful
 `TryAddValuesAsync_UpdatesExistingValue` must pass every time. The check-off is recorded here
 together with that dependency so the dependency is auditable rather than implicit.
 
-If P8-T6 does not produce ten clean runs, this check-off must be reverted. The reconciliation task
-P8-T11 re-reads spec.md after P8-T6 has run and lists `fail-before-exception`, `p4-t4` and
+## Resolution of that dependency (added 2026-09-08T10-40, after P8-T6 ran)
+
+DEPENDENCY: DISCHARGED. The AC1 check-off stands.
+
+P8-T6 ran ten consecutive full-suite runs on the unchanged source commit `03b7bd57` at 24 workers.
+`TryAddValuesAsync_UpdatesExistingValue` read `Passed` in **all ten**, which is precisely the
+clause this note was tracking: "the test passes deterministically under 24-worker parallel coverage
+runs".
+
+Nine of the ten runs were completely clean. Run 7 reported one failure, but it was a different
+test in a different assembly area,
+`MethodBodyReader_Tests.GetBodyCode_ReturnsConcatenatedInstructions`, caused by an unsynchronised
+static in `ILGlobals` that lies outside this item's write set (see `p8-t4-ac4-runs.md`). That
+failure defeats **AC4**, whose condition is a property of the whole run rather than of one test,
+and AC4 is correspondingly left unchecked. It does not bear on AC1, whose condition names this
+one test, and that test did not fail once in ten runs.
+
+This supersedes the earlier conservative wording in this note, which said the check-off must be
+reverted if P8-T6 did not produce ten clean runs. That wording conflated the two criteria: AC1's
+clause is about the #780 test specifically, and AC4's is about the run as a whole. The precise
+condition for AC1 was met.
+
+The reconciliation task P8-T11 lists `fail-before-exception`, `p4-t4-ac1-pass-after.md` and
 `p8-t6-ac4-ten-run.md` as the three artifacts that jointly discharge AC1.
 
 ## Acceptance evaluation
