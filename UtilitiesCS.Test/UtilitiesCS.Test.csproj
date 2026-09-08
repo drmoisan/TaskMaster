@@ -74,6 +74,7 @@
     <Compile Include="TestHelpers\ManualFireInnerTimer.cs" />
     <Compile Include="TestHelpers\ManualFireTimerWrapper.cs" />
     <Compile Include="TestHelpers\UiThreadDispatcherScope.cs" />
+    <Compile Include="TestHelpers\UiThreadStateScope.cs" />
     <Compile Include="TestAssemblyInitializer.cs" />
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Dialogs\ActionButtonTests.cs" />
@@ -308,6 +309,7 @@
     <Compile Include="OutlookObjects\Folder\ArchiveStemProjectionTests.cs" />
     <Compile Include="OutlookObjects\Folder\ArchiveChainProjectionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorRecentsProjectionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorArchiveRootDegradationTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderSuggestionTreeHierarchyTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderSuggestionTreeStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\PercentageFormatterTests.cs" />
@@ -501,6 +503,7 @@
     <Compile Include="Threading\AsyncMultiTasker_Tests.cs" />
     <Compile Include="Threading\ProgressViewer_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />
+    <Compile Include="Threading\UiThreadInitContract_Tests.cs" />
     <Compile Include="Threading\WpfUiDispatcherTests.cs" />
     <Compile Include="Threading\CurrentStoreContextTests.cs" />
     <Compile Include="Threading\LockupStallDeciderTests.cs" />
