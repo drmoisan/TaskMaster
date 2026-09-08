@@ -64,4 +64,15 @@ Not an acceptance criterion and not performed by this delivery: QuickFiler launc
 
 ## 6. Environmental finding recorded for future planners
 
-Research R4 concluded that a plain `[TestMethod]` runs MTA in this repository, and `UtilitiesCS.Test/test.runsettings` does record that global STA execution is intentionally disabled. **That premise does not hold for every scheduling arrangement.** When a `[TestClass] [DoNotParallelize]` class shares the serial execution bucket with an `[STATestClass] [DoNotParallelize]` class in the same assembly, the plain `[TestMethod]` cases were measured running on an **STA** thread. `evidence/regression-testing/p2-t10-fail-before.md` records the measurement verbatim and the correction it forced. A test that needs a caller of a known apartment must create a dedicated thread and set the apartment explicitly, rather than relying on the ambient worker.
+Research R4 concluded that a plain `[TestMethod]` runs MTA in this repository, and `UtilitiesCS.Test/test.runsettings` does record that global STA execution is intentionally disabled. **That premise does not hold for every scheduling arrangement.** Plain `[TestMethod]` cases were measured running on an **STA** thread; `evidence/regression-testing/p2-t10-fail-before.md` records the measurement verbatim and the correction it forced.
+
+**The operational rule below is the load-bearing part of this section and it is confirmed. A test that needs a caller of a known apartment must create a dedicated thread and set the apartment explicitly, rather than relying on the ambient worker.**
+
+**Correction (2026-09-08, orchestrator, after feature review).** An earlier revision of this section attributed the STA observation to a `[TestClass] [DoNotParallelize]` class sharing the serial execution bucket with an `[STATestClass] [DoNotParallelize]` class. **That stated cause is not established and should not be relied on.** A simpler explanation covers the same observation and two further tree-verified facts:
+
+- `UtilitiesCS.Test/Properties/AssemblyInfo.cs:18` carries the only assembly-level `[assembly: Parallelize(...)]` in this repository. No other test assembly has one, so an assembly invoked without a `/Settings:` runsettings does not parallelize at all.
+- No `.runsettings` anywhere in the repository sets `ExecutionThreadApartmentState`.
+
+Tests dispatched to the MSTest parallel worker pool run on thread-pool threads and are MTA. Tests that run on the main test-execution thread — the `[DoNotParallelize]` serial bucket, or every test in an assembly where parallelization is off — inherit that thread's apartment, and the vstest execution thread on .NET Framework is STA unless `ExecutionThreadApartmentState` overrides it. Bucket-sharing with an `[STATestClass]` is not required for the effect.
+
+A consequence for this delivery is recorded in the correction sections of `p0-t15-mta-synccontextform-measurement.md` and `p6-t4-ac2-regression-reconciliation.md`: the `[P0-T15]` probe most likely ran STA, so it took no MTA measurement, and the status of the #782 mechanism narrative reverts to UNKNOWN. Acceptance criterion AC5 is unchecked in `spec.md` for that reason.
