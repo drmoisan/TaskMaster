@@ -24,6 +24,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
     ///     is set to a synthetic snapshot so that SetupTree() does not hit COM.
     /// </summary>
     [STATestClass]
+    [DoNotParallelize]
     public class FilterOlFoldersViewer_Tests
     {
         // ---------------------------------------------------------------------------

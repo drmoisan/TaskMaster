@@ -13,7 +13,7 @@ using System.Windows.Threading;
 
 namespace QuickFiler.Viewers
 {
-    public partial class SyncContextForm : Form
+    public partial class SyncContextForm : Form, UtilitiesCS.Threading.IUiCaptureSource
     {
         public SyncContextForm()
         {

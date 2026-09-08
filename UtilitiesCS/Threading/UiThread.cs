@@ -23,6 +23,16 @@ namespace UtilitiesCS
             int lockupAttributionThresholdMs = 5000
         )
         {
+            // The precondition is the first statement rather than a sibling of the latch read:
+            // the four monitoring assignments below mutate process-global configuration on every
+            // call regardless of the latch, so a non-STA caller would otherwise poison them even
+            // when Initialize() never runs.
+            ApartmentState apartment = Thread.CurrentThread.GetApartmentState();
+            if (apartment != ApartmentState.STA)
+            {
+                throw new InvalidOperationException(NonStaInitMessage(apartment));
+            }
+
             _monitorUiThread = monitorUiThread;
             if (onLockupDetected is not null)
             {
@@ -33,9 +43,19 @@ namespace UtilitiesCS
                 _monitorTimeProvider = timeProvider;
             }
             _lockupAttributionThresholdMs = lockupAttributionThresholdMs;
-            if (_loaded.CheckAndSetFirstCall)
+
+            // The flag is set after Initialize() returns, not before it runs, so a failed first
+            // attempt leaves it false and a later call from an STA thread retries. The lock
+            // additionally serializes concurrent first attempts, which the previous
+            // Interlocked.Exchange latch never did.
+            lock (InitLock)
             {
+                if (_initialized)
+                {
+                    return;
+                }
                 Initialize();
+                _initialized = true;
             }
         }
 
@@ -43,12 +63,13 @@ namespace UtilitiesCS
         private static Action<LockupAttribution>? _onLockupDetected;
         private static TimeProvider? _monitorTimeProvider;
         private static int _lockupAttributionThresholdMs = 5000;
-        private static ThreadSafeSingleShotGuard _loaded = new ThreadSafeSingleShotGuard();
+        private static readonly object InitLock = new object();
+        private static bool _initialized;
 
         private static void Initialize()
         {
             // Create a hidden form to initialize the synchronization context
-            _syncContextForm = new SyncContextForm();
+            _syncContextForm = SyncContextFormFactory();
             _syncContextForm.ShowInTaskbar = false;
             _syncContextForm.WindowState = FormWindowState.Minimized;
             _syncContextForm.Show();
@@ -78,7 +99,41 @@ namespace UtilitiesCS
             _syncContextForm.Hide();
         }
 
-        private static SyncContextForm? _syncContextForm;
+        private static IUiCaptureSource? _syncContextForm;
+
+        /// <summary>
+        /// Supplies the capture object <see cref="Initialize"/> reads the UI values from. Tests
+        /// replace it so initialization can be driven, and made to fail, without a live form.
+        /// </summary>
+        internal static Func<IUiCaptureSource> SyncContextFormFactory { get; set; } =
+            DefaultSyncContextFormFactory;
+
+        private static IUiCaptureSource DefaultSyncContextFormFactory() => new SyncContextForm();
+
+        /// <summary>
+        /// Restores every process-global static this type owns to its declared initial value.
+        /// </summary>
+        /// <remarks>
+        /// Test-only. The statics are process-wide for the whole test assembly, so a test that
+        /// drives initialization through a failure would otherwise change the premise of every
+        /// later test in that process. This method is not thread-safe; serialization is provided
+        /// by <c>[DoNotParallelize]</c> on every consuming test class.
+        /// </remarks>
+        internal static void ResetForTesting()
+        {
+            _initialized = false;
+            _uiSyncContext = null;
+            _dispatcher = null;
+            _autoScaleFactor = null;
+            _syncContextForm = null;
+            _threadMonitor = null;
+            _uiThreadId = -1;
+            _monitorUiThread = false;
+            _onLockupDetected = null;
+            _monitorTimeProvider = null;
+            _lockupAttributionThresholdMs = 5000;
+            SyncContextFormFactory = DefaultSyncContextFormFactory;
+        }
 
         #region UI Thread Synchronization
 
@@ -97,7 +152,42 @@ namespace UtilitiesCS
                 _context = context;
             }
 
-            public bool IsCompleted => _context == SynchronizationContext.Current;
+            public bool IsCompleted
+            {
+                get
+                {
+                    SynchronizationContext? ambient = SynchronizationContext.Current;
+                    if (ReferenceEquals(_context, ambient))
+                    {
+                        return true;
+                    }
+                    // A null ambient context means there is nothing to resume onto: continuing
+                    // inline would break TaskScheduler.FromCurrentSynchronizationContext() at the
+                    // two WebView2 setup sites.
+                    if (ambient is null)
+                    {
+                        return false;
+                    }
+                    if (_uiThreadId == -1 || _uiThreadId != Thread.CurrentThread.ManagedThreadId)
+                    {
+                        return false;
+                    }
+                    // The persistent UI context captured at Init() time.
+                    if (ReferenceEquals(_context, _uiSyncContext))
+                    {
+                        return true;
+                    }
+                    // A dispatcher context is UI-owned only when this thread's dispatcher is the
+                    // UI dispatcher. The spelling is fully qualified because inside this nested
+                    // struct the simple name Dispatcher also names the enclosing type's static
+                    // property of the same name.
+                    return _context is DispatcherSynchronizationContext
+                        && ReferenceEquals(
+                            System.Windows.Threading.Dispatcher.FromThread(Thread.CurrentThread),
+                            _dispatcher
+                        );
+                }
+            }
 
             public void OnCompleted(Action continuation) =>
                 _context.Post(_postCallback, continuation);
@@ -134,6 +224,14 @@ namespace UtilitiesCS
 
         internal const string DispatcherNotInitializedMessage =
             "The UI dispatcher has not been captured. Call UiThread.Init() on the UI (STA) thread during host startup before reading UiThread.Dispatcher.";
+
+        // Split from the formatted message so a test can assert the stable text without pinning
+        // how the ApartmentState enum renders.
+        internal const string NonStaInitMessagePrefix =
+            "UiThread.Init() must be called on the UI (STA) thread during host startup. Observed apartment state: ";
+
+        private static string NonStaInitMessage(ApartmentState observed) =>
+            NonStaInitMessagePrefix + observed;
 
         /// <summary>
         /// Gets the dispatcher captured from the UI (STA) thread during host startup.

@@ -16,6 +16,7 @@ using OutlookFolders = Microsoft.Office.Interop.Outlook.Folders;
 namespace UtilitiesCS.Test.OutlookObjects.Folder
 {
     [TestClass]
+    [DoNotParallelize]
     public class FolderPredictorTests
     {
         [TestMethod]
