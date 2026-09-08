@@ -62,6 +62,34 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             return rootFolder;
         }
 
+        /// <summary>
+        /// Sibling of <see cref="CreateDisplayFailingSmtpRootFolder"/> that additionally returns
+        /// the <c>ExchangeUser</c> mock, so a test can count invocations of the
+        /// <c>PrimarySmtpAddress</c> getter and therefore count how many times the SMTP lookup was
+        /// actually attempted. The original helper is deliberately left unchanged, because the
+        /// three #797 AC6 tests below depend on its exact behaviour.
+        /// </summary>
+        private static (
+            Mock<OutlookFolder> RootFolder,
+            Mock<ExchangeUser> ExchangeUser
+        ) CreateDisplayFailingSmtpRootFolderWithUser(string reason)
+        {
+            var rootFolder = new Mock<OutlookFolder>();
+            var session = new Mock<NameSpace>();
+            var currentUser = new Mock<OutlookRecipient>();
+            var addressEntry = new Mock<AddressEntry>();
+            var exchangeUser = new Mock<ExchangeUser>();
+
+            exchangeUser.SetupGet(x => x.PrimarySmtpAddress).Throws(new COMException(reason));
+            addressEntry.SetupGet(x => x.Address).Returns("/o=EX/cn=Recipients");
+            addressEntry.Setup(x => x.GetExchangeUser()).Returns(exchangeUser.Object);
+            currentUser.SetupGet(x => x.AddressEntry).Returns(addressEntry.Object);
+            session.SetupGet(x => x.CurrentUser).Returns(currentUser.Object);
+            rootFolder.SetupGet(x => x.Session).Returns(session.Object);
+
+            return (rootFolder, exchangeUser);
+        }
+
         [TestMethod]
         public void PopulateWithCurrent_WhenUserEmailIsNull_RetriesLookupAndRendersAddress()
         {
@@ -127,6 +155,98 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             // Assert
             controller.Viewer.UserEmail.Text.Should().Contain("The operation failed.");
             controller.Viewer.UserEmail.Text.Should().NotBe("Error Loading");
+        }
+
+        /// <summary>
+        /// AC4 of issue #812: the #797 AC6 retry is unbounded. <c>PopulateWithCurrent</c> runs on
+        /// every store re-selection, not only on dialog open, and a failing lookup leaves
+        /// <c>UserEmailAddress</c> null, so the guard condition stays true and the COM lookup is
+        /// re-attempted on every pass. One controller instance must attempt it at most once.
+        /// </summary>
+        [TestMethod]
+        public void PopulateWithCurrent_CalledTwiceOnOneController_RetriesLookupOnlyOnce()
+        {
+            // Arrange
+            var (controller, _) = CreateControllerWithViewer();
+            var (rootFolder, exchangeUser) = CreateDisplayFailingSmtpRootFolderWithUser(
+                "The operation failed."
+            );
+            controller.Current = new StoreWrapper(null)
+            {
+                RootFolder = rootFolder.Object,
+                UserEmailAddress = null,
+                DisplayName = "Mailbox",
+            };
+
+            // Act
+            controller.PopulateWithCurrent();
+            controller.PopulateWithCurrent();
+
+            // Assert
+            controller
+                .Current.UserEmailAddress.Should()
+                .BeNull("the lookup fails, which is what leaves the guard condition true");
+            exchangeUser.VerifyGet(x => x.PrimarySmtpAddress, Times.Once());
+        }
+
+        /// <summary>
+        /// The bound is per controller instance, not per store and not per process. A second
+        /// controller over the same failing store gets its own single attempt, which is what makes
+        /// the bound equal to "once per dialog open" given that
+        /// <c>RibbonController.FolderStoresSettings</c> constructs a fresh controller per open.
+        /// </summary>
+        [TestMethod]
+        public void PopulateWithCurrent_OnASecondControllerOverTheSameFailingStore_RetriesOnceMore()
+        {
+            // Arrange
+            var (firstController, _) = CreateControllerWithViewer();
+            var (secondController, _) = CreateControllerWithViewer();
+            var (rootFolder, exchangeUser) = CreateDisplayFailingSmtpRootFolderWithUser(
+                "The operation failed."
+            );
+            var sharedStore = new StoreWrapper(null)
+            {
+                RootFolder = rootFolder.Object,
+                UserEmailAddress = null,
+                DisplayName = "Mailbox",
+            };
+            firstController.Current = sharedStore;
+            secondController.Current = sharedStore;
+
+            // Act
+            firstController.PopulateWithCurrent();
+            secondController.PopulateWithCurrent();
+
+            // Assert
+            exchangeUser.VerifyGet(x => x.PrimarySmtpAddress, Times.Exactly(2));
+        }
+
+        /// <summary>
+        /// The latch does not replace the null check: when the address is already populated the
+        /// lookup must not be attempted at all, so the added UI-thread latency stays at zero for
+        /// the ordinary case.
+        /// </summary>
+        [TestMethod]
+        public void PopulateWithCurrent_WhenUserEmailIsAlreadyPopulated_NeverInvokesExchangeUserLookup()
+        {
+            // Arrange
+            var (controller, _) = CreateControllerWithViewer();
+            var (rootFolder, exchangeUser) = CreateDisplayFailingSmtpRootFolderWithUser(
+                "The operation failed."
+            );
+            controller.Current = new StoreWrapper(null)
+            {
+                RootFolder = rootFolder.Object,
+                UserEmailAddress = "already@example.com",
+                DisplayName = "Mailbox",
+            };
+
+            // Act
+            controller.PopulateWithCurrent();
+
+            // Assert
+            controller.Current.UserEmailAddress.Should().Be("already@example.com");
+            exchangeUser.VerifyGet(x => x.PrimarySmtpAddress, Times.Never());
         }
 
         #endregion AC6

@@ -821,6 +821,7 @@
     <Compile Include="OutlookObjects\Folder\FolderProbabilityAdapter.cs" />
     <Compile Include="OutlookObjects\Folder\IFolderSearchHandler.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.IFolderSearchHandler.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictor.ArchiveRoot.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\OlFolderHelper\SmithWaterman.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScorer.cs" />
     <Compile Include="OutlookObjects\MailItem\ItemInfo.cs" />

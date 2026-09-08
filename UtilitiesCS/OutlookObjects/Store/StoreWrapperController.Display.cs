@@ -39,8 +39,13 @@ namespace UtilitiesCS.OutlookObjects.Store
             // bounds the added UI-thread latency to the single lookup startup already performs.
             // Every dereference on this path is null-conditional, so a null current store cannot
             // throw here.
-            if (Current is not null && Current.UserEmailAddress is null)
+            if (
+                Current is not null
+                && Current.UserEmailAddress is null
+                && !_userEmailRetryAttempted
+            )
             {
+                _userEmailRetryAttempted = true;
                 Current.RefreshUserEmailAddress();
             }
 
