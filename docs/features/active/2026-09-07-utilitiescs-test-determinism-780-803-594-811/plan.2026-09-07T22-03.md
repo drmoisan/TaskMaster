@@ -3,9 +3,9 @@
 - **Issue:** #811
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-08T01-15
-- **Status:** Ready for preflight (revision round 1 delta applied)
-- **Version:** 1.1
+- **Last Updated:** 2026-09-08T02-20
+- **Status:** Approved for execution. Executor preflight returned PREFLIGHT: ALL CLEAR on round 3, after the round-1 delta (nine defects) and the round-2 delta (four defects) were applied. The MCP plan validator returns ok with no warnings in either channel.
+- **Version:** 1.2
 - **Work Mode:** full-bug
 - **Base commit:** 04a54e681bd21e841e124c016df30672ee701b75 (origin/main at branch creation)
 - **Branch:** bug/utilitiescs-test-determinism-780-803-594-811
