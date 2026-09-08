@@ -17,6 +17,14 @@ ExpectedExitCode: 0
 
 MTA_INITIALIZE_OUTCOME: COMPLETED
 
+> **CORRECTION (2026-09-08, added by the orchestrator after feature review).** The `MTA_` prefix on the
+> token above is **not established and is most likely wrong**. Read the correction section at the end
+> of this file before relying on any claim made here. The token is left in place rather than rewritten
+> because the approved plan requires exactly one `MTA_INITIALIZE_OUTCOME:` line valued `COMPLETED` or
+> `THREW`, and neither value can express "apartment not established". What this run measured is that
+> `new SyncContextForm(); Show();` completed on the vstest main execution thread, whose apartment was
+> never read.
+
 ## Output Summary
 
 ```
@@ -48,3 +56,39 @@ Both assertions passed, so `new SyncContextForm(); Show();` **completed without 
 The recorded #782 mechanism requires `new SyncContextForm(); Show();` to throw on a non-STA thread. This measurement shows that it does not throw on this host, so **that mechanism narrative is not reproducible as stated on this execution host**. [P6-T4] carries the reconciliation and records the disposition; the AC2 "reproduce the #782 regression scenario as a test" clause is discharged there by the forced-throw scenario driven through the factory seam rather than by the narrative.
 
 This is a measurement of one host at one point in time. It refutes the narrative's necessary precondition on this host; it does not establish what was observed on the host where #782 was recorded.
+
+## Correction: the apartment of this run was never established
+
+Timestamp: 2026-09-08T04-10. Added by the orchestrator after the feature review of this delivery, and
+verified independently against the tree before being written here.
+
+**The inference recorded above is unsound, and the conclusion drawn from it is withdrawn.** Nothing in
+this run read `Thread.CurrentThread.GetApartmentState()`. The apartment was inferred from research R4,
+and *this same delivery falsified R4 by direct measurement*:
+`../regression-testing/p2-t10-fail-before.md` quotes the verbatim TRX message
+`Expected Thread.CurrentThread.GetApartmentState() to be ApartmentState.MTA {value: 1}, but found ApartmentState.STA {value: 0}.`
+observed from a plain `[TestMethod]` on a plain `[TestClass]`.
+
+Two facts settle why the `/Tests:` single-test selection does not rescue the inference. Both were
+verified directly against the tree by the orchestrator rather than accepted from the review:
+
+1. `UtilitiesCS.Test/Properties/AssemblyInfo.cs:18` carries the only assembly-level
+   `[assembly: Parallelize(...)]` in this repository. `QuickFiler.Test` carries none, so with no
+   `/Settings:` passed — and this run passed none — that assembly does not parallelize at all.
+2. No `.runsettings` anywhere in the repository sets `ExecutionThreadApartmentState`.
+
+The consequence is that a test in a non-parallelizing assembly runs on the vstest main execution
+thread, which on .NET Framework is STA unless overridden. Under that explanation **this run executed
+STA**, no MTA measurement was taken, and the refutation of the #782 mechanism narrative does not
+follow: a successful run on an STA thread says nothing about whether the construction throws on an MTA
+thread.
+
+**The status of the #782 narrative therefore reverts to UNKNOWN**, which is where decision D5 found it.
+Acceptance criterion AC5 in `spec.md` has been unchecked accordingly.
+
+This correction does not affect the delivered code. The AC2 design argument recorded in
+`p6-t4-ac2-regression-reconciliation.md` was verified structurally by the review and holds whichever
+value a real measurement would produce, because the AC1 precondition makes the potentially-throwing
+body of `Initialize()` unreachable from any non-STA caller. Settling the measurement requires reverting
+`UtilitiesCS/Threading/UiThread.cs` to its pre-fix state and re-running the probe on a thread whose
+apartment is explicitly set, which is follow-up work rather than a defect in this delivery.

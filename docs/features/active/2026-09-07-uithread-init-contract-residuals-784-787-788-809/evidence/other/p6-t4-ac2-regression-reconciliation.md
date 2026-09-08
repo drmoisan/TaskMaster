@@ -6,6 +6,19 @@ Source read: `MTA_INITIALIZE_OUTCOME:` in `docs/features/active/2026-09-07-uithr
 
 Measured value: **`COMPLETED`**.
 
+> **CORRECTION (2026-09-08, added by the orchestrator after feature review).** The refutation asserted
+> in Disposition A below is **withdrawn**. The `[P0-T15]` run never read the executing thread's
+> apartment state, and this same delivery falsified the research premise the `MTA` label rested on, so
+> that run most likely executed STA and no MTA measurement was taken. The status of the #782 mechanism
+> narrative is **UNKNOWN**, not refuted. The two tree-verified facts behind this are recorded in the
+> correction section of `p0-t15-mta-synccontextform-measurement.md`.
+>
+> The section "Why the AC2 design is safe whichever value was measured" below is **unaffected**. The
+> feature review verified it structurally against the head tree, and it was written from the outset to
+> stand independently of the measured value, which is what decision D5 required. The delivered code and
+> tests need no change. `spec.md` AC5 has been unchecked because its measurement clause is not
+> established.
+
 ## Disposition A
 
 The measured value is `COMPLETED`, so Disposition A applies and Disposition B is not recorded.
