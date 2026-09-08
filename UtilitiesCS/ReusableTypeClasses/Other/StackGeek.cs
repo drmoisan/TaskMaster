@@ -172,6 +172,13 @@ namespace UtilitiesCS
         // Driver code
         public static void Main(String[] args)
         {
+            Run(Console.Out);
+        }
+
+        // The sample scenario, written to a supplied writer so a test can assert on the output
+        // without redirecting the process-wide Console.Out.
+        public static void Run(System.IO.TextWriter writer)
+        {
             GFG ob = new GFG();
             myStack ms = ob.createMyStack();
             ob.push(ms, 11);
@@ -184,11 +191,11 @@ namespace UtilitiesCS
             ob.push(ms, 88);
             ob.push(ms, 99);
 
-            Console.WriteLine("Popped : " + ob.pop(ms));
-            Console.WriteLine("Popped : " + ob.pop(ms));
-            Console.WriteLine("Middle Element : " + ob.findMiddle(ms));
+            writer.WriteLine("Popped : " + ob.pop(ms));
+            writer.WriteLine("Popped : " + ob.pop(ms));
+            writer.WriteLine("Middle Element : " + ob.findMiddle(ms));
             ob.deleteMiddle(ms);
-            Console.WriteLine("New Middle Element : " + ob.findMiddle(ms));
+            writer.WriteLine("New Middle Element : " + ob.findMiddle(ms));
         }
     }
 

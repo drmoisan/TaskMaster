@@ -60,30 +60,19 @@ namespace UtilitiesCS
         > MessageBoxInvoker = System.Windows.Forms.MessageBox.Show;
 
         /// <summary>
-        /// Testability seam for the <see cref="OlTableExtensions.ETL"/> extension method
-        /// that converts an Outlook Table to a 2-D data array.
-        /// Tests replace this delegate to supply pre-built data without a live COM Table.
-        /// Uses <see cref="object"/> as the parameter type to avoid CS1769 (embedded interop
-        /// types cannot be used as generic type arguments across assembly boundaries).
+        /// The production ETL over an Outlook Table, used whenever no <c>etl</c> argument is
+        /// supplied. Uses <see cref="object"/> as the parameter type to avoid CS1769 (embedded
+        /// interop types cannot be used as generic type arguments across assembly boundaries).
         /// </summary>
-        internal static Func<
+        private static readonly Func<
             object,
             (object[,] data, Dictionary<string, int> columnInfo)
-        > TableEtlInvoker = t => ((Outlook.Table)t).ETL();
+        > DefaultTableEtl = t => ((Outlook.Table)t).ETL();
 
-        /// <summary>
-        /// Testability seam for the <see cref="OlTableExtensions.ETL"/> extension method
-        /// as used inside <see cref="FromDefaultFolder(Store,OlDefaultFolders,string[],string[])"/>.
-        /// Tests replace this delegate to supply pre-built data without a live COM Table.
-        /// Uses <see cref="object"/> as the parameter type to avoid CS1769 (embedded interop
-        /// types cannot be used as generic type arguments across assembly boundaries).
-        /// </summary>
-        internal static Func<
-            object,
-            (object[,] data, Dictionary<string, int> columnInfo)
-        > StoreTableEtlInvoker = t => ((Outlook.Table)t).ETL();
-
-        public static Frame<int, string> GetEmailDataInView(Explorer activeExplorer)
+        public static Frame<int, string> GetEmailDataInView(
+            Explorer activeExplorer,
+            Func<object, (object[,] data, Dictionary<string, int> columnInfo)>? etl = null
+        )
         {
             Outlook.Table table = activeExplorer.GetTableInView();
             var currentFolder = activeExplorer.CurrentFolder;
@@ -91,7 +80,7 @@ namespace UtilitiesCS
 
             AddQfcColumns(table, currentFolder);
 
-            (object[,] data, Dictionary<string, int> columnInfo) = TableEtlInvoker(table);
+            (object[,] data, Dictionary<string, int> columnInfo) = (etl ?? DefaultTableEtl)(table);
 
             // Closes the second set of unchecked dictionary reads, the ones GetEmailDataFromTable
             // performs on this synchronous path. The asynchronous path never reaches them, so its
@@ -140,7 +129,10 @@ namespace UtilitiesCS
             Explorer activeExplorer,
             CancellationToken token,
             CancellationTokenSource tokenSource,
-            ProgressTracker progress
+            ProgressTracker progress,
+            // A null timeProvider resolves to the system clock, so production timing is unchanged.
+            // Tests inject a FakeTimeProvider to drive every deadline on this path deterministically.
+            TimeProvider? timeProvider = null
         )
         {
             token.ThrowIfCancellationRequested();
@@ -173,7 +165,7 @@ namespace UtilitiesCS
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(AddQfcColumnsAsync)} ...");
             // currentFolder is the live Explorer's CurrentFolder (non-null); the defensive
             // ?.Name in the preceding log line set its flow state to maybe-null.
-            await AddQfcColumnsAsync(table, currentFolder!, token, 0);
+            await AddQfcColumnsAsync(table, currentFolder!, token, 0, timeProvider: timeProvider);
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.EtlAsync)} ...");
             var etlStopwatch = Stopwatch.StartNew();
@@ -181,8 +173,21 @@ namespace UtilitiesCS
                 token,
                 tokenSource,
                 0,
-                progress.Increment(2).SpawnChild(96)
+                progress.Increment(2).SpawnChild(96),
+                timeProvider: timeProvider
             );
+
+            // EtlAsync swallows its TimeoutException and returns a null data array through a
+            // null-forgiving suppression, so this is the first point the failure can be named.
+            if (tableSnapshot.data is null)
+            {
+                throw new InvalidOperationException(
+                    $"The table snapshot for folder '{folderName}' was not produced: the table ETL "
+                        + "timed out or was cancelled before returning any rows, so the email data "
+                        + "frame cannot be built for this folder."
+                );
+            }
+
             LogDfTiming(
                 "GetEmailDataInViewAsync table snapshot ready | table snapshot",
                 $"rowCount={tableSnapshot.Item1.GetLength(0)}; columnCount={tableSnapshot.Item1.GetLength(1)}; etlElapsedMs={etlStopwatch.ElapsedMilliseconds}"
@@ -205,7 +210,7 @@ namespace UtilitiesCS
                     () => Email2dArrayToDf(storeID, tableSnapshot.Item1, tableSnapshot.Item2),
                     token
                 )
-                .TimeoutAfter(1000, 2);
+                .TimeoutAfter(1000, timeProvider);
             LogDfTiming(
                 "GetEmailDataInViewAsync dataframe transform complete | dataframe transform",
                 $"rowCount={df.RowCount}; columnCount={df.ColumnCount}; elapsedMs={dataframeStopwatch.ElapsedMilliseconds}; totalElapsedMs={getEmailDataStopwatch.ElapsedMilliseconds}"

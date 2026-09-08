@@ -71,6 +71,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
+    <Compile Include="TestHelpers\ArmingBarrierTimeProvider.cs" />
     <Compile Include="TestHelpers\ManualFireInnerTimer.cs" />
     <Compile Include="TestHelpers\ManualFireTimerWrapper.cs" />
     <Compile Include="TestHelpers\UiThreadDispatcherScope.cs" />
@@ -189,6 +190,7 @@
     <Compile Include="Extensions\DfDeedle_Tests.cs" />
     <Compile Include="Extensions\DfDeedle_COM_Tests.cs" />
     <Compile Include="Extensions\DfDeedleQfcColumnTimeoutTests.cs" />
+    <Compile Include="Extensions\DfDeedleEtlTimeoutTests.cs" />
     <Compile Include="Extensions\DfDeedleRequiredColumnValidationTests.cs" />
     <Compile Include="Extensions\DfMLNet_Tests.cs" />
     <Compile Include="Extensions\DictionaryExtensions_Tests.cs" />
@@ -539,6 +541,7 @@
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.Launch.cs" />
     <Compile Include="OutlookObjects\Store\StoreWrapperController_Tests.Display.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensionsEtlClockTests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\ConfigController_Tests.cs" />
   </ItemGroup>

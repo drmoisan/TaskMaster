@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Deedle;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -22,14 +23,16 @@ namespace UtilitiesCS.Test.Extensions
     ///
     /// Purpose:
     ///     Covers the COM-interface paths (HasUserDefinedProperty, EnsureTriageColumnExists,
-    ///     AddQfcColumns), the testability-seam paths (GetEmailDataFromTable,
-    ///     GetEmailDataInView via TableEtlInvoker, AddQfcColumnsAsync), the storage-folder
-    ///     factory paths (FromDefaultFolder), and the pure Deedle extension methods
+    ///     AddQfcColumns), the injected-ETL paths (GetEmailDataFromTable, GetEmailDataInView
+    ///     via its optional etl parameter, AddQfcColumnsAsync), the storage-folder factory
+    ///     paths (FromDefaultFolder), and the pure Deedle extension methods
     ///     (PrintToLog, DropFirstN, Exclude, GetDuplicateEntriesByColumn).
     ///
     /// Usage:
-    ///     Every test that modifies a static seam saves/restores the original value to
-    ///     prevent side effects across the test run.
+    ///     The two ETL delegates are ordinary optional parameters, so no test in this class
+    ///     writes process-wide state to inject ETL data.
+    ///     MessageBoxInvoker is the one remaining static seam: every test that swaps it
+    ///     restores it in a finally block, and it has no reader on any parallel-phase path.
     /// </summary>
     [TestClass]
     public class DfDeedle_COM_Tests
@@ -364,7 +367,7 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         // ----------------------------------------------------------------
-        // GetEmailDataInView (using TableEtlInvoker seam)
+        // GetEmailDataInView (using the optional etl parameter)
         // ----------------------------------------------------------------
 
         [TestMethod]
@@ -396,22 +399,15 @@ namespace UtilitiesCS.Test.Extensions
             mockExplorer.SetupGet(e => e.CurrentView).Returns(mockTableView.Object);
             mockExplorer.SetupGet(e => e.CurrentFolder).Returns(folderWithTriage.Object);
 
-            var originalEtl = DfDeedle.TableEtlInvoker;
-            DfDeedle.TableEtlInvoker = _ => (injectedData, injectedColInfo);
+            // Act
+            Frame<int, string> df = DfDeedle.GetEmailDataInView(
+                mockExplorer.Object,
+                etl: _ => (injectedData, injectedColInfo)
+            );
 
-            try
-            {
-                // Act
-                Frame<int, string> df = DfDeedle.GetEmailDataInView(mockExplorer.Object);
-
-                // Assert
-                df.Should().NotBeNull();
-                df.RowCount.Should().Be(1);
-            }
-            finally
-            {
-                DfDeedle.TableEtlInvoker = originalEtl;
-            }
+            // Assert
+            df.Should().NotBeNull();
+            df.RowCount.Should().Be(1);
         }
 
         /// <summary>
@@ -478,7 +474,8 @@ namespace UtilitiesCS.Test.Extensions
                 explorer.Object,
                 CancellationToken.None,
                 new CancellationTokenSource(),
-                progress
+                progress,
+                timeProvider: new FakeTimeProvider()
             );
 
             result.RowCount.Should().Be(1);
@@ -722,7 +719,7 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         // ----------------------------------------------------------------
-        // FromDefaultFolder(Store) — non-null table path (StoreTableEtlInvoker seam)
+        // FromDefaultFolder(Store) — non-null table path (optional etl parameter)
         // ----------------------------------------------------------------
 
         [TestMethod]
@@ -732,7 +729,7 @@ namespace UtilitiesCS.Test.Extensions
             // and mock folder.GetTable() (the COM method on MAPIFolder) to return a mock Table.
             // GetTable(Store,...) is a static extension method that Moq cannot intercept directly;
             // the correct seam is the underlying COM interface chain.
-            // StoreTableEtlInvoker is replaced to supply known data without live COM calls.
+            // The optional etl parameter supplies known data without live COM calls.
             var mockColumns = new Mock<Outlook.Columns>(MockBehavior.Loose);
             var mockTable = new Mock<Outlook.Table>(MockBehavior.Loose);
             mockTable.SetupGet(t => t.Columns).Returns(mockColumns.Object);
@@ -759,27 +756,18 @@ namespace UtilitiesCS.Test.Extensions
                 ["StoreId"] = 5,
             };
 
-            var originalSeam = DfDeedle.StoreTableEtlInvoker;
-            DfDeedle.StoreTableEtlInvoker = _ => (injectedData, injectedColInfo);
+            // Act
+            Frame<int, string> df = DfDeedle.FromDefaultFolder(
+                mockStore.Object,
+                OlDefaultFolders.olFolderInbox,
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                etl: _ => (injectedData, injectedColInfo)
+            );
 
-            try
-            {
-                // Act
-                Frame<int, string> df = DfDeedle.FromDefaultFolder(
-                    mockStore.Object,
-                    OlDefaultFolders.olFolderInbox,
-                    Array.Empty<string>(),
-                    Array.Empty<string>()
-                );
-
-                // Assert: frame is non-null and has data from the injected ETL result.
-                df.Should().NotBeNull();
-                df.RowCount.Should().Be(1);
-            }
-            finally
-            {
-                DfDeedle.StoreTableEtlInvoker = originalSeam;
-            }
+            // Assert: frame is non-null and has data from the injected ETL result.
+            df.Should().NotBeNull();
+            df.RowCount.Should().Be(1);
         }
 
         // ----------------------------------------------------------------
@@ -793,7 +781,7 @@ namespace UtilitiesCS.Test.Extensions
             // and mock folder.GetTable() (the COM method on MAPIFolder) to return a mock Table.
             // GetTable(Store,...) is a static extension method that Moq cannot intercept directly;
             // the correct seam is the underlying COM interface chain.
-            // StoreTableEtlInvoker supplies known data with an EntryID column so that
+            // The optional etl parameter supplies known data with an EntryID column so that
             // the IndexRowsWith and frame-assembly paths inside the method are exercised.
             var mockColumns = new Mock<Outlook.Columns>(MockBehavior.Loose);
             var mockTable = new Mock<Outlook.Table>(MockBehavior.Loose);
@@ -824,27 +812,18 @@ namespace UtilitiesCS.Test.Extensions
             var mockStores = new Mock<Outlook.Stores>(MockBehavior.Loose);
             mockStores.Setup(s => s.GetEnumerator()).Returns(singleStoreList.GetEnumerator());
 
-            var originalSeam = DfDeedle.StoreTableEtlInvoker;
-            DfDeedle.StoreTableEtlInvoker = _ => (injectedData, injectedColInfo);
+            // Act
+            Frame<int, string> df = DfDeedle.FromDefaultFolder(
+                mockStores.Object,
+                OlDefaultFolders.olFolderInbox,
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                etl: _ => (injectedData, injectedColInfo)
+            );
 
-            try
-            {
-                // Act
-                Frame<int, string> df = DfDeedle.FromDefaultFolder(
-                    mockStores.Object,
-                    OlDefaultFolders.olFolderInbox,
-                    Array.Empty<string>(),
-                    Array.Empty<string>()
-                );
-
-                // Assert: frame is non-null and contains data from the single store.
-                df.Should().NotBeNull();
-                df.RowCount.Should().Be(1);
-            }
-            finally
-            {
-                DfDeedle.StoreTableEtlInvoker = originalSeam;
-            }
+            // Assert: frame is non-null and contains data from the single store.
+            df.Should().NotBeNull();
+            df.RowCount.Should().Be(1);
         }
 
         private static ProgressTracker CreateProgressTracker()
