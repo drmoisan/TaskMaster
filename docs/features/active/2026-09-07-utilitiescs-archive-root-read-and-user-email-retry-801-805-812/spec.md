@@ -59,8 +59,8 @@ Line-number corrections to `issue.md` (re-derived; N2, and confirmed by reading 
 ### Write Set (the complete set of files this change may modify or create)
 
 Production:
-- `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.ArchiveRoot.cs` (new partial part: logger + guarded accessor)
-- `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` (replace the three display-projection read expressions with accessor calls; hoist the suggestion read; net line count must not increase)
+- `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.ArchiveRoot.cs` (new partial part: logger + guarded accessor + the relocated `ProjectSuggestionPath` helper)
+- `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` (replace the three display-projection read expressions with accessor calls; hoist the suggestion read; net line count must not increase. Dated amendment, 2026-09-08, per the #812 plan D9: the private helper `ProjectSuggestionPath` is relocated verbatim out of this file into the new part file, with a second `archiveRoot` parameter added and no behavioural change. The relocation is required rather than cosmetic, because without it the two hoisted accessor calls would raise the file from 1002 to 1004 lines and AC6 requires the post-change count to be no greater than 1002.)
 - `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs` (per-instance latch field + XML doc)
 - `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs` (latch in the retry gate; comment correction)
 - `UtilitiesCS/OutlookObjects/Store/StoreWrapper.cs` (comment correction only)
@@ -69,6 +69,19 @@ Test:
 - `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorArchiveRootDegradationTests.cs` (new)
 - `UtilitiesCS.Test/OutlookObjects/Folder/ArchiveStemProjectionTests.cs` (add the null-root identity case; A5 gap)
 - `UtilitiesCS.Test/OutlookObjects/Store/StoreWrapperController_Tests.Display.cs` (latch tests + comment correction)
+
+Build configuration (dated amendment, 2026-09-08, per the #812 plan D14):
+- `UtilitiesCS/UtilitiesCS.csproj` (add the `<Compile Include>` item for the new production part file)
+- `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (add the `<Compile Include>` item for the new test file)
+
+Both project files are legacy `packages.config`-style projects carrying explicit `<Compile Include>`
+items rather than globbing, so a new `.cs` file that is not added to its project does not compile.
+Editing them is a mechanical consequence of the project format, not a scope expansion.
+
+Write Set scoping note (dated amendment, 2026-09-08, per the #812 plan D14): the AC6 500-line audit
+is executed over `*.cs` paths only. `.claude/rules/general-code-change.md` scopes the cap to
+production code, test code, and reusable script files; a `.csproj` is build configuration and sits
+outside that scope, and `.csharpierignore` likewise keeps `*.csproj` out of the formatter.
 
 Documentation:
 - `docs/features/active/2026-09-06-folder-settings-never-persist-and-user-email-error-loading-797/spec.md` (three prose passages)
@@ -500,6 +513,16 @@ are collected. Use `/InIsolation`; `vstest.console.exe` is not on `PATH` and is 
 3. `coverage/plan797-helpers.ps1` does not exist in this worktree (`coverage/` is git-ignored). The
    filter expression transfers; the runner script does not. TRX output carries `runUser` and
    `computerName` and must not be committed.
+4. **`UtilitiesCS.Test.Extensions.DictionaryExtensions_Tests` carries a wall-clock timing flake
+   tracked as issue 780**, specifically `TryAddValuesAsync_UpdatesExistingValue`. Dated amendment,
+   2026-09-08, per the #812 plan D18. The mechanism is a fixed deadline in a production helper this
+   change does not touch: `UtilitiesCS/Extensions/DictionaryExtensions.cs:177` calls
+   `linkedTS.CancelAfter(500)` and the next line awaits work on that linked token, so under the
+   class-level parallelism of a full-suite run the 500 ms elapses and the await throws
+   `TaskCanceledException`. It passes in about 2 ms in an isolated scoped run. Do **not** filter it
+   out. Treat a failure as a known flake, re-run the scoped invocation
+   `FullyQualifiedName~DictionaryExtensions_Tests&TestCategory!=LiveOutlook` once, record both
+   attempts, and name issue 780.
 
 ### Coverage targets
 
@@ -591,7 +614,7 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
   the captured log containing zero occurrences of `Skipping target "CoreCompile"` so the gates are
   demonstrably non-vacuous; and `vstest.console.exe` over `UtilitiesCS.Test.dll`, `QuickFiler.Test.dll`,
   and `TaskMaster.Test.dll` with `/EnableCodeCoverage`, `/InIsolation`, and the documented hazard filter,
-  reporting zero failures other than a `DfDeedle_COM_Tests` occurrence handled under the issue-803
+  reporting zero failures other than a carve-out member handled under the issue-803 or issue-780
   protocol. Coverage of the new accessor and the latch gate is `>= 90%`; repository line coverage on the
   testable denominator is `>= 80%`. Evidence written under
   `docs/features/active/2026-09-07-utilitiescs-archive-root-read-and-user-email-retry-801-805-812/evidence/`.

@@ -192,11 +192,14 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal string? RefreshUserEmailAddress()
         {
             // why: issue #797 AC6. The lookup ran once per Init and was never retried, and the
-            // resolved address carries JsonIgnore so a success is not cached across restarts. The
-            // settings dialog calls this at most once per open, and only when the address is null,
-            // which bounds the added UI-thread latency to the single lookup startup already
-            // performs. Safe when RootFolder is null: the chain's first read is null-conditional,
-            // so the call yields null and records a reason rather than throwing.
+            // resolved address carries JsonIgnore so a success is not cached across restarts.
+            // This member itself guarantees nothing about how often the lookup runs: it re-runs
+            // the lookup on every call and republishes whatever it returns. The bound lives in
+            // the caller. why: issue #812. StoreWrapperController.PopulateWithCurrent attempts
+            // this at most once per controller instance, which equals once per dialog open only
+            // because RibbonController.FolderStoresSettings builds a fresh controller per open.
+            // Safe when RootFolder is null: the chain's first read is null-conditional, so the
+            // call yields null and records a reason rather than throwing.
             UserEmailAddress = GetSmtpAddressFromStore();
             return UserEmailAddress;
         }

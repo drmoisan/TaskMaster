@@ -35,8 +35,14 @@ namespace UtilitiesCS.OutlookObjects.Store
             // why: issue #797 AC6. The SMTP lookup runs once per store initialisation and is never
             // retried, and a successful result is not persisted, so one transient COM failure at
             // startup left the label showing a generic placeholder for the rest of the session.
-            // Retry here, at most once per dialog open and only when the address is null, which
-            // bounds the added UI-thread latency to the single lookup startup already performs.
+            // Retry here, but only when the address is null, which bounds the added UI-thread
+            // latency to the single lookup startup already performs.
+            // why: issue #812. PopulateWithCurrent runs on every store re-selection, not only on
+            // dialog open, and a failed lookup leaves the address null, so the #797 guard alone
+            // re-attempted the COM lookup on every pass. The latch below bounds the retry to at
+            // most one attempt per controller instance. That equals one attempt per dialog open
+            // only because RibbonController.FolderStoresSettings constructs a fresh controller
+            // per open; it is not a property of PopulateWithCurrent itself.
             // Every dereference on this path is null-conditional, so a null current store cannot
             // throw here.
             if (

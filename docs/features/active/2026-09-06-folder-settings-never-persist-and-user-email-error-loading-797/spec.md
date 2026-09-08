@@ -209,9 +209,13 @@ partial.
    that no existing seam in UtilitiesCS provides one: the repository's only timeout primitive
    dispatches work to ThreadPool (MTA) threads, and an Outlook interop object is STA-apartment-bound,
    so the call marshals back to the STA and the STA still blocks while the caller merely abandons the
-   wait. AC6 is therefore satisfied with a synchronous retry on the UI thread, attempted at most once
-   per dialog open and only when the address is null. A non-blocking read is recorded here as a
-   potential follow-up work item, not folded in.
+   wait. AC6 is therefore satisfied with a synchronous retry on the UI thread, attempted only when
+   the address is null. Dated correction, 2026-09-08, issue #812: this passage originally bounded
+   that retry to once per dialog open, a bound the delivered code did not enforce, because
+   PopulateWithCurrent also runs on every store re-selection. #812 added a latch bounding it to at
+   most one attempt per controller instance, which equals once per dialog open only because
+   RibbonController.FolderStoresSettings constructs a fresh controller per open. A non-blocking read
+   is recorded here as a potential follow-up work item, not folded in.
 9. **The dead-branch observation at StoreWrapperController.cs line 466 is not addressed.** The
    research recorded, as a secondary observation, that the path-name producer never returns an empty
    name, making that branch effectively unreachable. That is a separate finding outside AC1-AC8.
@@ -489,8 +493,14 @@ This subsection adds detail only. The checkbox text above is the authoritative w
   application globals that already implements exactly this ordering with per-step exception handling.
   The retry site is PopulateWithCurrent, which the research verified is the single method that runs
   both when the dialog opens and on every store re-selection, and which already marshals to the UI
-  thread at its top. The retry is attempted at most once per dialog open and only when the address is
-  null. The blocking-latency limitation is recorded in Non-Goals item 8 and in Risks.
+  thread at its top. Dated correction, 2026-09-08, issue #812: this passage previously asserted in
+  one sentence that PopulateWithCurrent runs on every store re-selection and in the next that the
+  retry is bounded to once per dialog open, which cannot both hold of the delivered code. The
+  reconciled position is the first sentence plus a latch: the member does run on every re-selection,
+  and #812 added a latch bounding the retry to at most one attempt per controller instance. That
+  equals once per dialog open only because RibbonController.FolderStoresSettings constructs a fresh
+  controller per open. The retry is still attempted only when the address is null. The
+  blocking-latency limitation is recorded in Non-Goals item 8 and in Risks.
 - **AC7 detail.** A pure trim helper on the display partial, plus the two label assignments. The
   research verified that no existing test pins the untrimmed form, so this adds coverage rather than
   changing an expectation.
@@ -618,10 +628,13 @@ contrary to D1.
 
 1. **UI-thread latency from the AC6 retry.** Adding a retry at dialog-open time reintroduces a
    synchronous Outlook COM property read on the UI thread, on a chain independently demonstrated
-   capable of long blocks. Mitigation: retry at most once per dialog open and only when the address
-   is null, which bounds the added latency to the same single lookup the startup path already
-   performs. The residual risk is accepted because AC6 as written requires the retry. A non-blocking
-   read is recorded as a follow-up, per Non-Goals item 8.
+   capable of long blocks. Mitigation, as corrected on 2026-09-08 by issue #812: retry only when the
+   address is null, and at most once per controller instance, which bounds the added latency to the
+   same single lookup the startup path already performs. The original wording stated the bound as
+   once per dialog open, which the delivered code did not enforce; #812 added the latch that does,
+   and the per-open reading holds only because RibbonController.FolderStoresSettings constructs a
+   fresh controller per open. The residual risk is accepted because AC6 as written requires the
+   retry. A non-blocking read is recorded as a follow-up, per Non-Goals item 8.
 2. **Controller partial split.** Moving the display members to a new partial is a mechanical
    relocation, but the controller already has several existing test files whose fixtures reach the
    relocated members. Mitigation: relocate without behavioural edit

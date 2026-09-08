@@ -115,9 +115,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         [TestMethod]
         public void PopulateWithCurrent_WhenUserEmailIsAlreadyPopulated_DoesNotRetryLookup()
         {
-            // Arrange (issue #797, AC6): the retry is attempted at most once per dialog open and
-            // only when the address is null, which bounds the added UI-thread latency. The mocked
-            // chain would yield a different address, so an unchanged value proves no retry ran.
+            // Arrange (issue #797, AC6, corrected by #812): the retry is attempted at most once
+            // per controller instance and only when the address is null, which bounds the added
+            // UI-thread latency. The mocked chain would yield a different address, so an
+            // unchanged value proves no retry ran.
             var (controller, _) = CreateControllerWithViewer();
             var rootFolder = CreateDisplaySmtpRootFolder("would-have-retried@example.com");
             controller.Current = new StoreWrapper(null)
