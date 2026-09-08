@@ -61,10 +61,10 @@ Medium, carried from #787: in production `ThisAddIn.cs:35-40` is the only `Init(
 
 ## Acceptance Criteria
 
-- [ ] AC1: `Init()` throws a named `InvalidOperationException` when called from a non-STA thread, before any global is captured; the MTA test caller at `QfcHomeControllerRunAsyncTests.cs:329` is corrected or given an STA host.
-- [ ] AC2: A failed `Initialize()` does not consume the latch; a subsequent `Init()` retries and succeeds. The #782 regression scenario is reproduced as a test and passes with the chosen design.
-- [ ] AC3: `SynchronizationContextAwaiter.IsCompleted` returns true on the owning UI thread regardless of ambient context instance, and false elsewhere; ordering-sensitive callers in `ItemViewer` and `EfcFormController` still pass their existing tests.
-- [ ] AC4: Unit tests cover STA/MTA rejection, latch re-arm after throw, and awaiter inline-vs-post decisions with a fake dispatcher seam; no real Outlook host.
+- [x] AC1: `Init()` throws a named `InvalidOperationException` when called from a non-STA thread, before any global is captured; the MTA test caller at `QfcHomeControllerRunAsyncTests.cs:329` is corrected or given an STA host.
+- [x] AC2: A failed `Initialize()` does not consume the latch; a subsequent `Init()` retries and succeeds. The #782 regression scenario is reproduced as a test and passes with the chosen design.
+- [x] AC3: `SynchronizationContextAwaiter.IsCompleted` returns true on the owning UI thread regardless of ambient context instance, and false elsewhere; ordering-sensitive callers in `ItemViewer` and `EfcFormController` still pass their existing tests.
+- [x] AC4: Unit tests cover STA/MTA rejection, latch re-arm after throw, and awaiter inline-vs-post decisions with a fake dispatcher seam; no real Outlook host.
 
 ## Proposed Fix / Validation Ideas
 
