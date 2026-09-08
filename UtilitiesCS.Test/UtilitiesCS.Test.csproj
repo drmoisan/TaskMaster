@@ -309,6 +309,7 @@
     <Compile Include="OutlookObjects\Folder\ArchiveStemProjectionTests.cs" />
     <Compile Include="OutlookObjects\Folder\ArchiveChainProjectionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorRecentsProjectionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorArchiveRootDegradationTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderSuggestionTreeHierarchyTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderSuggestionTreeStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\PercentageFormatterTests.cs" />

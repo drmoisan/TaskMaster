@@ -94,6 +94,17 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal Func<string, (string, string)> FsConverter { get; set; } = null!;
 
         /// <summary>
+        /// Bounds the AC6 SMTP retry to one attempt per controller instance (issue #812). That
+        /// equals one attempt per dialog open ONLY because
+        /// <c>RibbonController.FolderStoresSettings</c> constructs a fresh
+        /// <see cref="StoreWrapperController"/> on every open; reusing a single controller across
+        /// dialog opens would silently reduce the bound to once per controller lifetime. The field
+        /// is never reset, because a reset would restore the unbounded per-re-selection retry that
+        /// #812 exists to remove.
+        /// </summary>
+        private bool _userEmailRetryAttempted;
+
+        /// <summary>
         /// Determines whether the store-wrapper model has finished loading and is safe to
         /// bind into the settings dialog. Addresses issue #240: <c>Globals.Ol.StoresWrapper</c>
         /// is populated asynchronously during startup and can be null (load not yet complete),

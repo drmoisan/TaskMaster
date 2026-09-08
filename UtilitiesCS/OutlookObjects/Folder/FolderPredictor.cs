@@ -792,7 +792,7 @@ namespace UtilitiesCS
             {
                 folderList.Add("======= RECENT SELECTIONS ========");
                 // AC5: recents share the suggestion projection; the ! is required (else CS8620).
-                var r = _globals.Ol.ArchiveRootPath;
+                var r = GetArchiveRootForDisplayOrNull();
                 folderList.AddRange(
                     _globals.AF.RecentsList.Select(x => ArchiveStemProjection.ToDisplayStem(x, r)!)
                 );
@@ -812,7 +812,8 @@ namespace UtilitiesCS
         public void AddSuggestions(ref List<string> folderList) // internal
         {
             folderList.Add("========= SUGGESTIONS =========");
-            folderList.AddRange(Suggestions.ToArray(5).Select(ProjectSuggestionPath));
+            var r = GetArchiveRootForDisplayOrNull();
+            folderList.AddRange(Suggestions.ToArray(5).Select(x => ProjectSuggestionPath(x, r)));
         }
 
         // Row-model mirror of AddMatches: the SEARCH RESULTS separator (Separator, no score)
@@ -842,19 +843,13 @@ namespace UtilitiesCS
             rows.Add(
                 new FolderRow("========= SUGGESTIONS =========", FolderRowKind.Separator, null)
             );
+            var root = GetArchiveRootForDisplayOrNull();
             foreach (var score in Suggestions.ToScoredArray(5))
             {
-                var folderPath = ProjectSuggestionPath(score.FolderPath);
+                var folderPath = ProjectSuggestionPath(score.FolderPath, root);
                 var projectedScore = new FolderScore(folderPath, score.Score, score.Probability);
                 rows.Add(new FolderRow(folderPath, FolderRowKind.Suggestion, projectedScore));
             }
-        }
-
-        private string ProjectSuggestionPath(string folderPath)
-        {
-            // Null-forgiving: ToDisplayStem returns null only for a null input, which this
-            // non-nullable parameter excludes; unsuppressed the return is CS8603 (#799 AC4).
-            return ArchiveStemProjection.ToDisplayStem(folderPath, _globals?.Ol.ArchiveRootPath)!;
         }
 
         // Row-model mirror of AddRecents: the RECENT SELECTIONS separator (Separator, no score)
@@ -873,7 +868,7 @@ namespace UtilitiesCS
                 );
                 // AC5 row-model mirror: projecting one surface only would break the documented
                 // text-parity contract. Null-forgiving as in AddRecents (else CS8604 at FolderRow).
-                var root = _globals.Ol.ArchiveRootPath;
+                var root = GetArchiveRootForDisplayOrNull();
                 foreach (var recent in _globals.AF.RecentsList)
                 {
                     var text = ArchiveStemProjection.ToDisplayStem(recent, root)!;
