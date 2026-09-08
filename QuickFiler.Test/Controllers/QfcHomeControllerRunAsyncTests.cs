@@ -323,38 +323,72 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
-        public void Worker_RunWorkerCompleted_HandlesCompletionCorrectly()
+        public async System.Threading.Tasks.Task Worker_RunWorkerCompleted_HandlesCompletionCorrectly()
         {
-            // Arrange
-            UiThread.Init(false);
-            var mockFormViewer = new Mock<IQfcFormViewer>();
-            mockFormViewer.SetupAllProperties();
-            mockFormViewer.SetupProperty(m => m.ItemsPerLoadEnabled, false);
-            mockFormViewer.SetupProperty(m => m.SkipButtonEnabled, false);
-            _controller
-                .GetType()
-                .GetField(
-                    "_formViewer",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, mockFormViewer.Object);
+            // Arrange: install a dispatcher belonging to a thread that actually pumps, instead of
+            // calling UiThread.Init() on the MSTest worker. Init() now rejects a non-STA caller,
+            // and the old arrangement additionally left the test order-dependent on whichever
+            // thread had consumed the initialization latch first.
+            var host = new QuickFiler.Test.TestSupport.WinFormsPumpHost();
+            UiThreadDispatcherTransaction transaction = null;
+            try
+            {
+                // Dispatcher.FromThread is a lookup that never creates a dispatcher, so the
+                // dispatcher must first be created on the pump thread itself; resolving it before
+                // that returns null and Install(null) would leave UiThread._dispatcher unset.
+                Thread pumpThread = await host.InvokeAsync(() =>
+                    {
+                        System.Windows.Threading.Dispatcher.CurrentDispatcher.Should().NotBeNull();
+                        return System.Threading.Thread.CurrentThread;
+                    })
+                    .ConfigureAwait(false);
 
-            var eventArgs = new RunWorkerCompletedEventArgs(null, null, false);
+                System.Windows.Threading.Dispatcher pumpDispatcher =
+                    System.Windows.Threading.Dispatcher.FromThread(pumpThread);
+                pumpDispatcher
+                    .Should()
+                    .NotBeNull(
+                        because: "the dispatcher was created on the pump thread by the call above"
+                    );
 
-            // Act
-            _controller
-                .GetType()
-                .GetMethod(
-                    "Worker_RunWorkerCompleted",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .Invoke(_controller, new object[] { null, eventArgs });
+                transaction =
+                    await QuickFiler.Controllers.Tests.UiThreadDispatcherFixture.BeginTransactionAsync();
+                transaction.Install(pumpDispatcher);
 
-            // Assert
-            Assert.IsTrue(mockFormViewer.Object.ItemsPerLoadEnabled);
-            Assert.IsTrue(mockFormViewer.Object.SkipButtonEnabled);
+                var mockFormViewer = new Mock<IQfcFormViewer>();
+                mockFormViewer.SetupAllProperties();
+                mockFormViewer.SetupProperty(m => m.ItemsPerLoadEnabled, false);
+                mockFormViewer.SetupProperty(m => m.SkipButtonEnabled, false);
+                _controller
+                    .GetType()
+                    .GetField(
+                        "_formViewer",
+                        System.Reflection.BindingFlags.NonPublic
+                            | System.Reflection.BindingFlags.Instance
+                    )
+                    .SetValue(_controller, mockFormViewer.Object);
+
+                var eventArgs = new RunWorkerCompletedEventArgs(null, null, false);
+
+                // Act
+                _controller
+                    .GetType()
+                    .GetMethod(
+                        "Worker_RunWorkerCompleted",
+                        System.Reflection.BindingFlags.NonPublic
+                            | System.Reflection.BindingFlags.Instance
+                    )
+                    .Invoke(_controller, new object[] { null, eventArgs });
+
+                // Assert
+                Assert.IsTrue(mockFormViewer.Object.ItemsPerLoadEnabled);
+                Assert.IsTrue(mockFormViewer.Object.SkipButtonEnabled);
+            }
+            finally
+            {
+                transaction?.Dispose();
+                await host.StopAsync().ConfigureAwait(false);
+            }
         }
     }
 }

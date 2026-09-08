@@ -117,6 +117,24 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             projected.Should().Be(UnderRoot);
         }
 
+        /// <summary>
+        /// A null archive root disables the projection and the input is returned unchanged. The
+        /// suite already pins the empty and whitespace-only roots; the null root is the case the
+        /// #812 degradation depends on, because the guarded accessor returns null when the root
+        /// cannot be resolved and every display site then passes that null through here.
+        /// </summary>
+        [TestMethod]
+        public void ToDisplayStem_NullRoot_ReturnsInputUnchanged()
+        {
+            // Arrange, Act
+            var projected = ArchiveStemProjection.ToDisplayStem(UnderRoot, null);
+
+            // Assert
+            projected
+                .Should()
+                .Be(UnderRoot, "a null root is the #812 unresolvable-root degradation path");
+        }
+
         /// <summary>A null path is returned unchanged rather than throwing.</summary>
         [TestMethod]
         public void ToDisplayStem_NullPath_ReturnsNull()
