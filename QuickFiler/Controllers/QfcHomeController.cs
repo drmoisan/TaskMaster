@@ -387,6 +387,8 @@ namespace QuickFiler.Controllers
             {
                 _datamodel?.Cleanup();
                 _tokenSource?.Dispose();
+                _tokenSource = null;
+                _datamodel = null;
                 Globals = null;
                 _formViewer = null;
                 _explorerController = null;

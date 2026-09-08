@@ -85,11 +85,12 @@ namespace QuickFiler.Controllers.Tests
             {
                 formViewer.SetupGet(x => x.Worker).Returns(worker);
                 var tokenSource = new CancellationTokenSource();
+                var datamodel = new Mock<IQfcDatamodel>();
                 var controller = new QfcHomeController(
                     new Mock<IApplicationGlobals>().Object,
                     parentCleanup.Object
                 );
-                SetPrivateField(controller, "_datamodel", new Mock<IQfcDatamodel>().Object);
+                SetPrivateField(controller, "_datamodel", datamodel.Object);
                 SetPrivateField(controller, "_formViewer", formViewer.Object);
                 SetPrivateField(controller, "_tokenSource", tokenSource);
 
@@ -112,7 +113,47 @@ namespace QuickFiler.Controllers.Tests
                     "the worker-completed handler must be detached before the viewer is dropped"
                 );
                 parentCleanup.Verify(x => x.Invoke(), Times.Once);
+
+                // Issue #810 (AC3): a second cleanup must not re-run the datamodel stage. The
+                // fields the first pass consumed are nulled, so the second pass has nothing left
+                // to clean and the datamodel sees exactly one call across both passes.
+                controller.Cleanup();
+                datamodel.Verify(
+                    x => x.Cleanup(),
+                    Times.Once,
+                    "cleanup must null the datamodel so a repeat pass cannot clean it twice"
+                );
             }
+        }
+
+        /// <summary>
+        /// Issue #810 (AC3): <c>Cleanup()</c> disposes the cancellation token source but must also
+        /// null the field. A disposed source left reachable through
+        /// <see cref="QfcHomeController.TokenSource"/> lets a later cancel call
+        /// <c>Cancel()</c> on it and take an <see cref="ObjectDisposedException"/> on a teardown
+        /// path that has no handler for one.
+        /// </summary>
+        [TestMethod]
+        public void Cleanup_NullsTokenSourceSoLaterCancelCannotReachDisposedSource()
+        {
+            // Arrange
+            var parentCleanup = new Mock<System.Action>();
+            var controller = new QfcHomeController(
+                new Mock<IApplicationGlobals>().Object,
+                parentCleanup.Object
+            );
+            SetPrivateField(controller, "_tokenSource", new CancellationTokenSource());
+            controller
+                .TokenSource.Should()
+                .NotBeNull("the injected source must be reachable before cleanup runs");
+
+            // Act
+            controller.Cleanup();
+
+            // Assert
+            controller
+                .TokenSource.Should()
+                .BeNull("cleanup must null the field so no caller can reach the disposed source");
         }
     }
 }

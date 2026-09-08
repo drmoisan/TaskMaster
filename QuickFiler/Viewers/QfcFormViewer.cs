@@ -4,12 +4,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using QuickFiler.Interfaces;
+using QuickFiler.Viewers;
 using UtilitiesCS;
 
 namespace QuickFiler
@@ -207,10 +207,11 @@ namespace QuickFiler
         public void ParkFocusOffWebView2() => this.ActiveControl = _l1v1L2h2_ButtonOK;
 
         // Issue #796 (AC2): the breadcrumb popups that can take activation away from this form, one
-        // entry per item viewer that owns one. Keyed by the owning item viewer rather than held in a
-        // list so a reconfigured item viewer replaces its own entry instead of accumulating a second.
-        private readonly Dictionary<Control, Func<bool>> _breadcrumbPopupOwners =
-            new Dictionary<Control, Func<bool>>();
+        // entry per item viewer that owns one. Issue #810 (AC7) moved the store and the derivation
+        // into BreadcrumbPopupOwnerRegistry, so both are measurable; this class is exempt from
+        // coverage measurement and emits no Cobertura class element.
+        private readonly BreadcrumbPopupOwnerRegistry _breadcrumbPopupOwners =
+            new BreadcrumbPopupOwnerRegistry();
 
         /// <summary>
         /// Issue #796 (AC2): registers the predicate reporting whether the breadcrumb popup owned by
@@ -223,15 +224,8 @@ namespace QuickFiler
         /// issue #677 may-take-focus precedent. Re-registering the same item viewer replaces its
         /// entry, so repeated configuration passes leave exactly one predicate per item viewer.
         /// </remarks>
-        internal void SetBreadcrumbPopupOwner(Control itemViewer, Func<bool> popupIsOpen)
-        {
-            if (itemViewer == null || popupIsOpen == null)
-            {
-                return;
-            }
-
-            _breadcrumbPopupOwners[itemViewer] = popupIsOpen;
-        }
+        internal void SetBreadcrumbPopupOwner(Control itemViewer, Func<bool> popupIsOpen) =>
+            _breadcrumbPopupOwners.Register(itemViewer, popupIsOpen);
 
         /// <inheritdoc />
         /// <remarks>
@@ -242,8 +236,7 @@ namespace QuickFiler
         /// discriminator originally proposed and is not usable here in either direction. A form with
         /// no registered popup reports false, which is the GENUINE case and preserves issue #677.
         /// </remarks>
-        public bool IsDeactivationSelfInflictedByOwnPopup =>
-            _breadcrumbPopupOwners.Values.Any(popupIsOpen => popupIsOpen());
+        public bool IsDeactivationSelfInflictedByOwnPopup => _breadcrumbPopupOwners.AnyOpen;
 
         // Seam D — collapsed item-viewer template margin
         public Padding ItemViewerTemplateMargin => _QfcItemViewerTemplate?.Margin ?? default;

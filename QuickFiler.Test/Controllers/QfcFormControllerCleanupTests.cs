@@ -395,5 +395,61 @@ namespace QuickFiler.Controllers.Tests
                     );
             }
         }
+
+        /// <summary>
+        /// Issue #810 (AC4): the ribbon-release callback must run exactly once even when an earlier
+        /// teardown stage throws. Scenario: the viewer's <c>Dispose()</c> throws on every pass and
+        /// <c>Cleanup()</c> is called twice. Expected outcome: both passes propagate the planted
+        /// exception and the callback runs exactly once across them. Before the fix the throw
+        /// skipped the callback entirely, leaving both ribbon buttons inert for the rest of the
+        /// Outlook session; a callback that ran on both passes would release the ribbon twice.
+        /// </summary>
+        [TestMethod]
+        public void Cleanup_ViewerDisposeThrows_StillInvokesParentCleanupOnce()
+        {
+            // Arrange
+            int parentCleanupCount = 0;
+            var controller = new QfcFormController(
+                _mockGlobals.Object,
+                _mockFormViewer.Object,
+                _mockQfcQueue.Object,
+                QfEnums.InitTypeEnum.Sort,
+                () => parentCleanupCount++,
+                _mockParent.Object,
+                _tokenSource,
+                _tokenSource.Token
+            );
+            controller.TimeProvider = new FakeTimeProvider();
+            controller.UndoConsumerStarter = body => body();
+            controller.UndoItemProcessor = _ => Task.CompletedTask;
+            _mockFormViewer
+                .Setup(x => x.Dispose())
+                .Throws(new InvalidOperationException("planted"));
+
+            // Act
+            Action firstPass = () => controller.Cleanup();
+            Action secondPass = () => controller.Cleanup();
+
+            // Assert
+            firstPass
+                .Should()
+                .Throw<InvalidOperationException>(
+                    because: "issue #810 AC4 keeps the planted fault observable rather than "
+                        + "swallowing it"
+                );
+            secondPass
+                .Should()
+                .Throw<InvalidOperationException>(
+                    because: "the viewer still throws on a repeat pass, because the first pass "
+                        + "could not reach the line that clears it"
+                );
+            parentCleanupCount
+                .Should()
+                .Be(
+                    1,
+                    because: "issue #810 AC4 requires the ribbon-release callback to run under a "
+                        + "finally exactly once, whichever stage threw and however many passes run"
+                );
+        }
     }
 }

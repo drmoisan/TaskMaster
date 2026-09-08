@@ -81,6 +81,7 @@
     <Compile Include="Viewers\BreadcrumbMessengerHubTests.cs" />
     <Compile Include="Viewers\BreadcrumbPopupPlacementTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownCloseOrderingTests.cs" />
+    <Compile Include="Viewers\BreadcrumbPopupOwnerRegistryTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHostTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHostTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHostTests.Part3.cs" />

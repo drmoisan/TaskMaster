@@ -51,6 +51,7 @@
 - [No SendMessage tool: relaunch with a resume brief](no-sendmessage-relaunch-with-resume-brief.md) — a stopped subagent can't be resumed in place; launch fresh with a reconstructed brief, never a placeholder prompt
 - [Dead subagent's work may already be complete on disk](dead-subagent-work-may-be-complete-on-disk.md) — diff the worktree against the last commit before relaunching; never trust its self-reported metrics
 - [Remediation loop strict handoff](remediation-loop-strict-handoff.md) · [Remediation-plan em-dash required](remediation-plan-em-dash-required.md)
+- [Get-BlastRadius over-includes citations, omits gitignored writes](get-blastradius-overincludes-citations-omits-gitignored-writes.md) — explicit NON-goals became modules; reconcile both directions
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) · [use the portable PS modules](model-routing-scripts-absent-on-epic-integration-base.md) · [feature-review is fable only under `preferred`](model-routing-feature-review-is-always-fable.md)
 
 ## Coverage

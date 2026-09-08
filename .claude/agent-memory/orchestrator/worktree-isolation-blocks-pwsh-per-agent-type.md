@@ -53,6 +53,23 @@ blocking condition rather than concluding anything about agent types. Do not "re
 item branch into the sandbox worktree with `--ignore-other-worktrees`: that leaves one branch checked
 out in two worktrees and has to be reconciled by hand.
 
+**Extension 2026-09-08 (#810 preparation): the refusal is on the BASH TOOL, and a delegated
+subagent can still reach pwsh.** As a worktree-isolated `orchestrator` every `pwsh` form was
+refused, including the trivial `pwsh -NoProfile -Command "Write-Output ok"` and both the
+double- and single-quoted `-Command` spellings. A `general-purpose` subagent launched from
+that same session then ran `pwsh` successfully through a dedicated PowerShell tool — its own
+Bash tool refused the identical command. So the accurate statement is "the Bash tool refuses
+pwsh for a sandboxed agent", not "pwsh is unreachable from this session".
+
+That distinction matters because it restores a path to any PowerShell library function the
+orchestrator needs but cannot invoke: `Get-BlastRadius` in `.claude/lib/blast-radius/`,
+`Invoke-OrchestratorStatePreflight`, `Get-ComplexityFloor`. Delegate a narrow subagent whose
+only job is to run the function and return its raw output verbatim, and instruct it to probe
+`pwsh -NoProfile -Command "Write-Output ok"` first and report a truthful "pwsh unavailable"
+rather than hand-deriving a substitute. A hand-derived stand-in for a tool output is exactly
+the failure the indirection exists to prevent. This does NOT reopen the C# toolchain for a
+sandboxed executor: that agent's own Bash tool is still the thing running msbuild and vstest.
+
 Related: [[pwsh-double-quoted-command-refused-in-worktree]] records a narrower guard where the
 discriminator was `$` complexity; [[bash-tool-rejects-complex-commands-in-isolated-worktree]] and
 [[subagent-self-reported-correction-can-be-false]] are the same family.

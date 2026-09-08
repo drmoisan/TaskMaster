@@ -429,43 +429,6 @@ namespace QuickFiler.Viewers
             }
         }
 
-        private void FinishClose(BreadcrumbDropDownCloseReason reason)
-        {
-            CompleteAll(
-                // Issue #680: restore the AutoClose default first, so every next lifecycle starts
-                // from standard popup semantics. FinishClose is the single completion point for the
-                // programmatic close path (CompleteClose), the native-close path (OnDropDownClosed),
-                // and RestoreAfterOpenFailure, so one restore here covers all three.
-                () => DropDown.AutoClose = true,
-                () =>
-                {
-                    // Issue #796 (AC3): an uncommitted-reason close arriving while a commit has
-                    // been requested for this popup lifetime is a close racing the commit, so it
-                    // must not undo it. The suppression is conditional on the latch and is
-                    // therefore scoped: with no commit in flight the cancel still runs, which is
-                    // what the retained BreadcrumbPendingOpenCloseTests cancel assertions pin.
-                    if (reason == BreadcrumbDropDownCloseReason.Uncommitted && !IsCommitPending)
-                        _cancelSelection();
-                },
-                // Issue #677: only the focus step is gated; the cancel step above always runs.
-                FocusAnchorIfPermitted
-            );
-        }
-
-        internal void RestoreAfterOpenFailure()
-        {
-            bool closeNative = OpenState || DropDown.Visible;
-            OpenState = false;
-            CompleteAll(
-                () =>
-                {
-                    if (closeNative)
-                        CloseNative();
-                },
-                () => FinishClose(BreadcrumbDropDownCloseReason.Uncommitted)
-            );
-        }
-
         private void CompleteAll(params Action[] operations)
         {
             Exception? failure = null;
