@@ -65,7 +65,24 @@ Test:
 - `UtilitiesCS.Test/Threading/UiThreadInitContract_Tests.cs` — new; the AC1 and AC2 cases.
 - `UtilitiesCS.Test/TestHelpers/UiThreadStateScope.cs` — new; snapshot/restore of the process-global statics.
 - `UtilitiesCS.Test/UtilitiesCS.Test.csproj` — explicit `<Compile Include>` for the two new test files (same legacy-project constraint).
+- `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs` — gains `[DoNotParallelize]` only; no other change.
+- `UtilitiesCS.Test/EmailIntelligence/FolderRemapViewer_Tests.cs` — gains `[DoNotParallelize]` only; no other change.
+- `UtilitiesCS.Test/EmailIntelligence/FilterOlFoldersViewer_Tests.cs` — gains `[DoNotParallelize]` only; no other change.
 - `QuickFiler.Test/Controllers/QfcHomeControllerRunAsyncTests.cs` — the MTA `Init()` caller, reconciled per decision D4.
+
+Write Set amendment (2026-09-07, recorded during preparation preflight round 1). The three
+`[DoNotParallelize]`-only test files above were added to this list after preflight established that
+they are unprotected writers of the `UiThread` process-global statics: `FolderPredictorTests` writes
+`UiThread._uiSyncContext` by reflection at `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs:479`,
+and the two `[STATestClass]` viewer test classes drive `Init()` to success transitively and so write
+all four capture fields. None of the three carries `[DoNotParallelize]` today. Under
+`<Parallelize Workers="0" Scope="ClassLevel"/>` the serial and parallel buckets overlap in wall-clock
+time, so marking only the classes this delivery adds does not stop a writer in another class of the
+same assembly; the guarantee holds only when no writer of the shared static remains in the parallel
+bucket. The collision does not exist today, because the currently marked class owns only `_dispatcher`;
+it is introduced by this delivery, which clears and rewrites the remaining statics. The amendment is
+therefore a consequence of this change rather than pre-existing debt, and each of the three files
+gains exactly one attribute line.
 
 - In scope:
   - The three defects #787, #788, and #784, all resident in `UtilitiesCS/Threading/UiThread.cs`.
