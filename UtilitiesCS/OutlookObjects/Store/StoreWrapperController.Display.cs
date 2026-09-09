@@ -37,21 +37,26 @@ namespace UtilitiesCS.OutlookObjects.Store
             // startup left the label showing a generic placeholder for the rest of the session.
             // Retry here, but only when the address is null, which bounds the added UI-thread
             // latency to the single lookup startup already performs.
-            // why: issue #812. PopulateWithCurrent runs on every store re-selection, not only on
-            // dialog open, and a failed lookup leaves the address null, so the #797 guard alone
-            // re-attempted the COM lookup on every pass. The latch below bounds the retry to at
-            // most one attempt per controller instance. That equals one attempt per dialog open
-            // only because RibbonController.FolderStoresSettings constructs a fresh controller
-            // per open; it is not a property of PopulateWithCurrent itself.
+            // why: issue #812, rescoped by issue #823. PopulateWithCurrent runs on every store
+            // re-selection, not only on dialog open, and a failed lookup leaves the address null,
+            // so the #797 guard alone re-attempted the COM lookup on every pass. The set below
+            // bounds the retry to at most one attempt per controller instance per store, keyed by
+            // reference identity, so a controller shown several failing stores still attempts each
+            // of them once. That equals one attempt per store per dialog open only because
+            // RibbonController.FolderStoresSettings constructs a fresh controller per open; it is
+            // not a property of PopulateWithCurrent itself.
+            // why: the Add precedes the lookup so that an exception escaping
+            // RefreshUserEmailAddress still consumes that store's single attempt; recording it
+            // afterwards would leave a throwing store retried on every pass.
             // Every dereference on this path is null-conditional, so a null current store cannot
             // throw here.
             if (
                 Current is not null
                 && Current.UserEmailAddress is null
-                && !_userEmailRetryAttempted
+                && !_userEmailRetryAttemptedStores.Contains(Current)
             )
             {
-                _userEmailRetryAttempted = true;
+                _userEmailRetryAttemptedStores.Add(Current);
                 Current.RefreshUserEmailAddress();
             }
 

@@ -8,7 +8,7 @@ namespace QuickFiler.Viewers
     /// <summary>
     /// Issue #438: the popup-open entry points, carrying the explicit <c>takeFocus</c> intent.
     /// <para>
-    /// Held on a second partial-class part so <c>BreadcrumbDropDownHost.cs</c> (480 lines) stays
+    /// Held on a second partial-class part so <c>BreadcrumbDropDownHost.cs</c> (459 lines) stays
     /// clear of the repository's 500-line ceiling.
     /// </para>
     /// </summary>

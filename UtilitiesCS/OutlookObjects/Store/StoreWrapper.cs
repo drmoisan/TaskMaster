@@ -195,8 +195,9 @@ namespace UtilitiesCS.OutlookObjects.Store
             // resolved address carries JsonIgnore so a success is not cached across restarts.
             // This member itself guarantees nothing about how often the lookup runs: it re-runs
             // the lookup on every call and republishes whatever it returns. The bound lives in
-            // the caller. why: issue #812. StoreWrapperController.PopulateWithCurrent attempts
-            // this at most once per controller instance, which equals once per dialog open only
+            // the caller. why: issue #812, rescoped by issue #823.
+            // StoreWrapperController.PopulateWithCurrent attempts this at most once
+            // per controller instance per store, which equals once per store per dialog open only
             // because RibbonController.FolderStoresSettings builds a fresh controller per open.
             // Safe when RootFolder is null: the chain's first read is null-conditional, so the
             // call yields null and records a reason rather than throwing.

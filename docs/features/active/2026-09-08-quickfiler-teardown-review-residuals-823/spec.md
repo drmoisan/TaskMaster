@@ -675,44 +675,44 @@ than fixed as a literal in this document.
 
 ### R1 — per-store retry budget
 
-- [ ] **AC1.** A new test `PopulateWithCurrent_OnTwoFailingStoresInOneController_RetriesEachStoreOnce`
+- [x] **AC1.** A new test `PopulateWithCurrent_OnTwoFailingStoresInOneController_RetriesEachStoreOnce`
       exists in `UtilitiesCS.Test/OutlookObjects/Store/StoreWrapperController_Tests.Display.cs`, uses
       one controller and two distinct `StoreWrapper` instances each built with
       `CreateDisplayFailingSmtpRootFolderWithUser`, and passes with `Times.Once()` asserted on each
       store's own `ExchangeUser.PrimarySmtpAddress` getter.
-- [ ] **AC2.** Fail-before proof for AC1 is recorded under
+- [x] **AC2.** Fail-before proof for AC1 is recorded under
       `evidence/regression-testing/` in this feature folder: the same test, run against the tree at
       base ref `BASE-SHA` with only the test added, fails, and the recorded failure text shows store
       B's `PrimarySmtpAddress` getter observed as `Times.Never()`. The artifact carries `Timestamp`,
       `Command`, and `EXIT_CODE` per the evidence conventions.
-- [ ] **AC3.** A new test
+- [x] **AC3.** A new test
       `PopulateWithCurrent_OnOneFailingStoreReselectedThreeTimes_RetriesLookupOnlyOnce` exists in the
       same file, calls `PopulateWithCurrent()` three times on one controller with one store, and
       passes with `Times.Once()`.
-- [ ] **AC4.** `PopulateWithCurrent_OnASecondControllerOverTheSameFailingStore_RetriesOnceMore`
+- [x] **AC4.** `PopulateWithCurrent_OnASecondControllerOverTheSameFailingStore_RetriesOnceMore`
       passes, and its assertion argument at
       `UtilitiesCS.Test/OutlookObjects/Store/StoreWrapperController_Tests.Display.cs` remains
       `Times.Exactly(2)`. This is the criterion that forbids a `static` latch.
-- [ ] **AC5.** `PopulateWithCurrent_WithNullCurrent_RendersPlaceholdersAndDoesNotThrow` passes
+- [x] **AC5.** `PopulateWithCurrent_WithNullCurrent_RendersPlaceholdersAndDoesNotThrow` passes
       unchanged. This is the criterion that forbids deriving the set key before the
       `Current is not null` conjunct.
-- [ ] **AC6.** `PopulateWithCurrent_CalledTwiceOnOneController_RetriesLookupOnlyOnce` and
+- [x] **AC6.** `PopulateWithCurrent_CalledTwiceOnOneController_RetriesLookupOnlyOnce` and
       `PopulateWithCurrent_WhenUserEmailIsAlreadyPopulated_NeverInvokesExchangeUserLookup` both pass
       unchanged.
-- [ ] **AC7.** In `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs`, the retry state is a
+- [x] **AC7.** In `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs`, the retry state is a
       `HashSet<StoreWrapper>` instance field whose declaration does not contain the `static` keyword,
       and a repo-wide search for the token `_userEmailRetryAttempted;` returns no match.
-- [ ] **AC8.** Reading `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs` at the
+- [x] **AC8.** Reading `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs` at the
       retry gate confirms both ordering constraints: the membership test is the third conjunct,
       following `Current is not null` and `Current.UserEmailAddress is null` in that order; and the
       `Add` statement precedes the `Current.RefreshUserEmailAddress()` call.
-- [ ] **AC9.** Each of the five superseded prose sites listed in section R1.8 has been rewritten to
+- [x] **AC9.** Each of the five superseded prose sites listed in section R1.8 has been rewritten to
       state the per-controller-per-store bound, verified by reading each site; and a search scoped to
       the three files `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs`,
       `UtilitiesCS/OutlookObjects/Store/StoreWrapper.cs` and
       `UtilitiesCS.Test/OutlookObjects/Store/StoreWrapperController_Tests.Display.cs` for the token
       `not per store` returns no match.
-- [ ] **AC10.** The living `spec.md` of the issue-812 feature folder carries one appended dated
+- [x] **AC10.** The living `spec.md` of the issue-812 feature folder carries one appended dated
       correction block naming issue #823 and the change from a per-controller bound to a
       per-controller-per-store bound; and
       `git diff --name-only BASE-SHA...HEAD -- docs/features/active/2026-09-07-utilitiescs-archive-root-read-and-user-email-retry-801-805-812/`
@@ -721,7 +721,7 @@ than fixed as a literal in this document.
 
 ### R2 — decision recorded, no code change
 
-- [ ] **AC11.** This specification's R2 section records the intermediate-state decision, the
+- [x] **AC11.** This specification's R2 section records the intermediate-state decision, the
       unchanged exception type, the deferral to issue #813, and the `:200` correction; and
       `git diff --name-only BASE-SHA...HEAD` does not list
       QuickFiler/Controllers/QfcItemController.FolderHandling.cs, with `git status --porcelain`
@@ -729,73 +729,73 @@ than fixed as a literal in this document.
 
 ### R3 — contract reconciliation
 
-- [ ] **AC12.** A test `Register_NullControlOrNullPredicate_IsRejected` exists in
+- [x] **AC12.** A test `Register_NullControlOrNullPredicate_IsRejected` exists in
       `QuickFiler.Test/Viewers/BreadcrumbPopupOwnerRegistryTests.cs` and passes, asserting
       `ArgumentNullException` with parameter name `itemViewer` for the null-control call, parameter
       name `popupIsOpen` for the null-predicate call, and `AnyOpen` still false after both rejected
       calls.
-- [ ] **AC13.** A search scoped to `QuickFiler.Test/Viewers/BreadcrumbPopupOwnerRegistryTests.cs` for
+- [x] **AC13.** A search scoped to `QuickFiler.Test/Viewers/BreadcrumbPopupOwnerRegistryTests.cs` for
       the token `Register_NullControlOrNullPredicate_IsIgnored` returns no match.
-- [ ] **AC14.** A search scoped to `QuickFiler.Test/Viewers/BreadcrumbPopupOwnerRegistryTests.cs` for
+- [x] **AC14.** A search scoped to `QuickFiler.Test/Viewers/BreadcrumbPopupOwnerRegistryTests.cs` for
       the token `#nullable enable` returns no match.
-- [ ] **AC15.** Reading `QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs` and
+- [x] **AC15.** Reading `QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs` and
       `QuickFiler/Viewers/QfcFormViewer.cs` confirms that neither XML doc states that a null argument
       is ignored or tolerated, and neither repeats the form-lookup rationale; a search scoped to those
       two files for the token `Ignored when null` returns no match.
-- [ ] **AC16.** `Register` in `QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs` still declares
+- [x] **AC16.** `Register` in `QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs` still declares
       `Control itemViewer` and `Func<bool> popupIsOpen` with no `?` on either type, verified by
       reading the declaration; and the file still carries `#nullable enable` on line 1.
 
 ### R4 — line-count comment
 
-- [ ] **AC17.** The parenthetical figure in the comment at
+- [x] **AC17.** The parenthetical figure in the comment at
       `QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs` equals the line count of
       `QuickFiler/Viewers/BreadcrumbDropDownHost.cs` measured at delivery with a whole-file line
       count. The measurement recorded during research and re-measured while authoring this
       specification is 459, so the expected corrected token is `(459 lines)`; a search scoped to
       `QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs` for the token `(480 lines)` returns no
       match, and the delivery measurement is recorded alongside the criterion.
-- [ ] **AC18.** `git diff --name-only BASE-SHA...HEAD` lists none of
+- [x] **AC18.** `git diff --name-only BASE-SHA...HEAD` lists none of
       QuickFiler/Viewers/BreadcrumbBridgeCoordinator.Search.cs,
       QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.Search.cs, or
       QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.Focus.cs.
 
 ### R5 — observation record
 
-- [ ] **AC19.** The file
+- [x] **AC19.** The file
       `docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/evidence/other/flake-watch-uithread-dispatcher-transaction.2026-09-09T00-15.md`
       exists, names the test
       `Transaction_SecondCallerCannotInstallUntilTheFirstRestores`, declares the per-row schema of
       date, command, assembly set, parallelism setting and failure text, and carries the seeded
       observation row for the issue-810 run recording one failure and three passes.
-- [ ] **AC20.** The XML doc on
+- [x] **AC20.** The XML doc on
       `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs` at the test
       method names issue #823 and the artifact path from AC19; and
       `git diff BASE-SHA...HEAD -- QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs`
       shows added lines that all begin with `///` and shows no removed or added executable statement.
-- [ ] **AC21.** A search scoped to
+- [x] **AC21.** A search scoped to
       `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs` for each of
       the tokens `Thread.Sleep`, `Task.Delay` and `RetryAttribute` returns no match, confirming that
       no sleep, retry or timing tolerance was introduced.
 
 ### Toolchain (run in `CLAUDE.md` order; restart from step 1 on any failure or rewrite)
 
-- [ ] **AC22.** Step 1 — `dotnet tool run csharpier format .` followed by
+- [x] **AC22.** Step 1 — `dotnet tool run csharpier format .` followed by
       `dotnet tool run csharpier check .`, with the check run producing exit code 0 and its output
       recorded showing that it reported no file needing formatting. Evidence under
       `evidence/qa-gates/`.
-- [ ] **AC23.** Step 2 —
+- [x] **AC23.** Step 2 —
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with exit code 0 and 0 errors, and the recorded log contains zero occurrences of
       `Skipping target "CoreCompile"`, proving the rebuild was not vacuous. Evidence under
       `evidence/qa-gates/`.
-- [ ] **AC24.** Step 3 —
+- [x] **AC24.** Step 3 —
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with exit code 0 and 0 errors, with the recorded log containing zero occurrences of
       `Skipping target "CoreCompile"`. This is the confirming gate for the R3.7 prediction of no new
       CS86xx diagnostic and for the R3.6 constraint on the test file. Evidence under
       `evidence/qa-gates/`.
-- [ ] **AC25.** Step 4 — `vstest.console.exe` with `/EnableCodeCoverage` over the
+- [x] **AC25.** Step 4 — `vstest.console.exe` with `/EnableCodeCoverage` over the
       `UtilitiesCS.Test` and `QuickFiler.Test` assemblies completes with zero failed tests, and the
       evidence artifact records the numeric total passed count, the numeric failed count, and the
       numeric line-coverage and branch-coverage percentages read from the generated coverage report.
@@ -803,17 +803,17 @@ than fixed as a literal in this document.
 
 ### Footprint
 
-- [ ] **AC26.** `git diff --name-only BASE-SHA...HEAD` lists no path beginning with `.claude/`, and
+- [x] **AC26.** `git diff --name-only BASE-SHA...HEAD` lists no path beginning with `.claude/`, and
       does not list `CLAUDE.md`, and lists no path beginning with `docs/features/epics/`;
       `git status --porcelain` confirms no untracked addition under any of those paths.
-- [ ] **AC27.** `git diff --name-only BASE-SHA...HEAD` lists no file from the off-limits list in the
+- [x] **AC27.** `git diff --name-only BASE-SHA...HEAD` lists no file from the off-limits list in the
       Scope & Non-Goals section, and lists no `.csproj` file; `git status --porcelain` confirms no
       untracked addition at any of those paths.
-- [ ] **AC28.** Every path listed by `git diff --name-only BASE-SHA...HEAD`, together with every
+- [x] **AC28.** Every path listed by `git diff --name-only BASE-SHA...HEAD`, together with every
       untracked path reported by `git status --porcelain`, appears in the Write Set section of this
       specification or is a file inside
       `docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/`.
-- [ ] **AC29.** `docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/user-story.md`
+- [x] **AC29.** `docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/user-story.md`
       does not exist, confirmed by a directory listing of the feature folder. `full-bug` work mode
       requires its absence.
 
