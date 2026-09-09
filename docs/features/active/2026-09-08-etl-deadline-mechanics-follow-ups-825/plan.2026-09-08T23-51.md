@@ -4,14 +4,21 @@
 - **Parent (optional):** epic review-residuals-2026-09-08, child F825
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-09
-- **Status:** Awaiting executor preflight (revision round 4)
-- **Version:** 1.3 — round 4 applied the seven-defect confirming-preflight delta, D-18 through D-24.
-  Every one corrected an acceptance condition asserted over output a tool does not print on its
-  success path, plus one single-branch satisfiability gap at P3-T3. Round 3 applied the
+- **Status:** Awaiting executor preflight (revision round 5)
+- **Version:** 1.4 — round 5 applied the six-defect third-preflight delta, D-25 through D-30:
+  instruction scope widened to reach a third Item1 read at P5-T4; derived-figure rules added at
+  P0-T9 and P8-T7 for Cobertura elements that carry no line counters; the test-assembly exclusion
+  mechanism at P8-T7 corrected from the run-time module pattern to the first-party allowlist; the
+  P9-T1 artifact requirement split into an artifact-bearing list and a count-or-search list; D7
+  extended to sanitise the five MSBuild logs before commit; and P8-T8's three deleted tests recorded
+  as contributing exactly zero. Round 4 applied the seven-defect confirming-preflight delta, D-18
+  through D-24. Every one corrected an acceptance condition asserted over output a tool does not
+  print on its success path, plus one single-branch satisfiability gap at P3-T3. Round 3 applied the
   seventeen-defect executor preflight delta. Round 2 applied the orchestrator's Branch A
   adjudication: the executor-side spec-amendment tasks were removed, Phase 3 opened with a read-only
-  amended-spec verification, and Phase 3 was renumbered contiguously. Rounds 3 and 4 changed no task
-  count and added no task; round 4 added one decision entry, D10. The task count is unchanged at 108
+  amended-spec verification, and Phase 3 was renumbered contiguously. Rounds 3, 4 and 5 changed no
+  task count and added no task; round 4 added one decision entry, D10, and round 5 amended D7 rather
+  than adding a task, so no identifier moved. The task count is unchanged at 108
   across ten phases, so every P#-T# cross-reference in this file is unchanged and still resolves.
 - **Work Mode:** full-bug (sole acceptance-criteria source: spec.md, 35 criteria)
 
@@ -197,9 +204,25 @@ records the observation in the artifact, marks the task BLOCKED, and reports it;
 recorded as PASS and must not be worked around by narrowing the search root, which would change the
 coverage denominator.
 
-**D7 — build logs use a .txt extension.** .gitignore line 84 ignores files ending in .log, so an
-MSBuild file log written into the evidence folder with that extension would never be committed.
-Every /flp:LogFile= target in this plan ends in .txt.
+**D7 — build logs use a .txt extension and are sanitised before they are committed.** .gitignore
+line 84 ignores files ending in .log, so an MSBuild file log written into the evidence folder with
+that extension would never be committed. Every /flp:LogFile= target in this plan ends in .txt.
+Every such log carries absolute host paths: MSBuild echoes the csc command line at detailed
+verbosity, and each /reference:, /analyzer:, /analyzerconfig: and /additionalfile: argument spells
+out an absolute root, so the log carries the session worktree root and the main checkout root and
+therefore the host user account name. Before P9-T4 commits, and as the last action of each task
+that writes one, the executor rewrites every occurrence of the worktree root to the literal
+<repo-root> and every occurrence of the main checkout root to the literal <main-checkout-root>,
+case-insensitively, in each of the five logs this plan produces:
+evidence/baseline/build-analyzers.txt, evidence/baseline/build-nullable.txt,
+evidence/other/ac8-createcancellationtokensource-proof.txt,
+evidence/qa-gates/qc-build-analyzers.txt and evidence/qa-gates/qc-build-nullable.txt. That is the
+convention the repository's own committed logs already follow; see
+docs/features/active/2026-08-25-itemviewer-surface-defects-489/evidence/qa-gates/phase0-analyzer-build.2026-08-27T23-22.msbuild.txt
+line 57. The rewrite runs after every count this plan reads from a log, because the tokens counted
+(`Skipping target "CoreCompile"`, `/out:obj\Debug\UtilitiesCS.dll`, `/out:obj\Debug\UtilitiesCS.Test.dll`
+and `CS1061`) carry no absolute path and are unaffected by it. P9-T4 additionally confirms that
+none of the five committed logs contains the token `C:\Users\`.
 
 **D8 — TRX and raw coverage stay out of the evidence folder.** TRX files are not gitignored and carry
 the host machine and user name in two casings. No task in this plan writes a TRX into the evidence
@@ -291,6 +314,14 @@ the captured output does not support, fails the task.
       the counters vstest omits are recorded.
 
 - [ ] [P0-T9] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/baseline/coverage-baseline-by-file.md — record the per-file coverage baseline for the five production files this feature edits by reading the class elements of the sibling coverage-baseline.cobertura.xml whose filename attribute ends in OlTableExtensions.TableAccess.cs, OlTableExtensions.Etl.cs, TimeOutTask.cs, DfDeedle.cs or DfDeedle.QfcColumns.cs.
+      The counters are derived, not read: a Cobertura class element carries line-rate, branch-rate,
+      complexity, name and filename only, and no line counters. Derive each file's figures with
+      Get-CoberturaClassLineSummary, declared at scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1
+      line 158, whose TotalLines and CoveredLines are deduplicated by line number. A direct count of
+      the line descendants of a class element double-counts, because each class carries both a
+      methods/method/lines tree and a class-level lines block repeating the same line numbers. The
+      helper is dot-sourced from that file, which itself dot-sources the sibling PackageRate,
+      ClosureFilter and Threshold files.
       Acceptance: the artifact carries `Timestamp:` and exactly five `File:` blocks, each with
       `LinesCovered:` and `LinesValid:` integers aggregated over every class element sharing that
       filename. Aggregation by filename is required because async state machines split a single
@@ -498,6 +529,13 @@ the captured output does not support, fails the task.
       five-line call at P8-T1, after which a single-line regex returns zero matches.
 
 - [ ] [P3-T7] UtilitiesCS.Test/Extensions/DfDeedleEtlTimeoutTests.cs — add a third test-owned gate to BuildExplorer by inserting a leading Action parameter named onGetTable before onAddSentOnColumn, invoking it inside the GetTable setup at line 119 before returning the table mock, and updating the doc comment at lines 66-71 to describe three gates.
+      Adding the parameter breaks all three existing BuildExplorer call sites, at lines 142, 190 and
+      218, so this task also updates each of the three to pass a leading argument: an empty lambda at
+      the call sites on lines 190 and 218, and an empty lambda placeholder at the line-142 call site,
+      which P3-T8 replaces with the third gate's Wait. The call-site update is in scope deliberately:
+      the acceptance below counts call sites file-wide, an edit confined to the declaration and the
+      GetTable setup cannot reach them, and the file does not compile without it. The declaration at
+      line 72 is not a call site and is not counted.
       Acceptance: the file contains exactly one line matching `System\.Action onGetTable`, exactly one
       line matching `onGetTable\(\);`, and exactly three call sites of BuildExplorer each passing four
       arguments.
@@ -711,8 +749,15 @@ the captured output does not support, fails the task.
       deleted, and zero added lines matching it; and the anchored diff contains zero removed lines
       matching `LogTableTiming`.
 
-- [ ] [P5-T4] UtilitiesCS/Extensions/DfDeedle.cs — change the two Item1 reads on line 193 to the tuple's data name so the flow analysis the guard at line 182 establishes carries to the log payload under this file's nullable context opened at line 23, and rewrite the stale sentence at lines 180-181 that describes a null-forgiving suppression so it describes a nullable tuple element; the guard at lines 182-189 and its InvalidOperationException message are not touched.
-      Acceptance: the file contains zero occurrences of the token `tableSnapshot.Item1`; the anchored
+- [ ] [P5-T4] UtilitiesCS/Extensions/DfDeedle.cs — change the three Item1 reads to the tuple's data name so the flow analysis the guard at line 182 establishes carries to both consumers under this file's nullable context opened at line 23, and rewrite the stale sentence at lines 180-181 that describes a null-forgiving suppression so it describes a nullable tuple element; the guard at lines 182-189 and its InvalidOperationException message are not touched.
+      Two of the three reads are on line 193, inside the LogDfTiming payload. The third is on line
+      210, inside the lambda argument to Email2dArrayToDf. Line 210 is in scope deliberately: the
+      acceptance below is file-wide, and an edit confined to line 193 cannot reach it.
+      The two tableSnapshot.Item2 reads, at lines 200 and 210, are not renamed. Only the first tuple
+      element is read through the guard, so only it needs the name the guard establishes flow state
+      for.
+      Acceptance: the file contains zero occurrences of the token `tableSnapshot.Item1`; the file
+      still contains exactly two occurrences of the token `tableSnapshot.Item2`; and the anchored
       diff for this file contains zero removed lines matching `is null` and zero removed lines
       matching `The table snapshot for folder`.
 
@@ -921,15 +966,33 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
 
 - [ ] [P8-T7] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-coverage-comparison.md — compare baseline and post-change coverage counters read from evidence/baseline/coverage-baseline.cobertura.xml and evidence/qa-gates/coverage-postchange.cobertura.xml, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, the six baseline values, the six post-change
-      values, and these four decided gates. Gate A: LinesValid post is less than or equal to baseline
+      values, and these four decided gates. Every package-level and class-level figure below is
+      derived, not read: a Cobertura package element carries line-rate, branch-rate, complexity and
+      name only, and a class element adds filename and nothing more. Derive each package figure with
+      Get-CoberturaPackageLineSummary, declared at
+      scripts/vscode/Invoke-MSTestWithCoverage.PackageRate.ps1, and each per-filename figure with
+      Get-CoberturaClassLineSummary, declared at
+      scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 line 158. Both deduplicate by line
+      number, and the same pair produces the root-element attributes this artifact also records, so
+      the package sums reconcile with the root totals by construction. A hand-rolled count of line
+      descendants double-counts and does not reconcile.
+      Gate A: LinesValid post is less than or equal to baseline
       for the `UtilitiesCS` package element only. The repository-wide figure is reported
       informationally and is not gated because it aggregates eight further production assemblies this
       feature does not touch, so a movement in any of them would be attributed to this change. Test
-      assemblies are not in the figure at all: scripts/vscode/Invoke-MSTestWithCoverage.ps1 lines
-      99-112 append the module pattern `.*\.Test\.dll$` to the coverage settings it derives at run
-      time, so UtilitiesCS.Test.dll is excluded from instrumentation whatever coverage.config says on
-      disk, and every processed Cobertura committed under docs/features/ carries production packages
-      only. Gate B: LinesCovered post for the `UtilitiesCS`
+      assemblies are not in the processed figure:
+      scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 line 6 builds a first-party allowlist that
+      drops every project whose assembly name ends in .Test (lines 22-47), and
+      ConvertTo-KoverageCoberturaXml at line 405 strips every package outside that allowlist from
+      both the numerator and the denominator. The run-time module pattern `.*\.Test\.dll$` that the
+      runner appends at lines 99-112 does not do this work: it has been present since 2026-07-24 and
+      the two raw Cobertura artifacts committed under
+      docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/
+      on 2026-09-07 still carry instrumented UtilitiesCS.Test, QuickFiler.Test and seven further
+      .Test packages. Test assemblies are therefore instrumented and then removed during
+      post-processing, so a raw Cobertura is not interchangeable with a processed one for this
+      figure, and every processed Cobertura committed under docs/features/ carries production
+      packages only. Gate B: LinesCovered post for the `UtilitiesCS`
       package is greater than or equal to that package's baseline LinesCovered minus its reduction in
       LinesValid. Gate C: the same two comparisons for BranchesValid and BranchesCovered on the
       `UtilitiesCS` package. Gate D: for each of the five edited production files, the signed per-filename
@@ -940,10 +1003,12 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       surviving line keeps its coverage.
       The artifact additionally carries `ProductionLinesCovered:` and `ProductionLinesValid:` integers
       and a `TestableDenominatorLineRate:` decimal. The production-only aggregate is defined
-      mechanically as the sum over every instrumented module in the Cobertura file whose module name
-      does not end in .Test or .Tests; no per-class judgment is exercised. That filter is expected to
-      select every package in the file, because the runner has already excluded test assemblies from
-      instrumentation; it is retained as a mechanical guard, and the artifact records
+      mechanically as the sum of the Get-CoberturaPackageLineSummary results over every package
+      element in the Cobertura file whose name does not end in .Test or .Tests; no per-class
+      judgment is exercised. That filter is expected to
+      select every package in the file, because the first-party allowlist has already stripped every
+      .Test package from the processed Cobertura during post-processing;
+      it is retained as a mechanical guard, and the artifact records
       `ModulesFilteredOut:`, whose expected value is 0. The artifact records that
       CLAUDE.md § UT2 permits exemption through exactly two mechanisms, an [ExcludeFromCodeCoverage]
       attribute in source and an assembly-level exclude in coverage.config, and that each contributes
@@ -959,14 +1024,22 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
 
 - [ ] [P8-T8] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-coverage-comparison.md — append the deletion attribution to the same artifact.
       Acceptance: the artifact carries a `DeletionAttribution:` block naming the two TimeoutAfter
-      overloads, EtlAsyncOld and the three deleted tests with the LinesValid reduction each
-      contributed; an `AdditionAccounting:` block naming the added production statements and stating
-      the LinesValid each contributed; and a reconciliation showing that the deletion sum minus the
-      addition sum equals the `UtilitiesCS`-package LinesValid delta recorded by Gate A, with a
-      residual of exactly zero. A reconciliation of the deletion sum alone against the total cannot
-      close, because the total is deletions net of additions and this feature adds a parameter, a
-      resolved local and a comment block. If the reconciliation does not close, the artifact records
-      the residual and this task fails.
+      overloads and EtlAsyncOld with the LinesValid reduction each contributed, and naming the three
+      deleted tests EtlAsyncOld_WithBinaryAndObjectFields_ReturnsTransformedData,
+      TimeoutAfter_GenericTask_WithRepeatAttempts_ReturnsResult and
+      TimeoutAfter_NonGenericTask_WithRepeatAttempts_CompletesSuccessfully with a recorded
+      contribution of exactly 0 each, because all three live in UtilitiesCS.Test and that package is
+      stripped from the processed Cobertura by the first-party allowlist before any figure in this
+      plan is read; an `AdditionAccounting:` block naming the added production statements and
+      stating the LinesValid each contributed; and a reconciliation showing that the deletion sum
+      minus the addition sum equals the `UtilitiesCS`-package LinesValid delta recorded by Gate A,
+      with a residual of exactly zero. Every per-construct figure is obtained by differencing the
+      baseline and post-change per-filename line-number sets for the file that construct lived in,
+      using Get-CoberturaClassLineSummary; a count of deleted source lines is not a substitute,
+      because a comment, a declaration and a closing brace carry no line element. A reconciliation
+      of the deletion sum alone against the total cannot close, because the total is deletions net of
+      additions and this feature adds a parameter, a resolved local and a comment block. If the
+      reconciliation does not close, the artifact records the residual and this task fails.
 
 - [ ] [P8-T9] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-changed-line-coverage.md — compute changed-line coverage by taking the added-line numbers for each edited production file from `git diff $b --unified=0` using the D3 anchor, intersecting each file's set with the line elements of evidence/qa-gates/coverage-postchange.cobertura.xml aggregated by filename, and reporting covered over total, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, one `File:` block per edited production file with
@@ -1079,11 +1152,22 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
 ### Phase 9 — Reconciliation, Commit and Handoff
 
 - [ ] [P9-T1] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — reconcile the acceptance-criteria state against the evidence on disk.
-      Acceptance: the count of lines matching `^- \[x\] \*\*AC[0-9]+\*\*` is exactly 35, the count
-      matching `^- \[ \] \*\*AC[0-9]+\*\*` is exactly 0, and for every one of the 35 criteria the
-      artifact its check-off task named exists under
-      docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/. A checked box
-      whose artifact is absent is reverted to unchecked and this task fails. On the P1-T4 fallback
+      Acceptance: the count of lines matching `^- \[x\] \*\*AC[0-9]+\*\*` is exactly 35 and the count
+      matching `^- \[ \] \*\*AC[0-9]+\*\*` is exactly 0. For each of the 19 criteria whose check-off
+      task names an evidence artifact, that artifact exists under
+      docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/; a checked box
+      whose named artifact is absent is reverted to unchecked and this task fails. Those 19 are AC5
+      (P3-T16), AC6 (P3-T17), AC7 (P3-T18), AC8 (P1-T4), AC10 (P3-T20), AC11 (P5-T7), AC13 (P5-T9),
+      AC17 (P4-T10), AC18 (P4-T11), AC20 (P8-T14), AC23 (P7-T8), AC25 (P7-T10), AC26 (P3-T22), AC27
+      (P3-T23), AC28 (P8-T15), AC32 (P8-T19), AC33 (P8-T20), AC34 (P8-T21) and AC35 (P8-T22). The
+      remaining sixteen criteria are checked off against a file-content count, a search, or a prior
+      task's assertion rather than against an artifact, and are AC1 (P6-T4), AC2 (P6-T5), AC3
+      (P4-T7), AC4 (P3-T15), AC9 (P3-T19), AC12 (P5-T8), AC14 (P5-T10), AC15 (P4-T8), AC16 (P4-T9),
+      AC19 (P6-T6), AC21 (P7-T7), AC22 (P3-T21), AC24 (P7-T9), AC29 (P8-T16), AC30 (P8-T17) and AC31
+      (P8-T18). For each of those sixteen this task re-runs the count or search its check-off task
+      named and records the re-derived value; a value that no longer holds reverts that box to
+      unchecked and fails this task. The two lists are disjoint and together cover all 35 criteria.
+      On the P1-T4 fallback
       branch the two expected counts are 34 and 1 instead, AC8 is the single unchecked criterion, and
       the artifact required in its place is
       docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/ac8-refuted-fallback.md.
@@ -1120,9 +1204,17 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       because this plan edits all eleven, UtilitiesCS.Test/Extensions/DfDeedleEtlTimeoutTests.cs
       among them since the Write Set gained it on 2026-09-09. The porcelain span is the companion the
       name-listing diff requires: the diff enumerates tracked changes only, and the zero-line
-      porcelain result is what proves nothing was left untracked and therefore unreported. The
+      porcelain result is what proves nothing was left untracked and therefore unreported. Each of
+      the five committed MSBuild logs D7 names —
+      docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/baseline/build-analyzers.txt,
+      the sibling build-nullable.txt, evidence/other/ac8-createcancellationtokensource-proof.txt,
+      evidence/qa-gates/qc-build-analyzers.txt and the sibling qc-build-nullable.txt — contains zero
+      lines containing the token `C:\Users\`, which is the confirming check D7's sanitisation
+      requires and the reason the commit does not leak the host account name; a non-zero count
+      fails this task, and it is corrected by re-running the D7 rewrite rather than by amending the
+      commit alone. The
       artifact records `Timestamp:`, all three `Command:` lines, all three `EXIT_CODE:` values, the
-      commit sha and the full reported path list.
+      commit sha, the full reported path list and the five per-log `C:\Users\` counts.
 
 - [ ] [P9-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/review-handoff.md — write the review handoff index listing every artifact this plan produced with its path and one-line purpose, naming the adjudicated design conflict section of this plan as the first item a reviewer must read.
       Acceptance: the artifact carries `Timestamp:` and one bullet per artifact path written by Phases
