@@ -328,35 +328,35 @@ matches zero tests and exits `0` with "No test matches," silently masking a brok
 
 
 ## Acceptance Criteria
-- [ ] `FolderPredictorTests.cs` and all 4 new sibling files
+- [x] `FolderPredictorTests.cs` and all 4 new sibling files
       (`FolderPredictorTests.SuggestionsAndRecents.cs`,
       `FolderPredictorTests.FolderLookupAndUiSeams.cs`,
       `FolderPredictorTests.CreateFolderWorkflows.cs`, `FolderPredictorTests.TestSupport.cs`) are
       each at most 500 lines.
-- [ ] All 39 original `[TestMethod]`s are preserved with unchanged method bodies, verified by both a
+- [x] All 39 original `[TestMethod]`s are preserved with unchanged method bodies, verified by both a
       static source enumeration and a real `vstest.console.exe /ListTests` discovery run against a
       full rebuild of `UtilitiesCS.Test.dll`, showing exactly 39 `FolderPredictorTests.*` tests
       before the split and exactly 39 `FolderPredictorTests.*` tests after the split, with identical
       fully-qualified method names on both sides. A source grep alone, without the discovery run, is
       not sufficient evidence.
-- [ ] The type name `FolderPredictorTests` is identical, verbatim, across all 5 files, and only
+- [x] The type name `FolderPredictorTests` is identical, verbatim, across all 5 files, and only
       `FolderPredictorTests.cs` carries the `[TestClass]` and `[DoNotParallelize]` attributes.
-- [ ] Both nested helper classes (`TestableFolderPredictor`, `ImmediateSynchronizationContext`) and
+- [x] Both nested helper classes (`TestableFolderPredictor`, `ImmediateSynchronizationContext`) and
       all 5 shared private static helper methods (`CreateApplication`, `CreateFolder`,
       `CreateFoldersCollection`, `CreateGlobals`, `GetLeafName`) are preserved exactly, relocated to
       `FolderPredictorTests.TestSupport.cs`, with no visibility changes required for other split
       files to reference them.
-- [ ] `UtilitiesCS.Test/UtilitiesCS.Test.csproj` contains exactly one new `<Compile Include>` entry
+- [x] `UtilitiesCS.Test/UtilitiesCS.Test.csproj` contains exactly one new `<Compile Include>` entry
       per new file (4 total), inserted immediately after the existing
       `<Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />` entry, with no
       reordering or reformatting of any other `<Compile Include>` entry in the file.
-- [ ] A full `UtilitiesCS.Test` test run (`vstest.console.exe ... /EnableCodeCoverage`) passes with a
+- [x] A full `UtilitiesCS.Test` test run (`vstest.console.exe ... /EnableCodeCoverage`) passes with a
       pass count unchanged from the pre-split baseline.
-- [ ] The full C# toolchain — CSharpier format/check, the analyzer rebuild
+- [x] The full C# toolchain — CSharpier format/check, the analyzer rebuild
       (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`), and the nullable rebuild
       (`/p:TreatWarningsAsErrors=true`) — passes cleanly on all 5 changed/new `.cs` files and the
       modified `.csproj`.
-- [ ] No new test scenarios, coverage areas, or behavioral changes are introduced; every one of the
+- [x] No new test scenarios, coverage areas, or behavioral changes are introduced; every one of the
       39 test bodies is unchanged aside from its relocation to a new file.
 
 ## Risks & Mitigations

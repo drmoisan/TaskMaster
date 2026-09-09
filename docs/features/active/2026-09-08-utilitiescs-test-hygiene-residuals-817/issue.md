@@ -68,6 +68,10 @@ Sequencing note: issue 811 (`utilitiescs-test-determinism-780-803-594-811`) is s
 `bugs-2026-09-06` and touches this assembly, including `FolderPredictorTests.cs` by way of the shared
 `UtilitiesCS.Test.csproj`. Do not begin a file split until 811 has merged.
 
+Resolution note: the 5-file split landed with all 8 `spec.md` acceptance-criteria boxes checked and
+the full `UtilitiesCS.Test` pass count unchanged (baseline Total tests: 4904, Passed: 4904; post-split
+Total tests: 4904, Passed: 4904).
+
 ## Proposed Fix / Validation Ideas
 
 - [ ] Unit coverage areas: none new; a split must preserve the existing test set exactly, verified by
@@ -79,4 +83,4 @@ Sequencing note: issue 811 (`utilitiescs-test-determinism-780-803-594-811`) is s
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch
