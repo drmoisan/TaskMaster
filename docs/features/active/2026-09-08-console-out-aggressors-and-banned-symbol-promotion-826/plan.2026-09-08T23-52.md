@@ -1406,7 +1406,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   **Acceptance:** the artifact lists exactly 16 rows, AC1 through AC16, each with a state and at least
   one artifact path, and its states agree with the check-off state of each bullet in `spec.md`.
 
-- [ ] [P8-T19] Commit every change and every evidence artifact, then verify a clean tree.
+- [x] [P8-T19] Commit every change and every evidence artifact, then verify a clean tree.
   ```powershell
       git add -- . ":(exclude).claude"
       git status --porcelain --untracked-files=all -- . ":(exclude).claude"
@@ -1424,7 +1424,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   checking this task off both happen after that observation, so they reappear in P8-T20's span and are
   committed by P8-T21, which carries the terminal clean-tree gate.
 
-- [ ] [P8-T20] Confirming write-set gate over the committed tree.
+- [x] [P8-T20] Confirming write-set gate over the committed tree.
   ```powershell
       git diff --name-only $Base HEAD -- . ":(exclude).claude"
       git status --porcelain --untracked-files=all -- . ":(exclude).claude"
@@ -1439,7 +1439,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   appear. The span is recorded verbatim and every entry must be either this plan file or a path under
   `<FEATURE>/evidence/`. P8-T21 clears it, together with this task's own artifact and check-off.
 
-- [ ] [P8-T21] Commit the terminal residual left by P8-T19 and P8-T20: the
+- [x] [P8-T21] Commit the terminal residual left by P8-T19 and P8-T20: the
   `p8-t20-committed-write-set.md` artifact and this plan file's check-offs for P8-T19 and P8-T20.
   This task is ordered write-then-commit, not commit-then-write, and the ordering is what makes its
   acceptance reachable. Perform these steps in exactly this order:
