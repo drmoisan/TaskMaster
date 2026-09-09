@@ -4,12 +4,14 @@
 - **Parent (optional):** epic review-residuals-2026-09-08, child F825
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-09
-- **Status:** Awaiting executor preflight (revision round 3)
-- **Version:** 1.2 — round 3 applied the seventeen-defect executor preflight delta. Round 2 applied
-  the orchestrator's Branch A adjudication: the executor-side spec-amendment tasks were removed,
-  Phase 3 opened with a read-only amended-spec verification, and Phase 3 was renumbered contiguously.
-  Round 3 changed no task count and added no task; it corrected command forms, decision D9, and the
-  acceptance conditions that were pinned to pre-change state. The task count is unchanged at 108
+- **Status:** Awaiting executor preflight (revision round 4)
+- **Version:** 1.3 — round 4 applied the seven-defect confirming-preflight delta, D-18 through D-24.
+  Every one corrected an acceptance condition asserted over output a tool does not print on its
+  success path, plus one single-branch satisfiability gap at P3-T3. Round 3 applied the
+  seventeen-defect executor preflight delta. Round 2 applied the orchestrator's Branch A
+  adjudication: the executor-side spec-amendment tasks were removed, Phase 3 opened with a read-only
+  amended-spec verification, and Phase 3 was renumbered contiguously. Rounds 3 and 4 changed no task
+  count and added no task; round 4 added one decision entry, D10. The task count is unchanged at 108
   across ten phases, so every P#-T# cross-reference in this file is unchanged and still resolves.
 - **Work Mode:** full-bug (sole acceptance-criteria source: spec.md, 35 criteria)
 
@@ -215,6 +217,18 @@ Any other repeated failure marks the task BLOCKED and is reported. A BLOCKED cov
 plan; it is never recorded as PASS, and a raw unprocessed Cobertura file is not an acceptable
 substitute for the processed one.
 
+**D10 — a green vstest run prints no `Failed:` and no `Skipped:` line.** A fully passing
+vstest.console.exe run on this toolchain prints exactly `Test Run Successful.`, `Total tests: N`,
+`Passed: N` and `Total time: ...`. The `Failed:` and `Skipped:` lines are emitted only when their
+counters are non-zero, and `Passed:` is likewise omitted when it is zero. D8 forbids a TRX, so no
+second source exists. Every task in this plan that records `TestsFailed:`, `TestsPassed:` or
+`TestsSkipped:` therefore transcribes the counters the run printed and records each omitted counter
+as 0 with the annotation `(omitted category, transcribed per D10)`. On a green run `TestsFailed: 0`
+and `TestsSkipped: 0` are that transcription, corroborated by the printed `Test Run Successful.`
+header and by `Passed:` equalling `Total tests:`. At P2-T4, whose run is red, `Failed:` is printed
+and `TestsPassed:` is `Total tests:` minus that figure. Recording UNVERIFIED, or recording a value
+the captured output does not support, fails the task.
+
 ---
 
 ### Phase 0 — Policy Reads, Toolchain Bootstrap and Baseline Capture
@@ -273,7 +287,8 @@ substitute for the processed one.
       that XML, namely `LineRate:`, `LinesCovered:`, `LinesValid:`, `BranchRate:`,
       `BranchesCovered:`, `BranchesValid:`, plus `TestsPassed:` and `TestsFailed:` read from the run
       summary. All eight values are integers or decimals; the string UNVERIFIED is not an acceptable
-      value. D6 applies if the run does not terminate. D9 applies if the run is red.
+      value. D6 applies if the run does not terminate. D9 applies if the run is red. D10 governs how
+      the counters vstest omits are recorded.
 
 - [ ] [P0-T9] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/baseline/coverage-baseline-by-file.md — record the per-file coverage baseline for the five production files this feature edits by reading the class elements of the sibling coverage-baseline.cobertura.xml whose filename attribute ends in OlTableExtensions.TableAccess.cs, OlTableExtensions.Etl.cs, TimeOutTask.cs, DfDeedle.cs or DfDeedle.QfcColumns.cs.
       Acceptance: the artifact carries `Timestamp:` and exactly five `File:` blocks, each with
@@ -314,11 +329,20 @@ substitute for the processed one.
       group at line 22 is conditioned on `Debug|AnyCPU`, so `/p:Platform=Any CPU` matches no property
       group, leaves `OutputPath` unset and fails before compilation. That failure produces no `CS1061`
       and is not a refutation; the task is BLOCKED if it occurs.
+      Create docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/
+      before invoking MSBuild. MSBuild's file logger does not create intermediate directories: a
+      `/flp:logfile=` target whose directory part does not exist terminates the build with MSB1029,
+      and no task before this one writes into evidence/other/. An MSB1029 failure is neither a
+      refutation nor the platform-mismatch case above; it is corrected by creating the directory and
+      re-running.
       Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, a
       `MemberProven: TimeProviderTaskExtensions.CreateCancellationTokenSource` line, and a
       `CS1061Count: 0` line obtained by counting occurrences of the token `CS1061` in the captured
-      log. The captured log must also contain at least one line matching `Task "Csc"` for
-      UtilitiesCS, proving the compilation ran rather than being skipped. A prose assertion of
+      log. The captured log must also contain at least one line containing the token
+      `/out:obj\Debug\UtilitiesCS.dll`, which is the csc.exe command line MSBuild echoes under this
+      project's CoreCompile heading, proving the compilation ran rather than being skipped. A
+      `Task "Csc"` search is not used: that line carries the project instance id rather than the
+      project path, so it cannot be attributed to a named project on its own. A prose assertion of
       availability, or a citation of the package XML alone, does not satisfy this task.
       A non-zero CS1061Count may be read as refutation of the member's availability only after two
       confounders are excluded and both exclusions are recorded in this artifact as
@@ -396,6 +420,7 @@ substitute for the processed one.
       TimeoutException catch opened at line 95 passes in place of the caller's timeoutMs. The factory
       is invoked at UtilitiesCS/Threading/TimeOutTask.cs line 52, outside the try opened at line 61,
       so its throw reaches the await inside the try at TableAccess.cs line 55 and enters that catch.
+      D10 governs how the counters vstest omits are recorded.
 
 - [ ] [P2-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/ac7-mechanism-note.md — record the exception-injection mechanism note required by spec.md Test Strategy.
       Acceptance: the artifact carries `Timestamp:`, names UtilitiesCS/Threading/TimeOutTask.cs line
@@ -439,6 +464,13 @@ substitute for the processed one.
       Acceptance: the file contains exactly one line matching `CreateCancellationTokenSource\(`; the
       argument the RunWithTimeout call passes is the resolved local rather than timeoutSourceFactory;
       and an explicitly supplied factory still wins, which P3-T11 proves by test.
+      On the P1-T4 fallback branch this task instead implements the in-repo provider-driven factory
+      spec.md Proposed Fix names, a plain CancellationTokenSource cancelled from a timer created on
+      the coalesced provider, and its acceptance reads instead: the file contains exactly one line
+      matching `CreateTimer\(` and zero lines matching `CreateCancellationTokenSource\(`; the
+      argument the RunWithTimeout call passes is the resolved local rather than timeoutSourceFactory;
+      an explicitly supplied factory still wins, which P3-T11 proves by test; and the executor
+      records the branch taken in the artifact P1-T4 names.
 
 - [ ] [P3-T4] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — propagate the new parameter through the TaskCanceledException retry recursion at pre-change lines 82-87, which already forwards timeoutMs and timeoutSourceFactory, by adding the provider as the trailing argument.
       Acceptance: the recursion inside the TaskCanceledException catch passes five arguments and the
@@ -521,7 +553,8 @@ substitute for the processed one.
       GetTableInViewAsync_NoTimeProviderSupplied_UsesSystemClockAndCompletes,
       GetEmailDataInViewAsync_EtlDeadlineExpires_ThrowsInvalidOperationNamingFolder,
       GetEmailDataInViewAsync_ClockNeverAdvances_ReturnsOneRowFrame and
-      GetEmailDataInViewAsync_SeparatesTableSnapshotFromDataFrameTransform each passing.
+      GetEmailDataInViewAsync_SeparatesTableSnapshotFromDataFrameTransform each passing. D10 governs
+      how the counters vstest omits are recorded.
 
 - [ ] [P3-T14] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac26-ac27-boundary.md — verify the ownership boundary by running, with the D3 anchor, `git diff $b -- UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs` and filtering its output for lines matching the regular expression `^[+-][^+-].*Console\.WriteLine`, then write this artifact.
       Acceptance: that filter produces zero lines;
@@ -629,7 +662,8 @@ substitute for the processed one.
       UtilitiesCS.Test/Threading/TimeOutTask_Tests.cs,
       UtilitiesCS.Test/Threading/TimeOutTask_OverloadCoverageTests.cs,
       UtilitiesCS.Test/Threading/TimeOutTask_InternalCoverageTests.cs and
-      UtilitiesCS.Test/Threading/TimeOutTask_AdditionalTests.cs, so this filter covers all four files.
+      UtilitiesCS.Test/Threading/TimeOutTask_AdditionalTests.cs, so this filter covers all four
+      files. D10 governs how the counters vstest omits are recorded.
 
 - [ ] [P4-T7] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC3.
       Acceptance: exactly one line matches `^- \[x\] \*\*AC3\*\*`, and
@@ -692,7 +726,8 @@ substitute for the processed one.
       Acceptance: the artifact carries `Timestamp:`, two `Command:` lines, the first of which is the
       solution rebuild above, two `EXIT_CODE: 0` lines, `Output Summary:`,
       `TestsFailed: 0`, and a named result line showing
-      EtlAsync_DeadlineExpires_ReturnsNullDataAndCancelsTokenSource passing.
+      EtlAsync_DeadlineExpires_ReturnsNullDataAndCancelsTokenSource passing. D10 governs how the
+      counters vstest omits are recorded.
 
 - [ ] [P5-T7] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC11, recording in the check-off report that the criterion's literal zero-hit wording is discharged by the two-to-one occurrence-count transition proven by P5-T1 and P5-T2, because the second occurrence at Etl.cs line 63 belongs to the out-of-scope synchronous ETL method.
       Acceptance: exactly one line matches `^- \[x\] \*\*AC11\*\*`, and the artifact written by P5-T2
@@ -786,10 +821,11 @@ timed source on the system clock.
 - [ ] [P7-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase7-green.md — rebuild with the D1 resolution followed by `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run a D2 run of the whole UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll assembly with a test-case filter excluding the LiveOutlook category, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, two `Command:` lines, the first of which is the
       solution rebuild above, two `EXIT_CODE: 0` lines, `Output Summary:`,
-      `TestsFailed: 0`, and `TestsSkipped:` and `TestsPassed:` integers. The LiveOutlook exclusion is
+      `TestsFailed: 0` and `TestsSkipped: 0`, both transcribed per D10, and a `TestsPassed:` integer
+      read from the printed `Passed:` line. The LiveOutlook exclusion is
       mandatory: the repository's only test in that category constructs a real Outlook Application and
       polls a live store, which is an external-process dependency the unit-test policy forbids. D6
-      applies if the run does not terminate.
+      applies if the run does not terminate. D10 governs how the counters vstest omits are recorded.
 
 - [ ] [P7-T7] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC21, strictly after the AC22 check-off completed at P3-T21.
       Acceptance: exactly one line matches `^- \[x\] \*\*AC21\*\*`; the AC22 line already matches
@@ -822,8 +858,22 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
 - [ ] [P8-T1] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/qc-csharpier-format.md — format the tree by running `dotnet tool run csharpier format .` from the repository root, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, a
       `FormattedFileCount:` line carrying the integer CSharpier prints on its summary line, and a
-      `ChangedFileCount:` line derived from a porcelain status with the D4 exclusion run immediately
-      before and immediately after the format, recording how many tracked files the format modified.
+      `ChangedFileCount:` line derived from an anchored numstat taken immediately before and
+      immediately after the format, namely `git diff --numstat $b -- . ":(exclude).claude"` with the
+      D3 anchor and the D4 exclusion, counting the paths whose insertion or deletion figure differs
+      between the two runs. A porcelain status is not usable for this observation: every file this
+      plan edits is already modified and therefore already listed before the format runs, and P0-T5
+      has excluded pre-existing drift in every file that is still clean, so a status-set comparison
+      reports zero however much content the formatter rewrote. The numstat form compares content and
+      is therefore falsifiable. Each of the two numstat runs is preceded by the staging span
+      `git add --intent-to-add -- . ":(exclude).claude"`, because a numstat enumerates tracked
+      changes only and UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs, which
+      P2-T1 created and no task has yet committed, would otherwise be invisible to both runs and its
+      reflow undetectable. A non-zero ChangedFileCount is expected on the first pass and restarts
+      this phase: P3-T6 writes DfDeedle.cs line 148 as a 113-column single-line call and P3-T7 and
+      P3-T8 take the three BuildExplorer call sites in
+      UtilitiesCS.Test/Extensions/DfDeedleEtlTimeoutTests.cs to 105, 102 and 102 columns, and
+      CSharpier's 100-column default print width rewraps all four.
       The exit code alone is not the observation: it is 0 both when the formatter changed nothing and
       when it repaired drift, so the before-and-after tree observation is what makes this step
       falsifiable. FormattedFileCount is a processed count, not a repaired count, so it is recorded
@@ -852,8 +902,14 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
 - [ ] [P8-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac32-non-vacuity.md — demonstrate non-vacuity of both MSBuild gates from the two sibling txt logs written by P8-T3 and P8-T4, then write this artifact.
       Acceptance: for each of the two logs the artifact records `SkippingCoreCompileCount: 0`, counted
       as lines containing the token `Skipping target "CoreCompile"`, and a
-      `CscInvocationsForWriteSetProjects:` integer of at least 2, counted as lines containing the
-      token `Task "Csc"` that name UtilitiesCS.csproj or UtilitiesCS.Test.csproj. The second figure is
+      `CscInvocationsForWriteSetProjects:` integer of at least 2, counted as the number of log lines
+      containing the token `/out:obj\Debug\UtilitiesCS.dll` plus the number containing the token
+      `/out:obj\Debug\UtilitiesCS.Test.dll`. Those are the csc.exe command lines MSBuild echoes under
+      each project's CoreCompile heading, and they are the only single-line evidence that names both
+      the compiler invocation and the project it compiled. A count of lines carrying both
+      `Task "Csc"` and a project file name must not be substituted: MSBuild prefixes a task-start
+      line with the project instance id and never with the project path, so those two tokens never
+      appear on one line and that count is zero whatever the build did. The second figure is
       what makes the first non-vacuous: a zero count of skip messages proves nothing unless
       compilation is shown to have run.
 
@@ -861,15 +917,19 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       Acceptance: the Cobertura XML exists; the artifact carries `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `Output Summary:`, the same six numeric root-element lines P0-T8 recorded, plus
       `TestsPassed:` and `TestsFailed: 0`. All eight values are numeric. D6 applies if the run does not
-      terminate. D9 applies if the run is red.
+      terminate. D9 applies if the run is red. D10 governs how the counters vstest omits are recorded.
 
 - [ ] [P8-T7] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-coverage-comparison.md — compare baseline and post-change coverage counters read from evidence/baseline/coverage-baseline.cobertura.xml and evidence/qa-gates/coverage-postchange.cobertura.xml, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, the six baseline values, the six post-change
       values, and these four decided gates. Gate A: LinesValid post is less than or equal to baseline
       for the `UtilitiesCS` package element only. The repository-wide figure is reported
-      informationally and is not gated: coverage.config excludes only third-party modules, so
-      UtilitiesCS.Test.dll is instrumented and the four tests this feature adds raise repository-wide
-      LinesValid even though production lines fall. Gate B: LinesCovered post for the `UtilitiesCS`
+      informationally and is not gated because it aggregates eight further production assemblies this
+      feature does not touch, so a movement in any of them would be attributed to this change. Test
+      assemblies are not in the figure at all: scripts/vscode/Invoke-MSTestWithCoverage.ps1 lines
+      99-112 append the module pattern `.*\.Test\.dll$` to the coverage settings it derives at run
+      time, so UtilitiesCS.Test.dll is excluded from instrumentation whatever coverage.config says on
+      disk, and every processed Cobertura committed under docs/features/ carries production packages
+      only. Gate B: LinesCovered post for the `UtilitiesCS`
       package is greater than or equal to that package's baseline LinesCovered minus its reduction in
       LinesValid. Gate C: the same two comparisons for BranchesValid and BranchesCovered on the
       `UtilitiesCS` package. Gate D: for each of the five edited production files, the signed per-filename
@@ -881,12 +941,17 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       The artifact additionally carries `ProductionLinesCovered:` and `ProductionLinesValid:` integers
       and a `TestableDenominatorLineRate:` decimal. The production-only aggregate is defined
       mechanically as the sum over every instrumented module in the Cobertura file whose module name
-      does not end in .Test or .Tests; no per-class judgment is exercised. The artifact records that
+      does not end in .Test or .Tests; no per-class judgment is exercised. That filter is expected to
+      select every package in the file, because the runner has already excluded test assemblies from
+      instrumentation; it is retained as a mechanical guard, and the artifact records
+      `ModulesFilteredOut:`, whose expected value is 0. The artifact records that
       CLAUDE.md § UT2 permits exemption through exactly two mechanisms, an [ExcludeFromCodeCoverage]
       attribute in source and an assembly-level exclude in coverage.config, and that each contributes
       zero first-party exclusions in this tree: no [ExcludeFromCodeCoverage] attribute appears on any
       in-scope production file, and coverage.config's ModulePaths excludes only the third-party modules
-      Deedle, FSharp, Castle.Core, FluentAssertions, Moq, Microsoft.Testing and MSTest. The testable
+      Deedle, FSharp, Castle.Core, FluentAssertions, Moq, Microsoft.Testing and MSTest, to which the
+      runner adds `.*\.Test\.dll$` at run time. No first-party production module is excluded by
+      either mechanism. The testable
       denominator therefore equals the production-only denominator, and the artifact asserts that
       identity rather than deriving an exemption list. It then carries either
       `TestableDenominatorFloorMet: true` when that rate is at or above 0.80, or, when it is below,
@@ -905,8 +970,16 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
 
 - [ ] [P8-T9] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-changed-line-coverage.md — compute changed-line coverage by taking the added-line numbers for each edited production file from `git diff $b --unified=0` using the D3 anchor, intersecting each file's set with the line elements of evidence/qa-gates/coverage-postchange.cobertura.xml aggregated by filename, and reporting covered over total, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, one `File:` block per edited production file with
-      `ChangedLines:`, `ChangedLinesCovered:` and a `ChangedLineRate:` decimal, and an overall
-      `NewAndChangedCodeRate:` decimal greater than or equal to 0.90. No ExcludeFromCodeCoverage
+      `ChangedLines:`, `ChangedLinesCovered:` and a `ChangedLineRate:` that is a decimal when
+      `ChangedLines:` is greater than zero and the literal `n/a` when it is zero, and an overall
+      `NewAndChangedCodeRate:` decimal greater than or equal to 0.90, computed as the sum of
+      `ChangedLinesCovered:` over the sum of `ChangedLines:` across the files whose `ChangedLines:` is
+      greater than zero. Two files are expected to report `ChangedLines: 0`:
+      UtilitiesCS/Threading/TimeOutTask.cs, which P4-T1 only deletes from, and
+      UtilitiesCS/Extensions/DfDeedle.QfcColumns.cs, whose single added line is the P6-T2 doc comment.
+      A comment or declaration line carries no line element, so the intersection correctly leaves
+      those two files empty; a rate of zero must not be recorded for them, because it would lower the
+      overall figure by arithmetic rather than by coverage. No ExcludeFromCodeCoverage
       attribute exists on any in-scope production file, so every changed line is measurable.
 
 - [ ] [P8-T10] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac20-docs-boundary.md — enforce the documentation boundary by running, with the D3 anchor, an intent-to-add over the worktree with the D4 exclusion, then `git diff --name-only $b -- docs/features/` and `git status --porcelain --untracked-files=all -- docs/features/`, then write this artifact.
