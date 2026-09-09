@@ -594,21 +594,34 @@ from step 1 on any failure or any file rewrite.
 
 **Assumptions.**
 
-- The base anchor for this feature's footprint is commit `c713d2a6`, the head of
-  `epic/review-residuals-2026-09-08-integration` at the point this branch was cut. Acceptance
-  criteria that compare against a base ref use `c713d2a6` as the anchor.
+- The base anchor for this feature's footprint is captured at execution time, not fixed as a commit
+  literal in this document. The implementation plan's first phase runs `git rev-parse HEAD` before
+  any task has edited a file and records the printed 40-character SHA as the `BASE-SHA` field of its
+  Phase 0 branch-and-base baseline artifact. Every acceptance criterion below that compares against
+  a base ref writes the token `BASE-SHA` as the diff's left ref operand; the executor substitutes
+  the recorded 40-character SHA for that token before running the command. A command left carrying
+  the token addresses no commit and fails, which is the intended failure mode rather than a silent
+  pass.
 
-  This is a correction the orchestrator made after the specification was drafted, and the reason is
-  load-bearing rather than cosmetic. `6f08302a` is the `origin/main` commit the integration branch
-  was cut from, and it is an ANCESTOR of this branch's head. A three-dot diff degenerates to a
-  two-dot diff whenever its left operand is an ancestor of its right, because the merge base is then
-  the left operand itself. Anchoring to `6f08302a` therefore bills this feature for the two
-  epic-planner commits `a2d766c7` and `c713d2a6` that sit between the two anchors. Measured on this
-  branch before any implementation work: `git diff --name-only c713d2a6...HEAD` lists eleven paths,
-  ten of which are the epic manifest and the nine promoted potential records this feature never
-  touched, while `git diff --name-only c713d2a6...HEAD` lists exactly one, this feature's own
-  `issue.md`. Under the wrong anchor the footprint criteria AC26, AC27 and AC28 would report
-  sibling-owned and epic-owned files against this delivery.
+  This replaces an earlier fixed-literal anchor, and the reason is load-bearing rather than
+  cosmetic. A three-dot diff degenerates into a two-dot diff whenever its left operand is an
+  ancestor of its right, because the merge base is then the left operand itself, so a literal anchor
+  bills this feature for every commit that lands between that literal and the executor's own work.
+  That degeneration was observed here. The anchor was first fixed to the head of
+  `epic/review-residuals-2026-09-08-integration` as it stood when this document was drafted, against
+  which the three-dot diff then listed one path, this feature's own `issue.md`. The epic-planner
+  subsequently fanned sibling preparation work into the same integration branch, and the same
+  command on the same branch now lists twenty-one paths: ten under `.claude/agent-memory/`, eight
+  owned by the sibling feature folders
+  `docs/features/active/2026-09-08-coverage-aggregation-double-counts-method-rows-815/` and
+  `docs/features/active/2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826/`, and
+  this feature's own three documents. `epic-orchestrator` branches this feature's execution worktree
+  from that integration branch at execution time, after further sibling fan-ins, so any literal
+  fixed now would be an ancestor of that future head and the same degeneration would recur. A
+  self-anchor cannot degenerate: the recorded HEAD is read before this feature's first commit, so it
+  is by construction not an ancestor of any commit that is not this feature's own. Under a
+  degenerated anchor the footprint criteria AC26, AC27 and AC28 would report sibling-owned and
+  epic-owned files against this delivery.
 - The line count of `QuickFiler/Viewers/BreadcrumbDropDownHost.cs` does not change before delivery.
   If it does, R4's corrected figure is the count measured at delivery, not the literal 459.
 
@@ -654,7 +667,11 @@ is either a named test's assertion argument or is re-measurable at check-off by 
 the criterion; no criterion asserts a population count that is not enumerated in full in this
 document.
 
-Base ref for every diff-based criterion: commit `c713d2a6`.
+Base ref for every diff-based criterion: the token `BASE-SHA`, standing for the 40-character SHA that
+the implementation plan's Phase 0 branch-and-base task recorded from `git rev-parse HEAD` before any
+task had edited a file. Substitute that literal SHA for the token before running any command below.
+See the anchor bullet under "Assumptions" for why the anchor is captured at execution time rather
+than fixed as a literal in this document.
 
 ### R1 — per-store retry budget
 
@@ -665,7 +682,7 @@ Base ref for every diff-based criterion: commit `c713d2a6`.
       store's own `ExchangeUser.PrimarySmtpAddress` getter.
 - [ ] **AC2.** Fail-before proof for AC1 is recorded under
       `evidence/regression-testing/` in this feature folder: the same test, run against the tree at
-      base ref `c713d2a6` with only the test added, fails, and the recorded failure text shows store
+      base ref `BASE-SHA` with only the test added, fails, and the recorded failure text shows store
       B's `PrimarySmtpAddress` getter observed as `Times.Never()`. The artifact carries `Timestamp`,
       `Command`, and `EXIT_CODE` per the evidence conventions.
 - [ ] **AC3.** A new test
@@ -698,7 +715,7 @@ Base ref for every diff-based criterion: commit `c713d2a6`.
 - [ ] **AC10.** The living `spec.md` of the issue-812 feature folder carries one appended dated
       correction block naming issue #823 and the change from a per-controller bound to a
       per-controller-per-store bound; and
-      `git diff --name-only c713d2a6...HEAD -- docs/features/active/2026-09-07-utilitiescs-archive-root-read-and-user-email-retry-801-805-812/`
+      `git diff --name-only BASE-SHA...HEAD -- docs/features/active/2026-09-07-utilitiescs-archive-root-read-and-user-email-retry-801-805-812/`
       lists that `spec.md` and nothing else, with `git status --porcelain` confirming no untracked
       addition under the same path.
 
@@ -706,7 +723,7 @@ Base ref for every diff-based criterion: commit `c713d2a6`.
 
 - [ ] **AC11.** This specification's R2 section records the intermediate-state decision, the
       unchanged exception type, the deferral to issue #813, and the `:200` correction; and
-      `git diff --name-only c713d2a6...HEAD` does not list
+      `git diff --name-only BASE-SHA...HEAD` does not list
       QuickFiler/Controllers/QfcItemController.FolderHandling.cs, with `git status --porcelain`
       confirming no untracked file at that path.
 
@@ -738,7 +755,7 @@ Base ref for every diff-based criterion: commit `c713d2a6`.
       specification is 459, so the expected corrected token is `(459 lines)`; a search scoped to
       `QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs` for the token `(480 lines)` returns no
       match, and the delivery measurement is recorded alongside the criterion.
-- [ ] **AC18.** `git diff --name-only c713d2a6...HEAD` lists none of
+- [ ] **AC18.** `git diff --name-only BASE-SHA...HEAD` lists none of
       QuickFiler/Viewers/BreadcrumbBridgeCoordinator.Search.cs,
       QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.Search.cs, or
       QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.Focus.cs.
@@ -754,7 +771,7 @@ Base ref for every diff-based criterion: commit `c713d2a6`.
 - [ ] **AC20.** The XML doc on
       `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs` at the test
       method names issue #823 and the artifact path from AC19; and
-      `git diff c713d2a6...HEAD -- QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs`
+      `git diff BASE-SHA...HEAD -- QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs`
       shows added lines that all begin with `///` and shows no removed or added executable statement.
 - [ ] **AC21.** A search scoped to
       `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs` for each of
@@ -786,13 +803,13 @@ Base ref for every diff-based criterion: commit `c713d2a6`.
 
 ### Footprint
 
-- [ ] **AC26.** `git diff --name-only c713d2a6...HEAD` lists no path beginning with `.claude/`, and
+- [ ] **AC26.** `git diff --name-only BASE-SHA...HEAD` lists no path beginning with `.claude/`, and
       does not list `CLAUDE.md`, and lists no path beginning with `docs/features/epics/`;
       `git status --porcelain` confirms no untracked addition under any of those paths.
-- [ ] **AC27.** `git diff --name-only c713d2a6...HEAD` lists no file from the off-limits list in the
+- [ ] **AC27.** `git diff --name-only BASE-SHA...HEAD` lists no file from the off-limits list in the
       Scope & Non-Goals section, and lists no `.csproj` file; `git status --porcelain` confirms no
       untracked addition at any of those paths.
-- [ ] **AC28.** Every path listed by `git diff --name-only c713d2a6...HEAD`, together with every
+- [ ] **AC28.** Every path listed by `git diff --name-only BASE-SHA...HEAD`, together with every
       untracked path reported by `git status --porcelain`, appears in the Write Set section of this
       specification or is a file inside
       `docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/`.
