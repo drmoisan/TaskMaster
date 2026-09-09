@@ -94,15 +94,24 @@ namespace UtilitiesCS.OutlookObjects.Store
         internal Func<string, (string, string)> FsConverter { get; set; } = null!;
 
         /// <summary>
-        /// Bounds the AC6 SMTP retry to one attempt per controller instance (issue #812). That
-        /// equals one attempt per dialog open ONLY because
+        /// Bounds the AC6 SMTP retry to at most one attempt per controller instance per store
+        /// (issue #812, rescoped by issue #823). Each distinct <see cref="StoreWrapper"/> this
+        /// controller displays gets its own single attempt, keyed by reference identity. That
+        /// still equals one attempt per store per dialog open ONLY because
         /// <c>RibbonController.FolderStoresSettings</c> constructs a fresh
         /// <see cref="StoreWrapperController"/> on every open; reusing a single controller across
-        /// dialog opens would silently reduce the bound to once per controller lifetime. The field
-        /// is never reset, because a reset would restore the unbounded per-re-selection retry that
-        /// #812 exists to remove.
+        /// dialog opens would silently reduce the bound to once per store per controller lifetime.
+        /// The set is never reset, because a reset would restore the unbounded per-re-selection
+        /// retry that #812 exists to remove.
+        /// <para>
+        /// Accepted cost: the worst case rises from one blocking UI-thread SMTP lookup per dialog
+        /// open to N, bounded by the number of stores in <c>Model.Stores</c> whose address is null.
+        /// That bound is set by configuration rather than by user gestures, which is the
+        /// distinction issue #812 drew and the reason the added cost is accepted.
+        /// </para>
         /// </summary>
-        private bool _userEmailRetryAttempted;
+        private readonly HashSet<StoreWrapper> _userEmailRetryAttemptedStores =
+            new HashSet<StoreWrapper>();
 
         /// <summary>
         /// Determines whether the store-wrapper model has finished loading and is safe to

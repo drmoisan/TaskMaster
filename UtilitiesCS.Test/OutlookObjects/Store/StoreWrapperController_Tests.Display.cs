@@ -115,10 +115,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         [TestMethod]
         public void PopulateWithCurrent_WhenUserEmailIsAlreadyPopulated_DoesNotRetryLookup()
         {
-            // Arrange (issue #797, AC6, corrected by #812): the retry is attempted at most once
-            // per controller instance and only when the address is null, which bounds the added
-            // UI-thread latency. The mocked chain would yield a different address, so an
-            // unchanged value proves no retry ran.
+            // Arrange (issue #797, AC6, corrected by #812 and rescoped by #823): the retry
+            // bound is per controller instance per store, and the retry is attempted only when
+            // the address is null, which bounds the added UI-thread latency. The mocked chain
+            // would yield a different address, so an unchanged value proves no retry ran.
             var (controller, _) = CreateControllerWithViewer();
             var rootFolder = CreateDisplaySmtpRootFolder("would-have-retried@example.com");
             controller.Current = new StoreWrapper(null)
@@ -191,10 +191,18 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         }
 
         /// <summary>
-        /// The bound is per controller instance, not per store and not per process. A second
-        /// controller over the same failing store gets its own single attempt, which is what makes
-        /// the bound equal to "once per dialog open" given that
+        /// The bound is one attempt
+        /// per controller instance per store, and it is never process-wide. A second controller
+        /// over the same failing store gets its own single attempt, which is what makes the bound
+        /// equal to "once per store per dialog open" given that
         /// <c>RibbonController.FolderStoresSettings</c> constructs a fresh controller per open.
+        /// <para>
+        /// This test is the guard forbidding a <c>static</c> retry set (issue #823). A
+        /// process-wide per-store latch would let the first controller consume the only attempt
+        /// for this store, so the getter would be observed once where the assertion below demands
+        /// two. Neither the assertion nor its argument may be relaxed to accommodate such a
+        /// change.
+        /// </para>
         /// </summary>
         [TestMethod]
         public void PopulateWithCurrent_OnASecondControllerOverTheSameFailingStore_RetriesOnceMore()
@@ -262,6 +270,36 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             // Assert
             exchangeUserA.VerifyGet(x => x.PrimarySmtpAddress, Times.Once());
             exchangeUserB.VerifyGet(x => x.PrimarySmtpAddress, Times.Once());
+        }
+
+        /// <summary>
+        /// The issue #812 invariant that issue #823 must not regress: no sequence of user gestures
+        /// may produce an unbounded series of blocking UI-thread COM lookups. Re-selecting one
+        /// failing store any number of times still spends that store's single attempt exactly
+        /// once, because the retry set is keyed by the store and is never reset.
+        /// </summary>
+        [TestMethod]
+        public void PopulateWithCurrent_OnOneFailingStoreReselectedThreeTimes_RetriesLookupOnlyOnce()
+        {
+            // Arrange
+            var (controller, _) = CreateControllerWithViewer();
+            var (rootFolder, exchangeUser) = CreateDisplayFailingSmtpRootFolderWithUser(
+                "The operation failed."
+            );
+            controller.Current = new StoreWrapper(null)
+            {
+                RootFolder = rootFolder.Object,
+                UserEmailAddress = null,
+                DisplayName = "Mailbox",
+            };
+
+            // Act
+            controller.PopulateWithCurrent();
+            controller.PopulateWithCurrent();
+            controller.PopulateWithCurrent();
+
+            // Assert
+            exchangeUser.VerifyGet(x => x.PrimarySmtpAddress, Times.Once());
         }
 
         /// <summary>
