@@ -5,9 +5,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 every wave transition, and at final integration-PR completion. The checkpoint JSON is the durable,
 machine-authoritative source; `epic.md` is the human-authored manifest and narrative.
 
-- Last updated: 2026-09-09T22:05:16Z
-- Integration branch: `epic/review-residuals-2026-09-08-integration` at `049c1427`
-- Current wave: 0 COMPLETE (7 of 7 merged). Wave 1 opens once a redundant resume agent exits.
+- Last updated: 2026-09-09T22:20:00Z
+- Integration branch: `epic/review-residuals-2026-09-08-integration` at `aff8285d`
+- Current wave: 1 (wave 0 complete, 7 of 7 merged; 826 executing)
 - Epic manifest: `docs/features/epics/review-residuals-2026-09-08/epic.md`
 - Epic kickoff: `docs/features/epics/review-residuals-2026-09-08/epic-kickoff.md`
 - Integration PR: not yet opened
@@ -23,7 +23,7 @@ machine-authoritative source; `epic.md` is the human-authored manifest and narra
 | 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | 0 | merged | [#832](https://github.com/drmoisan/TaskMaster/pull/832) | `553f874a` | 2026-09-09T13:46:00Z | 2026-09-09T18:43:00Z | 2026-09-09T18:47:53Z | — |
 | 824 | `2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824` | 0 | merged | [#833](https://github.com/drmoisan/TaskMaster/pull/833) | `96fd3dd8` | 2026-09-09T13:46:00Z | 2026-09-09T20:20:00Z | 2026-09-09T20:24:46Z | — |
 | 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | 0 | merged | [#834](https://github.com/drmoisan/TaskMaster/pull/834) | `049c1427` | 2026-09-09T13:46:00Z | 2026-09-09T21:50:00Z | 2026-09-09T22:02:23Z | — |
-| 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | 1 | not_started | — | — | — | — | — | — |
+| 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | 1 | worktree_created (executing) | — | — | 2026-09-09T22:15:00Z | — | — | — |
 
 ## Wave Layering
 
@@ -79,7 +79,23 @@ workflow file is edited to obtain a trigger:
 | [34391748802](https://github.com/drmoisan/TaskMaster/actions/runs/34391748802) | 823 | `553f874a` | success |
 | [34401152781](https://github.com/drmoisan/TaskMaster/actions/runs/34401152781) | 824 | `96fd3dd8` | success |
 
-Six dispatched integration runs, six successes.
+| [34410792972](https://github.com/drmoisan/TaskMaster/actions/runs/34410792972) | 825 | `aff8285d` | pending |
+
+Six concluded integration runs, six successes. The seventh is the first to cover the complete
+wave-0 tree with all seven features merged.
+
+## Wave 1 Barrier
+
+Wave 1 was not opened until dependency 825 was durably confirmed merged, verified from
+`gh pr view 834` (state MERGED, merge commit `049c1427`, merged at 2026-09-09T22:02:23Z) and by
+confirming that commit is an ancestor of the wave-1 worktree HEAD — not from a completion
+notification. The MCP epic-checkpoint validation, which had reported an
+`EPIC_WAVE_BARRIER_VIOLATION` line for 826 throughout wave 0 exactly as expected while its
+dependency was unmerged, returned `ok: true` with no findings once 825 flipped to merged.
+
+Feature 825's fourth gate, unresolved at merge time, was subsequently confirmed green on evidence
+by an independent re-run at the same head: 7213 tests, 7213 passed, 85.67% line and 79.84% branch
+coverage, clearing the 85% and 75% floors.
 
 ## Deferred Worktree Removals
 
