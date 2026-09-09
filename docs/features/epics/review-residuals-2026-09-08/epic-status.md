@@ -5,9 +5,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 every wave transition, and at final integration-PR completion. The checkpoint JSON is the durable,
 machine-authoritative source; `epic.md` is the human-authored manifest and narrative.
 
-- Last updated: 2026-09-09T18:49:30Z
-- Integration branch: `epic/review-residuals-2026-09-08-integration` at `553f874a`
-- Current wave: 0 (5 of 7 merged; 824 executing)
+- Last updated: 2026-09-09T20:26:30Z
+- Integration branch: `epic/review-residuals-2026-09-08-integration` at `96fd3dd8`
+- Current wave: 0 (6 of 7 merged; 825 executing, last of wave 0)
 - Epic manifest: `docs/features/epics/review-residuals-2026-09-08/epic.md`
 - Epic kickoff: `docs/features/epics/review-residuals-2026-09-08/epic-kickoff.md`
 - Integration PR: not yet opened
@@ -21,8 +21,8 @@ machine-authoritative source; `epic.md` is the human-authored manifest and narra
 | 817 | `2026-09-08-utilitiescs-test-hygiene-residuals-817` | 0 | merged | [#830](https://github.com/drmoisan/TaskMaster/pull/830) | `89bdfe06` | 2026-09-09T13:46:00Z | 2026-09-09T16:17:00Z | 2026-09-09T16:21:05Z | — |
 | 821 | `2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821` | 0 | merged | [#831](https://github.com/drmoisan/TaskMaster/pull/831) | `d636b0f2` | 2026-09-09T13:46:00Z | 2026-09-09T17:33:00Z | 2026-09-09T17:37:20Z | — |
 | 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | 0 | merged | [#832](https://github.com/drmoisan/TaskMaster/pull/832) | `553f874a` | 2026-09-09T13:46:00Z | 2026-09-09T18:43:00Z | 2026-09-09T18:47:53Z | — |
-| 824 | `2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824` | 0 | worktree_created (executing) | — | — | 2026-09-09T13:46:00Z | — | — | — |
-| 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
+| 824 | `2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824` | 0 | merged | [#833](https://github.com/drmoisan/TaskMaster/pull/833) | `96fd3dd8` | 2026-09-09T13:46:00Z | 2026-09-09T20:20:00Z | 2026-09-09T20:24:46Z | — |
+| 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | 0 | worktree_created (executing) | — | — | 2026-09-09T13:46:00Z | — | — | — |
 | 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | 1 | not_started | — | — | — | — | — | — |
 
 ## Wave Layering
@@ -76,7 +76,8 @@ workflow file is edited to obtain a trigger:
 | [34371580397](https://github.com/drmoisan/TaskMaster/actions/runs/34371580397) | 815 | `732b84d3` | success |
 | [34376281522](https://github.com/drmoisan/TaskMaster/actions/runs/34376281522) | 817 | `89bdfe06` | success |
 | [34384355056](https://github.com/drmoisan/TaskMaster/actions/runs/34384355056) | 821 | `d636b0f2` | success |
-| [34391748802](https://github.com/drmoisan/TaskMaster/actions/runs/34391748802) | 823 | `553f874a` | pending |
+| [34391748802](https://github.com/drmoisan/TaskMaster/actions/runs/34391748802) | 823 | `553f874a` | success |
+| [34401152781](https://github.com/drmoisan/TaskMaster/actions/runs/34401152781) | 824 | `96fd3dd8` | pending |
 
 ## Deferred Worktree Removals
 
@@ -95,6 +96,7 @@ for reclamation via `scripts/bash/cleanup-worktrees.sh`.
 | 817 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-817` | pending retry |
 | 821 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-821` | pending retry |
 | 823 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-823` | pending retry |
+| 824 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-824` | pending retry |
 
 ## Preparation Provenance
 
