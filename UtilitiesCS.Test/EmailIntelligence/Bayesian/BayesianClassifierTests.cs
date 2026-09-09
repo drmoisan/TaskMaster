@@ -19,7 +19,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true };
             this.dedicated = CreateDedicatedTokens();
             this.dedicated2 = CreateDedicatedTokens2();

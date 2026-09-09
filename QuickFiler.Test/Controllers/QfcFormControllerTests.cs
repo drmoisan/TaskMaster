@@ -89,7 +89,6 @@ namespace QuickFiler.Controllers.Tests
         [TestInitialize]
         public void Setup()
         {
-            Console.SetOut(new DebugTextWriter());
             _mockGlobals = new Mock<IApplicationGlobals>();
             _mockAF = new Mock<IAppAutoFileObjects>();
             _mockAF

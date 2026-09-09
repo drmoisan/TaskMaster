@@ -9,12 +9,6 @@ namespace VBFunctions.Test
     [TestClass]
     public class ComputerInfo_Test
     {
-        [TestInitialize]
-        public void Initialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-        }
-
         [TestMethod]
         public void ComputerInfo_PropertyTests()
         {

@@ -45,7 +45,6 @@ namespace QuickFiler.Controllers.Tests
         [TestInitialize]
         public void Setup()
         {
-            Console.SetOut(new DebugTextWriter());
             this._mockRepository = new MockRepository(MockBehavior.Strict);
             this._mockApplicationGlobals = this._mockRepository.Create<IApplicationGlobals>();
             this._mockApplicationGlobals.SetupGet(x => x.AF.CancelToken)

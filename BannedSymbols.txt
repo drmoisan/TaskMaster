@@ -5,3 +5,11 @@ M:System.Threading.Thread.Sleep(System.Int32);Do not call Thread.Sleep. Use asyn
 M:System.Threading.Thread.Sleep(System.TimeSpan);Do not call Thread.Sleep. Use async/await with an injected time abstraction or a cancellation token.
 M:System.Threading.Tasks.Task.Delay(System.Int32);Do not call Task.Delay directly in production code. Inject a time abstraction (System.TimeProvider).
 M:System.Threading.Tasks.Task.Delay(System.TimeSpan);Do not call Task.Delay directly in production code. Inject a time abstraction (System.TimeProvider).
+M:System.Threading.CancellationTokenSource.CancelAfter(System.Int32);Do not call CancelAfter. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.
+M:System.Threading.CancellationTokenSource.CancelAfter(System.TimeSpan);Do not call CancelAfter. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.
+M:System.Threading.CancellationTokenSource.#ctor(System.Int32);Do not construct a deadline CancellationTokenSource. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.
+M:System.Threading.CancellationTokenSource.#ctor(System.TimeSpan);Do not construct a deadline CancellationTokenSource. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.
+M:System.Threading.WaitHandle.WaitOne(System.Int32);Do not use a timed WaitOne. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.
+M:System.Threading.WaitHandle.WaitOne(System.TimeSpan);Do not use a timed WaitOne. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.
+M:System.Threading.WaitHandle.WaitOne(System.Int32,System.Boolean);Do not use a timed WaitOne. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.
+M:System.Threading.WaitHandle.WaitOne(System.TimeSpan,System.Boolean);Do not use a timed WaitOne. Inject a time abstraction (System.TimeProvider) and use FakeTimeProvider in tests.

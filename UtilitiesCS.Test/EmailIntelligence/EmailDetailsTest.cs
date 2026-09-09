@@ -10,12 +10,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
     [TestClass]
     public class EmailDetailsTest
     {
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-        }
-
         //[TestMethod]
         //public void ExtractNameFromAddress_Test()
         //{

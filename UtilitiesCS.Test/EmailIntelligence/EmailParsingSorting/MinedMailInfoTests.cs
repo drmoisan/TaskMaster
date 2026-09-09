@@ -26,7 +26,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             this.mockFolder = this.CreateMockFolder("FolderL1\\FolderL2\\FolderL3\\FolderName");
             this.mockFolderRoot = this.CreateMockFolder("FolderL1");

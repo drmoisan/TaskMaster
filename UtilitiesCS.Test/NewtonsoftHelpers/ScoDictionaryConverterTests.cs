@@ -22,7 +22,6 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
             globals = new TaskMaster.ApplicationGlobals(

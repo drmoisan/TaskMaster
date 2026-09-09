@@ -24,7 +24,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestInitialize]
         public void Setup()
         {
-            Console.SetOut(new DebugTextWriter());
             _mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
             _triage = new Triage(_mockGlobals.Object, CancellationToken.None)
             {

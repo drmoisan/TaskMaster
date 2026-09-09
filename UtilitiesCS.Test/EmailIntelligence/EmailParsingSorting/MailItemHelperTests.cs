@@ -35,7 +35,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Loose);
             this.mockGlobals = SetupMockGlobals();
             this.mockMailItem = SetupMockMail();

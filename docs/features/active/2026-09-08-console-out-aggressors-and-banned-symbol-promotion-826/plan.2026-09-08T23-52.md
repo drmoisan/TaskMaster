@@ -431,7 +431,7 @@ used and the per-assembly result counts either way.
 
 ### Phase 0 — Policy reads, toolchain bootstrap, base anchor, baselines
 
-- [ ] [P0-T1] Read, in this order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
+- [x] [P0-T1] Read, in this order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
   `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`,
   `.claude/rules/csharp.md`, then this feature's `spec.md` in full and its research record
   `docs/features/active/2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826/research/console-out-and-banned-symbol-residuals.2026-09-08T23-58.md`,
@@ -441,7 +441,7 @@ used and the per-assembly result counts either way.
   explicit list of files read.
   **Acceptance:** the artifact exists and lists all nine paths above under `Policy Order:`.
 
-- [ ] [P0-T2] Record the base anchor before any edit. Run the block below and write
+- [x] [P0-T2] Record the base anchor before any edit. Run the block below and write
   `<FEATURE>/evidence/baseline/base-ref.md` containing the literal line `BaseCommit: <40-hex sha>`, the
   branch name, and the porcelain output.
   ```powershell
@@ -460,7 +460,7 @@ used and the per-assembly result counts either way.
   is either this plan file or a path under `<FEATURE>/evidence/`, which are the only paths Phase 0 has
   written so far.
 
-- [ ] [P0-T3] Bootstrap the C# toolchain in this worktree. `.dotnet-sdk` does not exist here, so
+- [x] [P0-T3] Bootstrap the C# toolchain in this worktree. `.dotnet-sdk` does not exist here, so
   `global.json` cannot be satisfied by a globally installed SDK and every `dotnet` invocation would
   fail until this runs.
   ```powershell
@@ -474,7 +474,7 @@ used and the per-assembly result counts either way.
   `EXIT_CODE:` and `Output Summary:` for each of the five commands.
   **Acceptance:** all five commands exit 0 and the csharpier version reported is `1.2.6`.
 
-- [ ] [P0-T4] Upstream 825 precondition halt-gate. Confirm the two statements this feature owns
+- [x] [P0-T4] Upstream 825 precondition halt-gate. Confirm the two statements this feature owns
   survived feature 825 byte-identical and that the seam parameter still exists.
   ```powershell
       @(Select-String -LiteralPath $Tac -CaseSensitive -SimpleMatch "Console.WriteLine").Count
@@ -490,7 +490,7 @@ used and the per-assembly result counts either way.
   in the artifact, and returns to the orchestrator without editing the file; the spec forbids
   reconstructing a missing statement.
 
-- [ ] [P0-T5] Capture the pre-change census that makes the Phase 5 and Phase 3 gates capable of
+- [x] [P0-T5] Capture the pre-change census that makes the Phase 5 and Phase 3 gates capable of
   failing.
   ```powershell
       $cs = @(git ls-files "*.cs")
@@ -514,7 +514,7 @@ used and the per-assembly result counts either way.
   ten. Any deviation from the first three figures is recorded verbatim and reported to the
   orchestrator before Phase 5 begins, because the Phase 5 gates are stated against them.
 
-- [ ] [P0-T6] Baseline format state (toolchain step 1, read-only form).
+- [x] [P0-T6] Baseline format state (toolchain step 1, read-only form).
   ```powershell
       & $dotnet tool run csharpier check .
       $LASTEXITCODE
@@ -525,7 +525,7 @@ used and the per-assembly result counts either way.
   If the exit code is non-zero, the executor records the unformatted file list, writes
   `HALT: PRE-EXISTING FORMAT DRIFT` in the artifact and returns to the orchestrator, per D18.
 
-- [ ] [P0-T7] Baseline analyzer build (toolchain step 2).
+- [x] [P0-T7] Baseline analyzer build (toolchain step 2).
   ```powershell
       & $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /fl "/flp:LogFile=coverage/826-raw/p0-t7-analyzers.log;Verbosity=detailed"
       $LASTEXITCODE
@@ -537,7 +537,7 @@ used and the per-assembly result counts either way.
   **Acceptance:** `EXIT_CODE: 0`, ` 0 Error(s)` count at least 1, `Skipping target "CoreCompile"` count
   0, and `Task "Csc"` count at least 1.
 
-- [ ] [P0-T8] Baseline nullable build (toolchain step 3).
+- [x] [P0-T8] Baseline nullable build (toolchain step 3).
   ```powershell
       & $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /fl "/flp:LogFile=coverage/826-raw/p0-t8-nullable.log;Verbosity=detailed"
       $LASTEXITCODE
@@ -552,7 +552,7 @@ used and the per-assembly result counts either way.
   `Skipping target "CoreCompile"` count 0, and `Task "Csc"` count at least 1, which is what makes the
   CS0169, CS0414 and Skipping-target zeros non-vacuous.
 
-- [ ] [P0-T9] Baseline measured test and coverage run (toolchain step 4, measured form). This is the
+- [x] [P0-T9] Baseline measured test and coverage run (toolchain step 4, measured form). This is the
   run whose numbers AC15 compares against; P7-T5 is the confirming CI-verbatim run.
   ```powershell
       dotnet-coverage collect --output coverage/826-raw/p0-t9.cobertura.xml --output-format cobertura -- $vstest $Assemblies /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/Logger:trx;LogFileName=p0-t9.trx" /ResultsDirectory:coverage/826-raw/p0-t9 /TestCaseFilter:$FullFilter
@@ -584,7 +584,7 @@ used and the per-assembly result counts either way.
 
 ### Phase 1 — Item-2 reachability re-measurement against the post-825 tree
 
-- [ ] [P1-T1] Re-run the D2 derivation against the tree as it stands now, because feature 825 owns
+- [x] [P1-T1] Re-run the D2 derivation against the tree as it stands now, because feature 825 owns
   `UtilitiesCS/Threading/TimeOutTask.cs` and may have changed what escapes it. Perform these five
   mechanical steps with the Read and Grep tools and record each with its current line citation:
   1. In `UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs`, locate the
@@ -606,7 +606,7 @@ used and the per-assembly result counts either way.
   current line number, and contains exactly one line matching `BRANCH: REACHABLE` or exactly one line
   matching `BRANCH: UNREACHABLE` and not both.
 
-- [ ] [P1-T2] Write the fail-before exception dossier at
+- [x] [P1-T2] Write the fail-before exception dossier at
   `<FEATURE>/evidence/regression-testing/fail-before-exception.<timestamp>.md`. A failing run is
   structurally impossible under both branches of P2-T2: AC7 itself requires that reverting the item-2
   production edit alone must not be what makes the test pass or fail, so the test pins a branch rather
@@ -629,7 +629,7 @@ used and the per-assembly result counts either way.
 
 ### Phase 2 — Item 2: logger substitution, regression test, project registration
 
-- [ ] [P2-T1] In `UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs`, replace each of
+- [x] [P2-T1] In `UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs`, replace each of
   the two statements whose literal text is `Console.WriteLine($"Task timed out on try {counter}");`
   with `logger.Warn($"{nameof(GetTableInViewAsync)} timed out on try {counter}");`. Locate each by its
   literal text and its enclosing catch clause: one sits in the `else` branch of
@@ -651,7 +651,7 @@ used and the per-assembly result counts either way.
   `EnumerateTable`, which is out of scope and must remain); `timed out on try` count 2; and the
   anchored numstat for that path reads exactly 2 added and 2 removed lines.
 
-- [ ] [P2-T2] Create `UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsTimeoutDiagnosticsTests.cs`
+- [x] [P2-T2] Create `UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsTimeoutDiagnosticsTests.cs`
   as an MSTest class using Moq and FluentAssertions, following the mocking pattern established at
   `UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs` lines 1266 to 1321 (mock
   `Outlook.Table`, `Outlook.TableView` and `Outlook.Explorer`; set up `CurrentView` to return the
@@ -680,7 +680,7 @@ used and the per-assembly result counts either way.
   each of the `-SimpleMatch` tokens `Thread.Sleep`, `Task.Delay` and `Console.`, and the artifact
   records a `BRANCH:` value identical to the one in the P1-T1 artifact.
 
-- [ ] [P2-T3] Register the new test file in the legacy non-SDK project by inserting exactly one line
+- [x] [P2-T3] Register the new test file in the legacy non-SDK project by inserting exactly one line
   into `UtilitiesCS.Test/UtilitiesCS.Test.csproj`, adjacent to the existing
   `OutlookObjects\Table\` compile items, with the same indentation and element shape as its
   neighbours. The literal this task creates is the file name token
@@ -696,7 +696,7 @@ used and the per-assembly result counts either way.
   exactly 1 added and 0 removed lines; and the anchored numstat over `*.csproj` lists exactly that one
   project file and no other.
 
-- [ ] [P2-T4] Build the `UtilitiesCS.Test` project and run the new test class in isolation, so a
+- [x] [P2-T4] Build the `UtilitiesCS.Test` project and run the new test class in isolation, so a
   compile or registration failure surfaces here rather than in the final QA loop. This is an interim
   scoped check, not a toolchain-loop pass.
   ```powershell
@@ -716,7 +716,7 @@ used and the per-assembly result counts either way.
 
 ### Phase 3 — Item 3: banned symbols and the tracking comment, at unchanged severity
 
-- [ ] [P3-T1] Append exactly eight lines to `BannedSymbols.txt`, each in the same
+- [x] [P3-T1] Append exactly eight lines to `BannedSymbols.txt`, each in the same
   DocID-semicolon-message shape as the seven pre-existing lines, with a message naming
   `TimeProvider`. The eight lines this task creates are, verbatim:
 
@@ -760,7 +760,7 @@ used and the per-assembly result counts either way.
   proving no appended line carries leading whitespace.
   Evidence: `<FEATURE>/evidence/qa-gates/p3-t1-banned-symbols.md`.
 
-- [ ] [P3-T2] Re-measure the textual surface, then amend the `.editorconfig` tracking comment. First
+- [x] [P3-T2] Re-measure the textual surface, then amend the `.editorconfig` tracking comment. First
   measure, so that no unverified figure is written into the repository:
   ```powershell
       $cs = @(git ls-files "*.cs")
@@ -788,7 +788,7 @@ used and the per-assembly result counts either way.
   Evidence: `<FEATURE>/evidence/qa-gates/p3-t2-editorconfig-comment.md`, which also records the five
   re-measured counts.
 
-- [ ] [P3-T3] Prove the severity is untouched by the item-3 edit.
+- [x] [P3-T3] Prove the severity is untouched by the item-3 edit.
   ```powershell
       git diff $Base -- .editorconfig
   ```
@@ -803,7 +803,7 @@ used and the per-assembly result counts either way.
 
 ### Phase 4 — AC10: positive observation of RS0030 with a working control
 
-- [ ] [P4-T1] Certify an observation channel, in the D7 order, and stop at the first channel whose
+- [x] [P4-T1] Certify an observation channel, in the D7 order, and stop at the first channel whose
   control fires. Run a warm solution build first so that `/p:BuildProjectReferences=false` is valid,
   then build each of the three relevant projects separately with its own SARIF path, because a
   command-line `/p:ErrorLog=` is a global property and a `/m` solution build would have projects
@@ -863,7 +863,7 @@ used and the per-assembly result counts either way.
   which any of the three RS0030-scoped control counts is 0
   must not be recorded as the certified channel.
 
-- [ ] [P4-T2] Through the channel certified by P4-T1, observe RS0030 at the five files under test.
+- [x] [P4-T2] Through the channel certified by P4-T1, observe RS0030 at the five files under test.
   First re-derive the expected line numbers at observation time, so that no line number is carried
   from this document:
   ```powershell
@@ -892,7 +892,7 @@ used and the per-assembly result counts either way.
   number and source text in the artifact, leaves AC10 unchecked, and reports the discrepancy to the
   orchestrator rather than passing this task.
 
-- [ ] [P4-T3] Prove the severity is at `suggestion` in the tree, unconditionally, whichever channel
+- [x] [P4-T3] Prove the severity is at `suggestion` in the tree, unconditionally, whichever channel
   P4-T1 certified. This gate is what makes the channel-3 branch safe: raising a severity to measure it
   is permitted, leaving it raised is not.
   ```powershell
@@ -915,7 +915,7 @@ Before deleting anything in any task of this phase, read the enclosing initializ
 Risk 5 is deleting one line too many from an initializer that also constructs a `MockRepository`,
 mocks or fixtures; in the 23 delete-one-line files, delete **only** the single install statement.
 
-- [ ] [P5-T1] Delete the single `Console.SetOut(new DebugTextWriter());` statement from each of these
+- [x] [P5-T1] Delete the single `Console.SetOut(new DebugTextWriter());` statement from each of these
   six `UtilitiesCS.Test/NewtonsoftHelpers` files, leaving their initializer methods and every other
   statement intact: `WrapperScoDictionaryTest.cs`, `WrapperScDictionaryTest.cs`,
   `ScoDictionaryConverterTests.cs`, `ScDictionaryConverter_Tests.cs`, `PeopleScoConverter_Tests.cs`,
@@ -925,7 +925,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   `@(... -SimpleMatch "TestInitialize").Count` is unchanged from the P0-T5 census for those six files.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t1-newtonsoft-sweep.md`.
 
-- [ ] [P5-T2] Delete the single install statement from each of these six `UtilitiesCS.Test`
+- [x] [P5-T2] Delete the single install statement from each of these six `UtilitiesCS.Test`
   EmailIntelligence files, leaving their initializer methods and every other statement intact:
   `EmailIntelligence/ClassifierGroups/Triage/Triage_OlLogicTests.cs`,
   `EmailIntelligence/EmailParsingSorting/MinedMailInfoTests.cs`,
@@ -940,13 +940,13 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   `BayesianClassifierTests_UnfinishedStubs.cs` still has `Console.SetOut(` count 1.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t2-emailintelligence-sweep.md`.
 
-- [ ] [P5-T3] Delete the single install statement from `UtilitiesCS.Test/Threading/AppGlobalsConverterTests.cs`
+- [x] [P5-T3] Delete the single install statement from `UtilitiesCS.Test/Threading/AppGlobalsConverterTests.cs`
   and `UtilitiesCS.Test/Threading/AppGlobalsConverterTests_Unfinished.cs`, leaving their initializer
   methods and every other statement intact.
   **Acceptance:** across those two paths, `Console.SetOut(` count 0 and `DebugTextWriter` count 0.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t3-threading-sweep.md`.
 
-- [ ] [P5-T4] Delete the single install statement from each of these six `QuickFiler.Test/Controllers`
+- [x] [P5-T4] Delete the single install statement from each of these six `QuickFiler.Test/Controllers`
   files, matching on the full filename: `QfcHomeControllerTests.cs`,
   `QfcHomeControllerRunAsyncTests.cs`, `QfcHomeControllerPropertyTests.cs`,
   `QfcHomeControllerIterationTests.cs`, `QfcFormControllerTests.cs`, `QfcFormControllerSeamTests.cs`.
@@ -966,14 +966,14 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   misses, a delete-then-recreate-as-untracked.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t4-quickfiler-sweep.md`.
 
-- [ ] [P5-T5] Delete the single install statement from
+- [x] [P5-T5] Delete the single install statement from
   `ToDoModel.Test/Data Model/People/PeopleScoDictionaryNewTests.cs`, leaving its initializer method and
   every other statement intact. The directory name contains a space, so quote the path in every
   invocation.
   **Acceptance:** for that path, `Console.SetOut(` count 0 and `DebugTextWriter` count 0.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t5-todomodel-people-sweep.md`.
 
-- [ ] [P5-T6] In `ToDoModel.Test/Data Model/Tree/TreeNodeTests.cs` and
+- [x] [P5-T6] In `ToDoModel.Test/Data Model/Tree/TreeNodeTests.cs` and
   `ToDoModel.Test/Data Model/Tree/TreeNodeTests_UnfinishedStubs.cs`, delete all four elements
   together: the `private DebugTextWriter tw;` field declaration, the `tw = new DebugTextWriter();`
   assignment, the `Console.SetOut(tw);` call, and the orphaned commented-out `[ClassInitialize]` block
@@ -989,7 +989,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   `-SimpleMatch "TestInitialize"` count is 2 (unchanged from the P0-T5 census).
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t6-treenode-sweep.md`.
 
-- [ ] [P5-T7] Delete the whole initializer method, together with its attribute and its install
+- [x] [P5-T7] Delete the whole initializer method, together with its attribute and its install
   statement, from each of these six files, in which the install is the method's only executable
   statement: `VBFunctions.Test/ComputerInfo_Test.cs`,
   `UtilitiesCS.Test/HelperClasses/PrettyPrintTest.cs`, `UtilitiesCS.Test/Extensions/Frexp_Test.cs`,
@@ -1001,7 +1001,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   `-SimpleMatch "Console.SetOut("` count 0 and `-SimpleMatch "DebugTextWriter"` count 0.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t7-empty-initializers.md`.
 
-- [ ] [P5-T8] In `UtilitiesCS.Test/EmailIntelligence/Bayesian/ObsoleteBayesianClassifier_Tests.cs`,
+- [x] [P5-T8] In `UtilitiesCS.Test/EmailIntelligence/Bayesian/ObsoleteBayesianClassifier_Tests.cs`,
   delete both initializer methods, one in each of the file's two `[TestClass]` types, together with
   their attributes and their install statements. This is the only file in the population carrying two
   live install statements.
@@ -1010,7 +1010,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   and `-SimpleMatch "[TestClass]"` count is unchanged at 2.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t8-obsolete-bayesian.md`.
 
-- [ ] [P5-T9] Delete the whole initializer method, its attribute, its install statement **and** the
+- [x] [P5-T9] Delete the whole initializer method, its attribute, its install statement **and** the
   orphaned commented-out line that formed the rest of its body, from each of these three files:
   `UtilitiesCS.Test/OneDriveHelpers/AngleSharpParsedEmailBodyTests.cs`,
   `UtilitiesCS.Test/EmailIntelligence/Bayesian/BayesianClassifierGroupTests.cs`,
@@ -1028,7 +1028,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   make this gate unsatisfiable.
   Evidence: `<FEATURE>/evidence/qa-gates/p5-t9-comment-only-initializers.md`.
 
-- [ ] [P5-T10] Verify the whole item-1 sweep at repository scope.
+- [x] [P5-T10] Verify the whole item-1 sweep at repository scope.
   ```powershell
       $cs = @(git ls-files "*.cs")
       $so = @(Select-String -LiteralPath $cs -CaseSensitive -SimpleMatch "Console.SetOut(")
@@ -1048,7 +1048,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   `UtilitiesCS.Test/Extensions/DeedleTests.cs` - plus `TaskMaster/ThisAddIn.cs` are recorded as
   expected retentions and are not asserted to be zero.
 
-- [ ] [P5-T11] Interim nullable build to discharge the CS0169/CS0414 hazard (spec Risk 1) as early as
+- [x] [P5-T11] Interim nullable build to discharge the CS0169/CS0414 hazard (spec Risk 1) as early as
   possible. This is an interim diagnostic build, not a toolchain-loop pass; the loop itself runs in
   Phase 7.
   ```powershell
@@ -1069,7 +1069,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
 
 ### Phase 6 — Item-2 and item-3 write-set verification
 
-- [ ] [P6-T1] Verify AC5 and AC6 against the anchored diff, without reference to any line number.
+- [x] [P6-T1] Verify AC5 and AC6 against the anchored diff, without reference to any line number.
   ```powershell
       @(Select-String -LiteralPath $Tac -CaseSensitive -SimpleMatch "Console.WriteLine").Count
       @(Select-String -LiteralPath $Tac -CaseSensitive -SimpleMatch "Console.").Count
@@ -1091,7 +1091,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   so the deadline window, retry counter, `timeoutSourceFactory` seam, caught exception types, control
   flow after each diagnostic, other catch clauses and `using` directives are all provably untouched.
 
-- [ ] [P6-T2] Verify AC8 and the no-other-project-file constraint.
+- [x] [P6-T2] Verify AC8 and the no-other-project-file constraint.
   ```powershell
       git diff --numstat $Base -- "UtilitiesCS.Test/UtilitiesCS.Test.csproj"
       git diff $Base -- "UtilitiesCS.Test/UtilitiesCS.Test.csproj"
@@ -1105,7 +1105,7 @@ mocks or fixtures; in the 23 delete-one-line files, delete **only** the single i
   `UtilitiesCS.Test/UtilitiesCS.Test.csproj` and nothing else; and the porcelain companion span lists
   no untracked or modified project, props or targets file other than that one.
 
-- [ ] [P6-T3] Verify AC9 and AC12 against the final state of `BannedSymbols.txt`.
+- [x] [P6-T3] Verify AC9 and AC12 against the final state of `BannedSymbols.txt`.
   ```powershell
       (Get-Content -LiteralPath "BannedSymbols.txt").Count
       @(Select-String -LiteralPath "BannedSymbols.txt" -CaseSensitive -SimpleMatch "TimeoutAfter").Count
@@ -1139,7 +1139,7 @@ fix the cause and restart this phase from P7-T1. The phase is complete only when
 in a single uninterrupted pass. The C4 convention that every `.cs`-touching task formats the paths it
 touched is what makes a zero `$rewritten` the expected outcome here rather than a surprise.
 
-- [ ] [P7-T1] Toolchain step 1. Record SHA-256 hashes of every tracked `.cs` file plus the untracked
+- [x] [P7-T1] Toolchain step 1. Record SHA-256 hashes of every tracked `.cs` file plus the untracked
   `UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsTimeoutDiagnosticsTests.cs` immediately
   before and immediately after `format`, define `$rewritten` as the number of hash differences, and
   pair the write-mode command with the read-only `check` form, whose clean run prints a line beginning
@@ -1173,7 +1173,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   pre-existing drift inside this feature would put an out-of-scope file into the anchored diff and
   make AC16 unsatisfiable.
 
-- [ ] [P7-T2] Toolchain step 2.
+- [x] [P7-T2] Toolchain step 2.
   ```powershell
       & $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /fl "/flp:LogFile=coverage/826-raw/p7-t2-analyzers.log;Verbosity=detailed"
       $LASTEXITCODE
@@ -1188,7 +1188,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   the diagnostic is info-level and may be absent from this log entirely, which is exactly why AC10 is
   satisfied through the certified channel in Phase 4 and not from this log.
 
-- [ ] [P7-T3] Toolchain step 3.
+- [x] [P7-T3] Toolchain step 3.
   ```powershell
       & $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /fl "/flp:LogFile=coverage/826-raw/p7-t3-nullable.log;Verbosity=detailed"
       $LASTEXITCODE
@@ -1202,7 +1202,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   **Acceptance:** exit code 0; ` 0 Error(s)` count at least 1; CS0169 count 0; CS0414 count 0;
   `Skipping target "CoreCompile"` count 0; `Task "Csc"` count at least 1. This is the AC3 gate.
 
-- [ ] [P7-T4] Toolchain step 4, measured form. This run supplies the post-change numbers AC15
+- [x] [P7-T4] Toolchain step 4, measured form. This run supplies the post-change numbers AC15
   compares against P0-T9.
   ```powershell
       dotnet-coverage collect --output coverage/826-raw/p7-t4.cobertura.xml --output-format cobertura -- $vstest $Assemblies /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/Logger:trx;LogFileName=p7-t4.trx" /ResultsDirectory:coverage/826-raw/p7-t4 /TestCaseFilter:$FullFilter
@@ -1227,7 +1227,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   **Acceptance:** exit code 0; TRX failed count 0; the test named by P2-T2 appears in the TRX with
   outcome `Passed`; and every numeric field above is present and numeric.
 
-- [ ] [P7-T5] Toolchain step 4, confirming CI-verbatim form. P7-T4 is the measured run; this run
+- [x] [P7-T5] Toolchain step 4, confirming CI-verbatim form. P7-T4 is the measured run; this run
   confirms the CI-shaped invocation passes and that the two runs agree on result counts.
   ```powershell
       & $vstest $Assemblies /EnableCodeCoverage /InIsolation "/Logger:trx;LogFileName=p7-t5.trx" /ResultsDirectory:coverage/826-raw/p7-t5 /TestCaseFilter:$FullFilter
@@ -1241,7 +1241,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   **Acceptance:** exit code 0; TRX failed count 0; and the TRX total, passed and notExecuted counts
   equal the corresponding P7-T4 counts.
 
-- [ ] [P7-T6] Coverage comparison and AC15 record. Compare P0-T9 against P7-T4 under the D15
+- [x] [P7-T6] Coverage comparison and AC15 record. Compare P0-T9 against P7-T4 under the D15
   comparability rule and record the outcome.
   Write `<FEATURE>/evidence/qa-gates/p7-t6-coverage-delta.md` with: baseline and post-change
   `line-rate`, `lines-valid` and `lines-covered`; the absolute percentage difference in `lines-valid`;
@@ -1261,7 +1261,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   expected to move no figure at all, because all 33 files compile into `*.Test.dll` assemblies that
   the pipeline excludes from instrumentation.
 
-- [ ] [P7-T7] Record the loop-closure attestation. Write
+- [x] [P7-T7] Record the loop-closure attestation. Write
   `<FEATURE>/evidence/qa-gates/p7-t7-toolchain-attestation.md` naming the four commands in order, the
   artifact path for each, the exit code for each, and the number of times the phase was restarted.
   **Acceptance:** the artifact names all four steps in the order format, analyzer build, nullable
@@ -1272,7 +1272,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
 
 ### Phase 8 — Scope gate, acceptance check-off, commit
 
-- [ ] [P8-T1] AC16 scope gate (measured). Stage the new test file with an intent-to-add so the
+- [x] [P8-T1] AC16 scope gate (measured). Stage the new test file with an intent-to-add so the
   name-listing diff can see it, then enumerate the anchored diff and the porcelain companion span.
   ```powershell
       git add --intent-to-add "UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsTimeoutDiagnosticsTests.cs"
@@ -1293,39 +1293,39 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   systems", specifically including `UtilitiesCS/Threading/TimeOutTask.cs` and
   `QuickFiler.Test/Controllers/QfcHomeControllerCleanupTests.cs`.
 
-- [ ] [P8-T2] Check off AC1 in `spec.md` by changing its `- [ ]` to `- [x]`, citing
+- [x] [P8-T2] Check off AC1 in `spec.md` by changing its `- [ ]` to `- [x]`, citing
   `<FEATURE>/evidence/qa-gates/p5-t10-sweep-verification.md`.
   **Acceptance:** the AC1 bullet in `spec.md` reads `- [x]`, and the cited artifact records a
   repository-wide `Console.SetOut(` occurrence count of 2 across exactly the two named files.
 
-- [ ] [P8-T3] Check off AC2 in `spec.md`, citing
+- [x] [P8-T3] Check off AC2 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p5-t10-sweep-verification.md`.
   **Acceptance:** the AC2 bullet reads `- [x]`, and the cited artifact records a `DebugTextWriter`
   count of 0 for each of the 33 write-set files.
 
-- [ ] [P8-T4] Check off AC3 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p5-t6-treenode-sweep.md`
+- [x] [P8-T4] Check off AC3 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p5-t6-treenode-sweep.md`
   and `<FEATURE>/evidence/qa-gates/p7-t3-nullable.md`.
   **Acceptance:** the AC3 bullet reads `- [x]`; the first artifact records a whole-word `tw` count of
   0 in both `TreeNode` files; and the second records exit code 0 with CS0169 count 0 and CS0414
   count 0.
 
-- [ ] [P8-T5] Check off AC4 in `spec.md`, citing
+- [x] [P8-T5] Check off AC4 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p5-t7-empty-initializers.md`,
   `<FEATURE>/evidence/qa-gates/p5-t8-obsolete-bayesian.md` and
   `<FEATURE>/evidence/qa-gates/p5-t9-comment-only-initializers.md`.
   **Acceptance:** the AC4 bullet reads `- [x]`, and the three artifacts together record a
   `TestInitialize` count of 0 for all ten named files.
 
-- [ ] [P8-T6] Check off AC5 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t1-ac5-ac6.md`.
+- [x] [P8-T6] Check off AC5 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t1-ac5-ac6.md`.
   **Acceptance:** the AC5 bullet reads `- [x]`, and the artifact records `Console.WriteLine` count 0
   and `Console.` count 1 for the table-access file.
 
-- [ ] [P8-T7] Check off AC6 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t1-ac5-ac6.md`.
+- [x] [P8-T7] Check off AC6 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t1-ac5-ac6.md`.
   **Acceptance:** the AC6 bullet reads `- [x]`, and the artifact records the 2-added, 2-removed
   anchored numstat, two removed `Console.WriteLine` lines, two added `logger.Warn` lines, and the
   catch-ordering derivation placing one in each catch clause.
 
-- [ ] [P8-T8] Check off AC7 in `spec.md`, citing
+- [x] [P8-T8] Check off AC7 in `spec.md`, citing
   `<FEATURE>/evidence/other/item2-branch-reachability.<timestamp>.md`,
   `<FEATURE>/evidence/regression-testing/p2-t2-regression-test.md`,
   `<FEATURE>/evidence/regression-testing/fail-before-exception.<timestamp>.md` and
@@ -1337,16 +1337,16 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   `Passed`; the test file contains zero occurrences of `Thread.Sleep` and zero of `Task.Delay`; and,
   under `BRANCH: UNREACHABLE`, the check-off note carries the required one-sentence statement.
 
-- [ ] [P8-T9] Check off AC8 in `spec.md`, citing
+- [x] [P8-T9] Check off AC8 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p6-t2-ac8-project-file.md`.
   **Acceptance:** the AC8 bullet reads `- [x]`, and the artifact records 1 added and 0 removed lines
   for `UtilitiesCS.Test/UtilitiesCS.Test.csproj` and no other project file in the name-listing diff.
 
-- [ ] [P8-T10] Check off AC9 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t3-ac9-ac12.md`.
+- [x] [P8-T10] Check off AC9 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t3-ac9-ac12.md`.
   **Acceptance:** the AC9 bullet reads `- [x]`, and the artifact records all eight DocID counts as 1
   with a `TimeProvider` message and an 8-added, 0-removed anchored numstat.
 
-- [ ] [P8-T11] Check off AC10 in `spec.md`, citing
+- [x] [P8-T11] Check off AC10 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p4-t1-rs0030-channel.md` and
   `<FEATURE>/evidence/qa-gates/p4-t2-rs0030-observation.md`.
   **Acceptance:** the AC10 bullet reads `- [x]`; the channel artifact records exactly one `CHANNEL:`
@@ -1356,23 +1356,23 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   the void result, and the executor reports the blocker rather than downgrading AC10 to an absence
   check.
 
-- [ ] [P8-T12] Check off AC11 in `spec.md`, citing
+- [x] [P8-T12] Check off AC11 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p3-t3-severity-unchanged.md` and
   `<FEATURE>/evidence/qa-gates/p4-t3-severity-restored.md`.
   **Acceptance:** the AC11 bullet reads `- [x]`; both artifacts record a `suggestion` count of 1 and a
   count of 0 for anchored-diff changed lines containing `dotnet_diagnostic.`.
 
-- [ ] [P8-T13] Check off AC12 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t3-ac9-ac12.md`.
+- [x] [P8-T13] Check off AC12 in `spec.md`, citing `<FEATURE>/evidence/qa-gates/p6-t3-ac9-ac12.md`.
   **Acceptance:** the AC12 bullet reads `- [x]`, and the artifact records a `TimeoutAfter` count of 0
   and a `WaitHandle.WaitOne;` count of 0 in `BannedSymbols.txt`.
 
-- [ ] [P8-T14] Check off AC13 in `spec.md`, citing
+- [x] [P8-T14] Check off AC13 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p3-t2-editorconfig-comment.md`.
   **Acceptance:** the AC13 bullet reads `- [x]`, and the artifact records a region `181` count of 0
   together with region counts of at least 1 for `TreatWarningsAsErrors`, `_build-nullable.yml` and
   `2026-09-08`, plus the five re-measured symbol counts written into the comment.
 
-- [ ] [P8-T15] Check off AC14 in `spec.md`, citing
+- [x] [P8-T15] Check off AC14 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p7-t1-format.md`, `<FEATURE>/evidence/qa-gates/p7-t2-analyzers.md`,
   `<FEATURE>/evidence/qa-gates/p7-t3-nullable.md`, `<FEATURE>/evidence/qa-gates/p7-t4-tests-coverage.md`,
   `<FEATURE>/evidence/qa-gates/p7-t5-tests-ci-verbatim.md` and
@@ -1381,7 +1381,7 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   single pass; and both msbuild artifacts record `Skipping target "CoreCompile"` count 0 together with
   `Task "Csc"` count at least 1.
 
-- [ ] [P8-T16] Check off AC15 in `spec.md`, citing
+- [x] [P8-T16] Check off AC15 in `spec.md`, citing
   `<FEATURE>/evidence/baseline/baseline-tests-coverage.md` and
   `<FEATURE>/evidence/qa-gates/p7-t6-coverage-delta.md`. If `BRANCH: UNREACHABLE` was recorded by
   P1-T1, the check-off note in `spec.md` must state, in one sentence, that the two changed lines
@@ -1394,12 +1394,12 @@ touched is what makes a zero `$rewritten` the expected outcome here rather than 
   statement that no exclusion, threshold change or `[ExcludeFromCodeCoverage]` attribute was added;
   and, under `BRANCH: UNREACHABLE`, the check-off note carries the required one-sentence statement.
 
-- [ ] [P8-T17] Check off AC16 in `spec.md`, citing
+- [x] [P8-T17] Check off AC16 in `spec.md`, citing
   `<FEATURE>/evidence/qa-gates/p8-t1-ac16-write-set.md`.
   **Acceptance:** the AC16 bullet reads `- [x]`, and the artifact records an empty "observed minus
   allow-list" set difference and the explicit absence of every named out-of-scope path.
 
-- [ ] [P8-T18] Write the acceptance-criteria status summary at
+- [x] [P8-T18] Write the acceptance-criteria status summary at
   `<FEATURE>/evidence/issue-updates/ac-status-summary.<timestamp>.md`, listing all 16 criteria with
   their final state and the artifact path that establishes each. Record `PostedAs: unknown` unless the
   orchestrator posts it, and mirror nothing into `issue.md` (this feature must not edit `issue.md`).
