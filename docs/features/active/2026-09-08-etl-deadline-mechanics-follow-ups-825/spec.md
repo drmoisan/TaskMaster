@@ -38,6 +38,7 @@ Files this feature creates or modifies. This list is the change footprint.
 - `UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsEtlClockTests.cs`
 - `UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs` (new file)
 - `UtilitiesCS.Test/Threading/TimeOutTask_Tests.cs`
+- `UtilitiesCS.Test/Extensions/DfDeedleEtlTimeoutTests.cs` (timer-ordering update only; added 2026-09-09, see AC6)
 - `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
 
 UtilitiesCS/UtilitiesCS.csproj is **not** in the write set: this feature adds no new production
@@ -192,11 +193,25 @@ this document. Do not add code spans to them.
   UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs (817); .editorconfig,
   BannedSymbols.txt, the two Console.WriteLine diagnostics described below, and every Console.SetOut
   restore in test classes (826).
-- **The three tests that reach the 2000 ms window through DfDeedle.** UtilitiesCS.Test/Extensions/
-  DfDeedleEtlTimeoutTests.cs and UtilitiesCS.Test/Extensions/DfDeedle_COM_Tests.cs already supply a
-  `FakeTimeProvider` to `GetEmailDataInViewAsync` (DfDeedleEtlTimeoutTests.cs lines 153 and 199,
-  DfDeedle_COM_Tests.cs line 478). Once DfDeedle forwards that provider, those three tests become
-  deterministic with **no edit at all**. They must stay out of the diff.
+- **Two of the three tests that reach the 2000 ms window through DfDeedle.** UtilitiesCS.Test/
+  Extensions/DfDeedleEtlTimeoutTests.cs and UtilitiesCS.Test/Extensions/DfDeedle_COM_Tests.cs already
+  supply a `FakeTimeProvider` to `GetEmailDataInViewAsync` (DfDeedleEtlTimeoutTests.cs lines 153 and
+  199, DfDeedle_COM_Tests.cs line 478). Once DfDeedle forwards that provider,
+  DfDeedleEtlTimeoutTests.cs line 187 and DfDeedle_COM_Tests.cs line 473 become deterministic with no
+  edit, because neither counts arming signals. Both must stay out of the diff, and DfDeedle_COM_Tests.cs
+  must not appear in the diff at all.
+  **Amended 2026-09-09.** The test at DfDeedleEtlTimeoutTests.cs line 135 is the exception and does
+  need an edit; it is no longer covered by this non-goal. That test drives the call with an
+  `ArmingBarrierTimeProvider` (constructed at line 141, passed at line 153) and consumes arming
+  signals in a fixed order, awaiting at line 158, re-arming at line 159, awaiting again at line 164
+  and advancing 250 ms at line 165. Threading the provider into `GetTableInViewAsync` makes the
+  table-acquisition deadline create a timer on that same barrier — table acquisition at DfDeedle.cs
+  line 148 runs before AddQfcColumnsAsync at line 168 and EtlAsync at line 172 — so the acquisition
+  timer becomes the first signal and every later expectation shifts by one. The barrier's `Armed`
+  latch (UtilitiesCS.Test/TestHelpers/ArmingBarrierTimeProvider.cs line 47 signals on every
+  `CreateTimer`) drops a signal whenever two timers arm inside one await window, so the ordering
+  cannot be recovered by adding awaits alone: one test-owned gate per timer is required. The edit is
+  therefore a deliberate, scoped timer-ordering update, listed in the Write Set and bounded by AC6.
 - **Rewriting historical records.** The past-tense mention of the removed static in
   UtilitiesCS.Test/Extensions/DfDeedleEtlTimeoutTests.cs line 212 is historically accurate and needs
   no change; every occurrence under docs/features/** is a historical record and must not be
@@ -490,8 +505,9 @@ no soak.**
 
 See the Write Set section. In summary: three production files carry behaviour changes
 (TableAccess.cs, Etl.cs, TimeOutTask.cs), two carry comment or single-argument changes (DfDeedle.cs,
-DfDeedle.QfcColumns.cs), three existing test files are edited, one test file is added, and the test
-project file gains one compile item.
+DfDeedle.QfcColumns.cs), four existing test files are edited (OlTableExtensions_Tests.cs,
+OlTableExtensionsEtlClockTests.cs, TimeOutTask_Tests.cs and, per the 2026-09-09 AC6 amendment,
+DfDeedleEtlTimeoutTests.cs), one test file is added, and the test project file gains one compile item.
 
 ### Functions/classes impacted
 
@@ -642,10 +658,16 @@ file in this feature are deletions and in-place updates only.
 - OlTableExtensionsEtlClockTests.cs lines 99-103 — doc comment only; assertions unchanged.
 - OlTableExtensions_Tests.cs lines 984-1015 and TimeOutTask_Tests.cs lines 191-214 — deleted with the
   code they cover.
-- DfDeedleEtlTimeoutTests.cs and DfDeedle_COM_Tests.cs — **no change**. Their existing
+- DfDeedle_COM_Tests.cs and DfDeedleEtlTimeoutTests.cs line 187 — **no change**. Their existing
   `FakeTimeProvider` arguments become effective on the table-acquisition deadline automatically once
-  DfDeedle forwards the provider. Their continued passing is itself evidence that item 2 is wired
-  correctly.
+  DfDeedle forwards the provider, and neither consumes arming signals. Their continued passing is
+  itself evidence that item 2 is wired correctly.
+- DfDeedleEtlTimeoutTests.cs line 135 — **timer-ordering update only**, per the amended non-goal
+  above and AC6. `BuildExplorer` gains one leading gate parameter invoked inside its `GetTable` setup,
+  and the test gains a third `ManualResetEventSlim` plus one further await/re-arm pair so that exactly
+  one timer arms inside each await window: acquisition, then column-add, then the ETL hop. The two
+  other tests in the class pass an empty lambda for the new gate. No assertion in the class changes,
+  and the historically accurate past-tense mention at line 212 is not touched.
 
 ### Determinism requirements
 
@@ -725,9 +747,23 @@ or a named captured artifact.
       exists in `UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs`, uses
       `ArmingBarrierTimeProvider`, and passes. Its `await barrier.Armed` cannot complete unless the
       deadline timer was created on the injected provider.
-- [ ] **AC6** — DfDeedle.cs line 148 passes its `timeProvider` to `GetTableInViewAsync`, and neither
-      DfDeedleEtlTimeoutTests.cs nor DfDeedle_COM_Tests.cs appears in this feature's diff, while both
-      classes still pass.
+- [ ] **AC6** — DfDeedle.cs line 148 passes its `timeProvider` to `GetTableInViewAsync`;
+      DfDeedle_COM_Tests.cs is absent from this feature's diff; DfDeedleEtlTimeoutTests.cs appears in
+      the diff only as the bounded timer-ordering update described in Test Strategy, adding no
+      assertion and removing none; and both classes still pass.
+      **Amended 2026-09-09** to remove an obligation that could not be met. The original wording
+      required DfDeedleEtlTimeoutTests.cs to be absent from the diff while still passing. Threading
+      the provider into `GetTableInViewAsync` inserts the table-acquisition timer as the first arming
+      signal on the `ArmingBarrierTimeProvider` that the test at line 135 consumes in a fixed order,
+      and the barrier's latch drops a signal whenever two timers arm inside one await window. The
+      test's `barrier.Advance(250)` at line 165 would then run before the 250 ms ETL timer exists,
+      firing nothing; because the assertion at lines 168-172 sits inside the `try`, the `finally` at
+      lines 174-179 never releases the gates, so the failure mode is a hang rather than a clean
+      failure. No implementation choice avoids this: a deadline under the caller's clock is a timer on
+      that clock. The alternative — not forwarding the provider from DfDeedle.cs line 148 — was
+      rejected because it falsifies this criterion's first clause and the AC34 invariant, and leaves
+      the production table-acquisition deadline on the system clock, which is the defect item 2 exists
+      to close.
 - [ ] **AC7** — Test `GetTableInViewAsync_TimeoutRetry_UsesCallerTimeoutMsNotLiteral2000` passes, and
       a fail-before record showing it failing against the pre-change file is captured under the
       feature evidence folder (kind: regression-testing).
@@ -773,8 +809,13 @@ or a named captured artifact.
 - [ ] **AC19** — A search of DfDeedle.QfcColumns.cs for `TableEtlInvoker` returns no hit, the
       corrected sentence names `DefaultTableEtl` or the `etl` parameter on `GetEmailDataInView`, and
       the CS1769 rationale sentence is retained.
-- [ ] **AC20** — DfDeedleEtlTimeoutTests.cs and every file under docs/features/** other than this
-      feature's own documents are absent from the diff.
+- [ ] **AC20** — DfDeedle_COM_Tests.cs and every file under docs/features/** other than this
+      feature's own documents are absent from the diff, and DfDeedleEtlTimeoutTests.cs appears only as
+      the bounded timer-ordering update AC6 permits.
+      **Amended 2026-09-09** for the same measured reason recorded under AC6. The
+      docs/features/** clause is unchanged and remains the binding one: no promotion record, no
+      potential entry, no epic manifest edit and no sibling feature folder may appear in this
+      feature's diff.
 
 **Item 6 — `[DoNotParallelize]`**
 
