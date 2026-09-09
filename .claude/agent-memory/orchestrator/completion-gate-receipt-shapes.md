@@ -89,6 +89,36 @@ Workaround that passed: keep `delegation_receipts` as `{"promotion": {...}}` onl
 per-phase receipts to a sibling top-level key (`phase_delegations`) with a one-line note saying why.
 Plain validation plus `--require-model-routing` then returns `ok:true`.
 
+#### CORRECTION 2026-09-09 (preparation child #815): the MCP validator DOES accept `agents`
+
+The paragraph above is too strong and cost me a needless workaround on an earlier run. Measured on
+this date, `mcp__drm-copilot__validate_orchestration_artifacts --artifact-type orchestrator-state`
+with `require_model_routing: true` returned `ok:true` against
+`delegation_receipts: {"agents": [ ...six receipts... ], "promotion": {...}}`. `agents` is accepted,
+matching the earlier paragraph in this file and not the "only accepted key is `promotion`" claim.
+Prefer the `{agents, promotion}` object form; only fall back to a `phase_delegations` sibling key if
+a validator version actually rejects `agents`.
+
+Two further relaxations measured the same day:
+
+- **Extra keys inside a receipt are ignored.** Each receipt carried `phase`, `model`, `directive`,
+  `round`, `summary` and `completed_at` alongside the required set, and none was rejected. The
+  validator checks for the PRESENCE of its required keys, not for the absence of others. So the
+  "there is no `phase` key" note above means only that `phase` is not *required* — it is not
+  prohibited, and a receipt may carry it for human readability.
+- **The error output is a complete, per-index list.** A failure prints
+  `Checkpoint delegation receipt #N missing key: <key>` for every missing key of every receipt at
+  once, so one failed call tells you the whole required set. Read that output instead of guessing key
+  names one at a time.
+
+The seven keys it demanded here were `step`, `agent_name`, `agent_id`, `skill_source`, `started_at`,
+`result_signal`, `artifact_paths`. `completed_at` was supplied and not complained about, so the
+eight-key list above remains the safe thing to write.
+
+`agent_id` need not be a harness agent ID. Descriptive stable strings
+(`atomic-planner-round-2`, `atomic-executor-preflight-round-3`) validate, and they avoid copying
+internal harness identifiers into a tracked artifact.
+
 ### `--require-complete` is NOT the operative gate for an epic child
 
 It demands the full route-large matrix: agent receipts for `task-researcher`, `prd-feature`,
