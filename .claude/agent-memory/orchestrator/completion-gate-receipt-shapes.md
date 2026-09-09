@@ -145,3 +145,39 @@ The gates that actually govern an epic child are `enforce-pr-author-skill.ps1` (
 creation) and `enforce-epic-merge-gate.ps1` (on PR merge) — both of which pass on the plain schema.
 Record a `completion_gate_divergence` block explaining the refusal and move on; never fabricate a
 receipt to clear it.
+
+### Refinement (epic child #823, 2026-09-09): clear 10 of the 12, and know exactly which 2 remain
+
+The "cannot satisfy it honestly" conclusion above is right but too coarse — it invites skipping the
+whole gate. Measured on a `route_id: "epic"` child, `validate-orchestrator-output.ps1` reports **12**
+errors, and **10 of them clear truthfully** in about one edit:
+
+- set `required_agents` / `required_skills` / `required_mcp_tools` to the exact route-`epic` lists in
+  `config/orchestration-routing.json` (read them; the epic block is at ~line 122). This is a contract
+  *declaration*, not a claim of work done;
+- add a `skill_receipts[]` row per required skill with `required: true` and a real `evidence` string.
+  All eight route-`epic` skills are genuinely applied by a child that executes a plan and opens a PR;
+- add `mcp_call_receipts[]` for `collect_pr_context` and `validate_orchestration_artifacts`, both of
+  which a child really does call with `ok:true`.
+
+Note the route-`epic` matrix demands **no promotion MCP tools**, so the `new_potential_bug_entry`
+swap divergence documented above does not bite here.
+
+**The irreducible residual is exactly two agent receipts: `orchestrator` and `pr-author`.** The
+route-`epic` `required_agents` is `["orchestrator","pr-author"]`, which is the epic *parent's*
+delegation profile; a child's only real delegation is `atomic-executor`. Neither is fillable honestly:
+
+- `orchestrator` is the agent that owns the checkpoint. A receipt for it asserts a self-delegation
+  that never happened, and `.claude/rules/orchestrator-state.md` confirms the intended reading by
+  excluding `orchestrator` from the delegated-agent set as "the caller, not a delegated subagent".
+- `pr-author` does not exist in the child's agent surface, so the skill runs **inline**. An inline
+  skill run is not a delegation — there is no subagent and no model-selection event. Adding it to
+  `agents` also forces `require_model_routing` to demand a routing receipt, and there the trap bites:
+  `resolve_delegation_model('pr-author','C2','disabled')` returns **sonnet** while opus actually did
+  the authoring, so the only way to make `model` match reality is to inflate the band to C3. Refuse
+  that; record the inline run in `pr_author_receipt` instead.
+
+Relabelling `route_id` to `large` does not help — that matrix wants `task-researcher`, `prd-feature`
+and `atomic-planner`, which the epic-planner preparation run performed, not the child. Neither matrix
+fits a child resumed at atomic execution. Fix upstream in drm-copilot; `.claude/` and
+`config/orchestration-routing.json` are push-down-owned here.

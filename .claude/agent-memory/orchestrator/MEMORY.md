@@ -26,6 +26,9 @@
 - [Commit everything before the S9 CI gate](feedback_commit_before_ci_gate.md) · [Commit review artifacts + step8 preflight](feedback_commit_review_artifacts_and_step8_preflight.md)
 - [External actor can merge your PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) · [Migration posture before PR gate](feedback_migration_not_just_patch.md)
 - [Whole-repo CI gate is not out-of-scope](whole-repo-ci-gate-not-out-of-scope.md) · [Flaky CI: PhysicalFileInfoAdapter](project_flaky_ci_physicalfileinfoadapter_test.md)
+- [Local C# gate for a non-C# change](local-csharp-gate-for-a-non-csharp-change.md) — mirror the 2.1GB bootstrap from a sibling worktree; evidence XML already ignored
+- [Executor-blocked AC may be orchestrator-dischargeable](executor-blocked-ac-may-be-orchestrator-dischargeable.md) — check your own tool surface; integration-base PRs don't auto-close
+- [`gh issue create` is hook-blocked](gh-issue-create-blocked-by-promotion-mcp-hook.md) — no file-free promotion route; settle the commit target BEFORE the PR merges
 
 ## Verification discipline
 - [My own negative claims need a scoped search](my-own-negative-claims-need-a-scoped-search.md) — I overturned a correct spec on a grep of the wrong file
@@ -35,14 +38,17 @@
 - [Verify repro before bugfix cycle](feedback_verify_repro_before_bugfix_cycle.md) · [Git-blame regressions first](feedback_gitblame_regressions_before_novel_hypothesis.md)
 - [Re-verify ground truth after a user mid-cycle commit](feedback_reverify_ground_truth_after_user_midcycle_commit.md) · [Evidence timestamps can be synthesized](evidence-timestamps-can-be-synthesized.md)
 - [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — compare against origin/main
+- [Epic child: never anchor a plan on origin/main](epic-child-plan-must-not-anchor-on-origin-main.md) — the merge base sits behind every merged sibling
 - [Three-dot diff degenerates on an ancestor base](three-dot-diff-degenerates-on-ancestor-base.md) — bills sibling merges to your footprint
 - [Merging main invalidates the plan's base anchor](merging-main-invalidates-plan-base-anchor.md) — re-anchor to the merge commit
 - [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) · [Verify reducibility before accepting an exemption count](feedback_verify_reducibility_before_accepting_exemption_count.md)
+- [Piped command's `$?` is the LAST segment](piped-command-exit-code-is-the-last-segment.md) — suspect the measurement before overwriting a memory it contradicts
 
 ## Plans, preflight, delegation
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) · [converges on verbatim delta text](preflight-converges-on-verbatim-delta-text.md) · [may exceed the 2-round target](preflight-rounds-exceed-target-legitimately.md)
 - [Preflight sibling-invalidation cascade](preflight-sibling-invalidation-cascade.md) · [sweep ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) · [defect-trend scope confound](preflight-defect-trend-scope-confound.md)
 - [Absence from a failure list isn't a pass](absence-from-failure-list-is-not-a-pass-gate.md) — pair with a discovery-count control
+- [Count gate broken by the plan's own new names](plan-token-count-gate-broken-by-own-mandated-identifiers.md) — unsatisfiable, not vacuous
 - [Convergence signal is systematically optimistic](convergence-signal-is-systematically-optimistic.md) — budget 3 rounds
 - [Multi-location fact residuals drive rounds](multi-location-fact-residuals-drive-preflight-rounds.md) · [Apply EVERY part of a multi-part delta](apply-every-part-of-a-multipart-delta.md)
 - [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) · [validator requires LF](mcp-plan-validator-requires-lf.md) · [em-dash is version-dependent](mcp-plan-validator-defective-em-dash.md) · [Edit/Write pervasive-diff](mcp-plan-validator-editwrite-pervasive-diff.md)
@@ -66,6 +72,7 @@
 - [Repo-wide coverage: run the FULL suite](feedback_repowide_coverage_run_full_suite.md) · [authority exception](feedback_repowide_coverage_authority_exception.md) · [No exemption when the purpose is testability](feedback_no_coverage_exemption_when_purpose_is_testability.md)
 - [Convert Cobertura to JaCoCo BEFORE commit](cobertura-substitution-must-happen-precommit.md) — intercept before the executor's commit
 - [Coverage mode raw-vs-processed is flake-sensitive](coverage-mode-raw-vs-processed-is-flake-sensitive.md) — re-measure in a detached worktree
+- [Post-processed Cobertura = zero exit, NOT a test result](cobertura-postprocessing-is-a-zero-exit-proxy-not-a-test-result.md) — no .trx exists; re-run the gate
 - [[ExcludeFromCodeCoverage] is INVISIBLE, not 0%](excludefromcodecoverage-invisible-to-coverage-gates.md) — per-file hits-row gates unsatisfiable; METHOD-level leaks
 - [vstest emits TWO .coverage files per run](vstest-emits-two-coverage-files-per-run.md) — need a disambiguation rule
 
@@ -82,6 +89,7 @@
 ## Tooling quirks (Bash / pwsh / hooks)
 - [NEVER `cd X && ...` or grep/sed/cat via Bash](feedback_no_cd_or_non_allowlisted_bash_segments.md) — only `git *`, `pwsh *`, `poetry run *` + 3 lib scripts; EVERY segment must match
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) · [mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) · [collapses `\` before sed](bash-tool-collapses-double-backslash-in-sed.md)
+- [Bash eats `$` in a double-quoted pwsh -Command](bash-expands-dollar-in-double-quoted-pwsh-command.md) — single-quote outside; import modules by ABSOLUTE path
 - [pwsh double-quoted -Command is refused in a worktree](pwsh-double-quoted-command-refused-in-worktree.md) · [grep-count wrapper leaks $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) · [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md)
 - [Worktree isolation blocks pwsh — the SANDBOX, not the agent type](worktree-isolation-blocks-pwsh-per-agent-type.md) — launch execution WITHOUT isolation
 - [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) · [Promotion hook matches commit-message text](promotion-hook-matches-commit-message-text.md)

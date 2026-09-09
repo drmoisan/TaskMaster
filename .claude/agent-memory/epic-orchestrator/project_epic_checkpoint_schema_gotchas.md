@@ -40,7 +40,29 @@ artifact_type `epic-orchestrator-state`). Not documented in the agent/skill §6 
   `epic-child-resume-post-ratification`). The wave-barrier line for that dep persists until the resume
   actually merges — it does NOT clear on the decision alone.
 
+- **`feature_folder` must be the BASENAME, and `depends_on` must hold BASENAMES, not issue_nums.**
+  Verified 2026-09-09 on the review-residuals-2026-09-08 epic by reading
+  `.claude/hooks/enforce-epic-wave-barrier.ps1`. The hook scans the delegation prompt for a
+  `docs/features/active/<...>` token, takes the LONGEST match, strips a trailing `.md` to its parent
+  dir, and extracts the **basename** — then compares that basename to `features[].feature_folder`
+  for **string equality**. A checkpoint storing the full `docs/features/active/<name>` path never
+  matches, `Find-EpicWaveBarrierFeatureRecord` returns `$null`, and
+  `Test-EpicWaveBarrierDependenciesMerged` fails CLOSED, denying EVERY epic child launch —
+  including wave-0 children with an empty `depends_on`, whose edges are trivially satisfiable. The
+  same equality lookup resolves each `depends_on` entry, so the skill's documented issue_num-keyed
+  form (`depends_on: [825]`) also never resolves and permanently denies the dependent. The
+  manifest's own `epic.md` frontmatter uses basenames, so match it. The MCP validator agrees with
+  the basename form (it names both folders in its wave-barrier line), so the two are consistent
+  once you pick basenames. Keep the resolved path in an additive `feature_folder_path` and the
+  issue-num edges in an additive `depends_on_issue_nums` for traceability.
+- **The prompt must literally contain the child's `docs/features/active/<folder>` path.** The hook
+  denies with `EPIC_WAVE_BARRIER_BLOCKED: an epic-mode orchestrator delegation must reference the
+  target feature folder in the prompt` when no such token is present. The marker it gates on is the
+  literal substring `Epic mode: true` with `subagent_type == 'orchestrator'`; anything else passes
+  through untouched.
+
 **Why:** These cost a full discovery pass (reading the bundled TS/Py validator + hooks) on the
-2026-07-19 utilitiescs-nullable-remediation epic run.
+2026-07-19 utilitiescs-nullable-remediation epic run. The basename finding was caught
+pre-emptively on 2026-09-09 by reading the hook BEFORE the first spawn, which is the cheap order.
 **How to apply:** When seeding or resuming an epic checkpoint, include `max_parallel_features` and use
 `feature_folders` in `waves[]`; do not treat mid-flight wave-barrier notices as errors to fix.

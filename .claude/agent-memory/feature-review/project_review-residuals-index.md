@@ -72,3 +72,23 @@ not the full record.
   "every file this plan's diff creates" but lists only the 27 code entries of 81; two plan claims that
   P8-T22 stages the #743 promotion record (it was committed in the branch's FIRST commit `3fc7fafe`);
   P7-T9 writes no evidence artifact; AC18's wording doesn't cover the promoted record that AC16 mandates.
+- **#825** (ETL deadline mechanics): 35/35 AC PASS, 0 blocking. Post-825 processed Cobertura
+  85.6686/79.8366; new-and-changed 20/22 = 90.91%. Reusable moves: (a) **a widened `T?` return type
+  can produce zero nullable warnings because every consumer sits in a nullable-DISABLED file** — the
+  green gate is NOT evidence the propagation was checked. Grep `#nullable` per consumer file; here
+  only `DfDeedle.cs` was enabled (and guarded), while `OlTableExtensions_Tests.cs` enables only
+  `#nullable enable annotations` in 5 narrow scoped regions that miss its `EtlAsync` call site, so
+  `data[0,0]` on a now-nullable value is silently unchecked. (b) When an AC's literal wording is
+  unsatisfiable, an **occurrence-count transition (2 -> 1) plus an anchored diff** is a sound
+  substitute and is more discriminating than the unachievable zero-hit form — grade PASS-with-disclosed-
+  substitution, not PARTIAL, provided it's disclosed in the plan AND the check-off text AND an evidence
+  artifact. (c) A vacuous AC verification (a search that already returned no hit before the change)
+  must be replaced by the substance clause; check the pre-change state before crediting such a search.
+  (d) `ArmingBarrierTimeProvider.Armed` is a **latch**, so it drops a signal when two timers arm inside
+  one await window — threading a provider one hop further inserts a new first signal and breaks any
+  test that consumes signals in a fixed order; the failure mode is a HANG (assertion inside the `try`,
+  gates released only in the `finally`), not a clean failure. (e) `await barrier.Armed` with no
+  `[Timeout]` turns the regression it exists to catch into a hang. Residuals, all non-blocking:
+  `TimeOutTask.cs` 966 lines and `OlTableExtensions_Tests.cs` ~1822 lines both still over the 500 cap
+  (only the former has a recorded follow-up); `spec.md` says 968 lines / 43-line reduction where the
+  measured values are 966 / 45 (`issue.md` and `file-size-accounting.md` are correct).
