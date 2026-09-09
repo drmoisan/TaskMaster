@@ -100,6 +100,38 @@ a pointer that does not exist, and marking it delivered would assert a fact this
 The residual action is for the orchestrator, which has the promotion route available: raise the issue
 using the text below, then check AC14 off citing the resulting issue number and URL.
 
+## RESOLUTION — promotion raised by the orchestrator at 2026-09-09T15-42
+
+The `POSTING BLOCKED` state recorded above was a tool-surface limitation of the executor session, not
+of the run. The orchestrator holds the promotion route and has now exercised it, so the middle clause
+of AC14 is satisfied and the criterion is checked off.
+
+- `PostedAs: body`
+- **Issue number:** 828
+- **Issue URL:** https://github.com/drmoisan/TaskMaster/issues/828
+- **Title:** Bug: claude-md-cut3-names-uninvoked-coverage-command
+- **State at creation:** OPEN
+- **Work mode:** minor-audit. **Promotion type:** bug.
+- **Potential entry:** `docs/features/potential/2026-09-09-claude-md-cut3-names-uninvoked-coverage-command.md`
+- **Promoted record:** `docs/features/potential/promoted/2026-09-09-claude-md-cut3-names-uninvoked-coverage-command.md`
+
+Fidelity check, per the promotion tooling's section-mapping behaviour: the issue body is 3383 bytes
+and contains zero occurrences of the literal `not provided in potential file`, so every canonical
+bug-template section carried through with its content intact. The ownership caveat — that `CLAUDE.md`
+ownership between this repository and `drm-copilot` must be settled before any edit, because
+everything under `.claude/` other than `agent-memory/` is pushed down with no templating — is carried
+in the issue body itself under `## Suspected Cause / Notes`, so the reader who picks up issue 828
+does not need this feature folder.
+
+Scope note: creating the promotion wrote two files under `docs/features/potential/`. That prefix is
+one of the five permitted prefixes of plan decision D6, whose Deviation 2 anticipates exactly this
+case and admits the prefix because AC14 requires a promotion and this repository's promotion
+lifecycle is file-based. The AC13 scope gate is therefore unaffected, and it was re-verified against
+the committed tree after this promotion landed.
+
+`EXIT_CODE: 0` for the promotion route. The `Command:` field at the head of this artifact records the
+executor's blocked attempt and is left unaltered as the audit trail of that attempt.
+
 ## CLAUDE.md is not modified by this branch
 
 This feature makes no change to `CLAUDE.md`. The companion assertion — that `CLAUDE.md` is absent

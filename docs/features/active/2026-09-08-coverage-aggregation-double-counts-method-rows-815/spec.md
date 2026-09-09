@@ -550,7 +550,7 @@ reused.
       production and test file, and every historical plan or evidence document carrying the
       descendant-axis snippet are unmodified. The diff listing is recorded in this feature's
       evidence/qa-gates/ folder.
-- [ ] **AC14 - The CLAUDE.md CUT3 wording mismatch is handed off, not fixed here.** The mismatch
+- [x] **AC14 - The CLAUDE.md CUT3 wording mismatch is handed off, not fixed here.** The mismatch
       between CUT3 step 4 and the dotnet-coverage route is recorded in this feature's evidence with
       a pointer to a separate promotion or issue raised for it, and CLAUDE.md does not appear in
       this branch's diff.

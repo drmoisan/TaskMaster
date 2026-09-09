@@ -28,11 +28,32 @@ EXIT_CODE: 0
 | AC11 | **PASS** | `evidence/baseline/p0-t3-file-line-counts.md`; `evidence/qa-gates/p4-t5-file-line-counts.md` | Before-and-after counts for every Write Set file; largest count in the folders is 496. |
 | AC12 | **PASS** | `evidence/qa-gates/p4-t6-threshold-unchanged-gate.md`; `evidence/qa-gates/p5-t8-coverage-comparison.md` | Threshold script byte-identical by SHA-256; the 80-versus-85 line-floor divergence recorded as a finding, not actioned. |
 | AC13 | **PASS** | `evidence/qa-gates/p4-t7-scope-boundary.md`; `evidence/qa-gates/p5-t10-final-tree.md` | All listed paths within the five permitted prefixes; all eight prohibitions verified absent. |
-| AC14 | **PARTIAL** | `evidence/other/p4-t8-claude-md-cut3-handoff.md` | See the unmet clause below. |
+| AC14 | **PASS** | `evidence/other/p4-t8-claude-md-cut3-handoff.md` | Resolved by the orchestrator at 2026-09-09T15-42; issue 828 raised. See the resolution below. |
 
 All fourteen rows name an artifact that exists on disk.
 
-## The unmet clause, stated in full
+## AC14 — resolved at 2026-09-09T15-42 (supersedes the PARTIAL recorded at 2026-09-09T11-46)
+
+The middle clause is now satisfied. The orchestrator holds the promotion route that the executor
+session lacked, and exercised it after the executor returned:
+
+- **Issue 828** — https://github.com/drmoisan/TaskMaster/issues/828, state OPEN, title
+  `Bug: claude-md-cut3-names-uninvoked-coverage-command`, promoted as type `bug` in `minor-audit`
+  mode from `docs/features/potential/2026-09-09-claude-md-cut3-names-uninvoked-coverage-command.md`.
+- The issue body is 3383 bytes and carries zero `not provided in potential file` placeholders, so
+  every canonical bug-template section survived promotion with its content intact. The ownership
+  caveat about `CLAUDE.md` versus `drm-copilot` is inside the issue body, not only in this folder.
+- `evidence/other/p4-t8-claude-md-cut3-handoff.md` now carries the issue number and URL under its
+  `## RESOLUTION` heading, which is the pointer AC14 requires.
+
+All three AC14 clauses therefore hold: the mismatch is recorded in this feature's evidence, a pointer
+to a separately raised issue exists, and `CLAUDE.md` does not appear in this branch's diff. AC14
+reads `- [x]` in `spec.md` and plan task P6-T14 is checked off.
+
+The section below is retained unaltered as the audit trail of the state the executor recorded and
+correctly declined to overstate.
+
+## The unmet clause as recorded at 2026-09-09T11-46, since resolved
 
 **AC14.** The criterion reads: "The mismatch between CUT3 step 4 and the dotnet-coverage route is
 recorded in this feature's evidence **with a pointer to a separate promotion or issue raised for
@@ -65,16 +86,14 @@ citing the resulting issue number and URL.
 ### Acceptance Criteria Status
 - Source: docs/features/active/2026-09-08-coverage-aggregation-double-counts-method-rows-815/spec.md
 - Total AC items: 14
-- Checked off (delivered): 13
-- Remaining (unchecked): 1
-- Items remaining: AC14 - The CLAUDE.md CUT3 wording mismatch is handed off, not fixed here.
-  Unmet clause: "with a pointer to a separate promotion or issue raised for it". No promotion or
-  issue was raised, because the MCP promotion route is not present in this executor's tool surface.
-  The other two clauses of AC14 are satisfied.
+- Checked off (delivered): 14
+- Remaining (unchecked): 0
+- Items remaining: none
 ```
 
-Output Summary: 14 acceptance criteria evaluated. 13 PASS and 1 PARTIAL. AC1 through AC13 are checked
-off in `spec.md`, each citing an artifact that exists on disk. AC14 is left unchecked; its unmet
-clause is the pointer to a raised promotion, which this executor could not create because the
-promotion MCP tool is absent from its tool surface. No assertion was weakened and no threshold was
-changed to reach any of the thirteen passes.
+Output Summary: 14 acceptance criteria evaluated, 14 PASS, 0 remaining. AC1 through AC13 were checked
+off by the executor, each citing an artifact that exists on disk. AC14 was recorded PARTIAL by the
+executor because the promotion MCP route is absent from its tool surface, and was resolved by the
+orchestrator, which raised issue 828 and recorded the pointer in
+`evidence/other/p4-t8-claude-md-cut3-handoff.md`. No assertion was weakened, no threshold was
+lowered, and no criterion was checked off ahead of the evidence that discharges it.
