@@ -4,8 +4,19 @@
 - **Parent (optional):** epic review-residuals-2026-09-08, child F825
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-09
-- **Status:** Awaiting executor preflight (revision round 5)
-- **Version:** 1.4 — round 5 applied the six-defect third-preflight delta, D-25 through D-30:
+- **Status:** Awaiting executor preflight (revision round 6)
+- **Version:** 1.5 — round 6 applied the two-defect fourth-preflight delta, D-31 and D-32, and two
+  further instances the planner's own sweeps found. D-31 carried the Cobertura per-filename
+  derivation rule already stated at P0-T9 and P8-T7 to the third reader of the same data, P8-T9,
+  whose ChangedLinesCovered figure is otherwise sensitive to which of the two repeated line views
+  and which class element is read. D-32 stopped P7-T1 writing the pre-change line number 1646 into
+  a permanent source comment that P3-T9 and P4-T3 have already moved, and named the test by its
+  method name instead. The sweep for that second class found two more permanent-source cases and
+  closed both the same way: P6-T1's budget comment cited OlTableExtensions.Etl.cs lines 127-130
+  while inserting itself above line 84, and P7-T4's reason comment cited TimeOutTask_Tests.cs lines
+  27-37 and 40-50 while inserting itself above line 10, so each range moved by the height of the
+  comment that cited it. Round 6 changed no task count, added no task and moved no identifier.
+  Round 5 applied the six-defect third-preflight delta, D-25 through D-30:
   instruction scope widened to reach a third Item1 read at P5-T4; derived-figure rules added at
   P0-T9 and P8-T7 for Cobertura elements that carry no line counters; the test-assembly exclusion
   mechanism at P8-T7 corrected from the run-time module pattern to the first-party allowlist; the
@@ -794,10 +805,20 @@ the captured output does not support, fails the task.
 
 ### Phase 6 — Items 1 and 5: Budget Rationale and the Stale Doc Comment
 
-- [ ] [P6-T1] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs — add the budget rationale comment immediately above the per-row budget expression inside EtlAsync, without altering that expression or its numeric literal, recording three facts: that the value rests on no recorded measurement; that no measurement is obtainable in this environment because there is no benchmark harness in any project file and the fixtures are Moq objects whose GetRowCount, GetNextRow and GetArray return in microseconds; and the live-Outlook capture route by name, namely the LogTableTiming EtlAsync-complete payload carrying rowCount and elapsedMs emitted at lines 127-130 together with the log4net root level ALL set at TaskMaster/log4net.config line 4.
+- [ ] [P6-T1] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs — add the budget rationale comment immediately above the per-row budget expression inside EtlAsync, without altering that expression or its numeric literal, recording three facts: that the value rests on no recorded measurement; that no measurement is obtainable in this environment because there is no benchmark harness in any project file and the fixtures are Moq objects whose GetRowCount, GetNextRow and GetArray return in microseconds; and the live-Outlook capture route by name, namely the LogTableTiming EtlAsync-complete payload carrying rowCount and elapsedMs, together with the log4net root level ALL set at TaskMaster/log4net.config line 4.
+      The comment names that payload by the LogTableTiming method name and carries no line-number
+      citation into UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs. The executor reads the
+      payload at pre-change lines 127-130 of that file, but this task inserts its comment block above
+      the budget expression at pre-change line 84, so those four lines move down by the height of the
+      comment as it is written, and P8-T1's format pass can move them again. A line number for this
+      file written into the comment would therefore be stale before this task finishes, and unlike the
+      artifact re-derivations at P3-T21, P6-T3 and P8-T13 it would persist in permanent source after
+      this feature merges. The TaskMaster/log4net.config line 4 citation is unaffected and may be
+      written: that file is outside this feature's Write Set and no task in this plan edits it.
       Acceptance: the file contains exactly one occurrence of the token `250 * rowCount`; the comment
       block immediately above it contains all three of the tokens `no recorded measurement`,
-      `LogTableTiming` and `elapsedMs`; and, using the D3 anchor,
+      `LogTableTiming` and `elapsedMs`; that comment block contains zero lines matching the regular
+      expression `lines? [0-9]+-[0-9]+`; and, using the D3 anchor,
       `git diff $b -- UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs` produces exactly one
       removed line matching the regular expression `250 \* rowCount` and zero added lines matching it.
       Exactly one removed line, not zero: P4-T2 deleted EtlAsyncOld, whose pre-change line 149 carried
@@ -832,10 +853,20 @@ This phase runs last among the editing phases. Its first edit is gated on the AC
 completed at P3-T21, which established that no test in OlTableExtensions_Tests still arms a real
 timed source on the system clock.
 
-- [ ] [P7-T1] UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs — replace the class comment at lines 18-20 with one recording what changed: the class contains four tests calling GetTableInViewAsync, not ten; the test at line 1646 now supplies a FakeTimeProvider so no wall-clock deadline governs any test in the class; and the attribute is therefore removed.
+- [ ] [P7-T1] UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs — replace the class comment at lines 18-20 with one recording what changed: the class contains four tests calling GetTableInViewAsync, not ten; GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot now supplies a FakeTimeProvider so no wall-clock deadline governs any test in the class; and the attribute is therefore removed.
+      The replacement comment names that test by its method name and carries no line-number
+      citation. Its declaration sat at pre-change line 1646, but P3-T9 added a type entry and a
+      trailing argument at each of the three earlier binding sites and P4-T3 deleted the EtlAsyncOld
+      test above it, so 1646 is no longer where it sits. Writing that number into permanent source
+      would reproduce the defect this task exists to correct: the comment being replaced is wrong
+      precisely because it states a fact about the file that the file no longer carries. Lines 18-20
+      are themselves unmoved, because every edit this plan makes to this file before this task is
+      below them.
       Acceptance: the file contains zero lines matching the token `soak`, down from one before this
-      feature; the replacement comment contains the token `FakeTimeProvider`; and the comment asserts
-      no population of tests driving the 2000 ms window.
+      feature; the replacement comment contains the token `FakeTimeProvider` and the token
+      `GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot`; the replacement
+      comment contains zero lines matching the regular expression `line [0-9]`; and the comment
+      asserts no population of tests driving the 2000 ms window.
 
 - [ ] [P7-T2] UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs — remove the DoNotParallelize attribute, leaving the TestClass attribute that follows it in place. The attribute sits at pre-change line 21 with TestClass at pre-change line 22; P7-T1 has already replaced the three-line class comment above them, so both are located by content rather than by line number.
       Acceptance: the file contains zero occurrences of the token `[DoNotParallelize]` and exactly one
@@ -848,11 +879,21 @@ timed source on the system clock.
       used to govern. The zero value of RunsObserved is the machine-checkable form of the criterion
       forbidding a soak: the justification is the code change, not observed green runs.
 
-- [ ] [P7-T4] UtilitiesCS.Test/Threading/TimeOutTask_Tests.cs — add the verified reason comment on the lines immediately above the DoNotParallelize attribute at line 10 and below the TestClass attribute at line 9, naming the two wall-clock races in the class: the 200-millisecond delay raced against a 10-millisecond timeout at lines 27-37 and the 50-millisecond delay raced against a zero timeout at lines 40-50.
+- [ ] [P7-T4] UtilitiesCS.Test/Threading/TimeOutTask_Tests.cs — add the verified reason comment on the lines immediately above the DoNotParallelize attribute at line 10 and below the TestClass attribute at line 9, naming the two wall-clock races in the class: the 200-millisecond delay raced against a 10-millisecond timeout, and the 50-millisecond delay raced against a zero timeout.
+      The comment names each race by its Task.Delay literal and its timeout argument and carries no
+      line-number citation. The executor finds the two tests at pre-change lines 27-37 and 40-50,
+      declared under TestMethod attributes at 26 and 39, and P4-T4's deletions at pre-change lines
+      190-215 sit below both and move neither. This task's own comment lines are inserted between the
+      TestClass attribute at line 9 and the DoNotParallelize attribute at line 10, which is above both
+      ranges, so writing either range into the comment makes it stale by the height of the comment
+      itself, and P8-T1's format pass can move both again. As at P7-T1, that stale figure would
+      persist in permanent source after this feature merges rather than in an artifact a later task
+      re-derives.
       Acceptance: the file still contains exactly one occurrence of the token `[DoNotParallelize]`;
       the comment lines immediately preceding it contain both of the tokens `Task.Delay(200)` and
-      `Task.Delay(50)`; and the line number of the DoNotParallelize occurrence is strictly greater
-      than the line number of the TestClass occurrence.
+      `Task.Delay(50)`; those comment lines contain zero lines matching the regular expression
+      `lines? [0-9]+-[0-9]+`; and the line number of the DoNotParallelize occurrence is strictly
+      greater than the line number of the TestClass occurrence.
 
 - [ ] [P7-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac23-attributes-retained.md — verify the two classes that keep their attributes are untouched, then write this artifact.
       Acceptance: UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsEtlClockTests.cs contains
@@ -1042,6 +1083,21 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       reconciliation does not close, the artifact records the residual and this task fails.
 
 - [ ] [P8-T9] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-changed-line-coverage.md — compute changed-line coverage by taking the added-line numbers for each edited production file from `git diff $b --unified=0` using the D3 anchor, intersecting each file's set with the line elements of evidence/qa-gates/coverage-postchange.cobertura.xml aggregated by filename, and reporting covered over total, then write this artifact.
+      The per-filename line data is derived, not read directly. Each class element repeats every
+      line number twice, once under methods/method/lines and once in the class-level lines rollup,
+      and a single source file is split across several class elements because an async method
+      compiles to its own state machine class. Build each file's line map with
+      Get-CoberturaClassLineSummary, declared at
+      scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 line 158, over every class element whose
+      filename attribute ends in that file's name, and merge the resulting maps by line number,
+      resolving a line number that appears in more than one map by taking the maximum hits value.
+      That is the same derivation P0-T9 and P8-T7 use, and it is required here for the same reason:
+      a line read from one class element, or from one of the two repeated views, can carry a hits
+      value that a sibling entry for the same line contradicts, and
+      UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs carries most of this
+      feature's changed lines inside an async method, which is exactly the case that produces more
+      than one class element for one filename. A line is counted in ChangedLinesCovered: when its
+      merged hits value is greater than zero.
       Acceptance: the artifact carries `Timestamp:`, one `File:` block per edited production file with
       `ChangedLines:`, `ChangedLinesCovered:` and a `ChangedLineRate:` that is a decimal when
       `ChangedLines:` is greater than zero and the literal `n/a` when it is zero, and an overall
