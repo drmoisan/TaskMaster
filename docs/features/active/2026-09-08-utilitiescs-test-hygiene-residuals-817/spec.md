@@ -339,9 +339,9 @@ matches zero tests and exits `0` with "No test matches," silently masking a brok
       before the split and exactly 39 `FolderPredictorTests.*` tests after the split, with identical
       fully-qualified method names on both sides. A source grep alone, without the discovery run, is
       not sufficient evidence.
-- [ ] The type name `FolderPredictorTests` is identical, verbatim, across all 5 files, and only
+- [x] The type name `FolderPredictorTests` is identical, verbatim, across all 5 files, and only
       `FolderPredictorTests.cs` carries the `[TestClass]` and `[DoNotParallelize]` attributes.
-- [ ] Both nested helper classes (`TestableFolderPredictor`, `ImmediateSynchronizationContext`) and
+- [x] Both nested helper classes (`TestableFolderPredictor`, `ImmediateSynchronizationContext`) and
       all 5 shared private static helper methods (`CreateApplication`, `CreateFolder`,
       `CreateFoldersCollection`, `CreateGlobals`, `GetLeafName`) are preserved exactly, relocated to
       `FolderPredictorTests.TestSupport.cs`, with no visibility changes required for other split
