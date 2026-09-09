@@ -457,30 +457,30 @@ reused.
 
 ## Acceptance Criteria
 
-- [ ] **AC1 - A committed, callable de-duplicated first-party aggregation exists.** A PowerShell
+- [x] **AC1 - A committed, callable de-duplicated first-party aggregation exists.** A PowerShell
       function defined in a file under `scripts/vscode/` accepts a Cobertura document and returns
       the first-party covered and valid line and branch counts. It resolves after dot-sourcing
       `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` alone. It obtains per-class figures by
       calling `Get-CoberturaClassLineSummary` or `Get-CoberturaPackageLineSummary` rather than
       re-deriving the de-duplication rule, and it introduces no second definition of that rule.
-- [ ] **AC2 - The counting rule is stated as an invariant and matched by the delivered code.** The
+- [x] **AC2 - The counting rule is stated as an invariant and matched by the delivered code.** The
       function's comment-based help states the invariant from Root Cause Analysis verbatim in
       substance: each (class, source line number) pair is counted exactly once, so the four counts do
       not depend on whether a source line also appears under a `<method>` element. The four numbered
       trace steps in Root Cause Analysis describe the defect the delivered implementation removes,
       and no step of that trace remains reachable from the new code path.
-- [ ] **AC3 - The descendant-axis selection is absent from the delivered scripts and tests.** A
+- [x] **AC3 - The descendant-axis selection is absent from the delivered scripts and tests.** A
       case-sensitive search for the literal `.//line` over `scripts/vscode/` returns zero matches
       after the change, matching the verified pre-change baseline of zero. Under
       `tests/scripts/vscode/` the only permitted occurrences are inside the differential test
       required by AC6, which reproduces the defective selection deliberately in order to fail
       against it.
-- [ ] **AC4 - The first-party allowlist is derived, not hard-coded.** The new function's allowlist
+- [x] **AC4 - The first-party allowlist is derived, not hard-coded.** The new function's allowlist
       parameter defaults to `Get-KoverageProjectAllowlist` and the delivered code under
       `scripts/vscode/` contains no literal list of production assembly names. A test supplies an
       explicit override and asserts that a package outside the override is excluded from both the
       numerator and the denominator.
-- [ ] **AC5 - A named Pester test asserts de-duplicated counts over a duplicate-method-row
+- [x] **AC5 - A named Pester test asserts de-duplicated counts over a duplicate-method-row
       fixture.** A test in `tests/scripts/vscode/` uses an in-memory here-string Cobertura fixture
       in which at least one class repeats the same line numbers in both its class-level `<lines>`
       rollup and a method-level `<lines>` block, including at least one branch row carrying
@@ -493,7 +493,7 @@ reused.
       It asserts no rate or percentage, for the reason recorded in Repro & Evidence and in the
       existing comment at `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1` lines
       210-211. The test creates no file on disk.
-- [ ] **AC6 - The test demonstrably fails against the pre-fix aggregation.** The demonstration
+- [x] **AC6 - The test demonstrably fails against the pre-fix aggregation.** The demonstration
       mechanism is a differential assertion inside the same test file: a private test-scoped helper
       reproduces the pinned descendant-axis snippet quoted in Repro & Evidence, is run over the
       identical fixture, and the test asserts that its `BranchesValid` and `LinesValid` are strictly
@@ -501,7 +501,7 @@ reused.
       correct ones for that fixture. The assertion fails if the new function reproduces the
       descendant-axis behavior, so it cannot pass vacuously. The evidence artifact for this
       criterion records both computations' four counts for the fixture.
-- [ ] **AC7 - A corroborating measurement against a committed real Cobertura report is recorded.**
+- [x] **AC7 - A corroborating measurement against a committed real Cobertura report is recorded.**
       Both computations are run over a Cobertura document committed under another feature folder -
       the designated document is
       docs/features/active/2026-09-06-quickfiler-crash-column-add-timeout-swallowed-keynotfound-798/evidence/qa-gates/coverage-final.cobertura.xml -
@@ -510,20 +510,20 @@ reused.
       descendant-axis `lines-valid` is strictly greater than the de-duplicated `lines-valid`. This
       criterion does not require re-deriving the 79.38% or 77.03% figures from issue 809, because
       the report that produced them is not committed.
-- [ ] **AC8 - The entry point reports the aggregate.** `Invoke-MSTestWithCoverageMain` in
+- [x] **AC8 - The entry point reports the aggregate.** `Invoke-MSTestWithCoverageMain` in
       `scripts/vscode/Invoke-MSTestWithCoverage.ps1` writes the four counts and both derived
       percentages to output during a coverage run, and retains its existing
       `Done. Coverage artifact: <path>` line. The reported text is produced by a pure formatting
       function that takes the aggregation result and returns a string, and a Pester test asserts
       that string for a known input without invoking a coverage run.
-- [ ] **AC9 - Format and analyzer gates.** PoshQC format over `scripts/vscode` and
+- [x] **AC9 - Format and analyzer gates.** PoshQC format over `scripts/vscode` and
       `tests/scripts/vscode` returns ok and leaves `git status --porcelain` empty on a re-run.
       PoshQC analyze over `tests/scripts/vscode` returns ok. PoshQC analyze over `scripts/vscode`
       reports no more findings than the pre-change baseline captured in this feature's
       evidence/baseline/ folder on the same branch head, and zero findings are attributed to any file
       this feature adds or modifies. A demand for zero findings across `scripts/vscode` is
       explicitly not made, because the folder carries a pre-existing inherited baseline.
-- [ ] **AC10 - Test and coverage gates.** PoshQC test over `tests/scripts/vscode` returns ok with
+- [x] **AC10 - Test and coverage gates.** PoshQC test over `tests/scripts/vscode` returns ok with
       zero failures and zero errors, and the JUnit total exceeds the pre-change baseline total
       captured in this feature's evidence/baseline/ folder, reflecting the added tests. Coverage for the
       files this feature adds or modifies is measured by a direct Pester run whose code-coverage
@@ -533,18 +533,18 @@ reused.
       artifacts/pester/powershell-coverage.xml is not used: its packages cover only .claude and
       .codex paths and none under the scripts tree, so it cannot measure this feature's changed
       files.
-- [ ] **AC11 - File-size ceiling holds.** Every file under `scripts/vscode/` and
+- [x] **AC11 - File-size ceiling holds.** Every file under `scripts/vscode/` and
       `tests/scripts/vscode/` is at or below 500 physical lines after the change, measured with
       `(Get-Content -LiteralPath <path>).Count`, per .claude/rules/general-code-change.md.
       Before-and-after counts for every file in the Write Set are recorded in this feature's
       evidence/qa-gates/ folder.
-- [ ] **AC12 - No threshold is lowered.** The branch diff changes no threshold constant. In
+- [x] **AC12 - No threshold is lowered.** The branch diff changes no threshold constant. In
       particular `Assert-CoberturaLineCoverageThreshold` in
       scripts/vscode/Invoke-MSTestWithCoverage.Threshold.ps1 retains its existing comparison
       value and its existing failure message. If any figure recomputed during this delivery falls
       below a governing threshold, it is recorded as a finding in this feature's evidence and no
       threshold is changed, per epic Non-Goal 5.
-- [ ] **AC13 - Scope boundary holds.** `git diff --name-only` against the merge-base lists only
+- [x] **AC13 - Scope boundary holds.** `git diff --name-only` against the merge-base lists only
       paths under `scripts/vscode/`, `tests/scripts/vscode/`, and this feature's folder. CLAUDE.md,
       any path under .claude/skills/ or .claude/rules/, .editorconfig, BannedSymbols.txt, every C#
       production and test file, and every historical plan or evidence document carrying the

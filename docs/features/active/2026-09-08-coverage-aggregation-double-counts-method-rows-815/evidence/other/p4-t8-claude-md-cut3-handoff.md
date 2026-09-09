@@ -84,6 +84,22 @@ does not run produces false PARTIAL verdicts on every future item that cites it.
 > handed off rather than fixed in that change. Bundling it would have put a `CLAUDE.md` edit inside a
 > change whose only code surface is three PowerShell files.
 
+## Consequence for AC14, recorded at 2026-09-09T11-45
+
+AC14 requires the mismatch to be "recorded in this feature's evidence **with a pointer to a separate
+promotion or issue raised for it**, and CLAUDE.md does not appear in this branch's diff."
+
+Two of the three clauses are satisfied: the mismatch is recorded here in full, and P4-T7 verified
+individually that `CLAUDE.md` appears in neither the anchored diff nor the porcelain status. **The
+middle clause is not satisfied**: no promotion or issue was raised, so no pointer to one exists, for
+the tool-surface reason stated above.
+
+AC14 is therefore left as `- [ ]` in `spec.md` and reported as PARTIAL. Plan task P6-T14 accepts a
+`POSTING BLOCKED` artifact as sufficient for its own check-off, but the criterion's own text asks for
+a pointer that does not exist, and marking it delivered would assert a fact this run cannot verify.
+The residual action is for the orchestrator, which has the promotion route available: raise the issue
+using the text below, then check AC14 off citing the resulting issue number and URL.
+
 ## CLAUDE.md is not modified by this branch
 
 This feature makes no change to `CLAUDE.md`. The companion assertion — that `CLAUDE.md` is absent
