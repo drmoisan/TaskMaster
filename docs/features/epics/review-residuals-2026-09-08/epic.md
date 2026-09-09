@@ -29,28 +29,28 @@ intent:
     - No production file may be added to a coverage exclusion list to protect a threshold.
 features:
   - issue_num: 813
-    feature_folder: assignfoldercombobox-unguarded-archiverootpath-read
+    feature_folder: 2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813
     depends_on: []
   - issue_num: 815
-    feature_folder: coverage-aggregation-double-counts-method-rows
+    feature_folder: 2026-09-08-coverage-aggregation-double-counts-method-rows-815
     depends_on: []
   - issue_num: 817
-    feature_folder: utilitiescs-test-hygiene-residuals
+    feature_folder: 2026-09-08-utilitiescs-test-hygiene-residuals-817
     depends_on: []
   - issue_num: 821
-    feature_folder: qfchomecontroller-parentcleanup-double-ribbon-release
+    feature_folder: 2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821
     depends_on: []
   - issue_num: 823
-    feature_folder: quickfiler-teardown-review-residuals
+    feature_folder: 2026-09-08-quickfiler-teardown-review-residuals-823
     depends_on: []
   - issue_num: 824
-    feature_folder: ilglobals-loadopcodes-unsynchronised-static-race
+    feature_folder: 2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824
     depends_on: []
   - issue_num: 825
-    feature_folder: etl-deadline-mechanics-follow-ups
+    feature_folder: 2026-09-08-etl-deadline-mechanics-follow-ups-825
     depends_on: []
   - issue_num: 826
-    feature_folder: console-out-aggressors-and-banned-symbol-promotion
+    feature_folder: 2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826
     depends_on: [825]
 ---
 
@@ -96,7 +96,7 @@ Eight open bug issues, one independently mergeable child feature each:
 | `assignfoldercombobox-unguarded-archiverootpath-read` | 813 | `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` | 0 | C2 |
 | `coverage-aggregation-double-counts-method-rows` | 815 | `scripts/vscode/Invoke-MSTestWithCoverage.*.ps1` | 0 | C3 |
 | `utilitiescs-test-hygiene-residuals` | 817 | `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs` | 0 | C2 |
-| `qfchomecontroller-parentcleanup-double-ribbon-release` | 821 | `QuickFiler/Controllers/QfcHomeController.cs`, `UtilitiesCS/Threading/ProgressViewer.cs` | 0 | C3 |
+| `qfchomecontroller-parentcleanup-double-ribbon-release` | 821 | `QuickFiler/Controllers/QfcHomeController.cs`, `QuickFiler/Controllers/EfcHomeController.cs`, `UtilitiesCS/Threading/ProgressViewer.cs`, `UtilitiesCS/Threading/ProgressPane.cs` | 0 | C3 |
 | `quickfiler-teardown-review-residuals` | 823 | `UtilitiesCS/OutlookObjects/Store/StoreWrapperController*.cs`, `QuickFiler/Viewers/Breadcrumb*` | 0 | C3 |
 | `ilglobals-loadopcodes-unsynchronised-static-race` | 824 | `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/` | 0 | C3 |
 | `etl-deadline-mechanics-follow-ups` | 825 | `UtilitiesCS/OutlookObjects/Table/OlTableExtensions.*`, `UtilitiesCS/Threading/TimeOutTask.cs` | 0 | C3 |
@@ -208,3 +208,81 @@ authorizes those two configuration edits. It does not authorize breaking the bui
 them: if the promotion cannot be staged without failing the analyzer gate, feature 826 records
 the constraint and delivers the reachable subset rather than lowering any other gate to
 compensate.
+
+## Preparation Outcome
+
+All eight features are prepared and their preparation is committed on this branch. Each has an
+issue, an active feature folder, research, `spec.md`, an approved atomic plan, and a recorded
+`PREFLIGHT: ALL CLEAR` verified against the child checkpoint on disk rather than accepted from a
+child's summary. `user-story.md` is absent for every feature, which is correct for `full-bug`.
+
+| Issue | Feature folder | Plan | Phases | Preflight |
+| --- | --- | --- | --- | --- |
+| 813 | `2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813` | `plan.2026-09-08T23-49.md` | 10 | ALL CLEAR |
+| 815 | `2026-09-08-coverage-aggregation-double-counts-method-rows-815` | `plan.2026-09-08T23-49.md` | 7 | ALL CLEAR |
+| 817 | `2026-09-08-utilitiescs-test-hygiene-residuals-817` | `plan.2026-09-08T23-50.md` | 5 | ALL CLEAR |
+| 821 | `2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821` | `plan.2026-09-08T23-50.md` | 8 | ALL CLEAR |
+| 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | `plan.2026-09-08T23-50.md` | 7 | ALL CLEAR |
+| 824 | `2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824` | `plan.2026-09-08T23-51.md` | 7 | ALL CLEAR |
+| 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | `plan.2026-09-08T23-51.md` | 10 | ALL CLEAR |
+| 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | `plan.2026-09-08T23-52.md` | 9 | ALL CLEAR |
+
+The `feature_folder` values in the frontmatter above were back-filled from each promotion receipt
+after preparation. They are the concrete directory basenames under `docs/features/active/`, which
+carry a date prefix and an issue suffix that the original decomposition hints did not.
+
+## Execution Preconditions
+
+These constrain how `epic-orchestrator` runs the execution phase. Each was measured during
+preparation; none is a restatement of policy.
+
+1. **Launch every child atomic execution WITHOUT worktree isolation.** `pwsh` is refused for
+   worktree-isolated agents in this environment. Every feature's plan is command-bearing, and three
+   children hit the refusal directly during preparation. Feature 815 alone has fifteen tasks that
+   invoke `pwsh`, and feature 823 records the constraint as `EH1`: an isolated executor fails at its
+   first command-bearing task on a false blocker rather than a real one.
+2. **Feature 826's AC7 resolves against the post-825 tree, by design.** Both `Console.WriteLine`
+   sites that 826 owns are currently unreachable through `RunWithTimeout` under `strict: false`,
+   where only an `OperationCanceledException` escapes and `catch (TaskCanceledException)` cannot
+   catch it. Rather than weakening AC7, 826's plan carries `[P1-T1]`, which re-measures reachability
+   after 825 has executed and records a `BRANCH:` value selecting between two branches its own task
+   text authorizes. If 825 does not change what escapes, the executor takes the UNREACHABLE branch
+   and produces a fail-before exception dossier. This is what makes the single `depends_on` edge
+   load-bearing at execution time.
+3. **Feature 823's diff anchor is computed at execution time.** Its plan self-anchors via `[P0-T2]`
+   rather than naming a fixed base commit. A fixed anchor degenerates as sibling features fan in,
+   which was measured during preparation: a base chosen to prevent exactly that failure had already
+   accumulated twenty-one unrelated paths one generation later.
+4. **Feature 821, contingency path only.** The hang-risk fallback in `[P0-T10]` and `[P6-T5]` writes
+   per-assembly Cobertura files, but `[P0-T11]`, `[P0-T12]`, `[P6-T9]` and `[P6-T10]` hard-code the
+   primary `coverage/coverage.cobertura.xml`. If the fallback triggers, run those queries once per
+   per-assembly file and record per-assembly rather than repository-wide figures.
+5. **Feature 823, late-QC flake.** `[P6-T5]` and `[P6-T6]` lack the intermittent-test carve-out that
+   `[P3-T9]` has, so the known roughly one-in-four flake
+   `Transaction_SecondCallerCannotInstallUntilTheFirstRestores` can halt execution at final QC. The
+   halt is safe and recoverable by re-running.
+
+## Follow-Ups To File After This Epic Merges
+
+Preparation surfaced four defects outside the epic's blast radius. None was filed during
+preparation, because a promotion record under `docs/features/potential/promoted/` would have
+violated the footprint criterion each child's own spec carries. File them through the promotion
+lifecycle once this integration branch merges.
+
+1. **`GetTableInViewAsync` silently returns null on timeout instead of throwing** (from 825, spec
+   AC35). It calls `TimeOutTask.RunWithTimeout` with `maxAttempts: 1` and `strict: false`. On the
+   ordinary timeout path `RunWithTimeout` absorbs the `TaskCanceledException`, exhausts its internal
+   retry, and returns `default(TResult)` without throwing, so neither catch block in
+   `GetTableInViewAsync` is entered, neither retry recursion runs, and the method returns `table!`
+   as null to its caller. Same null-through-suppression class as issue 825 item 3 at a different
+   site, and already acknowledged by a comment in the method.
+2. **`QfcHomeController.CreateCancellationToken()` has no production caller** (from 821, O-4,
+   HIGH). The synchronous `Init()` path at `QfcHomeController.cs:102` therefore passes a null
+   `_tokenSource` to `QfcFormControllerLoader`; `QfcFormController.Actions.cs:38`, `:75` and `:131`
+   early-return on `_tokenSource is null`, so `LoadItems` and `LoadItemsAsync` silently do nothing.
+   `RibbonController.LoadQuickFiler()` at `:97-110` is that path.
+3. **Undisposed cancellation token sources** (from 821, O-3, MEDIUM). The sources constructed at
+   `SubjectMapSco.Orchestration.cs:228` and `ProgressPackage.cs:25` are never disposed by any
+   holder.
+4. **`ProgressTrackerAsync` is dormant production code** (from 821, O-5, LOW). It has no
+   construction site outside its own tests.
