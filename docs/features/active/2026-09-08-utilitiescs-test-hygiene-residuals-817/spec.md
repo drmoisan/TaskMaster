@@ -333,7 +333,7 @@ matches zero tests and exits `0` with "No test matches," silently masking a brok
       `FolderPredictorTests.FolderLookupAndUiSeams.cs`,
       `FolderPredictorTests.CreateFolderWorkflows.cs`, `FolderPredictorTests.TestSupport.cs`) are
       each at most 500 lines.
-- [ ] All 39 original `[TestMethod]`s are preserved with unchanged method bodies, verified by both a
+- [x] All 39 original `[TestMethod]`s are preserved with unchanged method bodies, verified by both a
       static source enumeration and a real `vstest.console.exe /ListTests` discovery run against a
       full rebuild of `UtilitiesCS.Test.dll`, showing exactly 39 `FolderPredictorTests.*` tests
       before the split and exactly 39 `FolderPredictorTests.*` tests after the split, with identical
@@ -356,7 +356,7 @@ matches zero tests and exits `0` with "No test matches," silently masking a brok
       (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`), and the nullable rebuild
       (`/p:TreatWarningsAsErrors=true`) — passes cleanly on all 5 changed/new `.cs` files and the
       modified `.csproj`.
-- [ ] No new test scenarios, coverage areas, or behavioral changes are introduced; every one of the
+- [x] No new test scenarios, coverage areas, or behavioral changes are introduced; every one of the
       39 test bodies is unchanged aside from its relocation to a new file.
 
 ## Risks & Mitigations
