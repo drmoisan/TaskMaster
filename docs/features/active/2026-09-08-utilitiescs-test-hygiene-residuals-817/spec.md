@@ -328,7 +328,7 @@ matches zero tests and exits `0` with "No test matches," silently masking a brok
 
 
 ## Acceptance Criteria
-- [ ] `FolderPredictorTests.cs` and all 4 new sibling files
+- [x] `FolderPredictorTests.cs` and all 4 new sibling files
       (`FolderPredictorTests.SuggestionsAndRecents.cs`,
       `FolderPredictorTests.FolderLookupAndUiSeams.cs`,
       `FolderPredictorTests.CreateFolderWorkflows.cs`, `FolderPredictorTests.TestSupport.cs`) are
@@ -350,9 +350,9 @@ matches zero tests and exits `0` with "No test matches," silently masking a brok
       per new file (4 total), inserted immediately after the existing
       `<Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />` entry, with no
       reordering or reformatting of any other `<Compile Include>` entry in the file.
-- [ ] A full `UtilitiesCS.Test` test run (`vstest.console.exe ... /EnableCodeCoverage`) passes with a
+- [x] A full `UtilitiesCS.Test` test run (`vstest.console.exe ... /EnableCodeCoverage`) passes with a
       pass count unchanged from the pre-split baseline.
-- [ ] The full C# toolchain — CSharpier format/check, the analyzer rebuild
+- [x] The full C# toolchain — CSharpier format/check, the analyzer rebuild
       (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`), and the nullable rebuild
       (`/p:TreatWarningsAsErrors=true`) — passes cleanly on all 5 changed/new `.cs` files and the
       modified `.csproj`.

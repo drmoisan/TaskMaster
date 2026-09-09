@@ -137,6 +137,5 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Should()
                 .Equal("========= SUGGESTIONS =========", "Archive\\A", "Archive\\B");
         }
-
     }
 }

@@ -162,6 +162,5 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             act.Should().Throw<ArgumentException>();
         }
-
     }
 }

@@ -325,6 +325,5 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Should()
                 .Be("FY26");
         }
-
     }
 }
