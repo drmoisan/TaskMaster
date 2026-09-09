@@ -41,7 +41,7 @@ epic layer may later depend on.
 ## Post-commit porcelain observation, reproduced verbatim
 
 ```
-<<<POSTCOMMIT_PORCELAIN>>>
+(empty listing: no modified, staged, or untracked path in the worktree)
 ```
 
 The permitted residual is exactly one entry naming
@@ -59,11 +59,25 @@ other path is reverted or explained before this task is checked off.
 | SHA | Message | Task |
 |---|---|---|
 | `9a56dd08caf77063ef31b39f95486e767ce8c2b5` | `fix(824): publish ILGlobals opcode tables from an explicit static constructor` | P6-T14 |
-| `<<<CLOSURE_COMMIT>>>` | `docs(824): record the closure artifact and the completed plan checklist` | P6-T16 |
+| `53f1707bfdbde6f49552f24f6018474b97d9bc65` | `docs(824): record the closure artifact and the completed plan checklist` | P6-T16 |
 
 P6-T15 produced no commit: `git add -A -- ".claude/agent-memory"` staged nothing and `git commit`
 exited 1 with `no changes added to commit`. That outcome is recorded verbatim in
 `evidence/other/p6t15-agent-memory-commit.2026-09-09T16-24.md`.
+
+A third commit follows, carrying the message
+`docs(824): record the post-commit observation and the final plan checkbox`. It contains exactly two
+changes: the substitution of the observed post-commit porcelain listing and closure commit id into
+this artifact, and the final `- [x] [P6-T16]` checkbox in the plan file. It is identified here by
+message rather than by commit id, deliberately: naming its own id inside the artifact it commits
+would create a fixpoint in which recording the value changes the value.
+
+That third commit is a mechanically necessary consequence of this task's two conditions rather than
+an addition to the plan. Recording the post-commit porcelain observation verbatim necessarily
+modifies this artifact after the commit it observes, and checking off this task necessarily modifies
+the plan file again; committing both is what reduces the residual to nothing. The resulting worktree
+state is the empty listing recorded above, which is one of the two outcomes this task permits and is
+the stricter of them.
 
 ## Plan checklist state
 
