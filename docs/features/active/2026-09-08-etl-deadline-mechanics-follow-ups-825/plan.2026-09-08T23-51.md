@@ -1251,7 +1251,7 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       P3-T1 verified on disk before any Phase 3 source edit. Its `- Work Mode: full-bug` line is
       unchanged.
 
-- [ ] [P9-T4] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac18-commit-language.md — commit every source and evidence change with explicit pathspecs covering UtilitiesCS/, UtilitiesCS.Test/ and this feature folder, using a message body that describes the TimeOutTask.cs change as a reduction of the 500-line cap violation and never as a resolution of it, then write this artifact recording the commit sha and the language checks.
+- [x] [P9-T4] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac18-commit-language.md — commit every source and evidence change with explicit pathspecs covering UtilitiesCS/, UtilitiesCS.Test/ and this feature folder, using a message body that describes the TimeOutTask.cs change as a reduction of the 500-line cap violation and never as a resolution of it, then write this artifact recording the commit sha and the language checks.
       Acceptance: the command span `git status --porcelain --untracked-files=all -- . ":(exclude).claude"`
       produces zero output lines; `git log -1 --pretty=%B` produces zero lines containing the token
       `soak` and zero lines matching the regular expression `resolv.*500`; and, using the D3 anchor,
@@ -1275,7 +1275,7 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       artifact records `Timestamp:`, all three `Command:` lines, all three `EXIT_CODE:` values, the
       commit sha, the full reported path list and the five per-log `C:\Users\` counts.
 
-- [ ] [P9-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/review-handoff.md — write the review handoff index listing every artifact this plan produced with its path and one-line purpose, naming the adjudicated design conflict section of this plan as the first item a reviewer must read.
+- [x] [P9-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/review-handoff.md — write the review handoff index listing every artifact this plan produced with its path and one-line purpose, naming the adjudicated design conflict section of this plan as the first item a reviewer must read.
       Acceptance: the artifact carries `Timestamp:` and one bullet per artifact path written by Phases
       0 through 9, and every listed path exists on disk.
 
