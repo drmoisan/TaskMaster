@@ -8,8 +8,9 @@
 
 - Issue: #825
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/825
-- Last Updated: 2026-09-08
+- Last Updated: 2026-09-09
 - Work Mode: full-bug
+- Delivery Status: Delivered 2026-09-09 on branch bug/etl-deadline-mechanics-follow-ups-825-exec. All 35 acceptance criteria in spec.md are checked off; see the Delivery Record section at the end of this document.
 
 ## Summary
 
@@ -125,3 +126,75 @@ deliberate conservative choice pending evidence.
 
 - [ ] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
+
+## Delivery Record
+
+Delivered 2026-09-09. All six items are implemented and all 35 acceptance criteria in spec.md are
+checked off; the summary is mirrored at evidence/issue-updates/ac-status-summary.md.
+
+### What was delivered
+
+Item 1 records the 250 ms per-row budget rationale in a comment at the expression, without changing
+the value. Item 2 threads a trailing optional `TimeProvider` from `DfDeedle.GetEmailDataInViewAsync`
+into `GetTableInViewAsync`, resolves the deadline source once so an explicitly supplied factory
+still wins, and makes the `TimeoutException` retry propagate the caller's `timeoutMs` instead of a
+literal 2000. Item 3 widens `EtlAsync`'s first tuple element to `object[,]?` and deletes the
+null-forgiving suppression. Item 4 deletes the two inert `(int, int)` `TimeoutAfter` overloads,
+`EtlAsyncOld`, and their three tests. Item 5 corrects the stale `TableEtlInvoker` doc comment to
+name `DefaultTableEtl`. Item 6 removes `[DoNotParallelize]` from `OlTableExtensions_Tests` with a
+corrected class comment, and documents the verified reason for retaining it on `TimeOutTask_Tests`.
+
+Four regression tests were added in the new file
+UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs, with one compile item added
+to the test project.
+
+### The three acceptance-criteria amendments
+
+AC6, AC20 and AC35 each carry an `Amended 2026-09-09` marker in spec.md. **All three amendments were
+made during preparation by the orchestrator, before the plan was handed to an executor, and not by
+the executor.** Authorship of acceptance criteria belongs with planning and scoping agents; an
+executor free to rewrite the criterion it is judged against is not gated by that criterion. The
+executor's Phase 3 opened with a read-only verification that the working tree carried the amended
+spec, recorded at evidence/qa-gates/ac6-ac20-amended-spec-verification.md, and **no acceptance
+criterion was amended during execution.**
+
+The measured reason for the AC6 and AC20 amendments is the same in both cases. Threading the
+provider into `GetTableInViewAsync` inserts the table-acquisition timer as the first arming signal
+on the latch-based `ArmingBarrierTimeProvider` that the test at DfDeedleEtlTimeoutTests.cs line 135
+consumes in a fixed order. The barrier's `Armed` signal is a latch, so it drops a signal whenever
+two timers arm inside one await window; the test's `barrier.Advance(250)` would then run before the
+250 ms ETL timer existed, firing nothing, and because its assertion sits inside the `try` the
+`finally` that releases the gates would never run. The failure mode would be a hang rather than a
+clean failure. The original wording required DfDeedleEtlTimeoutTests.cs to be absent from the diff
+while still passing, and those obligations could not both hold. The amendment admits a bounded
+timer-ordering update to that one file, adding no assertion and removing none, which the delivered
+change respects: the anchored diff for it adds and removes zero `.Should()` lines.
+DfDeedle_COM_Tests.cs remains absent from the diff entirely.
+
+The measured reason for the AC35 amendment is a contradiction with AC20. The original wording
+required the reachability observation to be filed through the promotion lifecycle, which writes a
+record under docs/features/potential/promoted/ and would therefore put a file under docs/features/**
+that is not one of this feature's own documents, falsifying AC20 on the same branch. The amendment
+substitutes an evidence artifact plus a deferred epic handoff for the on-branch promotion. That
+artifact is evidence/other/ac35-reachability-observation.md and it records
+`PromotionWrittenOnThisBranch: false`.
+
+### Deferred follow-ups, to be filed by the epic after this feature merges
+
+1. Capture real ETL durations against folder size from a live Outlook session and revisit the 250 ms
+   per-row budget with that measurement in hand.
+2. Reduce TimeOutTask.cs below the 500-line cap. This feature took it from 1011 lines to 966, which
+   is a reduction and not a resolution.
+3. The reachability observation concerning the two `catch` blocks in `GetTableInViewAsync` under
+   `strict: false`, and the adjacent null-return defect it exposes.
+4. Convert the `TimeOutTask_Tests` wall-clock races to an injected clock, which would then allow that
+   class's `[DoNotParallelize]` to be removed rather than documented.
+
+### One idea in the original capture that was deliberately not followed
+
+The Proposed Fix section above suggested repeated full-suite runs as the basis for removing
+`[DoNotParallelize]`. That approach was not used and is not the justification for the removal.
+Repeated runs sample one machine and one suite composition and establish nothing durable, and
+repository policy separately forbids stabilising a test with a timing tolerance. The justification is
+the item 2 code change, which removes the wall-clock deadline the attribute guarded against; it is
+recorded at evidence/other/ac21-justification.md with `RunsObserved: 0`.

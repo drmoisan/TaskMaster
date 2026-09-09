@@ -145,7 +145,11 @@ namespace UtilitiesCS
             //logger.Debug($"{nameof(GetEmailDataInViewAsync)}: {activeExplorer.CurrentFolder.Name}");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.GetTableInViewAsync)} ...");
-            Outlook.Table table = await activeExplorer.GetTableInViewAsync(token, 0);
+            Outlook.Table table = await activeExplorer.GetTableInViewAsync(
+                token,
+                0,
+                timeProvider: timeProvider
+            );
             //table.EnumerateTable();
             var currentFolder = activeExplorer.CurrentFolder;
             var storeID = activeExplorer.CurrentFolder.StoreID;
@@ -178,7 +182,7 @@ namespace UtilitiesCS
             );
 
             // EtlAsync swallows its TimeoutException and returns a null data array through a
-            // null-forgiving suppression, so this is the first point the failure can be named.
+            // nullable tuple element, so this is the first point the failure can be named.
             if (tableSnapshot.data is null)
             {
                 throw new InvalidOperationException(
@@ -190,7 +194,7 @@ namespace UtilitiesCS
 
             LogDfTiming(
                 "GetEmailDataInViewAsync table snapshot ready | table snapshot",
-                $"rowCount={tableSnapshot.Item1.GetLength(0)}; columnCount={tableSnapshot.Item1.GetLength(1)}; etlElapsedMs={etlStopwatch.ElapsedMilliseconds}"
+                $"rowCount={tableSnapshot.data.GetLength(0)}; columnCount={tableSnapshot.data.GetLength(1)}; etlElapsedMs={etlStopwatch.ElapsedMilliseconds}"
             );
 
             // Guards the row builder's unchecked column indexing. A swallowed column-add timeout
@@ -207,7 +211,7 @@ namespace UtilitiesCS
                 "table snapshot captured before dataframe transform"
             );
             Frame<int, string> df = await Task.Run(
-                    () => Email2dArrayToDf(storeID, tableSnapshot.Item1, tableSnapshot.Item2),
+                    () => Email2dArrayToDf(storeID, tableSnapshot.data, tableSnapshot.Item2),
                     token
                 )
                 .TimeoutAfter(1000, timeProvider);

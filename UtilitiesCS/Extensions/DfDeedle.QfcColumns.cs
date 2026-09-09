@@ -93,7 +93,7 @@ namespace UtilitiesCS
         /// When null the production <see cref="AddQfcColumns"/> path is used. Declared as
         /// <c>Action&lt;object, object&gt;</c> rather than over the interop types because embedded
         /// interop types cannot be used as generic type arguments across an assembly boundary
-        /// (CS1769); the same constraint already applies to the <c>TableEtlInvoker</c> seam.
+        /// (CS1769); the same constraint already applies to the <c>DefaultTableEtl</c> seam.
         /// </param>
         /// <param name="timeProvider">
         /// Clock used to arm the timeout. When null the system clock is used; tests supply a

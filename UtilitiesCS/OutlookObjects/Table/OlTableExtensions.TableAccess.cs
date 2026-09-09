@@ -29,12 +29,17 @@ namespace UtilitiesCS
             return view.GetTable();
         }
 
+        // A null timeProvider resolves to TimeProvider.System, so production timing is unchanged
+        // when no clock is supplied. Do not introduce a CancelAfter call on the source the provider
+        // creates: on pre-.NET 8 runtimes, and net481 is one, CancelAfter(TimeSpan) does not
+        // terminate the original delay timer.
         public static async Task<Outlook.Table> GetTableInViewAsync(
             this Explorer activeExplorer,
             CancellationToken token,
             int counter,
             int timeoutMs = 2000,
-            Func<int, CancellationTokenSource>? timeoutSourceFactory = null
+            Func<int, CancellationTokenSource>? timeoutSourceFactory = null,
+            TimeProvider? timeProvider = null
         )
         {
             var acquisitionStopwatch = Stopwatch.StartNew();
@@ -52,6 +57,18 @@ namespace UtilitiesCS
                 );
             }
 
+            // Resolve the deadline source once. An explicitly supplied factory still wins, which
+            // keeps the existing direct-caller seam working unchanged; otherwise the deadline is
+            // armed on the caller's clock, so a test that supplies a FakeTimeProvider governs it.
+            Func<int, CancellationTokenSource> resolvedTimeoutSourceFactory =
+                timeoutSourceFactory
+                ?? (
+                    ms =>
+                        (timeProvider ?? TimeProvider.System).CreateCancellationTokenSource(
+                            TimeSpan.FromMilliseconds(ms)
+                        )
+                );
+
             try
             {
                 table = await TimeOutTask.RunWithTimeout(
@@ -60,7 +77,7 @@ namespace UtilitiesCS
                     timeoutMs,
                     1,
                     false,
-                    timeoutSourceFactory
+                    resolvedTimeoutSourceFactory
                 );
 
                 LogTableTiming(
@@ -83,7 +100,8 @@ namespace UtilitiesCS
                             token,
                             counter + 1,
                             timeoutMs,
-                            timeoutSourceFactory
+                            timeoutSourceFactory,
+                            timeProvider
                         );
                     }
                     else
@@ -97,14 +115,16 @@ namespace UtilitiesCS
                 Console.WriteLine($"Task timed out on try {counter}");
                 if (counter < 2)
                 {
-                    // Preserve the original behavior of this retry path, which used the default
-                    // 2000 ms timeout (it omitted the timeoutMs argument); only the new factory
-                    // is propagated so test injection threads through this branch too.
+                    // The caller's timeoutMs is propagated rather than a literal, so both attempts
+                    // are governed by the same caller-visible deadline on the same caller-supplied
+                    // clock. A test can therefore observe and control the value the second attempt
+                    // used, which a hard-coded literal made impossible.
                     table = await activeExplorer.GetTableInViewAsync(
                         token,
                         counter + 1,
-                        2000,
-                        timeoutSourceFactory
+                        timeoutMs,
+                        timeoutSourceFactory,
+                        timeProvider
                     );
                 }
                 else

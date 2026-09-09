@@ -729,25 +729,25 @@ or a named captured artifact.
 
 **Item 1 — the 250 ms per-row budget**
 
-- [ ] **AC1** — `EtlAsync` still computes its budget as `250 * rowCount`; the diff for
+- [x] **AC1** — `EtlAsync` still computes its budget as `250 * rowCount`; the diff for
       OlTableExtensions.Etl.cs contains no change to that expression or its numeric literal.
-- [ ] **AC2** — A comment at that site records (a) that the value rests on no recorded measurement,
+- [x] **AC2** — A comment at that site records (a) that the value rests on no recorded measurement,
       (b) that no measurement is obtainable in this environment, and (c) the live-Outlook capture
       route by name: the `LogTableTiming` "EtlAsync complete" payload carrying `rowCount` and
       `elapsedMs`, and the log4net root level `ALL`. All three facts must be present.
-- [ ] **AC3** — After the change, a case-sensitive search of OlTableExtensions.Etl.cs for
+- [x] **AC3** — After the change, a case-sensitive search of OlTableExtensions.Etl.cs for
       `250 * rowCount` returns no hit outside the body of `EtlAsync`.
 
 **Item 2 — the residual 2000 ms window**
 
-- [ ] **AC4** — `GetTableInViewAsync` declares `TimeProvider? timeProvider = null` as its last
+- [x] **AC4** — `GetTableInViewAsync` declares `TimeProvider? timeProvider = null` as its last
       parameter, positioned after `timeoutSourceFactory`, and no caller outside
       OlTableExtensions_Tests.cs and DfDeedle.cs was edited in order to keep compiling.
-- [ ] **AC5** — Test `GetTableInViewAsync_InjectedClock_ArmsAcquisitionDeadlineOnInjectedProvider`
+- [x] **AC5** — Test `GetTableInViewAsync_InjectedClock_ArmsAcquisitionDeadlineOnInjectedProvider`
       exists in `UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs`, uses
       `ArmingBarrierTimeProvider`, and passes. Its `await barrier.Armed` cannot complete unless the
       deadline timer was created on the injected provider.
-- [ ] **AC6** — DfDeedle.cs line 148 passes its `timeProvider` to `GetTableInViewAsync`;
+- [x] **AC6** — DfDeedle.cs line 148 passes its `timeProvider` to `GetTableInViewAsync`;
       DfDeedle_COM_Tests.cs is absent from this feature's diff; DfDeedleEtlTimeoutTests.cs appears in
       the diff only as the bounded timer-ordering update described in Test Strategy, adding no
       assertion and removing none; and both classes still pass.
@@ -764,52 +764,52 @@ or a named captured artifact.
       rejected because it falsifies this criterion's first clause and the AC34 invariant, and leaves
       the production table-acquisition deadline on the system clock, which is the defect item 2 exists
       to close.
-- [ ] **AC7** — Test `GetTableInViewAsync_TimeoutRetry_UsesCallerTimeoutMsNotLiteral2000` passes, and
+- [x] **AC7** — Test `GetTableInViewAsync_TimeoutRetry_UsesCallerTimeoutMsNotLiteral2000` passes, and
       a fail-before record showing it failing against the pre-change file is captured under the
       feature evidence folder (kind: regression-testing).
-- [ ] **AC8** — The availability of
+- [x] **AC8** — The availability of
       `TimeProviderTaskExtensions.CreateCancellationTokenSource(TimeProvider, TimeSpan)` was proven
       **by a compile, not assumed**: a captured MSBuild log under the feature evidence folder (kind:
       other or build) shows `UtilitiesCS` compiling successfully with a real call site present. A
       prose assertion of availability, or a citation of the package XML alone, is a FAIL.
-- [ ] **AC9** — The `TaskCanceledException` retry branch still propagates `timeoutMs` and
+- [x] **AC9** — The `TaskCanceledException` retry branch still propagates `timeoutMs` and
       `timeoutSourceFactory` and now also propagates `timeProvider`; the `TimeoutException` retry
       branch contains no numeric literal timeout argument.
-- [ ] **AC10** — Test `GetTableInViewAsync_ExplicitFactorySupplied_TakesPrecedenceOverTimeProvider`
+- [x] **AC10** — Test `GetTableInViewAsync_ExplicitFactorySupplied_TakesPrecedenceOverTimeProvider`
       passes, demonstrating that a supplied factory still overrides the clock-derived one.
 
 **Item 3 — the `EtlAsync` tuple contract**
 
-- [ ] **AC11** — `EtlAsync` declares
+- [x] **AC11** — `EtlAsync` declares
       `Task<(object[,]? data, Dictionary<string, int> columnInfo)>`, and a search of
       OlTableExtensions.Etl.cs for the null-forgiving return `data!` returns no hit.
-- [ ] **AC12** — `EtlAsync` still catches and swallows `TimeoutException` and still calls
+- [x] **AC12** — `EtlAsync` still catches and swallows `TimeoutException` and still calls
       `tokenSource.Cancel()`; `EtlAsync` throws no new exception type. The `DfDeedle` null guard and
       its `InvalidOperationException` message are unchanged in the diff.
-- [ ] **AC13** — `OlTableExtensionsEtlClockTests.EtlAsync_DeadlineExpires_ReturnsNullDataAndCancelsTokenSource`
+- [x] **AC13** — `OlTableExtensionsEtlClockTests.EtlAsync_DeadlineExpires_ReturnsNullDataAndCancelsTokenSource`
       passes with its body unchanged, including `data.Should().BeNull()` and the
       `IsCancellationRequested` assertion.
-- [ ] **AC14** — The doc comment on that test no longer describes a null-forgiving suppression.
+- [x] **AC14** — The doc comment on that test no longer describes a null-forgiving suppression.
 
 **Item 4 — the inert `(int, int)` overloads**
 
-- [ ] **AC15** — TimeOutTask.cs declares no `TimeoutAfter` overload with an `int repeatAttempts`
+- [x] **AC15** — TimeOutTask.cs declares no `TimeoutAfter` overload with an `int repeatAttempts`
       parameter, and contains no `catch (TimeoutException)` clause inside a `TimeoutAfter` method.
-- [ ] **AC16** — A repository-wide search of C# source files for `EtlAsyncOld` returns no hit.
-- [ ] **AC17** — TimeOutTask_Tests.cs no longer contains
+- [x] **AC16** — A repository-wide search of C# source files for `EtlAsyncOld` returns no hit.
+- [x] **AC17** — TimeOutTask_Tests.cs no longer contains
       `TimeoutAfter_GenericTask_WithRepeatAttempts_ReturnsResult` or
       `TimeoutAfter_NonGenericTask_WithRepeatAttempts_CompletesSuccessfully`, and the remaining
       `TimeOutTask` tests across all four partial files pass.
-- [ ] **AC18** — The delivered change makes no claim, in code comment, commit message or PR body,
+- [x] **AC18** — The delivered change makes no claim, in code comment, commit message or PR body,
       that the TimeOutTask.cs 500-line cap violation is resolved; the reduction is described as a
       reduction.
 
 **Item 5 — the stale doc comment**
 
-- [ ] **AC19** — A search of DfDeedle.QfcColumns.cs for `TableEtlInvoker` returns no hit, the
+- [x] **AC19** — A search of DfDeedle.QfcColumns.cs for `TableEtlInvoker` returns no hit, the
       corrected sentence names `DefaultTableEtl` or the `etl` parameter on `GetEmailDataInView`, and
       the CS1769 rationale sentence is retained.
-- [ ] **AC20** — DfDeedle_COM_Tests.cs and every file under docs/features/** other than this
+- [x] **AC20** — DfDeedle_COM_Tests.cs and every file under docs/features/** other than this
       feature's own documents are absent from the diff, and DfDeedleEtlTimeoutTests.cs appears only as
       the bounded timer-ordering update AC6 permits.
       **Amended 2026-09-09** for the same measured reason recorded under AC6. The
@@ -819,54 +819,54 @@ or a named captured artifact.
 
 **Item 6 — `[DoNotParallelize]`**
 
-- [ ] **AC21** — `[DoNotParallelize]` is absent from `OlTableExtensions_Tests`, and its class comment
+- [x] **AC21** — `[DoNotParallelize]` is absent from `OlTableExtensions_Tests`, and its class comment
       no longer asserts any population of tests driving the 2000 ms window and no longer states that
       a soak is pending; it states instead that the wall-clock hazard was removed by the item 2
       change.
-- [ ] **AC22** — The test at OlTableExtensions_Tests.cs line 1646 supplies a `FakeTimeProvider`, so
+- [x] **AC22** — The test at OlTableExtensions_Tests.cs line 1646 supplies a `FakeTimeProvider`, so
       no test in that class arms a real `CancellationTokenSource` on the system clock. Verified by a
       search of the file for `new CancellationTokenSource(` with a numeric argument returning no hit.
-- [ ] **AC23** — `OlTableExtensionsEtlClockTests` and DfDeedleEtlTimeoutTests retain their
+- [x] **AC23** — `OlTableExtensionsEtlClockTests` and DfDeedleEtlTimeoutTests retain their
       `[DoNotParallelize]` attributes and their existing reason comments.
-- [ ] **AC24** — `TimeOutTask_Tests` retains `[DoNotParallelize]` and a comment immediately above the
+- [x] **AC24** — `TimeOutTask_Tests` retains `[DoNotParallelize]` and a comment immediately above the
       attribute records the verified reason, naming the wall-clock races in the class (the
       `Task.Delay(200)` versus `TimeoutAfter(10)` test and the `Task.Delay(50)` versus
       `TimeoutAfter(0)` test).
-- [ ] **AC25** — No acceptance criterion in this feature is satisfied by repeated passing runs: the
+- [x] **AC25** — No acceptance criterion in this feature is satisfied by repeated passing runs: the
       change record contains no soak, and the justification for AC21 is the item 2 change, not
       observed green runs.
 
 **Ownership boundary**
 
-- [ ] **AC26** — `git diff` for OlTableExtensions.TableAccess.cs shows no added and no removed line
+- [x] **AC26** — `git diff` for OlTableExtensions.TableAccess.cs shows no added and no removed line
       containing `Console.WriteLine`; both diagnostics survive byte-identical including their leading
       indentation.
-- [ ] **AC27** — The `counter` variable and both `catch` blocks in `GetTableInViewAsync` still exist.
-- [ ] **AC28** — No file listed as sibling-owned in the Non-goals section appears in this feature's
+- [x] **AC27** — The `counter` variable and both `catch` blocks in `GetTableInViewAsync` still exist.
+- [x] **AC28** — No file listed as sibling-owned in the Non-goals section appears in this feature's
       diff.
 
 **Process, build and coverage**
 
-- [ ] **AC29** — All new tests are in
+- [x] **AC29** — All new tests are in
       `UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs`, that file has a
       `<Compile Include>` entry in `UtilitiesCS.Test/UtilitiesCS.Test.csproj`, and the diff for that
       project file adds only that entry (no reordering, no reformatting).
-- [ ] **AC30** — OlTableExtensions_Tests.cs gains no new `[TestMethod]`; its diff contains deletions
+- [x] **AC30** — OlTableExtensions_Tests.cs gains no new `[TestMethod]`; its diff contains deletions
       and in-place edits only.
-- [ ] **AC31** — The new test file contains no `Thread.Sleep`, `Task.Delay`, `DateTime.Now`,
+- [x] **AC31** — The new test file contains no `Thread.Sleep`, `Task.Delay`, `DateTime.Now`,
       `Stopwatch`, retry loop or timing tolerance.
-- [ ] **AC32** — A full toolchain pass is recorded: `csharpier check` clean, both MSBuild gates
+- [x] **AC32** — A full toolchain pass is recorded: `csharpier check` clean, both MSBuild gates
       passing with `/t:Rebuild`, and the test run green. The captured build log shows no
       `Skipping target "CoreCompile"` entry for any project in the Write Set.
-- [ ] **AC33** — Baseline (merge-base) and post-change coverage are both captured under the feature
+- [x] **AC33** — Baseline (merge-base) and post-change coverage are both captured under the feature
       evidence folder; coverage on changed lines does not regress; new and changed code is at 90% or
       better; the repository-wide figure against the CLAUDE.md § UT2 testable denominator is recorded
       and reported, with the deletion-driven delta explicitly attributed.
-- [ ] **AC34** — The delivered implementation matches the invariant sentence and the four-step trace
+- [x] **AC34** — The delivered implementation matches the invariant sentence and the four-step trace
       recorded in Proposed Fix: a reviewer can follow `timeoutMs` from the accept point through the
       throw point and the absorption point to the retry, and confirm the caller's value is no longer
       discarded.
-- [ ] **AC35** — The reachability observation recorded under Assumptions is captured as an evidence
+- [x] **AC35** — The reachability observation recorded under Assumptions is captured as an evidence
       artifact under this feature's own evidence/other/ folder, and the follow-up is recorded in that
       same artifact as a handoff for the epic to file **after this feature merges**. No promotion
       record, potential entry or any other file outside this feature's own folder is written under
