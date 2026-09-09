@@ -504,7 +504,7 @@ Notes on the choices:
   `InvalidOperationException` unreachable — a test reaches it by assigning a null through
   `CancelSource` and calling the new member directly, because it deliberately does not consult the
   button's enabled state.
-- File size: `UtilitiesCS/Threading/ProgressViewer.cs` is 93 lines today and lands near 125, well
+- File size: `UtilitiesCS/Threading/ProgressViewer.cs` is 92 lines today and lands near 125, well
   under the 500-line ceiling.
 
 ### The same design applies to Site B'
