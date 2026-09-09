@@ -14,6 +14,10 @@ namespace UtilitiesCS.EmailIntelligence.TaskPane
 {
     public partial class ProgressPane : UserControl
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
+
         public ProgressPane()
         {
             InitializeComponent();
@@ -46,16 +50,58 @@ namespace UtilitiesCS.EmailIntelligence.TaskPane
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
         {
             _tokenSource = tokenSource;
-            this.ButtonCancel.Enabled = true;
+
+            // Enable only for a non-null source, so the button cannot be clickable in a state the
+            // handler cannot serve. The pane keeps this inline check rather than delegating to a
+            // property setter, because unlike the viewer it exposes no such property.
+            this.ButtonCancel.Enabled = tokenSource is not null;
+        }
+
+        // Requests cancellation on the borrowed source. This pane borrows the source and never
+        // disposes it; a different holder owns disposal. A null source is a host wiring defect,
+        // because the button was enabled without a source ever being supplied, so it fails fast with
+        // a diagnosable message. A disposed source is a lifecycle race rather than a defect: the
+        // owner disposed it because the tracked operation is over, so there is nothing to cancel and
+        // the correct response is to return quietly.
+        internal void RequestCancel()
+        {
+            CancellationTokenSource source =
+                _tokenSource
+                ?? throw new InvalidOperationException(
+                    "ProgressPane cancellation was requested with no CancellationTokenSource. "
+                        + "Call SetCancellationTokenSource before enabling ButtonCancel."
+                );
+
+            try
+            {
+                source.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                logger.Debug(
+                    "Cancel requested after the token source was disposed; nothing to cancel."
+                );
+            }
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            // Invariant: ButtonCancel is enabled only after SetCancellationTokenSource assigns
-            // _tokenSource, so a click here implies _tokenSource is non-null (preserves the prior
-            // NRE-if-null behavior).
-            _tokenSource!.Cancel();
-            this.Dispose();
+            // Boundary: this is a WinForms handler in a VSTO add-in, so an escaping exception
+            // surfaces to the Outlook user. RequestCancel carries the diagnosable message; this
+            // frame logs it and still disposes in the finally, so a wiring defect can neither strand
+            // the pane alive nor reach the user as a stack trace.
+            try
+            {
+                RequestCancel();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error("ProgressPane cancel request failed.", ex);
+            }
+            finally
+            {
+                this.Dispose();
+            }
         }
     }
 }

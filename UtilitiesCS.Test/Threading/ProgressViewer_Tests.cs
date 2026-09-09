@@ -348,5 +348,139 @@ namespace UtilitiesCS.Test.Threading
                 SynchronizationContext.SetSynchronizationContext(previousContext);
             }
         }
+
+        /// <summary>Runs <paramref name="body"/> under a fresh SynchronizationContext, restoring the previous one.</summary>
+        private static void WithSynchronizationContext(Action body)
+        {
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
+            try
+            {
+                body();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        /// <summary>Runs <paramref name="body"/> against a real viewer, disposing it only if the body did not.</summary>
+        private static void WithViewer(Action<ProgressViewer> body) =>
+            WithSynchronizationContext(() =>
+            {
+                ProgressViewer viewer = new ProgressViewer();
+                try
+                {
+                    body(viewer);
+                }
+                finally
+                {
+                    if (!viewer.IsDisposed)
+                    {
+                        viewer.Dispose();
+                    }
+                }
+            });
+
+        /// <summary>Resolves the private Designer field <c>ButtonCancel</c> on a real viewer instance.</summary>
+        private static System.Windows.Forms.Button GetCancelButton(ProgressViewer viewer) =>
+            typeof(ProgressViewer)
+                .GetField("ButtonCancel", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.GetValue(viewer) as System.Windows.Forms.Button
+            ?? throw new MissingFieldException(nameof(ProgressViewer), "ButtonCancel");
+
+        /// <summary>Invokes the private <c>CancelButton_Click</c> handler by reflection.</summary>
+        private static void InvokeCancelClick(ProgressViewer viewer)
+        {
+            MethodInfo cancelClick =
+                typeof(ProgressViewer).GetMethod(
+                    "CancelButton_Click",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                ) ?? throw new MissingMethodException(nameof(ProgressViewer), "CancelButton_Click");
+            cancelClick.Invoke(viewer, new object[] { viewer, EventArgs.Empty });
+        }
+
+        /// <summary>Issue #821 AC7: a cancel request with no source fails fast with a diagnosable message.</summary>
+        [TestMethod]
+        public void RequestCancel_WhenSourceIsNull_ThrowsInvalidOperationExceptionWithMessage()
+        {
+            // RequestCancel reads only _cancelSource and never touches the null ButtonCancel field.
+            ProgressViewer viewer = CreateHeadlessViewer();
+
+            Action act = () => viewer.RequestCancel();
+
+            act.Should()
+                .Throw<InvalidOperationException>(
+                    "a cancel request with no source is a host wiring defect, not a user error"
+                )
+                .WithMessage(
+                    "*SetCancellationTokenSource*",
+                    "the message must name the member a caller uses to supply a source"
+                );
+        }
+
+        /// <summary>Issue #821 AC8: a cancel request after the owner disposed the source returns quietly.</summary>
+        [TestMethod]
+        public void RequestCancel_WhenSourceIsDisposed_DoesNotThrow() =>
+            // The real constructor is required because the assignment route goes through
+            // CancelSource, whose setter dereferences the Designer-created button.
+            WithViewer(viewer =>
+            {
+                var cts = new CancellationTokenSource();
+                cts.Dispose();
+                viewer.CancelSource = cts;
+
+                Action act = () => viewer.RequestCancel();
+
+                act.Should().NotThrow("a disposed source leaves nothing to cancel");
+            });
+
+        /// <summary>Issue #821 AC9: a null source cannot escape the handler, which still closes.</summary>
+        [TestMethod]
+        public void CancelButton_Click_WhenSourceIsNull_DoesNotThrowOutOfTheHandler() =>
+            WithViewer(viewer =>
+            {
+                Action act = () => InvokeCancelClick(viewer);
+
+                act.Should().NotThrow("no exception may reach the Outlook UI thread");
+                viewer
+                    .IsDisposed.Should()
+                    .BeTrue("the handler closes in a finally, so it cannot strand the dialog open");
+            });
+
+        /// <summary>Issue #821 AC9: a disposed source cannot escape the handler, which still closes.</summary>
+        [TestMethod]
+        public void CancelButton_Click_WhenSourceIsDisposed_DoesNotThrowOutOfTheHandler() =>
+            WithViewer(viewer =>
+            {
+                var cts = new CancellationTokenSource();
+                cts.Dispose();
+                viewer.CancelSource = cts;
+
+                Action act = () => InvokeCancelClick(viewer);
+
+                act.Should().NotThrow("no exception may reach the Outlook UI thread");
+                viewer
+                    .IsDisposed.Should()
+                    .BeTrue("the handler closes in a finally, so it cannot strand the dialog open");
+            });
+
+        /// <summary>Issue #821 AC10: a null source leaves the Cancel button disabled.</summary>
+        [TestMethod]
+        public void SetCancellationTokenSource_WithNull_DoesNotEnableButton() =>
+            WithViewer(viewer =>
+            {
+                using var cts = new CancellationTokenSource();
+                System.Windows.Forms.Button cancelButton = GetCancelButton(viewer);
+
+                // A live source first, so the null step below is wiring-sensitive rather than merely
+                // observing the constructor's own disabled default.
+                viewer.SetCancellationTokenSource(cts);
+                cancelButton.Enabled.Should().BeTrue("a live source must offer cancellation");
+
+                viewer.SetCancellationTokenSource(null);
+                cancelButton.Enabled.Should().BeFalse("a null source must not leave it clickable");
+            });
     }
 }

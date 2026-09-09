@@ -15,6 +15,10 @@ namespace UtilitiesCS
 {
     public partial class ProgressViewer : Form //, IProgressViewer
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
+
         public ProgressViewer()
         {
             InitializeComponent();
@@ -63,17 +67,57 @@ namespace UtilitiesCS
 
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
         {
-            _cancelSource = tokenSource;
-            this.ButtonCancel.Enabled = true;
+            // Delegates to the CancelSource setter rather than assigning the field and enabling the
+            // button itself. That setter already enables only for a non-null source, so delegating
+            // removes the duplicated enabling logic instead of duplicating and patching it.
+            CancelSource = tokenSource;
+        }
+
+        // Requests cancellation on the borrowed source. This viewer borrows the source and never
+        // disposes it; a different holder owns disposal. A null source is a host wiring defect,
+        // because the button was enabled without a source ever being supplied, so it fails fast with
+        // a diagnosable message. A disposed source is a lifecycle race rather than a defect: the
+        // owner disposed it because the tracked operation is over, so there is nothing to cancel and
+        // the correct response is to return quietly.
+        internal void RequestCancel()
+        {
+            CancellationTokenSource source =
+                _cancelSource
+                ?? throw new InvalidOperationException(
+                    "ProgressViewer cancellation was requested with no CancellationTokenSource. "
+                        + "Assign CancelSource or call SetCancellationTokenSource before enabling ButtonCancel."
+                );
+
+            try
+            {
+                source.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                logger.Debug(
+                    "Cancel requested after the token source was disposed; nothing to cancel."
+                );
+            }
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            // Invariant: ButtonCancel is enabled only after SetCancellationTokenSource assigns
-            // _cancelSource, so a click here implies _cancelSource is non-null (preserves the prior
-            // NRE-if-null behavior).
-            _cancelSource!.Cancel();
-            this.Close();
+            // Boundary: this is a WinForms handler in a VSTO add-in, so an escaping exception
+            // surfaces to the Outlook user. RequestCancel carries the diagnosable message; this
+            // frame logs it and still closes in the finally, so a wiring defect can neither strand
+            // the dialog open nor reach the user as a stack trace.
+            try
+            {
+                RequestCancel();
+            }
+            catch (System.Exception ex)
+            {
+                logger.Error("ProgressViewer cancel request failed.", ex);
+            }
+            finally
+            {
+                this.Close();
+            }
         }
 
         #region IProgressViewer
