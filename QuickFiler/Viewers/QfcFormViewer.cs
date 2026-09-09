@@ -217,8 +217,13 @@ namespace QuickFiler
         /// Issue #796 (AC2): registers the predicate reporting whether the breadcrumb popup owned by
         /// <paramref name="itemViewer"/> is currently open, and therefore able to hold activation.
         /// </summary>
-        /// <param name="itemViewer">The item viewer that owns the popup. Ignored when null.</param>
-        /// <param name="popupIsOpen">The open-state predicate. Ignored when null.</param>
+        /// <param name="itemViewer">
+        /// The item viewer that owns the popup. Forwarded unchanged to the registry, which rejects
+        /// a null with <c>ArgumentNullException</c> (issue #823, R3).
+        /// </param>
+        /// <param name="popupIsOpen">
+        /// The open-state predicate. Forwarded unchanged on the same terms.
+        /// </param>
         /// <remarks>
         /// Assigned by the item viewer immediately after it constructs its popup host, mirroring the
         /// issue #677 may-take-focus precedent. Re-registering the same item viewer replaces its
