@@ -33,7 +33,10 @@
   `UtilitiesCS/Threading/ProgressViewer.cs`, `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs`
   and `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs`,
   `QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs`, `QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs`,
-  the SDIL reader files (unenumerable — no file matching `*Sdil*`/`*SDIL*` exists in the current tree),
+  the SDIL reader files (`UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs`,
+  `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILInstruction.cs`,
+  `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/MethodBodyReader.cs` — confirmed to exist and named
+  explicitly in the P6-T3 enforcement gate below),
   `UtilitiesCS/OutlookObjects/Table/OlTableExtensions*.cs`, `UtilitiesCS/Threading/TimeOutTask.cs`,
   `UtilitiesCS/Extensions/DfDeedle.cs`, `.editorconfig`, `BannedSymbols.txt`, and
   `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`. No task in this plan touches
@@ -125,7 +128,7 @@
 - [ ] [P1-T1] Re-read `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` and confirm the
   unguarded read still sits at lines 231-234 exactly as:
   `string predetermined = ProjectPredeterminedFolder(_predeterminedFolder, _globals is null ? null : (_globals.Ol?.ArchiveRootPath ?? string.Empty));`
-  (the exact 3-line expression spanning lines 231-234), and record the confirmed line range and file
+  (the exact 4-line expression spanning lines 231-234), and record the confirmed line range and file
   line count (296) in `<FEATURE>/evidence/baseline/phase1-file-size-check.<TIMESTAMP>.md`.
   Acceptance: the recorded text matches this expression verbatim and the file has 296 lines. If it
   does not match, this task fails and the plan requires re-authoring before Phase 2 proceeds.
@@ -391,11 +394,25 @@
 
 - [ ] [P6-T1] Grep `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` for the literal
   single-line token `catch (InvalidOperationException)`: it must appear exactly once, inside
-  `AssignFolderComboBox`. Separately grep the same file for the literal tokens `catch (Exception` and
-  `catch (System.Exception`: both must return zero matches. Record both grep results,
+  `AssignFolderComboBox`. Then extract only the `AssignFolderComboBox` method body (lines 191-250
+  pre-fix, confirmed by direct read: the method opens at line 191 and its closing brace is at line
+  250; lines 252-296 belong to two unrelated methods, `ProjectPredeterminedFolder` and
+  `PopulateAndSelectFolder`, and must not be included in the extracted span. After the Phase 3 edit
+  the method's closing brace shifts a few lines later to accommodate the added `try`/`catch` block;
+  extract through the method's actual closing brace at execution time, not a fixed line number) and
+  grep that extracted span only (not the whole file) for the literal tokens `catch (Exception` and
+  `catch (System.Exception`: both must return zero matches within the extracted span. The whole-file
+  form of this check is deliberately not used, because
+  `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` contains three pre-existing,
+  out-of-scope occurrences of the literal substring `catch (System.Exception` outside
+  `AssignFolderComboBox` (a comment at line 74, and real catch clauses at lines 121 and 127 inside
+  `LoadFolderHandlerAsync`), none of which this plan's Phase 3 edit touches; a whole-file zero-match
+  assertion against that token is unsatisfiable regardless of this plan's change and would not test
+  anything about the Phase 3 edit. Record both grep results, the extracted line range used,
   `Timestamp:`, `Command:`, `Output Summary:` in
   `<FEATURE>/evidence/qa-gates/phase6-catch-type-check.<TIMESTAMP>.md`. Acceptance: exactly one match
-  for `catch (InvalidOperationException)` and zero matches for the two broader-catch tokens.
+  for `catch (InvalidOperationException)` in the whole file, and zero matches for the two
+  broader-catch tokens within the extracted `AssignFolderComboBox` method-body span only.
 
 - [ ] [P6-T2] Check off the fourth Acceptance Criteria checkbox in spec.md (the item beginning "The
   fix in `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` catches only
@@ -404,13 +421,16 @@
 
 - [ ] [P6-T3] Run `git merge-base HEAD main` to resolve the base SHA for this branch (per
   `pr-base-branch-merge-base`), then run
-  `git diff --name-only <merge-base-sha> -- TaskMaster/AppGlobals/AppOlObjects.cs TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs TaskMaster/AppGlobals/ArchiveRootPathGuard.cs QuickFiler/Controllers/QfcHomeController.cs UtilitiesCS/Threading/ProgressViewer.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.RowTransforms.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs UtilitiesCS/Threading/TimeOutTask.cs UtilitiesCS/Extensions/DfDeedle.cs .editorconfig BannedSymbols.txt UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`,
-  then also run `git status --porcelain -- TaskMaster/AppGlobals/AppOlObjects.cs TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs TaskMaster/AppGlobals/ArchiveRootPathGuard.cs QuickFiler/Controllers/QfcHomeController.cs UtilitiesCS/Threading/ProgressViewer.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.RowTransforms.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs UtilitiesCS/Threading/TimeOutTask.cs UtilitiesCS/Extensions/DfDeedle.cs .editorconfig BannedSymbols.txt UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`
+  `git diff --name-only <merge-base-sha> -- TaskMaster/AppGlobals/AppOlObjects.cs TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs TaskMaster/AppGlobals/ArchiveRootPathGuard.cs QuickFiler/Controllers/QfcHomeController.cs UtilitiesCS/Threading/ProgressViewer.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILInstruction.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/MethodBodyReader.cs" UtilitiesCS/OutlookObjects/Table/OlTableExtensions.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.RowTransforms.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs UtilitiesCS/Threading/TimeOutTask.cs UtilitiesCS/Extensions/DfDeedle.cs .editorconfig BannedSymbols.txt UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`,
+  then also run `git status --porcelain -- TaskMaster/AppGlobals/AppOlObjects.cs TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs TaskMaster/AppGlobals/ArchiveRootPathGuard.cs QuickFiler/Controllers/QfcHomeController.cs UtilitiesCS/Threading/ProgressViewer.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILInstruction.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/MethodBodyReader.cs" UtilitiesCS/OutlookObjects/Table/OlTableExtensions.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.RowTransforms.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs UtilitiesCS/Threading/TimeOutTask.cs UtilitiesCS/Extensions/DfDeedle.cs .editorconfig BannedSymbols.txt UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`
   as a porcelain-status companion so an untracked file among the sibling-exclusion set (which the
   name-only diff alone cannot see) is also caught
-  (paths confirmed to exist at plan-authoring time via repository glob; spec.md's "SDIL Reader
-  files" phrase names no locatable file by that pattern in the current tree, so it is not enumerable
-  here and is instead covered by the comprehensive allow-list check in P6-T4). Record `Timestamp:`,
+  (all named paths, including the three SDIL reader production files under
+  `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/`, confirmed to exist at plan-revision time via
+  repository glob; a prior revision of this task incorrectly asserted no `*Sdil*`/`*SDIL*`-matching
+  file existed in the tree and left the SDIL reader files uncovered by this explicit check, relying
+  solely on the comprehensive allow-list check in P6-T4 as a backstop — that assertion was false and
+  is corrected here by naming the three files explicitly). Record `Timestamp:`,
   both `Command:` lines, `EXIT_CODE:`, `Output Summary:` in
   `<FEATURE>/evidence/qa-gates/phase6-scope-boundary-check.<TIMESTAMP>.md`. Acceptance: both the diff
   output and the porcelain-status output are empty (none of the named files were modified, staged, or
@@ -492,8 +512,29 @@
 
 ## SELF-REVIEW: RE-DERIVED THIS PASS
 
-Every citation below was re-read against the current repository tree in this authoring pass (no
-citation was carried forward from an earlier round; this is the plan's first authored pass):
+This plan has been through four preflight revision rounds since initial authoring. Round 1 applied
+three deltas (the corrected sibling-file paths in the plan-wide header/P6-T3 list; the added
+branch-coverage disposition in the "Coverage floor resolution" note and P5-T6's acceptance; the
+added backslash-path guidance for the post-processed Cobertura per-line lookup in P5-T6). Round 2
+applied one further delta (P6-T1's broader-catch check rescoped from a whole-file grep to an
+`AssignFolderComboBox` method-body span, because the whole-file form was unsatisfiable against three
+pre-existing, out-of-scope `catch (System.Exception` occurrences), plus a citation-completeness
+backfill for two round-1 facts. Round 3 corrected two further defects: P6-T1's stated method-body
+span was wrong (it named "lines 191-296, through EOF," but `AssignFolderComboBox`'s actual
+closing brace is at line 250; lines 252-296 belong to the unrelated `ProjectPredeterminedFolder` and
+`PopulateAndSelectFolder` methods) and has been corrected to lines 191-250 pre-fix (with guidance to
+extract through the method's actual closing brace post-fix, since Phase 3 shifts it a few lines
+later); and P1-T1's descriptive prose mislabeled the 4-line replaced expression (lines 231-234) as a
+"3-line expression," corrected to "4-line." Round 4 corrected one further defect: the plan-wide
+header note, P6-T3, and this section had each asserted "no file matching `*Sdil*`/`*SDIL*` exists in
+the current tree" as the reason spec.md's "SDIL Reader files" exclusion was left unenumerated; this
+was false. `git ls-files -- "*SDIL*"` returns six tracked files, three of which
+(`UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs`, `ILInstruction.cs`, `MethodBodyReader.cs`)
+are the production files that phrase names. All three prose locations and P6-T3's explicit
+`git diff`/`git status` pathspecs have been corrected to name these three files. Every citation below
+that a round's edit touched, added, or removed was re-read directly against the current repository
+tree in that same pass; citations untouched by any revision round are unchanged from the initial
+pass and are retained below for completeness of the traceability record:
 
 - `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` — lines 191 (`AssignFolderComboBox`
   start), 200-249 (guarded block), 206 (`EnsureBreadcrumbPipeline`), 212 (`AddFolderItems`), 219-222
@@ -558,8 +599,31 @@ citation was carried forward from an earlier round; this is the plan's first aut
   `QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs`, `UtilitiesCS/OutlookObjects/Table/OlTableExtensions*.cs`,
   `UtilitiesCS/Threading/TimeOutTask.cs`, `UtilitiesCS/Extensions/DfDeedle.cs`, and
   `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs` all exist at the paths now named
-  in P6-T3; no file matching `*Sdil*`/`*SDIL*` exists anywhere in the tree, so spec.md's "SDIL Reader
-  files" phrase is recorded as unenumerable rather than guessed at.
+  in P6-T3. This round's re-derivation also found that a prior revision's claim — "no file matching
+  `*Sdil*`/`*SDIL*` exists anywhere in the tree" — was false: `git ls-files -- "*SDIL*"` returns six
+  tracked files, three of which are the production files spec.md's Scope & Non-Goals section names
+  as "the SDIL reader files" (`UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs`,
+  `ILInstruction.cs`, `MethodBodyReader.cs`; the other three are that production code's own test
+  files under `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/`). This round corrects the plan-wide
+  header note and P6-T3 to name the three production paths explicitly rather than asserting they are
+  unenumerable.
+- `docs/features/active/2026-09-07-utilitiescs-test-determinism-780-803-594-811/policy-audit.2026-09-08T11-30.md`
+  — re-read this round (round 2 self-review, backfilling a round-1 citation gap): lines 91, 168-169,
+  and 180-182 confirmed the exact repo-wide branch-rate (66.3978%) and line-rate (86.0424%) figures
+  the "Coverage floor resolution" note (plan-wide conventions) and P5-T6's acceptance condition rely
+  on.
+- `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` — re-read this round (round 2
+  self-review): lines 74 (a comment containing the literal substring `catch (System.Exception`), 121
+  and 127 (real `catch (System.Exception ...)` clauses inside `LoadFolderHandlerAsync`, outside
+  `AssignFolderComboBox`), confirming P6-T1's whole-file broader-catch form was unsatisfiable and
+  motivating this round's rescoping of that task to the `AssignFolderComboBox` method-body span
+  (lines 191-250 pre-fix; the method's closing brace is at line 250, not line 296 — lines 252-296
+  belong to the unrelated `ProjectPredeterminedFolder` and `PopulateAndSelectFolder` methods).
+- `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` — re-read this round (round 2 self-review,
+  backfilling a round-1 citation gap): lines 64 and 420 confirmed `ConvertTo-KoverageRelativePath`'s
+  `-PathSeparator` parameter defaults to `[System.IO.Path]::DirectorySeparatorChar` (backslash on
+  Windows), and line 436 confirmed `ConvertTo-KoverageCoberturaXml` rewrites each class node's
+  `filename` attribute through that function, supporting P5-T6's backslash-path lookup guidance.
 
 **Sibling-region re-check:** The two existing `Ol.ArchiveRootPath` tests in `Part2.cs` (lines
 163-204, 266-308) were re-read alongside the target lines to confirm they remain unaffected by this
@@ -588,6 +652,10 @@ CITATION: QuickFiler/Viewers/IItemViewer.cs | lines 13-15, 87, 93-96, 118, 192
 CITATION: docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/spec.md | lines 60-82, 211-228, 244-251
 CITATION: docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/research/research.2026-09-08T23-58.md | section 5, section 4
 CITATION: scripts/vscode/Invoke-MSTestWithCoverage.ps1 | lines 1-13
+CITATION: docs/features/active/2026-09-07-utilitiescs-test-determinism-780-803-594-811/policy-audit.2026-09-08T11-30.md | lines 91, 168-169, 180-182
+CITATION: QuickFiler/Controllers/QfcItemController.FolderHandling.cs | lines 74, 121, 127 (pre-existing catch (System.Exception outside AssignFolderComboBox)
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 | lines 64, 420, 436
+CITATION: UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs, ILInstruction.cs, MethodBodyReader.cs | existence confirmed via git ls-files -- "*SDIL*"
 AC-TRACEABILITY: PASS
 AC-INVENTORY: AC1, AC2, AC3, AC4, AC5, AC6
 AC-MAPPING: AC1 | IMPLEMENTATION: P2-T1, P3-T1 | TESTS: P4-T1 | EVIDENCE: phase2-expect-fail-run, phase4-post-fix-confirm
