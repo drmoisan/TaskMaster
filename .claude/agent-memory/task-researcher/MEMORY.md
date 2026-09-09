@@ -61,6 +61,7 @@
 - [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — #731: sharing EmailMoveMonitor DROPS move actions; `volatile` = CS0420 build break; TWO dead ctor params; Cleanup() is UI-thread so no Task.Wait (2026-09-02)
 - [qfc791-deadline-and-cancel-teardown](project_qfc791_deadline_and_cancel_teardown.md) — #791: #424 AC:231/239 + #608 AC:184 ratified the empty-at-deadline result being superseded; item cap alone can't bound the pre-UI wait; gate ctor lookup fails closed (2026-09-06)
 - [qfc810-teardown-dropdown-residuals](project_qfc810_teardown_dropdown_residuals.md) — #810: method-group at park-focus blocks an optional param (CS0123); QfcHomeController.cs + BreadcrumbDropDownHost.cs both 496/500; dead accessor is in QfcItemController not the host (2026-09-07)
+- [console-out-and-rs0030-promotion-826](project_console_out_and_rs0030_promotion_826.md) — #826: Directory.Build.props DOES exist (CLAUDE.md stale); no GenerateDocumentationFile so IDE0005 never fires — CS0169/CS0414 is the real deletion hazard; TimeoutAfter is repo-local (2026-09-08)
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
