@@ -64,9 +64,12 @@ The conflict is no longer open: the orchestrator adjudicated Branch A on 2026-09
 re-measured the finding below and confirmed it, and Phase 3 implements Branch A. The measurement and
 the rejected alternative are retained verbatim so the choice stays reviewable.
 
-**Who amended the acceptance criteria, and why not the executor.** The AC6, AC20 and AC35
-amendments Branch A requires were applied to spec.md during preparation by the orchestrator and
-committed as 945659cd, before this plan is handed to an executor. Round 1 of this plan had the
+**Who amended the acceptance criteria, and why not the executor.** All three acceptance-criteria
+amendments were applied to spec.md during preparation by the orchestrator, before this plan is
+handed to an executor. The AC35 amendment, which discharges the reachability observation through an
+evidence artifact and a deferred epic handoff instead of an on-branch promotion, was committed as
+13c27214. The AC6 and AC20 pair that Branch A requires was committed as 945659cd. Round 1 of this
+plan had the
 executor make the AC6 and AC20 amendments at its own Phase 3 tasks; that assignment was wrong and
 has been removed. .claude/skills/acceptance-criteria-tracking/SKILL.md places authorship of
 acceptance criteria with planning and scoping agents, not with executors, and an executor free to
