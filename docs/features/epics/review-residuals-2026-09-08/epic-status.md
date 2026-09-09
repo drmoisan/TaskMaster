@@ -5,9 +5,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 every wave transition, and at final integration-PR completion. The checkpoint JSON is the durable,
 machine-authoritative source; `epic.md` is the human-authored manifest and narrative.
 
-- Last updated: 2026-09-09T13:46:46Z
-- Integration branch: `epic/review-residuals-2026-09-08-integration` at `e708cf02`
-- Current wave: 0
+- Last updated: 2026-09-09T14:38:00Z
+- Integration branch: `epic/review-residuals-2026-09-08-integration` at `48cd004b`
+- Current wave: 0 (1 of 7 merged; 815 executing)
 - Epic manifest: `docs/features/epics/review-residuals-2026-09-08/epic.md`
 - Epic kickoff: `docs/features/epics/review-residuals-2026-09-08/epic-kickoff.md`
 - Integration PR: not yet opened
@@ -16,8 +16,8 @@ machine-authoritative source; `epic.md` is the human-authored manifest and narra
 
 | issue_num | feature_folder | wave | merge_status | pr_url | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 813 | `2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
-| 815 | `2026-09-08-coverage-aggregation-double-counts-method-rows-815` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
+| 813 | `2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813` | 0 | merged | [#827](https://github.com/drmoisan/TaskMaster/pull/827) | `48cd004b` | 2026-09-09T13:46:00Z | 2026-09-09T14:30:00Z | 2026-09-09T14:34:01Z | — |
+| 815 | `2026-09-08-coverage-aggregation-double-counts-method-rows-815` | 0 | worktree_created (executing) | — | — | 2026-09-09T13:46:00Z | — | — | — |
 | 817 | `2026-09-08-utilitiescs-test-hygiene-residuals-817` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
 | 821 | `2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
 | 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
@@ -55,6 +55,38 @@ recorded in full, with its authority, under `execution_deviations` in the epic c
    still checked out in a framework-locked preparation worktree, so `git worktree add` cannot reuse
    them. Every preparation branch was verified to be fully contained in the integration branch
    before renaming, so no preparation work is stranded.
+
+## CI Gating
+
+`.github/workflows/ci.yml` triggers `pull_request` only on branches `[main, development]`. Every
+child pull request in this epic is based on the integration branch, so it receives **zero** CI runs
+and merge-on-green would silently become merge-on-nothing. Two compensations are in force, and no
+workflow file is edited to obtain a trigger:
+
+- Each child treats an absence of checks as an absence of evidence rather than as green, records the
+  zero-run fact as its `ci_gate` evidence, and proves its own tree with the full four-step C#
+  toolchain locally before merging.
+- The epic parent dispatches `gh workflow run ci.yml --ref epic/review-residuals-2026-09-08-integration`
+  after each fan-in, because a per-child run on a head that predates a sibling's merge never gates
+  the integrated tree.
+
+| run | after merge of | head_sha | conclusion |
+| --- | --- | --- | --- |
+| [34364775706](https://github.com/drmoisan/TaskMaster/actions/runs/34364775706) | 813 | `48cd004b` | pending |
+
+## Deferred Worktree Removals
+
+`enforce-parallel-worktree-removal-gate.ps1` demands a matching **parallel** checkpoint `items[]`
+record. This is an epic run, which keeps its per-feature records in the epic checkpoint's
+`features[]`, so the parallel gate has no jurisdiction here yet fails closed and denies every
+removal. The epic-specific gate would have allowed each of these: the feature is merged and the
+worktree is clean. Removal is deferred rather than forced, and no parallel checkpoint is fabricated
+to satisfy a gate that does not govern this run. Leftover worktrees are listed at epic completion
+for reclamation via `scripts/bash/cleanup-worktrees.sh`.
+
+| issue_num | worktree_path | first denied at |
+| --- | --- | --- |
+| 813 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-813` | 2026-09-09T14:37:00Z |
 
 ## Preparation Provenance
 
