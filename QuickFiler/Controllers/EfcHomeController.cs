@@ -346,7 +346,9 @@ namespace QuickFiler
             _explorerController = null;
             _formController = null;
             _keyboardHandler = null;
-            _parentCleanup.Invoke();
+            System.Action parentCleanup = _parentCleanup; // #810 idiom carried up by #821.
+            _parentCleanup = null;
+            parentCleanup?.Invoke();
         }
 
         #endregion

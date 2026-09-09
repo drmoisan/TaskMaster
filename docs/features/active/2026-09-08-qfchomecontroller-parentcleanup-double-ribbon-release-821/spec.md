@@ -637,20 +637,20 @@ change-scoped.
 
 ## Acceptance Criteria
 
-- [ ] **AC1 — Site A guard.** In `QuickFiler/Controllers/QfcHomeController.cs`, the `finally` block of
+- [x] **AC1 — Site A guard.** In `QuickFiler/Controllers/QfcHomeController.cs`, the `finally` block of
       `Cleanup` reads `ParentCleanup` into a local, assigns null to `ParentCleanup`, and then invokes
       the local, in that order; the file contains zero occurrences of the statement
       `ParentCleanup?.Invoke();`. The invocation remains inside the `finally`.
-- [ ] **AC2 — Site A' guard.** In `QuickFiler/Controllers/EfcHomeController.cs`, `Cleanup` reads
+- [x] **AC2 — Site A' guard.** In `QuickFiler/Controllers/EfcHomeController.cs`, `Cleanup` reads
       `_parentCleanup` into a local, assigns null to `_parentCleanup`, and then invokes the local
       through a null-conditional; the file contains zero occurrences of the statement
       `_parentCleanup.Invoke();`.
-- [ ] **AC3 — Site A regression test, added not moved.** A test method named
+- [x] **AC3 — Site A regression test, added not moved.** A test method named
       `Cleanup_CalledTwice_InvokesParentCleanupOnce` exists in
       `QuickFiler.Test/Controllers/QfcHomeControllerCleanupTests.cs`, calls `Cleanup()` twice on one
       controller instance with **both calls preceding** its single `Times.Once` verification of the
       parent-cleanup mock, and supplies a `because` string on that verification.
-- [ ] **AC4 — the existing Site A test is repaired, not left blind.** In
+- [x] **AC4 — the existing Site A test is repaired, not left blind.** In
       `QuickFiler.Test/Controllers/QfcHomeControllerCleanupTests.cs`, the method
       `Cleanup_DisposesTokenSourceAndDetachesWorkerCompleted` has its **second**
       `controller.Cleanup()` call relocated to sit immediately after the first, so that **both**
@@ -668,41 +668,52 @@ change-scoped.
       The dedicated test required by AC3 is added **in addition**, so the suite carries one
       single-purpose fail-before artifact alongside the repaired multi-assertion test; AC3 and AC4
       are both required and neither substitutes for the other.
-- [ ] **AC5 — Site A' regression test.** A test method named
+- [x] **AC5 — Site A' regression test.** A test method named
       `Cleanup_CalledTwice_InvokesParentCleanupOnce` exists in
       `QuickFiler.Test/Controllers/EfcHomeControllerLifecycleTests.cs`, calls `Cleanup()` twice on one
       controller instance with both calls preceding the assertion, and asserts an invocation **count
       equal to 1**, not a boolean flag. The pre-existing test
       `Cleanup_ClearsControllerFieldsAndInvokesParentCleanup` remains present and passes.
-- [ ] **AC6 — fail-before evidence for both cleanup sites.** A captured test run showing the two new
+- [x] **AC6 — fail-before evidence for both cleanup sites.** A captured test run showing the two new
       tests from AC3 and AC5 **failing** against the pre-fix production code is committed under
       docs/features/active/2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821/evidence/regression-testing/,
       naming both failing test methods and their assertion messages. Evidence written to any other
       location does not satisfy this criterion.
-- [ ] **AC7 — Site B null case throws typed and diagnosable.** Requesting cancellation on
+- [x] **AC7 — Site B null case throws typed and diagnosable.** Requesting cancellation on
       `UtilitiesCS/Threading/ProgressViewer.cs` while its token-source field is null throws
       InvalidOperationException whose message is non-empty and names the member a caller must use to
       supply a source. Discharged by `RequestCancel_WhenSourceIsNull_ThrowsInvalidOperationExceptionWithMessage`
       in `UtilitiesCS.Test/Threading/ProgressViewer_Tests.cs`, which asserts both the exception type
       and the message content.
-- [ ] **AC8 — Site B disposed case returns quietly.** Requesting cancellation on
+- [x] **AC8 — Site B disposed case returns quietly.** Requesting cancellation on
       `UtilitiesCS/Threading/ProgressViewer.cs` after the source's owner has disposed it raises no
       exception. Discharged by `RequestCancel_WhenSourceIsDisposed_DoesNotThrow` in
       `UtilitiesCS.Test/Threading/ProgressViewer_Tests.cs`.
-- [ ] **AC9 — Site B handler containment.** Neither the null case nor the disposed case allows any
+- [x] **AC9 — Site B handler containment.** Neither the null case nor the disposed case allows any
       exception to escape `CancelButton_Click` in `UtilitiesCS/Threading/ProgressViewer.cs`, and the
       form is closed in both cases. Discharged by
       `CancelButton_Click_WhenSourceIsNull_DoesNotThrowOutOfTheHandler` and
       `CancelButton_Click_WhenSourceIsDisposed_DoesNotThrowOutOfTheHandler` in
       `UtilitiesCS.Test/Threading/ProgressViewer_Tests.cs`.
-- [ ] **AC10 — Site B enabling hole closed.** `SetCancellationTokenSource` in
+- [x] **AC10 — Site B enabling hole closed.** `SetCancellationTokenSource` in
       `UtilitiesCS/Threading/ProgressViewer.cs` no longer sets the Cancel button's enabled state to
       true unconditionally; handed a null source it leaves the button disabled. Discharged by
       `SetCancellationTokenSource_WithNull_DoesNotEnableButton` in
       `UtilitiesCS.Test/Threading/ProgressViewer_Tests.cs`. The `CancelSource` property setter's
       existing behaviour at line 60 is unchanged, and the existing test
       `CancelSource_WhenAssigned_EnablesButtonAndCancelsSameSourceOnClick` still passes.
-- [ ] **AC11 — Site B' receives the same four changes.** `UtilitiesCS/Threading/ProgressPane.cs`
+
+      Delivered: `SetCancellationTokenSource` discharges this criterion by delegating to the
+      `CancelSource` property setter, which already enables only for a non-null source, per the OQ3
+      resolution recorded as decision 2 of the plan — this supersedes the spec's recommended-shape
+      bullet proposing an inline `Enabled = tokenSource is not null;` for that line only, and is a
+      reconciliation rather than a deviation, because AC10 asks only that a null source leave the
+      button disabled and the delegation removes duplicated enabling logic rather than duplicating
+      and patching it. Evidence: `evidence/qa-gates/ac14-trace-correspondence.2026-09-09T00-05.md`
+      (P3-T2), `evidence/qa-gates/preexisting-tests-still-pass.2026-09-09T00-05.md` (P6-T7), which
+      records `CancelSource_WhenAssigned_EnablesButtonAndCancelsSameSourceOnClick` as **passing**, and
+      `evidence/qa-gates/progress-surface-tests.2026-09-09T00-05.md` (P6-T8).
+- [x] **AC11 — Site B' receives the same four changes.** `UtilitiesCS/Threading/ProgressPane.cs`
       carries the same guard, the same typed throw with a message naming its own supplying member,
       the same handler boundary (closing with `this.Dispose()` rather than a form close), and the
       same conditional enabling. Discharged by five tests in
@@ -713,34 +724,43 @@ change-scoped.
       `CancelButtonClick_WhenSourceIsDisposed_DoesNotThrowOutOfTheHandler`, and
       `SetCancellationTokenSource_WithNull_DoesNotEnableButton`. The existing test
       `CancelButtonClick_WhenInvoked_CancelsTokenSource` still passes.
-- [ ] **AC12 — borrower constraint held.** Neither `UtilitiesCS/Threading/ProgressViewer.cs` nor
+
+      Delivered: `ProgressPane` keeps the inline null check `this.ButtonCancel.Enabled = tokenSource
+      is not null;` rather than delegating, because it has no `CancelSource` property to delegate to;
+      that asymmetry with `ProgressViewer` is the OQ3 resolution and is intentional. Evidence:
+      `evidence/qa-gates/ac14-trace-correspondence.2026-09-09T00-05.md` (P3-T5 through P3-T8) and
+      `evidence/qa-gates/progress-surface-tests.2026-09-09T00-05.md` (P6-T8), which records all five
+      pane tests as passing;
+      `evidence/qa-gates/preexisting-tests-still-pass.2026-09-09T00-05.md` records
+      `CancelButtonClick_WhenInvoked_CancelsTokenSource` as **passing**.
+- [x] **AC12 — borrower constraint held.** Neither `UtilitiesCS/Threading/ProgressViewer.cs` nor
       `UtilitiesCS/Threading/ProgressPane.cs` calls Dispose on its cancellation token source field,
       and neither constructs a CancellationTokenSource. The single disposal site for the QuickFiler
       session source remains `QuickFiler/Controllers/QfcHomeController.cs` line 389, and neither
       progress surface rethrows out of its event handler.
-- [ ] **AC13 — the suppression is gone and nothing was weakened to achieve it.** The four production
+- [x] **AC13 — the suppression is gone and nothing was weakened to achieve it.** The four production
       files in the Write Set contain zero occurrences of the token `!.Cancel()` and zero occurrences
       of the directive `#pragma warning disable`. Neither .editorconfig nor BannedSymbols.txt appears
       in the diff of this change, and no analyzer or compiler diagnostic severity is lowered
       anywhere.
-- [ ] **AC14 — the delivered implementation matches the stated invariant and trace.** The code
+- [x] **AC14 — the delivered implementation matches the stated invariant and trace.** The code
       satisfies both invariant sentences in Proposed Fix verbatim, and the four-step trace holds
       against the delivered code: the accept point validates its argument, the throw point is
       replaced by a guarded call, the previously absent absorption point now exists inside the
       handler, and the surface closes in all three outcomes.
-- [ ] **AC15 — no consumer-side catch was widened.** The two `catch (System.Exception e)` blocks in
+- [x] **AC15 — no consumer-side catch was widened.** The two `catch (System.Exception e)` blocks in
       `Cleanup` at `QuickFiler/Controllers/QfcHomeController.cs` remain two separate blocks that do
       not enclose the `finally`, the ObjectDisposedException catch in
       QuickFiler/Controllers/QfcFormController.SetupDisposal.cs is unchanged, and the existing test
       `Cleanup_DatamodelCleanupThrows_StillInvokesParentCleanup` in
       `QuickFiler.Test/Controllers/QfcHomeControllerCleanupTests.cs` still passes, proving a throwing
       teardown stage still reaches the callback.
-- [ ] **AC16 — the enumerations survive and the wrong label does not.** Both enumeration tables in
+- [x] **AC16 — the enumerations survive and the wrong label does not.** Both enumeration tables in
       this spec are still present at delivery with their derived figures intact (9 holders, 4
       cancelling sites, 1 additional unguarded cleanup site beyond Site A), and the phrase
       "fourth sharer" appears nowhere in the delivered production code, test code, code comments or
       commit messages.
-- [ ] **AC17 — full toolchain pass, in order, on the final state of the tree.** In this order:
+- [x] **AC17 — full toolchain pass, in order, on the final state of the tree.** In this order:
       `dotnet tool run csharpier format .` then `dotnet tool run csharpier check .` reporting zero
       files needing formatting; `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       with zero errors and no new warnings; `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
@@ -749,7 +769,7 @@ change-scoped.
       MSBuild's incremental up-to-date check does not invalidate on a command-line property change,
       so a warm Build target returns success having skipped compilation, and the gate becomes
       vacuous. If any step fails or changes a file, restart from the first step.
-- [ ] **AC18 — change-scoped coverage.** Every new or modified member in the four production files —
+- [x] **AC18 — change-scoped coverage.** Every new or modified member in the four production files —
       the new cancel-request member on each progress surface, both modified
       `SetCancellationTokenSource` methods, both modified `CancelButton_Click` handlers, and both
       modified `Cleanup` methods — reaches at least 90 percent line coverage in the AC17 test run, and no
@@ -757,14 +777,14 @@ change-scoped.
       figure against the testable denominator defined in CLAUDE.md section UT2 is recorded in the
       delivery notes and must not be lowered by this change; because no merge-base coverage baseline
       exists in this feature folder, the repository-wide figure is reported rather than gated.
-- [ ] **AC19 — no project file is modified.** No file with a .csproj extension appears in the diff of
+- [x] **AC19 — no project file is modified.** No file with a .csproj extension appears in the diff of
       this change. All eight files in the Write Set already carry a Compile Include entry, so none is
       required.
-- [ ] **AC20 — no out-of-scope file is modified.** The set of files changed by this fix is exactly the
+- [x] **AC20 — no out-of-scope file is modified.** The set of files changed by this fix is exactly the
       eight files in the Write Set, plus this spec, plus the evidence artifact required by AC6. No
       file named in Out of scope / non-goals is modified, and no policy document under .claude/rules
       or .github/instructions, and not CLAUDE.md.
-- [ ] **AC21 — preserved findings survive the merge.** Findings O-3, O-4 and O-5 are present in the
+- [x] **AC21 — preserved findings survive the merge.** Findings O-3, O-4 and O-5 are present in the
       Out of scope / non-goals section of this spec at merge, each with its file-and-line citation,
       and O-4 (the synchronous Init path passing a null token source, making item loading a silent
       no-op) is written out in enough detail to be promoted verbatim by a later reader without
@@ -810,3 +830,51 @@ change-scoped.
 - Links: GitHub issue #821 (consolidating the closed #822); epic `review-residuals-2026-09-08`;
   research record at
   docs/features/active/2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821/research/enumeration-findings.2026-09-08T23-45.md.
+
+## Acceptance Criteria Status
+
+- Source: `docs/features/active/2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821/spec.md`
+- Total AC items: 21
+- Checked off (delivered): 21
+- Remaining (unchecked): 0
+- Items remaining: none
+
+All evidence paths below are relative to
+`docs/features/active/2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821/`.
+
+| AC | Status | Evidence that discharges it |
+|---|---|---|
+| AC1 | delivered | `evidence/other/site-a-diff-shape.2026-09-09T00-05.md` (P2-T1, P2-T4) |
+| AC2 | delivered | `evidence/other/site-a-diff-shape.2026-09-09T00-05.md` (P2-T2, P2-T4) |
+| AC3 | delivered | `evidence/regression-testing/pass-after-cleanup-sites.2026-09-09T00-05.md` (P1-T1, P6-T6) |
+| AC4 | delivered | `evidence/regression-testing/pass-after-cleanup-sites.2026-09-09T00-05.md` (P1-T2, P6-T6) |
+| AC5 | delivered | `evidence/regression-testing/pass-after-cleanup-sites.2026-09-09T00-05.md` (P1-T3, P1-T4, P6-T6) |
+| AC6 | delivered | `evidence/regression-testing/fail-before-cleanup-sites.2026-09-09T00-05.md` |
+| AC7 | delivered | `evidence/qa-gates/progress-surface-tests.2026-09-09T00-05.md` (P3-T3, P6-T8) |
+| AC8 | delivered | `evidence/qa-gates/progress-surface-tests.2026-09-09T00-05.md` (P3-T3, P6-T8) |
+| AC9 | delivered | `evidence/qa-gates/progress-surface-tests.2026-09-09T00-05.md` (P3-T4, P6-T8) |
+| AC10 | delivered | `evidence/qa-gates/ac14-trace-correspondence.2026-09-09T00-05.md`, `evidence/qa-gates/preexisting-tests-still-pass.2026-09-09T00-05.md`, `evidence/qa-gates/progress-surface-tests.2026-09-09T00-05.md` (P3-T2, P6-T7, P6-T8) |
+| AC11 | delivered | `evidence/qa-gates/progress-surface-tests.2026-09-09T00-05.md`, `evidence/qa-gates/preexisting-tests-still-pass.2026-09-09T00-05.md` (P3-T5 through P3-T8, P6-T8) |
+| AC12 | delivered | `evidence/other/borrower-constraint.2026-09-09T00-05.md` (P3-T9) |
+| AC13 | delivered | `evidence/qa-gates/ac13-suppression-scan.2026-09-09T00-05.md`, `evidence/qa-gates/ac13-severity-unchanged.2026-09-09T00-05.md` (P5-T1, P5-T2) |
+| AC14 | delivered | `evidence/qa-gates/ac14-trace-correspondence.2026-09-09T00-05.md`, `evidence/qa-gates/ac14-invariants.2026-09-09T00-05.md` (P5-T8, P5-T9) |
+| AC15 | delivered | `evidence/other/catch-boundary-unchanged.2026-09-09T00-05.md`, `evidence/qa-gates/preexisting-tests-still-pass.2026-09-09T00-05.md` (P2-T5, P6-T7) |
+| AC16 | delivered | `evidence/qa-gates/ac16-label-scan.2026-09-09T00-05.md`, `evidence/qa-gates/ac16-enumerations-present.2026-09-09T00-05.md` (P5-T3, P5-T4) |
+| AC17 | delivered | `evidence/qa-gates/csharpier-format.2026-09-09T00-05.md`, `evidence/qa-gates/csharpier-check.2026-09-09T00-05.md`, `evidence/qa-gates/msbuild-analyzers.2026-09-09T00-05.md`, `evidence/qa-gates/msbuild-nullable.2026-09-09T00-05.md`, `evidence/qa-gates/mstest-coverage.2026-09-09T00-05.md` (P6-T1 through P6-T5) |
+| AC18 | delivered | `evidence/qa-gates/coverage-figures.2026-09-09T00-05.md`, `evidence/qa-gates/coverage-class-shape.2026-09-09T00-05.md`, `evidence/qa-gates/coverage-delta.2026-09-09T00-05.md` (P6-T9, P6-T10, P6-T11) |
+| AC19 | delivered | `evidence/qa-gates/ac19-no-csproj.2026-09-09T00-05.md` (P5-T6) |
+| AC20 | delivered | `evidence/qa-gates/ac20-footprint.2026-09-09T00-05.md` (P5-T7) |
+| AC21 | delivered | `evidence/qa-gates/ac21-findings-present.2026-09-09T00-05.md` (P5-T5) |
+
+Two recorded qualifications, both documented in the cited artifacts rather than concealed:
+
+- **AC19 and AC20.** This execution branch descends from the epic integration branch and carries 70
+  inherited sibling-feature commits, so the anchored `git diff` against
+  `git merge-base HEAD origin/main` lists 184 paths this feature did not author, including one
+  `.csproj` changed by inherited commit `468760ac`. Both criteria are evaluated against the authored
+  change span, which contains zero `.csproj` paths and zero out-of-scope paths. The inherited set is
+  disclosed in full in the two cited artifacts.
+- **AC18.** Cobertura reports `line-rate` per class rather than per method, so the per-member
+  condition for `QfcHomeController.Cleanup` is discharged by the alternative route the plan
+  specifies: its only four zero-hit lines, 382-385, lie in a pre-existing catch block this fix did
+  not change and were already zero-hit in the baseline. No threshold was lowered.

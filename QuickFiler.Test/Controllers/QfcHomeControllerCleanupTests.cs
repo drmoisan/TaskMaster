@@ -95,6 +95,10 @@ namespace QuickFiler.Controllers.Tests
                 SetPrivateField(controller, "_tokenSource", tokenSource);
 
                 // Act
+                // Issue #810 (AC3): a second cleanup must not re-run the datamodel stage. The
+                // fields the first pass consumed are nulled, so the second pass has nothing left
+                // to clean and the datamodel sees exactly one call across both passes.
+                controller.Cleanup();
                 controller.Cleanup();
 
                 // Assert
@@ -113,11 +117,6 @@ namespace QuickFiler.Controllers.Tests
                     "the worker-completed handler must be detached before the viewer is dropped"
                 );
                 parentCleanup.Verify(x => x.Invoke(), Times.Once);
-
-                // Issue #810 (AC3): a second cleanup must not re-run the datamodel stage. The
-                // fields the first pass consumed are nulled, so the second pass has nothing left
-                // to clean and the datamodel sees exactly one call across both passes.
-                controller.Cleanup();
                 datamodel.Verify(
                     x => x.Cleanup(),
                     Times.Once,
@@ -154,6 +153,40 @@ namespace QuickFiler.Controllers.Tests
             controller
                 .TokenSource.Should()
                 .BeNull("cleanup must null the field so no caller can reach the disposed source");
+        }
+
+        /// <summary>
+        /// Issue #821 (AC3): the ribbon release callback must fire at most once per controller
+        /// instance. The null-conditional operator on the previous <c>ParentCleanup?.Invoke()</c>
+        /// guarded against the delegate being null, not against it having already run, so a repeat
+        /// <c>Cleanup()</c> released the ribbon a second time. A stale second release resets
+        /// high-confidence mode after a later launch has set it, because the production callback
+        /// <c>RibbonController.ReleaseQuickFiler</c> mutates a persisted setting.
+        /// <para>
+        /// Both calls precede the verification deliberately. Moq evaluates <c>Verify</c> eagerly, so
+        /// an assertion placed between the two calls observes only the first and cannot fail.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void Cleanup_CalledTwice_InvokesParentCleanupOnce()
+        {
+            // Arrange
+            var parentCleanup = new Mock<System.Action>();
+            var controller = new QfcHomeController(
+                new Mock<IApplicationGlobals>().Object,
+                parentCleanup.Object
+            );
+
+            // Act
+            controller.Cleanup();
+            controller.Cleanup();
+
+            // Assert
+            parentCleanup.Verify(
+                x => x.Invoke(),
+                Times.Once,
+                "the ribbon release callback must fire at most once per controller instance"
+            );
         }
     }
 }
