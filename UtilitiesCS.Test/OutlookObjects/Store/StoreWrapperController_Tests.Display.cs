@@ -223,6 +223,48 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         }
 
         /// <summary>
+        /// Issue #823 (R1): the retry budget is one attempt per controller instance per store. A
+        /// single controller shown two distinct failing stores must therefore attempt the SMTP
+        /// lookup once against each of them. Before the fix, one controller-scoped flag was
+        /// consumed by whichever store was displayed first and the second store's lookup never ran,
+        /// so its address label stayed at the generic placeholder for the life of the dialog.
+        /// </summary>
+        [TestMethod]
+        public void PopulateWithCurrent_OnTwoFailingStoresInOneController_RetriesEachStoreOnce()
+        {
+            // Arrange
+            var (controller, _) = CreateControllerWithViewer();
+            var (rootFolderA, exchangeUserA) = CreateDisplayFailingSmtpRootFolderWithUser(
+                "Store A lookup failed."
+            );
+            var (rootFolderB, exchangeUserB) = CreateDisplayFailingSmtpRootFolderWithUser(
+                "Store B lookup failed."
+            );
+            var storeA = new StoreWrapper(null)
+            {
+                RootFolder = rootFolderA.Object,
+                UserEmailAddress = null,
+                DisplayName = "Mailbox A",
+            };
+            var storeB = new StoreWrapper(null)
+            {
+                RootFolder = rootFolderB.Object,
+                UserEmailAddress = null,
+                DisplayName = "Mailbox B",
+            };
+
+            // Act
+            controller.Current = storeA;
+            controller.PopulateWithCurrent();
+            controller.Current = storeB;
+            controller.PopulateWithCurrent();
+
+            // Assert
+            exchangeUserA.VerifyGet(x => x.PrimarySmtpAddress, Times.Once());
+            exchangeUserB.VerifyGet(x => x.PrimarySmtpAddress, Times.Once());
+        }
+
+        /// <summary>
         /// The latch does not replace the null check: when the address is already populated the
         /// lookup must not be attempted at all, so the added UI-thread latency stays at zero for
         /// the ordinary case.
