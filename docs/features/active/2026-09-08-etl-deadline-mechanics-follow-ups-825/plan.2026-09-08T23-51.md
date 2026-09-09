@@ -4,10 +4,13 @@
 - **Parent (optional):** epic review-residuals-2026-09-08, child F825
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-09
-- **Status:** Awaiting executor preflight (revision round 2)
-- **Version:** 1.1 — round 2 applied the orchestrator's Branch A adjudication: the executor-side
-  spec-amendment tasks are removed, Phase 3 opens with a read-only amended-spec verification, and
-  Phase 3 is renumbered contiguously.
+- **Status:** Awaiting executor preflight (revision round 3)
+- **Version:** 1.2 — round 3 applied the seventeen-defect executor preflight delta. Round 2 applied
+  the orchestrator's Branch A adjudication: the executor-side spec-amendment tasks were removed,
+  Phase 3 opened with a read-only amended-spec verification, and Phase 3 was renumbered contiguously.
+  Round 3 changed no task count and added no task; it corrected command forms, decision D9, and the
+  acceptance conditions that were pinned to pre-change state. The task count is unchanged at 108
+  across ten phases, so every P#-T# cross-reference in this file is unchanged and still resolves.
 - **Work Mode:** full-bug (sole acceptance-criteria source: spec.md, 35 criteria)
 
 **Task-line convention.** Every task opens with its primary file path, then an em dash, then the
@@ -201,6 +204,17 @@ the host machine and user name in two casings. No task in this plan writes a TRX
 folder; scoped runs pass no logger, and the coverage runner's Cobertura XML is the only machine
 artifact committed.
 
+**D9 — a red coverage run produces no readable artifact.** scripts/vscode/Invoke-MSTestWithCoverage.ps1
+throws at lines 235-237 when the coverage exit code is non-zero, and that throw precedes the Cobertura
+post-processing at lines 334-344, so a run with any failing test leaves no processed XML for P0-T8 or
+P8-T6 to read. If a run in this plan is red, the executor records the failing test names in the
+artifact and re-runs once. If the same test fails on the re-run and it is
+DictionaryExtensions_Tests.TryAddValuesAsync_UpdatesExistingValue, the executor records it as the
+flake tracked by issue #780, re-runs a third time and marks the task BLOCKED if it does not go green.
+Any other repeated failure marks the task BLOCKED and is reported. A BLOCKED coverage task halts the
+plan; it is never recorded as PASS, and a raw unprocessed Cobertura file is not an acceptable
+substitute for the processed one.
+
 ---
 
 ### Phase 0 — Policy Reads, Toolchain Bootstrap and Baseline Capture
@@ -225,15 +239,19 @@ artifact committed.
 
 - [ ] [P0-T4] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/baseline/dotnet-tool-restore.md — restore the local tool manifest by running `dotnet tool restore` from the repository root, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`,
-      and a `CSharpierVersion: 1.2.6` line read from .config/dotnet-tools.json. CSharpier 1.2.6
-      requires a subcommand, so the bare-path invocation form does not run.
+      and a `CSharpierVersion: 1.2.6` line read from the tool manifest at the repository root,
+      dotnet-tools.json. The manifest is at the repository root and not under .config/; there is no
+      .config/dotnet-tools.json in this tree. CSharpier 1.2.6 requires a subcommand, so the bare-path
+      invocation form does not run.
 
 - [ ] [P0-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/baseline/csharpier-check.md — capture the formatter baseline by running `dotnet tool run csharpier check .` from the repository root, then write this artifact.
-      Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and
-      a `CheckedFiles:` line carrying the integer CSharpier prints on its summary line. This command
-      is a read-only verify, so its exit code is a valid signal on its own; the CheckedFiles figure is
-      recorded so the final-QC run in Phase 8 can be compared against a number rather than only an
-      exit code.
+      Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, a
+      `CheckedFiles:` line carrying the integer CSharpier prints on its `Checked N files in Xms.`
+      summary line, and an `UnformattedFileList:` line naming every file the check reported or the
+      value none. A non-zero exit code halts the plan and is reported: P8-T1 runs a repository-wide
+      mutating `csharpier format .`, which would repair pre-existing drift anywhere in the tree, and
+      every file it repaired would then enter the branch diff and falsify the P9-T4 Write Set
+      accounting, which admits only the eleven Write Set paths and this feature's own folder.
 
 - [ ] [P0-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/baseline/build-analyzers.md — capture the analyzer-gate baseline using the D1 resolution followed by `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` with a detailed file log written to the sibling build-analyzers.txt in the same folder.
       Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, a
@@ -255,7 +273,7 @@ artifact committed.
       that XML, namely `LineRate:`, `LinesCovered:`, `LinesValid:`, `BranchRate:`,
       `BranchesCovered:`, `BranchesValid:`, plus `TestsPassed:` and `TestsFailed:` read from the run
       summary. All eight values are integers or decimals; the string UNVERIFIED is not an acceptable
-      value. D6 applies if the run does not terminate.
+      value. D6 applies if the run does not terminate. D9 applies if the run is red.
 
 - [ ] [P0-T9] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/baseline/coverage-baseline-by-file.md — record the per-file coverage baseline for the five production files this feature edits by reading the class elements of the sibling coverage-baseline.cobertura.xml whose filename attribute ends in OlTableExtensions.TableAccess.cs, OlTableExtensions.Etl.cs, TimeOutTask.cs, DfDeedle.cs or DfDeedle.QfcColumns.cs.
       Acceptance: the artifact carries `Timestamp:` and exactly five `File:` blocks, each with
@@ -290,7 +308,12 @@ artifact committed.
       `_ = TimeProvider\.System\.CreateCancellationTokenSource\(` and the file's line count is exactly
       one greater than the TableAccessCsLines value pinned by P0-T10.
 
-- [ ] [P1-T2] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/ac8-createcancellationtokensource-proof.md — compile the settling call site using the D1 resolution followed by `& $msbuild UtilitiesCS\UtilitiesCS.csproj /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` with a detailed file log written to the sibling ac8-createcancellationtokensource-proof.txt in the same folder.
+- [ ] [P1-T2] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/ac8-createcancellationtokensource-proof.md — compile the settling call site using the D1 resolution followed by `& $msbuild UtilitiesCS\UtilitiesCS.csproj /t:Rebuild /m /p:Configuration=Debug /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` with a detailed file log written to the sibling ac8-createcancellationtokensource-proof.txt in the same folder.
+      The solution platform name `Any CPU` is deliberately not passed to this project-scoped build.
+      UtilitiesCS/UtilitiesCS.csproj line 9 defaults `$(Platform)` to `AnyCPU` and its Debug property
+      group at line 22 is conditioned on `Debug|AnyCPU`, so `/p:Platform=Any CPU` matches no property
+      group, leaves `OutputPath` unset and fails before compilation. That failure produces no `CS1061`
+      and is not a refutation; the task is BLOCKED if it occurs.
       Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`, a
       `MemberProven: TimeProviderTaskExtensions.CreateCancellationTokenSource` line, and a
       `CS1061Count: 0` line obtained by counting occurrences of the token `CS1061` in the captured
@@ -323,6 +346,15 @@ artifact committed.
       factory that constructs a plain CancellationTokenSource and cancels it from a timer created on
       the provider, is implemented in Phase 3 instead and recorded in the same artifact. A BLOCKED
       P1-T2 result is not a refutation and does not open the fallback branch; it halts the plan.
+      If the fallback branch is taken, AC8 as written is refuted rather than satisfied and cannot be
+      checked off. The executor then writes
+      docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/ac8-refuted-fallback.md
+      recording the CS1061 evidence, both confounder exclusions and the fallback implemented in Phase
+      3, leaves AC8 unchecked, and reports the plan outcome as INCOMPLETE with AC8 named as the single
+      unmet criterion. P9-T1 then reads 34 checked and 1 unchecked, and P9-T2 records
+      `Checked off (delivered): 34` and `Remaining (unchecked): 1`. This branch is not expected: the
+      research read the member's declaration at line 199 of the shipped
+      Microsoft.Bcl.TimeProvider.xml.
 
 ### Phase 2 — Regression Test Red for the Retry Literal
 
@@ -343,7 +375,13 @@ artifact committed.
       `git diff $b --numstat -- UtilitiesCS.Test/UtilitiesCS.Test.csproj` reports exactly 1 added line
       and exactly 0 removed lines.
 
-- [ ] [P2-T3] UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll — build the test project against the pre-change production signature using the D1 resolution followed by `& $msbuild UtilitiesCS.Test\UtilitiesCS.Test.csproj /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`.
+- [ ] [P2-T3] UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll — build the test project against the pre-change production signature using the D1 resolution followed by `& $msbuild UtilitiesCS.Test\UtilitiesCS.Test.csproj /t:Rebuild /m /p:Configuration=Debug`.
+      The solution platform name `Any CPU` is deliberately not passed to this project-scoped build.
+      UtilitiesCS.Test/UtilitiesCS.Test.csproj line 11 defaults `$(Platform)` to `AnyCPU` and its Debug
+      property group at line 47 is conditioned on `Debug|AnyCPU`, so `/p:Platform=Any CPU` matches no
+      property group, leaves `OutputPath` unset and fails before compilation; the assembly write-time
+      assertion below could not then hold. That failure is BLOCKED and reported, not a build failure of
+      the test code.
       Acceptance: the command exits 0 and this assembly exists with a write time later than the
       timestamp recorded by P0-T2. The new test compiles against the pre-change signature because it
       uses only the timeoutSourceFactory parameter, which already exists at
@@ -388,32 +426,44 @@ artifact committed.
       no later task in this phase runs. The executor does not repair the disagreement by editing
       spec.md; acceptance criteria in this feature are authored by planning agents only.
 
-- [ ] [P3-T2] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — add the trailing optional parameter to GetTableInViewAsync, positioned after timeoutSourceFactory on line 37, declared as a nullable TimeProvider defaulting to null, with a comment recording that a null provider resolves to the system clock so production timing is unchanged, and that a CancelAfter call must never be introduced on a provider-created source because on pre-.NET 8 runtimes it does not terminate the original delay timer.
+- [ ] [P3-T2] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — add the trailing optional parameter to GetTableInViewAsync, positioned after timeoutSourceFactory on line 37, declared as a nullable TimeProvider defaulting to null. Place the explanatory comment on the lines immediately above the method declaration, not inside the parameter list, recording that a null provider resolves to the system clock so production timing is unchanged, and that a CancelAfter call must never be introduced on a provider-created source because on pre-.NET 8 runtimes it does not terminate the original delay timer.
       Acceptance: the file contains exactly one line matching the regular expression
       `TimeProvider\? timeProvider = null`, and the line number of that match is exactly one greater
-      than the line number of the single line matching
-      `Func<int, CancellationTokenSource>\? timeoutSourceFactory = null`.
+      than the line number of the single line matching `timeoutSourceFactory = null`. The comment
+      sits above the declaration rather than above the new parameter because a comment line inside
+      the parameter list would separate the two parameters and falsify the adjacency assertion. The
+      shortened `timeoutSourceFactory = null` token replaces the full parameter declaration so the
+      asserted literal carries no angle brackets, which the plan-acceptance gate skips.
 
-- [ ] [P3-T3] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — resolve the deadline source once inside GetTableInViewAsync, before the try that opens at line 55, as a local factory equal to the supplied timeoutSourceFactory when it is non-null and otherwise to a clock-derived factory calling CreateCancellationTokenSource on the provider coalesced with TimeProvider.System with a TimeSpan.FromMilliseconds argument, and pass that resolved local to TimeOutTask.RunWithTimeout in place of the raw parameter.
+- [ ] [P3-T3] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — resolve the deadline source once inside GetTableInViewAsync, before the try that opens at pre-change line 55 and which P3-T2's parameter and comment lines have already moved down, as a local factory equal to the supplied timeoutSourceFactory when it is non-null and otherwise to a clock-derived factory calling CreateCancellationTokenSource on the provider coalesced with TimeProvider.System with a TimeSpan.FromMilliseconds argument, and pass that resolved local to TimeOutTask.RunWithTimeout in place of the raw parameter.
       Acceptance: the file contains exactly one line matching `CreateCancellationTokenSource\(`; the
       argument the RunWithTimeout call passes is the resolved local rather than timeoutSourceFactory;
       and an explicitly supplied factory still wins, which P3-T11 proves by test.
 
-- [ ] [P3-T4] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — propagate the new parameter through the TaskCanceledException retry recursion at lines 82-87, which already forwards timeoutMs and timeoutSourceFactory, by adding the provider as the trailing argument.
+- [ ] [P3-T4] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — propagate the new parameter through the TaskCanceledException retry recursion at pre-change lines 82-87, which already forwards timeoutMs and timeoutSourceFactory, by adding the provider as the trailing argument.
       Acceptance: the recursion inside the TaskCanceledException catch passes five arguments and the
-      fifth is timeProvider; the Console.WriteLine at line 79 and its twenty leading spaces are
-      untouched.
+      fifth is timeProvider; and the single Console.WriteLine inside the TaskCanceledException catch,
+      at pre-change line 79, is byte-identical to its pre-change text including its twenty leading
+      spaces. It is located by content and by enclosing catch block rather than by line number,
+      because P3-T2 and P3-T3 add lines above it and it no longer sits at line 79.
 
-- [ ] [P3-T5] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — replace the literal timeout argument in the TimeoutException retry recursion at lines 103-108 with timeoutMs, add the provider as the trailing argument, and replace the rationale comment at lines 100-102 with one recording that the caller's value is now propagated so both attempts are governed by the same caller-visible deadline on the same caller-supplied clock.
+- [ ] [P3-T5] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs — replace the literal timeout argument in the TimeoutException retry recursion at pre-change lines 103-108 with timeoutMs, add the provider as the trailing argument, and replace the rationale comment at pre-change lines 100-102 with one recording that the caller's value is now propagated so both attempts are governed by the same caller-visible deadline on the same caller-supplied clock.
       Acceptance: the file contains zero lines matching the regular expression `^\s+2000,$`, down from
       the TableAccessLiteral2000ArgumentCount value of 1 pinned by P0-T10; the file still contains
-      exactly one line matching `int timeoutMs = 2000`; and the Console.WriteLine at line 97 and its
-      sixteen leading spaces are untouched.
+      exactly one line matching `int timeoutMs = 2000`; and the single Console.WriteLine inside the
+      TimeoutException catch, at pre-change line 97, is byte-identical to its pre-change text
+      including its sixteen leading spaces. It is located by content and by enclosing catch block
+      rather than by line number, because P3-T2, P3-T3 and P3-T4 add lines above it and it no longer
+      sits at line 97.
 
 - [ ] [P3-T6] UtilitiesCS/Extensions/DfDeedle.cs — change line 148 so it passes the provider as a named third argument to GetTableInViewAsync, completing the pattern already used at line 168 for AddQfcColumnsAsync and at lines 172-178 for EtlAsync.
-      Acceptance: the file contains exactly one line matching the regular expression
-      `GetTableInViewAsync\(token, 0, timeProvider: timeProvider\)`, and the count of lines in that
-      file containing the token `timeProvider: timeProvider` is exactly 3.
+      Acceptance: the file contains zero occurrences of the token `GetTableInViewAsync(token, 0);`,
+      which is the pre-change two-argument call at line 148, and the count of lines in that file
+      containing the token `timeProvider: timeProvider` is exactly 3, up from the two at lines 168 and
+      177. The single-line form `GetTableInViewAsync(token, 0, timeProvider: timeProvider)` is
+      deliberately not asserted: that statement is 113 columns at this indentation, there is no
+      .csharpierrc in the repository, and CSharpier's default 100-column print width breaks it into a
+      five-line call at P8-T1, after which a single-line regex returns zero matches.
 
 - [ ] [P3-T7] UtilitiesCS.Test/Extensions/DfDeedleEtlTimeoutTests.cs — add a third test-owned gate to BuildExplorer by inserting a leading Action parameter named onGetTable before onAddSentOnColumn, invoking it inside the GetTable setup at line 119 before returning the table mock, and updating the doc comment at lines 66-71 to describe three gates.
       Acceptance: the file contains exactly one line matching `System\.Action onGetTable`, exactly one
@@ -435,7 +485,12 @@ artifact committed.
       `git diff $b -- UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs` produces zero
       lines matching the regular expression `^\+.*\[TestMethod\]`.
 
-- [ ] [P3-T10] UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs — add GetTableInViewAsync_InjectedClock_ArmsAcquisitionDeadlineOnInjectedProvider, which constructs an ArmingBarrierTimeProvider over a FakeTimeProvider, gates the mocked GetTable on a ManualResetEventSlim, starts the call without awaiting it, awaits the barrier, releases the gate in a finally, and asserts the returned table is the mock.
+- [ ] [P3-T10] UtilitiesCS.Test/OutlookObjects/Table/GetTableInViewAsyncClockTests.cs — add GetTableInViewAsync_InjectedClock_ArmsAcquisitionDeadlineOnInjectedProvider, which constructs an ArmingBarrierTimeProvider over a FakeTimeProvider, gates the mocked GetTable on a ManualResetEventSlim, starts the call without awaiting it, awaits the barrier, sets the gate inside the try, awaits the call, and asserts the returned table is the mock; the gate is set a second time in a finally so an orphaned Task.Run body cannot outlive the test on the failure path.
+      The gate must be set inside the try before the call is awaited: releasing it only in the finally
+      leaves the awaited call blocked on a gate nothing sets, and because the assertion sits inside the
+      try the failure mode is a hang rather than a failure. The fake clock is not advanced, because
+      advancing past timeoutMs cancels the acquisition and RunWithTimeout then returns default, making
+      the returned table null.
       Acceptance: the file contains exactly one occurrence of the token
       `GetTableInViewAsync_InjectedClock_ArmsAcquisitionDeadlineOnInjectedProvider`, exactly one
       occurrence of `new ArmingBarrierTimeProvider(`, and one occurrence of
@@ -456,8 +511,9 @@ artifact committed.
       the regular expression `Thread\.Sleep|Task\.Delay|DateTime\.Now|Stopwatch`; and at most 500
       lines.
 
-- [ ] [P3-T13] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase3-green.md — rebuild with the D1 resolution, then run two D2 scoped runs against UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll, the first filtered to GetTableInViewAsyncClockTests, OlTableExtensions_Tests and OlTableExtensionsEtlClockTests, the second filtered to DfDeedleEtlTimeoutTests and DfDeedle_COM_Tests, then write this artifact.
-      Acceptance: the artifact carries `Timestamp:`, two `Command:` lines, two `EXIT_CODE: 0` lines,
+- [ ] [P3-T13] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase3-green.md — rebuild with the D1 resolution followed by `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run two D2 scoped runs against UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll, the first filtered to GetTableInViewAsyncClockTests, OlTableExtensions_Tests and OlTableExtensionsEtlClockTests, the second filtered to DfDeedleEtlTimeoutTests and DfDeedle_COM_Tests, then write this artifact.
+      Acceptance: the artifact carries `Timestamp:`, three `Command:` lines, the first of which is the
+      solution rebuild above, three `EXIT_CODE: 0` lines,
       `Output Summary:`, `TestsFailed: 0` for both runs, and named per-test result lines showing
       GetTableInViewAsync_TimeoutRetry_UsesCallerTimeoutMsNotLiteral2000,
       GetTableInViewAsync_InjectedClock_ArmsAcquisitionDeadlineOnInjectedProvider,
@@ -516,8 +572,10 @@ artifact committed.
       token `new FakeTimeProvider()` numbering exactly one greater than the
       OlTableExtensionsTestsFakeTimeProviderCount value pinned by P0-T10. The added one is the
       argument P3-T9 introduced inside the test method
-      GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot, whose declaration is
-      at line 1646 and whose InvokeAsyncResult argument list is at lines 1662-1677; the pinned one is
+      GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot, whose declaration and
+      InvokeAsyncResult argument list are at pre-change lines 1646 and 1662-1677 and have moved by the
+      lines P3-T9 added at the three earlier binding sites; the check-off report records the
+      re-derived numbers. The pinned one is
       the pre-existing argument at line 974, which sits inside
       EtlAsync_WithBinaryAndObjectFieldsAndProgress_ReturnsTransformedData and is unrelated to
       GetTableInViewAsync, so it must not be mistaken for the criterion's subject. The corroborating
@@ -555,7 +613,7 @@ artifact committed.
 
 - [ ] [P4-T4] UtilitiesCS.Test/Threading/TimeOutTask_Tests.cs — delete the two test callers of the removed overloads, TimeoutAfter_GenericTask_WithRepeatAttempts_ReturnsResult at lines 190-201 and TimeoutAfter_NonGenericTask_WithRepeatAttempts_CompletesSuccessfully at lines 203-215.
       Acceptance: the file contains zero occurrences of the token `WithRepeatAttempts` and its line
-      count is strictly less than 218.
+      count is strictly less than 217, the count the file carries before this task.
 
 - [ ] [P4-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/file-size-accounting.md — record the file-size accounting the acceptance criteria require.
       Acceptance: the artifact carries `Timestamp:`, `LinesBefore: 1011`, a measured `LinesAfter:`
@@ -564,8 +622,9 @@ artifact committed.
       other artifact, code comment, commit message or PR body in this feature may state that the cap
       violation is resolved.
 
-- [ ] [P4-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase4-green.md — rebuild with the D1 resolution, then run a D2 scoped run against UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll filtered to TimeOutTask_Tests and OlTableExtensions_Tests, then write this artifact.
-      Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`,
+- [ ] [P4-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase4-green.md — rebuild with the D1 resolution followed by `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run a D2 scoped run against UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll filtered to TimeOutTask_Tests and OlTableExtensions_Tests, then write this artifact.
+      Acceptance: the artifact carries `Timestamp:`, two `Command:` lines, the first of which is the
+      solution rebuild above, two `EXIT_CODE: 0` lines, `Output Summary:`,
       `TestsFailed: 0`, and a `TestsPassed:` integer. TimeOutTask_Tests is one partial class spanning
       UtilitiesCS.Test/Threading/TimeOutTask_Tests.cs,
       UtilitiesCS.Test/Threading/TimeOutTask_OverloadCoverageTests.cs,
@@ -612,9 +671,11 @@ artifact committed.
       `Timestamp:`, `Command:`, `EXIT_CODE: 0` and both counts.
 
 - [ ] [P5-T3] UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs — keep the swallow path in EtlAsync unchanged: the TimeoutException catch at lines 119-125, its logger.Error and its tokenSource.Cancel stay verbatim, and the LogTableTiming call at lines 127-130 that sits between the swallow and the return is untouched.
-      Acceptance: the file contains exactly one line matching `tokenSource\.Cancel\(\);` inside
-      EtlAsync, and the anchored diff for this file contains zero removed lines matching
-      `tokenSource\.Cancel` and zero removed lines matching `LogTableTiming`.
+      Acceptance: the file contains exactly one line matching `tokenSource\.Cancel\(\);`, inside
+      EtlAsync; the anchored diff for this file contains exactly one removed line matching
+      `tokenSource\.Cancel`, which is the EtlAsyncOld occurrence at pre-change line 167 that P4-T2
+      deleted, and zero added lines matching it; and the anchored diff contains zero removed lines
+      matching `LogTableTiming`.
 
 - [ ] [P5-T4] UtilitiesCS/Extensions/DfDeedle.cs — change the two Item1 reads on line 193 to the tuple's data name so the flow analysis the guard at line 182 establishes carries to the log payload under this file's nullable context opened at line 23, and rewrite the stale sentence at lines 180-181 that describes a null-forgiving suppression so it describes a nullable tuple element; the guard at lines 182-189 and its InvalidOperationException message are not touched.
       Acceptance: the file contains zero occurrences of the token `tableSnapshot.Item1`; the anchored
@@ -627,8 +688,9 @@ artifact committed.
       zero matching `IsCancellationRequested`; and every changed line in that diff begins with three
       slashes of doc-comment syntax.
 
-- [ ] [P5-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase5-green.md — rebuild with the D1 resolution, then run a D2 scoped run against UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll filtered to OlTableExtensionsEtlClockTests, OlTableExtensions_Tests and the DfDeedle classes, then write this artifact.
-      Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`,
+- [ ] [P5-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase5-green.md — rebuild with the D1 resolution followed by `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run a D2 scoped run against UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll filtered to OlTableExtensionsEtlClockTests, OlTableExtensions_Tests and the DfDeedle classes, then write this artifact.
+      Acceptance: the artifact carries `Timestamp:`, two `Command:` lines, the first of which is the
+      solution rebuild above, two `EXIT_CODE: 0` lines, `Output Summary:`,
       `TestsFailed: 0`, and a named result line showing
       EtlAsync_DeadlineExpires_ReturnsNullDataAndCancelsTokenSource passing.
 
@@ -656,20 +718,26 @@ artifact committed.
       Acceptance: the file contains exactly one occurrence of the token `250 * rowCount`; the comment
       block immediately above it contains all three of the tokens `no recorded measurement`,
       `LogTableTiming` and `elapsedMs`; and, using the D3 anchor,
-      `git diff $b -- UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs` produces zero removed
-      lines matching the regular expression `250 \* rowCount`.
+      `git diff $b -- UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs` produces exactly one
+      removed line matching the regular expression `250 \* rowCount` and zero added lines matching it.
+      Exactly one removed line, not zero: P4-T2 deleted EtlAsyncOld, whose pre-change line 149 carried
+      a byte-identical copy of the expression, so the zero-removed form cannot hold at this point in
+      the plan. The zero-added half is what proves the surviving expression inside EtlAsync and its
+      numeric literal were not rewritten.
 
 - [ ] [P6-T2] UtilitiesCS/Extensions/DfDeedle.QfcColumns.cs — correct the stale doc comment at line 96 by replacing the name TableEtlInvoker with DefaultTableEtl, which is declared at DfDeedle.cs lines 67-70, retaining the CS1769 rationale sentence unchanged.
       Acceptance: the file contains zero occurrences of the token `TableEtlInvoker`, at least one
       occurrence of the token `DefaultTableEtl`, and exactly one occurrence of the token `CS1769`.
 
 - [ ] [P6-T3] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac19-historical-records.md — confirm the historical record this feature must not rewrite is untouched, by running with the D3 anchor `git diff $b -- UtilitiesCS.Test/Extensions/DfDeedleEtlTimeoutTests.cs` and counting added or removed lines matching TableEtlInvoker, then write this artifact.
-      Acceptance: that count is zero, so the historically accurate past-tense mention at line 212 of
-      that file survives; the artifact records `Timestamp:`, `Command:`, `EXIT_CODE: 0` and the count.
+      Acceptance: that count is zero, so the historically accurate past-tense mention of
+      TableEtlInvoker survives. It sits at pre-change line 212 and P3-T7 and P3-T8 add lines above it,
+      so the artifact records the line number re-derived at the time of this check rather than 212. The
+      artifact records `Timestamp:`, `Command:`, `EXIT_CODE: 0` and the count.
 
 - [ ] [P6-T4] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC1.
-      Acceptance: exactly one line matches `^- \[x\] \*\*AC1\*\*`, and the P6-T1 zero-removed-lines
-      assertion for the budget expression passed.
+      Acceptance: exactly one line matches `^- \[x\] \*\*AC1\*\*`, and the P6-T1 one-removed,
+      zero-added assertion for the budget expression passed.
 
 - [ ] [P6-T5] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC2.
       Acceptance: exactly one line matches `^- \[x\] \*\*AC2\*\*`, and the three tokens named in P6-T1
@@ -689,7 +757,7 @@ timed source on the system clock.
       feature; the replacement comment contains the token `FakeTimeProvider`; and the comment asserts
       no population of tests driving the 2000 ms window.
 
-- [ ] [P7-T2] UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs — remove the DoNotParallelize attribute at line 21, leaving the TestClass attribute at line 22 in place.
+- [ ] [P7-T2] UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs — remove the DoNotParallelize attribute, leaving the TestClass attribute that follows it in place. The attribute sits at pre-change line 21 with TestClass at pre-change line 22; P7-T1 has already replaced the three-line class comment above them, so both are located by content rather than by line number.
       Acceptance: the file contains zero occurrences of the token `[DoNotParallelize]` and exactly one
       occurrence of the token `[TestClass]`.
 
@@ -715,8 +783,9 @@ timed source on the system clock.
       `DoNotParallelize`; and UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsRetryTests.cs
       still contains zero occurrences of `[DoNotParallelize]`.
 
-- [ ] [P7-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase7-green.md — rebuild with the D1 resolution, then run a D2 run of the whole UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll assembly with a test-case filter excluding the LiveOutlook category, then write this artifact.
-      Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`,
+- [ ] [P7-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/regression-testing/phase7-green.md — rebuild with the D1 resolution followed by `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run a D2 run of the whole UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll assembly with a test-case filter excluding the LiveOutlook category, then write this artifact.
+      Acceptance: the artifact carries `Timestamp:`, two `Command:` lines, the first of which is the
+      solution rebuild above, two `EXIT_CODE: 0` lines, `Output Summary:`,
       `TestsFailed: 0`, and `TestsSkipped:` and `TestsPassed:` integers. The LiveOutlook exclusion is
       mandatory: the repository's only test in that category constructs a real Outlook Application and
       polls a live store, which is an external-process dependency the unit-test policy forbids. D6
@@ -739,8 +808,11 @@ timed source on the system clock.
 
 - [ ] [P7-T10] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC25.
       Acceptance: exactly one line matches `^- \[x\] \*\*AC25\*\*`; the artifact written by P7-T3
-      carries `RunsObserved: 0`; and, using the D3 anchor, `git log $b..HEAD --pretty=%B` produces
-      zero lines containing the token `soak`.
+      carries `RunsObserved: 0`; and every artifact under
+      docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/ contains zero
+      lines containing the token `soak`. The commit-message check is not repeated here: no task before
+      P9-T4 creates a commit, so at this point `git log $b..HEAD` names an empty range and returns zero
+      lines whatever the executor has written. P9-T4 performs that check against the commit it makes.
 
 ### Phase 8 — Final QC Toolchain Loop, Coverage and Boundary Gates
 
@@ -756,6 +828,12 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       when it repaired drift, so the before-and-after tree observation is what makes this step
       falsifiable. FormattedFileCount is a processed count, not a repaired count, so it is recorded
       but never used as a restart trigger; a non-zero ChangedFileCount is the restart trigger.
+      This task additionally re-runs the P3-T14 boundary filter after the format: using the D3 anchor,
+      `git diff $b -- UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs` filtered for
+      lines matching the regular expression `^[+-][^+-].*Console\.WriteLine` must still produce zero
+      lines, and the artifact records `ConsoleWriteLineDiffLinesAfterFormat: 0`. P3-T14 ran before any
+      formatter pass, so without this re-check a reflow introduced by `csharpier format .` would
+      falsify AC26 after its check-off at P3-T22. A non-zero count restarts this phase and is reported.
 
 - [ ] [P8-T2] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/qc-csharpier-check.md — verify formatting by running `dotnet tool run csharpier check .` from the repository root, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`,
@@ -783,27 +861,47 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       Acceptance: the Cobertura XML exists; the artifact carries `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `Output Summary:`, the same six numeric root-element lines P0-T8 recorded, plus
       `TestsPassed:` and `TestsFailed: 0`. All eight values are numeric. D6 applies if the run does not
-      terminate.
+      terminate. D9 applies if the run is red.
 
 - [ ] [P8-T7] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-coverage-comparison.md — compare baseline and post-change coverage counters read from evidence/baseline/coverage-baseline.cobertura.xml and evidence/qa-gates/coverage-postchange.cobertura.xml, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, the six baseline values, the six post-change
-      values, and these four decided gates. Gate A: LinesValid post is less than or equal to baseline,
-      because this change deletes production lines and adds only a comment block, a parameter and a
-      resolved local. Gate B: LinesCovered post is greater than or equal to baseline minus the
-      reduction in LinesValid. Gate C: the same two comparisons for BranchesValid and
-      BranchesCovered. Gate D: for each of the five edited production files, the signed per-filename
+      values, and these four decided gates. Gate A: LinesValid post is less than or equal to baseline
+      for the `UtilitiesCS` package element only. The repository-wide figure is reported
+      informationally and is not gated: coverage.config excludes only third-party modules, so
+      UtilitiesCS.Test.dll is instrumented and the four tests this feature adds raise repository-wide
+      LinesValid even though production lines fall. Gate B: LinesCovered post for the `UtilitiesCS`
+      package is greater than or equal to that package's baseline LinesCovered minus its reduction in
+      LinesValid. Gate C: the same two comparisons for BranchesValid and BranchesCovered on the
+      `UtilitiesCS` package. Gate D: for each of the five edited production files, the signed per-filename
       LinesCovered delta, aggregated over all class elements sharing that filename, is recorded, and a
       negative delta on any file this feature did not shrink is a failure. Raw LineRate and BranchRate
       are reported informationally only. A raw-rate no-regression gate is not used and must not be
       substituted: deleting fully covered lines lowers the aggregate rate by arithmetic even when every
       surviving line keeps its coverage.
+      The artifact additionally carries `ProductionLinesCovered:` and `ProductionLinesValid:` integers
+      and a `TestableDenominatorLineRate:` decimal. The production-only aggregate is defined
+      mechanically as the sum over every instrumented module in the Cobertura file whose module name
+      does not end in .Test or .Tests; no per-class judgment is exercised. The artifact records that
+      CLAUDE.md § UT2 permits exemption through exactly two mechanisms, an [ExcludeFromCodeCoverage]
+      attribute in source and an assembly-level exclude in coverage.config, and that each contributes
+      zero first-party exclusions in this tree: no [ExcludeFromCodeCoverage] attribute appears on any
+      in-scope production file, and coverage.config's ModulePaths excludes only the third-party modules
+      Deedle, FSharp, Castle.Core, FluentAssertions, Moq, Microsoft.Testing and MSTest. The testable
+      denominator therefore equals the production-only denominator, and the artifact asserts that
+      identity rather than deriving an exemption list. It then carries either
+      `TestableDenominatorFloorMet: true` when that rate is at or above 0.80, or, when it is below,
+      `NotLoweredVersusBaseline:` computed against the same figure derived from the baseline Cobertura.
 
 - [ ] [P8-T8] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-coverage-comparison.md — append the deletion attribution to the same artifact.
       Acceptance: the artifact carries a `DeletionAttribution:` block naming the two TimeoutAfter
-      overloads, EtlAsyncOld and the three deleted tests, stating the LinesValid reduction each
-      contributed, and reconciling their sum against the total LinesValid reduction recorded by Gate A
-      with a residual of exactly zero. If the sum does not reconcile, the artifact records the residual
-      and this task fails.
+      overloads, EtlAsyncOld and the three deleted tests with the LinesValid reduction each
+      contributed; an `AdditionAccounting:` block naming the added production statements and stating
+      the LinesValid each contributed; and a reconciliation showing that the deletion sum minus the
+      addition sum equals the `UtilitiesCS`-package LinesValid delta recorded by Gate A, with a
+      residual of exactly zero. A reconciliation of the deletion sum alone against the total cannot
+      close, because the total is deletions net of additions and this feature adds a parameter, a
+      resolved local and a comment block. If the reconciliation does not close, the artifact records
+      the residual and this task fails.
 
 - [ ] [P8-T9] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/qa-gates/ac33-changed-line-coverage.md — compute changed-line coverage by taking the added-line numbers for each edited production file from `git diff $b --unified=0` using the D3 anchor, intersecting each file's set with the line elements of evidence/qa-gates/coverage-postchange.cobertura.xml aggregated by filename, and reporting covered over total, then write this artifact.
       Acceptance: the artifact carries `Timestamp:`, one `File:` block per edited production file with
@@ -848,9 +946,12 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       Acceptance: the artifact carries `Timestamp:` and records the traced conclusion that
       RunWithTimeout returns null rather than throwing on the ordinary timeout path, so neither catch
       block in GetTableInViewAsync and neither retry recursion is entered by that path; it names
-      UtilitiesCS/Threading/TimeOutTask.cs lines 52, 60, 63, 65, 67, 69, 82 and 94 and
-      UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs lines 55, 71, 95 and 118 as the
-      traced sites; it records that this is a pre-existing condition this feature does not fix; it
+      UtilitiesCS/Threading/TimeOutTask.cs lines 52, 60, 63, 65, 67, 69, 82 and 94, which Phase 4's
+      deletions at pre-change lines 824-940 leave unmoved, and four TableAccess.cs sites cited by the
+      line numbers the file carries after Phase 3 and re-derived when this artifact is written: the try
+      opening the RunWithTimeout await, the TaskCanceledException catch, the TimeoutException catch and
+      the `return table!`. Their pre-change numbers were 55, 71, 95 and 118; Phase 3's additions move
+      all four. It records that this is a pre-existing condition this feature does not fix; it
       records `PromotionWrittenOnThisBranch: false`; and it carries a `DeferredHandoff:` block
       addressed to the epic listing all four follow-ups from spec.md Rollout and stating they are filed
       after this feature merges. No file outside
@@ -889,8 +990,9 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
 
 - [ ] [P8-T20] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC33.
       Acceptance: exactly one line matches `^- \[x\] \*\*AC33\*\*`; the artifacts written by P8-T7,
-      P8-T8 and P8-T9 all exist; Gates A through D all pass; and NewAndChangedCodeRate is at least
-      0.90.
+      P8-T8 and P8-T9 all exist; Gates A through D all pass; NewAndChangedCodeRate is at least
+      0.90; and the P8-T7 artifact carries `TestableDenominatorLineRate:` with either
+      `TestableDenominatorFloorMet: true` or `NotLoweredVersusBaseline: true`.
 
 - [ ] [P8-T21] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/spec.md — check off AC34.
       Acceptance: exactly one line matches `^- \[x\] \*\*AC34\*\*`, and the artifact written by P8-T12
@@ -908,13 +1010,18 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       matching `^- \[ \] \*\*AC[0-9]+\*\*` is exactly 0, and for every one of the 35 criteria the
       artifact its check-off task named exists under
       docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/. A checked box
-      whose artifact is absent is reverted to unchecked and this task fails.
+      whose artifact is absent is reverted to unchecked and this task fails. On the P1-T4 fallback
+      branch the two expected counts are 34 and 1 instead, AC8 is the single unchecked criterion, and
+      the artifact required in its place is
+      docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/ac8-refuted-fallback.md.
 
 - [ ] [P9-T2] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/issue-updates/ac-status-summary.md — write the acceptance-criteria status summary.
       Acceptance: the artifact carries `Timestamp:` and the four required lines in the
       acceptance-criteria-tracking format, namely a Source line naming spec.md,
       `Total AC items: 35`, `Checked off (delivered): 35` and `Remaining (unchecked): 0`, plus an
-      `Items remaining:` line whose value is none.
+      `Items remaining:` line whose value is none. On the P1-T4 fallback branch the three lines read
+      `Total AC items: 35`, `Checked off (delivered): 34` and `Remaining (unchecked): 1`, the
+      `Items remaining:` value is AC8, and the plan outcome reported is INCOMPLETE.
 
 - [ ] [P9-T3] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/issue.md — record the delivered outcome, the three spec amendments to AC6, AC20 and AC35 with their measured reasons, and the four deferred follow-ups.
       Acceptance: issue.md contains the token `Amended 2026-09-09`, the token
@@ -958,3 +1065,10 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       invisible to the diff. This second commit
       exists because P9-T5 writes an artifact after the clean-tree commit, and a plan whose terminal
       state is a dirty worktree is not complete.
+      One residual is permitted and expected: this plan file's own check-off for P9-T6, which is
+      written after the commit P9-T6 makes and therefore cannot be inside it. The executor records it
+      in its final report as `UncommittedResidual: plan.2026-09-08T23-51.md (P9-T6 check-off only)` and
+      confirms by
+      `git diff --numstat HEAD -- docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/plan.2026-09-08T23-51.md`
+      that it is one insertion and one deletion in one file. No other path may be dirty. The porcelain
+      span above runs before that check-off, so its zero-line result remains the gate.
