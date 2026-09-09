@@ -5,9 +5,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 every wave transition, and at final integration-PR completion. The checkpoint JSON is the durable,
 machine-authoritative source; `epic.md` is the human-authored manifest and narrative.
 
-- Last updated: 2026-09-09T16:22:54Z
-- Integration branch: `epic/review-residuals-2026-09-08-integration` at `89bdfe06`
-- Current wave: 0 (3 of 7 merged; 821 executing)
+- Last updated: 2026-09-09T17:39:30Z
+- Integration branch: `epic/review-residuals-2026-09-08-integration` at `d636b0f2`
+- Current wave: 0 (4 of 7 merged; 823 executing)
 - Epic manifest: `docs/features/epics/review-residuals-2026-09-08/epic.md`
 - Epic kickoff: `docs/features/epics/review-residuals-2026-09-08/epic-kickoff.md`
 - Integration PR: not yet opened
@@ -19,8 +19,8 @@ machine-authoritative source; `epic.md` is the human-authored manifest and narra
 | 813 | `2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813` | 0 | merged | [#827](https://github.com/drmoisan/TaskMaster/pull/827) | `48cd004b` | 2026-09-09T13:46:00Z | 2026-09-09T14:30:00Z | 2026-09-09T14:34:01Z | — |
 | 815 | `2026-09-08-coverage-aggregation-double-counts-method-rows-815` | 0 | merged | [#829](https://github.com/drmoisan/TaskMaster/pull/829) | `732b84d3` | 2026-09-09T13:46:00Z | 2026-09-09T15:30:00Z | 2026-09-09T15:34:59Z | — |
 | 817 | `2026-09-08-utilitiescs-test-hygiene-residuals-817` | 0 | merged | [#830](https://github.com/drmoisan/TaskMaster/pull/830) | `89bdfe06` | 2026-09-09T13:46:00Z | 2026-09-09T16:17:00Z | 2026-09-09T16:21:05Z | — |
-| 821 | `2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821` | 0 | worktree_created (executing) | — | — | 2026-09-09T13:46:00Z | — | — | — |
-| 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
+| 821 | `2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821` | 0 | merged | [#831](https://github.com/drmoisan/TaskMaster/pull/831) | `d636b0f2` | 2026-09-09T13:46:00Z | 2026-09-09T17:33:00Z | 2026-09-09T17:37:20Z | — |
+| 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | 0 | worktree_created (executing) | — | — | 2026-09-09T13:46:00Z | — | — | — |
 | 824 | `2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
 | 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | 0 | worktree_created | — | — | 2026-09-09T13:46:00Z | — | — | — |
 | 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | 1 | not_started | — | — | — | — | — | — |
@@ -74,7 +74,8 @@ workflow file is edited to obtain a trigger:
 | --- | --- | --- | --- |
 | [34364775706](https://github.com/drmoisan/TaskMaster/actions/runs/34364775706) | 813 | `48cd004b` | success |
 | [34371580397](https://github.com/drmoisan/TaskMaster/actions/runs/34371580397) | 815 | `732b84d3` | success |
-| [34376281522](https://github.com/drmoisan/TaskMaster/actions/runs/34376281522) | 817 | `89bdfe06` | pending |
+| [34376281522](https://github.com/drmoisan/TaskMaster/actions/runs/34376281522) | 817 | `89bdfe06` | success |
+| [34384355056](https://github.com/drmoisan/TaskMaster/actions/runs/34384355056) | 821 | `d636b0f2` | pending |
 
 ## Deferred Worktree Removals
 
@@ -91,6 +92,7 @@ for reclamation via `scripts/bash/cleanup-worktrees.sh`.
 | 813 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-813` | 2026-09-09T14:37:00Z |
 | 815 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-815` | 2026-09-09T15:40:00Z |
 | 817 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-817` | pending retry |
+| 821 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-821` | pending retry |
 
 ## Preparation Provenance
 
