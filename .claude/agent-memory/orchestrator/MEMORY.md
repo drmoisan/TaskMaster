@@ -64,6 +64,7 @@
 ## C# toolchain and tests
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) · [analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) · [direct-csproj build facts](csharp-direct-csproj-build-facts.md)
 - [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) · [which non-vacuity pattern to count](msbuild-non-vacuity-which-pattern-to-count.md) · [a successful msbuild prints "error" 35 times](msbuild-success-output-contains-error.md)
+- [`suggestion` diagnostics never reach the msbuild log](suggestion-severity-diagnostics-invisible-to-msbuild.md) — and BannedApiAnalyzers ignores a bad DocID silently, so absence proves nothing; certify a SARIF channel with a control
 - [MSB3021-only failure = testhost lock](msbuild-msb3021-only-means-test-host-lock.md)
 - [Aggregate vstest crash: isolate per assembly](vstest-aggregate-crash-isolate-per-assembly.md) · [bare vstest omits the LiveOutlook filter](bare-vstest-omits-liveoutlook-filter.md)
 - [Tests must not trigger UX or a live worker](feedback_tests_must_not_trigger_ux_or_live_worker.md) · [Banned API in a touched file is in scope](feedback_banned_api_in_touched_file_in_scope.md)

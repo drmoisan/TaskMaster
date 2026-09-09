@@ -63,6 +63,17 @@ resolved correctly against that worktree, and NO mirroring was needed —
 `enforce-prd-feature-before-planner.ps1` allowed the `atomic-planner` delegation with issue.md and
 spec.md present only in the item worktree.
 
+**Second confirming data point, 2026-09-09 (#826 preparation, launched by `epic-planner`).** Real
+isolation again: `git rev-parse --show-toplevel` returned
+`C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a176c8956f6e15150` on branch
+`worktree-agent-a176c8956f6e15150`, not the session root `TaskMaster-wt/2026-09-08T23-27` that the
+system-prompt CLAUDE.md paths pointed at. No mirroring was needed: `Agent(prd-feature)` and
+`Agent(atomic-planner)` were both allowed with the feature folder present only in the item worktree.
+Both `parallel-orchestrator` (#810) and `epic-planner` (#826) now have a confirmed isolating launch,
+so the isolating topology is the common case and the session-root topology is the exception — but
+the probe is one cheap call, so still run it. Note the trap: the system prompt's injected CLAUDE.md
+and rules paths name the SESSION root, so they are not a reliable signal of your own cwd.
+
 So the first action of any preparation or execution child is one `git rev-parse --show-toplevel`
 call. If it returns your item worktree, skip the mirroring entirely; the decoy-plan hazard below
 is real and worth avoiding when it buys nothing. If it returns the session root, mirror the whole
