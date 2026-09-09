@@ -5,9 +5,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 every wave transition, and at final integration-PR completion. The checkpoint JSON is the durable,
 machine-authoritative source; `epic.md` is the human-authored manifest and narrative.
 
-- Last updated: 2026-09-09T20:26:30Z
-- Integration branch: `epic/review-residuals-2026-09-08-integration` at `96fd3dd8`
-- Current wave: 0 (6 of 7 merged; 825 executing, last of wave 0)
+- Last updated: 2026-09-09T22:05:16Z
+- Integration branch: `epic/review-residuals-2026-09-08-integration` at `049c1427`
+- Current wave: 0 COMPLETE (7 of 7 merged). Wave 1 opens once a redundant resume agent exits.
 - Epic manifest: `docs/features/epics/review-residuals-2026-09-08/epic.md`
 - Epic kickoff: `docs/features/epics/review-residuals-2026-09-08/epic-kickoff.md`
 - Integration PR: not yet opened
@@ -22,7 +22,7 @@ machine-authoritative source; `epic.md` is the human-authored manifest and narra
 | 821 | `2026-09-08-qfchomecontroller-parentcleanup-double-ribbon-release-821` | 0 | merged | [#831](https://github.com/drmoisan/TaskMaster/pull/831) | `d636b0f2` | 2026-09-09T13:46:00Z | 2026-09-09T17:33:00Z | 2026-09-09T17:37:20Z | — |
 | 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | 0 | merged | [#832](https://github.com/drmoisan/TaskMaster/pull/832) | `553f874a` | 2026-09-09T13:46:00Z | 2026-09-09T18:43:00Z | 2026-09-09T18:47:53Z | — |
 | 824 | `2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824` | 0 | merged | [#833](https://github.com/drmoisan/TaskMaster/pull/833) | `96fd3dd8` | 2026-09-09T13:46:00Z | 2026-09-09T20:20:00Z | 2026-09-09T20:24:46Z | — |
-| 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | 0 | worktree_created (executing) | — | — | 2026-09-09T13:46:00Z | — | — | — |
+| 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | 0 | merged | [#834](https://github.com/drmoisan/TaskMaster/pull/834) | `049c1427` | 2026-09-09T13:46:00Z | 2026-09-09T21:50:00Z | 2026-09-09T22:02:23Z | — |
 | 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | 1 | not_started | — | — | — | — | — | — |
 
 ## Wave Layering
@@ -77,7 +77,9 @@ workflow file is edited to obtain a trigger:
 | [34376281522](https://github.com/drmoisan/TaskMaster/actions/runs/34376281522) | 817 | `89bdfe06` | success |
 | [34384355056](https://github.com/drmoisan/TaskMaster/actions/runs/34384355056) | 821 | `d636b0f2` | success |
 | [34391748802](https://github.com/drmoisan/TaskMaster/actions/runs/34391748802) | 823 | `553f874a` | success |
-| [34401152781](https://github.com/drmoisan/TaskMaster/actions/runs/34401152781) | 824 | `96fd3dd8` | pending |
+| [34401152781](https://github.com/drmoisan/TaskMaster/actions/runs/34401152781) | 824 | `96fd3dd8` | success |
+
+Six dispatched integration runs, six successes.
 
 ## Deferred Worktree Removals
 
@@ -97,6 +99,28 @@ for reclamation via `scripts/bash/cleanup-worktrees.sh`.
 | 821 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-821` | pending retry |
 | 823 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-823` | pending retry |
 | 824 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-824` | pending retry |
+| 825 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-825` | pending retry |
+
+## Redundant Resume of Feature 825
+
+Recorded because the audit trail should show it rather than hide it. The first 825 orchestrator
+emitted a task-notification carrying a narrative progress report — its pull request open, the test
+gate still running — instead of the agreed bounded return shape. Treating that as a stop, the parent
+re-derived durable state (pull request open, worktree clean at the pull-request head), found no
+`vstest.console`, `testhost`, `CodeCoverage` or `datacollector` process alive, and double-sampled the
+coverage file twenty seconds apart with identical mtime and length. Every probe read as idle, so a
+resume agent was launched.
+
+The original agent was not idle. It merged twenty-three seconds after that ground-truth read, while
+the resume prompt was being composed. The flaw is specific: process scans and file-mtime sampling
+measure the **workload**, not the **agent**. An agent between tool calls after a long test run is
+indistinguishable from a dead one by those probes.
+
+The resulting double-delegation is bounded. The single-instance side effect at this step is the
+merge, and it is not repeatable — the pull request was already merged, so the resume agent could not
+merge it again. No second pull request, no second issue, no branch mutation. Wave 1 was deliberately
+held until the redundant agent exited, preserving the effective-concurrency-of-one invariant that
+exists because non-isolated children share one session-scoped orchestrator checkpoint.
 
 ## Preparation Provenance
 
