@@ -3,7 +3,7 @@ VSTest version 18.9.0 (x64)
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
 1.0615
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\rr0908-817\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ExecutingAssembly_ContainsNoFormDerivedType [44 ms]
   Passed MakeSearchPattern_Simple [2 ms]
   Passed MakeSearchPattern_AltWC [< 1 ms]
@@ -4909,10 +4909,10 @@ Data collector 'Blame' message: All tests finished running, Sequence file will n
   Passed AfterDeserialize_WithConfiguredGlobals_LoadsClassifiersAndReportsCompletion [6 ms]
   Passed HeavyParallelizationAsync_WithNullProbabilities_RebuildsLegacyClassifierState [14 ms]
   Passed HeavyParallelizationAsync_WithFewerClassifiersThanProcessors_DoesNotThrow [2 ms]
-Results File: C:\Users\DanMoisan\repos\TaskMaster-wt\rr0908-817\docs\features\active\2026-09-08-utilitiescs-test-hygiene-residuals-817\evidence\baseline\pre-split-full-run.trx
+Results File: <repo-root>\docs\features\active\2026-09-08-utilitiescs-test-hygiene-residuals-817\evidence\baseline\pre-split-full-run.trx
 
 Attachments:
-  C:\Users\DanMoisan\repos\TaskMaster-wt\rr0908-817\docs\features\active\2026-09-08-utilitiescs-test-hygiene-residuals-817\evidence\baseline\c0ad4dc9-20ea-4db8-95e3-2fb473dced24\DanMoisan_MEGALODON4_2026-09-09.11_50_57.coverage
+  <repo-root>\docs\features\active\2026-09-08-utilitiescs-test-hygiene-residuals-817\evidence\baseline\c0ad4dc9-20ea-4db8-95e3-2fb473dced24\<user>_<host>_2026-09-09.11_50_57.coverage
 Test Run Successful.
 Total tests: 4904
      Passed: 4904
