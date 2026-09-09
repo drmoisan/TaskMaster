@@ -1279,7 +1279,7 @@ it changed a tracked file, restart this phase from T1. Do not proceed past a fai
       Acceptance: the artifact carries `Timestamp:` and one bullet per artifact path written by Phases
       0 through 9, and every listed path exists on disk.
 
-- [ ] [P9-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/review-handoff.md — commit this artifact and anything else P9-T5 touched, using explicit pathspecs under this feature's folder.
+- [x] [P9-T6] docs/features/active/2026-09-08-etl-deadline-mechanics-follow-ups-825/evidence/other/review-handoff.md — commit this artifact and anything else P9-T5 touched, using explicit pathspecs under this feature's folder.
       Acceptance: the command span `git status --porcelain --untracked-files=all -- . ":(exclude).claude"`
       produces zero output lines, and the command span
       `git diff --name-only HEAD~1 HEAD -- . ":(exclude).claude"` lists at least one path and only
