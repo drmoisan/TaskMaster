@@ -98,8 +98,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
 
         /// <summary>
         /// Documents the surviving EtlAsync contract on deadline expiry: the TimeoutException is
-        /// swallowed, a null data array is returned through a null-forgiving suppression, and the
-        /// supplied token source is cancelled. This is the shape the DfDeedle guard now catches.
+        /// swallowed, a null data array is returned through the tuple's nullable first element, and
+        /// the supplied token source is cancelled. This is the shape the DfDeedle guard now catches.
         /// </summary>
         [TestMethod]
         public async Task EtlAsync_DeadlineExpires_ReturnsNullDataAndCancelsTokenSource()

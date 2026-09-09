@@ -63,7 +63,7 @@ namespace UtilitiesCS
             return (data!, columnDictionary);
         }
 
-        public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsync(
+        public static async Task<(object[,]? data, Dictionary<string, int> columnInfo)> EtlAsync(
             this Outlook.Table table,
             CancellationToken token,
             CancellationTokenSource tokenSource,
@@ -81,6 +81,16 @@ namespace UtilitiesCS
             LogTableTiming("EtlAsync start | ETL over table snapshots");
 
             var rowCount = table.GetRowCount();
+            // The 250 ms per-row budget rests on no recorded measurement, and none is obtainable in
+            // this environment: no project file wires a benchmark harness, and the test fixtures are
+            // Moq objects whose GetRowCount, GetNextRow and GetArray return in microseconds, so
+            // anything timed against them would characterise Moq rather than COM. The capture route
+            // that would produce the measurement already exists and is enabled in a live Outlook
+            // session: LogTableTiming emits rowCount, columnCount and elapsedMs on its
+            // "EtlAsync complete" payload, and TaskMaster/log4net.config line 4 sets the root logger
+            // to level ALL, so a live add-in run already records the pairing. Collecting those
+            // payloads across folders of differing rowCount is the recipe; substituting another
+            // guessed constant is not, and is out of scope here.
             int milliseconds = 250 * rowCount;
             object[,]? data = null;
             var columnDictionary = table.GetColumnDictionary();
@@ -128,46 +138,7 @@ namespace UtilitiesCS
                 "EtlAsync complete | ETL over table snapshots",
                 $"rowCount={rowCount}; columnCount={columnDictionary.Count}; elapsedMs={etlStopwatch.ElapsedMilliseconds}"
             );
-            return (data!, columnDictionary);
-        }
-
-        public static async Task<(
-            object[,]? data,
-            Dictionary<string, int>? columnInfo
-        )> EtlAsyncOld(
-            this Outlook.Table table,
-            CancellationToken token,
-            CancellationTokenSource tokenSource,
-            int counter,
-            ProgressTracker? progress,
-            Dictionary<string, Func<object, string>>? objectConverters = null
-        )
-        {
-            token.ThrowIfCancellationRequested();
-
-            var rowCount = table.GetRowCount();
-            int milliseconds = 250 * rowCount;
-            var attempts = 3;
-            object[,]? data = null;
-            Dictionary<string, int>? columnInfo = null;
-
-            try
-            {
-                (data, columnInfo) = await Task.Run(
-                        () => table.ETL(objectConverters, progress),
-                        token
-                    )
-                    .TimeoutAfter(milliseconds, attempts);
-            }
-            catch (TimeoutException)
-            {
-                logger.Error(
-                    $"{DateTime.Now.ToString("mm:ss.fff")} {nameof(ETL)} timed out {attempts} times with a timeout of {milliseconds} milliseconds. Canceling"
-                );
-                tokenSource.Cancel();
-            }
-
-            return (data, columnInfo);
+            return (data, columnDictionary);
         }
 
         private static async Task<IAsyncEnumerable<object[]>> EtlByRowAsync(

@@ -821,33 +821,6 @@ namespace UtilitiesCS
 
         internal struct VoidTypeStruct { } // See Footnote #1
 
-        public static Task<TResult> TimeoutAfter<TResult>(
-            this Task<TResult> task,
-            int millisecondsTimeout,
-            int repeatAttempts
-        )
-        {
-            Task<TResult> result = null!;
-
-            try
-            {
-                result = task.TimeoutAfter(millisecondsTimeout);
-            }
-            catch (TimeoutException)
-            {
-                logger.Warn($"Task timed out. {repeatAttempts} attempts remaining.");
-                if (repeatAttempts > 0)
-                {
-                    result = task.TimeoutAfter(millisecondsTimeout, repeatAttempts - 1);
-                }
-                else
-                {
-                    logger.Warn($"Task timed out after {repeatAttempts} attempts.");
-                }
-            }
-            return result!;
-        }
-
         /// <summary>
         /// https://devblogs.microsoft.com/pfxteam/crafting-a-task-timeoutafter-method/
         /// </summary>
@@ -919,24 +892,6 @@ namespace UtilitiesCS
             );
 
             return tcs.Task;
-        }
-
-        public static Task TimeoutAfter(this Task task, int millisecondsTimeout, int repeatAttempts)
-        {
-            Task result = null!;
-
-            try
-            {
-                result = task.TimeoutAfter(millisecondsTimeout);
-            }
-            catch (TimeoutException)
-            {
-                if (repeatAttempts > 0)
-                {
-                    result = task.TimeoutAfter(millisecondsTimeout, repeatAttempts - 1);
-                }
-            }
-            return result!;
         }
 
         /// <param name="task"></param>

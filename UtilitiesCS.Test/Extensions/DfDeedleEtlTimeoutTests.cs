@@ -64,13 +64,16 @@ namespace UtilitiesCS.Test.Extensions
         }
 
         /// <summary>
-        /// Builds a strict one-row Table behind a strict Explorer. The two supplied actions are
-        /// the test-owned gates: the first runs inside Columns.Add("SentOn"), which is the first
-        /// call AddQfcColumns makes, and the second runs inside GetNextRow, which is the first
-        /// call the ETL row reader makes. Blocking on them makes the arming order deterministic.
+        /// Builds a strict one-row Table behind a strict Explorer. The three supplied actions are
+        /// the test-owned gates, in the order the production path reaches them: the first runs
+        /// inside TableView.GetTable, which is the call the table acquisition makes; the second
+        /// runs inside Columns.Add("SentOn"), which is the first call AddQfcColumns makes; and the
+        /// third runs inside GetNextRow, which is the first call the ETL row reader makes.
+        /// Blocking on them makes the arming order deterministic.
         /// </summary>
         private static Mock<Outlook.Explorer> BuildExplorer(
             Mock<MAPIFolder> folder,
+            System.Action onGetTable,
             System.Action onAddSentOnColumn,
             System.Action onGetNextRow
         )
@@ -116,7 +119,13 @@ namespace UtilitiesCS.Test.Extensions
             columns.Setup(x => x.Add("SentOn")).Callback(onAddSentOnColumn).Returns((Column)null);
 
             var tableView = new Mock<TableView>(MockBehavior.Strict);
-            tableView.Setup(x => x.GetTable()).Returns(table.Object);
+            tableView
+                .Setup(x => x.GetTable())
+                .Returns(() =>
+                {
+                    onGetTable();
+                    return table.Object;
+                });
 
             var explorer = new Mock<Outlook.Explorer>(MockBehavior.Strict);
             explorer.SetupGet(x => x.CurrentView).Returns(tableView.Object);
@@ -134,12 +143,19 @@ namespace UtilitiesCS.Test.Extensions
         [TestMethod]
         public async Task GetEmailDataInViewAsync_EtlDeadlineExpires_ThrowsInvalidOperationNamingFolder()
         {
-            // Arrange: two test-owned gates make the timer-arming order deterministic. Without
-            // them the number of Armed signals before the ETL deadline depends on a pool race.
+            // Arrange: three test-owned gates make the timer-arming order deterministic. The
+            // barrier's Armed signal is a latch, so it drops a signal whenever two timers arm
+            // inside one await window; one gate per timer keeps each window to a single arming.
+            var gateAcquire = new ManualResetEventSlim(false);
             var gateA = new ManualResetEventSlim(false);
             var gateB = new ManualResetEventSlim(false);
             var barrier = new ArmingBarrierTimeProvider(new FakeTimeProvider());
-            var explorer = BuildExplorer(BuildFolderWithTriageUdp(), gateA.Wait, gateB.Wait);
+            var explorer = BuildExplorer(
+                BuildFolderWithTriageUdp(),
+                gateAcquire.Wait,
+                gateA.Wait,
+                gateB.Wait
+            );
             var progress = CreateProgressTracker();
 
             try
@@ -153,13 +169,21 @@ namespace UtilitiesCS.Test.Extensions
                     timeProvider: barrier
                 );
 
-                // Timer 1: the 3000 ms column-add deadline, deterministic because the adder is
+                // Timer 1: the 2000 ms table-acquisition deadline, which is now armed on the
+                // caller's clock because GetEmailDataInViewAsync forwards the provider to
+                // GetTableInViewAsync. It is deterministic because GetTable is blocked on the
+                // acquisition gate and so the work task cannot complete first.
+                await barrier.Armed;
+                barrier.ReArm();
+                gateAcquire.Set();
+
+                // Timer 2: the 3000 ms column-add deadline, deterministic because the adder is
                 // blocked on gate A and so the work task cannot complete first.
                 await barrier.Armed;
                 barrier.ReArm();
                 gateA.Set();
 
-                // Timer 2: the 250 ms ETL hop deadline, deterministic because the row read is
+                // Timer 3: the 250 ms ETL hop deadline, deterministic because the row read is
                 // blocked on gate B. Advancing before this timer exists would hang the test.
                 await barrier.Armed;
                 barrier.Advance(250);
@@ -173,7 +197,8 @@ namespace UtilitiesCS.Test.Extensions
             }
             finally
             {
-                // Release both gates so the orphaned Task.Run bodies complete.
+                // Release all three gates so the orphaned Task.Run bodies complete.
+                gateAcquire.Set();
                 gateA.Set();
                 gateB.Set();
             }
@@ -187,7 +212,12 @@ namespace UtilitiesCS.Test.Extensions
         public async Task GetEmailDataInViewAsync_ClockNeverAdvances_ReturnsOneRowFrame()
         {
             // Arrange: no gate is engaged, so the production path runs to completion.
-            var explorer = BuildExplorer(BuildFolderWithTriageUdp(), () => { }, () => { });
+            var explorer = BuildExplorer(
+                BuildFolderWithTriageUdp(),
+                () => { },
+                () => { },
+                () => { }
+            );
             var progress = CreateProgressTracker();
 
             // Act
@@ -215,7 +245,12 @@ namespace UtilitiesCS.Test.Extensions
         public void GetEmailDataInView_NoEtlArgument_UsesProductionDefaultDelegate()
         {
             // Arrange
-            var explorer = BuildExplorer(BuildFolderWithTriageUdp(), () => { }, () => { });
+            var explorer = BuildExplorer(
+                BuildFolderWithTriageUdp(),
+                () => { },
+                () => { },
+                () => { }
+            );
 
             // Act
             Frame<int, string> result = DfDeedle.GetEmailDataInView(explorer.Object);
