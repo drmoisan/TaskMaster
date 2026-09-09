@@ -580,8 +580,11 @@ ordinary expiry path, and the existing tests are consistent with it (line 1324 a
 `OperationCanceledException` propagates; line 1267 asserts no synthetic retry occurs). This is an
 observation about a pre-existing condition, **not** something this feature fixes and **not** an
 acceptance criterion. The executor must record the observation as evidence under the feature's
-evidence folder (kind: other) and file it through the issue-promotion lifecycle as a follow-up; it
-must not be acted on here. It does bear on test design: see Test Strategy.
+evidence folder (kind: other) and must record the follow-up as a handoff for the epic to file
+**after this feature merges**. **No promotion record is written on this branch.** Writing one would
+create a file under docs/features/potential/promoted/, which AC20 forbids; the two obligations
+cannot both hold on the same branch, and the on-branch write is the one that is dropped. It must
+not be acted on here. It does bear on test design: see Test Strategy.
 
 ## Data / API / Config Impact
 
@@ -822,9 +825,16 @@ or a named captured artifact.
       recorded in Proposed Fix: a reviewer can follow `timeoutMs` from the accept point through the
       throw point and the absorption point to the retry, and confirm the caller's value is no longer
       discarded.
-- [ ] **AC35** — The reachability observation recorded under Assumptions is captured as evidence
-      (kind: other) and filed as a follow-up issue through the promotion lifecycle; no code change in
-      this feature acts on it.
+- [ ] **AC35** — The reachability observation recorded under Assumptions is captured as an evidence
+      artifact under this feature's own evidence/other/ folder, and the follow-up is recorded in that
+      same artifact as a handoff for the epic to file **after this feature merges**. No promotion
+      record, potential entry or any other file outside this feature's own folder is written under
+      docs/features/** on this branch, and no code change in this feature acts on the observation.
+      **Amended 2026-09-09** to remove a contradiction with AC20: the original wording required
+      filing through the promotion lifecycle, which writes a record under
+      docs/features/potential/promoted/ and would have put a file under docs/features/** that is not
+      one of this feature's own documents, falsifying AC20 on the same branch. The evidence artifact
+      plus the deferred handoff discharges the observation without the on-branch write.
 
 ## Risks & Mitigations
 
@@ -867,8 +877,11 @@ or a named captured artifact.
 
 - **Rollout.** Ordinary branch, PR and merge. No flag, no migration, no operational step. This
   feature merges before sibling feature 826 executes in wave 1.
-- **Post-fix follow-ups**, each to be filed through the issue-promotion lifecycle rather than left as
-  prose in this folder:
+- **Post-fix follow-ups.** Each is recorded here and in an evidence artifact under this feature's own
+  evidence/other/ folder, and each is handed to the epic to file through the issue-promotion
+  lifecycle **after this feature merges**. None is filed on this branch: a promotion writes a record
+  under docs/features/potential/promoted/, which AC20 forbids in this feature's diff. The follow-ups
+  are:
   1. Capture real ETL durations against folder size from a live Outlook session using the recipe in
      item 1, and revisit the 250 ms per-row budget with that measurement in hand.
   2. Reduce TimeOutTask.cs below the 500-line cap; this feature takes it from 1011 to 968 lines only.
