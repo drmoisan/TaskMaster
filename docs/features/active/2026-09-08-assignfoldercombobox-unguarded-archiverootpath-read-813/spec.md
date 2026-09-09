@@ -3,8 +3,8 @@
 - **Issue:** #813
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-08T23-49
-- **Status:** Draft
+- **Last Updated:** 2026-09-09
+- **Status:** Implemented
 - **Version:** 0.1
 
 ## Context
@@ -209,21 +209,21 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] A regression test exists in `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`
+- [x] A regression test exists in `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`
       (or a new `...Part3.cs` if the file-size cap requires it) that stubs
       `IApplicationGlobals.Ol.ArchiveRootPath` to throw `InvalidOperationException` and asserts
       `AssignFolderComboBox()` completes without throwing.
-- [ ] The same test asserts the folder combo box and suggestion rows are still populated
+- [x] The same test asserts the folder combo box and suggestion rows are still populated
       (`AddFolderItems` and `SetFolderSuggestions` were invoked) despite the archive-root read
       failing.
-- [ ] The same test asserts no preselection occurs (`SetFolderSelectedItem` is never called) and that
+- [x] The same test asserts no preselection occurs (`SetFolderSelectedItem` is never called) and that
       the index-fallback path (`SetFolderSelectedIndex`) runs instead.
-- [ ] The fix in `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` catches only
+- [x] The fix in `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` catches only
       `InvalidOperationException`, not a broader exception type.
-- [ ] No files owned by issue #812 (`AppOlObjects.cs`, `AppOlObjects.ArchiveRoot.cs`,
+- [x] No files owned by issue #812 (`AppOlObjects.cs`, `AppOlObjects.ArchiveRoot.cs`,
       `ArchiveRootPathGuard.cs`) or by sibling epic features (listed under Scope & Non-Goals) are
       modified.
-- [ ] Full C# toolchain passes with no regression: CSharpier format check, `.NET` analyzer rebuild
+- [x] Full C# toolchain passes with no regression: CSharpier format check, `.NET` analyzer rebuild
       (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`), nullable rebuild
       (`/p:TreatWarningsAsErrors=true`), and MSTest execution via `vstest.console.exe`.
 

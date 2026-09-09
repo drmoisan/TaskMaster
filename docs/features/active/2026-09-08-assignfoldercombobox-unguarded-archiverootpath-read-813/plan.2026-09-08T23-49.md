@@ -74,19 +74,19 @@
 
 ### Phase 0 — Policy Reads & Toolchain/Coverage Baseline
 
-- [ ] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
+- [x] [P0-T1] Read, in order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
   `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`. Record `Timestamp:`,
   `Policy Order: CLAUDE.md, general-code-change.md, general-unit-test.md, csharp.md`, and the
   explicit list of the four file paths read, in `<FEATURE>/evidence/baseline/phase0-instructions-read.<TIMESTAMP>.md`.
   Acceptance: the artifact file exists and lists all four paths in the stated order.
 
-- [ ] [P0-T2] Capture the pre-change repository state: run `git rev-parse HEAD` and
+- [x] [P0-T2] Capture the pre-change repository state: run `git rev-parse HEAD` and
   `git status --porcelain` from the worktree root. Record `Timestamp:`, `Command:`, `EXIT_CODE:`,
   and `Output Summary:` (the HEAD SHA and the porcelain output, or `Output Summary: clean` if empty)
   in `<FEATURE>/evidence/baseline/phase0-branch-state.<TIMESTAMP>.md`. Acceptance: the artifact
   records a 40-character HEAD SHA and the literal porcelain output.
 
-- [ ] [P0-T3] Resolve the toolchain executable paths needed by later phases: run
+- [x] [P0-T3] Resolve the toolchain executable paths needed by later phases: run
   `vswhere.exe -latest -find **\vstest.console.exe` to resolve `vstest.console.exe`, and confirm
   `msbuild` is resolvable (via `vswhere.exe -latest -find **\MSBuild.exe` or the `msbuild` on PATH).
   Record both resolved paths, `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` in
@@ -94,26 +94,26 @@
   non-empty and point to files that exist. Later phases that invoke `vstest.console.exe` reference
   the path recorded in this artifact rather than a hardcoded absolute path.
 
-- [ ] [P0-T4] Run `dotnet tool restore` from the worktree root. Record `Timestamp:`, `Command:`,
+- [x] [P0-T4] Run `dotnet tool restore` from the worktree root. Record `Timestamp:`, `Command:`,
   `EXIT_CODE:`, `Output Summary:` in `<FEATURE>/evidence/baseline/phase0-dotnet-tool-restore.<TIMESTAMP>.md`.
   Acceptance: `EXIT_CODE: 0`.
 
-- [ ] [P0-T5] Run `dotnet tool run csharpier check QuickFiler/Controllers/QfcItemController.FolderHandling.cs QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`
+- [x] [P0-T5] Run `dotnet tool run csharpier check QuickFiler/Controllers/QfcItemController.FolderHandling.cs QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`
   to capture the pre-change formatting state of the two owned files. Record `Timestamp:`,
   `Command:`, `EXIT_CODE:`, `Output Summary:` in `<FEATURE>/evidence/baseline/phase0-csharpier-check.<TIMESTAMP>.md`.
   Acceptance: `EXIT_CODE: 0` (both files are already CSharpier-compliant pre-change).
 
-- [ ] [P0-T6] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] [P0-T6] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   to capture the pre-change analyzer baseline. Record `Timestamp:`, `Command:`, `EXIT_CODE:`,
   `Output Summary:` (must include the literal `Build succeeded` line and the `0 Error(s)` count) in
   `<FEATURE>/evidence/baseline/phase0-analyzer-rebuild.<TIMESTAMP>.md`. Acceptance: `EXIT_CODE: 0`.
 
-- [ ] [P0-T7] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] [P0-T7] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
   to capture the pre-change nullable/type-check baseline. Record `Timestamp:`, `Command:`,
   `EXIT_CODE:`, `Output Summary:` (must include `Build succeeded` and `0 Error(s)`) in
   `<FEATURE>/evidence/baseline/phase0-nullable-rebuild.<TIMESTAMP>.md`. Acceptance: `EXIT_CODE: 0`.
 
-- [ ] [P0-T8] Run `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <FEATURE>/evidence/baseline/coverage-baseline.cobertura.xml`
+- [x] [P0-T8] Run `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <FEATURE>/evidence/baseline/coverage-baseline.cobertura.xml`
   to capture the pre-change repo-wide coverage baseline and confirm the full suite is green before
   any change is made. Record `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` containing
   the total tests passed/failed count and the repo-wide `line-rate`/`branch-rate` percentages read
@@ -125,7 +125,7 @@
 
 ### Phase 1 — Scope & File-State Confirmation
 
-- [ ] [P1-T1] Re-read `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` and confirm the
+- [x] [P1-T1] Re-read `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` and confirm the
   unguarded read still sits at lines 231-234 exactly as:
   `string predetermined = ProjectPredeterminedFolder(_predeterminedFolder, _globals is null ? null : (_globals.Ol?.ArchiveRootPath ?? string.Empty));`
   (the exact 4-line expression spanning lines 231-234), and record the confirmed line range and file
@@ -133,13 +133,13 @@
   Acceptance: the recorded text matches this expression verbatim and the file has 296 lines. If it
   does not match, this task fails and the plan requires re-authoring before Phase 2 proceeds.
 
-- [ ] [P1-T2] Re-read `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`
+- [x] [P1-T2] Re-read `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`
   and confirm its current line count. Append the count to
   `<FEATURE>/evidence/baseline/phase1-file-size-check.<TIMESTAMP>.md`. Acceptance: the recorded
   count is 363. (This confirms the plan's Part2.cs-vs-Part3.cs sizing decision from the plan header
   still holds at execution time.)
 
-- [ ] [P1-T3] Confirm `docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/spec.md`
+- [x] [P1-T3] Confirm `docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/spec.md`
   exists and `docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/user-story.md`
   does not exist (full-bug mode gate). Record both findings in
   `<FEATURE>/evidence/baseline/phase1-mode-gate-check.<TIMESTAMP>.md`. Acceptance: `spec.md` exists,
@@ -149,7 +149,7 @@
 
 ### Phase 2 — Failing Regression Test (must fail first)
 
-- [ ] [P2-T1] [expect-fail] In `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`,
+- [x] [P2-T1] [expect-fail] In `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`,
   add exactly three new `using` directives after the existing `using UtilitiesCS;` line (line 8):
   `using System.Collections.Generic;`, `using System.Reflection;`, and
   `using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;`. Then add the
@@ -247,7 +247,7 @@
   `AssignFolderComboBox_WhenArchiveRootPathThrows_DegradesToIndexFallbackWithoutThrowing` exists in
   `Part2.cs` with the body above, verbatim.
 
-- [ ] [P2-T2] [expect-fail] Build `QuickFiler.Test.csproj` (Debug|Any CPU) and run, against the
+- [x] [P2-T2] [expect-fail] Build `QuickFiler.Test.csproj` (Debug|Any CPU) and run, against the
   UNCHANGED (pre-fix) production code, the single new test via the `vstest.console.exe` path
   recorded in `<FEATURE>/evidence/baseline/phase0-toolchain-paths.<TIMESTAMP>.md`:
   `<vstest.console.exe> QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /TestCaseFilter:"FullyQualifiedName~AssignFolderComboBox_WhenArchiveRootPathThrows_DegradesToIndexFallbackWithoutThrowing" /InIsolation /Logger:trx /ResultsDirectory:<FEATURE>/evidence/regression-testing`.
@@ -261,7 +261,7 @@
 
 ### Phase 3 — Minimal Fix
 
-- [ ] [P3-T1] In `QuickFiler/Controllers/QfcItemController.FolderHandling.cs`, replace lines 231-234:
+- [x] [P3-T1] In `QuickFiler/Controllers/QfcItemController.FolderHandling.cs`, replace lines 231-234:
 
   ```csharp
                   string predetermined = ProjectPredeterminedFolder(
@@ -302,25 +302,25 @@
 
 ### Phase 4 — Regression Confirmation & AC1–AC3 Sign-off
 
-- [ ] [P4-T1] Rebuild `QuickFiler.Test.csproj` (Debug|Any CPU) and re-run the exact command from
+- [x] [P4-T1] Rebuild `QuickFiler.Test.csproj` (Debug|Any CPU) and re-run the exact command from
   P2-T2 (same `TestCaseFilter`, same `vstest.console.exe` path) against the now-fixed production
   code. Record `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (must state 1 passed, 0
   failed) in `<FEATURE>/evidence/regression-testing/phase4-post-fix-confirm.<TIMESTAMP>.md`.
   Acceptance: `EXIT_CODE: 0`, 1 passed, 0 failed.
 
-- [ ] [P4-T2] Once P4-T1 passes, check off the first Acceptance Criteria checkbox in
+- [x] [P4-T2] Once P4-T1 passes, check off the first Acceptance Criteria checkbox in
   `docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/spec.md`
   (the item beginning "A regression test exists in
   `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`") by changing its
   `- [ ]` to `- [x]`. Acceptance (AC1 sign-off): that single line reads `- [x]` and no other
   Acceptance Criteria checkbox in spec.md is changed by this task.
 
-- [ ] [P4-T3] Check off the second Acceptance Criteria checkbox in spec.md (the item beginning "The
+- [x] [P4-T3] Check off the second Acceptance Criteria checkbox in spec.md (the item beginning "The
   same test asserts the folder combo box and suggestion rows are still populated") by changing its
   `- [ ]` to `- [x]`. Acceptance (AC2 sign-off): that single line reads `- [x]` and no other
   Acceptance Criteria checkbox in spec.md is changed by this task.
 
-- [ ] [P4-T4] Check off the third Acceptance Criteria checkbox in spec.md (the item beginning "The
+- [x] [P4-T4] Check off the third Acceptance Criteria checkbox in spec.md (the item beginning "The
   same test asserts no preselection occurs") by changing its `- [ ]` to `- [x]`. Acceptance (AC3
   sign-off): that single line reads `- [x]` and no other Acceptance Criteria checkbox in spec.md is
   changed by this task.
@@ -329,32 +329,32 @@
 
 ### Phase 5 — Full C# Toolchain QA Loop & Coverage Delta
 
-- [ ] [P5-T1] Run `dotnet tool run csharpier format QuickFiler/Controllers/QfcItemController.FolderHandling.cs QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`.
+- [x] [P5-T1] Run `dotnet tool run csharpier format QuickFiler/Controllers/QfcItemController.FolderHandling.cs QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`.
   Record `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` containing the literal
   `Formatted 2 files in` prefix CSharpier prints on a completed run for two files passed on the
   command line (this is the tool's standard summary line regardless of whether either file needed
   reformatting) in `<FEATURE>/evidence/qa-gates/phase5-csharpier-format.<TIMESTAMP>.md`.
   Acceptance: `EXIT_CODE: 0` and the literal prefix is present in the recorded output.
 
-- [ ] [P5-T2] Run `dotnet tool run csharpier check QuickFiler/Controllers/QfcItemController.FolderHandling.cs QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`.
+- [x] [P5-T2] Run `dotnet tool run csharpier check QuickFiler/Controllers/QfcItemController.FolderHandling.cs QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`.
   Record `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` in
   `<FEATURE>/evidence/qa-gates/phase5-csharpier-check.<TIMESTAMP>.md`. Acceptance: `EXIT_CODE: 0`.
   If `EXIT_CODE` is nonzero, re-run P5-T1 and repeat this task until `EXIT_CODE: 0` (restart-from-
   formatting rule).
 
-- [ ] [P5-T3] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
+- [x] [P5-T3] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
   Record `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (must include `Build succeeded`
   and `0 Error(s)`) in `<FEATURE>/evidence/qa-gates/phase5-analyzer-rebuild.<TIMESTAMP>.md`.
   Acceptance: `EXIT_CODE: 0`. If nonzero or if this step changed any tracked file, restart the loop
   from P5-T1.
 
-- [ ] [P5-T4] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`.
+- [x] [P5-T4] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`.
   Record `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (must include `Build succeeded`
   and `0 Error(s)`) in `<FEATURE>/evidence/qa-gates/phase5-nullable-rebuild.<TIMESTAMP>.md`.
   Acceptance: `EXIT_CODE: 0`. If nonzero or if this step changed any tracked file, restart the loop
   from P5-T1.
 
-- [ ] [P5-T5] Run `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <FEATURE>/evidence/qa-gates/coverage-post-change.cobertura.xml`.
+- [x] [P5-T5] Run `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <FEATURE>/evidence/qa-gates/coverage-post-change.cobertura.xml`.
   Record `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` containing the total
   tests-passed/failed count (must show 0 failed, and must include the new
   `AssignFolderComboBox_WhenArchiveRootPathThrows_DegradesToIndexFallbackWithoutThrowing` test in the
@@ -362,7 +362,7 @@
   Cobertura XML, in `<FEATURE>/evidence/qa-gates/phase5-coverage-post-change.<TIMESTAMP>.md`.
   Acceptance: `EXIT_CODE: 0`, 0 failed tests, both percentages recorded as numeric values.
 
-- [ ] [P5-T6] Compare `<FEATURE>/evidence/baseline/coverage-baseline.cobertura.xml` (P0-T8) against
+- [x] [P5-T6] Compare `<FEATURE>/evidence/baseline/coverage-baseline.cobertura.xml` (P0-T8) against
   `<FEATURE>/evidence/qa-gates/coverage-post-change.cobertura.xml` (P5-T5). Record in
   `<FEATURE>/evidence/qa-gates/phase5-coverage-delta.<TIMESTAMP>.md`:
   `Baseline: <line-rate>% line / <branch-rate>% branch`,
@@ -383,7 +383,7 @@
   closing); every line inside the added `try`/`catch (InvalidOperationException)` block shows a hit
   count > 0 (100% new-code coverage, exceeding the 90% new-code floor).
 
-- [ ] [P5-T7] Once P5-T1 through P5-T6 all show a passing acceptance state in the same pass, check
+- [x] [P5-T7] Once P5-T1 through P5-T6 all show a passing acceptance state in the same pass, check
   off the sixth Acceptance Criteria checkbox in spec.md (the item beginning "Full C# toolchain passes
   with no regression") by changing its `- [ ]` to `- [x]`. Acceptance (AC6 sign-off): that single
   line reads `- [x]`.
@@ -392,7 +392,7 @@
 
 ### Phase 6 — Scope-Boundary & Catch-Type Verification (AC4–AC5 Sign-off)
 
-- [ ] [P6-T1] Grep `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` for the literal
+- [x] [P6-T1] Grep `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` for the literal
   single-line token `catch (InvalidOperationException)`: it must appear exactly once, inside
   `AssignFolderComboBox`. Then extract only the `AssignFolderComboBox` method body (lines 191-250
   pre-fix, confirmed by direct read: the method opens at line 191 and its closing brace is at line
@@ -414,12 +414,12 @@
   for `catch (InvalidOperationException)` in the whole file, and zero matches for the two
   broader-catch tokens within the extracted `AssignFolderComboBox` method-body span only.
 
-- [ ] [P6-T2] Check off the fourth Acceptance Criteria checkbox in spec.md (the item beginning "The
+- [x] [P6-T2] Check off the fourth Acceptance Criteria checkbox in spec.md (the item beginning "The
   fix in `QuickFiler/Controllers/QfcItemController.FolderHandling.cs` catches only
   `InvalidOperationException`") by changing its `- [ ]` to `- [x]`. Acceptance (AC4 sign-off): that
   single line reads `- [x]`.
 
-- [ ] [P6-T3] Run `git merge-base HEAD main` to resolve the base SHA for this branch (per
+- [x] [P6-T3] Run `git merge-base HEAD main` to resolve the base SHA for this branch (per
   `pr-base-branch-merge-base`), then run
   `git diff --name-only <merge-base-sha> -- TaskMaster/AppGlobals/AppOlObjects.cs TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs TaskMaster/AppGlobals/ArchiveRootPathGuard.cs QuickFiler/Controllers/QfcHomeController.cs UtilitiesCS/Threading/ProgressViewer.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILInstruction.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/MethodBodyReader.cs" UtilitiesCS/OutlookObjects/Table/OlTableExtensions.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.RowTransforms.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs UtilitiesCS/Threading/TimeOutTask.cs UtilitiesCS/Extensions/DfDeedle.cs .editorconfig BannedSymbols.txt UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`,
   then also run `git status --porcelain -- TaskMaster/AppGlobals/AppOlObjects.cs TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs TaskMaster/AppGlobals/ArchiveRootPathGuard.cs QuickFiler/Controllers/QfcHomeController.cs UtilitiesCS/Threading/ProgressViewer.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs QuickFiler/Viewers/BreadcrumbPopupOwnerRegistry.cs QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILInstruction.cs" "UtilitiesCS/NewtonsoftHelpers/SDIL Reader/MethodBodyReader.cs" UtilitiesCS/OutlookObjects/Table/OlTableExtensions.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.Etl.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.RowTransforms.cs UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs UtilitiesCS/Threading/TimeOutTask.cs UtilitiesCS/Extensions/DfDeedle.cs .editorconfig BannedSymbols.txt UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`
@@ -436,7 +436,7 @@
   output and the porcelain-status output are empty (none of the named files were modified, staged, or
   left untracked-and-changed).
 
-- [ ] [P6-T4] Run `git diff --name-only <merge-base-sha> HEAD` (same base SHA from P6-T3) against
+- [x] [P6-T4] Run `git diff --name-only <merge-base-sha> HEAD` (same base SHA from P6-T3) against
   the full working tree, then also run `git status --porcelain` (no pathspec) as a porcelain-status
   companion so any untracked file the commit-to-commit diff cannot see is still captured. Record the
   full file list from both commands, `Timestamp:`, both `Command:` lines, `Output Summary:` in
@@ -448,11 +448,11 @@
   are limited to paths under
   `docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/`.
 
-- [ ] [P6-T5] Check off the fifth Acceptance Criteria checkbox in spec.md (the item beginning "No
+- [x] [P6-T5] Check off the fifth Acceptance Criteria checkbox in spec.md (the item beginning "No
   files owned by issue #812") by changing its `- [ ]` to `- [x]`. Acceptance (AC5 sign-off): that
   single line reads `- [x]`.
 
-- [ ] [P6-T6] Measure the final line count of
+- [x] [P6-T6] Measure the final line count of
   `QuickFiler.Test/Controllers/QfcItemController.FolderHandlingTests.Part2.cs`. Record the count in
   `<FEATURE>/evidence/other/phase6-file-size-final.<TIMESTAMP>.md`. Acceptance: the count is <= 500.
 
@@ -460,19 +460,19 @@
 
 ### Phase 7 — Documentation & Spec Status Update
 
-- [ ] [P7-T1] In spec.md, confirm all six Acceptance Criteria checkboxes now read `- [x]` (set by
+- [x] [P7-T1] In spec.md, confirm all six Acceptance Criteria checkboxes now read `- [x]` (set by
   P4-T2, P4-T3, P4-T4, P6-T2, P6-T5, P5-T7). Record a summary in
   `<FEATURE>/evidence/other/phase7-spec-status-update.<TIMESTAMP>.md` listing all six checkbox texts
   and confirming each is checked. Acceptance: all six read `- [x]`.
 
-- [ ] [P7-T2] Update spec.md's `- **Status:**` field from `Draft` to `Implemented` and its
+- [x] [P7-T2] Update spec.md's `- **Status:**` field from `Draft` to `Implemented` and its
   `- **Last Updated:**` field to the current date. Acceptance: both fields reflect the new values.
 
 ---
 
 ### Phase 8 — PR & Handoff Preparation
 
-- [ ] [P8-T1] Write a PR-notes artifact summarizing the fix (one-line production change: narrow
+- [x] [P8-T1] Write a PR-notes artifact summarizing the fix (one-line production change: narrow
   `try`/`catch (InvalidOperationException)` around the `Ol.ArchiveRootPath` read in
   `AssignFolderComboBox`; one new regression test in `Part2.cs`), the risk (none — behaviorally
   equivalent to the existing null-`_globals` path per research §2), and links to issue #813 and
@@ -484,12 +484,12 @@
 
 ### Phase 9 — Rollout & Follow-up Notes
 
-- [ ] [P9-T1] Record spec.md's Rollout & Follow-up content verbatim (standard PR review and merge, no
+- [x] [P9-T1] Record spec.md's Rollout & Follow-up content verbatim (standard PR review and merge, no
   phased rollout or feature flag; post-merge verification that the regression test passes in CI;
   links to #813, #812, #797) into `<FEATURE>/evidence/other/rollout-followup.<TIMESTAMP>.md`.
   Acceptance: the artifact exists and reproduces that section's content.
 
-- [ ] [P9-T2] Mirror the completion status of issue #813 into
+- [x] [P9-T2] Mirror the completion status of issue #813 into
   `<FEATURE>/evidence/issue-updates/issue-813.<TIMESTAMP>.md` per the Issue Update Mirroring
   convention: `Timestamp:`, the intended text, and `PostedAs: unknown` if the GitHub issue itself is
   not updated as part of this plan's execution (posting the update is a separate, later action not
