@@ -440,7 +440,7 @@ deterministically on the fixed tree.
 Criteria are numbered AC1..AC12 for downstream planning and audit reference. Each is verifiable by a
 named test, a named command, or a stated file-and-line observation.
 
-- [ ] **AC1 — Publication mechanism.** In `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs`,
+- [x] **AC1 — Publication mechanism.** In `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs`,
       the declarations currently at :117 (`public static OpCode[] multiByteOpCodes = null!;`) and
       :118 (`public static OpCode[] singleByteOpCodes = null!;`) are both `public static readonly`
       with no initializer, and an explicit private static constructor of `ILGlobals` builds each
@@ -452,7 +452,7 @@ named test, a named command, or a stated file-and-line observation.
       five-step trace in the Proposed Fix section, including the requirement that the field
       assignment follows the fill rather than preceding it.
 
-- [ ] **AC2 — Primary behavioural gate: `LoadOpCodes()` does not republish the tables.** The test
+- [x] **AC2 — Primary behavioural gate: `LoadOpCodes()` does not republish the tables.** The test
       `LoadOpCodes_DoesNotRepublishPublishedTables` exists in
       `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/ILGlobals_Tests.cs`, captures
       `ILGlobals.singleByteOpCodes` and `ILGlobals.multiByteOpCodes` into locals, calls
@@ -466,7 +466,7 @@ named test, a named command, or a stated file-and-line observation.
       the criterion is order-independent. The test contains no sleep, no retry, no timing tolerance,
       no repeated-run loop, and no additional thread.
 
-- [ ] **AC3 — Secondary structural gate: both fields are `InitOnly`.** The tests
+- [x] **AC3 — Secondary structural gate: both fields are `InitOnly`.** The tests
       `SingleByteOpCodes_FieldIsInitOnly` and `MultiByteOpCodes_FieldIsInitOnly` exist in
       `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/ILGlobals_Tests.cs`, resolve each field via
       `typeof(ILGlobals).GetField(nameof(ILGlobals.singleByteOpCodes), BindingFlags.Public | BindingFlags.Static)`
@@ -476,7 +476,7 @@ named test, a named command, or a stated file-and-line observation.
       tests must not additionally assert anything about `TypeAttributes.BeforeFieldInit`, which
       would over-constrain the implementation encoding rather than the property that matters.
 
-- [ ] **AC4 — Supporting test: exhaustive opcode-table population.** The test
+- [x] **AC4 — Supporting test: exhaustive opcode-table population.** The test
       `OpCodeTables_ContainEveryOpCodeDeclaredOnOpCodes` exists in
       `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/ILGlobals_Tests.cs` and, for every `public
       static` field of type `OpCode` on `typeof(OpCodes)`, asserts that `singleByteOpCodes[value]`
@@ -488,7 +488,7 @@ named test, a named command, or a stated file-and-line observation.
       Its value is that it replaces two weak spot checks and would catch a fix that publishes the
       tables safely but fills them wrongly.
 
-- [ ] **AC5 — `LoadOpCodes()` retained as a forced-initialization call.**
+- [x] **AC5 — `LoadOpCodes()` retained as a forced-initialization call.**
       `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs` still declares
       `public static void LoadOpCodes()` and its body is
       `RuntimeHelpers.RunClassConstructor(typeof(ILGlobals).TypeHandle);` with the corresponding
@@ -498,7 +498,7 @@ named test, a named command, or a stated file-and-line observation.
       `ILGlobals.LoadOpCodes()` call at :364 inside `CreateReader` (declared at :362) compiles
       unchanged and the file remains at 489 lines against the 500-line cap.
 
-- [ ] **AC6 — Corrected nullable annotations and comment.** In
+- [x] **AC6 — Corrected nullable annotations and comment.** In
       `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs`, the `= null!` suppressions currently
       at :117 and :118 are deleted, and the three-line comment currently at :114-116 — which asserts
       that the fields are "populated by LoadOpCodes() before any read" and that they are "annotated
@@ -510,7 +510,7 @@ named test, a named command, or a stated file-and-line observation.
       remains at :1, and the nullable msbuild command in AC11 completes with zero CS86xx
       diagnostics, in particular no CS8618 on either field.
 
-- [ ] **AC7 — The four existing `LoadOpCodes_*` tests no longer mis-attribute published state to a
+- [x] **AC7 — The four existing `LoadOpCodes_*` tests no longer mis-attribute published state to a
       `LoadOpCodes()` Act.** In `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/ILGlobals_Tests.cs`,
       a `Grep` for `LoadOpCodes` returns exactly one invocation of `ILGlobals.LoadOpCodes()`, and it
       is the Act of `LoadOpCodes_DoesNotRepublishPublishedTables` from AC2. A `Grep` for
@@ -521,7 +521,7 @@ named test, a named command, or a stated file-and-line observation.
       `LoadOpCodes()` call, preserving the assertions previously at :18-19 and :29-30. The two spot
       checks previously at :40 and :50 are deleted, their coverage subsumed by AC4.
 
-- [ ] **AC8 — No `[DoNotParallelize]` on either test class.** A `Grep` for `DoNotParallelize` over
+- [x] **AC8 — No `[DoNotParallelize]` on either test class.** A `Grep` for `DoNotParallelize` over
       `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/ILGlobals_Tests.cs` and
       `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/MethodBodyReader_Tests.cs` returns zero matches
       in both files, matching their current state. Neither class gains the attribute as a
@@ -530,7 +530,7 @@ named test, a named command, or a stated file-and-line observation.
       still carries `Parallelize(Workers = 0, Scope = ExecutionScope.ClassLevel)` at :18-21
       unchanged, confirmed by `git diff --stat` listing no entry for that file.
 
-- [ ] **AC9 — No synchronisation primitive introduced, and `MethodBodyReader.cs` unchanged.**
+- [x] **AC9 — No synchronisation primitive introduced, and `MethodBodyReader.cs` unchanged.**
       `git diff --stat` against the merge base lists no entry for
       `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/MethodBodyReader.cs`, so the reads at :105 and :110
       keep their exact current expression form and no consumer-side `catch` in that file is
@@ -538,7 +538,7 @@ named test, a named command, or a stated file-and-line observation.
       `UtilitiesCS/NewtonsoftHelpers/SDIL Reader/ILGlobals.cs` returns zero matches, confirming the
       rejected candidates 2 and the `volatile` variant were not partially adopted.
 
-- [ ] **AC10 — Build-file discipline.** `git diff` for `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- [x] **AC10 — Build-file discipline.** `git diff` for `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
       shows either no change at all (the preferred outcome, achieved by placing the new tests in the
       already-registered `ILGlobals_Tests.cs`) or exactly one added line and zero removed lines, that
       line being a single `<Compile Include>` entry for this feature's own new test file, matching
@@ -546,7 +546,7 @@ named test, a named command, or a stated file-and-line observation.
       reordering, reformatting, or whitespace normalisation of any existing item appears in either
       diff.
 
-- [ ] **AC11 — Clean full C# toolchain pass, in the repository-standard order.** The four commands
+- [x] **AC11 — Clean full C# toolchain pass, in the repository-standard order.** The four commands
       below, quoted from CLAUDE.md, are run in this order, and the final pass completes all four with
       no failure and no file modified by the formatter:
       1. `dotnet tool run csharpier format .`, then `dotnet tool run csharpier check .` reporting
@@ -563,7 +563,7 @@ named test, a named command, or a stated file-and-line observation.
       pass are written under the feature's evidence directory at
       docs/features/active/2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824/evidence/qa-gates/.
 
-- [ ] **AC12 — Coverage captured and not regressed on changed lines.** A pre-change baseline coverage
+- [x] **AC12 — Coverage captured and not regressed on changed lines.** A pre-change baseline coverage
       document is written under
       docs/features/active/2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824/evidence/baseline/
       and a post-change coverage document captured from the AC11 step 4 run is written under
