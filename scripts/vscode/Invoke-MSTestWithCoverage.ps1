@@ -342,6 +342,7 @@ function Invoke-MSTestWithCoverageMain {
     Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
 
     Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
+    Write-Output (Get-CoberturaFirstPartyCoverageReport -CoberturaXml $processedXmlContent)
     Write-Output "Done. Coverage artifact: $resolvedOutputPath"
 }
 

@@ -45,7 +45,7 @@ Describe 'Invoke-MSTestWithCoverage assembly discovery' {
             $script:capturedTestAssembly = $TestAssembly
         }
         Mock Get-Content { '<coverage />' }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" />' }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8"><packages /></coverage>' }
         Mock Set-Content {}
     }
 

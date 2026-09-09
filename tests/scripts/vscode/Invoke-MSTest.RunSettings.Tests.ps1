@@ -368,7 +368,7 @@ Describe 'Invoke-MSTestWithCoverageMain' {
             $script:coverageCallCount++
         }
         Mock Get-Content { '<coverage />' }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" />' }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8"><packages /></coverage>' }
         Mock Set-Content {}
     }
 
@@ -401,9 +401,9 @@ Describe 'Invoke-MSTestWithCoverageMain' {
     It 'passes the generated Cobertura result to the threshold evaluator before completing successfully' {
         $script:evaluatedCoberturaXml = $null
         Mock Assert-CoberturaLineCoverageThreshold { param([string]$CoberturaXml) $script:evaluatedCoberturaXml = $CoberturaXml }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" />' }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8"><packages /></coverage>' }
         Invoke-MSTestWithCoverageMain -ScriptRoot $script:scriptDir
-        $script:evaluatedCoberturaXml | Should -Be '<coverage line-rate="0.8" />'
+        $script:evaluatedCoberturaXml | Should -Be '<coverage line-rate="0.8"><packages /></coverage>'
     }
 
     It 'fails when the search root cannot be found' {
