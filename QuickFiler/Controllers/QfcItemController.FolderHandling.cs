@@ -228,9 +228,24 @@ namespace QuickFiler.Controllers
                 // both sides now route through the one shared projection
                 // ArchiveStemProjection.ToDisplayStem, so they agree by construction rather than by
                 // duplication.
+                string archiveRootPath;
+                try
+                {
+                    archiveRootPath = _globals is null
+                        ? null
+                        : (_globals.Ol?.ArchiveRootPath ?? string.Empty);
+                }
+                catch (InvalidOperationException)
+                {
+                    // #813: Ol.ArchiveRootPath throws when the archive root is unconfigured or
+                    // unresolvable. Degrade to no preselection instead of propagating onto the UI
+                    // dispatcher thread; ProjectPredeterminedFolder/ToDisplayStem already treat an
+                    // empty archive root as the identity projection.
+                    archiveRootPath = string.Empty;
+                }
                 string predetermined = ProjectPredeterminedFolder(
                     _predeterminedFolder,
-                    _globals is null ? null : (_globals.Ol?.ArchiveRootPath ?? string.Empty)
+                    archiveRootPath
                 );
                 if (
                     !string.IsNullOrEmpty(predetermined)
