@@ -1,11 +1,14 @@
-# etl-deadline-mechanics-follow-ups
+# etl-deadline-mechanics-follow-ups (Issue #825)
 
 - Date captured: 2026-09-08
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/etl-deadline-mechanics-follow-ups/ (Issue #825)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #825
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/825
+- Last Updated: 2026-09-08
 ## Summary
 
 Residual ETL deadline mechanics left in place by issue #811, which placed the 250 ms per-row ETL

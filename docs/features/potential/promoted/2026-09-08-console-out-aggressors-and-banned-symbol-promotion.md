@@ -1,11 +1,14 @@
-# console-out-aggressors-and-banned-symbol-promotion
+# console-out-aggressors-and-banned-symbol-promotion (Issue #826)
 
 - Date captured: 2026-09-08
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/console-out-aggressors-and-banned-symbol-promotion/ (Issue #826)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #826
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/826
+- Last Updated: 2026-09-08
 ## Summary
 
 Residual process-wide console mutation and analyzer-severity work left in place by issue #811.

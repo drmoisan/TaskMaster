@@ -1,11 +1,14 @@
-# ilglobals-loadopcodes-unsynchronised-static-race
+# ilglobals-loadopcodes-unsynchronised-static-race (Issue #824)
 
 - Date captured: 2026-09-08
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/ilglobals-loadopcodes-unsynchronised-static-race/ (Issue #824)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #824
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/824
+- Last Updated: 2026-09-08
 ## Summary
 
 An unsynchronised static-mutation race in `ILGlobals.LoadOpCodes()` is the sole reason acceptance
