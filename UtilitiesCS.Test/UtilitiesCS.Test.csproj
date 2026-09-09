@@ -409,6 +409,10 @@
     <Compile Include="OutlookObjects\Folder\FolderTreeTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorCoverageExpansionTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorTests.SuggestionsAndRecents.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorTests.FolderLookupAndUiSeams.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorTests.CreateFolderWorkflows.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderPredictorTests.TestSupport.cs" />
     <Compile Include="OutlookObjects\Folder\FolderRowTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapperCoverageExpansionTests.cs" />
     <Compile Include="OutlookObjects\Folder\MAPIMethodsTests.cs" />

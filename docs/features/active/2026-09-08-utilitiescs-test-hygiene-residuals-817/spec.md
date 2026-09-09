@@ -346,7 +346,7 @@ matches zero tests and exits `0` with "No test matches," silently masking a brok
       `CreateFoldersCollection`, `CreateGlobals`, `GetLeafName`) are preserved exactly, relocated to
       `FolderPredictorTests.TestSupport.cs`, with no visibility changes required for other split
       files to reference them.
-- [ ] `UtilitiesCS.Test/UtilitiesCS.Test.csproj` contains exactly one new `<Compile Include>` entry
+- [x] `UtilitiesCS.Test/UtilitiesCS.Test.csproj` contains exactly one new `<Compile Include>` entry
       per new file (4 total), inserted immediately after the existing
       `<Compile Include="OutlookObjects\Folder\FolderPredictorTests.cs" />` entry, with no
       reordering or reformatting of any other `<Compile Include>` entry in the file.
