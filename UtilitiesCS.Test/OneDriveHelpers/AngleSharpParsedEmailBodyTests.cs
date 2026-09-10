@@ -15,13 +15,6 @@ namespace UtilitiesCS.Test.OneDriveHelpers
     {
         private AngleSharpParsedEmailBodyDerived parsed;
 
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-            //this.mockRepository = new MockRepository(MockBehavior.Loose);
-        }
-
         public class AngleSharpParsedEmailBodyDerived : AngleSharpParsedEmailBody
         {
             public AngleSharpParsedEmailBodyDerived()

@@ -28,8 +28,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
-
             _mockRepository = new MockRepository(MockBehavior.Loose);
             _mockGlobals = _mockRepository.Create<IApplicationGlobals>();
             _mockGlobals.SetupAllProperties();

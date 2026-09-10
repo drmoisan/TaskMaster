@@ -28,11 +28,15 @@ namespace QuickFiler.Viewers
         /// popup is open, replacing any predicate previously recorded for the same control.
         /// </summary>
         /// <param name="itemViewer">
-        /// The control that owns the popup. A null value is ignored rather than rejected: the
-        /// registration hop runs from a form lookup that can legitimately find no form.
+        /// The control that owns the popup. A null value is rejected with an
+        /// ArgumentNullException. Issue #823 (R3): the sole production call site consumes the form
+        /// lookup with the null-conditional operator, so a failed lookup produces a null receiver
+        /// and skips the invocation entirely rather than producing a null argument, and the two
+        /// arguments it passes are <c>this</c> and a lambda literal. A null therefore cannot arise
+        /// from any reachable path and is a contract breach when it does.
         /// </param>
         /// <param name="popupIsOpen">
-        /// The predicate. A null value is ignored on the same reasoning.
+        /// The predicate. A null value is rejected on the same reasoning.
         /// </param>
         /// <remarks>
         /// Assigning by key rather than adding is what keeps the registry one entry per owner. An
@@ -41,9 +45,14 @@ namespace QuickFiler.Viewers
         /// </remarks>
         internal void Register(Control itemViewer, Func<bool> popupIsOpen)
         {
-            if (itemViewer == null || popupIsOpen == null)
+            if (itemViewer == null)
             {
-                return;
+                throw new ArgumentNullException(nameof(itemViewer));
+            }
+
+            if (popupIsOpen == null)
+            {
+                throw new ArgumentNullException(nameof(popupIsOpen));
             }
 
             _owners[itemViewer] = popupIsOpen;

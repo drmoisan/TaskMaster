@@ -402,7 +402,9 @@ namespace QuickFiler.Controllers
             }
             finally
             {
-                ParentCleanup?.Invoke();
+                System.Action parentCleanup = ParentCleanup; // #810 idiom carried up by #821.
+                ParentCleanup = null;
+                parentCleanup?.Invoke();
                 logger.Info("Home cleanup complete; ribbon release callback invoked.");
             }
         }

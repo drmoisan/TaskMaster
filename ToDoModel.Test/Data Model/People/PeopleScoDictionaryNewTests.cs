@@ -23,7 +23,6 @@ namespace ToDoModel.Tests.Data_Model.People
         [TestInitialize]
         public void Setup()
         {
-            Console.SetOut(new DebugTextWriter());
             _mockGlobals = new Mock<IApplicationGlobals>();
             var fs = new Mock<IFileSystemFolderPaths>();
             var specialFolders = new Dictionary<string, string>()

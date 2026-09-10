@@ -35,3 +35,13 @@ Cheap tells for an un-post-processed file, before you trust any delta:
 - note `<package ...>` puts `name` *after* `line-rate`, so `grep '<package name='` returns **zero matches** and looks like "no packages". Match `'<package [^>]*>'` and extract `name` instead.
 
 A green run also passes `Assert-CoberturaLineCoverageThreshold`, but that helper's floor is **80%** (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487`), not 85 — clearing it corroborates >= 80% only, so still compute the 85% line / 75% branch check yourself.
+
+### A THIRD denominator, from `dotnet-coverage collect` over explicitly-named assemblies (epic child #823, 2026-09-09)
+
+An executor whose plan pins `dotnet-coverage collect --output-format cobertura -- vstest.console.exe <9 named assemblies>` as its "measured run" produced **84.68%, `lines-valid` 134377** — a denominator *larger than both* figures above (80166 unfiltered, 111207 filtered), because naming assemblies explicitly bypasses `coverage.config` filtering entirely and the collector instruments everything those assemblies load. It correctly reported no regression (+0.01) but concluded the **85% floor was NOT MET**, and wrote that conclusion into its evidence and its final report.
+
+Re-running the repo's canonical `Invoke-MSTestWithCoverage.ps1` on the *same commit* printed `First-party coverage: lines 56031/65440 (85.62%), branches 13484/16892 (79.82%)` — over the 85% line floor and over the 75% branch floor.
+
+**Why it matters:** the pessimistic figure is not wrong as a measurement, but it is measured against a denominator no policy is written against, and propagating it unqualified reports a policy failure that does not exist. The plan's own D11 required only that baseline and post-change use the *same* instrument — which is enough for the no-regression check and says nothing about which denominator the *floor* is evaluated against.
+
+**How to apply:** when an executor reports the 85% floor missed, check `lines-valid` before relaying it. If it is far above ~111k, the run bypassed `coverage.config`; re-measure with the canonical script and report the first-party figure as the floor comparison, keeping the executor's figure for the delta. Record both rather than overwriting one with the other.

@@ -25,6 +25,16 @@ was gated), and nothing was stranded because all evidence was committed before P
 follow-up PR was needed. The fidelity proof was a true two-parent merge whose tree hash equalled HEAD's
 exactly, with an empty `git diff <merge> HEAD`.
 
+**Recurrence (child 825, 2026-09-09) — a parent's "ground truth" block can be stale on arrival.**
+A resume prompt opened with a carefully-derived facts block ("PR #834 is OPEN, mergeable MERGEABLE,
+mergeStateStatus CLEAN", timestamped 22:02Z) and instructed the child to merge on green. `gh pr view`
+returned `MERGED` on the first call: the owner had merged at 22:02:23Z, *within the same minute the
+parent derived the block*. The lesson generalises beyond external merges: a parent's re-derived ground
+truth is a measurement, not a guarantee, and its staleness window starts the moment it is written. Verify
+every load-bearing premise it asserts before acting on it, especially the ones the prompt tells you to
+verify — and also the ones it presents as settled. Here the prompt's own step 1 (re-check HEAD and
+cleanliness) was satisfied, while the unchecked premise (PR still open) was the one that had changed.
+
 **How to apply:**
 
 - When the base tip moves, always `git log --oneline origin/<base> ^HEAD` before re-merging. A single

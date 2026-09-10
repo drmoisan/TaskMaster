@@ -191,6 +191,13 @@ namespace QuickFiler.Controllers.Tests
         /// R4 — a second caller cannot install until the first has restored. The waiting transaction
         /// observes the pre-install value on acquisition, never the first transaction's installed
         /// value, because restore strictly precedes gate release.
+        /// <para>
+        /// Issue #823 (R5): this test fails intermittently. Observations of its outcomes are
+        /// collected in the append-only log at
+        /// docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/evidence/other/flake-watch-uithread-dispatcher-transaction.2026-09-09T00-15.md.
+        /// Append an observation there rather than stabilising the test with a sleep, a retry or a
+        /// timing tolerance, none of which this repository permits.
+        /// </para>
         /// </summary>
         [TestMethod]
         [Timeout(GateTimeoutMs)]

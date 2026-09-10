@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace SDILReader
@@ -111,17 +112,34 @@ namespace SDILReader
     {
         public static Dictionary<int, object> Cache = new Dictionary<int, object>();
 
-        // Invariant: these are populated by LoadOpCodes() before any read of the tables;
-        // annotated null! (rather than nullable) to preserve the non-null contract that
-        // consumers (e.g. MethodBodyReader) already rely on. Behavior unchanged.
-        public static OpCode[] multiByteOpCodes = null!;
-        public static OpCode[] singleByteOpCodes = null!;
+        /// <summary>
+        /// Multi-byte (0xFE-prefixed) opcode table, indexed by the low byte of the opcode value.
+        /// Published once by the static constructor of <see cref="ILGlobals"/>, fully populated,
+        /// and never reassigned thereafter. <c>readonly</c> prevents reassignment of the array
+        /// reference; it does not prevent element mutation, so callers must treat the contents as
+        /// read-only.
+        /// </summary>
+        public static readonly OpCode[] multiByteOpCodes;
+
+        /// <summary>
+        /// Single-byte opcode table, indexed by the opcode value. Published once by the static
+        /// constructor of <see cref="ILGlobals"/>, fully populated, and never reassigned
+        /// thereafter. <c>readonly</c> prevents reassignment of the array reference; it does not
+        /// prevent element mutation, so callers must treat the contents as read-only.
+        /// </summary>
+        public static readonly OpCode[] singleByteOpCodes;
         public static Module[]? modules = null;
 
-        public static void LoadOpCodes()
+        /// <summary>
+        /// Builds both opcode tables in locals and publishes each one exactly once, after the
+        /// reflection loop has run to completion. Assigning the fields only at the end is what
+        /// removes the window in which a reader could observe a table that had been allocated but
+        /// not yet filled.
+        /// </summary>
+        static ILGlobals()
         {
-            singleByteOpCodes = new OpCode[0x100];
-            multiByteOpCodes = new OpCode[0x100];
+            OpCode[] singleTable = new OpCode[0x100];
+            OpCode[] multiTable = new OpCode[0x100];
             FieldInfo[] infoArray1 = typeof(OpCodes).GetFields();
             for (int num1 = 0; num1 < infoArray1.Length; num1++)
             {
@@ -134,7 +152,7 @@ namespace SDILReader
                     ushort num2 = (ushort)code1.Value;
                     if (num2 < 0x100)
                     {
-                        singleByteOpCodes[(int)num2] = code1;
+                        singleTable[(int)num2] = code1;
                     }
                     else
                     {
@@ -142,10 +160,23 @@ namespace SDILReader
                         {
                             throw new Exception("Invalid OpCode.");
                         }
-                        multiByteOpCodes[num2 & 0xff] = code1;
+                        multiTable[num2 & 0xff] = code1;
                     }
                 }
             }
+            singleByteOpCodes = singleTable;
+            multiByteOpCodes = multiTable;
+        }
+
+        /// <summary>
+        /// Forces the opcode tables to be published, if they have not been already. Retained for
+        /// the five existing call sites; the tables themselves are built by the static constructor,
+        /// so this method neither allocates nor reassigns anything and is safe to call repeatedly
+        /// from any thread.
+        /// </summary>
+        public static void LoadOpCodes()
+        {
+            RuntimeHelpers.RunClassConstructor(typeof(ILGlobals).TypeHandle);
         }
 
         /// <summary>

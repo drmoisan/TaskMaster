@@ -658,3 +658,43 @@ are both fully reachable from unit tests, so no exemption is claimed for either.
   #797 feature folder
   `docs/features/active/2026-09-06-folder-settings-never-persist-and-user-email-error-loading-797/`;
   research artifact `research/2026-09-07T23-45-utilitiescs-archive-root-and-user-email-retry-812-research.md`.
+
+---
+
+## Correction 2026-09-09 (issue #823)
+
+Issue #823, entry R1, rescoped the SMTP retry budget this specification introduced. Where #812
+bounded the retry to one attempt per controller instance, the bound is now one attempt per
+controller instance per store.
+
+**Why the original scope was too coarse.** One `StoreWrapperController` observes many distinct
+`StoreWrapper` instances, because `DisplayName_SelectedValueChanged` assigns `Current` from
+`Model.Stores` and then calls `PopulateWithCurrent()`. The single `bool` this specification
+introduced was consumed by whichever store happened to be selected first with a null address, so
+every later store's lookup was suppressed and its address label stayed at the generic placeholder
+for the life of the dialog.
+
+**The two changed sites.**
+
+- `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs` — the `private bool
+  _userEmailRetryAttempted;` field is replaced by a non-static, readonly
+  `HashSet<StoreWrapper>` keyed by reference identity, and its XML doc is rewritten to state the
+  new bound.
+- `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.Display.cs` — the third conjunct of the
+  retry gate becomes a membership test against that set, and the assignment becomes an `Add` of
+  `Current`. The first two conjuncts keep their text and their order, and the `Add` keeps its
+  position ahead of the `Current.RefreshUserEmailAddress()` call so that an exception escaping the
+  lookup still consumes that store's single attempt.
+
+**The #812 property that is preserved.** The bound remains set by configuration rather than by user
+gestures. No sequence of user re-selections can produce an unbounded series of blocking UI-thread
+COM lookups, which is the invariant this specification was written to establish. The set is never
+reset, and a fresh dialog open still yields a fresh budget only because
+`RibbonController.FolderStoresSettings` constructs a fresh controller on every open.
+
+**Accepted cost.** The worst case rises from one blocking UI-thread SMTP lookup per dialog open to
+N, where N is the number of stores in `Model.Stores` whose address is null. That figure is a
+property of the profile's configuration, not of how the user drives the dialog, so it does not
+reintroduce the defect #812 removed.
+
+Nothing else in this feature folder was modified by issue #823.

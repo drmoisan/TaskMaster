@@ -1,6 +1,6 @@
 ---
 name: msbuild-log-has-two-absolute-path-leak-classes
-description: A raw MSBuild file-logger log carries TWO distinct absolute host paths — the worktree root AND the main-checkout root via csc.exe /analyzerconfig: — so a worktree-root-only sanitisation leaves ~36 leaks per log
+description: A raw MSBuild file-logger log carries FOUR absolute-host-path leak classes — worktree root, main-checkout root, MSBuildUserExtensionsPath and _DeploymentUrl — so even a two-root sanitisation leaves ~21 account-name leaks per log
 metadata:
   type: project
 ---
@@ -14,6 +14,21 @@ prefixes, not one:
    `/analyzerconfig:` argument pointing at the *ancestor* checkout's `.editorconfig`. MSBuild
    emits two `/analyzerconfig:` arguments back to back for the same file: the main-checkout one
    and the worktree-rooted one.
+
+**Two further classes survive both root rewrites** (measured on issue #825, 2026-09-09, at
+`Verbosity=detailed`): after rewriting both roots, 21 lines per log still carried `C:\Users\`, in
+these forms:
+
+3. **`MSBuildUserExtensionsPath`** — a property-reassignment line echoing
+   `C:\Users\<account>\AppData\Local\Microsoft\MSBuild` "expanded from the environment".
+4. **`_DeploymentUrl`** — three property-reassignment lines echoing a OneDrive folder under the
+   user profile (a ClickOnce publish URL carried by the VSTO project).
+
+Neither is under any repository root, so neither root substitution reaches it. A plan whose gate
+demands a **zero** count of the token `C:\Users\` in the committed logs therefore cannot pass on a
+two-root rewrite, however correct that rewrite is. Add a **third** pass mapping the user-profile
+root (`C:\Users\<account>`) to `<user-profile-root>`, applied *after* the two root passes so it
+only reaches residuals. Record it as a deviation if the plan's decision record names only two.
 
 **Why:** when running inside a linked worktree, the main-checkout root is an *ancestor* of the
 worktree root, so it is not itself prefixed by the worktree-root string and a worktree-root-only

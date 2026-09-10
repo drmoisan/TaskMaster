@@ -170,6 +170,30 @@ namespace QuickFiler.Controllers.Tests
             controller.KeyboardHandler.Should().BeNull();
         }
 
+        /// <summary>
+        /// Issue #821 (AC5): <c>Cleanup</c> invoked the parent-cleanup field with no guard at all, so
+        /// a repeat call released the ribbon twice. <c>Cleanup</c> is handed out as a method group to
+        /// two distinct form controllers, so two invocations on one home controller are reachable.
+        /// Both calls precede the assertion, and the assertion reads a count rather than a boolean,
+        /// because a boolean flag is true after one invocation and after two alike.
+        /// </summary>
+        [TestMethod]
+        public void Cleanup_CalledTwice_InvokesParentCleanupOnce()
+        {
+            var probe = new LifecycleProbe();
+            var controller = probe.CreateControllerWithMail(probe.Mail);
+
+            controller.Cleanup();
+            controller.Cleanup();
+
+            probe
+                .ParentCleanupCallCount.Should()
+                .Be(
+                    1,
+                    "the ribbon release callback must fire at most once per controller instance"
+                );
+        }
+
         [TestMethod]
         public void ExplorerControllerAndKeyboardHandler_SettersStoreAssignedInstances()
         {
@@ -235,7 +259,19 @@ namespace QuickFiler.Controllers.Tests
 
             internal bool ParentCleanupCalled { get; private set; }
 
-            internal System.Action ParentCleanup => () => ParentCleanupCalled = true;
+            /// <summary>
+            /// Issue #821 (AC5): a boolean flag cannot distinguish one invocation from two, so the
+            /// probe counts them. The delegate closes over this probe instance, so the counter
+            /// accumulates even though the property below returns a fresh delegate on each read.
+            /// </summary>
+            internal int ParentCleanupCallCount { get; private set; }
+
+            internal System.Action ParentCleanup =>
+                () =>
+                {
+                    ParentCleanupCalled = true;
+                    ParentCleanupCallCount++;
+                };
 
             private EfcFormController FormController { get; } =
                 CreateUninitialized<EfcFormController>();

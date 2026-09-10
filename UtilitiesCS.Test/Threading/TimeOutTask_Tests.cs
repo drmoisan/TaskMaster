@@ -7,6 +7,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UtilitiesCS.Test
 {
     [TestClass]
+    // Not parallelized, with the reason verified rather than assumed: this class contains real
+    // wall-clock races. One test races a Task.Delay(200) against a TimeoutAfter(10) and asserts the
+    // timeout wins; another races a Task.Delay(50) against a TimeoutAfter(0) and asserts the same.
+    // Both depend on the delay not completing first, which class-level parallelism under a
+    // saturated thread pool can invert. Converting them to an injected clock would remove the need
+    // for this attribute and is recorded as a deferred follow-up rather than attempted here.
     [DoNotParallelize]
     public partial class TimeOutTask_Tests
     {
@@ -181,33 +187,6 @@ namespace UtilitiesCS.Test
 
             // Act
             var result = task.TimeoutAfter(Timeout.Infinite);
-            await result;
-
-            // Assert
-            result.IsCompleted.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public async Task TimeoutAfter_GenericTask_WithRepeatAttempts_ReturnsResult()
-        {
-            // Arrange
-            var task = Task.FromResult(99);
-
-            // Act
-            var result = await task.TimeoutAfter(100, 3);
-
-            // Assert
-            result.Should().Be(99);
-        }
-
-        [TestMethod]
-        public async Task TimeoutAfter_NonGenericTask_WithRepeatAttempts_CompletesSuccessfully()
-        {
-            // Arrange
-            var task = Task.CompletedTask;
-
-            // Act
-            var result = task.TimeoutAfter(100, 3);
             await result;
 
             // Assert

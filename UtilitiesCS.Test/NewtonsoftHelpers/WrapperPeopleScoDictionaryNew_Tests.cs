@@ -15,12 +15,6 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
     [TestClass]
     public class WrapperPeopleScoDictionaryNew_Tests
     {
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-        }
-
         [TestMethod]
         public void Constructor_Default_InitializesCoDictionary()
         {

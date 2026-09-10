@@ -6,12 +6,6 @@ namespace UtilitiesCS.Test.HelperClasses
     [TestClass]
     public class PrettyPrintTest
     {
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-        }
-
         [TestMethod]
         public void ToJustifiedText_AddSpacing_Test()
         {

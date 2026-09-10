@@ -19,7 +19,6 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Loose);
             this.mockFileSystemFolderPaths = this.mockRepository.Create<IFileSystemFolderPaths>();
             this.mockJsonReader = this.mockRepository.Create<JsonReader>();

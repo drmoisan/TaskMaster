@@ -2,6 +2,8 @@
 
 ## Preflight revision seams (per-issue)
 
+- [#826](project_826_factory_outside_try_reachability_seams.md) — a seam invoked OUTSIDE the `try` makes both catch bodies reachable; enumerate the seam's line vs the `try`'s, not the catch clauses
+- [#815](project_815_coverage_aggregation_exposure_plan_seams.md) — `.//line` baseline already zero (needs a positive control); pinned nine-name allowlist zeroes the differential helper; test tree tighter than production; 500 lines legal, 501 not
 - [#810 R1–R2](project_810_teardown_dropdown_residuals_plan_seams.md) — inherited paths must be a RULE not a list (executor writes agent-memory mid-run); never upper-bound a csharpier checked-file delta; `TokenSource` null before Cleanup too
 - [#791](project_791_hc_deadline_cancel_teardown_plan_seams.md) — `QfcDatamodel` excluded from coverage; no shell var survives between tasks · [#781](project_781_excludefromcodecoverage_guard_plan_seams.md) — `[ExcludeFromCodeCoverage]` makes changed-line coverage unmeasurable
 - [#736 R1–R5](project_736_efc_archiveroot_boundary_sink_plan_seams.md) — 485-line test file voids the Write Set; hardcoded floors; one shared `try`; name-vs-content gates; existence-only `*.log`

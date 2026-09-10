@@ -146,12 +146,14 @@ namespace QuickFiler.Test.Viewers
 
         /// <summary>
         /// Scenario: a registration is attempted with a null control, and another with a null
-        /// predicate. Expected outcome: both are ignored without throwing, and the registry still
-        /// reports no popup open. The registration hop runs from a form-lookup that can legitimately
-        /// return null, so a null argument is an ordinary condition rather than a contract breach.
+        /// predicate. Expected outcome: each is rejected with an <see cref="ArgumentNullException"/>
+        /// naming the offending parameter, and the registry is provably unchanged afterwards.
+        /// Issue #823 (R3): both parameters are declared non-nullable, and the sole production call
+        /// site passes <c>this</c> and a lambda literal, so a null argument is a contract breach
+        /// rather than an ordinary condition and the boundary rejects it explicitly.
         /// </summary>
         [TestMethod]
-        public void Register_NullControlOrNullPredicate_IsIgnored()
+        public void Register_NullControlOrNullPredicate_IsRejected()
         {
             // Arrange
             var registry = new BreadcrumbPopupOwnerRegistry();
@@ -162,13 +164,17 @@ namespace QuickFiler.Test.Viewers
                 Action registerNullPredicate = () => registry.Register(owner, null);
 
                 // Assert
-                registerNullControl.Should().NotThrow("a null owner is ignored, not rejected");
+                registerNullControl
+                    .Should()
+                    .Throw<ArgumentNullException>("a null owner is rejected, not ignored")
+                    .WithParameterName("itemViewer");
                 registerNullPredicate
                     .Should()
-                    .NotThrow("a null predicate is ignored, not rejected");
+                    .Throw<ArgumentNullException>("a null predicate is rejected, not ignored")
+                    .WithParameterName("popupIsOpen");
                 registry
                     .AnyOpen.Should()
-                    .BeFalse("neither ignored registration may contribute to the derivation");
+                    .BeFalse("the registry is provably unchanged by a rejected registration");
             }
         }
     }

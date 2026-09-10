@@ -188,5 +188,141 @@ namespace UtilitiesCS.Test.Threading
                 SynchronizationContext.SetSynchronizationContext(previousContext);
             }
         }
+
+        /// <summary>Runs <paramref name="body"/> under a fresh SynchronizationContext, restoring the previous one.</summary>
+        private static void WithSynchronizationContext(Action body)
+        {
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
+            try
+            {
+                body();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        /// <summary>Runs <paramref name="body"/> against a real pane, disposing it only if the body did not.</summary>
+        private static void WithPane(Action<ProgressPane> body) =>
+            WithSynchronizationContext(() =>
+            {
+                // The handler disposes the pane, so it must never be wrapped in a using block.
+                ProgressPane pane = new ProgressPane();
+                try
+                {
+                    body(pane);
+                }
+                finally
+                {
+                    if (!pane.IsDisposed)
+                    {
+                        pane.Dispose();
+                    }
+                }
+            });
+
+        /// <summary>Resolves the private Designer field <c>ButtonCancel</c> on a real pane instance.</summary>
+        private static System.Windows.Forms.Button GetCancelButton(ProgressPane pane) =>
+            typeof(ProgressPane)
+                .GetField("ButtonCancel", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.GetValue(pane) as System.Windows.Forms.Button
+            ?? throw new MissingFieldException(nameof(ProgressPane), "ButtonCancel");
+
+        /// <summary>Invokes the private <c>CancelButton_Click</c> handler by reflection.</summary>
+        private static void InvokeCancelClick(ProgressPane pane)
+        {
+            MethodInfo cancelClick =
+                typeof(ProgressPane).GetMethod(
+                    "CancelButton_Click",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                ) ?? throw new MissingMethodException(nameof(ProgressPane), "CancelButton_Click");
+            cancelClick.Invoke(pane, new object[] { pane, EventArgs.Empty });
+        }
+
+        /// <summary>Issue #821 AC11: a cancel request with no source fails fast with a diagnosable message.</summary>
+        [TestMethod]
+        public void RequestCancel_WhenSourceIsNull_ThrowsInvalidOperationExceptionWithMessage() =>
+            WithSynchronizationContext(() =>
+            {
+                // A using is safe here because RequestCancel does not dispose the pane.
+                using var pane = new ProgressPane();
+
+                Action act = () => pane.RequestCancel();
+
+                act.Should()
+                    .Throw<InvalidOperationException>(
+                        "a cancel request with no source is a host wiring defect, not a user error"
+                    )
+                    .WithMessage(
+                        "*SetCancellationTokenSource*",
+                        "the message must name the member a caller uses to supply a source"
+                    );
+            });
+
+        /// <summary>Issue #821 AC11: a cancel request after the owner disposed the source returns quietly.</summary>
+        [TestMethod]
+        public void RequestCancel_WhenSourceIsDisposed_DoesNotThrow() =>
+            WithPane(pane =>
+            {
+                var cts = new CancellationTokenSource();
+                cts.Dispose();
+                pane.SetCancellationTokenSource(cts);
+
+                Action act = () => pane.RequestCancel();
+
+                act.Should().NotThrow("a disposed source leaves nothing to cancel");
+            });
+
+        /// <summary>Issue #821 AC11: a null source cannot escape the handler, which still disposes.</summary>
+        [TestMethod]
+        public void CancelButtonClick_WhenSourceIsNull_DoesNotThrowOutOfTheHandler() =>
+            WithPane(pane =>
+            {
+                Action act = () => InvokeCancelClick(pane);
+
+                act.Should().NotThrow("no exception may reach the Outlook UI thread");
+                pane.IsDisposed.Should()
+                    .BeTrue(
+                        "the handler disposes in a finally, so it cannot strand the pane alive"
+                    );
+            });
+
+        /// <summary>Issue #821 AC11: a disposed source cannot escape the handler, which still disposes.</summary>
+        [TestMethod]
+        public void CancelButtonClick_WhenSourceIsDisposed_DoesNotThrowOutOfTheHandler() =>
+            WithPane(pane =>
+            {
+                var cts = new CancellationTokenSource();
+                cts.Dispose();
+                pane.SetCancellationTokenSource(cts);
+
+                Action act = () => InvokeCancelClick(pane);
+
+                act.Should().NotThrow("no exception may reach the Outlook UI thread");
+                pane.IsDisposed.Should()
+                    .BeTrue(
+                        "the handler disposes in a finally, so it cannot strand the pane alive"
+                    );
+            });
+
+        /// <summary>Issue #821 AC11: a null source leaves the Cancel button disabled.</summary>
+        [TestMethod]
+        public void SetCancellationTokenSource_WithNull_DoesNotEnableButton() =>
+            WithPane(pane =>
+            {
+                using var cts = new CancellationTokenSource();
+                System.Windows.Forms.Button cancelButton = GetCancelButton(pane);
+
+                // A live source first, so the null step below is wiring-sensitive rather than merely
+                // observing the constructor's own disabled default.
+                pane.SetCancellationTokenSource(cts);
+                cancelButton.Enabled.Should().BeTrue("a live source must offer cancellation");
+
+                pane.SetCancellationTokenSource(null);
+                cancelButton.Enabled.Should().BeFalse("a null source must not leave it clickable");
+            });
     }
 }

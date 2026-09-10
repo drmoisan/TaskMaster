@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -6,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -358,6 +361,89 @@ namespace QuickFiler.Controllers.Tests
                     "cancellation is observed before any predictor construction is attempted"
                 );
             }
+        }
+
+        /// <summary>
+        /// Builds a <see cref="FolderPredictor"/> via the globals-providing constructor so
+        /// <c>Suggestions</c> is non-null (matching production initialization), with a known
+        /// <c>FolderArray</c> seeded the same way <see cref="BuildFolderHandlerWithArray"/> does.
+        /// Used only by the #813 regression test below, which must observe
+        /// <c>SetFolderSuggestions</c> being invoked.
+        /// </summary>
+        private static FolderPredictor BuildFolderHandlerWithSuggestions(
+            IApplicationGlobals globals,
+            params string[] folders
+        )
+        {
+            var fp = new FolderPredictor(globals);
+            typeof(FolderPredictor)
+                .GetField("_folderList", BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(fp, new List<string>(folders));
+            return fp;
+        }
+
+        /// <summary>
+        /// Issue #813. <c>Ol.ArchiveRootPath</c> throws <see cref="InvalidOperationException"/> when the
+        /// archive root is unconfigured or unresolvable. The read at <c>AssignFolderComboBox</c>'s
+        /// predetermined-folder projection step must not propagate that exception onto the UI dispatcher
+        /// thread; it must degrade to no preselection while leaving the combo box and suggestion rows
+        /// populated.
+        /// </summary>
+        [TestMethod]
+        public void AssignFolderComboBox_WhenArchiveRootPathThrows_DegradesToIndexFallbackWithoutThrowing()
+        {
+            // Arrange
+            var mock = new Mock<IItemViewer>();
+            mock.SetupGet(v => v.InvokeRequired).Returns(false);
+            // FolderContains returns false because the predetermined folder text is not present in the
+            // populated array; this isolates the assertion to the archive-root fallback behavior
+            // (AC3) independent of any containment match.
+            mock.Setup(v => v.FolderContains(It.IsAny<string>())).Returns(false);
+            mock.Setup(v => v.GetSelectedFolder()).Returns(string.Empty);
+
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(g => g.Ol.ArchiveRootPath).Throws<InvalidOperationException>();
+            globals.SetupGet(g => g.AF.RecentsList).Returns(new SloLinkedList<string>());
+
+            var controller = new FolderController();
+            SetPrivate(controller, "_itemViewer", mock.Object);
+            SetPrivate(controller, "_globals", globals.Object);
+            SetPrivate(controller, "_predeterminedFolder", @"\\A\chosen");
+            SetPrivate(
+                controller,
+                "_folderHandler",
+                BuildFolderHandlerWithSuggestions(globals.Object, @"\\A\header", @"\\A\top")
+            );
+
+            // Act
+            Action act = () => controller.AssignFolderComboBox();
+
+            // Assert
+            act.Should()
+                .NotThrow<InvalidOperationException>(
+                    "an unresolvable archive root must degrade to no preselection instead of "
+                        + "propagating onto the UI dispatcher thread"
+                );
+            mock.Verify(
+                v => v.AddFolderItems(It.IsAny<string[]>()),
+                Times.Once(),
+                "the combo box must still populate even though the archive-root read fails"
+            );
+            mock.Verify(
+                v => v.SetFolderSuggestions(It.IsAny<IReadOnlyList<FolderRow>>()),
+                Times.Once(),
+                "suggestion rows must still populate even though the archive-root read fails"
+            );
+            mock.Verify(
+                v => v.SetFolderSelectedItem(It.IsAny<string>()),
+                Times.Never(),
+                "no preselection can occur once the archive-root read fails"
+            );
+            mock.Verify(
+                v => v.SetFolderSelectedIndex(It.IsAny<int>()),
+                Times.Once(),
+                "the index-fallback path must run instead of preselection"
+            );
         }
     }
 }

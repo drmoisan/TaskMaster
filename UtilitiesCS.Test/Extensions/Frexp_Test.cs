@@ -10,12 +10,6 @@ namespace UtilitiesCS.Test.Extensions
     [TestClass]
     public class Frexp_Test
     {
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-        }
-
         [TestMethod]
         public void FrexpTest()
         {

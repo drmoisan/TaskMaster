@@ -15,10 +15,11 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS.Test.OutlookObjects.Table
 {
-    // The console reason for this attribute was removed by the TextWriter seam under #811.
-    // It is retained because this class has not been soaked under class-level parallelism
-    // and ten of its tests drive the 2000 ms GetTableInViewAsync window.
-    [DoNotParallelize]
+    // Four tests in this class call GetTableInViewAsync, not ten as an earlier comment claimed.
+    // GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot now supplies a
+    // FakeTimeProvider, and it was the only one that armed a real timed CancellationTokenSource, so
+    // no wall-clock deadline governs any test here. The DoNotParallelize attribute that guarded
+    // against that deadline expiring under thread-pool contention has therefore been removed.
     [TestClass]
     public class OlTableExtensions_Tests
     {
@@ -982,39 +983,6 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         }
 
         [TestMethod]
-        public async Task EtlAsyncOld_WithBinaryAndObjectFields_ReturnsTransformedData()
-        {
-            var recipient = new object();
-            var row = CreateRowMock(
-                new object[] { recipient, "raw-store", "Subject" },
-                new Dictionary<int, string> { { 2, "STORE-ID-004" } },
-                new Dictionary<int, object> { { 1, recipient } }
-            );
-            var (mockTable, _) = CreateTableWithColumns(
-                new[] { "MessageRecipients", "Store", "Subject" },
-                null,
-                row
-            );
-            var converters = new Dictionary<string, Func<object, string>>
-            {
-                { "MessageRecipients", _ => "Converted Old Async" },
-            };
-
-            var (data, columnInfo) = await mockTable.Object.EtlAsyncOld(
-                CancellationToken.None,
-                new CancellationTokenSource(),
-                0,
-                null,
-                converters
-            );
-
-            columnInfo["MessageRecipients"].Should().Be(0);
-            data[0, 0].Should().Be("Converted Old Async");
-            data[0, 1].Should().Be("STORE-ID-004");
-            data[0, 2].Should().Be("Subject");
-        }
-
-        [TestMethod]
         public async Task EtlPrepAsync_WithBinaryAndObjectFields_ReturnsPreparedRowsAndMetadata()
         {
             var recipient = new object();
@@ -1252,11 +1220,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                         typeof(int),
                         typeof(int),
                         typeof(Func<int, CancellationTokenSource>),
+                        typeof(TimeProvider),
                     },
                     mockExplorer.Object,
                     CancellationToken.None,
                     0,
                     2000,
+                    null,
                     null
                 );
 
@@ -1308,12 +1278,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     typeof(int),
                     typeof(int),
                     typeof(Func<int, CancellationTokenSource>),
+                    typeof(TimeProvider),
                 },
                 mockExplorer.Object,
                 CancellationToken.None,
                 0,
                 5,
-                timeoutSourceFactory
+                timeoutSourceFactory,
+                null
             );
 
             result.Should().BeSameAs(mockTable.Object);
@@ -1339,11 +1311,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                         typeof(int),
                         typeof(int),
                         typeof(Func<int, CancellationTokenSource>),
+                        typeof(TimeProvider),
                     },
                     mockExplorer.Object,
                     cancel.Token,
                     0,
                     2000,
+                    null,
                     null
                 );
 
@@ -1668,12 +1642,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     typeof(int),
                     typeof(int),
                     typeof(Func<int, CancellationTokenSource>),
+                    typeof(TimeProvider),
                 },
                 mockExplorer.Object,
                 CancellationToken.None,
                 0,
                 2000,
-                null
+                null,
+                new FakeTimeProvider()
             );
 
             result.Should().BeSameAs(mockTable.Object);
