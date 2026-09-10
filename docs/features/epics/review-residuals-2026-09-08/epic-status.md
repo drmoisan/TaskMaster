@@ -5,9 +5,10 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 every wave transition, and at final integration-PR completion. The checkpoint JSON is the durable,
 machine-authoritative source; `epic.md` is the human-authored manifest and narrative.
 
-- Last updated: 2026-09-09T22:20:00Z
-- Integration branch: `epic/review-residuals-2026-09-08-integration` at `aff8285d`
-- Current wave: 1 (wave 0 complete, 7 of 7 merged; 826 executing)
+- Last updated: 2026-09-10T00:20:00Z
+- Integration branch: `epic/review-residuals-2026-09-08-integration` at `5eaf33dc`
+- Current wave: 1 COMPLETE. All eight features merged.
+- Integration-to-`main` pull request: pending the final integrated-tree CI gate
 - Epic manifest: `docs/features/epics/review-residuals-2026-09-08/epic.md`
 - Epic kickoff: `docs/features/epics/review-residuals-2026-09-08/epic-kickoff.md`
 - Integration PR: not yet opened
@@ -23,7 +24,7 @@ machine-authoritative source; `epic.md` is the human-authored manifest and narra
 | 823 | `2026-09-08-quickfiler-teardown-review-residuals-823` | 0 | merged | [#832](https://github.com/drmoisan/TaskMaster/pull/832) | `553f874a` | 2026-09-09T13:46:00Z | 2026-09-09T18:43:00Z | 2026-09-09T18:47:53Z | — |
 | 824 | `2026-09-08-ilglobals-loadopcodes-unsynchronised-static-race-824` | 0 | merged | [#833](https://github.com/drmoisan/TaskMaster/pull/833) | `96fd3dd8` | 2026-09-09T13:46:00Z | 2026-09-09T20:20:00Z | 2026-09-09T20:24:46Z | — |
 | 825 | `2026-09-08-etl-deadline-mechanics-follow-ups-825` | 0 | merged | [#834](https://github.com/drmoisan/TaskMaster/pull/834) | `049c1427` | 2026-09-09T13:46:00Z | 2026-09-09T21:50:00Z | 2026-09-09T22:02:23Z | — |
-| 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | 1 | worktree_created (executing) | — | — | 2026-09-09T22:15:00Z | — | — | — |
+| 826 | `2026-09-08-console-out-aggressors-and-banned-symbol-promotion-826` | 1 | merged | [#835](https://github.com/drmoisan/TaskMaster/pull/835) | `219804ef` | 2026-09-09T22:15:00Z | 2026-09-10T00:10:00Z | 2026-09-10T00:15:01Z | — |
 
 ## Wave Layering
 
@@ -79,7 +80,8 @@ workflow file is edited to obtain a trigger:
 | [34391748802](https://github.com/drmoisan/TaskMaster/actions/runs/34391748802) | 823 | `553f874a` | success |
 | [34401152781](https://github.com/drmoisan/TaskMaster/actions/runs/34401152781) | 824 | `96fd3dd8` | success |
 
-| [34410792972](https://github.com/drmoisan/TaskMaster/actions/runs/34410792972) | 825 | `aff8285d` | pending |
+| [34410792972](https://github.com/drmoisan/TaskMaster/actions/runs/34410792972) | 825 | `aff8285d` | success |
+| [34420677042](https://github.com/drmoisan/TaskMaster/actions/runs/34420677042) | 826 | `219804ef` | pending |
 
 Six concluded integration runs, six successes. The seventh is the first to cover the complete
 wave-0 tree with all seven features merged.
@@ -137,6 +139,35 @@ merge, and it is not repeatable — the pull request was already merged, so the 
 merge it again. No second pull request, no second issue, no branch mutation. Wave 1 was deliberately
 held until the redundant agent exited, preserving the effective-concurrency-of-one invariant that
 exists because non-isolated children share one session-scoped orchestrator checkpoint.
+
+## Delivered Scope, and What Is Explicitly Not Closed
+
+This epic closes exactly eight issues: 813, 815, 817, 821, 823, 824, 825 and 826. No other issue is
+resolved by it.
+
+`collect_pr_context` emits a much longer "author asserted" auto-close list — including #181, #230,
+#441, #478, #498, #602, #670, #677, #780, #797, #798, #799, #801, #805, #809, #810, #811, #812 and
+#814 — by scraping issue numbers from commit messages and feature documentation. Those are prose
+references, not deliveries. They must not be turned into closing keywords.
+
+The sharpest case is **#181, which remains open and must stay open.** Feature 826 was authorized to
+promote `dotnet_diagnostic.RS0030.severity` from `suggestion` to `warning`, but the authorization
+explicitly did not extend to breaking the build to obtain it. The feature took the documented
+fallback: it delivered the reachable subset by extending `BannedSymbols.txt` from seven entries to
+fifteen — adding `CancelAfter` (both overloads), the two deadline `CancellationTokenSource`
+constructors, and all four timed `WaitOne` overloads — and left `RS0030` at `suggestion` with an
+in-file comment recording the blocking precondition.
+
+That comment also corrects a figure carried in the epic manifest. The manifest cited roughly 143
+pre-existing usages; 826 re-measured at implementation time and found 153 **textual** hits
+(`DateTime.Now` 53, `DateTime.UtcNow` 20, `Random.Shared` 5, `Thread.Sleep` 15, `Task.Delay` 60),
+noting that textual hits are not diagnostics and the earlier figure was a diagnostic count, so the
+two are not comparable. Promotion stays blocked because toolchain step 3 promotes every warning to a
+build error.
+
+This is the epic's Non-Goal 5 and its NFR set being honoured rather than worked around: no threshold
+was lowered, no severity weakened, and no production file added to a coverage exclusion list to make
+a gate pass.
 
 ## Preparation Provenance
 
