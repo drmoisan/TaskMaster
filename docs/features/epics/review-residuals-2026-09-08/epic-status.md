@@ -5,13 +5,19 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 every wave transition, and at final integration-PR completion. The checkpoint JSON is the durable,
 machine-authoritative source; `epic.md` is the human-authored manifest and narrative.
 
-- Last updated: 2026-09-10T00:20:00Z
-- Integration branch: `epic/review-residuals-2026-09-08-integration` at `5eaf33dc`
-- Current wave: 1 COMPLETE. All eight features merged.
-- Integration-to-`main` pull request: pending the final integrated-tree CI gate
+**EPIC COMPLETE.**
+
+- Last updated: 2026-09-10T00:40:00Z
+- Integration branch: `epic/review-residuals-2026-09-08-integration`, final tip `86caef4a`
+- Waves: both complete. All eight features merged.
+- Integration-to-`main` PR: [#836](https://github.com/drmoisan/TaskMaster/pull/836), **merged**
+  2026-09-10T00:37:38Z as `0f0fd8305d28d323836b3d01e99cb7625d07f6d5`, now the tip of `main`
+- Acceptance criteria: 141 of 141 checked across the eight `spec.md` files
 - Epic manifest: `docs/features/epics/review-residuals-2026-09-08/epic.md`
 - Epic kickoff: `docs/features/epics/review-residuals-2026-09-08/epic-kickoff.md`
-- Integration PR: not yet opened
+
+This closing entry necessarily lands in a follow-up commit rather than in PR #836 itself: a
+generated projection cannot record the merge commit of the pull request that carries it.
 
 ## Feature Status
 
@@ -81,7 +87,18 @@ workflow file is edited to obtain a trigger:
 | [34401152781](https://github.com/drmoisan/TaskMaster/actions/runs/34401152781) | 824 | `96fd3dd8` | success |
 
 | [34410792972](https://github.com/drmoisan/TaskMaster/actions/runs/34410792972) | 825 | `aff8285d` | success |
-| [34420677042](https://github.com/drmoisan/TaskMaster/actions/runs/34420677042) | 826 | `219804ef` | pending |
+| [34420677042](https://github.com/drmoisan/TaskMaster/actions/runs/34420677042) | 826 | `219804ef` | cancelled (superseded) |
+| [34420821429](https://github.com/drmoisan/TaskMaster/actions/runs/34420821429) | 826 (final tip) | `86caef4a` | success |
+
+Run 34420677042 was cancelled rather than failed: `ci.yml` declares a concurrency group keyed on
+the ref with `cancel-in-progress: true`, so dispatching the run against the final tip cancelled it.
+No evidence was lost, because `86caef4a` is a strict descendant of `219804ef` adding only
+documentation commits.
+
+**The real gate.** PR [#836](https://github.com/drmoisan/TaskMaster/pull/836) targets `main`, so it
+is the first pull request in this epic to receive CI automatically. All five required checks passed
+on run [34421610457](https://github.com/drmoisan/TaskMaster/actions/runs/34421610457) at head
+`86caef4a`: actionlint, build-analyzers, build-nullable, format-check, and mstest-coverage.
 
 Six concluded integration runs, six successes. The seventh is the first to cover the complete
 wave-0 tree with all seven features merged.
@@ -118,6 +135,35 @@ for reclamation via `scripts/bash/cleanup-worktrees.sh`.
 | 823 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-823` | pending retry |
 | 824 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-824` | pending retry |
 | 825 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-825` | pending retry |
+| 826 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-826` | pending retry |
+
+All eight remain on disk at epic completion. They are clean and their branches are fully contained
+in `main`, so this is a disk-reclamation matter only, not a correctness one. Reclaim with
+`scripts/bash/cleanup-worktrees.sh`. A ninth worktree, `rr0908-status`, carries this closing commit
+and can be removed with it.
+
+## Acceptance Criteria
+
+141 of 141 acceptance criteria are checked across the eight `spec.md` files, verified against
+`main` at `0f0fd830` after the epic merged.
+
+| issue | checked / total |
+| --- | --- |
+| 813 | 6 / 6 |
+| 815 | 14 / 14 |
+| 817 | 8 / 8 |
+| 821 | 21 / 21 |
+| 823 | 29 / 29 |
+| 824 | 12 / 12 |
+| 825 | 35 / 35 |
+| 826 | 16 / 16 |
+
+Work mode is `full-bug` for all eight features, so `spec.md` is the sole acceptance-criteria source
+and the absence of `user-story.md` is correct rather than a gap. Counting used
+`Get-NamedSectionCheckboxCount` from `.claude/lib/requirements/GeneratedDocumentCounters.psm1`,
+which scopes to the `Acceptance Criteria` heading and stops at the next equal-or-shallower heading.
+A first pass that counted every checkbox in each `spec.md` reported 150 of 183; that denominator
+was wrong because it swept in checkboxes from other sections.
 
 ## Redundant Resume of Feature 825
 
