@@ -13,21 +13,11 @@ namespace ToDoModel.Test
     public class TreeNodeTests
     {
         private MockRepository mockRepository;
-        private DebugTextWriter tw;
-
-        //[ClassInitialize]
-        //public void ClassInitialize()
-        //{
-        //    tw = new DebugTextWriter();
-        //    Console.SetOut(tw);
-        //}
 
         [TestInitialize]
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-            tw = new DebugTextWriter();
-            Console.SetOut(tw);
         }
 
         #region Helper Methods and Classes

@@ -93,7 +93,7 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    Console.WriteLine($"Task timed out on try {counter}");
+                    logger.Warn($"{nameof(GetTableInViewAsync)} timed out on try {counter}");
                     if (counter < 2)
                     {
                         table = await activeExplorer.GetTableInViewAsync(
@@ -112,7 +112,7 @@ namespace UtilitiesCS
             }
             catch (TimeoutException)
             {
-                Console.WriteLine($"Task timed out on try {counter}");
+                logger.Warn($"{nameof(GetTableInViewAsync)} timed out on try {counter}");
                 if (counter < 2)
                 {
                     // The caller's timeoutMs is propagated rather than a literal, so both attempts

@@ -674,26 +674,26 @@ Each criterion below is independently verifiable by a third party re-running a s
 search, and each is capable of failing. Searches assert short, single-line tokens rather than
 multi-word prose that line-wrapping would break.
 
-- [ ] **AC1 — Console writer installs are gone.** A repository-wide search of `*.cs` for the token
+- [x] **AC1 — Console writer installs are gone.** A repository-wide search of `*.cs` for the token
   `Console.SetOut(` returns hits in exactly two files, and neither is a test file modified by this
   feature: TaskMaster/ThisAddIn.cs (production, out of scope) and
   UtilitiesCS.Test/EmailIntelligence/Bayesian/BayesianClassifierTests_UnfinishedStubs.cs (a
   commented-out line that installs nothing). Before the change the same search returns 38 occurrences
   across 35 files.
-- [ ] **AC2 — No residual writer references in the changed test files.** For each of the 33 files
+- [x] **AC2 — No residual writer references in the changed test files.** For each of the 33 files
   listed in the "Write set" section, a search for the token `DebugTextWriter` returns zero hits. This
   criterion is scoped to those 33 files only: UtilitiesCS/HelperClasses/Logging/DebugTextWriter.cs,
   UtilitiesCS.Test/HelperClasses/DebugTextLogger_Tests.cs, UtilitiesCS.Test/DeedleTests.cs,
   UtilitiesCS.Test/Extensions/DeedleTests.cs and TaskMaster/ThisAddIn.cs legitimately retain the
   token and are out of scope.
-- [ ] **AC3 — The CS0169/CS0414 hazard in the two `TreeNode` files is discharged, proven by the
+- [x] **AC3 — The CS0169/CS0414 hazard in the two `TreeNode` files is discharged, proven by the
   type-check step rather than by inspection.** In `ToDoModel.Test/Data Model/Tree/TreeNodeTests.cs`
   and `ToDoModel.Test/Data Model/Tree/TreeNodeTests_UnfinishedStubs.cs`, a search for the token
   `tw` as a whole word returns zero hits (field declaration, assignment, `Console.SetOut(tw);` call
   and the commented-out `[ClassInitialize]` block are all removed), **and** toolchain step 3
   (`msbuild ... /p:TreatWarningsAsErrors=true`) exits 0 with zero `CS0169` and zero `CS0414`
   occurrences in its log.
-- [ ] **AC4 — Empty initializers are deleted with their statement.** In each of these ten files, a
+- [x] **AC4 — Empty initializers are deleted with their statement.** In each of these ten files, a
   search for the token `TestInitialize` returns zero hits: `VBFunctions.Test/ComputerInfo_Test.cs`,
   `UtilitiesCS.Test/HelperClasses/PrettyPrintTest.cs`, `UtilitiesCS.Test/Extensions/Frexp_Test.cs`,
   `UtilitiesCS.Test/EmailIntelligence/EmailDetailsTest.cs`,
@@ -706,11 +706,11 @@ multi-word prose that line-wrapping would break.
   the same search returns at least one hit in every one of those ten files, so the criterion is
   capable of failing. In the last three, the orphaned comment that formed the method's only
   remaining body is removed as well.
-- [ ] **AC5 — No console output remains in the table-access file.** A search of
+- [x] **AC5 — No console output remains in the table-access file.** A search of
   `UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs` for the token
   `Console.WriteLine` returns **0** occurrences. (A search for `Console.` still returns 1, the
   `writer ?? Console.Out` seam in `EnumerateTable`, which is out of scope and must remain.)
-- [ ] **AC6 — Both diagnostics are routed through the logger, anchored by text and confined to the
+- [x] **AC6 — Both diagnostics are routed through the logger, anchored by text and confined to the
   two statements.** `UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs` contains two
   `logger.Warn` calls that did not exist before, one inside `catch (TaskCanceledException)` and one
   inside `catch (TimeoutException)`, and the diff for that file shows **only** those two statement
@@ -718,7 +718,7 @@ multi-word prose that line-wrapping would break.
   seam, the exception types caught, the control flow after each diagnostic, any other `catch` clause,
   or any `using` directive. The implementation matches the four-step trace in "Proposed Fix": the
   diagnostic that today reaches an unreadable `DebugTextWriter` reaches the log4net `logger` instead.
-- [ ] **AC7 — A named regression test covers the previously uncovered branch and passes.** A new test
+- [x] **AC7 — A named regression test covers the previously uncovered branch and passes.** A new test
   in `UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensionsTimeoutDiagnosticsTests.cs` forces entry
   into `catch (TimeoutException)` in `GetTableInViewAsync` through the existing `timeoutSourceFactory`
   seam, asserts the bounded retry occurred, passes under
@@ -727,11 +727,11 @@ multi-word prose that line-wrapping would break.
   recorded in evidence. Reverting the item-2 production edit alone must not be what makes this test
   pass or fail — the test pins the branch, and its purpose is to bring the changed lines under
   coverage.
-- [ ] **AC8 — The project file gains exactly one line.** `git diff` of
+- [x] **AC8 — The project file gains exactly one line.** `git diff` of
   `UtilitiesCS.Test/UtilitiesCS.Test.csproj` shows exactly one added line, a single `<Compile
   Include>` entry naming the new test file, with zero removed lines and zero reordered or reformatted
   existing entries. No other project file in the solution is modified by this feature.
-- [ ] **AC9 — The eight DocID lines are present, in the file's existing format.** `BannedSymbols.txt`
+- [x] **AC9 — The eight DocID lines are present, in the file's existing format.** `BannedSymbols.txt`
   contains one line for each of the following eight DocIDs, and each line carries a `;` message
   suffix naming `TimeProvider`: `CancellationTokenSource.CancelAfter(System.Int32)`,
   `CancellationTokenSource.CancelAfter(System.TimeSpan)`,
@@ -740,7 +740,7 @@ multi-word prose that line-wrapping would break.
   `WaitHandle.WaitOne(System.Int32,System.Boolean)`,
   `WaitHandle.WaitOne(System.TimeSpan,System.Boolean)`, each prefixed `M:System.Threading.`. The
   seven pre-existing lines are unchanged.
-- [ ] **AC10 — The DocIDs are proven to resolve, by positive observation, with a working control.**
+- [x] **AC10 — The DocIDs are proven to resolve, by positive observation, with a working control.**
   Because BannedApiAnalyzers silently ignores a malformed or unresolvable DocID, a clean build and
   the absence of an error each verify nothing. This criterion requires **positive observation** of
   RS0030 diagnostics at the enumerated sites below, captured in an evidence artifact naming the
@@ -759,23 +759,23 @@ multi-word prose that line-wrapping would break.
   criterion to an absence check. The predicted total of 15 new diagnostics is a **prediction**: record
   the actual observed total as evidence, but the pass condition is that every enumerated site above
   is observed, not that the total equals 15.
-- [ ] **AC11 — RS0030 severity is unchanged, deliberately.** `.editorconfig` still contains the exact
+- [x] **AC11 — RS0030 severity is unchanged, deliberately.** `.editorconfig` still contains the exact
   line `dotnet_diagnostic.RS0030.severity = suggestion`, and `git diff` of `.editorconfig` shows no
   change to any `severity` value on any line. Leaving this alone is a decision, not an omission.
-- [ ] **AC12 — The two documented exclusions hold.** `BannedSymbols.txt` contains **zero**
+- [x] **AC12 — The two documented exclusions hold.** `BannedSymbols.txt` contains **zero**
   occurrences of the token `TimeoutAfter`, and **zero** occurrences of the token
   `WaitHandle.WaitOne;` (the parameterless-overload DocID form, which carries no parentheses). Both
   exclusions are justified in "Proposed Fix" and neither may be added silently.
-- [ ] **AC13 — The tracking comment no longer points at closed work.** The BannedApiAnalyzers comment
+- [x] **AC13 — The tracking comment no longer points at closed work.** The BannedApiAnalyzers comment
   block in `.editorconfig` immediately above line 548 contains **zero** occurrences of the token
   `#181`, and states the promotion precondition inline together with the verified textual surface as
   of 2026-09-08.
-- [ ] **AC14 — Full toolchain pass, non-vacuous.** All four steps in the "Toolchain commands" list
+- [x] **AC14 — Full toolchain pass, non-vacuous.** All four steps in the "Toolchain commands" list
   above pass in order in a single final pass, with the exact commands recorded in evidence. Both
   msbuild steps use `/t:Rebuild` and their logs contain **zero** occurrences of the token
   `Skipping target "CoreCompile"`, so the analyzer and nullable gates are proven to have compiled
   rather than skipped.
-- [ ] **AC15 — Coverage obligations met and recorded.** The changed production lines in
+- [x] **AC15 — Coverage obligations met and recorded.** The changed production lines in
   `UtilitiesCS/OutlookObjects/Table/OlTableExtensions.TableAccess.cs` are covered by the AC7 test —
   they are uncovered before this change, so they must not be left newly-touched-but-uncovered. The
   repository line-coverage figure is recorded from the step-4 run and is not lower than the
@@ -784,7 +784,7 @@ multi-word prose that line-wrapping would break.
   threshold or `[ExcludeFromCodeCoverage]` attribute is added anywhere in this change. Item 1 is
   expected to move no coverage figure at all, because all 33 files compile into `*.Test.dll`
   assemblies that are excluded from instrumentation at run time.
-- [ ] **AC16 — No out-of-scope file is touched.** `git diff --name-only` against the merge base lists
+- [x] **AC16 — No out-of-scope file is touched.** `git diff --name-only` against the merge base lists
   only files named in the "Write set" section. In particular it contains no entry for CLAUDE.md, for
   any path under .claude/rules/ or .github/instructions/, for
   docs/features/epics/review-residuals-2026-09-08/, for this feature's issue.md or research file, or

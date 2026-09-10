@@ -11,21 +11,11 @@ namespace Z.Unfinished.ToDoModel.Test.Data_Model.Tree
     public class TreeNodeTests_UnfinishedStubs
     {
         private MockRepository mockRepository;
-        private DebugTextWriter tw;
-
-        //[ClassInitialize]
-        //public void ClassInitialize()
-        //{
-        //    tw = new DebugTextWriter();
-        //    Console.SetOut(tw);
-        //}
 
         [TestInitialize]
         public void TestInitialize()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-            tw = new DebugTextWriter();
-            Console.SetOut(tw);
         }
 
         #region Helper Methods and Classes

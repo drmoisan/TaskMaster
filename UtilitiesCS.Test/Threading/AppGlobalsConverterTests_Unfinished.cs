@@ -16,7 +16,6 @@ namespace Z.Disabled.UtilitiesCS.Test.Threading
         [TestInitialize]
         public void TestInitialize()
         {
-            Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Loose);
             this.mockFileSystemsFolderPaths = this.mockRepository.Create<IFileSystemFolderPaths>();
             //this.mockFileSystemsFolderPaths.SetupGet(x => x.FldrPythonStaging).Returns("Working");

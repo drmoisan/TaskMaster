@@ -18,13 +18,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
     {
         //private MockRepository mockRepository;
 
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-            //this.mockRepository = new MockRepository(MockBehavior.Strict);
-        }
-
         [TestMethod]
         public void PythonIntegrationTest()
         {

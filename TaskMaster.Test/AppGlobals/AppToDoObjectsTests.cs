@@ -28,12 +28,6 @@ namespace TaskMaster.Test.AppGlobals
     [TestClass]
     public class AppToDoObjectsTests
     {
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-        }
-
         #region Helper Classes and Variables
 
         private MockRepository mockRepository = null!;

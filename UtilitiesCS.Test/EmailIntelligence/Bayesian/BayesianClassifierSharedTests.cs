@@ -17,13 +17,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
     [TestClass]
     public class BayesianClassifierSharedTests
     {
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-            //this.mockRepository = new MockRepository(MockBehavior.Loose) { CallBase = true };
-        }
-
         #region Helper Functions and Classes
 
         private static SubBayesianClassifier CreateSimpleClassifier(

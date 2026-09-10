@@ -55,12 +55,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             }
         }
 
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
-        }
-
         private static void SetNonPublicProperty<TTarget, TValue>(
             TTarget target,
             string propertyName,
@@ -468,12 +462,6 @@ namespace UtilitiesCS.Test.EmailIntelligence.Bayesian
             {
                 this.Classifiers = classifiers;
             }
-        }
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            Console.SetOut(new DebugTextWriter());
         }
 
         private static ClassifierGroup CreateConfiguredGroup()
