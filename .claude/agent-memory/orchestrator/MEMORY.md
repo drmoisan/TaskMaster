@@ -68,6 +68,7 @@
 
 ## Coverage
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) · [lines-covered is nondeterministic](coverage-lines-covered-is-nondeterministic.md) · [#457 coverage moved UP](project_457_coverage_moved_up_not_down.md)
+- [Raw Cobertura branch-rate is 13pts low](branch-coverage-denominator-trap-raw-cobertura.md) — line-only checks pass while branch sits below the 75% floor
 - [feature-review 85% floor trap](feature-review-coverage-85-floor-trap.md) · [JaCoCo not Cobertura for evidence](jacoco-not-cobertura-for-evidence.md) · [PoshQC drops coverage.xml at repo root](poshqc-test-drops-coverage-xml-at-repo-root.md)
 - [Repo-wide coverage: run the FULL suite](feedback_repowide_coverage_run_full_suite.md) · [authority exception](feedback_repowide_coverage_authority_exception.md) · [No exemption when the purpose is testability](feedback_no_coverage_exemption_when_purpose_is_testability.md)
 - [Convert Cobertura to JaCoCo BEFORE commit](cobertura-substitution-must-happen-precommit.md) — intercept before the executor's commit
@@ -109,6 +110,7 @@
 - [Epic children need full lifecycle + PRs](feedback_epic_children_require_full_lifecycle_and_prs.md) · [Epic child PRs get no CI](project_epic_child_prs_no_ci.md) · [PR-gate gotchas](epic-child-pr-gate-gotchas.md)
 - [Epic self-merge step9 gate sequencing](epic-mode-pr-merge-gate-sequencing.md) · [step9 passed vs verified](epic-child-self-merge-step9-passed-vs-verified.md) · [Portable completion gate is FULL parity](portable-completion-gate-allows-blocked-child.md)
 - [Epic-child stale local integration ref](project_epic_child_stale_local_integration_ref.md) · [plan Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) · [Prepared child invalidated by a sibling merge](prepared-epic-child-invalidated-by-sibling-merge.md)
+- [Epic manifest's ALL CLEAR table is not evidence](epic-manifest-all-clear-table-is-not-evidence.md) — grep the child folder; 1 round found 7 blocking defects incl. an inverted derivation
 - [Epic-child rebase shared-memory conflict](epic-child-rebase-shared-memory-conflict.md) · [agent-memory merge conflicts](epic-child-agent-memory-merge-conflicts.md) · [Parallel children conflict on the memory index](parallel-epic-children-conflict-on-agent-memory-index.md)
 - [Child cwd is the session root](preparation-child-cwd-is-session-root-not-item-worktree.md) — mirror the WHOLE folder; execution mode too
 - [Resume brief's "already in your worktree" can be false](resume-brief-worktree-contents-premise-can-be-false.md) — Glob first; repair with `merge --ff-only`, which creates no branch

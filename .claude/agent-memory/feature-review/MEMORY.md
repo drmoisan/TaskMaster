@@ -9,7 +9,7 @@
 - [csharpier-formats-xml-probe-verification](project_csharpier-formats-xml-probe-verification.md) — CSharpier 1.3.0 formats *.xml (width=100); reproduce "formatter mandated this" claims with a scratch probe
 - [jacoco-summary-substitution-is-valid-coverage-evidence](project_jacoco-summary-substitution-is-valid-coverage-evidence.md) — committed evidence may be package-level JaCoCo; re-sum and corroborate counters, distrust sub-noise deltas
 - [csharp-local-fullsuite-coverage-blocked](project_csharp-local-fullsuite-coverage-blocked.md) — local full-assembly C# coverage fails on Moq binding redirect; repo-wide gate is the PR CI run
-- [csharp-repowide-coverage-below-80](project_csharp-repowide-coverage-below-80.md) — raw all-DLL merges read ~59-69% (vendor-inflated denominator); first-party figures clear the floor (#253: 91.22%)
+- [csharp-repowide-coverage-below-80](project_csharp-repowide-coverage-below-80.md) — vendor/`*.Test` packages in the denominator INFLATE line and CRUSH branch; always read `branch-rate` too (#826)
 - [Validator IS run — by the orchestrator](project_taskmaster-validator-memories-are-cross-repo.md) — CORRECTED at #781: canonical policy-audit template structure is mandatory on the FIRST draft
 - [Template `N/A - out of scope` vs hook narrowing regex](project_template-na-wording-vs-hook-narrowing-regex.md) — safe only for languages with ZERO changed files; simulate per-language before finalizing
 - [PowerShell line-count undercount](powershell-measure-object-line-undercount.md) — `Measure-Object -Line` undercounts vs `awk NR`/`wc -l`
@@ -75,6 +75,7 @@
 - [791-review-residuals](project_791-review-residuals.md) — PASS/0 blocking, 6/6 AC; QfcDatamodel excluded from Cobertura; walk ALL THREE links of a "runs under finally" ownership chain
 - [440-review-residuals](project_440-review-residuals.md) — PASS/0 blocking; a "corrected" defect-encoding test can be defect-NEUTRAL (check fail-before Totals)
 - [644-review-residuals](project_644-review-residuals.md) — all 3 cycles PASS/0 blocking; rejecting the caller's `.claude/agent-memory` diff exclusion found the only new defect
+- [826-review-residuals](project_826-review-residuals.md) — PASS/0, 16/16; only finding was unreported branch coverage; a no-Bash review parsed Cobertura fine with Grep `-o`
 - [647-review-residuals](project_647-review-residuals.md) — PASS/0 blocking, 21/21 AC; AC20 PASS-with-deviation on in-spec provisions
 - [measure every changed file, not just the AC-named one](feedback_measure-every-changed-file-not-just-the-ac-named-one.md) — per-file Cobertura aggregation exposed a call-site regression (77.05%, new lines uncovered) no executor artifact reported
 - [sibling `Should().Be(other)` assertion has no pinning power](project_662-sibling-assertion-blind-spot.md) — #662: apply the prohibited edit and evaluate EVERY assertion; a two-valued constant pair can be load-bearing
