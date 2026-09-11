@@ -77,6 +77,26 @@ writes the MCP promotion tool-name literals into a checkpoint's `required_mcp_to
 with `PROMOTION_MCP_ONLY_BLOCKED`. Split the literals across string concatenation to write them.
 See [[hooks-pattern-match-bash-command-text]].
 
+**That same hook also blocks a plain `gh issue create` outright** (verified 2026-09-07, #797 parallel
+item). There is no direct route to a GitHub issue from an agent session: the only sanctioned path is
+`new_potential_entry`/`new_potential_bug_entry` -> `potential_to_issue` -> `new_active_feature_folder`.
+This collides head-on with a branch whose plan declares a Write Set and whose Phase 5 scope gate has
+already passed, because MCP promotion writes `docs/features/potential/...` — an unclaimed path that
+falsifies the recorded scope evidence. Running it against the session root instead is worse in a
+parallel run: it drops untracked files into the worktree a concurrent sibling is using, where a
+blanket `git add` sweeps them onto the sibling's branch. So on a scope-gated branch there is no way to
+file a follow-up issue at all. Record the finding in the committed `code-review.<ts>.md` (which does
+merge to main with the feature folder) and in the PR body's Follow-ups section, then hand the
+promotion to the caller. See [[footprint-ac-forbids-onbranch-followup-promotion]] and
+[[feedback_promote_latent_defects_to_issues]], which this bounds rather than contradicts.
+
+**A `--body-file` for `gh pr create` must exist relative to the SESSION ROOT, not the item worktree**
+(verified same run). The pr-author hook resolves the path against its own cwd. Author in the worktree,
+then copy body + receipt + `pr_context.summary.txt` to the session root, and write the receipt
+`created_at` AFTER that copy — copying refreshes the summary's mtime, and a receipt older than it
+fails the staleness check. Verify both copies hash identically before creating the PR.
+See [[child-orchestrator-pr-hook-reads-session-root]] and [[pr-author-receipt-staleness-is-mtime-vs-created-at]].
+
 **Do not fabricate a lost receipt.** When a prior attempt dies and takes the gitignored checkpoint
 with it, the raw MCP promotion payloads are gone. Record `receipt: null` plus a `receipt_note`
 explaining what corroborates the invocation (folder on disk, issue.md provenance section), and set

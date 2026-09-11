@@ -116,6 +116,28 @@ together. It also fails Layer 2's structural reading of the barrier. So the re-r
 housekeeping; in this direction it is the only thing standing between the run and a real
 concurrency violation.
 
+**The concurrent writer can be another PARENT executing the run, not just another add — and then
+`next_step` and `completed_steps` are not yours to write.** Observed 2026-09-07 on
+`/parallel-add 812`: while preparation ran, a separate `parallel-orchestrator` session admitted three
+sibling items AND began executing one of them, moving `recolor_generation` 0 to 2, `current_cohort`
+2 to 3, the item count 4 to 7, the edge count 5 to 17, and setting
+`next_step` to a step naming its in-flight item. The add still applied cleanly, because the fix is to
+NARROW the write surface rather than to serialize the operations: append the item, the cohort rows,
+the edges, the mutation entry, the receipts, and `last_updated`, and leave `next_step` and
+`completed_steps` exactly as found. Those two are the executing parent's single-writer fields, and
+the add is already recorded canonically in `mutations[]`, so touching them buys nothing and risks
+losing that parent's progress. Same reasoning applies to the generated status document: regenerate it
+because a `mutations[]` append is a regeneration boundary, but leave the run's commit cadence to the
+session that owns execution rather than racing a commit on a file another agent is actively editing.
+
+**Guard the write with an explicit freshness assertion, and make it abort rather than merge.** Encode
+the exact state the decision was computed against — generation, item-key set, current-generation
+cohort map, and the pinned item's state — and re-check all four against a fresh read immediately
+before writing, exiting non-zero on any mismatch. This is cheap and it converts the lost-update race
+from silent corruption into a re-run. On 812 the guard passed, so the decision stood; had a fourth
+sibling landed in the final minutes it would have aborted and forced the recompute that the
+verdict-inversion cases above make mandatory.
+
 **`current_cohort_members` must include `scheduled` members, not just pinned ones.** That is
 exactly what made 656 defer: 646 was never in flight, only admitted and waiting. An admission
 check written against the `in_flight` subset alone would have missed it and admitted 656

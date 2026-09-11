@@ -206,5 +206,34 @@ that review finished, exactly as a committed clearance artifact is for preparati
 concluding anything from the child's silence, and never merge on the artifacts' mere existence — read
 the verdict line and the Blocking count, because a review that ran and FAILED also leaves three files.
 
+**An execution child killed MID-PLAN resumes from the PLAN CHECKLIST, not from its checkpoint
+`next_step`.** Observed 2026-09-07 on item 798 of run `bugs-2026-09-06`, where a session rate limit
+killed the child and this parent together. The child checkpoint read
+`completed_steps` through `S5_preflight`, `next_step: S5_atomic_execution` — accurate but useless,
+because the entire multi-phase execution is ONE checkpoint step. The plan file resolved it exactly:
+phases 0 through 6 fully checked, `P7-T1` through `P7-T7` checked, `P7-T8` the first unchecked task.
+Parse the plan for `- [ ] [P#-T#]` and name the first unchecked ID in the resume prompt. A prompt
+that says only "resume atomic execution" invites the child to re-verify phases that are already
+committed.
+
+This rung is distinguished from the CI-wait case above by the ABSENCE of the audit artifacts: no
+`code-review`, `policy-audit` or `feature-audit` in the feature folder means review never ran, so
+the child died inside execution rather than after it.
+
+Three further mechanics on this rung:
+
+- **The work is split across a commit and a dirty tree, and both halves are real.** Here commit
+  `4a29d7e7` carried phases 0 through 6, while the Phase 7 evidence artifacts were still UNTRACKED
+  and the plan file carrying the checkbox state was MODIFIED. Tell the child both halves are valid
+  work: do not regenerate evidence for a checked task, and do not reset a checkbox.
+- **An unpushed local commit is the normal state, not a defect.** `git ls-remote` showed the item
+  branch still at the planner base while the worktree HEAD had advanced. That gap is just an
+  execution child that had not reached its push, and it is also the cheapest proof that no
+  pull request can exist yet.
+- **A rate limit that kills the parent kills every child with it, and the parent checkpoint is
+  usually still CORRECT.** All three durable commands agreed with every recorded field here, so
+  nothing was rewritten. Re-derive anyway and say so — the value of the pass is the confirmation,
+  and a resume that skips it cannot tell agreement from luck.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].

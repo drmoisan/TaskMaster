@@ -36,3 +36,14 @@ change that cannot occur, and the operator would have discovered it only by watc
 - This is the same posture as [[decide-scope-calls-yourself]]: carry out the instruction, then
   report the decision and the rationale, including when the instruction cannot achieve its evident
   goal.
+
+**A C# run is NOT automatically a complete graph — measure it rather than predicting it.** The
+completeness on `bugs-638-644-647` came from every plan citing the mandated coverage script (see
+[[mandate-reads-omits-scripts-vscode]]), which makes every pair contend through a shared path. That
+mechanism does not fire when two items live in disjoint assemblies. Observed 2026-09-08 admitting
+item 811 to run `bugs-2026-09-06`: 811 (UtilitiesCS / UtilitiesCS.Test) and 796 (QuickFiler /
+QuickFiler.Test) share NO module and NO path, so `Test-BlastRadiusConflict` returned False on both
+the narrow and the widened radius — the run's first non-adjacent pair, at 13 of 15 possible pairs.
+The practical consequence is that a genuine second lane can exist on a C# run, so the
+missing-pair count is worth computing every time and the earlier all-pairs result should be read as
+one run's property rather than as a property of the language.

@@ -52,11 +52,11 @@ Two ERROR lines per occurrence (`WebView2BreadcrumbHost - Breadcrumb CoreWebView
 ## Impact / Severity
 
 - [ ] Blocker
-- [ ] High
-- [x] Medium
+- [x] High
+- [ ] Medium
 - [ ] Low
 
-Medium: the breadcrumb folder selector is unavailable on affected launches, and the half-initialized control is a candidate contributor to the sporadic Outlook keyboard lock tracked under the sibling QuickFiler Cancel-teardown issue filed the same day.
+High (raised 2026-09-06, see Update below; originally Medium): the breadcrumb folder selector is unavailable on affected launches, and the half-initialized control is a candidate contributor to the sporadic Outlook keyboard lock tracked under the sibling QuickFiler Cancel-teardown issue filed the same day.
 
 ## Suspected Cause / Notes
 
@@ -74,3 +74,39 @@ Medium: the breadcrumb folder selector is unavailable on affected launches, and 
 
 - [x] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
+
+## Update 2026-09-06: reproduces on every Efc open via pop-out and Sort Email; severity raised to High
+
+Two user-visible symptoms reported today are this failure:
+
+1. **Pop-out from a QfcItem to an EfcItem shows an empty folder list.** No suggestions, no banners, and typing a search string does nothing.
+2. **Ribbon -> Sort Email opens an EfcViewer whose "Matched Folders:" section has no entries.** The label is a static WinForms label above the breadcrumb WebView2, which is why it survives while the list is blank.
+
+### Log evidence
+
+`TaskMaster\bin\Debug\logs\debug_2026-09-06.log` records the paired `WebView2BreadcrumbHost` / `EfcFormController` initialization failure with HRESULT 0x8007139F on every Efc open in the session: ten pop-out opens between 17:39:00 and 17:41:42, three at 19:04-19:06, and the Sort Email open at 19:56:36 (the `SortEmail_Click` stack at 19:56:36,171 is followed by the failure at 19:56:37,940). Today the failure is deterministic on the Efc entry points, not intermittent as originally recorded.
+
+```
+2026-09-06 19:56:37,940 [VSTA_Main] ERROR QuickFiler.Viewers.WebView2BreadcrumbHost - Breadcrumb CoreWebView2 initialization failed: The group or resource is not in the correct state to perform the requested operation. (Exception from HRESULT: 0x8007139F)
+2026-09-06 19:56:38,004 [VSTA_Main] ERROR QuickFiler.Controllers.EfcFormController - Breadcrumb WebView2 initialization failed: The group or resource is not in the correct state to perform the requested operation. (Exception from HRESULT: 0x8007139F)
+```
+
+### Why the list is blank rather than degraded
+
+- `BreadcrumbBridgeRouter.DeliverDocument` (`QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs:168-180`) stashes the rendered document in `_pendingDocument` when `_host.IsCoreInitialized` is false. `WebView2BreadcrumbHost` (`:330-342`) returns on `!e.IsSuccess` without ever raising `CoreInitialized`, so the pending document is never navigated. There is no fallback rendering and no retry.
+- `EfcFormController.InitializeBreadcrumbHostAsync` (`:1071-1081`) and `PopulateFolderCombobox` (`:1250-1271`) are fire-and-forget tasks with total catch blocks, so the failure is log-only.
+- `EfcFormController.BindBreadcrumbRowsAsync` (`:1115-1118`) reads `_globals.Ol.ArchiveRootPath` unguarded; `TryGetArchiveRoot` (`EfcDataModel.cs:280-297`) is not used on the bind path.
+
+### Additional latent defect on the pop-out path
+
+`QfcCollectionController.PopOutControlGroup` (`QuickFiler\Controllers\QfcCollectionController.cs:710-735`) hands only the raw `MailItem` and `_globals` to `new EfcHomeController(...)` via the synchronous constructor, so the Efc view rebuilds prediction from scratch with an unloaded `MailItemHelper` (`EfcDataModel.cs:48-81` vs `CreateAsync` `:89-142`). The in-QuickFiler carry pattern from #678 (`QfcItemController.FolderHandling.cs:68-83`, `_carriedFolderHandler`) is not applied to the pop-out. `EfcViewerQueue.BuildQueue` has no production call site, so `EfcViewer` is always constructed inline on the calling thread and captures `SynchronizationContext.Current` as-is (`EfcViewer.cs:23-30`); if the pop-out continuation lands off the UI thread, `UiThread.SynchronizationContextAwaiter` throws on the null context (`UiThread.cs:91-98`) inside the same swallowed tasks.
+
+### Additional acceptance criteria (settled with the maintainer 2026-09-06)
+
+- [ ] AC-U1: A failed `CoreWebView2` initialization is retried, and on final failure the Efc view shows a visible error state in the folder area instead of a blank list.
+- [ ] AC-U2: `_pendingDocument` is never silently dropped: it is delivered when initialization later succeeds or an error is surfaced.
+- [ ] AC-U3: The pop-out path carries the already-initialized folder predictor and loaded `MailItemHelper` from the QfcItem, following the #678 carry pattern, and constructs the `EfcViewer` on the UI thread.
+- [ ] AC-U4: `PopulateFolderCombobox` and `InitializeBreadcrumbHostAsync` report failures through `TryReportBoundaryFault` to the user, not log-only.
+- [ ] AC-U5: Manual verification on both entry points: pop-out from QuickFiler and ribbon Sort Email each show suggestion rows and respond to typed search.
+
+Severity: raised from Medium to High. Both Efc entry points are unusable for folder selection in the affected sessions.

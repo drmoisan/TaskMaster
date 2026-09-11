@@ -52,6 +52,21 @@ production file cap is 3 and is already full`, naming three stale scratchpad scr
 earlier sessions. Do not delete the budget state file and do not raise the cap to get around
 it; inline the logic into `pwsh -NoProfile -Command` instead, which is not counted.
 
+**A backslash-escaped `\$` DOES survive a double-quoted outer wrapper (measured 2026-09-07, #797):**
+the rule above says to prefer a single-quoted outer wrapper, and that remains the default. But when a
+payload must be double-quoted because it contains single-quoted PowerShell literals, `\$` passes bash
+untouched and arrives at pwsh as `$`. Verified repeatedly:
+`pwsh -NoProfile -Command "... ; Write-Output ('EXIT=' + [int]\$LASTEXITCODE)"` printed the real exit
+code, and `... | ForEach-Object { '{0} = {1}' -f \$_, (Get-Content -LiteralPath \$_).Count }` enumerated
+correctly. A bare `$_` in the same position is deleted outright, leaving `_` — which does not error, it
+silently resolves to a bareword and produces wrong output. Escape every `$` you need, and prove it once
+with a trivial payload before relying on it.
+
+**`pwsh -WorkingDirectory <dir>` works with BOTH `-File` and `-Command` (same run):** it is the correct
+way to run a repo-root-relative command in a specific worktree without `cd`, which the bash discipline
+forbids. Without it, `-File` starts in the session root and any script that derives a repository root
+from the current directory acts on the wrong checkout.
+
 Corollary measured at the same time: Pester 5.6.1 creates `CodeCoverage.OutputPath`'s
 parent directory (`New-Item -Force -ItemType Container`), so redirecting coverage into a
 not-yet-existing evidence folder is safe. Pester also ignores `Run.Exit` by default, so a

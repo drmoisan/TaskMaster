@@ -45,6 +45,15 @@ does not match, and is allowed silently.
   corrected for children already launched — it can only be fixed for the next batch. That asymmetry
   is a reason to review a delegation prompt for permission-surface defects BEFORE the first launch,
   not after the first complaint.
+- **Never assign the child a cleanup task outside the worktree you just bound it to.** On
+  `bugs-2026-09-06` (2026-09-07) I gave the item 796 child a binding "every read, write and git
+  command must be rooted at the item worktree; do not touch the session worktree" directive AND a
+  closing obligation to remove the session-root mirror of `issue.md`/`spec.md` that the `prd-feature`
+  hook required. The two directives contradict, and because there is no retraction channel (previous
+  bullet) the contradiction shipped. The parent owns every path outside the item worktree —
+  session-root mirrors, shared checkpoints, worktree removal — so keep those on the parent's own
+  todo list and out of the child prompt. A mirror that a running child's own hook still depends on
+  must not be deleted before that child reaches DONE in any case.
 - Same authoring family as [[keyed-issue-num-in-delegation-prompts]] and
   [[never-backtick-exclusion-paths-in-delegation-prompts]]: the prompt text is an interface to
   mechanical matchers, and a natural phrasing can defeat one.

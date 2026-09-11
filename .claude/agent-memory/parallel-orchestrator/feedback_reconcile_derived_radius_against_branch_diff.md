@@ -121,6 +121,28 @@ child. Both confirmations came from a RESUMED preparation as well as a fresh one
 survives the resume path. Keep running the diff regardless — it is still the only thing that
 distinguishes a suppressed child from a dead one.
 
+**The disclosure clause works even when a SUBAGENT writes memory, which the footprint clause alone
+would not have caught.** Confirmed 2026-09-07 on `/parallel-add 812`: the reconciliation was clean,
+all five branch files covered exactly, and the child had run to completion rather than dying. The new
+detail is the mechanism. The child did not simply decline to write memory — its `atomic-planner`
+subagent DID write `.claude/agent-memory/atomic-planner/MEMORY.md` plus a new sibling note, and the
+child detected the write, REVERTED both, and restated the prohibition in its later subagent prompts.
+So the pair of clauses buys a detect-and-repair loop inside the child, not just abstention at the top
+level, which matters because the escape scales with the delegation chain and the parent never sees a
+subagent prompt. Keep requiring the disclosure even when the footprint clause is already present: the
+disclosure is what makes the child look.
+
+**Expect derivation ARTIFACTS in a clean radius, and record them rather than removing them.** The 812
+radius came back with 76 paths for a five-file branch. Three shapes accounted for most of the excess:
+a broad `.claude/worktrees/**` subtree glob harvested from plan text, entries carrying a trailing
+line-number suffix such as `FolderPredictor.cs:795`, and bare relative fragments such as
+`research/...` and `evidence/...` with no leading directory. None can be narrowed away — that is
+prohibited — and none created a false edge on this run, because no other radius held a matching
+token. Note the asymmetry that makes the broad glob worth flagging anyway: a line-suffixed or
+fragment token can never match a tracked file, so it is inert, whereas `.claude/worktrees/**` is a
+live glob that would contend with any future item declaring a worktree path. Record the distinction
+in `blast_radius_note` so a later reader can tell an inert artifact from a latent one.
+
 **Re-test the widened radius before writing it.** Adding paths can in principle resolve a new
 shared surface or a new edge, and a radius that silently gained contention is worth knowing
 about before it reaches the checkpoint rather than after. On 656 the re-test came back clean —
