@@ -11,8 +11,14 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-04T09-15 |
-| next_step | Every non-withdrawn item in this run (15 of 15) has reached merge_status merged or worktree_removed. Issue 584 was confirmed still open post-merge and closed directly with a link to PR 778, mirroring the 731/732 precedent. Per mode open this run does not auto-complete and remains a standing queue; it terminates only via /parallel-close, which is out of scope for this driver and has not been invoked. |
+| last_updated | 2026-09-11T18-40 |
+| next_step | CLOSED_open_mode_run_terminated_no_further_admissions_mutations_array_is_final |
+
+The run was terminated on 2026-09-11T18-40 by `/parallel-close`. The close gate was evaluated against
+re-derived durable state and accepted: no item was in flight. All 15 items had already reached a terminal
+merge status. The run admits no further items, and the `close` entry below is the final element of the
+mutations array. `recolor_generation` is unchanged at 1, because run termination changes no cohort
+assignment.
 
 ## Items
 
@@ -54,7 +60,15 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 751 | 2026-09-03T16-30 | 2026-09-03T19-20 | 2026-09-03T20-05 | 2026-09-03T19-38 | - |
 | 752 | 2026-09-03T15-00 | 2026-09-04T04-08 | 2026-09-04T04-45 | 2026-09-04T04-29 | - |
 
-Worktree removal for items 645 and 707 was attempted (non-forced `git worktree remove`) and deferred: both worktrees carry modified/untracked files and removal was not forced. `merge_status: merged` still satisfies open-mode completion.
+Worktree removal was deferred during the run for every item whose tree carried modified or untracked
+files; removal was never forced. `merge_status: merged` still satisfies open-mode completion.
+
+At close time (2026-09-11T18-40) the durable re-derivation found every recorded item worktree path absent
+from disk and absent from the worktree listing: the deferred trees were reclaimed by a later out-of-band
+cleanup sweep rather than by this run's own gated removal step. The recorded `merge_status` values were
+therefore left as written, because no durable per-item removal timestamp is recoverable and recording
+`worktree_removed` would assert a lifecycle step this run did not perform. `merged` and `worktree_removed`
+are both terminal, so the difference affects neither the close gate nor the completion predicate.
 
 ## Cohorts
 
@@ -98,6 +112,7 @@ Worktree removal for items 645 and 707 was attempted (non-forced `git worktree r
 | --- | --- | --- | --- | --- | --- | --- |
 | add | 752 | 2026-09-03T14-55 | - | scheduled | - | 1 |
 | add | 751 | 2026-09-03T16-25 | - | scheduled | - | 1 |
+| close | - | 2026-09-11T18-40 | - | - | - | 1 |
 
 ## Drift Events
 
