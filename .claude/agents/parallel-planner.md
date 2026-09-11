@@ -160,6 +160,9 @@ The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObser
 `Test-BlastRadius`, and `Test-BlastRadiusConflict`. Its truth table is
 `config/blast-radius.json`, which push-down publishes alongside `.claude`.
 
+`Test-BlastRadiusConflict` reads that table's optional `mergeable_paths` list and contributes no
+`path_overlap` edge for a path matching it, while the path stays in the declared radius.
+
 **Cohort seeding and concurrency batching — bash entry points.** The bash library is granted as
 four entry-point-specific allowlist entries — `"Bash(bash .claude/lib/bash/compute-cohorts.sh*)"`,
 `"Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"`,

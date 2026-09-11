@@ -196,6 +196,10 @@ The facade re-exports the five functions this skill needs: `Get-PlanPaths` (port
 call to `Test-BlastRadius` in `@(...)`: it writes its findings to the pipeline, so a zero-element
 result writes nothing and a one-element result writes a single object.
 
+`Test-BlastRadiusConflict` reads the optional `mergeable_paths` list from that truth table and
+contributes no `path_overlap` edge for a path matching it, while the path itself stays in the
+declared radius and is still read by every audit.
+
 The truth table the port reads is `config/blast-radius.json`, which push-down publishes into the
 destination workspace alongside `.claude`.
 
@@ -312,6 +316,8 @@ The library returns the partition; the planner supplies the record fields.
    `Test-BlastRadiusConflict` to every unordered pair of `declared` radii, then pass the pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
    Read the verdict from the conflict key of the returned hashtable.
+   `Test-BlastRadiusConflict` contributes no `path_overlap` edge for a path matching the truth
+   table's optional `mergeable_paths` list, and the path stays in the declared radius.
    The hashtable itself is always truthy, so a bare boolean test on the result treats every pair as
    conflicting and serializes the whole run. This is the sibling hazard to the `@(...)` warning
    above for `Test-BlastRadius`: that function writes an `IList`-shaped pipeline result whose

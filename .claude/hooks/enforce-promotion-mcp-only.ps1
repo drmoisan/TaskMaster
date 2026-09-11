@@ -31,6 +31,13 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+
+# Shared command-line parser (issue #545). Every forbidden-token scan and both `gh`
+# expressions below run against each segment's clause-ordered scan text, and the
+# structural matcher reaches the relocating `gh` spellings adjacency cannot.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 $script:PromotionMcpOnlyBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct Bash promotion-script execution is not allowed in agent sessions. Use the drm-copilot MCP promotion tools instead.'
 
 $script:PromotionMcpOnlyGhIssueBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct GitHub issue creation via `gh` bypasses the approved drm-copilot MCP promotion path (`mcp__drm-copilot__new_potential_entry` -> `mcp__drm-copilot__potential_to_issue` -> `mcp__drm-copilot__new_active_feature_folder`). Use those MCP tools instead.'
@@ -90,15 +97,34 @@ function Get-PromotionBypassReason {
         'new_active_feature_folder'
     )
 
-    foreach ($token in $forbiddenTokens) {
-        if ($CommandText.IndexOf($token, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
-            return (Get-PromotionMcpOnlyBlockedReason)
+    # Issue #545: the scan text of a segment is its raw text only when the segment is
+    # wrapper-led, carries a live substitution, or could not be balanced; otherwise
+    # quoted spans and attached heredoc bodies are masked. A promotion tool name that
+    # appears only as a JSON receipt value is therefore a mention, not an invocation.
+    $segments = @(Read-CommandLineSegment -CommandText $CommandText)
+
+    foreach ($segment in $segments) {
+        foreach ($token in $forbiddenTokens) {
+            if ($segment.ScanText.IndexOf($token, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                return (Get-PromotionMcpOnlyBlockedReason)
+            }
         }
     }
 
     # `gh issue create` and `gh issue new` are direct bypasses of the MCP
     # promotion path. Tolerate any flags after the subcommand.
-    if ($CommandText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
+    foreach ($segment in $segments) {
+        if ($segment.ScanText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
+            return (Get-PromotionMcpOnlyGhIssueBlockedReason)
+        }
+    }
+
+    # The adjacency-requiring expression above cannot see a relocating spelling, in
+    # which a `gh` global option such as --repo or -R sits between the command word
+    # and its subcommand (D10). The structural matcher absorbs those options and
+    # reads the subcommand path positionally, so both spellings classify.
+    if ((Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('issue', 'create')) -or
+        (Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('issue', 'new'))) {
         return (Get-PromotionMcpOnlyGhIssueBlockedReason)
     }
 
@@ -106,10 +132,12 @@ function Get-PromotionBypassReason {
     # explicit POST method is supplied. `gh api` defaults to GET, so we only
     # block when -X POST or --method POST is present, to avoid false positives
     # on issue read operations. Use a single regex with lookaheads against the
-    # whole command string.
+    # scan text of one segment.
     $ghApiIssuesPostPattern = '(?i)(?=.*\bgh\s+api\b)(?=.*repos/[^/\s]+/[^/\s]+/issues(?:\b|/[^/\s]*$))(?=.*(?:-X\s+POST|--method\s+POST))'
-    if ($CommandText -match $ghApiIssuesPostPattern) {
-        return (Get-PromotionMcpOnlyGhIssueBlockedReason)
+    foreach ($segment in $segments) {
+        if ($segment.ScanText -match $ghApiIssuesPostPattern) {
+            return (Get-PromotionMcpOnlyGhIssueBlockedReason)
+        }
     }
 
     return $null

@@ -50,6 +50,32 @@ Use these semantic MCP tools when the corresponding operation is required:
 - `run_poshqc_analyze`
 - `run_poshqc_analyze_autofix`
 - `run_poshqc_test`
+- `resolve_orchestration_topology`
+- `resolve_provider_routing`
+- `transition_prepared_orchestration`
+
+## Independent Expected Context for Portable Handoff Tools
+
+The three portable prepared-orchestration tools bind a handoff to one specific
+destination checkout. Every call to `resolve_orchestration_topology`,
+`resolve_provider_routing`, and `transition_prepared_orchestration` must carry
+the complete caller-controlled independent expected context:
+
+- `expected_repository_id`
+- `expected_workspace_root`
+- `expected_branch`
+- `expected_source_head_sha`
+- `allowed_head_relationship`
+- `expected_issue_number`
+- `expected_feature_folder`
+- `expected_work_mode`
+- `expected_plan_path`
+- `expected_plan_sha256`
+
+Derive each value from the destination checkout and the caller's own record.
+The envelope under validation is never the source of the values it is
+validated against. A call that omits a value, or that copies one from the
+envelope, is rejected before the service is invoked.
 
 Legacy VS Code command IDs are historical source material only and must not be invoked:
 

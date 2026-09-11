@@ -5,6 +5,12 @@
 [CmdletBinding()]
 param()
 
+# Shared command-line parser (issue #545). The scope filter and the operand extractor below
+# both run against the segment that structurally invokes `git worktree remove`, which is what
+# keeps the two runtimes on one implementation of the same concern.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 $script:SafeWorktreeStatuses = @('merged', 'worktree_removed')
 
 function ConvertFrom-CodexWorktreeJson {
@@ -28,18 +34,35 @@ function ConvertFrom-CodexWorktreeJson {
 }
 
 function Get-CodexWorktreeRemovalPath {
+    <#
+    .SYNOPSIS
+        Extract the target worktree path from a git worktree remove command.
+    .DESCRIPTION
+        The operand comes from the segment that structurally invokes git worktree remove, so
+        a chained 'cd <path> &&' segment contributes nothing and a quoted mention of the
+        phrase resolves to no operand. The tokenizer strips balanced double and single
+        quotes, which is what the previous pattern's `double` and `single` alternatives did.
+
+        The previous pattern accepted '--force' only immediately after 'remove'. That
+        spelling is preserved and the trailing spelling now works too, because '--force' is a
+        zero-argument flag that never contributes an operand wherever it is written. Its
+        presence is read structurally through Test-CommandLineFlag rather than by a raw-text
+        search. The empty-string-on-miss contract is unchanged: callers test `if ($target)`.
+    .OUTPUTS
+        System.String
+    #>
     [CmdletBinding()]
     [OutputType([string])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Command)
 
-    $pattern = '(?i)\bgit\s+worktree\s+remove(?:\s+--force)?\s+(?:"(?<double>[^"]+)"|''(?<single>[^'']+)''|(?<bare>\S+))'
-    if ($Command -notmatch $pattern) {
-        return ''
+    $hasForce = Test-CommandLineFlag -CommandText $Command -CommandWord 'git' -SubcommandPath @('worktree', 'remove') -FlagName '--force'
+    $operands = @(Get-CommandLineOperand -CommandText $Command -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))
+
+    if ($operands.Count -gt 0) {
+        return [string]$operands[0]
     }
-    foreach ($name in @('double', 'single', 'bare')) {
-        if ($Matches[$name]) {
-            return [string]$Matches[$name]
-        }
+    if ($hasForce) {
+        return '--force'
     }
     return ''
 }
@@ -97,7 +120,10 @@ function Invoke-CodexWorktreeRemovalDecision {
         return $null
     }
     $command = [string]$payload.tool_input.command
-    if ($command -notmatch '(?i)\bgit\s+worktree\s+remove\b') {
+    # Scope filter. Structural, so a relocating spelling such as
+    # 'git -C <dir> worktree remove <path>' is in scope and quoted prose that merely mentions
+    # the phrase is not (issue #545).
+    if (-not (Test-CommandLineInvocation -CommandText $command -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))) {
         return $null
     }
     $target = Get-CodexWorktreeRemovalPath -Command $command

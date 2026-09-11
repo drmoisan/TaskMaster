@@ -40,6 +40,10 @@
 param()
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+# Shared command-line parser (issue #545), consumed by the scope filter in
+# Invoke-EpicMergeGateDecision and by Get-EpicMergeGateCommandPrNumber.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 
 $script:ChildCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
@@ -128,6 +132,22 @@ function Get-EpicMergeGateCommandPrNumber {
     <#
     .SYNOPSIS
         Extract an explicit PR number argument from a gh pr merge command, or $null.
+    .DESCRIPTION
+        Both spellings are read from the segment that structurally invokes gh pr merge,
+        never from the whole command line. The positional form ("gh pr merge 410 --merge")
+        resolves through Get-CommandLineOperand and takes the first all-digit operand; the
+        flag-led forms ("gh pr merge --merge 410" and "gh pr merge --merge=410") resolve
+        through Get-CommandLineFlagValue. A bare "gh pr merge --merge" yields $null, which
+        the parallel branch treats as fail-closed.
+
+        The deleted unanchored branch scanned the WHOLE command text for the first run of
+        digits once "gh pr merge" appeared anywhere in it, and that failed in both
+        directions. Fail-closed: a leading "cd <path>" whose path carries a timestamp
+        component supplied a digit run that was not a pull request number, so an authorized
+        merge was blocked. False-allow: with authorized item 501 and unauthorized item 777,
+        "cd /repo/worktrees/501 && gh pr merge --merge 777" extracted 501, matched the
+        authorized item, and permitted the merge of PR 777. Taking the number from the
+        matched segment's own operand or flag value closes both directions.
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .OUTPUTS
@@ -140,20 +160,17 @@ function Get-EpicMergeGateCommandPrNumber {
         [string] $CommandText
     )
 
-    # Original form: the PR number appears immediately after "merge"
-    # (e.g. "gh pr merge 410 --merge"). Preserved verbatim so epic-path outcomes
-    # for the forms the epic path uses are unchanged.
-    if ($CommandText -match '(?i)\bgh\s+pr\s+merge\s+(\d+)\b') {
-        return [int]$Matches[1]
+    foreach ($operand in @(Get-CommandLineOperand -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge'))) {
+        if ($operand -match '^\d+$') {
+            return [int]$operand
+        }
     }
-    # Broadened, additive form: the parallel command places the flag before the
-    # number (e.g. "gh pr merge --merge 410"). Once "gh pr merge" is confirmed,
-    # capture the first standalone run of digits that is not preceded by "-" or a
-    # word character, so a flag token such as "--merge" is not treated as a number
-    # and a bare "gh pr merge --merge" still yields $null.
-    if ($CommandText -match '(?i)\bgh\s+pr\s+merge\b' -and $CommandText -match '(?<![-\w])(\d+)\b') {
-        return [int]$Matches[1]
+
+    $flagValue = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if ($null -ne $flagValue -and $flagValue -match '^\d+$') {
+        return [int]$flagValue
     }
+
     return $null
 }
 
@@ -373,8 +390,26 @@ function Invoke-EpicMergeGateDecision {
     }
 
     # Only a gh pr merge invocation carrying --merge is in scope for this gate; every
-    # other Bash command is unaffected.
-    if ($commandText -notmatch '(?i)\bgh\s+pr\s+merge\b' -or $commandText -notmatch '--merge\b') {
+    # other Bash command is unaffected. Both legs are read structurally from the segment
+    # that invokes the command, so a quoted mention of the phrase and a --merge token
+    # belonging to some other segment no longer bring a command into scope.
+    #
+    # The flag leg needs a raw-scan fallback: a wrapper's quoted argument collapses into ONE
+    # token, so a flag inside it is never read as a token, and the token-only read took
+    # bash -c "gh pr merge --merge 688" out of scope. The fallback reads only the segments the
+    # scanner already scans raw, so a masked mention in a non-wrapper segment stays out.
+    $isMergeInvocation = Test-CommandLineInvocation -CommandText $commandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge')
+    $hasMergeFlag = Test-CommandLineFlag -CommandText $commandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if (-not $hasMergeFlag) {
+        foreach ($segment in @(Read-CommandLineSegment -CommandText $commandText)) {
+            if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+                $segment.ScanText.IndexOf('--merge', [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                $hasMergeFlag = $true
+                break
+            }
+        }
+    }
+    if (-not $isMergeInvocation -or -not $hasMergeFlag) {
         return Get-EpicMergeGateAllowDecision
     }
 

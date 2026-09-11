@@ -19,6 +19,10 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 # proof the issue #539 exemption is behaviourally unchanged.
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1')
 
+# Shared command-line parser (issue #545): per-segment scan text and structural matching.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 # The readiness checkpoint this gate reads and names in its block message.
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
@@ -132,9 +136,11 @@ function Test-ImplementationCommand {
         '(^|\s)npx\s+(prettier|eslint|tsc|jest)\b',
         '(^|\s)pwsh\s+.*(Invoke-Pester|tests/scripts/)'
     )
+    $scanText = @(Read-CommandLineSegment -CommandText $normalizedCommand).ScanText
+    $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
-        if ($normalizedCommand -notmatch $implementationCommandPatterns[$index]) {
+        if (-not (($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }) -or ($index -eq 0 -and $isStaging))) {
             continue
         }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern

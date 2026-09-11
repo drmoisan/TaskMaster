@@ -44,6 +44,13 @@ $script:AbandonConfirmToken = '--confirm-abandon'
 # Literal prefix on the deny reason, so the reason code is greppable in transcripts.
 $script:AbandonBlockedReasonCode = 'PARALLEL_ABANDON_BLOCKED'
 
+# Shared command-line parser (issue #545). Dot-sourced BELOW the two token assignments
+# rather than above them, deliberately: the assignments keep their existing line numbers,
+# so the diff shows no change at either line. Both are still declared before any function
+# body runs, because the file executes top to bottom before any of its functions is called.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 function Get-ParallelAbandonGateToolInput {
     <#
     .SYNOPSIS
@@ -85,10 +92,77 @@ function Get-ParallelAbandonNormalizedCommand {
     return ($CommandText -replace '\s+', ' ').Trim()
 }
 
+function Test-ParallelAbandonSegmentDisposition {
+    <#
+    .SYNOPSIS
+        Report whether one segment's tokens request the abandon disposition.
+    .DESCRIPTION
+        The option name and its value are derived from $script:AbandonDispositionToken by
+        splitting it on whitespace, so this function restates neither literal and the seam
+        test's single-source-of-truth property is preserved. Both spellings the producer's
+        argparse registration accepts are recognized: the separated pair
+        '--disposition' 'abandon' as two adjacent tokens, and the equals-joined single token
+        '--disposition=abandon'.
+
+        Comparison is by whole-token equality, which is case-insensitive in PowerShell and
+        therefore preserves the OrdinalIgnoreCase behaviour of the containment test it
+        replaces. Because a quoted span is one token, a grep whose quoted search term is the
+        disposition token no longer requests an abandon.
+
+        A raw-scan leg runs after the token loop, on the segments the scanner itself scans
+        raw, so a disposition carried inside a wrapper's quoted argument is still recognized.
+    .PARAMETER Segment
+        One segment record produced by Read-CommandLineSegment.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowNull()] $Segment)
+
+    $parts = @($script:AbandonDispositionToken -split '\s+' | Where-Object { $_ })
+    if ($parts.Count -lt 2) {
+        return $false
+    }
+    $optionName = $parts[0]
+    $optionValue = $parts[1]
+    $joined = $optionName + '=' + $optionValue
+
+    $token = @($Segment.Tokens)
+
+    for ($index = 0; $index -lt $token.Count; $index++) {
+        if ($token[$index] -eq $joined) {
+            return $true
+        }
+        if ($token[$index] -eq $optionName -and
+            $index + 1 -lt $token.Count -and
+            $token[$index + 1] -eq $optionValue) {
+            return $true
+        }
+    }
+
+    if (-not (Test-CommandLineSegmentRawScan -Segment $Segment)) {
+        return $false
+    }
+
+    # A wrapper's quoted argument is a nested command line and collapses into ONE token, so
+    # neither the adjacent pair nor the equals-joined token can form inside it. Both accepted
+    # spellings are reconstructed from the split constant rather than restated, so the
+    # single-source-of-truth seam test still finds each literal exactly once in this file.
+    $scanText = [string]$Segment.ScanText
+    $comparison = [System.StringComparison]::OrdinalIgnoreCase
+    return ($scanText.IndexOf($joined, $comparison) -ge 0 -or
+        $scanText.IndexOf(($optionName + ' ' + $optionValue), $comparison) -ge 0)
+}
+
 function Test-ParallelAbandonCommandInScope {
     <#
     .SYNOPSIS
         Report whether a command carries the abandon disposition token at all.
+    .DESCRIPTION
+        Evaluated per segment through the shared parser rather than as a containment test
+        over the whole command string. In scope when ANY segment requests the abandon
+        disposition in either accepted spelling.
     .PARAMETER NormalizedCommand
         The whitespace-normalized command text.
     .OUTPUTS
@@ -105,15 +179,25 @@ function Test-ParallelAbandonCommandInScope {
     if ([string]::IsNullOrWhiteSpace($NormalizedCommand)) {
         return $false
     }
-    return $NormalizedCommand.Contains(
-        $script:AbandonDispositionToken,
-        [System.StringComparison]::OrdinalIgnoreCase)
+
+    foreach ($segment in @(Read-CommandLineSegment -CommandText $NormalizedCommand)) {
+        if (Test-ParallelAbandonSegmentDisposition -Segment $segment) {
+            return $true
+        }
+    }
+
+    return $false
 }
 
 function Test-ParallelAbandonCommandConfirmed {
     <#
     .SYNOPSIS
         Report whether a command carries the confirmation marker.
+    .DESCRIPTION
+        Confirmed only when a SINGLE segment carries both the abandon disposition and the
+        confirmation marker. The confirmation is the caller's deliberate acknowledgement of
+        this abandon, so a marker echoed in an unrelated segment is not an acknowledgement
+        of the command that follows it.
     .PARAMETER NormalizedCommand
         The whitespace-normalized command text.
     .OUTPUTS
@@ -130,9 +214,22 @@ function Test-ParallelAbandonCommandConfirmed {
     if ([string]::IsNullOrWhiteSpace($NormalizedCommand)) {
         return $false
     }
-    return $NormalizedCommand.Contains(
-        $script:AbandonConfirmToken,
-        [System.StringComparison]::OrdinalIgnoreCase)
+
+    foreach ($segment in @(Read-CommandLineSegment -CommandText $NormalizedCommand)) {
+        $tokens = @($segment.Tokens)
+        if (-not (Test-ParallelAbandonSegmentDisposition -Segment $segment)) {
+            continue
+        }
+        if ($tokens -contains $script:AbandonConfirmToken) {
+            return $true
+        }
+        if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+            ([string]$segment.ScanText).IndexOf($script:AbandonConfirmToken, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            return $true
+        }
+    }
+
+    return $false
 }
 
 function Get-ParallelAbandonGateAllowDecision {

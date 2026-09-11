@@ -17,6 +17,47 @@ A hardened snapshot from another repository contains a JSON Schema for the orche
 
 This prohibition is specific to the disqualified foreign schema identified by the `drmoisan.github.io/mix-calculator/` `$id`. A schema whose `$id` is repo-local and whose required-field set and `additionalProperties` policy match this repository's checkpoint contract is not the disqualified foreign artifact; even so, the repository's enforcement mechanism remains the Python validator prose-and-logic above, not an imported schema file.
 
+## Portable Handoff Projection Invariants
+
+A provider-native destination checkpoint materialized from the portable handoff
+contract must retain the following linkage:
+
+- `provider`, `checkpoint_expression`, and `destination_projector` identify the
+  destination expression and selected adapter.
+- `plan-path` and `next_step` equal the portable envelope's exact plan path and
+  recorded lifecycle transition. The destination must not rediscover a plan or
+  replace either value from local convention.
+- `portable_handoff` retains the handoff ID, envelope SHA-256, latest history
+  entry SHA-256, adapter identity, source validator, identity and binding
+  fields, source checkpoint/archive facts, exact plan proof, lifecycle,
+  capabilities, and scheduler context.
+- Historical source receipts remain opaque references under
+  `portable_handoff.source.expression.historical_receipts`. They must not be
+  rewritten as destination-provider receipts.
+- `destination_evidence` starts as `pending_first_delegation` with an empty
+  receipt list. Destination routing, topology, model, and receipts may be
+  recorded only for the first new delegation after checkpoint materialization.
+
+The portable lifecycle permits only the registered state transitions:
+`legacy_v1` to migration, `preparation_complete` to
+`prepared_to_atomic_execution`, `validated` to destination materialization,
+`materialized` to `atomic_execution`, and a bounded scheduled-child return from
+an authorized child execution phase. An attempted replay of a completed phase
+is invalid.
+
+A failed contract, binding, capability, authority, plan, replay, dirty-worktree,
+candidate, archive, or replacement check must produce the deterministic blocked
+result and leave the source checkpoint authoritative. A blocked result must
+retain the primary `HANDOFF_*` code and affected paths where applicable; it must
+not record a completed transition or destination delegation.
+
+For parallel and epic children, `return_to_scheduler` accepts only a result
+whose run, item, parent checkpoint path/hash, scheduler owner, child execution
+owner, return contract, plan hash, child checkpoint hash, and result hash match
+the envelope. The child may return that bounded result but may not assume
+cohort or wave ordering, barriers, fan-in, integration, cleanup, or parent
+completion authority.
+
 ## Scope and Backward Compatibility
 
 These invariants apply only when the checkpoint contains a top-level `remediation_loop` with a `cycles` array. A checkpoint with no `remediation_loop` (the existing step-based checkpoint shape) is unaffected: it validates exactly as before and produces no new errors. The invariants are additive.

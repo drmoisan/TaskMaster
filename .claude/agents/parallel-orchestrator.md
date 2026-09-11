@@ -18,6 +18,10 @@ tools:
   - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
   - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
   - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
+  - "Bash(dotnet tool restore*)"
+  - "Bash(dotnet csharpier check *)"
+  - "Bash(dotnet build *)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
@@ -222,11 +226,20 @@ and `mcp_call_receipts[]` populated with the `parallel` route's required names f
 
 The checkpoint schema is owned by F3 and is defined once in
 `.claude/rules/parallel-orchestration.md`, enforced by
-`scripts/dev_tools/validate_parallel_orchestrator_state.py`. You consume that schema and add no
-field to it. The `parallel-orchestrate` skill's `## Parallel-Level Checkpoint` section carries the
+`scripts/dev_tools/validate_parallel_orchestrator_state.py`. You consume that schema and
+add no field to it that the rule file does not declare.
+`mergeable_conflicts_resolved` is the one declared optional item field.
+The `parallel-orchestrate` skill's `## Parallel-Level Checkpoint` section carries the
 full enumeration, the `merge_status` transition chain you write, and the arrays that are read-only
 to you. Validate through `mcp__drm-copilot__validate_orchestration_artifacts` with
 `artifact_type: "parallel-orchestrator-state"`.
+
+You run the project-file merge step of the `parallel-orchestrate` skill yourself rather than
+delegating it. The four entries added to your `tools:` list above for the resolution script and
+for the three .NET verification commands are scoped to that step and to no other, and they are the
+only reason those commands appear in your allowlist at all. That step's one optional item field is
+`mergeable_conflicts_resolved`, declared in the rule file and appended to an item after a
+parent-side resolution.
 
 ## Documentation Maintenance
 

@@ -344,6 +344,29 @@ Remediation is child-owned and parent-initiated. The conflict is always between 
 branch and `origin/main`; there is no integration branch and therefore no fan-in conflict path on
 this surface.
 
+Project-file conflicts are resolved by the parent first (issue #643); the numbered steps below are
+the escalation path.
+
+- (a) On a conflicted `gh pr merge --merge`, the parent runs the two commands
+  `git -C <worktree_path> fetch origin main` and
+  `git -C <worktree_path> merge --no-commit origin/main`.
+- (b) The parent then runs
+  `pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1 -Worktree <worktree_path>`
+  and parses its single JSON object. A `result` of `escalate` makes the parent run
+  `git -C <worktree_path> merge --abort`
+  and continue with step 1 below, including `escalate_paths` in the Blocking finding.
+- (c) On `resolved` the parent stages and commits the resolved paths with a message body listing
+  every entry added from each side and every version choice, then runs the three commands
+  `dotnet tool restore --tool-manifest <worktree_path>/.config/dotnet-tools.json`,
+  `dotnet csharpier check <worktree_path>`, and
+  `dotnet build <worktree_path>/<solution>`, each with path arguments rather than `cd`.
+  A failing check reverts with
+  `git -C <worktree_path> reset --hard HEAD~1`
+  and escalates with the tool output as the finding.
+- (d) On success the parent pushes the item branch, records `mergeable_conflicts_resolved` on the
+  item, sets `merge_status: pr_open`, regenerates `parallel-status.md`, and re-enters
+  `## Per-Item Merge to Main (Merge-on-Green)` at the durable `gh pr checks` confirmation step.
+
 1. On a conflicted `gh pr merge --merge`, the parent detects the failure and re-delegates that item's
    child orchestration, passing the conflict signal and the instruction to resolve against
    `origin/main`. The conflict capture and the finding write both belong to the child's
@@ -427,6 +450,14 @@ whose rows appear only once F6 populates that array; section `## Drift Events` p
 `drift_events[]`, which only F8 populates. An empty array renders an empty section rather than an
 omitted one.
 
+The projection's `## Mergeable Conflicts Resolved` heading renders
+`items[].mergeable_conflicts_resolved`: for each entry the path, the `resolved_at` stamp, the
+`merged_against` ref, the `merge_commit_sha`, the entries added from each side, and the version
+resolutions. The same resolution is cited in three further places: the body of the resolution
+commit message, the pull-request body, and an evidence artifact at
+`docs/features/parallel/<slug>/evidence/other/mergeable-conflicts.<yyyy-MM-ddTHH-mm>.md` carrying
+`Timestamp`, `Command`, `EXIT_CODE`, and the script's JSON output verbatim.
+
 Regeneration boundaries — regenerate at each of the following, not only at final completion:
 
 - Run kickoff, seeding the initial projection from the manifest and the seeded cohorts.
@@ -435,6 +466,7 @@ Regeneration boundaries — regenerate at each of the following, not only at fin
 - Every `recolor_generation` increment.
 - Every append to `mutations[]`.
 - Every append to `drift_events[]`.
+- Every append to an item's `mergeable_conflicts_resolved`.
 - Run completion in `closed` mode, or run close in `open` mode.
 
 Defining the `mutations[]` and `drift_events[]` appends as regeneration boundaries here means F6 and
@@ -444,8 +476,10 @@ F8 need no amendment to these projection rules.
 
 This section is consumption documentation only. The checkpoint schema is owned by F3, defined once
 as prose invariants in `.claude/rules/parallel-orchestration.md`, and enforced by
-`scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema; add no field to it
-and extend no enum in it.
+`scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema;
+add no field to it that `.claude/rules/parallel-orchestration.md` does not declare,
+and extend no enum in it. `mergeable_conflicts_resolved` is the one declared optional item
+field.
 
 Fields `parallel-orchestrator` writes to `artifacts/orchestration/parallel-orchestrator-state.json`:
 `objective`, `route_id: "parallel"`, `parallel_slug`, `parallel_manifest_path`,

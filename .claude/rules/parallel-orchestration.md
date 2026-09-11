@@ -260,6 +260,61 @@ wildcard occupies or truncates the feature-folder segment, a contract token carr
 letter, and a token containing a placeholder or interpolation marker. `artifacts/` is not a known
 top-level segment, so a bare `artifacts/**` subtree claim no longer satisfies the shape rules.
 
+### Mechanically-mergeable path class (issue #643)
+
+Some contended paths are not a design collision. A `.csproj` item list, a `packages.config` package
+list, and an `app.config` binding-redirect list are additive registries: two items that each append a
+distinct entry produce a textual conflict that a deterministic union resolves without judgement.
+Serializing those items buys nothing.
+
+`config/blast-radius.json` carries an optional `mergeable_paths` list of exact entries and `**`
+globs. That list is the mechanically-mergeable path class. Its published default is the five-entry
+list `**/*.csproj`, `**/packages.config`, `**/app.config`, `**/*.vbproj`, `**/*.props`.
+
+A matching path **stays in the declared `paths`**. The exclusion is applied at exactly one place per
+runtime — inside `conflicts` (`scripts/dev_tools/_blast_radius_conflicts.py`) and inside
+`Test-BlastRadiusConflict` (`.claude/lib/blast-radius/BlastRadius.psm1`), on both radii's `paths`
+immediately before the smallest-path-overlap computation. Derivation, normalization,
+observed-radius construction, V1, V2, V3, and `detect_escaped_paths` are therefore unchanged: the
+class narrows one comparison and nothing else. The key is optional and fail-closed: a truth table
+that omits it excludes nothing and reproduces pre-change behaviour exactly.
+
+The matcher is local to this comparison and does not extend the glob engine. A declared path matches
+the class when, against some configured entry, any of the following holds: the two strings are
+ordinally equal; or the declared path is concrete (carries no wildcard) and the configured entry is
+a glob that contains it; or the declared path is concrete and, for a configured entry beginning with
+`**/`, the same two-step test succeeds against the entry with that prefix removed, which is what
+makes a root-level `Directory.Build.props` match `**/*.props`. A declared path that is itself a glob
+is mergeable only when it equals a configured entry verbatim, because a glob can expand over
+non-mergeable files. `_glob_to_regex_text` (`scripts/dev_tools/_blast_radius_glob.py`) and its
+PowerShell mirror `BlastRadiusGlob.psm1` are unchanged by this class; if either is ever changed, both
+it and this matcher must be re-examined together, since the containment step depends on the glob
+engine's semantics.
+
+Three constraints bound the mergeable-path class:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** The class describes how a
+   contention is scored, not what an item may touch. An item that will write a `.csproj` still
+   declares that exact path in its radius.
+2. **The path stays in the declared radius, so the audits still see it.** Nothing is removed from any
+   stored record. Over-breadth, shared-surface, and manifest audits read the same `paths` they read
+   before; only the pairwise overlap set is narrowed.
+3. **`detect_escaped_paths` remains the backstop at execution time.** A mergeable classification is a
+   scheduling decision taken from declared text; `detect_escaped_paths` still compares the declared
+   radius against the paths a diff actually touched, so an item that wrote outside its radius is
+   caught against observed evidence regardless of this class.
+
+An item record of the parallel-orchestrator checkpoint MAY carry an optional
+`mergeable_conflicts_resolved` list recording the mergeable conflicts an item resolved mechanically.
+The field is additive and tolerated-not-validated: no validator in Python, TypeScript, or bash reads
+it, and it follows the `expected_conflict_components` diagnostic precedent — a record written for a
+human reader and for post-hoc audit, never a scheduling input. Each entry carries `path`,
+`resolved_at`, `merged_against`, `merge_commit_sha`, `entries_added_from_ours`,
+`entries_added_from_theirs`, and `version_resolutions`. Entry keys inside those three lists use
+`<ItemType>:<Include>` for MSBuild items, `package:<id>` for `packages.config` packages, and
+`bindingRedirect:<name>` for `app.config` binding redirects. Invariant 9 (the six `blast_radius`
+keys) and invariant 15 (the four edge reasons) are unchanged by this field.
+
 ### Placeholder-shape rejection (issue #502)
 
 The fourth shape is a token containing any member of the marker set
@@ -353,6 +408,15 @@ reading the file is not told something false, and because
 `tests/scripts/dev_tools/test_blast_radius_config.py` calls `load_module_globs` on it and that
 helper raises on an absent key. Nothing schedules on it.
 
+**The .NET manifest family is a structure signal, not a module source (issue #643).** `.csproj`,
+`.fsproj`, `.vbproj`, `.sln`, and `.slnx` are classified in
+`extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-manifests.ts` as
+structure-observing manifests: each one marks a project root and suppresses the
+top-level-directory fallback, and none of them contributes a module. A .NET solution layout
+therefore derives exactly `{ "config": ["config/**"] }` from `PAYLOAD_MODULES` alone. The reason is
+the granularity criterion: a per-assembly module would fire for the majority of work items in that
+solution, so it discriminates nothing and belongs in neither the module map nor the surface list.
+
 **`PAYLOAD_MODULES` carries `config` only.** `claude-runtime` was removed from it by the same
 granularity criterion that removed it from this repository's own map. The criterion transfers
 without modification: every agent in the runtime is instructed to read the policy rules and process
@@ -366,8 +430,8 @@ non-vacuous input.
 subset, not a copy of the self-hosted sets.** They were authored narrow when the bundled copy was
 created and were never a copy that fell behind, so the correct gate is portable-set equality against
 a declared constant plus a subset relation against the self-hosted list — never byte-equality with
-the self-hosted file. Only `version`, `over_breadth_fraction`, and `mandate_reads` are byte-equal
-across the two copies.
+the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, and `mergeable_paths`
+are byte-equal across the two copies.
 
 The reason the two key groups take different relations is an asymmetry between surfaces and modules.
 An over-matching MODULE glob costs concurrency on every pair of items it touches, because a module

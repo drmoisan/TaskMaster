@@ -9,6 +9,11 @@
     structural extraction only: no logic, decision behavior, or reason-string wording changed.
 #>
 
+# Shared command-line parser (issue #545). Dot-sourced here as well as from the parent hook
+# so this file keeps working when a test dot-sources it directly.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 function Get-PrAuthorCheckpointContent {
     <#
     .SYNOPSIS
@@ -64,7 +69,9 @@ function Test-EpicBaseBranchOverride {
 
     # The epic-mode base-branch override only constrains gh pr create; gh pr edit does not
     # re-target the base branch, so non-create commands are out of scope for this check.
-    if ($CommandText -notmatch '(?i)\bgh\s+pr\s+create\b') {
+    # The test is structural, so a quoted mention of the phrase is out of scope and a
+    # relocating spelling carrying a gh global option is in scope (issue #545).
+    if (-not (Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create'))) {
         return $null
     }
 
@@ -96,7 +103,11 @@ function Test-EpicBaseBranchOverride {
         return "EPIC_BASE_BRANCH_MISMATCH: checkpoint has epic_mode == true but no ``epic_context.integration_branch`` is recorded; ``gh pr create`` cannot be verified against the required ``--base`` value."
     }
 
-    if ($CommandText -cnotmatch [regex]::Escape("--base $integrationBranch")) {
+    # The --base value is taken from the matched segment's tokens, so a chained segment that
+    # happens to carry a --base token contributes nothing here. The comparison stays
+    # case-sensitive, as the previous -cnotmatch form was, because a branch name is.
+    $baseValue = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create') -FlagName '--base'
+    if ($null -eq $baseValue -or $baseValue -cne $integrationBranch) {
         return "EPIC_BASE_BRANCH_MISMATCH: ``gh pr create`` must pass ``--base $integrationBranch`` (``epic_context.integration_branch``) under ``epic_mode``; the command does not carry a matching ``--base`` argument."
     }
 

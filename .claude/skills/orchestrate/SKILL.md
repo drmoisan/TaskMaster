@@ -34,6 +34,48 @@ On every invocation, the main session must:
 2. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
 3. If no checkpoint exists or the objective is new, begin the orchestration lifecycle from the start.
 
+## Prepared-State Portable Handoff Intake
+
+Treat a portable prepared-state checkpoint as a request to resume the recorded
+lifecycle, not as a new orchestration intake. Before any destination launch:
+
+1. Validate the envelope through the published, workspace-explicit handoff
+   authority. Require exact repository, workspace, branch lineage, issue,
+   feature folder, work mode, scheduler, capability, and transition bindings.
+   Supply the complete caller-controlled independent expected context on every
+   call to `resolve_orchestration_topology`, `resolve_provider_routing`, and
+   `transition_prepared_orchestration`: `expected_repository_id`,
+   `expected_workspace_root`, `expected_branch`, `expected_source_head_sha`,
+   `allowed_head_relationship`, `expected_issue_number`,
+   `expected_feature_folder`, `expected_work_mode`, `expected_plan_path`, and
+   `expected_plan_sha256`. Derive each value from the destination checkout and
+   the caller's own record. A call that omits a value, or that copies one from
+   the envelope under validation, is rejected before any service invocation.
+2. Prove the plan using only the independently expected repository-relative
+   path and raw-byte SHA-256 the caller supplied in `expected_plan_path` and
+   `expected_plan_sha256`. Do not rediscover, rename, or substitute a plan, and
+   do not read the plan identity from the envelope.
+3. Use `transition_prepared_orchestration` as the only authority that may
+   materialize a provider-native destination checkpoint. Dry run validates and
+   projects state without source archival or canonical-checkpoint replacement.
+4. Preserve the envelope's completed phases and reject replay before mutation.
+   Promotion, research, feature-document authoring, atomic planning, and
+   preflight remain complete when the source recorded them as complete.
+5. Keep source-provider model, reasoning, profile, topology, launch, worktree,
+   and receipt evidence opaque. Create destination routing evidence only for
+   the first new delegation after materialization.
+
+When Claude is the destination, resolve its model through the existing Claude
+model-routing procedure and launch with the existing `Agent(...)` and Claude
+worktree mechanisms. Do not translate Codex deployment receipts into Claude
+launch evidence. When Claude is the source, preserve Claude launch and
+worktree evidence in the portable source expression and allow the Codex
+destination to resolve its own topology and model. An ordinary handoff whose
+recorded transition is `atomic_execution` resumes the exact approved plan at
+that transition without invoking a parent scheduler. Any validation,
+authority, plan, replay, or materialization failure returns the deterministic
+blocked result before launch.
+
 ### Model-choice reconciliation on resume
 
 Because model selection is required once delegation occurs (see `## Model Selection`), a resuming orchestrator must repair a missing model choice deterministically before delegating at a delegating `next_step`. When the resumed `next_step` is a delegating step:

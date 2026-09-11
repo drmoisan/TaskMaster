@@ -66,7 +66,9 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop`).
    Its two radius arguments are the two items' radius hashtables, not strings, and the third
    argument is the required parsed `config/blast-radius.json` mapping, which push-down publishes
-   into the destination workspace. `conflicts(a, b, config)` in
+   into the destination workspace. That mapping's optional `mergeable_paths` list is read by
+   `Test-BlastRadiusConflict`, which contributes no `path_overlap` edge for a path matching it
+   while the path stays in the declared radius. `conflicts(a, b, config)` in
    `scripts/dev_tools/compute_blast_radius.py` (defined in
    `scripts/dev_tools/_blast_radius_conflicts.py`) remains the repository authority and the parity
    reference. Read the verdict from `$result['conflict']`; do not test the returned hashtable

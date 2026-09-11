@@ -26,6 +26,11 @@
 [CmdletBinding()]
 param()
 
+# Shared command-line parser (issue #545). Dot-sourced here as well as from the parent hook
+# so this file keeps working when a test dot-sources it directly.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 function Test-PrAuthorReceiptVerification {
     <#
     .SYNOPSIS
@@ -166,16 +171,43 @@ function Get-PrAuthorBypassReason {
         [bool] $ContextExists
     )
 
-    # Only act on gh pr create or gh pr edit subcommands.
-    $isPrCreate = $CommandText -match '(?i)\bgh\s+pr\s+create\b'
-    $isPrEdit = $CommandText -match '(?i)\bgh\s+pr\s+edit\b'
+    # Only act on gh pr create or gh pr edit subcommands. The test is structural: a segment
+    # must INVOKE gh with the subcommand path, so quoted prose that merely mentions the
+    # phrase no longer triggers the gate, and a relocating spelling that carries a gh global
+    # option between the command word and the subcommand now does.
+    $isPrCreate = Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create')
+    $isPrEdit = Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'edit')
 
     if (-not $isPrCreate -and -not $isPrEdit) {
         return $null
     }
 
-    $hasBodyFile = $CommandText -match '(?i)--body-file\b'
-    $hasInlineBody = $CommandText -match '(?i)--body(?!-file)\b'
+    # Flag presence comes from the matched segment's tokens. Exact token comparison is what
+    # keeps '--body' from matching '--body-file'; the previous negative lookahead expressed
+    # the same distinction over raw text.
+    $subcommandPath = if ($isPrCreate) { @('pr', 'create') } else { @('pr', 'edit') }
+    $hasBodyFile = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body-file'
+    $hasInlineBody = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body'
+
+    # Raw-scan fallback for a wrapper-led, live-substitution, or unbalanced segment. A
+    # wrapper's quoted argument collapses into ONE token, so both flags read absent there and
+    # the gh pr edit no-body branch below allowed bash -c "gh pr edit 42 --body 'x'". The
+    # --body-file test runs first and wins, so a --body-file carried inside a wrapper is never
+    # misread as an inline body. That ordering restores the pre-parser routing, in which one
+    # whole-text --body-file match set $hasBodyFile for exactly this input.
+    if (-not $hasBodyFile -and -not $hasInlineBody) {
+        $comparison = [System.StringComparison]::OrdinalIgnoreCase
+        foreach ($segment in @(Read-CommandLineSegment -CommandText $CommandText)) {
+            if (-not (Test-CommandLineSegmentRawScan -Segment $segment)) {
+                continue
+            }
+            if ($segment.ScanText.IndexOf('--body-file', $comparison) -ge 0) {
+                $hasBodyFile = $true
+            } elseif ($segment.ScanText.IndexOf('--body', $comparison) -ge 0) {
+                $hasInlineBody = $true
+            }
+        }
+    }
 
     # Case A: gh pr create OR gh pr edit with inline --body (not --body-file). Evaluated before the
     # gh pr edit no-body allow short-circuit so inline-body edits are blocked, not allowed.
