@@ -34,5 +34,30 @@ task ID — nothing is dangling, nothing is false; only the ORDER is wrong.
    authorized to create the issue invites a duplicate — see
    [[project_preexisting_issue_breaks_promotion_receipt]].
 
+**Recurrence, and what the EXECUTOR does when one slips through.** Plan #798 cleared four preflight
+rounds carrying an instance of exactly this: `[P9-T13]`'s acceptance conjunct read "and P9-T16 has
+recorded the pre-existing violation as the third follow-up promotion", naming an artifact three tasks
+later. So the sweep above is still not reliably run — assume at execution time that one may be
+present.
+
+The executor handling that satisfies both hard constraints is a **deferred check-off**, not a
+reorder:
+
+1. Execute the task in its plan position and do all verification the tree can support.
+2. Leave BOTH the task checkbox and any AC checkbox it gates unchecked, and say why.
+3. Continue in strict order.
+4. The moment the producing task completes, return and close the deferred one.
+
+This is not reordering — no task ran out of position — and it obeys the fail-closed rule, which
+forbids checking off before the cited artifact exists. Report it as a deviation with the reason.
+
+A second trap sits next to it: a summary task positioned BEFORE the producer (here `[P9-T15]`, the AC
+status summary) will want to assert the producer's outcome. Do not write that assertion — that is
+[[feedback_never_predict_an_observation_into_an_artifact]]. Write the summary with an explicit
+placeholder section, then append the observation after the producer runs. I violated this on #798 and
+had to rewrite the section within the same task.
+
 Related: [[project_preflight_conjunctive_criterion_citation_gap]] (the round-3 sweep this one sits
-next to), [[feedback_confirmatory_preflight_proportionate_bar]].
+next to), [[feedback_confirmatory_preflight_proportionate_bar]],
+[[project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate]] (the sibling problem at the
+plan's final commit task).

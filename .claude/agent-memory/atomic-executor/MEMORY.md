@@ -110,3 +110,11 @@
 - [FakeTimeProvider zero due time fires at creation](project_faketimeprovider_zero_duetime_fires_at_creation.md) · [BeEmpty names only the first item](project_fluentassertions_beempty_names_only_first_item.md)
 - [Reflective property read escapes a member grep](project_reflective_property_read_escapes_member_expression_grep.md)
 - [Green run prints no Failed/Skipped line](project_vstest_success_run_prints_no_failed_or_skipped_line.md) · [Preparation mode flips anchored-diff membership](project_preparation_mode_flips_anchored_diff_gate_membership.md)
+- [git grep -c with an empty pattern is the line-count oracle](project_git_grep_c_empty_is_the_allowlisted_line_count_oracle.md) - Read renders a phantom trailing line; exact-count gates hard-stop on the off-by-one
+- [Contingency fallback orphans downstream hard-coded paths](project_contingency_fallback_orphans_downstream_hardcoded_paths.md) - the citation sweep passes; only the assumed branch is wrong
+- [Stale-citation gate literal is per-comment](project_stale_citation_gate_literal_must_match_the_comments_legitimate_citations.md) - a blanket gate is unsatisfiable when the comment legitimately cites an unmoved file
+- [Revision bullet negates an earlier clause left standing](project_revision_bullet_negates_earlier_clause_left_standing.md) - read the WHOLE task
+- [TimeoutAfter IsCompleted short-circuit loses to the Task.Run race](project_timeoutafter_iscompleted_shortcircuit_loses_to_taskrun_race.md)
+- [One Cobertura filename maps to several class nodes](project_cobertura_filename_maps_to_several_class_nodes.md) - nested types repeat it; the line element doubles per node
+- [msbuild file logger double-counts every warning](project_msbuild_filelogger_double_counts_each_warning.md) - inline + summary; a whole-log count gate fails at exactly 2x
+- [Reconciliation merge already tracks the feature docs](project_orchestrator_reconciliation_merge_tracks_feature_docs.md) - an untracked-folder baseline gate is false on arrival

@@ -1,12 +1,23 @@
 ---
 name: worktree-isolation-guard-refuses-pwsh-from-bash
-description: In an isolated agent worktree the PreToolUse guard refuses every Bash invocation of pwsh (both -Command AND -File) and every command whose NAME is a quoted absolute path, so plan tasks whose only command is one of those shapes cannot run
+description: In SOME isolated agent worktrees the PreToolUse guard refuses every Bash invocation of pwsh (both -Command AND -File) and every command whose NAME is a quoted absolute path; it is session-dependent, so probe both shapes before assuming either outcome
 metadata:
   type: project
 ---
 
-In a worktree-isolated agent session (`.claude/worktrees/agent-<id>/`), the Bash guard refuses two
-distinct command shapes.
+**Probe, do not assume — the refusal is session-dependent.** On 2026-09-07 in
+`agent-af8210acca019debc` (also under `.claude/worktrees/`, also a parallel-mode item worktree) the
+guard refused NOTHING: `pwsh -NoProfile -Command 'Set-Location <abs>; ...'` and
+`pwsh -NoProfile -File <abs>.ps1` both ran, an entire 29-task plan executed on that channel, and a
+quoted absolute path passed as an ARGUMENT ran too. So the 2026-09-02 refusals below are real but are
+a property of that session's configuration, not of worktree isolation as such. A plan that encodes a
+two-rung channel probe (attempt pwsh; on refusal record the text verbatim and fall back) handles both
+worlds; a plan that hard-codes either answer is wrong half the time.
+
+The rest of this note records the 2026-09-02 refusing session, whose workarounds remain the correct
+fallback when a probe DOES come back refused.
+
+In that session the Bash guard refused two distinct command shapes.
 
 **Shape 1 — anything that invokes `pwsh`.** Refusal text: "this command runs pwsh in a plain command;
 what it reads or is handed as shell text cannot be shown not to run git. Refusing to run it".
@@ -49,8 +60,11 @@ gives the executor no way to run it, and the task has no fallback. This is not a
 preference; it is an availability fact about the sandbox the executor runs in.
 
 **How to apply:**
+- Probe first. Run one trivial `pwsh -NoProfile -Command` early (a plan's channel-determination task
+  is the natural place) and record which channel is live, rather than predicting it from this note.
 - In preflight, flag any plan task whose sole command is a `pwsh` block (either flag form) or a
-  quoted absolute executable path, and propose the verified equivalent above.
+  quoted absolute executable path AND that offers no fallback rung, and propose the verified
+  equivalent above as that fallback.
 - Do not accept "it is a different invocation shape" as evidence; run the shape and record the result.
 - Prefer POSIX forms when authoring: `wc -l` for line counts, `grep -E` for `Select-String`,
   `git grep` for token searches, PATH-prefix for Windows exes not on PATH.

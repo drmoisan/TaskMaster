@@ -100,3 +100,12 @@
 - [Pester counts commands, not lines](project_pester-line-coverage-node-appears-only-with-an-analyzable-command.md) — a line holding only an `-and` operand gets NO JaCoCo node; adding a call makes it appear covered (802->803 confirms)
 - [policy-audit-template MCP unavailable](project_policy-audit-template-mcp-unavailable-737.md) — #737: hand-author preserving the 12 canonical headings, don't mark fully BLOCKED
 - [YAML comment-only diff proof](project_yaml-comment-only-diff-proof-via-parse-tree.md) — a deeper-indented comment can fold into a plain scalar; prove via parse-tree compare, 2 parsers
+- [799-review-residuals](project_799-review-residuals.md) - PASS/0, 8/8; an escalate-if-X precondition in a spec is checkable in code; session-root pr_context belonged to a DIFFERENT cohort item
+- [ExcludeFromCodeCoverage ruling](project_excludefromcodecoverage-attribute-ruling.md) - Not Blocking: CLAUDE.md is L1; the rules Blocking clause covers config `exclude` globs, not attributes
+- [707-review-residuals](project_707-review-residuals.md) - PASS/0; executor self-caught a stale merge-base; AC9 literal-text gap disclosed; async Cobertura delta > raw diff lines
+- [730-review-residuals](project_730-review-residuals.md) - closed c2; sanitization scoped to a file list missed an earlier doc; sanitize-after-commit leaves a blob -> squash-merge
+- [pr_context artifacts are TRACKED](project_pr-context-artifacts-are-tracked-not-gitignored.md) - main carries a stale pair from another feature; derive from git, record the deviation
+- [three-dot degenerates when base is an ancestor](project_three-dot-degenerates-when-base-is-ancestor.md) - #735: after a 2nd main merge `X...HEAD` becomes `X..HEAD`; re-derive `merge-base`
+- [752-review-residuals](project_752-review-residuals.md) - 6/6 AC, 1 blocking: an executor Write-Set scope lock does not discharge the branch-level host-path obligation; re-sweep the diff yourself
+- [645-review-residuals](project_645-review-residuals.md) - 10/10 AC, 1 blocking; committed Cobertura leaks the account name 2007x via `filename=` attrs
+- [DoNotParallelize census misses lazy-init writers](project_donotparallelize-census-misses-lazy-init-writers.md) - a bare underscore-field grep finds only test writers; sibling lazy-init properties reach the production writer

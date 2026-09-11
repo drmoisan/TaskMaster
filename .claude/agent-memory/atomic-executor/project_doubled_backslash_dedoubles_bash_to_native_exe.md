@@ -52,3 +52,29 @@ path separators.
 Related: [[project_unquoted_backslash_in_bash_arg_silently_redirects_output]],
 [[project_bash_heredoc_collapses_doubled_backslashes]],
 [[project_preflight_gate_literal_extract_from_plan_not_retype]]
+
+## Corollary: it produces a FALSE PREFLIGHT DEFECT, not just a weak gate (#752 round 4)
+
+While confirming a host-path-sanitisation plan I reproduced its branch-diff sweep with a single
+`grep -iE` alternation over `git diff <mb> HEAD` whose alternatives were the account-name token,
+the worktree-parent directory-name token, the Windows user-profile prefix (written with a doubled
+backslash inside a bash DOUBLE-quoted argument), its forward-slash twin, and the POSIX
+user-profile segment. It reported **one** token-bearing file. The plan's table claimed **four**
+files at six positions. That reads exactly like a wrong plan table and was one step from being
+written up as a blocking defect. The plan was right: the Windows-prefix alternative arrived
+de-doubled, so its lone backslash was an undefined ERE escape and could not match a backslash
+separator, and the other four alternatives genuinely appear on only that one line. Re-running it
+single-quoted with `-a` and no ERE also returned 0, for the same reason. This is the *same*
+mechanism the plan itself documents as the reason the original audit under-measured its own
+sweep — so the sweep and its reviewer failed identically.
+
+**How to apply when reviewing or reproducing a host-path sweep from Bash:**
+- Do not encode a backslash-bearing token in the grep pattern argument at all. Build a patterns
+  file with one token per line via `printf` and use `grep -a -n -i -F -f pat.txt <file>`.
+  `printf` emits a warning about `\U` when the Windows-prefix token passes through it and still
+  writes the right bytes — confirm with `cat -A pat.txt` before trusting any count.
+- Cross-check with a backslash-free substring first (`grep -a -i -n 'Users'`). If the plain
+  substring finds N lines and the "precise" pattern finds fewer, the pattern is the broken thing,
+  not the tree.
+- Never report "the plan's enumeration disagrees with the tree" from a single backslash-bearing
+  grep. Confirm with two independent spellings before writing the finding.

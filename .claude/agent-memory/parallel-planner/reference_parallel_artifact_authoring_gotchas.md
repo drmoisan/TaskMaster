@@ -61,6 +61,39 @@ Also note: preparation children do NOT agree on checkpoint shape. One recorded a
 signal in `delegation_receipts.agents[]` entries with `agent_name == 'atomic-executor'`. Do not
 assume a key path when verifying a child's preflight claim — list the top-level keys first.
 
+**The preimplementation gate blocks a `.json` write to the SCRATCHPAD (verified 2026-09-07).** Only
+the five exempt orchestration-bookkeeping trees are allow-listed, and the scratchpad is not one of
+them, so `Write` of a scratchpad `.json` returns `PREIMPLEMENTATION_GATE_BLOCKED`. `.md` and
+invented extensions such as `.psx` are not gated. Build intermediate JSON in memory inside a `.psx`
+script rather than staging it as a scratchpad file.
+
+**How to discharge the over-report cost rule cheaply: build a counterfactual radius in memory.**
+When a child's radius is over-broad, construct a clean radius holding only the paths its spec's
+Write Set declares, then re-run `Test-BlastRadiusConflict` for that item against every real sibling
+radius and compare verdicts pair by pair. If every verdict is unchanged, the over-report is not
+load-bearing and a correction round buys nothing. On the `bugs-2026-09-06` run item #798 derived 97
+paths against a declared 16 and five junk contracts, and all three of its verdicts were identical
+under the clean radius, because each edge was independently determined by a `.csproj` path overlap
+and a module overlap drawn from the declared set. That measurement retired the correction round.
+
+**Two PowerShell traps when driving the port from saved radius JSON (verified 2026-09-07).** Both
+throw with no line number, so they read as library faults when they are caller faults:
+
+1. **`ConvertFrom-Json` silently coerces an ISO-8601 scalar to `[DateTime]`.** Round-tripping a
+   derived radius through JSON therefore turns `computed_at` into a DateTime, and
+   `Test-BlastRadiusConflict` throws `computed_at must be a string, got DateTime.` Coerce it back
+   with `.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')` after loading. This bites on the
+   conflict path but NOT on the derivation path, where the caller supplies the string directly.
+2. **Never key a radius lookup table on `[ordered]@{}` with integer issue numbers.** An
+   `OrderedDictionary` resolves an integer indexer POSITIONALLY, so `$radii[796]` is read as element
+   796 and throws `Specified argument was out of the range of valid values. (Parameter 'index')`.
+   Use a plain `@{}` Hashtable, which does key lookup for integer keys.
+
+Also confirmed in the same run: `Test-BlastRadiusConflict` returns a hashtable whose `conflict` key
+carries the verdict and whose `reasons` key holds hashtables with `kind` and `detail`. Expanding
+`$_.kind` and `$_.detail` gives readable output; `-join` on `reasons` prints
+`System.Collections.Hashtable`.
+
 **Running the PowerShell port.** Two separate obstacles, often confused:
 
 - `powershell` (Windows PowerShell 5.1) fails with `running scripts is disabled on this system`

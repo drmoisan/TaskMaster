@@ -45,6 +45,16 @@ maintainer instruction. Roughly 146 files in other and archived feature folders 
 prefix, and about 157 still carry the bare host name; that remainder is tracked as its own issue
 because sanitizing it inside a bug-fix child would break the child's scope lock.
 
+Issue #645 (`quickfiler-session-metrics-twelve-hour-time-format-645`): a plan that explicitly
+reasoned about *avoiding* the TRX host-name trap (choosing plain-text vstest summary lines over a
+committed TRX for exactly this reason) still committed two full Cobertura reports
+(`coverage-baseline.cobertura.xml`, `coverage-final.cobertura.xml`, ~311k lines each) whose
+per-class `filename=` attributes carry the operator's account name and absolute worktree path —
+2,007 occurrences per file, 4,014 total, found via `git grep -c "<account>" <file>`. Awareness of
+the TRX-filename trap did not generalize to the much larger Cobertura leak in the same phase;
+check every committed coverage-tool XML output for `filename=`/`source`-style absolute-path
+attributes, not just TRX headers.
+
 ## Case-sensitivity trap: sanitising a TRX clears the header but not `storage=`
 
 Sanitising a TRX with a case-SENSITIVE substitution against the mixed-case workspace root looks

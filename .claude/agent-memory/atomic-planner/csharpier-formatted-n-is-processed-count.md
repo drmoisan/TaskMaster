@@ -19,3 +19,12 @@ makes the restart condition permanently true and the toolchain loop never termin
 hashes (before/after per file) in the evidence artifact, (2) define rewritten-count as the hash-diff
 count, (3) add the explicit prohibition on using `Formatted N files`. Related:
 [[csharpier-format-not-pipe-files-gate]], [[csharpier-repowide-format-breaks-zero-diff-acs]].
+
+**The two commands print DIFFERENT verbs, and `Formatted 0 files in` is printed by neither.**
+`dotnet tool run csharpier format .` prints `Formatted N files in Xms.`; `dotnet tool run csharpier
+check .` prints `Checked N files in Xms.` (repo evidence: a clean check printed `Checked 969 files
+in 2705ms.`). N is the scanned count in both. An acceptance condition that quotes the check
+command's success-case line must therefore assert a line beginning `Checked ` and ending `ms.` — an
+assertion on `Formatted 0 files in` is unsatisfiable against either command on any tree. Caught as
+#798 R1 preflight D1 (2026-09-07), where the same unsatisfiable literal appeared in eight
+acceptance conditions.

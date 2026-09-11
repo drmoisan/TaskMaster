@@ -115,3 +115,10 @@
 - [Verify citations in the ASSIGNED worktree](verify-citations-in-the-assigned-worktree.md) — sibling worktrees diverge
 - [#647 R1–R2](project_647_fileio2_retry_plan_seams.md) — vstest needs explicit `/Settings:`; ExpectedExitCode keys on THIS RUN
 - [SubagentStop hook gotchas](validate-planner-output-hook-line-anchored-gotchas.md) — the review record must also be plain text in chat
+- [#797](project_797_folder_settings_persistence_plan_seams.md) - coverage runner TestCaseFilter hard-coded; harness private-nested; R1: unbootstrapped worktree, msbuild not on PATH, hook path regex needs a separator; R2: a generic-type logger has no closed-type attach point, ClassLevel runsettings voids exact log-event counts; R3: an admitted red baseline voids every sibling exit-0 demand
+- [#798 R1](project_798_qfc_column_timeout_plan_seams.md) - frozen write set vs an 882-line member; a declared-but-unwired seam observes 0 invocations; a paren anchor misses generic overloads
+- [#821 R1](project_821_parentcleanup_double_release_plan_seams.md) - Read over-counts by one trailing line; Select-String default case-insensitivity defeats a first-char-case swap gate; a member with an untested pre-existing catch voids a whole-member coverage gate
+- [#825 R1-R6](project_825_etl_deadline_mechanics_plan_seams.md) - a latch ArmingBarrier encodes a FIXED timer order; the Csc task line never names a project; green vstest prints no Failed/Skipped line; the runner appends a test-dll exclusion so the test dll is NOT in the denominator
+- [Self-invalidating comment citations](project_825_etl_deadline_mechanics_plan_seams.md) - a comment inserted ABOVE the line range it cites moves that range; permanent source, survives the merge
+- [Planners amend ACs, never executors](acceptance-criteria-are-amended-by-planners-not-executors.md) - plan a read-only verification task instead
+- [ExcludeFromCodeCoverage voids per-file coverage rows](excludefromcodecoverage-voids-per-file-coverage-rows.md) - no class element at all, so a hits-row demand is unsatisfiable

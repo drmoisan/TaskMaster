@@ -51,11 +51,23 @@ DIRECTORY reference and dropped, however well-formed the path is. Measured: back
 `config/blast-radius.json` key, so it cannot be corrected from the destination workspace.
 
 Missing extensions that matter here: `resx` (every WinForms resource file), `config`
-(`packages.config`, carried by every non-SDK-style .NET Framework project in the repo), and `props`
-/ `targets` (`Directory.Build.props`, `Directory.Build.targets`). This is a third fail-OPEN in the
+(`packages.config`, carried by every non-SDK-style .NET Framework project in the repo), `props`
+/ `targets` (`Directory.Build.props`, `Directory.Build.targets`), and **`html`**. This is a third fail-OPEN in the
 same family as the bare-prose and space-split cases: the plan author did everything right and the
 write is still invisible to V1, V2, and V3, because the validator extracts from the same text with
 the same allow-list and is therefore self-consistent.
+
+**`html` is the highest-consequence member of that missing set in this repository (verified
+2026-09-07, item #796).** The WebView2 breadcrumb page `QuickFiler/Resources/FolderBreadcrumb.html`
+is the shared UI surface for BOTH the drop-down open/close lifecycle work and the breadcrumb
+row-text projection work, so two items routinely edit it at once. Measured on the real plan: the
+path is backticked 7 times in the plan and once in the spec, is declared in the spec's own Write Set
+with an explicit sibling-contention note, and is **absent from the derived radius**. A direct probe
+settles the mechanism — over one input string, `Get-PlanPaths` emitted
+`QuickFiler/Resources/FolderBreadcrumb.js` and `QuickFiler/Viewers/ItemViewer.Breadcrumb.cs` and
+dropped `QuickFiler/Resources/FolderBreadcrumb.html`. V1, V2 and V3 all returned ZERO findings with
+the path missing, which is the self-consistency trap: the validator extracts from the same text
+through the same allow list. Always hand-append this page when an item's Write Set declares it.
 
 **The extractor has no notion of POLARITY.** A backticked path in a sentence saying the plan will
 NOT touch it is harvested exactly like one saying it will. See

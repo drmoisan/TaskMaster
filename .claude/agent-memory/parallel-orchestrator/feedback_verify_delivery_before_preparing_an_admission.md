@@ -186,6 +186,30 @@ flags no deliverable. Where the audit's OTHER residuals were promoted to real is
 the SetupDisposal coverage debt), those promoted issues are the admissible items — judge each on its
 own merits, per [[promote-latent-defects-to-issues]].
 
+**A CONSOLIDATION issue inverts the closed-issue signal, and the tell is `stateReason`.** The fourth
+mechanism above uses a CLOSED candidate to reject an admission. The mirror case admits one. Observed
+2026-09-07 on `/parallel-add 812`: the candidate was a brand-new issue consolidating two review
+residuals, and both CONSTITUENT issues were already CLOSED — which reads like delivery until you read
+why. Both carried `stateReason NOT_PLANNED` and an identical comment: "Consolidated into the new
+issue (maintainer decision: batch review residuals by blast radius). All acceptance criteria from
+this issue are carried forward; this issue is closed as superseded, not as fixed." So
+`gh issue view <N> --json state,stateReason` earns its place in the first call twice over: `COMPLETED`
+settles a rejection, and `NOT_PLANNED` on a CONSTITUENT is not evidence of anything and demands the
+guard-site read. Expect this shape whenever a candidate's title carries several trailing issue
+numbers, which is this repository's consolidation naming convention.
+
+**Two structural facts specific to a consolidation candidate, both of which change the delegation.**
+First, the issue ALREADY EXISTS, so the potential-entry-to-issue promotion step must be skipped
+outright — it always files a new issue — and the child is told to perform the folder-creation half
+of the lifecycle only, recording the pre-existing issue truthfully in its promotion receipt, per
+[[promote-latent-defects-to-issues]]. Second, the source potential entry may be UNTRACKED in the
+session worktree, so it does not exist on `main` and is therefore invisible inside the child's own
+isolated worktree. Check with `git ls-files --error-unmatch <path>` before delegating; when it is
+untracked, hand the child the absolute session-worktree path as an explicit read-only one-file
+exception and have it author the promoted record inside its own worktree. A sibling consolidation
+branch showed the intended end state — a commit reading "restore promoted record and seed the active
+bug folder" — which is the cheapest way to learn the expected shape.
+
 **How to apply:** Make the pre-check the first step of the add, before the `proposed` entry and
 before the preparation delegation. When it shows the work is delivered — or that the defect does not
 reproduce, or that it produces no diff against main — REJECT the admission rather than preparing it: the skill's own constraint already covers this outcome — "a failed preparation

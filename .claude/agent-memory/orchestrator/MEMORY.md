@@ -122,3 +122,11 @@
 ## Repo layout
 - [VS Code extension location](project_extension_location.md) · [Verify package.json before vsce work](feedback_vsce_verify_package_location.md) · [Repo root is source of truth for the codex bundle](feedback_repo_root_is_source_of_truth.md)
 - [CLAUDE.md nullable command != CI gate — RESOLVED by #540](project_claudemd_nullable_command_diverges_from_ci.md)
+- [System.IO relative paths escape the worktree](system-io-relative-paths-escape-the-worktree.md) - Set-Location does NOT move Environment.CurrentDirectory; bit 3x in one run, incl. a write into another worktree
+- [new_active_feature_folder receipt under-reports artifacts](new-active-feature-folder-receipt-underreports-artifacts.md) - it scaffolds spec.md + plan.<ts>.md too; not a peer agent, and that plan file IS your canonical plan-path
+- [prd-feature STOP hooks are work-mode-blind](prd-feature-stop-hooks-are-workmode-blind.md) - demands an existing user-story.md on a full-bug, and any digit in an AC forces 11 exact labels into the RESEARCH file
+- [task-researcher filename regex is strict](task-researcher-filename-regex-is-strict.md) - the name must be <ts>-<slug>-research.md or SubagentStop blocks; the orchestrator suggested name can trap it
+- [#751: 5-round preflight for novel infra](project_issue_751_five_round_preflight_detached_launch_convention.md) - budget more rounds when a plan invents execution infra
+- [A delegate may have no Bash tool](delegate-may-lack-bash-tool-verify-its-git-claims.md) - it cannot verify its own git claims; check them yourself
+- [Coverage seam workaround for .claude worktrees](coverage-seam-workaround-for-claude-worktrees.md) - dot-source TWO files, explicit -TestAssembly
+- [isolation worktree spawn param kills the toolchain](isolation-worktree-spawn-param-kills-toolchain.md) - pwsh refused; isolation-dependent, NOT agent-type dependent
