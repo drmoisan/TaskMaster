@@ -16,8 +16,13 @@ $script:AllowedPreparationMcpTools = @(
     'mcp__drm-copilot__potential_to_issue',
     'mcp__drm-copilot__new_active_feature_folder',
     'mcp__drm-copilot__resolve_atomic_plan_prompt',
-    'mcp__drm-copilot__resolve_execute_hard_lock_prompt',
-    'mcp__drm-copilot__validate_orchestration_artifacts'
+    'mcp__drm-copilot__resolve_execute_hard_lock_prompt'
+)
+$script:PreparationSemanticMcpIds = @(
+    'drm-copilot.validate_orchestration_artifacts',
+    'drm-copilot.resolve_orchestration_topology',
+    'drm-copilot.resolve_provider_routing',
+    'drm-copilot.transition_prepared_orchestration'
 )
 
 function ConvertFrom-EpicPlanningJson {
@@ -40,6 +45,47 @@ function ConvertFrom-EpicPlanningJson {
         throw "EPIC_PLANNING_ONLY_BLOCKED: $Name is malformed JSON: $_"
     }
 }
+
+function Get-EpicPlanningRegisteredMcpTool {
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory)][string] $RegistryPath,
+        [Parameter(Mandatory)][string[]] $SemanticIds
+    )
+
+    if (-not (Test-Path -LiteralPath $RegistryPath -PathType Leaf)) {
+        throw "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP registry '$RegistryPath' does not exist."
+    }
+    $registry = ConvertFrom-EpicPlanningJson `
+        -Raw (Get-Content -Raw -LiteralPath $RegistryPath) `
+        -Name 'semantic MCP registry'
+    $registered = [System.Collections.Generic.List[string]]::new()
+    foreach ($semanticId in $SemanticIds) {
+        $property = $registry.semantic_tools.PSObject.Properties[$semanticId]
+        if ($null -eq $property) {
+            throw "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP id '$semanticId' is not registered."
+        }
+        $entry = $property.Value
+        $operation = $semanticId.Substring($semanticId.LastIndexOf('.') + 1)
+        if ([string]$entry.operation -ne $operation) {
+            throw "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP id '$semanticId' has an invalid operation."
+        }
+        foreach ($alias in @($entry.transport_aliases)) {
+            $escapedOperation = [regex]::Escape($operation)
+            if ([string]$alias -notmatch "^mcp__(?:drm-copilot|drm_copilot)__$escapedOperation`$") {
+                throw "EPIC_PLANNING_ONLY_BLOCKED: semantic MCP id '$semanticId' has an invalid transport alias."
+            }
+            $registered.Add([string]$alias)
+        }
+    }
+    return [string[]]($registered | Sort-Object -Unique)
+}
+
+$script:EpicPlanningRepositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$script:AllowedPreparationSemanticMcpTools = @(Get-EpicPlanningRegisteredMcpTool `
+        -RegistryPath (Join-Path $script:EpicPlanningRepositoryRoot 'config/orchestration-handoff-registry.json') `
+        -SemanticIds $script:PreparationSemanticMcpIds)
 
 function Get-EpicPlanningDenyDecision {
     [CmdletBinding()]
@@ -223,11 +269,9 @@ function Invoke-EpicPlanningOnlyDecision {
         return Get-EpicPlanningDenyDecision -Reason 'the Bash command is outside the preparation read, branch, commit, push, or validator allowlist.'
     }
 
-    if ($toolName -like 'mcp__*' -and $toolName -notlike 'mcp__drm-copilot__*') {
-        return Get-EpicPlanningDenyDecision -Reason "MCP tool '$toolName' is not part of the repository-scoped preparation surface."
-    }
-
-    if ($toolName -like 'mcp__drm-copilot__*') {
+    $allowedRepositoryMcp = $script:AllowedPreparationMcpTools -contains $toolName
+    $allowedSemanticMcp = $script:AllowedPreparationSemanticMcpTools -contains $toolName
+    if ($allowedRepositoryMcp -or $allowedSemanticMcp) {
         if ($attestedPreparation) {
             $workspaceRoot = [string]$payload.tool_input.workspace_root
             if ([string]::IsNullOrWhiteSpace($workspaceRoot) -or
@@ -236,10 +280,11 @@ function Invoke-EpicPlanningOnlyDecision {
                 return Get-EpicPlanningDenyDecision -Reason 'preparation MCP calls require workspace_root equal to the attested session cwd.'
             }
         }
-        if ($script:AllowedPreparationMcpTools -contains $toolName) {
-            return $null
-        }
-        return Get-EpicPlanningDenyDecision -Reason "MCP tool '$toolName' is outside the preparation lifecycle and validator allowlist."
+        return $null
+    }
+
+    if ($toolName -like 'mcp__*') {
+        return Get-EpicPlanningDenyDecision -Reason "MCP tool '$toolName' is outside the registered preparation lifecycle and semantic allowlist."
     }
 
     return Get-EpicPlanningDenyDecision -Reason "tool '$toolName' is not classified for preparation mode."
@@ -273,7 +318,7 @@ if ($MyInvocation.InvocationName -eq '.') {
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    $repositoryRoot = $script:EpicPlanningRepositoryRoot
     $checkpointPath = Join-Path $repositoryRoot 'artifacts/orchestration/orchestrator-state.json'
     $checkpointRaw = if (Test-Path -LiteralPath $checkpointPath -PathType Leaf) {
         Get-Content -Raw -LiteralPath $checkpointPath

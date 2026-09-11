@@ -5,6 +5,12 @@
 [CmdletBinding()]
 param()
 
+# Shared command-line parser (issue #545). The scope filter and the PR-number resolver below
+# both run against the segment that structurally invokes `gh pr merge`, which is what keeps
+# the two runtimes on one implementation of the same concern.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+
 function ConvertFrom-CodexMergeJson {
     [CmdletBinding()]
     param([AllowNull()][AllowEmptyString()][string] $Raw, [Parameter(Mandatory)][string] $Name, [switch] $Optional)
@@ -26,13 +32,37 @@ function ConvertFrom-CodexMergeJson {
 }
 
 function Get-CodexMergeCommandPrNumber {
+    <#
+    .SYNOPSIS
+        Resolve the explicit pull-request number of a gh pr merge invocation, or $null.
+    .DESCRIPTION
+        The number is taken from the segment that structurally invokes `gh pr merge` and
+        from nowhere else: the positional spelling through Get-CommandLineOperand, the
+        flag-led and equals-joined spellings through Get-CommandLineFlagValue. A leading
+        `cd <path>` segment contributes no operand and no flag value, so no digit run
+        outside the merge segment can be mistaken for a pull-request number.
+
+        This copy has never carried the Claude copy's unanchored whole-text digit scan and
+        deliberately does not acquire one. No regular expression matching a bare digit run
+        is introduced here; the only pattern below anchors an all-digit token end to end.
+    .OUTPUTS
+        System.Nullable[int]
+    #>
     [CmdletBinding()]
     [OutputType([int])]
     param([Parameter(Mandatory)][string] $Command)
 
-    if ($Command -match '(?i)\bgh\s+pr\s+merge\s+(\d+)\b') {
-        return [int]$Matches[1]
+    foreach ($operand in @(Get-CommandLineOperand -CommandText $Command -CommandWord 'gh' -SubcommandPath @('pr', 'merge'))) {
+        if ($operand -match '^\d+$') {
+            return [int]$operand
+        }
     }
+
+    $flagValue = Get-CommandLineFlagValue -CommandText $Command -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if ($null -ne $flagValue -and $flagValue -match '^\d+$') {
+        return [int]$flagValue
+    }
+
     return $null
 }
 
@@ -95,7 +125,23 @@ function Invoke-CodexEpicMergeDecision {
         return $null
     }
     $command = [string]$payload.tool_input.command
-    if ($command -notmatch '(?i)\bgh\s+pr\s+merge\b' -or $command -notmatch '(?i)--merge\b') {
+    # Both legs are read structurally from the segment that invokes the command, so a
+    # quoted mention of the phrase no longer brings a command into scope. The flag leg needs
+    # a raw-scan fallback: a wrapper's quoted argument collapses into ONE token, so a flag
+    # inside it is never read as a token, and the token-only read took
+    # bash -c "gh pr merge --merge 688" out of scope.
+    $isMergeInvocation = Test-CommandLineInvocation -CommandText $command -CommandWord 'gh' -SubcommandPath @('pr', 'merge')
+    $hasMergeFlag = Test-CommandLineFlag -CommandText $command -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
+    if (-not $hasMergeFlag) {
+        foreach ($segment in @(Read-CommandLineSegment -CommandText $command)) {
+            if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
+                $segment.ScanText.IndexOf('--merge', [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                $hasMergeFlag = $true
+                break
+            }
+        }
+    }
+    if (-not $isMergeInvocation -or -not $hasMergeFlag) {
         return $null
     }
 
