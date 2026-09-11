@@ -6,10 +6,11 @@
     Destination-runtime PowerShell facade for the blast-radius library, porting
     scripts/dev_tools/compute_blast_radius.py (derive_blast_radius,
     radius_from_observed_paths, _feature_folder_glob) and
-    scripts/dev_tools/_blast_radius_conflicts.py (conflicts,
-    _smallest_path_overlap, _smallest_common). It imports the extraction, glob,
-    truth-table, and validation modules that sit beside it and re-exports the
-    five functions the spec PowerShell surface fixes:
+    scripts/dev_tools/_blast_radius_conflicts.py (conflicts). The ports of
+    _smallest_path_overlap and _smallest_common, and the mechanically-mergeable
+    path exclusion, live in BlastRadiusConflict.psm1. It imports the extraction,
+    glob, truth-table, conflict, and validation modules that sit beside it and
+    re-exports the five functions the spec PowerShell surface fixes:
 
       - Get-PlanPaths                     port of extract_plan_paths
       - Get-BlastRadius                   port of derive_blast_radius
@@ -58,6 +59,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusNormalization.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm1') -Force -ErrorAction Stop
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
 # caller may pass either a bare folder name or an already-qualified path.
@@ -80,10 +82,6 @@ $script:ConflictPathOverlap = 'path_overlap'
 $script:ConflictModuleOverlap = 'module_overlap'
 $script:ConflictSharedSurfaceOverlap = 'shared_surface_overlap'
 $script:ConflictContractDependency = 'contract_dependency'
-
-# Separator used in an overlapping-pair detail string. The pair is ordered
-# ordinally before formatting so the detail is identical in both argument orders.
-$script:PairDetailSeparator = ' ~ '
 
 
 # Port of _feature_folder_glob. Accepting an already-qualified path avoids
@@ -341,68 +339,6 @@ function Get-BlastRadiusFromObservedPaths {
     }
 }
 
-# Port of _smallest_path_overlap. Each overlapping pair is ordered before it is
-# recorded, so the minimum is taken over a set that does not depend on argument
-# order; that is what makes the reported detail symmetric.
-function Get-SmallestPathOverlap {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $PathA,
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $PathB
-    )
-
-    $detail = [System.Collections.Generic.List[string]]::new()
-    foreach ($entryA in $PathA) {
-        foreach ($entryB in $PathB) {
-            if (-not (Test-EntryOverlap -EntryA $entryA -EntryB $entryB)) {
-                continue
-            }
-            $ordered = if ([string]::CompareOrdinal($entryA, $entryB) -le 0) {
-                @($entryA, $entryB)
-            } else {
-                @($entryB, $entryA)
-            }
-            $detail.Add($ordered -join $script:PairDetailSeparator)
-        }
-    }
-
-    return (Get-OrdinalSmallestEntry -Entry $detail.ToArray())
-}
-
-# Port of _smallest_common. Two empty collections share nothing, so the result is
-# $null and the level contributes no reason.
-function Get-SmallestCommonEntry {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $Left,
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $Right
-    )
-
-    $rightSet = [System.Collections.Generic.HashSet[string]]::new($Right, [StringComparer]::Ordinal)
-    $common = [System.Collections.Generic.List[string]]::new()
-    foreach ($entry in $Left) {
-        if ($rightSet.Contains($entry)) {
-            $common.Add($entry)
-        }
-    }
-
-    return (Get-OrdinalSmallestEntry -Entry $common.ToArray())
-}
-
 function Test-BlastRadiusConflict {
     <#
     .SYNOPSIS
@@ -423,9 +359,10 @@ function Test-BlastRadiusConflict {
         Second radius record.
 
     .PARAMETER Config
-        Parsed config/blast-radius.json. The relation reads no key from it today;
-        it is validated and kept in the signature because the contract is frozen
-        for downstream consumers.
+        Parsed config/blast-radius.json. The relation reads exactly one key from
+        it, mergeable_paths, whose entries are dropped from both radii before the
+        path comparison; the mapping is otherwise validated and kept in the
+        signature because the contract is frozen for downstream consumers.
 
     .OUTPUTS
         System.Collections.Hashtable. Keys conflict (a boolean) and reasons (an
@@ -461,8 +398,14 @@ function Test-BlastRadiusConflict {
     $right = ConvertTo-NormalizedBlastRadius -Radius $RadiusB
 
     $reason = [System.Collections.Generic.List[hashtable]]::new()
-    $pathDetail = Get-SmallestPathOverlap -PathA ([string[]]@($left['paths'])) `
-        -PathB ([string[]]@($right['paths']))
+    # The mechanically-mergeable exclusion lives only here: it filters the two
+    # collections this comparison reads and rewrites no radius record, so a
+    # derived, declared, or observed radius still lists every project file it
+    # cited (issue #643).
+    $mergeable = [string[]]@(Get-ConfigMergeablePath -Config $Config)
+    $pathDetail = Get-SmallestPathOverlap `
+        -PathA ([string[]]@(Get-NonMergeablePathEntry -Entry ([string[]]@($left['paths'])) -MergeablePath $mergeable)) `
+        -PathB ([string[]]@(Get-NonMergeablePathEntry -Entry ([string[]]@($right['paths'])) -MergeablePath $mergeable))
     if ($null -ne $pathDetail) {
         $reason.Add(@{ kind = $script:ConflictPathOverlap; detail = $pathDetail })
     }

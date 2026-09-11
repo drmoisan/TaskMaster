@@ -30,8 +30,21 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+# Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
+# Invoke-ParallelWorktreeRemovalGateDecision. Same module the epic gate imports.
+Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force
+# Shared command-line parser (issue #545), consumed by the scope filter in
+# Invoke-ParallelWorktreeRemovalGateDecision and by Get-ParallelWorktreeRemovalCommandPath.
+# Both call sites are byte-for-byte the calls the epic gate makes, so the duplicated
+# concern now has one implementation.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 $script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
+# Sanctioned-removal manifest location. Recorded here beside the checkpoint path so
+# every hook-read document this gate consults is named in one place; the module owns
+# the read itself.
+$script:CleanupWorktreeManifestPath = 'artifacts/orchestration/cleanup-worktrees-manifest.json'
 
 function Get-ParallelWorktreeRemovalGateCheckpointContent {
     <#
@@ -55,6 +68,24 @@ function Get-ParallelWorktreeRemovalCommandPath {
     <#
     .SYNOPSIS
         Extract the target worktree path argument from a git worktree remove command.
+    .DESCRIPTION
+        The operand comes from the segment that structurally invokes git worktree remove,
+        so a 'cd <path> &&' segment chained before the removal contributes nothing and a
+        quoted mention of the phrase resolves to no operand at all. Quotes around the path
+        are already stripped by the tokenizer.
+
+        '--force' is a zero-argument flag, so it never contributes an operand and may be
+        written on either side of the target path. Its presence is read structurally through
+        Test-CommandLineFlag rather than by searching the raw text, so a '--force' spelling
+        that appears inside an unrelated quoted argument cannot change how the operand list
+        is read. When no operand resolves, a present '--force' is reported in its place, so
+        the checkpoint lookup fails closed on a value that matches no recorded worktree_path
+        - the same value the previous raw-text pattern returned for that input.
+
+        This body is identical to Get-EpicWorktreeRemovalCommandPath in
+        enforce-epic-worktree-removal-gate.ps1. The two gates fire on the same command and
+        now delegate the shared concern to one parser rather than to two patterns that had
+        already diverged from the Codex copy.
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .OUTPUTS
@@ -67,8 +98,14 @@ function Get-ParallelWorktreeRemovalCommandPath {
         [string] $CommandText
     )
 
-    if ($CommandText -match '(?i)\bgit\s+worktree\s+remove\s+(?<path>\S+)') {
-        return $Matches['path'].Trim('"''')
+    $hasForce = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove') -FlagName '--force'
+    $operands = @(Get-CommandLineOperand -CommandText $CommandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))
+
+    if ($operands.Count -gt 0) {
+        return $operands[0]
+    }
+    if ($hasForce) {
+        return '--force'
     }
     return $null
 }
@@ -203,7 +240,10 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
         return Get-ParallelWorktreeGateAllowDecision
     }
 
-    if ($commandText -notmatch '(?i)\bgit\s+worktree\s+remove\b') {
+    # Scope filter. The test is structural, so a relocating spelling such as
+    # 'git -C <dir> worktree remove <path>' is now in scope and quoted prose that merely
+    # mentions the phrase is not (issue #545). This is the same call the epic gate makes.
+    if (-not (Test-CommandLineInvocation -CommandText $commandText -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))) {
         return Get-ParallelWorktreeGateAllowDecision
     }
 
@@ -221,6 +261,21 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
 
     $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $itemRecord) {
+        return Get-ParallelWorktreeGateAllowDecision
+    }
+
+    # Sanctioned-removal manifest branch (issue #635). It runs last, so a
+    # checkpoint-authorized removal still allows at the same decision point it does
+    # today and no transcript attribution changes.
+    #
+    # The coverage test is a PRESENCE test, deliberately not an authorization test. A
+    # target this checkpoint records at all is excluded from this branch regardless of
+    # that record's merge_status, so a removal the checkpoint does not authorize still
+    # reaches the unchanged deny below. This gate defines only the parallel checkpoint
+    # seam and has no epic-checkpoint seam, so its exclusion covers the items array
+    # only; the epic gate covers the features array with its own exclusion.
+    if (-not (Test-CleanupManifestCheckpointCoversPath -Checkpoint $checkpoint -RecordArrayName 'items' -WorktreePath $worktreePath) -and
+        (Test-CleanupWorktreeManifestAuthorizesRemoval -WorktreePath $worktreePath)) {
         return Get-ParallelWorktreeGateAllowDecision
     }
 
