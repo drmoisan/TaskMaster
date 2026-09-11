@@ -1,6 +1,6 @@
 ---
 name: msbuild-task-csc-literal-needs-detailed-verbosity
-description: The literal `Task "Csc"` that proves CoreCompile ran is emitted only at MSBuild detailed verbosity, so a non-vacuity gate asserting it over a default-verbosity console run cannot pass
+description: The literal `Task "Csc"` needs detailed verbosity AND can never be attributed to a named project on one line — use the echoed `/out:obj\Debug\<Assembly>.dll` csc command line instead
 metadata:
   type: feedback
 ---
@@ -25,5 +25,17 @@ Pair the literal count with a second, cheap observation that is independent of v
 `LastWriteTimeUtc` of the affected project's output assembly must advance across the command. Either
 observation alone proves compilation ran; together they survive a change in MSBuild's message text.
 
+**Prefer the echoed csc command line outright, and NEVER try to attribute `Task "Csc"` to a named
+project.** MSBuild prefixes a task-started line with the project INSTANCE ID, never with the project
+path, so a count of lines carrying both `Task "Csc"` and `UtilitiesCS.csproj` is zero at every
+verbosity — a gate on that pair can never pass. MSBuild echoes the full csc.exe command line under
+each project's `CoreCompile` heading at NORMAL verbosity, and that single line carries
+`/out:obj\Debug\<Assembly>.dll`, which names both the compiler invocation and the assembly it
+produced. Confirmed against the committed normal-verbosity log
+`docs/features/active/2026-08-26-qfc-unsynchronized-undo-handoff-after-batch-move-633/evidence/qa-gates/p7-t4-analyze.msbuild.txt`
+line 932 (`/out:obj\Debug\VBFunctions.dll`); that same log carries zero `Task "Csc"` lines. Caught as
+#825 R4 defect D-19 (2026-09-09).
+
 Related: [[project-512-toolchain-gate-fidelity-plan-seams]],
-[[project-663-qfc-alt-chord-plan-seams]].
+[[project-663-qfc-alt-chord-plan-seams]],
+[[project_825_etl_deadline_mechanics_plan_seams]].

@@ -34,3 +34,23 @@ not be modified: keep those citations unbackticked. Add a one-line note in the n
 explaining that the paths there are deliberately unbackticked, so a later editor does not "fix" the
 formatting and corrupt the footprint. Related: [[full-bug-spec-only]],
 [[ac-gates-verify-satisfiability]].
+
+**The verbatim-AC block is an unavoidable exception (seen on #797, 2026-09-06).** The strictest form
+collides with the "copy acceptance criteria verbatim" rule whenever the maintainer wrote inline code
+spans into the AC text. On #797 the criteria carried `StoresWrapper.json`,
+`%LocalAppData%\TaskMaster\StoresWrapper.json`, `SmartSerializable<T>.Serialize()` and `\\` — tokens
+that trip both the backtick sweep and the "no percent sign / no angle brackets" placeholder rule.
+Verbatim reproduction wins: keep the spans, and add a sentence to the top blockquote naming the AC
+block as the sole exception and classifying each span as a runtime value or a C# member name rather
+than a repository path. Do not paraphrase the criteria to dodge the sweep, and do not strip their
+backticks. Expect the audit grep to return exactly (Write Set paths + AC lines containing spans).
+
+**The seeded spec template is itself a source of false write claims (seen on #798, 2026-09-07).**
+The promotion scaffold copies `issue.md` prose into Context / Repro & Evidence, and that prose
+arrives with backticks already around paths that are *not* write claims: the debug-log path under
+the add-in bin directory, and any `issue.md` / skill-path reference the header adds. Strip those on
+the first pass — they are inside the template, so they are easy to read past. Fenced code blocks
+(stack traces, log excerpts) are safe and can keep their paths: an inline-code-span regex does not
+match inside a triple-backtick fence. Bare tokens such as `` `.cs` ``, `` `/t:Rebuild` `` and
+`` `File.cs:123` `` example strings also trip a path harvester; write them as prose. The mandated
+CLAUDE.md msbuild/vstest command strings are safe because they contain spaces.
