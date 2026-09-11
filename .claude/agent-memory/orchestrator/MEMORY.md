@@ -130,3 +130,8 @@
 - [A delegate may have no Bash tool](delegate-may-lack-bash-tool-verify-its-git-claims.md) - it cannot verify its own git claims; check them yourself
 - [Coverage seam workaround for .claude worktrees](coverage-seam-workaround-for-claude-worktrees.md) - dot-source TWO files, explicit -TestAssembly
 - [isolation worktree spawn param kills the toolchain](isolation-worktree-spawn-param-kills-toolchain.md) - pwsh refused; isolation-dependent, NOT agent-type dependent
+- [An analyzer control site can be UNCOMPILED](analyzer-control-site-can-be-uncompiled-not-just-commented.md) - legacy csproj have explicit Compile items, no wildcard; verify live code AND a Compile Include entry
+- [Don't elect reviewer-declined optional changes](do-not-elect-reviewer-declined-optional-changes.md) - the substitute value was itself a defect; cost 2 rounds. Bar additive edits to keep a delta narrow
+- [Byte-exact copy via git plumbing](byte-exact-copy-via-git-plumbing.md) - `hash-object -w` plus `cat-file blob >`; a SHA compare proves identity and keeps LF
+- [An imported checkpoint's recorded pass is not evidence](imported-checkpoint-recorded-pass-is-not-evidence.md) - a predecessor's `model_routing_preflight: pass` re-validated as 22 errors
+- [Self-anchor the diff base in epic children](self-anchor-the-diff-base-in-epic-children.md) - a base fixed by the parent degenerates once a sibling merges; derive it in the child at P0

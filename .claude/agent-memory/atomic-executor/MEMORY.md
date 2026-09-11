@@ -118,3 +118,5 @@
 - [One Cobertura filename maps to several class nodes](project_cobertura_filename_maps_to_several_class_nodes.md) - nested types repeat it; the line element doubles per node
 - [msbuild file logger double-counts every warning](project_msbuild_filelogger_double_counts_each_warning.md) - inline + summary; a whole-log count gate fails at exactly 2x
 - [Reconciliation merge already tracks the feature docs](project_orchestrator_reconciliation_merge_tracks_feature_docs.md) - an untracked-folder baseline gate is false on arrival
+- [Round-over-round plan diff is unavailable](project_preflight_round_over_round_diff_unavailable.md) - the plan's only commit predates every round; substitute a full re-read and say so
+- [Flaky-test carve-out added to one task only](project_flaky_test_carveout_added_to_one_task_only.md) - siblings running the same suite keep the stop rule; the row may be stranded

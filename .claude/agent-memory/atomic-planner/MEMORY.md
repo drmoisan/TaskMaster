@@ -122,3 +122,7 @@
 - [Self-invalidating comment citations](project_825_etl_deadline_mechanics_plan_seams.md) - a comment inserted ABOVE the line range it cites moves that range; permanent source, survives the merge
 - [Planners amend ACs, never executors](acceptance-criteria-are-amended-by-planners-not-executors.md) - plan a read-only verification task instead
 - [ExcludeFromCodeCoverage voids per-file coverage rows](excludefromcodecoverage-voids-per-file-coverage-rows.md) - no class element at all, so a hits-row demand is unsatisfiable
+- [#826 R2-R5](project_826_console_out_banned_symbol_plan_seams.md) - `0 Error(s)` is a substring of `10 Error(s)`; a file-NAME control certifies a void channel; an UNCOMPILED control emits nothing; "this revision pass" is unresolvable
+- [#824 R1-R5](project_824_ilglobals_static_publication_plan_seams.md) - gate the installer's own FS marker, not `dotnet --list-sdks`; a "move" task must state its deletion; `--amend` amends the PRECEDING task's commit; CS8618 is a warning under plain `/t:Build`; a later `using` shifts frozen line bounds; sort TRX by `LastWriteTime`
+- [#823](project_823_self_anchor_diff_base_seams.md) - a fixed anchor degenerates; self-anchor at P0. R1: a check-off task must complete with its AC unmet. R2: never key `ExpectedExitCode` to a baseline count
+- [Absence gates must target the carrying file](absence-gate-must-target-the-file-that-carries-it.md) - a sibling file's phrasing differs; baseline every token and halt on a 0 count
