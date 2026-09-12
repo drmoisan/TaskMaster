@@ -52,8 +52,8 @@ features:
   - issue_num: 454
     feature_folder: 2026-08-07-quickfiler-collection-controller-coverage-454
     depends_on: [432]
-  - issue_num: 1012
-    feature_folder: quickfiler-breadcrumb-bridge-coverage
+  - issue_num: 495
+    feature_folder: 2026-08-08-quickfiler-breadcrumb-bridge-coverage-495
     depends_on: [432]
   - issue_num: 455
     feature_folder: 2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455
@@ -77,7 +77,7 @@ features:
       - 1009
       - 1010
       - 454
-      - 1012
+      - 495
       - 455
       - 1014
       - 1015
