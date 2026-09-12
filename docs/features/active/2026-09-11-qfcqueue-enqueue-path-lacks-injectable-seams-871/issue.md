@@ -1,10 +1,15 @@
-# qfcqueue-enqueue-path-lacks-injectable-seams (Potential Bug)
+# qfcqueue-enqueue-path-lacks-injectable-seams (Issue #871)
 
 - Date captured: 2026-09-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/qfcqueue-enqueue-path-lacks-injectable-seams/ (Issue #871)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
+
+- Issue: #871
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/871
+- Last Updated: 2026-09-12
+- Work Mode: full-bug
 
 ## Summary
 
