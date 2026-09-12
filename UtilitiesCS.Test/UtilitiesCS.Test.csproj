@@ -565,7 +565,7 @@
       <HintPath>..\packages\FluentAssertions.8.10.0\lib\net47\FluentAssertions.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.1\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=3.3.2.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.3.3.2\lib\net462\log4net.dll</HintPath>
@@ -644,7 +644,7 @@
       <HintPath>..\packages\Microsoft.Extensions.TimeProvider.Testing.10.8.0\lib\net462\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Graph, Version=6.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.6.2.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Graph.6.2.0\lib\netstandard2.1\Microsoft.Graph.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Graph.Core, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Graph.Core.4.0.1\lib\net462\Microsoft.Graph.Core.dll</HintPath>
@@ -686,25 +686,25 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Kiota.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Kiota.Abstractions.2.0.0\lib\netstandard2.1\Microsoft.Kiota.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.2.0.0\lib\netstandard2.1\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.2.0.0\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kiota.Serialization.Form, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.2.0.0\lib\netstandard2.1\Microsoft.Kiota.Serialization.Form.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kiota.Serialization.Json, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.2.0.0\lib\netstandard2.1\Microsoft.Kiota.Serialization.Json.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.2.0.0\lib\netstandard2.1\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kiota.Serialization.Text, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Text.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.2.0.0\lib\netstandard2.1\Microsoft.Kiota.Serialization.Text.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ML.DataView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ML.DataView.5.0.0\lib\netstandard2.0\Microsoft.ML.DataView.dll</HintPath>
@@ -863,7 +863,7 @@
       <HintPath>..\packages\System.Reactive.7.0.0\lib\net472\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.Async.6.0.0-alpha.18\lib\netstandard2.0\System.Reactive.Async.dll</HintPath>
+      <HintPath>..\packages\System.Reactive.Async.6.0.0-alpha.18\lib\netstandard2.1\System.Reactive.Async.dll</HintPath>
     </Reference>
     <Reference Include="System.Reflection.Metadata, Version=10.0.0.10, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.Metadata.10.0.10\lib\net462\System.Reflection.Metadata.dll</HintPath>
