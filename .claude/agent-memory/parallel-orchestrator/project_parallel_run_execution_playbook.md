@@ -232,3 +232,25 @@ present were never ported. Discovering each gap mid-run costs a stall.
   - Re-confirm the check conclusion against the head that exists AFTER the update-branch. The
     pre-update green is evidence about a commit that is no longer the head, which is the same
     final-head requirement recorded in [[confirm-ci-by-conclusion-not-watch-exit-code]].
+- **Closing a run LATER means first finding its session worktree.** The checkpoint is gitignored and
+  lives in the cwd of the session that drove the run, not in the primary checkout, so
+  `TaskMaster/artifacts/orchestration/parallel-orchestrator-state.json` is simply ABSENT for any run
+  driven from a `TaskMaster-wt/<stamp>` worktree. Do not read that absence as "no such run". Locate it
+  with `find <repos-root> -maxdepth 6 -name parallel-orchestrator-state.json`, then read
+  `parallel_slug` out of each hit to pick the right one — several runs each keep their own copy, and
+  the filename is identical in all of them. On `bugs-2026-09-02` the file was in
+  `TaskMaster-wt/2026-09-02T08-47`. Run every close operation, including the MCP validation, with
+  `workspace_root` pointed at THAT worktree.
+  - The plan-home branch may be gone by then and the run docs merged to `main`, so
+    `docs/features/parallel/<slug>/parallel-status.md` is regenerated in the PRIMARY checkout even
+    though the checkpoint is not there. The two artifacts legitimately live in different trees at
+    close time; do not try to co-locate them.
+- **A `merged` item whose worktree vanished out of band stays `merged`; do not rewrite it to
+  `worktree_removed`.** Cache Doctrine says the git/gh commands beat the checkpoint, which reads like a
+  mandate to promote the status once the directory is gone. It is not. `worktree_removed` asserts that
+  the run performed its own gated removal step and carries a `worktree_removed_at`; when a later
+  cleanup sweep reclaimed the deferred trees, no durable per-item removal timestamp is recoverable and
+  inventing one is fabrication. Both values are terminal for invariant 8, the close gate, and the
+  completion predicate, so the divergence is inert — record it in a note key and in the status doc
+  instead. Same discipline as [[never-mix-gh-utc-with-local-timestamps]]: re-derivation exists to
+  correct values that CHANGE a decision, not to manufacture provenance for ones that do not.
