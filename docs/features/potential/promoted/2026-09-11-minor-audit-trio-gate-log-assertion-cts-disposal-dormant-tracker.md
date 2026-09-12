@@ -1,11 +1,14 @@
-# minor-audit-trio-gate-log-assertion-cts-disposal-dormant-tracker (Potential Bug)
+# minor-audit-trio-gate-log-assertion-cts-disposal-dormant-tracker (Issue #872)
 
 - Date captured: 2026-09-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/minor-audit-trio-gate-log-assertion-cts-disposal-dormant-tracker/ (Issue #872)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #872
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/872
+- Last Updated: 2026-09-12
 ## Summary
 
 Three minor-audit findings consolidated into one delivery, following the #823 precedent of closing several small residuals in a single item: #794 (the scan-bound log line in `QfcStreamingDequeueConfidenceGate` is not content-asserted by any test), #840 (two `CancellationTokenSource` instances are constructed and never disposed), and #841 (`ProgressTrackerAsync` has no production construction site). Their files are disjoint, each fix is confined to one or two files, and none changes a public contract.
