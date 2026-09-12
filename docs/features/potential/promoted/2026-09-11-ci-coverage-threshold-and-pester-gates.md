@@ -1,11 +1,14 @@
-# ci-coverage-threshold-and-pester-gates (Potential Bug)
+# ci-coverage-threshold-and-pester-gates (Issue #869)
 
 - Date captured: 2026-09-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/ci-coverage-threshold-and-pester-gates/ (Issue #869)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #869
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/869
+- Last Updated: 2026-09-12
 ## Summary
 
 CI collects C# coverage but enforces no threshold (#561), and runs no Pester at all, so the production PowerShell under `scripts/vscode/` has zero CI coverage (#562). Both gates are wired in one delivery against the thresholds the maintainer settled on 2026-09-11 under #563: 80% line and 75% branch for C#, 80% line for PowerShell. PowerShell coverage measures 78.3% today, so this item also raises `scripts/vscode` coverage above 80 rather than lowering the floor.
