@@ -16,6 +16,15 @@ Check both mechanically before signalling ALL CLEAR.
    files the feature created or modified and record the pre-existing violation as a promoted
    follow-up.
 
+1b. **Clean-tree assertion vs the plan's own evidence.** A Phase 0 task asserts "an empty
+   `git status --porcelain`" while earlier Phase 0 tasks have already written an untracked artifact
+   under `<FEATURE>/evidence/`. Example: `#497` F16 preflight — `[P0-T11]` requires empty porcelain
+   but `[P0-T1]`..`[P0-T10]` create `phase0-instructions-read.<TS>.md` first. Verify with
+   `git check-ignore -v <FEATURE>/evidence/...` (exit 1 = tracked/not ignored) before deciding.
+   Fix is to scope the gate: record porcelain verbatim, assert only that nothing outside the plan's
+   write-allowed set is dirty. Also check the executor's own `.claude/agent-memory/**` writes are
+   inside any later allowed-modified-path set — that tree is tracked in this repo.
+
 2. **Forward-phase artifact dependency.** A Phase N task's acceptance cites an artifact produced by
    a Phase N+k task. Example: `#434` F4 `[P12-T3]` required the coverage report produced at
    `[P13-T5]`. Executors run tasks in order, so the task can never be checked off.
