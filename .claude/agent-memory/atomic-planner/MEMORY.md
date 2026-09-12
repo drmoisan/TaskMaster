@@ -145,6 +145,11 @@
 - [Partial-class seam: declare and consume in the same phase](partial-class-seam-declaration-and-consumption-same-phase.md) — per-file phases must not split a seam's declaration from its consumption across two partials; dead code fails the analyzer build and blocks the earlier phase's coverage gate
 - [Seam default CS0236 + intermediate consumers](csharp-seam-default-cs0236-and-intermediate-consumers.md) — a delegate-seam default capturing `_field` in a property initializer is CS0236 (use backing field + lazy default); extraction rewires must check lines BETWEEN the call sites for pre-transform consumers
 - [AC source sweep: Definition of Done](ac-source-sweep-definition-of-done.md) — every AC needs a verification task, and spec.md's `## Definition of Done` checkboxes are AC-source too (`## Seeded Test Conditions` are not)
+- [Plan self-consistency sweeps](plan-self-consistency-sweeps.md) — pre-preflight: preamble-vs-task reachability, post-format size check on ALL new test files, and a named input for every "demonstrated against a concrete file" gate
+
+## Additional entries
+
+- [#453 QfcItemController plan seams](project_453_qfcitemcontroller_plan_seams.md) — AC-8 caps de-exemption at 15 and overrides 3 research artifacts; AC-4 = tests-first ordering not bundling; FlagTasks ctor touches COM; #441 false pass
 - [Stale-worktree guard must be repo-relative](stale-worktree-guard-must-be-repo-relative.md) — absolute `\.claude\` match flags the executing agent worktree's own DLLs and can never pass after a build; anchor to `(Resolve-Path .)`
 - [Baseline-relative gates; vacuous diff comparators](baseline-relative-toolchain-gates-and-vacuous-diff-comparators.md) — never assert absolute exit 0 for solution-wide CMD-ANALYZE/CMD-NULLABLE; `<merge-base>..HEAD` proves nothing when the plan never commits
 - [Seam shape: cardinality and mutability](seam-shape-must-match-target-cardinality-and-mutability.md) — per-element targets need a stateless facade (target as 1st param); reassigned fields need accessor delegates, never a readonly snapshot; re-attribute downstream tasks after narrowing a facade
@@ -153,7 +158,9 @@
 
 - [Verify line spans and computed literals](verify-line-spans-and-computed-literals.md) — replace-L<a>-L<b> spans swallow still-referenced field decls; recompute asserted literals incl. format rounding (`##0.00` rounds away from zero → "0.67" not "0.66")
 - [Never assert .Method.Name on a lambda-valued delegate](never-assert-method-name-on-lambda-valued-delegate.md) — classify each Production* default as named-method vs lambda before writing a ".Method.Name identity only" clause; lambdas need NotBeSameAs(sentinel)
+- [Verify caller-supplied citation corrections](verify-caller-supplied-citation-corrections.md) — preflight "fix this line number" deltas are themselves sometimes off-by-one; re-read the source before transcribing one into a validated plan
 
+- [#452 F9 EFC form/item/viewer plan seams](project_452_efc_form_item_viewer_plan_seams.md) — shared Phase 1 before per-file phases; viewer→form→item order; DEC-1 Form-construction IN/OUT task lists; IEfcFormViewer forward-member coverage trap
 - [#437 EfcHomeController plan seams](project_437_efc_home_controller_plan_seams.md) — EFC test files at 459-476 lines force new files; MoveFailureMessageAction=MessageBox.Show CI hang; ClassLevel parallelism + Production* statics; Timing.cs has no clock
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
@@ -190,6 +197,7 @@
 - [#432 coverage-ledger plan seams](project_432_coverage_ledger_plan_seams.md) — 121-file disjoint partition arithmetic; classification vs disposition are orthogonal axes; entry fn returns ExitCode (never calls exit); zero-line files can never be `testable`
 - [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
 - [#455 F13 breadcrumb/WebView2 plan seams](project_455_f13_breadcrumb_webview_plan_seams.md) — separate-type (never partial) exemption extraction; method-level attrs leak lambdas, type-level don't; 8/11 files already pass
+- [#456 F14 ItemViewer plan seams](project_456_f14_itemviewer_plan_seams.md) — ControlHost not on IBreadcrumbDropDownHost; S1 orphans Linq+Drawing usings; D5 overrides 3 research STA homes; AC9 forbids the D11 deletion
 - [#136 wave-1 non-halting F1 dependency](project_136_wave1_nonhalting_f1_dependency.md) — F1 ledger/harness absent at planning time is by design; write it as an execution-time read, never a preflight-evaluable gate
 - [#433 F7 QfcHomeController plan seams](project_433_f7_qfchomecontroller_plan_seams.md) — partial split before seams (487+15>500); `:133`/`:136` viewer/scheduler coupling; 5 frozen #424 test files; QuickFiler.Test.csproj wiring
 - [#424 QuickFiler deadline plan seams](project_424_quickfiler_deadline_plan_seams.md) — 12s const; Part2 partial no-[TestClass]; overload migration breaks loose-mock Setup/Verify (Issue218 "dormant" misclassification); grep old overload shape in ALL test files

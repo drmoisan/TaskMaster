@@ -43,11 +43,11 @@ features:
   - issue_num: 437
     feature_folder: 2026-08-07-quickfiler-efc-home-controller-coverage-437
     depends_on: [432]
-  - issue_num: 1009
-    feature_folder: quickfiler-efc-form-item-controller-coverage
+  - issue_num: 452
+    feature_folder: 2026-08-07-quickfiler-efc-form-item-controller-coverage-452
     depends_on: [432]
-  - issue_num: 1010
-    feature_folder: quickfiler-item-controller-coverage
+  - issue_num: 453
+    feature_folder: 2026-08-07-quickfiler-item-controller-coverage-453
     depends_on: [432]
   - issue_num: 454
     feature_folder: 2026-08-07-quickfiler-collection-controller-coverage-454
@@ -58,8 +58,8 @@ features:
   - issue_num: 455
     feature_folder: 2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455
     depends_on: [432]
-  - issue_num: 1014
-    feature_folder: quickfiler-itemviewer-coverage
+  - issue_num: 456
+    feature_folder: 2026-08-07-quickfiler-itemviewer-coverage-456
     depends_on: [432]
   - issue_num: 1015
     feature_folder: quickfiler-form-viewers-bayesian-coverage
@@ -74,12 +74,12 @@ features:
       - 435
       - 433
       - 437
-      - 1009
-      - 1010
+      - 452
+      - 453
       - 454
       - 495
       - 455
-      - 1014
+      - 456
       - 1015
 ---
 
@@ -91,9 +91,10 @@ features:
 
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
-> promotion receipt as its preparation completes. Ten are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**, **454**, **455**. Six remain placeholders in
-> the `1009`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> promotion receipt as its preparation completes. Twelve are now resolved — **432** (F1), **430**,
+> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**, **456**,
+> and **495** (F12, back-filled 2026-08-08 on completion of F12's preparation resume).
+> Two remain placeholders (F15, F16), whose children are still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
@@ -262,9 +263,40 @@ These are reconciled the same way the `winforms-testability-refactor` epic recon
 (precedent, ratified 2026-07-09): **refactor first, exempt only the irreducible remainder.** The
 qualifier "without an injectable seam" in the CLAUDE.md exemption is read as a live obligation, not
 a standing permission — if a seam can be introduced, the exemption does not apply and the file must
-be covered. `[ExcludeFromCodeCoverage]` on a *testable* seam is a Blocking finding. The 33 existing
-attributes are treated as unratified until F1's ledger either justifies each one against the
-irreducible-remainder test or marks it for removal by the owning child.
+be covered. `[ExcludeFromCodeCoverage]` on a *testable* seam is a Blocking finding.
+
+### Correction: a prior maintainer ratification supersedes this epic's ledger
+
+An earlier revision said the existing attributes were "treated as unratified until F1's ledger
+judges them." **That was wrong, and F10 caught it.** `epic-planner` verified the correction against
+GitHub directly:
+
+- **Issue #227** (`Refactor: qfc-item-controller-testability`, now **closed**) already adjudicated
+  the `QfcItemController` exemption boundary. Over five remediation cycles it was cut from 103
+  members to 19, with the maintainer rejecting each intermediate count. **18 of F10's 19 attributes
+  were ratified there.**
+- **Issue #230** (still **open**) is titled *"Build a WinForms message-pump test seam
+  (Application.Run() background thread) to unblock 9 QfcItemController orchestration members"* —
+  the title alone corroborates that nine of those exemptions are a **deliberate, tracked deferral**,
+  explicitly not a merge condition.
+
+**Ruling: F1's ledger has no authority to overturn a maintainer decision.** The ledger records such
+attributes with provenance `ratified-by-maintainer (#227)` and does not re-litigate them. This is
+not a weakening of the epic's stance — the refactor-first rule still governs every attribute that
+has *not* been through a maintainer adjudication, which is the large majority. It simply recognises
+that the question was already asked and answered for one family, by the only authority that can
+answer it.
+
+Consequences:
+
+- **Epic AC2, as originally worded, was unsatisfiable** for F10. The correct target is **19 → 15**,
+  not 19 → 0: one genuinely unratified attribute is removed (`EnsureBreadcrumbPipeline` at
+  `ViewerSetup.cs:132`, post-ratification drift that F10 isolated by diffing the ratified 18-member
+  list against a live grep of 19 sites), and three more fall away with dead-code deletion.
+- **No task may build the #230 seam.** That work is tracked, deferred, and out of this epic's scope.
+- Any other child that meets an attribute traceable to a closed maintainer-ratification issue
+  applies the same rule: record the provenance, do not re-litigate, and report it rather than
+  removing it.
 
 ### 2. Seam hierarchy
 
@@ -624,6 +656,17 @@ rather than crashes:
 4. **F11 found a second, distinct defect — filed as #478.** The merge step blends a correct
    class-level union with a primary-only method subtree. **Fixing #441's axis alone does not fix
    #478**; both must be addressed in one change or the harness stays wrong in a different way.
+5. **Never trust the emitted `line-rate` / `branch-rate` attributes — recompute from the
+   `<line>` elements.** Because of #441 the emitted rates are not per-file figures at all. F10
+   documented two proofs: `FocusAndTheme.cs` emits `line-rate=0.756032 = 282/373` for a **326-line
+   file**, and — far worse — `MailActions.cs` emits `branch-rate="0.75"`, **falsely passing** the
+   75% branch gate against a true 72.7%. The distortion runs in both directions, so no correction
+   factor exists.
+
+   This is also why the corrected baseline table in this manifest can be relied on: it was computed
+   by summing `condition-coverage` across the class-level `<line>` elements rather than reading the
+   emitted attributes, and its 72.7% for `MailActions.cs` **independently matches F10's true
+   figure** while the emitted attribute does not. Compute; do not read.
 
 ## Verified Toolchain and Tooling Facts
 
@@ -777,6 +820,101 @@ raised. The fix is a class-level-exempt adapter **type** — which carries its o
 must not be `partial`**, or the attribute silently exempts the entire type across every partial, the
 same propagation confirmed on `QfcDatamodel.cs:25` and `ItemViewer.cs`.
 
+## Epic Ruling: DEC-1 — unshown Form construction on an STA thread is ratified (F9)
+
+F9's plan halts at `P0-T14` awaiting a literal `RATIFIED_APPROACH`. **The ruling is Approach A.**
+
+The problem: `[ExcludeFromCodeCoverage]` at `EfcViewer.cs:20` sits on the partial *type*, so it also
+suppresses `EfcViewer.Designer.cs` (4,277 lines). Removing it — which the epic requires — moves those
+generated lines into the denominator in the same edit. F9 offered two routes:
+
+- **Approach A:** construct one **unshown** `EfcViewer` on an STA thread, dispose in `finally`.
+  Yields ~100% on `EfcViewer.cs` and ~99% on the Designer, *adding* roughly 2,000 covered lines.
+- **Approach B:** no Form construction. ~82% line, forfeits those ~2,000 lines, and requires
+  method-level attributes **inside generated code** that Visual Studio silently drops on
+  regeneration.
+
+`epic-planner` verified the precedent F9 cited rather than taking it on trust.
+`QuickFiler.Test/Controllers/BayesianPerformanceController.TestSupport.cs` already does exactly
+this, in merged code, in this very test project: `RunWithViewer` constructs a real Form-derived
+`BayesianPerformanceViewer`, never shows it, disposes it in `finally`, saves and restores the
+`SynchronizationContext`, runs on an `ApartmentState.STA` thread, and marshals exceptions back with
+`ExceptionDispatchInfo`. The pattern is established, not invented.
+
+Four reasons decide it:
+
+1. **The precedent is real and already merged**, in the same assembly, doing the same thing.
+2. **Approach A makes the generated file genuinely covered rather than exempted.** ~99% on the
+   Designer is a better outcome than any exemption: the file is measured and passes on its own
+   merit, and the ~2,000 added covered lines help every child's retain-or-improve obligation.
+3. **Approach B's mechanism is self-destroying.** Attributes written into generated code are removed
+   the next time the designer regenerates the file, so the exemption silently lapses and the file
+   fails a later gate with no diff to explain why. It also has zero repo precedent.
+4. The `winforms-testability-refactor` condition barring Form-derived types in tests is aimed at
+   **live** forms. The operative distinction is *shown or message-pumping* versus
+   *constructed-and-disposed-unshown*, and only the former is a policy hazard.
+
+**Conditions.** Approach A is ratified only in this shape:
+
+- Reuse the existing `RunWithViewer` harness shape verbatim: STA thread, never shown, `finally`
+  dispose, `SynchronizationContext` save/restore, `ExceptionDispatchInfo` exception marshalling.
+- STA-bound tests live in dedicated `*.StaTests.cs` files and each documents why no seam suffices.
+- **Never** call `.Show()`, `.ShowDialog()`, or anything that pumps a message loop. A test that
+  displays a popup remains a policy violation.
+- This ratifies Form *construction* for coverage of designer-generated control-tree initialization.
+  It does not license exercising interactive behavior through a live form.
+
+**This supersedes the stricter "constructing a live form is never acceptable" wording given to F14
+in its original brief.** F14 faces the identical situation on `ItemViewer.Designer.cs` (6,224 lines,
+suppressed by the type-level attribute on `ItemViewer.cs`) and may apply Approach A under the same
+four conditions. F15 may do likewise for its designer-backed viewers.
+
+## Epic Ruling: DEC-5 — a `measured-not-gated` disposition for generated files
+
+F9 raised that F1's three ledger buckets cannot express the state generated designer files land in
+under Approach A. F14 then disputed the framing, and **F14 is substantially right**, so the
+rationale below is corrected from F9's original.
+
+`epic-planner` measured the actual branch surface. A designer file carries exactly **one** branching
+line — `ItemViewerExpanded.Designer.cs` (612 lines) and `BayesianPerformanceViewer.Designer.cs`
+(350 lines) each have a single `branch="True"` line carrying four conditions, of which two are
+covered, giving the 50% figure. This is a lone generated construct, typically the `Dispose` null
+check — not a broad structural branch deficit as F9's "capped near 50% by construction" implied.
+
+F14's decisive point stands on measurement: **removing the type-level attribute improves repository
+coverage by +0.57 pp, while exempting the designer costs −0.16 pp**, because `InitializeComponent()`
+is branch-free across thousands of lines and one construction covers ~99.95% of it. **Generated
+designer files are therefore NOT `ratified-exempt`**, correcting this manifest's own earlier
+ground-1 classification of them as exempt-candidates. Exempting them destroys real, freely-obtained
+coverage.
+
+What remains unresolvable is only the branch gate on that single generated line, which no test can
+meaningfully drive.
+
+**Ruling: add a fourth ledger disposition, `measured-not-gated`,** for generated
+`*.Designer.cs` and generated `Properties/` files. Such files:
+
+- **are** instrumented, measured, and reported with real line and branch figures;
+- **do** contribute to repository-wide totals;
+- are **not** individually gated on either the 80% line or 75% branch floor;
+- carry no `[ExcludeFromCodeCoverage]` attribute.
+
+This is distinct from `interface-only / not-measured`, which has no denominator at all. Generated
+files have a real denominator and a real, useful numerator — they simply are not code this epic
+authored or controls. F16 verifies that every `measured-not-gated` row is genuinely generated code
+and not a testable file parked in a convenient bucket.
+
+### Zero-branch files report N/A, never 0% — binding on F1
+
+F14 raised this as a blocking requirement and it is correct. This manifest previously stated the
+N/A rule only for the **line** denominator. It applies identically to branches:
+
+**A file whose `branches-valid` is 0 reports branch coverage as `N/A`, never `0%`, and never counts
+as a failure.** `ItemViewer.WebViewThread.cs`, `ItemViewer.Commands.cs`, and
+`ItemViewer.DisplayState.cs` contain no branch points at all and could not otherwise pass a 75%
+branch gate no matter how thoroughly tested. F1's harness must implement this, and F14's Phase 0
+carries a halt gate on it.
+
 ## Latent Defect Promotion
 
 Preparation research surfaces real defects that are out of scope to fix under the epic's
@@ -907,8 +1045,9 @@ follow it rather than reaching into `UtilitiesCS` internals.
 Two QuickFiler features are active on `main` concurrently with this epic and touch files assigned to
 wave-1 children:
 
-- **#400** `2026-07-21-quickfiler-folder-selector-dropdown-400` — overlaps F13
-  (breadcrumb drop-down) territory.
+- **#400** `2026-07-21-quickfiler-folder-selector-dropdown-400` — overlaps **both F13 and F14**.
+  F14 established that #400's live remediation plan explicitly authorizes edits to
+  `ItemViewer.Breadcrumb.cs`, which is F14-owned; an earlier revision named only F13.
 - **#424** `2026-08-06-quickfiler-high-confidence-queue-init-stall-424` — overlaps F7
   (`QfcHomeController`) and possibly F2 (high-confidence queue admission) territory.
 - **#426** `Bug: emailmovemonitor-rejected-item-hook-retention` (added 2026-08-07 from F4's
@@ -920,9 +1059,20 @@ wave-1 children:
   reconcile it against F4's plan first; if #426 is executed independently while F4 is in flight,
   expect a genuine semantic conflict rather than a merely textual one.
 
+- **#440** `Bug: breadcrumb-left-right-arrow-parent-child-navigation` (added 2026-08-08 from F12's
+  research) — open, **not yet promoted to an active feature folder**, which is why it was missed in
+  the initial survey and in the #426 back-fill. Its body names `BreadcrumbBridgeRouter` and
+  `BreadcrumbRow` on the Efc path and `BreadcrumbBridgeCoordinator` / `FolderBreadcrumbBridgeRouter`
+  on the Qfc path, so it collides with **two of F12's five files** and reaches F13/F14 breadcrumb
+  surfaces. It will rewrite the Left/Right arrow-key semantics that F12's coverage tests must pin.
+  **Rule for F12 and any sibling that meets it: tests pin current behavior, not corrected
+  behavior**, and cite #440 in the test doc comment so a future break is legible. Whoever schedules
+  #440 should expect to update those tests as part of the fix rather than treat them as a
+  regression.
+
 Note that a *promoted-but-not-yet-active* issue is invisible to a `docs/features/active/` scan. That
-is how #426 was missed at decomposition time. Children whose research touches an area should search
-open GitHub issues by keyword, not only the active feature folders.
+is how #426 and #440 were missed at decomposition time. Children whose research touches an area
+should search open GitHub issues by keyword, not only the active feature folders.
 
 Neither blocks planning. At execution time `epic-orchestrator` rebases the integration branch on
 `main` before each wave, and any conflict is handled by the child's own R1–R5 remediation loop per
