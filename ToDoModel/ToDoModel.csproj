@@ -39,7 +39,7 @@
       <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.1\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=3.4.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.3.4.0\lib\net462\log4net.dll</HintPath>
