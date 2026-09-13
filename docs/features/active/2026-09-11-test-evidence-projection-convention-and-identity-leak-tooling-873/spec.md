@@ -211,6 +211,8 @@ The projection writer operates on the already-parsed post-processed document, wh
 `.claude/agent-memory/orchestrator/collect-pr-context-lands-in-main-checkout.md`
 `docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873`
 
+Two of the test-file entries above are forced by the builder signature change rather than chosen: `tests/scripts/vscode/Invoke-MSTest.Main.Tests.ps1` pins the complete argument array handed to the plain wrapper seam as an exact four-element assertion, which becomes a six-element array once the plain builder gains the results-directory and log-file-name switches, and `tests/scripts/vscode/Invoke-MSTestWithCoverage.AssemblyDiscovery.Tests.ps1` declares an explicit five-parameter mock body for `Invoke-DotnetCoverageCollection`, which stops binding once that function gains two parameters.
+
 ## Identifier Corrections
 
 The substitution target governs the replacement form, per R7 and the corruption precedent in R4.3.
