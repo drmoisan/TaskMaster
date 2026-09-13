@@ -111,7 +111,7 @@ file.
 
 ### Phase 0 — Context, Policy Reads, Toolchain Bootstrap, and Baselines
 
-- [ ] [P0-T1] Read, in order, CLAUDE.md, .claude/rules/general-code-change.md,
+- [x] [P0-T1] Read, in order, CLAUDE.md, .claude/rules/general-code-change.md,
   .claude/rules/general-unit-test.md, .claude/rules/quality-tiers.md, .claude/rules/tonality.md,
   and .claude/rules/csharp.md, plus
   docs/features/active/kastringasync-keyequals-contains-offset-583/issue.md,
@@ -126,7 +126,7 @@ file.
   Acceptance: the artifact exists and contains all three required fields with the ordered file
   list; no policy file is modified.
 
-- [ ] [P0-T2] Resolve the pinned .NET SDK for this worktree (attempt the .dotnet-sdk junction's
+- [x] [P0-T2] Resolve the pinned .NET SDK for this worktree (attempt the .dotnet-sdk junction's
   dotnet.exe with the version switch; if that path does not resolve, run
   scripts/vscode/Install-RepoDotNetSdk.ps1 as the fallback provisioner), then run the resolved
   dotnet executable's tool-restore command from the repository root to restore the CSharpier 1.2.6
@@ -137,7 +137,7 @@ file.
   '1.2.6') was restored... Restore was successful.") at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/dotnet-tool-restore.2026-08-22T09-18.md.
 
-- [ ] [P0-T3] Run a solution-wide NuGet restore of TaskMaster.sln from the repository root to
+- [x] [P0-T3] Run a solution-wide NuGet restore of TaskMaster.sln from the repository root to
   populate this worktree's packages directory, then verify the restored package-directory count
   is at least 100, recording both steps in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/nuget-restore.md`.
@@ -146,7 +146,7 @@ file.
   150) at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/nuget-restore.2026-08-22T09-18.md.
 
-- [ ] [P0-T4] Probe global-tool availability of the dotnet-coverage tool (a Get-Command lookup
+- [x] [P0-T4] Probe global-tool availability of the dotnet-coverage tool (a Get-Command lookup
   followed by its version switch); if absent, install it as a global dotnet tool via the resolved
   dotnet executable. Record the result in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/coverage-tool-probe.md`.
@@ -154,7 +154,7 @@ file.
   an observed exit code of 0, matching the recorded shape at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/coverage-tool-probe.2026-08-22T09-32.md.
 
-- [ ] [P0-T5] Run the resolved dotnet executable's CSharpier check subcommand against the whole
+- [x] [P0-T5] Run the resolved dotnet executable's CSharpier check subcommand against the whole
   repository root (read-only) and record a Timestamp field, a Command field, an EXIT_CODE field,
   and an Output Summary field stating the observed files-checked count and files-needing-formatting
   count in
@@ -164,7 +164,7 @@ file.
   6621ms.", exit code 0) at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/csharpier-check.2026-08-22T09-19.md.
 
-- [ ] [P0-T6] Run the solution's analyzer Rebuild (Configuration Debug, Platform Any CPU, the
+- [x] [P0-T6] Run the solution's analyzer Rebuild (Configuration Debug, Platform Any CPU, the
   EnableNETAnalyzers and EnforceCodeStyleInBuild properties both true) with a detailed file logger,
   then count the "Skipping target CoreCompile" and "CoreCompile:" log-line occurrences, and count
   the total warning lines. Record a Timestamp field, a Command field, an EXIT_CODE field, and an
@@ -177,7 +177,7 @@ file.
   pre-existing System.Reactive packages.config warnings / 0 errors) at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/msbuild-analyzers.2026-08-22T09-21.md.
 
-- [ ] [P0-T7] Run the solution's nullable Rebuild (Configuration Debug, Platform Any CPU, the
+- [x] [P0-T7] Run the solution's nullable Rebuild (Configuration Debug, Platform Any CPU, the
   TreatWarningsAsErrors property true, no nullable opt-in property) with a detailed file logger,
   then count the "Skipping target CoreCompile" log-line occurrences. Record a Timestamp field, a
   Command field, an EXIT_CODE field, and an Output Summary field in
@@ -187,7 +187,7 @@ file.
   CoreCompile / 5 pre-existing warnings / 0 errors) at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/msbuild-nullable.2026-08-22T09-23.md.
 
-- [ ] [P0-T8] Run a coverage-instrumented test capture of the whole QuickFiler.Test.dll assembly,
+- [x] [P0-T8] Run a coverage-instrumented test capture of the whole QuickFiler.Test.dll assembly,
   using dotnet-coverage collect wrapping the resolved vstest executable against that assembly with
   the TaskMaster CLI runsettings file, InIsolation, and the LiveOutlook-category exclusion filter.
   The coverage tool still writes its Cobertura-format output, but to a transient file in a
@@ -231,7 +231,7 @@ file.
   a labelled boolean with neither operand path, the existence check as a boolean, and the directory
   listing as entry names only.
 
-- [ ] [P0-T9] Run a scoped, non-instrumented vstest filter selecting every test whose fully
+- [x] [P0-T9] Run a scoped, non-instrumented vstest filter selecting every test whose fully
   qualified name contains the pinned KbdActions test class name, against the QuickFiler.Test build
   output assembly, with InIsolation and the TaskMaster CLI runsettings file, to record the pinned
   KbdActions test file's baseline Passed/Failed count without ever diffing that file. Record a
@@ -247,7 +247,7 @@ file.
 
 ### Phase 1 — Regression Test First (Red Before Fix)
 
-- [ ] [P1-T1] Add a new test method named
+- [x] [P1-T1] Add a new test method named
   KeyEquals_ContainsMatchAtNonPrefixIndex_InvokesUpdateWithLastMatchedCharacter to
   `QuickFiler.Test/Controllers/KaStringAsyncTests.cs`, using the file's existing NewKa factory
   helper, MSTest attributes, a FluentAssertions assertion with a because-style string, and
@@ -258,7 +258,7 @@ file.
   Acceptance: the method exists in the file with exactly this Key/other/Activated arrangement and
   an assertion of the literal "1"; the file's pre-existing test methods are otherwise unchanged.
 
-- [ ] [P1-T2] [expect-fail] Build TaskMaster.sln with a plain incremental build (Configuration Debug, Platform
+- [x] [P1-T2] [expect-fail] Build TaskMaster.sln with a plain incremental build (Configuration Debug, Platform
   Any CPU) to compile the P1-T1 test into the QuickFiler.Test build output assembly, then run the
   resolved vstest executable against that assembly with InIsolation and a test-case filter
   selecting only the new test method by its exact fully qualified name, against unmodified
@@ -274,7 +274,7 @@ file.
 
 ### Phase 2 — Minimal Production Fix
 
-- [ ] [P2-T1] In `QuickFiler/Controllers/KaStringAsync.cs`, replace the branch-1 Update argument
+- [x] [P2-T1] In `QuickFiler/Controllers/KaStringAsync.cs`, replace the branch-1 Update argument
   expression, currently reading Key.Substring(other.Length - 1, 1) at line 128, with
   Key.Substring(Key.IndexOf(other, StringComparison.Ordinal) + other.Length - 1, 1), leaving the
   Key.Contains(other) guard at line 125 and every other line of the method unchanged, and
@@ -286,7 +286,7 @@ file.
 
 ### Phase 3 — Prose Rewords
 
-- [ ] [P3-T1] In `QuickFiler.Test/Controllers/KaStringAsyncTests.cs`, reword the because-string in
+- [x] [P3-T1] In `QuickFiler.Test/Controllers/KaStringAsyncTests.cs`, reword the because-string in
   the test named for a contains-match while activated that invokes Update and returns true, from
   "Update receives Key.Substring(other.Length - 1, 1) => index 1 => \"b\"" to "Update receives the
   last character of the matched span (Key.IndexOf(\"ab\", StringComparison.Ordinal) + other.Length
@@ -294,7 +294,7 @@ file.
   Acceptance: the old because-string no longer appears in the file; the new because-string appears
   verbatim; the test's assertion of the value "b" is unchanged.
 
-- [ ] [P3-T2] In `QuickFiler/Controllers/KaStringAsync.cs`, reword the doc-comment sentence in the
+- [x] [P3-T2] In `QuickFiler/Controllers/KaStringAsync.cs`, reword the doc-comment sentence in the
   "Argument contract" paragraph, currently at lines 80-82, from "The guard clause at the top of
   this method rejects both fail-fast, so branch 1's substring offset expression is never evaluated
   with a negative start index." to "The guard clause at the top of this method rejects both
@@ -306,7 +306,7 @@ file.
 
 ### Phase 4 — Green-After-Fix Verification
 
-- [ ] [P4-T1] Build TaskMaster.sln with a plain incremental build (Configuration Debug, Platform
+- [x] [P4-T1] Build TaskMaster.sln with a plain incremental build (Configuration Debug, Platform
   Any CPU) to compile the P2-T1 fix and the P3-T1/P3-T2 rewords into the QuickFiler.Test build
   output assembly and QuickFiler's own output assembly, then run the resolved vstest executable
   against the QuickFiler.Test build output assembly with InIsolation and a test-case filter
@@ -323,7 +323,7 @@ file.
 
 ### Phase 5 — Final Quality-Assurance Loop
 
-- [ ] [P5-T1] Run the resolved dotnet executable's CSharpier format subcommand from the repository
+- [x] [P5-T1] Run the resolved dotnet executable's CSharpier format subcommand from the repository
   root, scoped only to the two files this change edits (QuickFiler/Controllers/KaStringAsync.cs
   and `QuickFiler.Test/Controllers/KaStringAsyncTests.cs`), then take a SHA-256 hash of each file
   immediately before and immediately after the invocation to measure the actual rewrite count
@@ -337,7 +337,7 @@ file.
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/csharpier-format.2026-08-22T09-52.md;
   if the measured rewrite count is greater than 0, P5-T15 restarts this phase from P5-T1.
 
-- [ ] [P5-T2] Run the resolved dotnet executable's CSharpier check subcommand from the repository
+- [x] [P5-T2] Run the resolved dotnet executable's CSharpier check subcommand from the repository
   root (read-only, repository-wide) and record a Timestamp field, a Command field, an EXIT_CODE
   field, and an Output Summary field in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/csharpier-check.md`.
