@@ -347,6 +347,8 @@
     <Compile Include="Controllers\QfcRemainingQueueAdmission.cs" />
     <Compile Include="Controllers\QfcQueue.cs" />
     <Compile Include="Controllers\QfcQueue.Enqueue.cs" />
+    <Compile Include="Controllers\QfcQueue.Tlp.cs" />
+    <Compile Include="Controllers\QfcQueue.UiIdle.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\ConversationResolver.Loading.cs" />

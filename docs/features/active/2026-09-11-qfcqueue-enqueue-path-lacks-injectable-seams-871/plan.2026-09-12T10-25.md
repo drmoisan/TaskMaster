@@ -417,7 +417,7 @@ option. Both relocated blocks are complete region and endregion pairs at the rec
 move intact. No relocated member references a primary-constructor parameter: the three parameters
 are referenced only by field initializers on the base part, which do not move.
 
-- [ ] [P1-T1] Create `QuickFiler/Controllers/QfcQueue.Tlp.cs` holding the whole Tlp Manipulation
+- [x] [P1-T1] Create `QuickFiler/Controllers/QfcQueue.Tlp.cs` holding the whole Tlp Manipulation
       region, which occupies lines 230 through 453 inclusive of `QuickFiler/Controllers/QfcQueue.cs`
       at the recorded anchor, moved verbatim, and delete exactly those lines from
       `QuickFiler/Controllers/QfcQueue.cs`, leaving in their place a one-line breadcrumb comment in
@@ -436,7 +436,7 @@ are referenced only by field initializers on the base part, which do not move.
       value P0-T13 recorded for it; and both files are recorded with their measured counts in
       artifact p1-t1-split-tlp.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P1-T2] Create `QuickFiler/Controllers/QfcQueue.UiIdle.cs` holding the whole Helper Methods
+- [x] [P1-T2] Create `QuickFiler/Controllers/QfcQueue.UiIdle.cs` holding the whole Helper Methods
       region, which occupies lines 472 through 505 inclusive of
       `QuickFiler/Controllers/QfcQueue.cs` at the recorded anchor, moved verbatim, and delete
       exactly those lines from `QuickFiler/Controllers/QfcQueue.cs`, leaving a one-line breadcrumb
@@ -452,7 +452,7 @@ are referenced only by field initializers on the base part, which do not move.
       the new file with their bodies byte-identical to the anchor apart from indentation; recorded
       in artifact p1-t2-split-uiidle.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P1-T3] Add one `<Compile Include>` item to `QuickFiler/QuickFiler.csproj` for each of
+- [x] [P1-T3] Add one `<Compile Include>` item to `QuickFiler/QuickFiler.csproj` for each of
       `QuickFiler/Controllers/QfcQueue.Tlp.cs` and `QuickFiler/Controllers/QfcQueue.UiIdle.cs`,
       placed adjacent to the two existing QfcQueue items, which sit at lines 348 and 349 at the
       recorded anchor. This project is a legacy non-SDK project with no implicit source glob, so a
@@ -460,7 +460,7 @@ are referenced only by field initializers on the base part, which do not move.
       existing. **Acceptance:** a search of `QuickFiler/QuickFiler.csproj` finds exactly one item
       naming each of the two new files.
 
-- [ ] [P1-T4] Run CMD-FORMAT-SCOPED over `QuickFiler/Controllers/QfcQueue.cs`,
+- [x] [P1-T4] Run CMD-FORMAT-SCOPED over `QuickFiler/Controllers/QfcQueue.cs`,
       `QuickFiler/Controllers/QfcQueue.Tlp.cs` and `QuickFiler/Controllers/QfcQueue.UiIdle.cs`,
       capturing the porcelain status immediately before and immediately after the command, then run
       CMD-CHECK-SCOPED over the same paths. **Acceptance:** the artifact
@@ -470,7 +470,7 @@ are referenced only by field initializers on the base part, which do not move.
       because the repo-wide pass belongs to the final QC loop; an interim repo-wide format would
       rewrite files outside the Write Set and break the Phase 6 scope lock.
 
-- [ ] [P1-T5] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, with the error and warning counts
+- [x] [P1-T5] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, with the error and warning counts
       captured by the anchored-pattern rule of P0-T9 and recorded in artifact
       p1-t5-analyze.2026-09-12T10-25.md under the qa-gates evidence directory. If the build reports
       an unnecessary-using diagnostic against any of `QuickFiler/Controllers/QfcQueue.cs`,
@@ -479,20 +479,20 @@ are referenced only by field initializers on the base part, which do not move.
       using from the base part is not a relocated
       member and does not affect the verbatim-move property that AC18 gates.
 
-- [ ] [P1-T6] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P1-T6] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p1-t6-nullable.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P1-T7] Run CMD-VSTEST followed by CMD-TRXCOUNTERS with a results directory named for this
+- [x] [P1-T7] Run CMD-VSTEST followed by CMD-TRXCOUNTERS with a results directory named for this
       task. **Acceptance:** EXIT_CODE 0, the counters report `failed=0`, and the reported `total`
       equals BASELINE_TEST_TOTAL from P0-T11. Recorded in artifact
       p1-t7-tests.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P1-T8] Measure with CMD-LINECOUNT the three files touched in this phase. **Acceptance:**
+- [x] [P1-T8] Measure with CMD-LINECOUNT the three files touched in this phase. **Acceptance:**
       each measured count is strictly less than 500 and each is recorded as a labelled numeric line
       in artifact p1-t8-line-counts.2026-09-12T10-25.md under the qa-gates evidence directory. No
       predicted figure from the spec or the research is acceptable in place of a measurement.
 
-- [ ] [P1-T9] Verify the split preserved the two invariants the spec names. **Acceptance:** a search
+- [x] [P1-T9] Verify the split preserved the two invariants the spec names. **Acceptance:** a search
       of `QuickFiler/Controllers/QfcQueue.Tlp.cs` and `QuickFiler/Controllers/QfcQueue.UiIdle.cs`
       for the literal token `#nullable` returns zero matches in each, and in each of
       `QuickFiler/Controllers/QfcQueue.cs`, `QuickFiler/Controllers/QfcQueue.Tlp.cs` and
