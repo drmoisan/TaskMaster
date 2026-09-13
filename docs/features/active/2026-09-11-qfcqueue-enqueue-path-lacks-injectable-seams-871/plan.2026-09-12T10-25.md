@@ -736,7 +736,7 @@ Framework and libraries are MSTest, Moq and FluentAssertions only. No temporary 
 filesystem, no network, no Outlook process, no sleep and no real wall-clock wait appears anywhere in
 either file.
 
-- [ ] [P4-T1] Create `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` containing the partial
+- [x] [P4-T1] Create `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` containing the partial
       test class declaration and nothing else, and
       `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.Harness.cs` containing the same partial test
       class carrying the shared harness only: a factory building a real queue through the real primary
@@ -759,14 +759,14 @@ either file.
       line count under CMD-LINECOUNT is strictly less than 500; and each file contains zero
       occurrences of each of the literals `Thread.Sleep`, `Task.Delay` and `DateTime.Now`.
 
-- [ ] [P4-T2] Add a `<Compile Include>` item to `QuickFiler.Test/QuickFiler.Test.csproj` for each of
+- [x] [P4-T2] Add a `<Compile Include>` item to `QuickFiler.Test/QuickFiler.Test.csproj` for each of
       `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` and
       `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.Harness.cs`, placed adjacent to the existing
       QfcQueue test items, which sit at lines 119, 120 and 215 at the recorded anchor.
       **Acceptance:** a search of `QuickFiler.Test/QuickFiler.Test.csproj` finds exactly one item
       naming each of the two files.
 
-- [ ] [P4-T3] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P4-T3] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p4-t3-analyze.2026-09-12T10-25.md under the qa-gates evidence directory. This is the positive
       verification that the three production manifest entries took effect, because the harness
       references a type declared in `QuickFiler/Interfaces/IUiIdleDispatcher.cs`. It does not verify
@@ -776,7 +776,7 @@ either file.
       compile the test-class part if the harness part is not in the manifest, and whose class-scoped
       run reports no cases if the test-class part is not.
 
-- [ ] [P4-T4] Add six named seam-contract tests, one per seam, each a `[TestMethod]` whose body is a
+- [x] [P4-T4] Add six named seam-contract tests, one per seam, each a `[TestMethod]` whose body is a
       single call to the harness helper from P4-T1 with that seam's getter and setter. The six seams
       are `MoveMonitor`, `UiIdleDispatcher`, `ItemViewerFactory`, `ViewerRowPlacer`,
       `ItemGroupFactory` and `BackgroundTlpFactory`. Run CMD-BUILD, then CMD-VSTEST-CLASS followed by
@@ -785,7 +785,7 @@ either file.
       least 6, recorded in artifact p4-t4-seam-contracts.2026-09-12T10-25.md under the
       regression-testing evidence directory.
 
-- [ ] [P4-T5] Add one named test constructing a queue in the headless test host and asserting that
+- [x] [P4-T5] Add one named test constructing a queue in the headless test host and asserting that
       no exception is thrown, and additionally asserting that the value returned by the
       `UiIdleDispatcher` getter is of the adapter type declared in
       `QuickFiler/Controllers/QfcQueue.UiIdle.cs`. Run CMD-BUILD, then CMD-VSTEST-CLASS followed by
@@ -795,7 +795,7 @@ either file.
       directory. The second assertion is also the positive reference that ties a test to a type
       declared in that new production file.
 
-- [ ] [P4-T6] Add one named test asserting, without invoking the delegate, that the default value of
+- [x] [P4-T6] Add one named test asserting, without invoking the delegate, that the default value of
       `ItemViewerFactory` has a method whose name is the literal `Dequeue` and whose declaring type
       is the viewer queue helper class. The delegate must not be invoked, because invoking it would
       read the process-wide dispatcher. Run CMD-BUILD, then CMD-VSTEST-CLASS followed by
@@ -804,14 +804,14 @@ either file.
       p4-t6-viewer-factory-identity.2026-09-12T10-25.md under the regression-testing evidence
       directory.
 
-- [ ] [P4-T7] Add two named guard tests proving the enqueue member throws `ArgumentNullException`
+- [x] [P4-T7] Add two named guard tests proving the enqueue member throws `ArgumentNullException`
       for a null item list and `ArgumentException` for an empty one, using the FluentAssertions
       asynchronous throw assertions. Run CMD-BUILD, then CMD-VSTEST-CLASS followed by
       CMD-TRXCOUNTERS. **Acceptance:** CMD-BUILD exits 0 and prints the summary line `0 Error(s)`;
       then CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t7-guards.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T8] Add one named success-path test that substitutes the dispatcher fake, the
+- [x] [P4-T8] Add one named success-path test that substitutes the dispatcher fake, the
       background-template factory and the item-group factory, enqueues a single page of mail-item
       mocks, and asserts the queue count becomes 1, that the dequeued tuple carries the exact panel
       reference the substituted background-template factory returned, and that the item groups
@@ -820,14 +820,14 @@ either file.
       CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t8-success-path.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T9] Add one named test that captures the running-jobs count from inside a seam callback,
+- [x] [P4-T9] Add one named test that captures the running-jobs count from inside a seam callback,
       proving the increment took effect mid-flight, and asserts the count is 0 after the call
       returns, proving the finally decrement. Run CMD-BUILD, then CMD-VSTEST-CLASS followed by
       CMD-TRXCOUNTERS. **Acceptance:** CMD-BUILD exits 0 and prints the summary line `0 Error(s)`;
       then CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t9-counter-bookkeeping.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T10] Add two named catch-path tests making the substituted item-group factory throw an
+- [x] [P4-T10] Add two named catch-path tests making the substituted item-group factory throw an
       `OperationCanceledException` and an `InvalidOperationException` respectively; in both cases the
       enqueue member must not propagate, the queue count must stay 0 and the running-jobs count must
       return to 0. The throw is raised from inside the try block, so the counter decrements normally;
@@ -838,7 +838,7 @@ either file.
       CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t10-catch-paths.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T11] Add two named tests covering both arms of the collection-changed notification: one
+- [x] [P4-T11] Add two named tests covering both arms of the collection-changed notification: one
       subscribing and asserting exactly one event whose action is the add action, and one running
       the same flow with no subscriber attached and asserting no exception. Run CMD-BUILD, then
       CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS. **Acceptance:** CMD-BUILD exits 0 and prints the
@@ -846,7 +846,7 @@ either file.
       `failed=0`, recorded in artifact p4-t11-collection-changed.2026-09-12T10-25.md under the
       regression-testing evidence directory.
 
-- [ ] [P4-T12] Add one named test assigning a strict-behaviour mock of the move-monitor interface
+- [x] [P4-T12] Add one named test assigning a strict-behaviour mock of the move-monitor interface
       through `MoveMonitor` and verifying the hook member is called exactly once per item with that
       item and a non-null action delegate. The captured delegate is not invoked, because it is an
       async-void lambda. Run CMD-BUILD, then CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS.
@@ -854,7 +854,7 @@ either file.
       CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t12-move-monitor.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T13] Add one named data-driven test with three rows covering item totals of 9, 10 and 11
+- [x] [P4-T13] Add one named data-driven test with three rows covering item totals of 9, 10 and 11
       and asserting the digits argument captured by the recording item-controller factory is 1, 2
       and 2 respectively. Run CMD-BUILD, then CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS.
       **Acceptance:** CMD-BUILD exits 0 and prints the summary line `0 Error(s)`; then
@@ -868,7 +868,7 @@ either file.
       hold whichever rule the runner applies. Recorded in
       artifact p4-t13-digits.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T14] Add two named tests covering the carrier-found and carrier-absent outcomes of the
+- [x] [P4-T14] Add two named tests covering the carrier-found and carrier-absent outcomes of the
       carried-handler resolution: one supplying a pre-scored carrier list containing an entry built
       for the enqueued mail item and asserting the captured carried-handler argument is that
       entry's handler, and one supplying a null carrier list and asserting the captured argument is
@@ -877,7 +877,7 @@ either file.
       CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t14-carrier.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T15] Add two named tests covering the item-controller pass-through: one asserting every
+- [x] [P4-T15] Add two named tests covering the item-controller pass-through: one asserting every
       one of the nine captured arguments, namely the globals instance the queue was constructed
       with, the home controller value the queue holds, the collection controller passed to the
       enqueue call, the viewer value which is null because the recording item-group factory leaves
@@ -889,7 +889,7 @@ either file.
       p4-t15-controller-passthrough.2026-09-12T10-25.md under the regression-testing evidence
       directory.
 
-- [ ] [P4-T16] Add one named test pinning the index mapping for a non-zero start. The loader member
+- [x] [P4-T16] Add one named test pinning the index mapping for a non-zero start. The loader member
       is private, so the test obtains it by reflection on the queue type, invokes it with a start
       value of 9 and a single-item list, awaits the returned value-task, and asserts the recording
       item-group factory received that single item at index 9 while the item-controller factory
@@ -898,7 +898,7 @@ either file.
       then CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t16-index-mapping.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T17] Add one named test that leaves `ItemGroupFactory` at its default, substitutes only
+- [x] [P4-T17] Add one named test that leaves `ItemGroupFactory` at its default, substitutes only
       `ItemViewerFactory` and `ViewerRowPlacer` plus the dispatcher fake, calls `AddAsync` directly,
       and asserts the returned item group carries the supplied mail item, that the viewer factory
       received the token the queue was constructed with, and that the row placer received the panel,
@@ -908,7 +908,7 @@ either file.
       then CMD-VSTEST-CLASS followed by CMD-TRXCOUNTERS reports `failed=0`, recorded in artifact
       p4-t17-addasync-body.2026-09-12T10-25.md under the regression-testing evidence directory.
 
-- [ ] [P4-T18] Add one named test that substitutes only the dispatcher, leaving the item-group,
+- [x] [P4-T18] Add one named test that substitutes only the dispatcher, leaving the item-group,
       viewer and row-placer seams at their defaults except for the viewer factory and row placer
       needed to keep the flow headless, drives one enqueue call, and asserts the substituted
       dispatcher recorded one invocation of each of the three shapes, and that the queue count
@@ -918,7 +918,7 @@ either file.
       artifact p4-t18-dispatcher-shapes.2026-09-12T10-25.md under the regression-testing evidence
       directory.
 
-- [ ] [P4-T19] Add one named test asserting that the panel reference the substituted
+- [x] [P4-T19] Add one named test asserting that the panel reference the substituted
       background-template factory returns is the same reference that reaches the dequeued queue
       entry, proving the value flows through unmodified. Run CMD-BUILD, then CMD-VSTEST-CLASS
       followed by CMD-TRXCOUNTERS. **Acceptance:** CMD-BUILD exits 0 and prints the summary line
@@ -928,7 +928,7 @@ either file.
       artifact p4-t19-background-template.2026-09-12T10-25.md under the regression-testing evidence
       directory.
 
-- [ ] [P4-T20] Measure `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` and
+- [x] [P4-T20] Measure `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` and
       `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.Harness.cs` with CMD-LINECOUNT.
       **Acceptance:** each measured count is strictly less than 470 and each is recorded as a
       labelled numeric line in artifact p4-t20-test-file-size.2026-09-12T10-25.md under the qa-gates
@@ -942,20 +942,20 @@ either file.
       these two. The authoritative measurement for the acceptance criterion is taken again after the
       final format in P5-T6.
 
-- [ ] [P4-T21] Run CMD-FORMAT-SCOPED over `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` and
+- [x] [P4-T21] Run CMD-FORMAT-SCOPED over `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` and
       `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.Harness.cs`, capturing the porcelain status
       immediately before and after, then CMD-CHECK-SCOPED over the same paths. **Acceptance:** both
       porcelain captures are recorded verbatim in artifact
       p4-t21-format.2026-09-12T10-25.md under the qa-gates evidence directory and CMD-CHECK-SCOPED
       exits 0.
 
-- [ ] [P4-T22] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P4-T22] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p4-t22-analyze.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P4-T23] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P4-T23] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p4-t23-nullable.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P4-T24] Run CMD-VSTEST across the whole test assembly followed by CMD-TRXCOUNTERS with a
+- [x] [P4-T24] Run CMD-VSTEST across the whole test assembly followed by CMD-TRXCOUNTERS with a
       results directory named for this task. **Acceptance:** EXIT_CODE 0, `failed=0`, and `total`
       strictly greater than BASELINE_TEST_TOTAL by exactly the `total` that the P4-T19 artifact
       recorded from CMD-TRXCOUNTERS. That figure is the class-scoped count of every case the new

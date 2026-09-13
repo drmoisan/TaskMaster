@@ -538,7 +538,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
 
 ## Acceptance Criteria
 
-- [ ] AC1 — S1 move-monitor seam. `QuickFiler/Controllers/QfcQueue.cs` declares
+- [x] AC1 — S1 move-monitor seam. `QuickFiler/Controllers/QfcQueue.cs` declares
       `internal IEmailMoveMonitor MoveMonitor { get; set; }` whose getter returns the existing
       `_moveMonitor` field and whose setter rejects `null` with `ArgumentNullException`. The explicit
       `_moveMonitor` field and its load-bearing per-owner comment survive verbatim; the field is not
@@ -564,14 +564,14 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       `QuickFiler/Controllers/QfcQueue.Tlp.cs` and has its inner argument substituted by AC4; its
       enclosing `UiIdleCallAsync` wrapper is unchanged, which is the property this criterion gates.
 
-- [ ] AC3 — S3 viewer-factory seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
+- [x] AC3 — S3 viewer-factory seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
       `internal Func<CancellationToken, ItemViewer> ItemViewerFactory { get; set; }` defaulted to the
       `ItemViewerQueue.Dequeue` method group, and `AddAsync` calls `ItemViewerFactory(_token)` in
       place of the previous direct call. A named test asserts, without invoking the delegate, that the
       default's `Method.Name` is `Dequeue` and its `Method.DeclaringType` is `ItemViewerQueue`, and a
       second named test asserts the substituted factory receives the queue's own cancellation token.
 
-- [ ] AC4 — S4 row-placer seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
+- [x] AC4 — S4 row-placer seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
       `internal Action<TableLayoutPanel, ItemViewer, int> ViewerRowPlacer { get; set; }` as a lazy
       `??=` property defaulted to the `AddViewerToTlp` method group, because an instance-method default
       cannot appear in an initializer. `AddAsync` calls `ViewerRowPlacer(tlp, viewer, indexNumber)`
@@ -579,14 +579,14 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       on first read and that a substituted placer receives exactly the tuple
       `(tlp, viewer, indexNumber)` that the previous direct call passed.
 
-- [ ] AC5 — S5 item-group seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
+- [x] AC5 — S5 item-group seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
       `internal Func<TableLayoutPanel, MailItem, int, Task<QfcItemGroup>> ItemGroupFactory { get; set; }`
       as a lazy `??=` property defaulted to the `AddAsync` method group, and
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` line 177 routes through it. Named tests assert the
       default is non-null on first read and that a substituted factory is invoked once per item with
       the `items[i - start]` mapping preserved for a non-zero `start`.
 
-- [ ] AC6 — S6 background-template seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
+- [x] AC6 — S6 background-template seam. `QuickFiler/Controllers/QfcQueue.Tlp.cs` declares
       `internal Func<TableLayoutPanel, TableLayoutPanel> BackgroundTlpFactory { get; set; }` defaulted
       to `template => template.Clone(name: "BackgroundTableLayout")`, reproducing the previous
       expression including the named argument, and `QuickFiler/Controllers/QfcQueue.Enqueue.cs` lines
@@ -594,7 +594,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       that the `TableLayoutPanel` the substituted factory returns is the same reference that reaches
       the dequeued queue entry, proving the value flows through unmodified.
 
-- [ ] AC7 — Seam contracts. The setter of each of `MoveMonitor`, `UiIdleDispatcher`,
+- [x] AC7 — Seam contracts. The setter of each of `MoveMonitor`, `UiIdleDispatcher`,
       `ItemViewerFactory`, `ViewerRowPlacer`, `ItemGroupFactory` and `BackgroundTlpFactory` rejects
       `null` with `ArgumentNullException`, and the getter of each returns a non-null value on a
       freshly constructed queue before any assignment. Verified by a named test per seam named in
@@ -616,7 +616,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       re-measured line count per file recorded in the evidence qa-gates directory; the predicted
       figures in this document are arithmetic estimates and are not acceptable as evidence.
 
-- [ ] AC9 — Project manifests. `QuickFiler/QuickFiler.csproj` contains a `<Compile Include>` item for
+- [x] AC9 — Project manifests. `QuickFiler/QuickFiler.csproj` contains a `<Compile Include>` item for
       each of `QuickFiler/Controllers/QfcQueue.Tlp.cs`, `QuickFiler/Controllers/QfcQueue.UiIdle.cs`
       and `QuickFiler/Interfaces/IUiIdleDispatcher.cs`, and
       `QuickFiler.Test/QuickFiler.Test.csproj` contains one for
@@ -627,41 +627,41 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       references a type declared in each new production file, so a missing manifest entry fails the
       build rather than passing silently.
 
-- [ ] AC10 — Guard branches reachable. Named tests prove `EnqueueAsync` throws
+- [x] AC10 — Guard branches reachable. Named tests prove `EnqueueAsync` throws
       `ArgumentNullException` for a null `items` argument and `ArgumentException` for an empty one,
       using FluentAssertions async throw assertions.
 
-- [ ] AC11 — Success path reachable. A named test enqueues one page with all seams substituted and
+- [x] AC11 — Success path reachable. A named test enqueues one page with all seams substituted and
       asserts the queue count becomes 1, that the dequeued tuple carries the `TableLayoutPanel` the
       substituted `BackgroundTlpFactory` produced, and that the item groups appear in input order.
 
-- [ ] AC12 — Catch paths reachable. Two named tests make the substituted `ItemGroupFactory` throw
+- [x] AC12 — Catch paths reachable. Two named tests make the substituted `ItemGroupFactory` throw
       `OperationCanceledException` and `InvalidOperationException` respectively; in both cases
       `EnqueueAsync` does not propagate, the queue count stays 0, and the running-jobs counter returns
       to 0.
 
-- [ ] AC13 — Counter bookkeeping observable. A named test captures the running-jobs count from inside
+- [x] AC13 — Counter bookkeeping observable. A named test captures the running-jobs count from inside
       a seam callback to prove the increment took effect mid-flight, and asserts the count is 0 after
       each of the three outcomes in AC11 and AC12, proving the `finally` decrement.
 
-- [ ] AC14 — Collection-changed notification reachable on both arms. A named test subscribes to
+- [x] AC14 — Collection-changed notification reachable on both arms. A named test subscribes to
       `CollectionChanged` and asserts exactly one event whose `Action` is
       `NotifyCollectionChangedAction.Add`; a second named test runs the same flow with no subscriber
       attached and asserts no exception, covering the other arm of the null-conditional invocation at
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` line 133.
 
-- [ ] AC15 — Move-monitor hook verified. A named test assigns a
+- [x] AC15 — Move-monitor hook verified. A named test assigns a
       `Mock<IEmailMoveMonitor>(MockBehavior.Strict)` through S1 and verifies `HookItem` is called
       exactly once per item with the item and a non-null `Action<MailItem>`. The captured delegate is
       not invoked by the test, because it is an async-void lambda.
 
-- [ ] AC16 — `LoadControllersViewersAsync` branches reachable. Named tests cover both arms of the
+- [x] AC16 — `LoadControllersViewersAsync` branches reachable. Named tests cover both arms of the
       `digits` ternary at `QuickFiler/Controllers/QfcQueue.Enqueue.cs` line 166 at totals of 9, 10 and
       11; the carrier-found and carrier-absent outcomes of `ResolveCarriedHandler`; the nine-argument
       pass-through into `ItemControllerFactory` with every argument captured and asserted; and one
       awaited `InitializeAsync` call per row verified with `Times.Once`.
 
-- [ ] AC17 — `AddAsync` body executed, not displaced. A named test leaves `ItemGroupFactory` at its
+- [x] AC17 — `AddAsync` body executed, not displaced. A named test leaves `ItemGroupFactory` at its
       default and substitutes only S3 and S4, calls `AddAsync` directly, and asserts the returned
       `QfcItemGroup` carries the supplied `MailItem`, that `ItemViewerFactory` received the queue's
       cancellation token, and that `ViewerRowPlacer` received `(tlp, viewer, indexNumber)`. This
