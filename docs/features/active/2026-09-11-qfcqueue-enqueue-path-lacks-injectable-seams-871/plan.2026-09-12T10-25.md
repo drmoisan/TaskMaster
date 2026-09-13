@@ -966,7 +966,7 @@ either file.
       must equal the sum. No count predicted from this plan is used. Recorded in artifact
       p4-t24-tests.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P4-T25] Commit Phase 4 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
+- [x] [P4-T25] Commit Phase 4 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
       and every path it reports satisfies the Scope-lock rule.
 
 ---
