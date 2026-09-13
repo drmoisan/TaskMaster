@@ -1066,6 +1066,7 @@
     <Compile Include="OutlookObjects\Table\OlTableExtensions.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions.RowTransforms.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions.TableAccess.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions.TableAccess.Failures.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItem.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemExtensions.cs" />
