@@ -74,3 +74,96 @@ The shared build lock was acquired for item 873 at 2026-09-13T06:46:19-04:00, he
 ## Consequence for the Plan
 
 [P6-T2] is left unchecked. [P6-T3], [P6-T4] and [P6-T5] are left unchecked because each depends on an artifact this run did not produce. AC23 is left unchecked. Phase 7 is not begun.
+
+---
+
+# Run 2 — Post-Merge Re-Run (acceptance MET)
+
+Timestamp: 2026-09-13T14-56
+
+Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath <worktree-root>; & <worktree-root>/scripts/vscode/Invoke-MSTestWithCoverage.ps1'`
+
+EXIT_CODE: 0
+
+ExpectedExitCode: 0
+
+Output Summary: The run completed end to end. 7222 tests executed, 7222 passed, 0 failed, in 32.78 seconds. The raw coverage document was retained in the repository coverage directory, the projection was written beside it, the projection parses as XML, its summed package LINE counters reconcile exactly against the raw document's root attributes, and the test-result summary was written to the results directory. This task's acceptance is MET.
+
+VERDICT: PASS.
+
+## Why Run 1 Failed And Run 2 Did Not
+
+Run 1 was aborted by three `QuickFiler.Test` failures, each a `System.TypeInitializationException` for `Deedle.Reflection` whose root cause was a failed bind of `netstandard, Version=2.1.0.0`. That artifact attributed the failure to a pre-existing defect outside this delivery's Write Set and declined to repair it.
+
+That attribution is confirmed correct by this run. The defect was repaired on `main` by a separate item, not by this delivery. Between Run 1 and Run 2 this branch merged `origin/main`; the merge carried in commit `509af24ed`, `fix(877): install QuickFiler.Test's own AssemblyResolve fallback from a shared TestSupport source file`, which adds `TestSupport/TestAssemblyResolver.cs` and installs the fallback in `QuickFiler.Test/SetupAssemblyInitializer.cs`. The solution was then rebuilt so the Debug assemblies under test carry that fix.
+
+No file in this delivery's Write Set was modified to make this run pass. The plan's Phase 6 flakiness-attribution rule was followed in Run 1 and is vindicated here.
+
+## Test Count Movement
+
+| Figure | Run 1 | Run 2 |
+|---|---|---|
+| Total tests | 7221 | 7222 |
+| Passed | 7218 | 7222 |
+| Failed | 3 | 0 |
+
+The three failures are resolved. The total rose by one because the merge also carried item 839's change to `QuickFiler.Test/Controllers/QfcHomeControllerTests.cs`.
+
+## Acceptance Observations
+
+The coverage tree was emptied to `coverage/.gitkeep` alone immediately before this run, so every observation below is attributable to this run rather than to a stale file left by Run 1.
+
+RAW_COVERAGE_DOCUMENT_PRESENT: true
+
+PROJECTION_FILE_PRESENT: true
+
+PROJECTION_PARSES_AS_XML: true
+
+TEST_RESULT_SUMMARY_PRESENT: true
+
+### Reconciliation integers
+
+| Figure | Projection | Raw document | Equal |
+|---|---|---|---|
+| Covered lines | 56066 | 56066 | yes |
+| Valid lines | 65416 | 65416 | yes |
+
+The projection figure is the sum of the package-level `LINE` counters; the raw figures are the root element's `lines-covered` and `lines-valid` attributes. The valid-lines figure is the sum of the `missed` and `covered` counters.
+
+### First-party coverage headline printed by the run
+
+```
+First-party coverage: lines 56066/65416 (85.71%), branches 13495/16896 (79.87%)
+```
+
+Both figures clear the `CLAUDE.md` floors of 80% line and 75% branch.
+
+## Post-Run State Of The Repository Coverage Directory
+
+Listed repository-relative; no absolute host path is recorded.
+
+```
+coverage/.gitkeep
+coverage/coverage.cobertura.xml
+coverage/coverage.cobertura.jacoco.xml
+coverage/test-results/mstest-coverage-run.trx
+coverage/test-results/mstest-coverage-run.summary.txt
+```
+
+Retention on this path is load-bearing and is confirmed: the raw document survives because the resolved output directory is the repository coverage directory.
+
+Unlike Run 1, this run produced no MSTest deployment directory. The subdirectory count under `coverage/test-results` after this run is 0.
+
+None of these paths is committed; the whole `coverage` tree is ignored by the repository ignore file.
+
+## Elapsed Time
+
+RUN_START: 2026-09-13T14:55:21-04:00
+
+RUN_END: 2026-09-13T14:56:38-04:00
+
+ELAPSED_SECONDS: 77
+
+## Build Lock
+
+The shared build lock was acquired for item 873 at 2026-09-13T14:55:15-04:00, held across this single run only, and released at 2026-09-13T14:56:48-04:00 immediately after the run returned.

@@ -293,7 +293,7 @@ New behaviour is asserted in new test files rather than by extending the existin
 - [x] **AC20 — File-size ceiling and helpers headroom.** Every PowerShell file in the Write Set is at most 500 lines after the change, and the net line growth of `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` is at most 1 line, that line being the dot-source of the new projection part file. Both are confirmed by a line count over the changed files.
 - [x] **AC21 — New-code coverage.** A direct Pester coverage capture over `scripts/vscode/Invoke-MSTestWithCoverage.Projection.ps1` and `scripts/vscode/Invoke-MSTest.TrxSummary.ps1` reports at least 90% line coverage for each, and the capture is recorded in this feature folder's evidence tree under the qa-gates kind. The qa-gates kind is named deliberately: the canonical evidence kinds are baseline, regression-testing, qa-gates, issue-updates, other and remediation-baseline, and a coverage kind is not among them, so an artifact written under a coverage kind would fail the evidence-path rule.
 - [x] **AC22 — Full toolchain pass and no temporary files.** A single consecutive pass of `Invoke-Formatter`, `Invoke-ScriptAnalyzer`, and `Invoke-Pester` over the changed script and test files completes with zero new findings and zero failed tests, and the C# format check completes without error. The two msbuild passes named in `CLAUDE.md` are judged against the Phase 0 baseline rather than against absolute zero: each must record an exit code and an error count that are no worse than the Phase 0 baseline recorded for that same command. Absolute success is deliberately not demanded, because the pre-change state of a whole-solution rebuild is not this delivery's to fix and a red baseline would make the clause unsatisfiable for reasons this change does not cause. A review of the seven test files in the Write Set confirms no test creates, writes or deletes a file on disk and no fixture is loaded from a path.
-- [ ] **AC23 — End-to-end observation.** The coverage entry point is run twice: once with the coverage output left at its default, after which the raw document is still present in the repository coverage directory and a projection file sits beside it that parses as XML and whose summed LINE counters equal the raw document's root covered-lines and valid-lines attributes; and once with the output pointed at a directory that is not the repository coverage directory itself, after which the raw document is absent and the projection and summary are present. The second run's directory is required to differ from the repository coverage directory; it is not required to sit outside the coverage tree. Invariant 4 states the discard branch as any directory other than the repository coverage directory, so a subdirectory of that tree exercises the discard branch exactly as an unrelated directory would, and keeping the second run inside the already-ignored coverage tree is what stops it adding a path that the footprint inventory and the clean-tree gate would otherwise have to admit. Both runs also produce a test-result summary. Neither run creates a test-result document bearing the default account-and-host file name: the check is scoped to paths that a porcelain status reports as added or modified relative to the base commit the plan's Phase 0 records. A whole-working-tree scan is explicitly not used, because more than one hundred such documents are already tracked from earlier features — one of them still carrying an unredacted default name — so a tree-wide scan would fail no matter what this delivery does. Removing those is the repository-wide sweep item's scope.
+- [x] **AC23 — End-to-end observation.** The coverage entry point is run twice: once with the coverage output left at its default, after which the raw document is still present in the repository coverage directory and a projection file sits beside it that parses as XML and whose summed LINE counters equal the raw document's root covered-lines and valid-lines attributes; and once with the output pointed at a directory that is not the repository coverage directory itself, after which the raw document is absent and the projection and summary are present. The second run's directory is required to differ from the repository coverage directory; it is not required to sit outside the coverage tree. Invariant 4 states the discard branch as any directory other than the repository coverage directory, so a subdirectory of that tree exercises the discard branch exactly as an unrelated directory would, and keeping the second run inside the already-ignored coverage tree is what stops it adding a path that the footprint inventory and the clean-tree gate would otherwise have to admit. Both runs also produce a test-result summary. Neither run creates a test-result document bearing the default account-and-host file name: the check is scoped to paths that a porcelain status reports as added or modified relative to the base commit the plan's Phase 0 records. A whole-working-tree scan is explicitly not used, because more than one hundred such documents are already tracked from earlier features — one of them still carrying an unredacted default name — so a tree-wide scan would fail no matter what this delivery does. Removing those is the repository-wide sweep item's scope.
 
 ## Acceptance Status Summary
 
@@ -302,8 +302,12 @@ evidence path is relative to
 `docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873/`.
 
 AC_TOTAL: 23
-AC_SATISFIED: 22
-AC_OUTSTANDING: 1
+AC_SATISFIED: 23
+AC_OUTSTANDING: 0
+
+Updated by plan task [P6-T5] at 2026-09-13T15-05, when Phase 6 completed and AC23 moved from
+OUTSTANDING to SATISFIED. The figures above are the current ones; the AC23 row and the section below
+record the change.
 
 | AC | Status | Evidence |
 |---|---|---|
@@ -329,24 +333,46 @@ AC_OUTSTANDING: 1
 | AC20 | SATISFIED | `evidence/qa-gates/p7-t8-file-size-audit.md` |
 | AC21 | SATISFIED | `evidence/qa-gates/p7-t7-new-code-coverage.md`, `evidence/qa-gates/p7-t7-new-code-coverage.jacoco.xml` |
 | AC22 | SATISFIED | `evidence/qa-gates/p7-t1-final-format.md`, `evidence/qa-gates/p7-t2-final-analyze.md`, `evidence/qa-gates/p7-t3-final-test.md`, `evidence/qa-gates/p7-t4-final-csharpier-check.md`, `evidence/qa-gates/p7-t5-final-msbuild-analyzer.md`, `evidence/qa-gates/p7-t6-final-msbuild-nullable.md`, `evidence/qa-gates/p7-t13-no-temporary-files-review.md` |
-| AC23 | OUTSTANDING | `evidence/qa-gates/p7-t0-phase6-outstanding-disclosure.md`, `evidence/regression-testing/p6-t1-assembly-inventory.md`, `evidence/regression-testing/p6-t2-default-output-run.md` |
+| AC23 | SATISFIED | `evidence/regression-testing/p6-t1-assembly-inventory.md`, `evidence/regression-testing/p6-t2-default-output-run.md`, `evidence/regression-testing/p6-t3-external-output-run.md`, `evidence/regression-testing/p6-t4-default-name-scan.md`, `evidence/qa-gates/p6-post-merge-csharp-revalidation.md` |
 
-### AC23 — reason for OUTSTANDING
+### AC23 — history and resolution
 
-AC23 is recorded as OUTSTANDING and is not recorded as satisfied. Its checkbox above is deliberately
-left unmarked.
+AC23 was recorded as OUTSTANDING in the P7-T14 summary written at 2026-09-13T07-24. It is now
+SATISFIED. Both states are recorded rather than the earlier one being erased, because the reason for
+the delay is part of the audit trail.
 
-Reason: plan tasks P6-T2, P6-T3, P6-T4 and P6-T5 have not run. P6-T1 is complete and recorded the
-assembly inventory; P6-T2's first attempt was aborted on a pre-existing defect and is recorded rather
-than repaired, as the plan's Phase 6 flakiness rule directs. AC23's operative observations are the two
-end-to-end runs of the coverage entry point and the default-name scan over their output, and none of
-those observations has been made. The evidence paths listed for AC23 are the artifacts that record
-that absence and its reason, not artifacts that satisfy the criterion.
+Why it was OUTSTANDING: plan tasks P6-T2 through P6-T5 had not run. P6-T2's first attempt aborted on
+three `QuickFiler.Test` failures whose root cause was a failed bind of `netstandard, Version=2.1.0.0`
+at static-initialiser time. That artifact attributed the failure to a pre-existing defect outside this
+delivery's Write Set and, following the plan's Phase 6 flakiness-attribution rule, recorded and
+reported it rather than repairing it.
 
-The Phase 7 pass that produced this summary was taken with those four Phase 6 tasks outstanding. The
-disclosure artifact records that fact, names the tracked paths Phase 6 would modify, and records the
-determination that none of them is a file any Phase 7 gate measures, so the Phase 7 results above
-stand on their own evidence.
+Why it is now SATISFIED: that attribution proved correct. The defect was repaired on `main` by a
+separate item, issue 877, merged as pull request 880, whose commit `509af24ed` installs an
+`AssemblyResolve` fallback from a shared `TestSupport` source file. This branch merged `origin/main`
+at `a5622ab9123a88bfa3ec5b8fccfdc613e74c4df5`, creating merge commit
+`e0b4a8c2f83ced8514f00b8e0ba1825327ae4111`, and rebuilt the solution. No file in this delivery's Write
+Set was modified to make the run pass.
+
+The criterion's operative observations have now all been made:
+
+- First run, coverage output at its default: raw document retained, projection present beside it,
+  projection parses as XML, and its summed `LINE` counters equal the raw document's root attributes
+  exactly at 56066 covered and 65416 valid. Test-result summary present.
+- Second run, output pointed at `coverage\tm873-external-output`, a directory other than the
+  repository coverage directory: raw document absent, projection and summary present. This is the
+  discard branch required by invariant 4.
+- Default-name scan: zero matches over each results-directory listing and zero matches over the
+  changed-path union.
+
+Both runs executed 7222 tests with 0 failures.
+
+The P7-T0 disclosure reasoned that Phase 6 as written could not modify any file a Phase 7 gate
+measures, and identified the one route by which that could change. The merge performed in Phase 6 was
+outside what that disclosure covered, because it altered C# compilation inputs. The three C# gates
+were therefore re-run against the merged tree and returned results identical to their Phase 0
+baselines; this is recorded in `evidence/qa-gates/p6-post-merge-csharp-revalidation.md`. The merge
+changed no PowerShell file, so the PowerShell gates retain their inputs.
 
 ### Headline numeric results behind the Phase 7 criteria
 
