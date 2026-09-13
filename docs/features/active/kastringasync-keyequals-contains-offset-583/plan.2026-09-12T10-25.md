@@ -346,7 +346,7 @@ file.
   the recorded repo-wide clean shape ("Checked 1517 files in 6574ms.", 0 needing formatting) at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/csharpier-check.2026-08-22T09-53.md.
 
-- [ ] [P5-T3] Run the solution's analyzer Rebuild (Configuration Debug, Platform Any CPU, the
+- [x] [P5-T3] Run the solution's analyzer Rebuild (Configuration Debug, Platform Any CPU, the
   EnableNETAnalyzers and EnforceCodeStyleInBuild properties both true) with a detailed file logger,
   count the "Skipping target CoreCompile" and "CoreCompile:" log-line occurrences, and record a
   Timestamp field, a Command field, an EXIT_CODE field, and an Output Summary field in
