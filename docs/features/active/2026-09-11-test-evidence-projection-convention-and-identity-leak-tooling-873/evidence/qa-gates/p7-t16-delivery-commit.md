@@ -77,8 +77,55 @@ and that fact is recorded here rather than left implicit. This executor made no 
 appear in the delivery set belong to other agents' directories and are delivery content: they are the
 identifier-leak substitutions that P5-T5 through P5-T10 name and that AC17 and AC19 are judged on.
 
+## Delivery commit result
+
+Commit: `019af015`
+Branch: `bug/test-evidence-projection-convention-and-identity-leak-tooling-873`
+Summary line: `18 files changed, 1821 insertions(+), 19 deletions(-)`
+
+Fifteen of the eighteen were newly created evidence artifacts under this feature folder. The other
+three are this plan file, the spec, and
+`tests/scripts/vscode/Invoke-MSTestWithCoverage.Projection.Tests.ps1`, which carries the two tests the
+P7-T7 remediation added. Every other path in the delivery pathspec set was already committed by an
+earlier phase and was clean, so it contributed nothing to this commit.
+
+The executor agent-memory commit was not run, because `EXECUTOR_MEMORY_PATH_COUNT` is 0 as recorded
+above. Neither `git add --` nor `git commit` was issued for that step.
+
 ## POST_COMMIT_PORCELAIN:
 
-Recorded below after the delivery commit.
+Command: git status --porcelain --untracked-files=all
 
-EXIT_CODE: recorded below.
+```
+```
+
+EXIT_CODE: 0
+
+The output is empty. Taken immediately after the delivery commit, this records that the delivery
+pathspec set covered every dirty path: nothing this Phase 7 pass produced was left unstaged or
+uncommitted.
+
+This is not yet the clean-tree observation this task's acceptance requires. Marking this task's own
+checkbox in the plan file is itself a modification of a tracked file, so a status run taken before
+that check-off cannot be the evidence that the worktree is clean at hand-back. The check-off, its own
+commit, and the final status run follow below.
+
+## Check-off commit and final status
+
+After this artifact was committed, this task's checkbox was marked in
+`docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873/plan.2026-09-12T10-26.md`,
+that file alone was staged with `git add --`, and it was committed with a single `-m` message
+identifying it as this task's check-off. The final
+`git status --porcelain --untracked-files=all` was then run and printed empty output.
+
+FINAL_PORCELAIN_EMPTY: true
+FINAL_STATUS_TAKEN_AFTER_CHECKOFF_COMMIT: true
+
+No `git push` was run. Publishing is the caller's.
+
+## Output Summary
+
+Delivery committed as `019af015` with 18 files changed. The executor agent-memory disposition is
+empty and both of its commands were correctly not run. `POST_COMMIT_PORCELAIN:` printed empty output
+with EXIT_CODE: 0, and the final status run, taken after this task's own check-off was committed, also
+printed empty output. The worktree is clean at hand-back and nothing was pushed.
