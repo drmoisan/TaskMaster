@@ -1209,7 +1209,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   Acceptance: `Checked:` is exactly 12 and `Unchecked:` is exactly 0. A count other than twelve checked
   means a criterion was flipped twice or not at all and fails this task.
 
-- [ ] [P2-T32] Commit the code change and the evidence with explicit pathspecs and write nothing
+- [x] [P2-T32] Commit the code change and the evidence with explicit pathspecs and write nothing
   further in this task.
 
   ```
