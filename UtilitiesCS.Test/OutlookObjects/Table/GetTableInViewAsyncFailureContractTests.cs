@@ -275,8 +275,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                 }
             );
 
-            Func<int, CancellationTokenSource> neverCancellingFactory = _ =>
-                new CancellationTokenSource();
+            Func<int, CancellationTokenSource> neverCancellingFactory =
+                _ => new CancellationTokenSource();
 
             // Act
             Func<Task> act = () =>
