@@ -4,7 +4,11 @@ Task: [P1-T11]
 Timestamp: 2026-09-13T02-50
 Command: none (verdict authored from the P0-T11 declaration and the P1-T9 and P1-T10 measurement artifacts in this folder)
 EXIT_CODE: 0
-Output Summary: the serial-regime figures select row 1 of the pre-declared decision rule; H-LEAK is REJECTED by direct observation and H-COST (elapsed fixture cost) is the single operative mechanism. No expiry was observed in either instrumented run.
+Output Summary: the serial-regime figures select row 1 of the pre-declared decision rule; H-LEAK is REJECTED by direct observation OF THE PRE-DECLARED COUNTER OBSERVABLE — the serial-regime contended count and the balance-test difference declared in advance at P0-T11 — and H-COST (elapsed fixture cost) is the single surviving mechanism. No expiry was observed in either instrumented run.
+
+AMENDMENT (review finding R-2, applied 2026-09-13). The phrase "rejected by direct observation" above originally stood without its object, which read as though an expiry had been observed and attributed. It was not. Nothing in this artifact rests on a reproduced expiry: the serial run recorded `timeout=0` over 1394 tests and the parallel run `timeout=0` over 1395, as section (v) states. The rejection of H-LEAK rests entirely on the counter observable, which is a legitimate basis and was declared before the measurement rather than chosen after it.
+
+CONSEQUENCE FOR AC1, STATED EXPLICITLY SO IT IS NOT INFERRED EITHER WAY. AC1's no-expiry clause is NOT satisfied by this evidence, so AC1 is NOT marked PASS and its checkbox in `spec.md` is unchecked. The defect did not reproduce in 62 targeted runs or in 1394 serial runs. Whether a non-reproducing negative result of this shape discharges AC1 is a judgment reserved to the maintainer; it is escalated and unresolved at the time of this amendment. No agent has ruled on it, and this artifact must not be read as ruling on it.
 
 ## (i) The discriminating observable (restated verbatim from the P0-T11 declaration)
 
