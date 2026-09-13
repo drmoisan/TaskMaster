@@ -44,6 +44,19 @@ tool now applies it automatically for both standalone and epic-child folders.
 tool appended the issue number and omitted the `YYYY-MM-DD-` prefix entirely, so the check below
 is still worth running on every creation rather than assuming the 2026-07-10 behavior holds.
 
+**REGRESSION CONFIRMED AGAIN, 2026-09-12 (#602).** `type: bug`,
+`feature_name=host-identifier-leakage-sweep`, `issue_number=602` again produced the prefix-less
+`docs/features/active/host-identifier-leakage-sweep-602`. Two bug-type data points now (#810, #602)
+with no prefix, against feature-type and epic-child runs that do prefix. Treat the prefix-less form as
+the EXPECTED outcome for `type: bug` and plan the rename into the flow rather than checking for it.
+
+A cheaper recovery than renaming: if the scaffolded documents are still the untouched templates (a
+skeleton `spec.md` and an empty timestamped plan file), do not `git mv` them. `git clean -fdx -- <old-folder>`
+the whole thing and materialize the real documents straight into the correctly-named folder. Renaming
+is only worth it once the folder holds authored content. Note also that the scaffolded plan file's
+timestamp becomes a second plan path competing with the one you actually want as canonical, which is a
+further reason to discard rather than move it.
+
 Renaming it is awkward when `pwsh` is refused by the sandbox (see
 [[worktree-isolation-blocks-pwsh-per-agent-type]]): `Move-Item` and `Rename-Item` are both
 unavailable, and `git mv` refuses an untracked path. The two-step that works with `git` alone is
