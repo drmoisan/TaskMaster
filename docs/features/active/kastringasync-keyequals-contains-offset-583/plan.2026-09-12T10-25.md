@@ -45,8 +45,21 @@ QuickFiler.Test build output assembly, the collection controller QfcCollectionCo
 keyboard dispatch handler KeyboardHandler.cs, the QuickFiler.Test Controllers KbdActions test
 file, and every path cited under the archived feature folder for issue #445
 (docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445) as the source
-of recorded gate output. None of these is created, modified, or deleted by this change; the
-diff's only writes are the backtick-marked Write Set paths.
+of recorded gate output. None of these is created, modified, or deleted by this change. This
+change's own source and documentation writes are the backtick-marked Write Set paths and no
+others. The agent-memory tree is the one further path this branch carries: the agents executing
+this plan maintain it as tracked session bookkeeping, it is no part of this change's footprint,
+and P5-T15 admits it to that task's scope list on that basis.
+
+The transient raw coverage output produced by P0-T8 and P5-T5 is likewise plain text here and is
+never a write claim against this repository. Each of those tasks directs dotnet-coverage to write
+its Cobertura-format file into a session-specific folder beneath the operating system's per-user
+temporary directory, resolved at run time from the runtime's temporary-path lookup and lying
+outside the repository root; the file is read for its figures and deleted before the task that
+produced it completes. This change creates no raw coverage XML anywhere inside the repository, and
+no raw coverage document and no test-results file is added to git. Per the projection-only
+evidence decision recorded on issue #671 on 2026-09-11, the markdown artifacts named in P0-T8 and
+P5-T5 are the evidence of record.
 
 ## Pinned file (read-only, never edited by this plan)
 
@@ -89,8 +102,12 @@ file.
   Nullable element; that MSBuild property is a solution-wide opt-in that CI deliberately omits. No
   task in this plan adds it.
 - **git diff anchoring.** Every git diff in this plan is anchored to the origin main ref, this
-  worktree's base (identical to the worktree HEAD at plan-authoring time), never left unanchored
-  and never pinned to a literal commit SHA.
+  worktree's base, never left unanchored and never pinned to a literal commit SHA. The worktree HEAD
+  is not identical to that ref: it carries one pre-execution documentation commit that added this
+  feature folder's issue.md, spec.md, plan file and research record, so an unscoped anchored diff
+  reports those four paths in addition to whatever this plan's tasks change. P5-T7's anchored diff is
+  scoped to QuickFiler/Controllers/KaStringAsync.cs, which that commit did not touch, so its added
+  line set is unaffected; P5-T15's scope list names the four documentation paths explicitly.
 
 ### Phase 0 — Context, Policy Reads, Toolchain Bootstrap, and Baselines
 
@@ -172,18 +189,47 @@ file.
 
 - [ ] [P0-T8] Run a coverage-instrumented test capture of the whole QuickFiler.Test.dll assembly,
   using dotnet-coverage collect wrapping the resolved vstest executable against that assembly with
-  the TaskMaster CLI runsettings file, InIsolation, and the LiveOutlook-category exclusion filter,
-  writing Cobertura-format output to
-  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/coverage-baseline.cobertura.xml`.
-  Read the emitted Cobertura XML's root line-rate and branch-rate attributes, and aggregate every
-  class element whose filename ends with the KaStringAsync source file name (deduplicated by line
-  number, maximum hits) into a covered/total count for that file. Record both in
-  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/coverage-baseline.md`.
+  the TaskMaster CLI runsettings file, InIsolation, and the LiveOutlook-category exclusion filter.
+  The coverage tool still writes its Cobertura-format output, but to a transient file in a
+  session-specific folder beneath the operating system's per-user temporary directory, resolved at
+  run time from the runtime's temporary-path lookup, never to any path inside this repository.
+  That raw file is read for its figures within this task and then deleted at the end of this task;
+  it is never added to git, and no raw coverage document is written under this feature's evidence
+  directory. From the raw document, read the root line-rate and branch-rate attributes; aggregate
+  every class element whose filename ends with the KaStringAsync source file name (deduplicated by
+  line number, maximum hits) into a covered/total count for that file; and derive from the same
+  aggregation a per-line hits projection for that file, one row per executable line number paired
+  with its maximum hit count across every matching class element, deduplicated by line number.
+  Record the numeric root line-rate, the numeric root branch-rate, the covered/total count, and the
+  per-line hits projection (under a section heading reading Per-line hits projection) in
+  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/coverage-baseline.md`,
+  together with: the raw-output location expressed as its subfolder and file name relative to the
+  temporary directory root (no absolute host path); the run-time result of a prefix comparison
+  showing that the resolved temporary directory's full path does not begin with the repository
+  root's full path, recorded as that comparison's boolean verdict alone with neither operand path
+  reproduced; the post-deletion existence check of the raw file; and a directory listing of
+  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/`
+  taken after the deletion, recorded as entry names only with no containing-directory header line.
+  None of those four recorded observations reproduces an absolute path: the raw-output location is
+  recorded relative to the temporary directory root, the prefix comparison as a labelled boolean
+  with neither operand reproduced, the existence check as a boolean, and the directory listing as
+  entry names only. That constraint governs those four observations only. The artifact's mandatory
+  Command field records the exact command, which names the resolved absolute executable paths per
+  the Command Reference above, and lies outside the constraint's scope; the archived precedent this
+  task is compared against records its command in the same form.
   Acceptance: an observed exit code of 0; the inner test run reports "Test Run Successful." with 0
   Failed; the Output Summary field carries the numeric line-rate, branch-rate, and the
   KaStringAsync file's covered/total counts (not a placeholder), using the same per-file
   aggregation method recorded at
-  docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/coverage-baseline.2026-08-22T09-34.md.
+  docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/coverage-baseline.2026-08-22T09-34.md;
+  the artifact's per-line hits projection section holds at least one row and repeats no line
+  number; the recorded directory listing of the baseline evidence subfolder contains no entry
+  whose name ends with .xml; the recorded prefix comparison shows the raw-output location lies
+  outside this repository's root; the recorded post-deletion existence check reports the raw
+  file absent; and none of the four observations above reproduces an absolute path — the
+  raw-output location appearing relative to the temporary directory root, the prefix comparison as
+  a labelled boolean with neither operand path, the existence check as a boolean, and the directory
+  listing as entry names only.
 
 - [ ] [P0-T9] Run a scoped, non-instrumented vstest filter selecting every test whose fully
   qualified name contains the pinned KbdActions test class name, against the QuickFiler.Test build
@@ -320,17 +366,48 @@ file.
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/msbuild-nullable.2026-08-22T09-23.md.
 
 - [ ] [P5-T5] Run a coverage-instrumented test capture of the whole QuickFiler.Test.dll assembly,
-  identical in form to P0-T8, writing Cobertura-format output to
-  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/coverage-postchange.cobertura.xml`.
-  Read the emitted Cobertura XML's root line-rate and branch-rate attributes, and aggregate every
-  class element whose filename ends with the KaStringAsync source file name into a post-change
-  covered/total count. Record both in
-  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/coverage-postchange.md`.
+  identical in form to P0-T8. The coverage tool still writes its Cobertura-format output, but to a
+  transient file in a session-specific folder beneath the operating system's per-user temporary
+  directory, resolved at run time from the runtime's temporary-path lookup, never to any path
+  inside this repository. That raw file is read for its figures within this task and then deleted
+  at the end of this task; it is never added to git, and no raw coverage document is written under
+  this feature's evidence directory. From the raw document, read the root line-rate and
+  branch-rate attributes; aggregate every class element whose filename ends with the KaStringAsync
+  source file name (deduplicated by line number, maximum hits) into a post-change covered/total
+  count for that file; and derive from the same aggregation the per-line hits projection for that
+  file in the same form as P0-T8 (one row per executable line number paired with its maximum hit
+  count across every matching class element, deduplicated by line number), which P5-T7's
+  changed-line intersection reads. Record the numeric root line-rate, the numeric root
+  branch-rate, the post-change covered/total count, and the per-line hits projection (under a
+  section heading reading Per-line hits projection) in
+  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/coverage-postchange.md`,
+  together with: the raw-output location expressed as its subfolder and file name relative to the
+  temporary directory root (no absolute host path); the run-time result of a prefix comparison
+  showing that the resolved temporary directory's full path does not begin with the repository
+  root's full path, recorded as that comparison's boolean verdict alone with neither operand path
+  reproduced; the post-deletion existence check of the raw file; and a directory listing of
+  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/`
+  taken after the deletion, recorded as entry names only with no containing-directory header line.
+  None of those four recorded observations reproduces an absolute path: the raw-output location is
+  recorded relative to the temporary directory root, the prefix comparison as a labelled boolean
+  with neither operand reproduced, the existence check as a boolean, and the directory listing as
+  entry names only. That constraint governs those four observations only. The artifact's mandatory
+  Command field records the exact command, which names the resolved absolute executable paths per
+  the Command Reference above, and lies outside the constraint's scope; the archived precedent this
+  task is compared against records its command in the same form.
   Acceptance: an observed exit code of 0; the inner test run reports "Test Run Successful." with 0
   Failed; the Output Summary field carries the numeric line-rate, branch-rate, and the
   KaStringAsync file's covered/total counts (not a placeholder), using the same per-file
   aggregation method recorded at
-  docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/coverage-postchange.2026-08-22T10-38.md.
+  docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/coverage-postchange.2026-08-22T10-38.md;
+  the artifact's per-line hits projection section holds at least one row and repeats no line
+  number; the recorded directory listing of the qa-gates evidence subfolder contains no entry
+  whose name ends with .xml; the recorded prefix comparison shows the raw-output location lies
+  outside this repository's root; the recorded post-deletion existence check reports the raw
+  file absent; and none of the four observations above reproduces an absolute path — the
+  raw-output location appearing relative to the temporary directory root, the prefix comparison as
+  a labelled boolean with neither operand path, the existence check as a boolean, and the directory
+  listing as entry names only.
 
 - [ ] [P5-T6] Run the same scoped, non-instrumented vstest filter used at P0-T9 (selecting every
   test whose fully qualified name contains the pinned KbdActions test class name, against the
@@ -343,22 +420,46 @@ file.
   identical to the P0-T9 baseline with 0 Failed and a delta of 0 — this is the AC5 evidence,
   obtained solely from the test-run outcome and never from a diff of the pinned file.
 
-- [ ] [P5-T7] Compute the coverage delta between
-  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/coverage-postchange.cobertura.xml`
-  and
-  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/coverage-baseline.cobertura.xml`:
-  (a) the instrumented-run line-rate/branch-rate delta, (b) the KaStringAsync file's per-file
-  covered/total before and after, and (c) changed-line coverage, by intersecting the added line
-  numbers from a git diff of QuickFiler/Controllers/KaStringAsync.cs anchored to the origin main
-  ref, using a zero-context unified diff, against the post-change per-line hit map. Record all
-  three, plus a companion git-status porcelain listing (to confirm no untracked file escapes the
-  anchored diff's tracked-file scope), in
+- [ ] [P5-T7] Compute the coverage delta from the two markdown evidence artifacts
+  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/coverage-baseline.md`
+  (P0-T8) and
+  `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/coverage-postchange.md`
+  (P5-T5), reading no raw coverage document (both raw outputs were deleted by the tasks that
+  produced them): (a) the instrumented-run line-rate/branch-rate delta, from the numeric root
+  line-rate and branch-rate figures recorded in the two artifacts; (b) the KaStringAsync file's
+  per-file covered/total before and after, from the covered/total counts recorded in the two
+  artifacts; and (c) changed-line coverage, by intersecting the added line numbers from a git diff
+  of QuickFiler/Controllers/KaStringAsync.cs anchored to the origin main ref, using a zero-context
+  unified diff, against the per-line hits projection recorded in coverage-postchange.md, whose rows
+  are that file's executable lines only: the denominator of the changed-line percentage is the set
+  of added line numbers that appear as a row in that projection, and the added line numbers with no
+  row there are non-executable and are listed separately as excluded from both the numerator and the
+  denominator. The reworded doc-comment lines from P3-T2 are the expected members of that excluded
+  set. A continuation line introduced by a formatter wrap is classified by the same row test rather
+  than assumed to be absent from the projection: the recorded evidence at
+  docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p7-t2-coverage-changed-lines.md
+  shows each continuation line of a wrapped call carrying its own row, so such a line belongs in the
+  denominator whenever it appears as a row there. Also
+  compare the per-line hits projection recorded in coverage-baseline.md against the one recorded
+  in coverage-postchange.md: map each baseline line number to its post-change line number through
+  the same anchored zero-context diff (a baseline line outside every hunk shifts by the net
+  added-minus-removed line count of the hunks that precede it; a baseline line inside a removed
+  hunk range has no post-change counterpart, is excluded from this comparison, and is covered by
+  (c) through its replacement lines), then pair each mapped line's baseline hits with its
+  post-change hits. Record all three computations, plus the projection comparison, plus a
+  companion git-status porcelain listing (to confirm no untracked file escapes the anchored
+  diff's tracked-file scope), in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/coverage-delta.md`.
   Acceptance: the artifact records numeric baseline coverage, numeric post-change coverage, and a
-  numeric changed-line coverage percentage; every changed line in
-  QuickFiler/Controllers/KaStringAsync.cs shows hits of at least 1 post-change and no line covered
-  at baseline is uncovered after, following the methodology recorded at
-  docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/coverage-delta.2026-08-22T10-40.md.
+  numeric changed-line coverage percentage over the denominator stated above; that denominator
+  holds at least one line; every added line of
+  QuickFiler/Controllers/KaStringAsync.cs that appears as a row in the coverage-postchange.md
+  projection shows hits of at least 1 there, and the artifact lists the added lines excluded as
+  non-executable; and no line with hits of at least 1 in the coverage-baseline.md projection has
+  hits of 0 at its mapped line in the coverage-postchange.md projection, following the changed-line
+  intersection methodology recorded at
+  docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/coverage-delta.2026-08-22T10-40.md
+  with the per-line hit source being the recorded projections rather than a raw document.
 
 - [ ] [P5-T8] Check off AC1 in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md`'s Acceptance Criteria
@@ -416,9 +517,15 @@ file.
   enumerates committed tracked changes, the porcelain listing catches anything uncommitted or
   untracked) and confirming every path reported by the anchored name-status diff, which enumerates
   tracked changes only, falls only within: the two production/test files
-  QuickFiler/Controllers/KaStringAsync.cs and `QuickFiler.Test/Controllers/KaStringAsyncTests.cs`,
-  this plan file's own checklist, spec.md's Acceptance Criteria checkboxes, and the evidence
-  subtree under this feature folder. The companion git-status porcelain listing is expected to
+  QuickFiler/Controllers/KaStringAsync.cs and `QuickFiler.Test/Controllers/KaStringAsyncTests.cs`;
+  this feature folder, comprising its issue.md, its spec.md, this plan file, its research record and
+  its evidence subtree, every one of which is an entry in spec.md's Write Set; and the agent-memory
+  tree, which the agents executing this plan write as tracked session bookkeeping and which is no
+  part of this change's source or documentation footprint. The anchored diff is expected to report
+  this feature folder's issue.md, spec.md, plan file and research record as added relative to the
+  origin main ref, because the worktree HEAD carries a pre-execution documentation commit that added
+  all four on top of that ref; those four paths are in scope for this check and are not a reason to
+  restart the phase. The companion git-status porcelain listing is expected to
   report the evidence artifacts this phase creates, which git reports as one collapsed entry per
   wholly-untracked directory rather than one line per file; that entry lies within the evidence
   subtree named above, and the porcelain listing exists to catch a change the anchored diff
