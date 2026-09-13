@@ -112,7 +112,9 @@ Describe 'Invoke-MSTestMain' {
             'C:\repo\A.Test\bin\Debug\A.Test.dll',
             "/Settings:$($script:expectedRunSettings)",
             '/InIsolation',
-            '/TestCaseFilter:TestCategory!=LiveOutlook'
+            '/TestCaseFilter:TestCategory!=LiveOutlook',
+            '/ResultsDirectory:C:\repo\coverage\test-results',
+            '/Logger:trx;LogFileName=mstest-run.trx'
         )
     }
 

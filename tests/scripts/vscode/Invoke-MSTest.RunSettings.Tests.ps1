@@ -24,6 +24,19 @@ BeforeAll {
 
     $script:expectedRunSettings = Join-Path $script:scriptDir 'TaskMaster.cli.runsettings'
 
+    # The four plain-builder sites splat from the two sets below, so an added parameter costs one
+    # key rather than one line per site. One set serves only three: the fourth supplies a
+    # two-element assembly array, so it clones the base and overrides that one key alone.
+    $script:vsTestArgument = @{
+        TestAssembly     = @('C:\repo\A.Test.dll')
+        RunSettingsPath  = $script:expectedRunSettings
+        ResultsDirectory = 'C:\repo\coverage\test-results'
+        LogFileName      = 'mstest-run.trx'
+    }
+
+    $script:vsTestPairArgument = $script:vsTestArgument.Clone()
+    $script:vsTestPairArgument.TestAssembly = @('C:\repo\A.Test.dll', 'C:\repo\B.Test.dll')
+
     # The ten coverage-family call sites splat from the four argument sets below, so each added
     # parameter costs one key rather than one line at every site. One set does not serve all ten:
     # the five builder sites share one, the three lifecycle collection sites a second, and the two
@@ -90,30 +103,26 @@ Describe 'Resolve-RunSettingsPath' {
 
 Describe 'Get-VsTestArgumentList (Invoke-MSTest.ps1)' {
     It 'includes /Settings: pointing at the off-root CLI TaskMaster.cli.runsettings' {
-        $arguments = Get-VsTestArgumentList `
-            -TestAssembly @('C:\repo\A.Test.dll', 'C:\repo\B.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-VsTestArgumentList @script:vsTestPairArgument
 
         $arguments | Should -Contain "/Settings:$($script:expectedRunSettings)"
     }
 
     It 'preserves the test assemblies and /InIsolation alongside /Settings:' {
-        $arguments = Get-VsTestArgumentList `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-VsTestArgumentList @script:vsTestArgument
 
         $arguments | Should -Be @(
             'C:\repo\A.Test.dll',
             "/Settings:$($script:expectedRunSettings)",
             '/InIsolation',
-            '/TestCaseFilter:TestCategory!=LiveOutlook'
+            '/TestCaseFilter:TestCategory!=LiveOutlook',
+            "/ResultsDirectory:$($script:vsTestArgument.ResultsDirectory)",
+            "/Logger:trx;LogFileName=$($script:vsTestArgument.LogFileName)"
         )
     }
 
     It 'appends the /TestCaseFilter excluding the LiveOutlook category' {
-        $arguments = Get-VsTestArgumentList `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-VsTestArgumentList @script:vsTestArgument
 
         $arguments | Should -Contain '/TestCaseFilter:TestCategory!=LiveOutlook'
     }
@@ -131,9 +140,7 @@ Describe 'Invoke-VsTestExe wrapper seam (Invoke-MSTest.ps1)' {
             $script:capturedVsTestArgs = $VsTestArgs
         }
 
-        $arguments = Get-VsTestArgumentList `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-VsTestArgumentList @script:vsTestArgument
 
         Invoke-VsTestExe -VsTestPath 'C:\vstest.console.exe' -VsTestArgs $arguments
 

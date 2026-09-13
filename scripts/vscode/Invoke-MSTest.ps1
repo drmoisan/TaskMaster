@@ -42,16 +42,32 @@ function Get-VsTestArgumentList {
         Returns the full argument array passed to vstest.console.exe: the discovered
         test assemblies, the /Settings: argument pointing at the repo-root
         TaskMaster.runsettings, and /InIsolation. Pure function; no I/O or execution.
+
+        The results directory and the trx log file name are supplied explicitly rather than
+        left to the test console, which otherwise places the document under a derived
+        machine-and-timestamp name that no later step can predict or read.
     #>
     param(
         [Parameter(Mandatory = $true)]
         [string[]]$TestAssembly,
 
         [Parameter(Mandatory = $true)]
-        [string]$RunSettingsPath
+        [string]$RunSettingsPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ResultsDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LogFileName
     )
 
-    return @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation', '/TestCaseFilter:TestCategory!=LiveOutlook')
+    return @($TestAssembly) + @(
+        "/Settings:$RunSettingsPath",
+        '/InIsolation',
+        '/TestCaseFilter:TestCategory!=LiveOutlook',
+        "/ResultsDirectory:$ResultsDirectory",
+        "/Logger:trx;LogFileName=$LogFileName"
+    )
 }
 
 function Invoke-VsTestExe {
@@ -145,9 +161,16 @@ function Invoke-MSTestMain {
     param(
         [string]$SearchRoot,
         [string]$Configuration,
+        [string]$ResultsDirectory = 'coverage\test-results',
+        [string]$LogFileName = 'mstest-run.trx',
         [switch]$NoExecute,
         [string]$ScriptRoot = $PSScriptRoot
     )
+
+    # The summary part file is dot-sourced here because this entry point dot-sources nothing
+    # else: without this line Get-TrxRunSummary is unresolvable and every summary attempt
+    # would take the non-fatal warning branch below, so no summary would ever be written.
+    . (Join-Path $ScriptRoot 'Invoke-MSTest.TrxSummary.ps1')
 
     if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
         $SearchRoot = '.'
@@ -159,6 +182,8 @@ function Invoke-MSTestMain {
 
     $repoRoot = (Resolve-Path (Join-Path $ScriptRoot '..\..')).Path
     $resolvedSearchRoot = Join-Path $repoRoot $SearchRoot
+    $resolvedResultsDirectory = Join-Path $repoRoot $ResultsDirectory
+    $resolvedLogFilePath = Join-Path $resolvedResultsDirectory $LogFileName
 
     if (-not (Test-Path $resolvedSearchRoot)) {
         throw "Search root not found: $resolvedSearchRoot"
@@ -185,7 +210,11 @@ function Invoke-MSTestMain {
     Write-Host "Using vstest.console: $vstestPath"
     Write-Host "Discovered $($testAssemblies.Count) test assemblies."
 
-    $vsTestArguments = Get-VsTestArgumentList -TestAssembly $testAssemblies -RunSettingsPath $runSettingsPath
+    $vsTestArguments = Get-VsTestArgumentList `
+        -TestAssembly $testAssemblies `
+        -RunSettingsPath $runSettingsPath `
+        -ResultsDirectory $resolvedResultsDirectory `
+        -LogFileName $LogFileName
 
     if ($NoExecute) {
         return
@@ -194,6 +223,37 @@ function Invoke-MSTestMain {
     Invoke-VsTestExe -VsTestPath $vstestPath -VsTestArgs $vsTestArguments
     if ($LASTEXITCODE -ne 0) {
         throw "MSTest execution failed with exit code $LASTEXITCODE"
+    }
+
+    # A test-result document that is missing, unreadable, unparseable or carries no
+    # result-summary node is reported rather than thrown: the exit-code check above has
+    # already surfaced a genuine test failure, and a caller that mocks no content reader must
+    # not be made to write a real document. The same suppression covers the discard, so the
+    # raw document survives whenever its summary did not.
+    $runSummary = $null
+    try {
+        $runSummary = Get-TrxRunSummary -TrxContent (
+            Get-Content -LiteralPath $resolvedLogFilePath -Raw -Encoding UTF8)
+    }
+    catch {
+        Write-Warning "Test-result summary was not written: $($_.Exception.Message)"
+    }
+
+    if ($runSummary) {
+        $summaryPath = Join-Path `
+            $resolvedResultsDirectory `
+        ([IO.Path]::GetFileNameWithoutExtension($resolvedLogFilePath) + '.summary.txt')
+        Set-Content `
+            -Path $summaryPath `
+            -Value (Format-TrxRunSummary -Summary $runSummary) `
+            -Encoding UTF8
+        # Write-Output rather than Write-Host, which the repository analyzer reports: the two
+        # Write-Host calls above predate that rule and are left as they are.
+        Write-Output "Test-result summary: $summaryPath"
+
+        # The raw test-result document is discarded once its summary exists: the summary is the
+        # committable projection and the document itself carries absolute host paths.
+        Remove-Item -LiteralPath $resolvedLogFilePath -Force
     }
 }
 
