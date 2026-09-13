@@ -356,7 +356,7 @@ file.
   greater than the P0-T6 baseline ceiling, matching the recorded shape at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/msbuild-analyzers.2026-08-22T09-21.md.
 
-- [ ] [P5-T4] Run the solution's nullable Rebuild (Configuration Debug, Platform Any CPU, the
+- [x] [P5-T4] Run the solution's nullable Rebuild (Configuration Debug, Platform Any CPU, the
   TreatWarningsAsErrors property true, no nullable opt-in property) with a detailed file logger,
   count the "Skipping target CoreCompile" log-line occurrences, and record a Timestamp field, a
   Command field, an EXIT_CODE field, and an Output Summary field in
