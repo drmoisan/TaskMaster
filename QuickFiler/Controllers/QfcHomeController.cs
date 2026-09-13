@@ -85,6 +85,7 @@ namespace QuickFiler.Controllers
 
         public IQfcHomeController Init()
         {
+            CreateCancellationToken();
             _datamodel = QfcDataModelLoader(Globals, this.Token);
             _explorerController = QfcExplorerControllerLoader(InitTypeEnum.Sort, Globals, this);
             _formViewer = new QfcFormViewer();
@@ -461,8 +462,6 @@ namespace QuickFiler.Controllers
         }
 
         private IQfcFormViewer _formViewer;
-
-        //public QfcFormViewer FormViewer { get => _formViewer; }
 
         internal void CreateCancellationToken()
         {
