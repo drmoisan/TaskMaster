@@ -47,6 +47,12 @@ function Get-DotnetCoverageArgumentList {
         --settings path carries the effective instrumentation exclusions and remains
         distinct from the inner vstest /Settings:<TaskMaster.runsettings> applied after
         the -- separator and the vstest executable path. Pure function; no I/O or execution.
+
+        The results-directory switch and the trx logger switch belong to the inner vstest
+        segment, so both are appended after the -- separator: they configure the test
+        console rather than the outer collector. The log file name is supplied explicitly
+        rather than left to the console, which otherwise derives a machine-and-timestamp
+        name no later step can predict or read.
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -62,7 +68,13 @@ function Get-DotnetCoverageArgumentList {
         [string[]]$TestAssembly,
 
         [Parameter(Mandatory = $true)]
-        [string]$RunSettingsPath
+        [string]$RunSettingsPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ResultsDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LogFileName
     )
 
     # The outer dotnet-coverage --settings is the effective instrumentation-exclude
@@ -73,7 +85,13 @@ function Get-DotnetCoverageArgumentList {
         '--output-format', 'cobertura',
         '--settings', $CoverageConfig,
         '--', $VsTestPath
-    ) + @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation', '/TestCaseFilter:TestCategory!=LiveOutlook')
+    ) + @($TestAssembly) + @(
+        "/Settings:$RunSettingsPath",
+        '/InIsolation',
+        '/TestCaseFilter:TestCategory!=LiveOutlook',
+        "/ResultsDirectory:$ResultsDirectory",
+        "/Logger:trx;LogFileName=$LogFileName"
+    )
 }
 
 function ConvertTo-DerivedCoverageSettingsXml {
@@ -192,7 +210,13 @@ function Invoke-DotnetCoverageCollection {
         [string[]]$TestAssembly,
 
         [Parameter(Mandatory = $true)]
-        [string]$RunSettingsPath
+        [string]$RunSettingsPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ResultsDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LogFileName
     )
 
     $derivedSettingsPath = Get-DerivedCoverageSettingsPath -OutputPath $OutputPath
@@ -227,7 +251,9 @@ function Invoke-DotnetCoverageCollection {
             -CoverageConfig $derivedFullPath `
             -VsTestPath $VsTestPath `
             -TestAssembly $TestAssembly `
-            -RunSettingsPath $RunSettingsPath
+            -RunSettingsPath $RunSettingsPath `
+            -ResultsDirectory $ResultsDirectory `
+            -LogFileName $LogFileName
 
         $global:LASTEXITCODE = 0
         Invoke-DotnetCoverageExe -DotnetCoverageArgs $dotnetCoverageArgs
@@ -254,11 +280,19 @@ function Invoke-MSTestWithCoverageMain {
         [string]$SearchRoot,
         [string]$Configuration,
         [string]$CoverageOutput = 'coverage\coverage.cobertura.xml',
+        [string]$ResultsDirectory = 'coverage\test-results',
+        [string]$LogFileName = 'mstest-coverage-run.trx',
         [switch]$NoExecute,
         [string]$ScriptRoot = $PSScriptRoot
     )
 
     . (Join-Path $ScriptRoot 'Invoke-MSTestWithCoverage.Helpers.ps1')
+
+    # The summary part file is dot-sourced explicitly rather than reached through the helpers
+    # file's own chain, because that chain does not include it: without this line
+    # Get-TrxRunSummary is unresolvable here and every summary attempt would take the
+    # non-fatal warning branch below, so no summary would ever be written.
+    . (Join-Path $ScriptRoot 'Invoke-MSTest.TrxSummary.ps1')
 
     if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
         $SearchRoot = '.'
@@ -312,6 +346,12 @@ function Invoke-MSTestWithCoverageMain {
         New-Item -ItemType Directory -Path $outputDir | Out-Null
     }
 
+    $resolvedResultsDirectory = Join-Path $repoRoot $ResultsDirectory
+    $resolvedLogFilePath = Join-Path $resolvedResultsDirectory $LogFileName
+    if (-not (Test-Path $resolvedResultsDirectory)) {
+        New-Item -ItemType Directory -Path $resolvedResultsDirectory | Out-Null
+    }
+
     Write-Output "Using vstest.console: $vstestPath"
     Write-Output "Discovered $($testAssemblies.Count) test assemblies."
     Write-Output "Coverage output: $resolvedOutputPath"
@@ -329,7 +369,9 @@ function Invoke-MSTestWithCoverageMain {
         -CoverageConfig $coverageConfig `
         -VsTestPath $vstestPath `
         -TestAssembly $testAssemblies `
-        -RunSettingsPath $runSettingsPath
+        -RunSettingsPath $runSettingsPath `
+        -ResultsDirectory $resolvedResultsDirectory `
+        -LogFileName $LogFileName
 
     # Post-process the Cobertura XML for Koverage compatibility:
     #   1. Rewrite absolute paths to workspace-relative paths using native separators.
@@ -343,6 +385,51 @@ function Invoke-MSTestWithCoverageMain {
 
     Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
     Write-Output (Get-CoberturaFirstPartyCoverageReport -CoberturaXml $processedXmlContent)
+
+    # The projection is built from the post-processed content, never from the raw collector
+    # string: the raw document still carries test and third-party packages and absolute
+    # source paths, so a projection of it would neither reconcile nor be committable.
+    $projectionPath = Join-Path `
+    (Split-Path $resolvedOutputPath -Parent) `
+    ([IO.Path]::GetFileNameWithoutExtension($resolvedOutputPath) + '.jacoco.xml')
+    $projectionXml = ConvertTo-JacocoPackageProjection -XmlDocument $processedXmlContent
+    Set-Content -Path $projectionPath -Value $projectionXml -Encoding UTF8
+    Assert-JacocoProjectionReconciliation `
+        -XmlDocument $processedXmlContent `
+        -ProjectionXml $projectionXml
+    Write-Output "Coverage projection: $projectionPath"
+
+    # A test-result document that is missing, unreadable, unparseable or carries no
+    # result-summary node is reported rather than thrown: a genuine test failure is already
+    # surfaced by the collection exit-code check above, and a caller that mocks a generic
+    # content reader must not be forced to produce a real document. The same suppression
+    # covers the discard, so the raw document survives whenever its summary did not.
+    $runSummary = $null
+    try {
+        $runSummary = Get-TrxRunSummary -TrxContent (
+            Get-Content -LiteralPath $resolvedLogFilePath -Raw -Encoding UTF8)
+    }
+    catch {
+        Write-Warning "Test-result summary was not written: $($_.Exception.Message)"
+    }
+
+    if ($runSummary) {
+        $summaryPath = Join-Path `
+            $resolvedResultsDirectory `
+        ([IO.Path]::GetFileNameWithoutExtension($resolvedLogFilePath) + '.summary.txt')
+        Set-Content `
+            -Path $summaryPath `
+            -Value (Format-TrxRunSummary -Summary $runSummary) `
+            -Encoding UTF8
+        Write-Output "Test-result summary: $summaryPath"
+
+        if (-not (Test-RawCoverageDocumentRetained `
+                    -OutputPath $resolvedOutputPath `
+                    -RepoRoot $repoRoot)) {
+            Remove-Item -LiteralPath $resolvedOutputPath -Force
+        }
+    }
+
     Write-Output "Done. Coverage artifact: $resolvedOutputPath"
 }
 

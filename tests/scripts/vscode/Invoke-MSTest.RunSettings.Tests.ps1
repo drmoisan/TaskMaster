@@ -23,6 +23,53 @@ BeforeAll {
     . (Join-Path $script:scriptDir 'Invoke-MSTestWithCoverage.Helpers.ps1')
 
     $script:expectedRunSettings = Join-Path $script:scriptDir 'TaskMaster.cli.runsettings'
+
+    # The ten coverage-family call sites splat from the four argument sets below, so each added
+    # parameter costs one key rather than one line at every site. One set does not serve all ten:
+    # the five builder sites share one, the three lifecycle collection sites a second, and the two
+    # isolated error-path sites differ from both and from each other. The three derived sets are
+    # per-site clones of the first with only their differing keys overridden. No site supplies a
+    # parameter both by splat and explicitly, which PowerShell rejects as a binding error.
+    $script:builderArgument = @{
+        OutputPath       = 'C:\repo\coverage\coverage.cobertura.xml'
+        CoverageConfig   = 'C:\repo\coverage.config'
+        VsTestPath       = 'C:\vstest.console.exe'
+        TestAssembly     = @('C:\repo\A.Test.dll')
+        RunSettingsPath  = $script:expectedRunSettings
+        ResultsDirectory = 'C:\repo\coverage\test-results'
+        LogFileName      = 'mstest-coverage-run.trx'
+    }
+
+    $script:collectionArgument = $script:builderArgument.Clone()
+    $script:collectionArgument.RunSettingsPath = 'C:\repo\scripts\vscode\TaskMaster.cli.runsettings'
+    $script:collectionArgument.TestAssembly = @(
+        'C:\repo\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll'
+        'C:\repo\Tags.Test\bin\Debug\Tags.Test.dll'
+        'C:\repo\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll'
+        'C:\repo\TaskTree.Test\bin\Debug\TaskTree.Test.dll'
+        'C:\repo\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll'
+        'C:\repo\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll'
+        'C:\repo\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll'
+        'C:\repo\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll'
+    )
+
+    $script:nonzeroExitArgument = $script:builderArgument.Clone()
+    $script:nonzeroExitArgument.VsTestPath = 'C:\repo\vstest.console.exe'
+    $script:nonzeroExitArgument.RunSettingsPath = 'C:\repo\TaskMaster.cli.runsettings'
+    $script:derivedEqualsCanonicalArgument = $script:nonzeroExitArgument.Clone()
+    $script:derivedEqualsCanonicalArgument.OutputPath = 'C:\repo\coverage.config'
+
+    # The test-result document the coverage entry point's reader mock answers with, and the path
+    # that mock is filtered to. The root declares the default TeamTest namespace, as a real
+    # document does, and the fixture is an in-memory here-string: no test in this file creates,
+    # writes or deletes a file.
+    $script:coverageTrxPath = 'C:\repo\coverage\test-results\mstest-coverage-run.trx'
+    $script:coverageTrxFixture = @'
+<TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Results><UnitTestResult testName="Contoso.Alpha.PassesCleanly" outcome="Passed" /></Results>
+  <ResultSummary outcome="Completed"><Counters total="1" executed="1" passed="1" failed="0" /></ResultSummary>
+</TestRun>
+'@
 }
 
 Describe 'Resolve-RunSettingsPath' {
@@ -98,23 +145,13 @@ Describe 'Invoke-VsTestExe wrapper seam (Invoke-MSTest.ps1)' {
 
 Describe 'Get-DotnetCoverageArgumentList (Invoke-MSTestWithCoverage.ps1)' {
     It 'includes the inner vstest /Settings: pointing at the off-root CLI TaskMaster.cli.runsettings' {
-        $arguments = Get-DotnetCoverageArgumentList `
-            -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
-            -CoverageConfig 'C:\repo\coverage.config' `
-            -VsTestPath 'C:\vstest.console.exe' `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-DotnetCoverageArgumentList @script:builderArgument
 
         $arguments | Should -Contain "/Settings:$($script:expectedRunSettings)"
     }
 
     It 'preserves the distinct outer --settings coverage.config (instrumentation excludes)' {
-        $arguments = Get-DotnetCoverageArgumentList `
-            -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
-            -CoverageConfig 'C:\repo\coverage.config' `
-            -VsTestPath 'C:\vstest.console.exe' `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-DotnetCoverageArgumentList @script:builderArgument
 
         $settingsIndex = [array]::IndexOf($arguments, '--settings')
         $settingsIndex | Should -BeGreaterThan -1
@@ -122,12 +159,7 @@ Describe 'Get-DotnetCoverageArgumentList (Invoke-MSTestWithCoverage.ps1)' {
     }
 
     It 'places the inner /Settings: after the -- separator and the vstest path' {
-        $arguments = Get-DotnetCoverageArgumentList `
-            -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
-            -CoverageConfig 'C:\repo\coverage.config' `
-            -VsTestPath 'C:\vstest.console.exe' `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-DotnetCoverageArgumentList @script:builderArgument
 
         $separatorIndex = [array]::IndexOf($arguments, '--')
         $vsTestSettingsIndex = [array]::IndexOf($arguments, "/Settings:$($script:expectedRunSettings)")
@@ -137,12 +169,7 @@ Describe 'Get-DotnetCoverageArgumentList (Invoke-MSTestWithCoverage.ps1)' {
     }
 
     It 'appends the /TestCaseFilter excluding the LiveOutlook category to the inner vstest args' {
-        $arguments = Get-DotnetCoverageArgumentList `
-            -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
-            -CoverageConfig 'C:\repo\coverage.config' `
-            -VsTestPath 'C:\vstest.console.exe' `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-DotnetCoverageArgumentList @script:builderArgument
 
         $arguments | Should -Contain '/TestCaseFilter:TestCategory!=LiveOutlook'
     }
@@ -158,12 +185,7 @@ Describe 'Invoke-DotnetCoverageExe wrapper seam (Invoke-MSTestWithCoverage.ps1)'
             $script:capturedCoverageArgs = $DotnetCoverageArgs
         }
 
-        $arguments = Get-DotnetCoverageArgumentList `
-            -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
-            -CoverageConfig 'C:\repo\coverage.config' `
-            -VsTestPath 'C:\vstest.console.exe' `
-            -TestAssembly @('C:\repo\A.Test.dll') `
-            -RunSettingsPath $script:expectedRunSettings
+        $arguments = Get-DotnetCoverageArgumentList @script:builderArgument
 
         Invoke-DotnetCoverageExe -DotnetCoverageArgs $arguments
 
@@ -175,20 +197,12 @@ Describe 'Invoke-DotnetCoverageExe wrapper seam (Invoke-MSTestWithCoverage.ps1)'
 Describe 'Invoke-MSTestWithCoverage derived settings' {
     Context 'Derived coverage settings lifecycle' {
         BeforeEach {
-            $script:canonicalCoverageConfig = 'C:\repo\coverage.config'
-            $script:coverageOutput = 'C:\repo\coverage\coverage.cobertura.xml'
-            $script:fakeVsTestPath = 'C:\vstest.console.exe'
-            $script:fakeRunSettingsPath = 'C:\repo\scripts\vscode\TaskMaster.cli.runsettings'
-            $script:fakeTestAssemblies = @(
-                'C:\repo\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll'
-                'C:\repo\Tags.Test\bin\Debug\Tags.Test.dll'
-                'C:\repo\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll'
-                'C:\repo\TaskTree.Test\bin\Debug\TaskTree.Test.dll'
-                'C:\repo\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll'
-                'C:\repo\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll'
-                'C:\repo\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll'
-                'C:\repo\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll'
-            )
+            # Read from the splatted set the three call sites here use, so neither can drift.
+            $script:canonicalCoverageConfig = $script:collectionArgument.CoverageConfig
+            $script:coverageOutput = $script:collectionArgument.OutputPath
+            $script:fakeVsTestPath = $script:collectionArgument.VsTestPath
+            $script:fakeRunSettingsPath = $script:collectionArgument.RunSettingsPath
+            $script:fakeTestAssemblies = $script:collectionArgument.TestAssembly
             $script:canonicalCoverageXml = @'
 <?xml version="1.0" encoding="utf-8"?>
 <Configuration>
@@ -255,12 +269,7 @@ Describe 'Invoke-MSTestWithCoverage derived settings' {
         }
 
         It 'uses the derived settings path and preserves all eight test assemblies after the vstest boundary' {
-            Invoke-DotnetCoverageCollection `
-                -OutputPath $script:coverageOutput `
-                -CoverageConfig $script:canonicalCoverageConfig `
-                -VsTestPath $script:fakeVsTestPath `
-                -TestAssembly $script:fakeTestAssemblies `
-                -RunSettingsPath $script:fakeRunSettingsPath
+            Invoke-DotnetCoverageCollection @script:collectionArgument
 
             $settingsIndex = [array]::IndexOf($script:capturedDerivedCoverageArgs, '--settings')
             $separatorIndex = [array]::IndexOf($script:capturedDerivedCoverageArgs, '--')
@@ -283,12 +292,7 @@ Describe 'Invoke-MSTestWithCoverage derived settings' {
         }
 
         It 'removes the derived settings after successful collection without writing the canonical file' {
-            Invoke-DotnetCoverageCollection `
-                -OutputPath $script:coverageOutput `
-                -CoverageConfig $script:canonicalCoverageConfig `
-                -VsTestPath $script:fakeVsTestPath `
-                -TestAssembly $script:fakeTestAssemblies `
-                -RunSettingsPath $script:fakeRunSettingsPath
+            Invoke-DotnetCoverageCollection @script:collectionArgument
 
             Should -Invoke -CommandName Get-Content -Times 1 -Exactly -ParameterFilter {
                 $LiteralPath -eq $script:canonicalCoverageConfig
@@ -309,14 +313,8 @@ Describe 'Invoke-MSTestWithCoverage derived settings' {
                 throw 'Simulated dotnet-coverage collection failure.'
             }
 
-            {
-                Invoke-DotnetCoverageCollection `
-                    -OutputPath $script:coverageOutput `
-                    -CoverageConfig $script:canonicalCoverageConfig `
-                    -VsTestPath $script:fakeVsTestPath `
-                    -TestAssembly $script:fakeTestAssemblies `
-                    -RunSettingsPath $script:fakeRunSettingsPath
-            } | Should -Throw -ExpectedMessage 'Simulated dotnet-coverage collection failure.'
+            { Invoke-DotnetCoverageCollection @script:collectionArgument } |
+                Should -Throw -ExpectedMessage 'Simulated dotnet-coverage collection failure.'
 
             Should -Invoke -CommandName Set-Content -Times 1 -Exactly
             Should -Invoke -CommandName Set-Content -Times 0 -Exactly -ParameterFilter {
@@ -368,7 +366,13 @@ Describe 'Invoke-MSTestWithCoverageMain' {
             $script:coverageCallCount++
         }
         Mock Get-Content { '<coverage />' }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8"><packages /></coverage>' }
+        # Filtered to the test-result path only, so the entry point's test-result read reaches the
+        # summary writer instead of the non-fatal warning branch, while the unfiltered mock above
+        # still answers the Cobertura read. The post-processor value below carries root
+        # lines-covered and lines-valid attributes and one package whose per-package figures sum to
+        # them, because the reconciliation assertion reads exactly those two root attributes.
+        Mock Get-Content -ParameterFilter { $LiteralPath -eq $script:coverageTrxPath } -MockWith { $script:coverageTrxFixture }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>' }
         Mock Set-Content {}
     }
 
@@ -395,15 +399,16 @@ Describe 'Invoke-MSTestWithCoverageMain' {
 
         Should -Invoke Invoke-DotnetCoverageCollection -Times 1 -Exactly
         Should -Invoke ConvertTo-KoverageCoberturaXml -Times 1 -Exactly
-        Should -Invoke Set-Content -Times 1 -Exactly
+        # Post-processed Cobertura document, JaCoCo projection, test-result summary.
+        Should -Invoke Set-Content -Times 3 -Exactly
     }
 
     It 'passes the generated Cobertura result to the threshold evaluator before completing successfully' {
         $script:evaluatedCoberturaXml = $null
         Mock Assert-CoberturaLineCoverageThreshold { param([string]$CoberturaXml) $script:evaluatedCoberturaXml = $CoberturaXml }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8"><packages /></coverage>' }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>' }
         Invoke-MSTestWithCoverageMain -ScriptRoot $script:scriptDir
-        $script:evaluatedCoberturaXml | Should -Be '<coverage line-rate="0.8"><packages /></coverage>'
+        $script:evaluatedCoberturaXml | Should -Be '<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>'
     }
 
     It 'fails when the search root cannot be found' {
@@ -437,9 +442,11 @@ Describe 'Invoke-MSTestWithCoverageMain' {
                 [string]$CoverageConfig,
                 [string]$VsTestPath,
                 [string[]]$TestAssembly,
-                [string]$RunSettingsPath
+                [string]$RunSettingsPath,
+                [string]$ResultsDirectory,
+                [string]$LogFileName
             )
-            $null = $OutputPath, $CoverageConfig, $VsTestPath, $RunSettingsPath
+            $null = $OutputPath, $CoverageConfig, $VsTestPath, $RunSettingsPath, $ResultsDirectory, $LogFileName
             $script:capturedTestAssembly = $TestAssembly
         }
 
@@ -468,14 +475,8 @@ Describe 'Invoke-MSTestWithCoverage isolated error paths' {
     It 'fails when the derived path equals the canonical coverage path' {
         Mock Get-DerivedCoverageSettingsPath { 'C:\repo\coverage.config' }
 
-        {
-            Invoke-DotnetCoverageCollection `
-                -OutputPath 'C:\repo\coverage.config' `
-                -CoverageConfig 'C:\repo\coverage.config' `
-                -VsTestPath 'C:\repo\vstest.console.exe' `
-                -TestAssembly @('C:\repo\A.Test.dll') `
-                -RunSettingsPath 'C:\repo\TaskMaster.cli.runsettings'
-        } | Should -Throw -ExpectedMessage 'Derived coverage settings path must differ from the canonical settings path.'
+        { Invoke-DotnetCoverageCollection @script:derivedEqualsCanonicalArgument } |
+            Should -Throw -ExpectedMessage 'Derived coverage settings path must differ from the canonical settings path.'
     }
 
     It 'fails when dotnet coverage returns a nonzero exit code' {
@@ -484,13 +485,7 @@ Describe 'Invoke-MSTestWithCoverage isolated error paths' {
         Mock Remove-Item {}
         Mock Invoke-DotnetCoverageExe { $global:LASTEXITCODE = 7 }
 
-        {
-            Invoke-DotnetCoverageCollection `
-                -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
-                -CoverageConfig 'C:\repo\coverage.config' `
-                -VsTestPath 'C:\repo\vstest.console.exe' `
-                -TestAssembly @('C:\repo\A.Test.dll') `
-                -RunSettingsPath 'C:\repo\TaskMaster.cli.runsettings'
-        } | Should -Throw -ExpectedMessage 'MSTest with coverage failed with exit code 7'
+        { Invoke-DotnetCoverageCollection @script:nonzeroExitArgument } |
+            Should -Throw -ExpectedMessage 'MSTest with coverage failed with exit code 7'
     }
 }
