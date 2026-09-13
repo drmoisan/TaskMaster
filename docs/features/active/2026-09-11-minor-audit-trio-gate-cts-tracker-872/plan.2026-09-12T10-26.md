@@ -282,7 +282,7 @@ already repaired pre-existing drift is not a baseline, so the formatter is not i
 The two rebuild gates precede the test runs because vstest.console.exe never compiles: a test assembly
 must already exist on disk before it is run.
 
-- [ ] [P0-T1] Read the repository policy documents in the required order and write
+- [x] [P0-T1] Read the repository policy documents in the required order and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/phase0-instructions-read.md`.
   The order is the standing instructions file CLAUDE.md at the repository root, then the rules files
   general-code-change.md, general-unit-test.md, quality-tiers.md, csharp.md, tonality.md and
@@ -291,7 +291,7 @@ must already exist on disk before it is run.
   Acceptance: the artifact exists and carries `Timestamp:`, a `Policy Order:` line, and an explicit
   bulleted list naming all seven files read, in the order above.
 
-- [ ] [P0-T2] Record the base commit anchor into
+- [x] [P0-T2] Record the base commit anchor into
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/base-commit.md`.
 
   ```
@@ -305,7 +305,7 @@ must already exist on disk before it is run.
   porcelain result is recorded rather than suppressed, and any pre-existing modification to a Write Set
   path is a BLOCKED condition reported to the caller.
 
-- [ ] [P0-T3] Restore the pinned dotnet tool manifest and write
+- [x] [P0-T3] Restore the pinned dotnet tool manifest and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/dotnet-tool-restore.md`.
 
   ```
@@ -318,7 +318,7 @@ must already exist on disk before it is run.
   The exit code alone is not the observation, because the command exits 0 whether or not it installed
   anything.
 
-- [ ] [P0-T4] Restore NuGet packages for the packages.config projects and write
+- [x] [P0-T4] Restore NuGet packages for the packages.config projects and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/restore.md`.
 
   ```
@@ -330,7 +330,7 @@ must already exist on disk before it is run.
   disk after the run, plus the installed package count printed by NuGet. An unbootstrapped worktree
   produces CS0006 reference errors in the later rebuild gates, so this task must complete before P0-T6.
 
-- [ ] [P0-T5] Capture the CSharpier baseline in read-only check mode and write
+- [x] [P0-T5] Capture the CSharpier baseline in read-only check mode and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/csharpier-check.md`.
 
   ```
@@ -345,7 +345,7 @@ must already exist on disk before it is run.
   tree that P0-T14 evaluates. The check subcommand is read-only and does not repair drift, which is
   why it and not the format subcommand is used for the baseline.
 
-- [ ] [P0-T6] Capture the analyzer rebuild baseline and write
+- [x] [P0-T6] Capture the analyzer rebuild baseline and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/build-analyzers.md`.
 
   ```
@@ -365,7 +365,7 @@ must already exist on disk before it is run.
   from a build whose CoreCompile was skipped as up to date, and the exit code cannot distinguish them.
   Per D10 the detailed log stays in the git-ignored TestResults directory and is not committed.
 
-- [ ] [P0-T7] Capture the nullable rebuild baseline and write
+- [x] [P0-T7] Capture the nullable rebuild baseline and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/build-nullable.md`.
 
   ```
@@ -378,7 +378,7 @@ must already exist on disk before it is run.
   `WarningCount:` line and an `ErrorCount:` line read by the same start-anchored match as P0-T6, and
   the same two non-vacuity log observations. Per D3 the command line contains no Nullable property.
 
-- [ ] [P0-T8] Capture the baseline executed-test count for the UtilitiesCS test assembly and write
+- [x] [P0-T8] Capture the baseline executed-test count for the UtilitiesCS test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/tests-utilitiescs.md`.
 
   ```
@@ -393,7 +393,7 @@ must already exist on disk before it is run.
   artifact also records that the printed success header reads `Test Run Successful.` and that the
   passed count equals the total count. This `TotalTests:` value is the AC11 baseline for this assembly.
 
-- [ ] [P0-T9] Capture the baseline executed-test count for the QuickFiler test assembly and write
+- [x] [P0-T9] Capture the baseline executed-test count for the QuickFiler test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/tests-quickfiler.md`.
 
   ```
@@ -434,7 +434,7 @@ must already exist on disk before it is run.
   resolving a named field. Placeholder values are prohibited. Per D7, if the run has not terminated
   within ten minutes, halt, record the observed state and report BLOCKED.
 
-- [ ] [P0-T11] Derive the per-file coverage baseline for `UtilitiesCS/Threading/ProgressPackage.cs` and
+- [x] [P0-T11] Derive the per-file coverage baseline for `UtilitiesCS/Threading/ProgressPackage.cs` and
   write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/coverage-baseline-progresspackage.md`.
 
@@ -452,7 +452,7 @@ must already exist on disk before it is run.
   hits value, and the merge is stated even when the class-element count is one. This is the AC12
   baseline and it is captured before any Phase 1 edit, so it describes the pre-change file.
 
-- [ ] [P0-T12] Capture the Compile-item count baseline for the two project files and write
+- [x] [P0-T12] Capture the Compile-item count baseline for the two project files and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/compile-item-counts.md`.
 
   ```
@@ -474,7 +474,7 @@ must already exist on disk before it is run.
   the Include attribute and that no Update or Remove form exists, so a single attribute-form count is a
   sound basis for the AC7 comparison.
 
-- [ ] [P0-T13] Pin the source facts the later comparisons depend on and write
+- [x] [P0-T13] Pin the source facts the later comparisons depend on and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/pinned-source-facts.md`.
 
   ```
@@ -503,7 +503,7 @@ must already exist on disk before it is run.
   second. A divergence between an observed value and an expected value is recorded and reported before
   Phase 1 begins.
 
-- [ ] [P0-T14] Evaluate the Phase 0 halt gate and write
+- [x] [P0-T14] Evaluate the Phase 0 halt gate and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/phase0-gate.md`.
   Acceptance: the artifact tabulates the recorded `EXIT_CODE:` of P0-T5, P0-T6, P0-T7, P0-T8, P0-T9 and
   P0-T10 and states, per row, whether it is zero. If every row is zero the artifact records
