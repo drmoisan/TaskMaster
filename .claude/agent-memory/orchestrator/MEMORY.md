@@ -76,6 +76,7 @@
 - [Post-processed Cobertura = zero exit, NOT a test result](cobertura-postprocessing-is-a-zero-exit-proxy-not-a-test-result.md) — no .trx exists; re-run the gate
 - [[ExcludeFromCodeCoverage] is INVISIBLE, not 0%](excludefromcodecoverage-invisible-to-coverage-gates.md) — per-file hits-row gates unsatisfiable; METHOD-level leaks
 - [vstest emits TWO .coverage files per run](vstest-emits-two-coverage-files-per-run.md) — need a disambiguation rule
+- [Coverage runner throws BEFORE post-processing](coverage-runner-throws-before-postprocessing.md) — line 236 beats line 341, so a failing test leaves raw XML; and evidence-dir .cobertura.xml is NOT gitignored
 
 ## C# toolchain and tests
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) · [analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) · [direct-csproj build facts](csharp-direct-csproj-build-facts.md)
