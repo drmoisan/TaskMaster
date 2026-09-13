@@ -2,6 +2,7 @@
 
 ## Preflight revision seams (per-issue)
 
+- [#602 R4](project_602_preparation_artifacts_shift_population_figures.md) — a Phase 0 tracked-file total or folder-scoped enumeration goes stale by the item's OWN artifact count; say so in prose, don't edit the spec
 - [#826](project_826_factory_outside_try_reachability_seams.md) — a seam invoked OUTSIDE the `try` makes both catch bodies reachable; enumerate the seam's line vs the `try`'s, not the catch clauses
 - [#815](project_815_coverage_aggregation_exposure_plan_seams.md) — `.//line` baseline already zero (needs a positive control); pinned nine-name allowlist zeroes the differential helper; test tree tighter than production; 500 lines legal, 501 not
 - [#810 R1–R2](project_810_teardown_dropdown_residuals_plan_seams.md) — inherited paths must be a RULE not a list (executor writes agent-memory mid-run); never upper-bound a csharpier checked-file delta; `TokenSource` null before Cleanup too
