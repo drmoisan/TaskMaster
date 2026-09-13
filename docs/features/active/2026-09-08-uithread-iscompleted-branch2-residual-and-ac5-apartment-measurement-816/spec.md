@@ -551,6 +551,7 @@ checks have already passed. No throughput or latency target applies and none is 
 `docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816/user-story.md`
 `docs/features/active/2026-09-07-uithread-init-contract-residuals-784-787-788-809/spec.md`
 `docs/features/active/2026-09-07-uithread-init-contract-residuals-784-787-788-809/evidence/other/ac05-mta-initialize-measurement.md`
+`docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816/plan.2026-09-12T13-23.md`
 
 ## Risks & Mitigations
 
