@@ -1,5 +1,6 @@
 # Task Researcher Memory Index
 
+- [pump-timeout-743](project_pump_timeout_743.md) — #743/#592/#511: the dispatcher-gate lead is stale (#493 deleted both symbols); 9 of 19 pump tests never take the gate; committed TRX timestamps are a measurement instrument; no expiry artifact exists in-repo (2026-09-12)
 - [qfc-breadcrumb-bridge-router-495](project_qfc_breadcrumb_bridge_router_495.md) — #495/F12: open #440 will rewrite this file's arrow-key semantics; the WRONG router class's emitted branch-rate matches the right answer to 6 digits (2026-08-08)
 - [breadcrumb-messenger-hub-495](project_breadcrumb_messenger_hub_495.md) — #495/F12: a Component finalizer can make a branch outcome GC-dependent (fake coverage); 3 types in one .cs emit ONE Cobertura class element; brief's "Lines" is coverable not physical (2026-08-08)
 - [qfc-upgrade-lifetime-495](project_qfc_upgrade_lifetime_495.md) — #495/F12: Cobertura `<class name>` can name a SECONDARY type in the file; multi-line ternary arms both report hits=1; pick the discriminating ordering for latch tests (2026-08-08)
