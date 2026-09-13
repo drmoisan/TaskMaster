@@ -89,10 +89,41 @@ namespace QuickFiler.Controllers.Tests
             result.Should().BeTrue("a substring match returns true");
             updateArg
                 .Should()
-                .Be("b", "Update receives Key.Substring(other.Length - 1, 1) => index 1 => \"b\"");
+                .Be(
+                    "b",
+                    "Update receives the last character of the matched span (Key.IndexOf(\"ab\", StringComparison.Ordinal) + other.Length - 1 = 1) => \"b\""
+                );
             ka.Activated.Should()
                 .BeTrue(
                     "the contains-match branch returns before the trailing Activated = false reset"
+                );
+        }
+
+        [TestMethod]
+        public void KeyEquals_ContainsMatchAtNonPrefixIndex_InvokesUpdateWithLastMatchedCharacter()
+        {
+            // Intent: issue #583 regression. Branch 1's Update argument was computed as
+            // Key.Substring(other.Length - 1, 1), which is only correct when other is a prefix
+            // of Key. For Key="01" and other="1", the probe matches at index 1, not index 0.
+            // Before the fix this yielded "0"; after the fix it yields "1".
+
+            // Arrange
+            string updateArg = null;
+            var ka = NewKa("01", update: s => updateArg = s);
+            ka.Activated = true;
+
+            // Act
+            var result = ka.KeyEquals("1");
+
+            // Assert
+            result.Should().BeTrue("a substring match returns true");
+            updateArg
+                .Should()
+                .Be(
+                    "1",
+                    "Update receives the last character of the matched span (Key.IndexOf(\"1\", "
+                        + "StringComparison.Ordinal) + other.Length - 1 = 1), not the pre-fix "
+                        + "prefix-only offset that yielded \"0\""
                 );
         }
 

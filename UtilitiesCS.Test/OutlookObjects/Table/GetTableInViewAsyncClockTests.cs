@@ -164,7 +164,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         /// barrier.Armed cannot complete unless a timer was created on the injected provider, so
         /// this test is the empirical proof that the deadline is under the caller's control. The
         /// fake clock is never advanced: advancing past timeoutMs would cancel the acquisition and
-        /// RunWithTimeout would return default, making the returned table null.
+        /// would now surface a TimeoutException from the acquisition rather than a table.
         /// </summary>
         [TestMethod]
         public async Task GetTableInViewAsync_InjectedClock_ArmsAcquisitionDeadlineOnInjectedProvider()
