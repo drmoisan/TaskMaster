@@ -193,14 +193,14 @@ front-runs the race.
 
 ## Acceptance Criteria
 
-- [ ] `QuickFiler.Test/SetupAssemblyInitializer.cs` installs an `AssemblyResolve` fallback in its own `[AssemblyInitialize]`, alongside the existing `EnableVisualStyles` and `SetCompatibleTextRenderingDefault` calls, and the fallback resolves by simple name plus public key token.
-- [ ] PRIMARY GUARD: `QuickFiler.Controllers.Tests.QfcInitEmailQueueZeroBatchTests` passes when it is the only class in the run and no runsettings file is passed, with the run recording the totals and exit code 0. This is the criterion that proves self-sufficiency; a suite run cannot, because any earlier class can rescue the bind invisibly.
-- [ ] The resolver logic is shared between `QuickFiler.Test` and `UtilitiesCS.Test` from a single source file, with the sharing mechanism justified in the change description; or, if sharing forces awkwardness, it is duplicated between exactly those two test projects with the reason recorded. `SVGControl` is not modified and the scope is confined to the two test projects.
-- [ ] `UtilitiesCS.Test` behaviour is unchanged in effect: it still installs the same resolver from its own `[AssemblyInitialize]`, with the same resolution semantics.
-- [ ] The explanatory comment states why the resolver exists, naming both vstest's testhost not honouring binding redirects and the netstandard 2.1.0.0 bind that nothing on the machine satisfies.
-- [ ] The full `QuickFiler.Test` suite passes with `Workers=0`, `Scope=ClassLevel`, and `/Settings:scripts/vscode/TaskMaster.cli.runsettings` still passed, with the run banner recording the parallelization mode, the totals, and exit code 0.
-- [ ] `scripts/vscode/TaskMaster.cli.runsettings` is unmodified, and the diff contains no `[DoNotParallelize]`, no `Workers` change, no retry, no sleep, and no timing tolerance.
-- [ ] The C# toolchain passes in CLAUDE.md order: CSharpier format check, .NET analyzers, nullable type-check, and MSTest.
+- [x] `QuickFiler.Test/SetupAssemblyInitializer.cs` installs an `AssemblyResolve` fallback in its own `[AssemblyInitialize]`, alongside the existing `EnableVisualStyles` and `SetCompatibleTextRenderingDefault` calls, and the fallback resolves by simple name plus public key token.
+- [x] PRIMARY GUARD: `QuickFiler.Controllers.Tests.QfcInitEmailQueueZeroBatchTests` passes when it is the only class in the run and no runsettings file is passed, with the run recording the totals and exit code 0. This is the criterion that proves self-sufficiency; a suite run cannot, because any earlier class can rescue the bind invisibly.
+- [x] The resolver logic is shared between `QuickFiler.Test` and `UtilitiesCS.Test` from a single source file, with the sharing mechanism justified in the change description; or, if sharing forces awkwardness, it is duplicated between exactly those two test projects with the reason recorded. `SVGControl` is not modified and the scope is confined to the two test projects.
+- [x] `UtilitiesCS.Test` behaviour is unchanged in effect: it still installs the same resolver from its own `[AssemblyInitialize]`, with the same resolution semantics.
+- [x] The explanatory comment states why the resolver exists, naming both vstest's testhost not honouring binding redirects and the netstandard 2.1.0.0 bind that nothing on the machine satisfies.
+- [x] The full `QuickFiler.Test` suite passes with `Workers=0`, `Scope=ClassLevel`, and `/Settings:scripts/vscode/TaskMaster.cli.runsettings` still passed, with the run banner recording the parallelization mode, the totals, and exit code 0.
+- [x] `scripts/vscode/TaskMaster.cli.runsettings` is unmodified, and the diff contains no `[DoNotParallelize]`, no `Workers` change, no retry, no sleep, and no timing tolerance.
+- [x] The C# toolchain passes in CLAUDE.md order: CSharpier format check, .NET analyzers, nullable type-check, and MSTest.
 
 ## Next Step
 
