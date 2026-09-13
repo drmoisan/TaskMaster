@@ -1,11 +1,14 @@
-# test-evidence-projection-convention-and-identity-leak-tooling (Potential Bug)
+# test-evidence-projection-convention-and-identity-leak-tooling (Issue #873)
 
 - Date captured: 2026-09-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/test-evidence-projection-convention-and-identity-leak-tooling/ (Issue #873)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #873
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/873
+- Last Updated: 2026-09-12
 ## Summary
 
 Implements the committed test-evidence convention the maintainer recorded on #671 on 2026-09-11 and removes the identity leaks that live in configuration rather than historical evidence (#728, the tooling half of #602). Raw `.trx` and raw `.cobertura.xml` output is no longer committed: the coverage entry point writes a package-level JaCoCo projection and the one-line first-party summary, the test runner writes a pass/fail summary, and raw output is discarded. Test-invocation scripts set an explicit results directory and log file name so the `<account>_<HOST>_<timestamp>.trx` default is never produced. The `PublishUrl` leak in `TaskMaster.csproj`, the five agent-memory files, and `.vscode/settings.json` are corrected in the same delivery.
