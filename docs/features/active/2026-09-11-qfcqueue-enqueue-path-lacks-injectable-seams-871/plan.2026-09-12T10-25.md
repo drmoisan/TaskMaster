@@ -355,7 +355,7 @@ tasks below complete.
       because a green run of this runner prints no failed or skipped line at all. Record the
       `total` integer as BASELINE_TEST_TOTAL; later phases compare against it.
 
-- [ ] [P0-T12] Run CMD-COVERAGE with the Cobertura output written as
+- [x] [P0-T12] Run CMD-COVERAGE with the Cobertura output written as
       coverage-baseline.2026-09-12T10-25.cobertura.xml under
       `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/evidence/baseline/`,
       and interpret it in the Markdown artifact p0-t12-coverage-baseline.2026-09-12T10-25.md in the
@@ -377,7 +377,7 @@ tasks below complete.
       is reported. That assertion is a repository-wide gate and is not this task's gate either way;
       this task's gate is the artifact content stated above.
 
-- [ ] [P0-T13] Measure the physical line count of `QuickFiler/Controllers/QfcQueue.cs`,
+- [x] [P0-T13] Measure the physical line count of `QuickFiler/Controllers/QfcQueue.cs`,
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` and the three existing QfcQueue test files in the
       QuickFiler test project's Controllers folder with CMD-LINECOUNT. Record in artifact
       p0-t13-line-counts-baseline.2026-09-12T10-25.md under the baseline evidence directory.
@@ -386,7 +386,7 @@ tasks below complete.
       figures were re-derived against the current tree while this plan was authored; a divergence
       means the tree moved and the split ranges in Phase 1 must be re-derived before proceeding.
 
-- [ ] [P0-T14] Write the fail-before exception dossier
+- [x] [P0-T14] Write the fail-before exception dossier
       fail-before-exception.2026-09-12T10-25.md into
       `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/evidence/regression-testing/`.
       A failing pre-change run is structurally impossible here: the defect is untestability, and any
@@ -403,7 +403,7 @@ tasks below complete.
       artifact records that folder-wide count alongside the scoped one so the distinction is
       auditable rather than implied.
 
-- [ ] [P0-T15] Commit the Phase 0 evidence with a single-line message. **Acceptance:** CMD-DIFF is
+- [x] [P0-T15] Commit the Phase 0 evidence with a single-line message. **Acceptance:** CMD-DIFF is
       run afterwards and every path it reports satisfies the Scope-lock rule; the commit contains at
       least the fourteen artifacts produced by P0-T1 through P0-T14.
 
