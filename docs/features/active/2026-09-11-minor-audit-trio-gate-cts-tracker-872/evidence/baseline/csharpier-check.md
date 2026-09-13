@@ -1,34 +1,41 @@
-# Phase 0 — CSharpier Baseline (Read-Only Check)
+# Phase 0 — CSharpier Baseline (read-only check)
 
-Timestamp: 2026-09-13T05-02
+Timestamp: 2026-09-13T14-51
 Task: [P0-T5]
 
 Command: dotnet tool run csharpier check .
 EXIT_CODE: 0
-CheckedFiles: 1626
+
+CheckedFiles: 1627
 UnformattedFileList: none
 
-Output Summary: the tool printed exactly one summary line and no per-file diagnostic. That line reads
-`Checked 1626 files in 5108ms.` No file was reported as not formatted, so the base tree carries no
-pre-existing formatter drift and the `UnformattedFileList:` value above is the word none rather than a
-path list.
+Output Summary: the tool printed the single summary line `Checked 1627 files in 5124ms.` and exited 0.
+It printed no per-file not-formatted line, so the base tree carries no pre-existing formatter drift.
+The checked count is greater than zero, so the run was not vacuous.
 
-The exit code is recorded as observed and was not asserted to be zero by this task. It happens to be 0,
-which is consistent with the empty unformatted list: pre-existing formatter drift is a fact about the
-base tree that P0-T14 evaluates, and on this tree there is none.
+## Derivation Of The Two Fields
 
-## Why The Check Subcommand And Not The Format Subcommand
+`CheckedFiles:` is transcribed from the count in the single summary line the tool prints in the form
+`Checked ` followed by a count and an elapsed time. `UnformattedFileList:` records the word none
+because the tool named no file as not formatted; the value is an enumeration of the tool's per-file
+output rather than an inference from the exit code.
 
-The check subcommand is read-only. It reports drift without repairing it, which is what makes it usable
-as a baseline. The format subcommand rewrites tracked source and exits 0 after rewriting, so a baseline
-captured after it had already repaired pre-existing drift would record a clean tree whatever the tree
-looked like beforehand. Phase 0 runs no formatter for that reason, and the first formatter invocation in
-this plan belongs to Phase 2.
+The check subcommand is read-only. It reports drift and does not repair it, which is why the baseline
+uses it and not the format subcommand: a baseline captured after a write-mode formatter has already
+repaired pre-existing drift is not a baseline. The exit code is recorded as observed and is not
+asserted to be zero by this task; P0-T14 evaluates it.
 
-The manifest-pinned CSharpier 1.2.6 was used, resolved through `dotnet tool run` after the P0-T3
-restore. No global CSharpier install was invoked.
+## Re-Run Note, Per D15
 
-## Build Lock
+This artifact overwrites a superseded capture taken before the main branch carrying the fix for issue
+#877 was merged into this branch. That merge added a source file under the repository-root TestSupport
+directory and changed a UtilitiesCS test source file, so the checked-file population is not the same
+population the superseded capture measured, and the count is re-measured rather than carried forward.
 
-The cross-item build lock was held across the check invocation only. Acquired 2026-09-13T05:02:32,
-released 2026-09-13T05:02:47.
+## Invocation Note
+
+The command was issued inside a single pwsh invocation whose first statement sets the location to this
+worktree root, so the `.` argument resolved to this worktree and not to any sibling. The tool was
+invoked through `dotnet tool run`, so the manifest-pinned version 1.2.6 recorded by P0-T3 is the
+version that ran. The build lock was held across this single command and released immediately
+afterwards.

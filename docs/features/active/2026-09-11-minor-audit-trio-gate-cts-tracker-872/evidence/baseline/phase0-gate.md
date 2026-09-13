@@ -1,102 +1,64 @@
-# Phase 0 — Halt Gate Evaluation
+# Phase 0 — Halt Gate
 
-Timestamp: 2026-09-13T05-15
+Timestamp: 2026-09-13T15-07
 Task: [P0-T14]
 
-PHASE0_GATE: RED
+PHASE0_GATE: GREEN
 
 ## Gate Table
 
-The gate tabulates the recorded `EXIT_CODE:` of the six command-bearing baseline tasks and states, per row,
-whether it is zero.
+Each row records the `EXIT_CODE:` value transcribed into the named artifact by the task that produced
+it, read back from that artifact rather than from memory of the run.
 
-| Task | Gate | Recorded EXIT_CODE | Is zero |
-| --- | --- | --- | --- |
-| P0-T5 | CSharpier check, read-only | 0 | yes |
-| P0-T6 | Analyzer rebuild | 0 | yes |
-| P0-T7 | Nullable rebuild | 0 | yes |
-| P0-T8 | vstest, UtilitiesCS test assembly | 0 | yes |
-| P0-T9 | vstest, QuickFiler test assembly | 0 | yes |
-| P0-T10 | Repository-wide coverage runner | 1 | NO |
+| Task | Artifact | Recorded EXIT_CODE | Zero? |
+|---|---|---|---|
+| P0-T5 | evidence/baseline/csharpier-check.md | 0 | yes |
+| P0-T6 | evidence/baseline/build-analyzers.md | 0 | yes |
+| P0-T7 | evidence/baseline/build-nullable.md | 0 | yes |
+| P0-T8 | evidence/baseline/tests-utilitiescs.md | 0 | yes |
+| P0-T9 | evidence/baseline/tests-quickfiler.md | 0 | yes |
+| P0-T10 | evidence/baseline/coverage-baseline.md | 0 | yes |
 
-Five of the six rows are zero. One row is non-zero.
+Every row is zero, so the gate records `PHASE0_GATE: GREEN` and Phase 1 may proceed. No row is
+non-zero, so there is no failing row to name and no BLOCKED condition arising from this gate.
 
-## Failing Row
-
-**P0-T10 — repository-wide coverage baseline. Observed `EXIT_CODE: 1`.**
-
-The repository coverage runner ran 7221 tests, of which 7218 passed and 3 failed, printed
-`Test Run Failed.`, and then threw from its own line 236 with the message
-`MSTest with coverage failed with exit code 1`. The three failing tests all belong to
-`QuickFiler.Controllers.Tests.QfcInitEmailQueueZeroBatchTests`:
-
-```
-Failed InitEmailQueue_ZeroBatchSize_ReturnsEmptyListWithoutThrowing
-Failed InitEmailQueue_ZeroBatchSize_StillStartsBackgroundWorker
-Failed InitEmailQueue_PositiveBatchSize_RetainsExistingProjectionAndFrameDrop
-```
-
-All three fail with a `TypeInitializationException` for `Deedle.Reflection`, whose innermost cause is a
-`FileNotFoundException` for `netstandard, Version=2.1.0.0`.
-
-Because the runner threw before its post-processing step, it printed neither its `First-party coverage: `
-line nor its terminating `Done. Coverage artifact: ` line, so P0-T10's requirement that the two figure sets
-reconcile could not be satisfied either. Both halves of that task's acceptance therefore fail.
-
-No other row failed, and no gate other than P0-T10 is implicated.
-
-## Classification Of The Failure
-
-This is a pre-existing, already-diagnosed tooling defect in the repository's coverage runner. It is not a
-regression introduced by this delivery, and no Phase 1 work has begun. The mechanism is recorded in the
-plan's decision D14: the runner appends the MSTest runsettings file at its line 76 and resolves that path
-internally, exposing no override parameter; that file's entire content is an MSTest Parallelize block with
-ClassLevel scope and a worker count of zero; under that class-level parallelism one race during concurrent
-class initialization poisons the Deedle reflection type, and the CLR caches a failed static initializer for
-the process lifetime, so repeated runs reproduce the failure and it reads as deterministic.
-
-The corroborating control is P0-T9, which ran the identical QuickFiler test assembly without that
-runsettings file minutes earlier and passed 1394 of 1394 at exit 0. A no-coverage control on the same
-process would not be a control, because of the cached-initializer behaviour; a separate process without the
-runsettings file is.
-
-## Why This Gate Halts Rather Than Proceeding
+## Why This Gate Exists
 
 An admitted red baseline would make every Phase 2 exit-zero demand unmeetable by any work this plan
-performs. In particular, the Phase 2 coverage task invokes the same runner and cannot avoid the same
-switch, so a Phase 2 run would fail identically and the failure would surface as a false Phase 2 regression
-attributed to this delivery. The divergence must be resolved by the caller before implementation starts.
+performs. The divergence would then surface as a false Phase 2 failure rather than as a baseline
+problem, so it must be resolved by the caller before implementation starts.
 
-Phase 1 has NOT begun. No Write Set path has been created, modified or deleted.
+## Re-Run Note, Per D15
 
-## What Was Deliberately Not Done
+This artifact overwrites a superseded capture. Every row above was re-measured against the post-merge
+tree by the re-executed task named in that row; no value is carried forward from the pre-merge run.
+The row that previously blocked this plan is the P0-T10 row: on the pre-merge tree the coverage runner
+produced three failures in the QuickFiler zero-batch email-queue test class under the parallelism the
+runner's internal MSTest runsettings file imposes, as D14 records. The fix for issue #877, merged as
+pull request #880, resolved it; the re-run passed 7222 of 7222 tests and exited 0.
 
-- `scripts/vscode/Invoke-MSTestWithCoverage.ps1` was not edited; it is outside the Write Set.
-- `scripts/vscode/TaskMaster.cli.runsettings` was not edited; it is outside the Write Set.
-- P0-T10 was not dropped, narrowed, or substituted with a run over a narrower population.
-- The defect was not re-diagnosed.
-- No file named `coverage.xml` was created under any artifacts path, so no repository coverage floor was
-  activated by this run.
+## Baseline Figures Carried Into Later Phases
 
-## Environment Bootstrap Performed Within Phase 0
+| Figure | Value | Superseded value |
+|---|---|---|
+| UtilitiesCS executed tests (AC11 baseline) | 4903 | 4903 |
+| QuickFiler executed tests (AC11 baseline) | 1395 | 1394 |
+| ProgressPackage.cs covered / total lines (AC12 baseline) | 52 / 52 | 52 / 52 |
+| ProgressPackage.cs class elements | 1 | 6 |
+| UtilitiesCS.csproj Compile items | 492 | 492 |
+| UtilitiesCS.Test.csproj Compile items | 478 | 477 |
+| Repository first-party line coverage | 85.71 percent | not recorded on the halted run |
+| Repository first-party branch coverage | 79.88 percent | not recorded on the halted run |
 
-Three environment actions were mechanically necessary before the gates could produce a measurement at all.
-Each is recorded in full in its own task artifact, each edits no tracked file, and none is a plan
-deviation:
+The QuickFiler baseline moved by one because the merge brought in one added test method, named
+Init_CreatesTokenSourceBeforeAnyLoaderObservesIt, a regression test for issue #839. The
+class-element count moved because the superseded figure was derived from a raw unprocessed Cobertura
+document left by the failing run, while the re-derivation reads the post-processed document; the
+covered and total line figures and the ratio are unchanged. The test-project Compile-item count moved
+by one because the #877 fix added the Compile item naming the shared assembly resolver source to that
+project alone.
 
-- The repo-local .NET SDK 8.0.205 was installed into the worktree-local git-ignored SDK directory, because
-  `dotnet` could not resolve at all in this fresh worktree. Recorded in the P0-T3 artifact.
-- NuGet packages were restored for the packages.config projects, installing 172 packages. This is P0-T4
-  itself.
-- Meziantou.Analyzer 3.0.203 was provisioned into the git-ignored packages directory, because 15 of the 16
-  first-party projects carry an `<Analyzer Include>` HintPath naming 3.0.203 while packages.config resolves
-  3.0.235. The skew is pre-existing: the main branch carries it identically and this branch modified no
-  project file. Recorded in the P0-T6 artifact.
+## Test Failures Observed
 
-After those three actions, `git status --porcelain --untracked-files=all -- "*.csproj" "*.config" "*.props" "*.targets"`
-produced no output.
-
-## Verdict
-
-PHASE0_GATE: RED. The executor halts at P0-T14 and reports BLOCKED to the caller, naming P0-T10 as the
-failing row, without beginning Phase 1.
+None. No test failed in P0-T8, in P0-T9 or in the P0-T10 coverage run, so there is no failure to
+report as a possible consequence of the assembly-resolution change that pull request 880 made.

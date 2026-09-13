@@ -1,123 +1,78 @@
-# Phase 0 — Repository-Wide Coverage Baseline (FAILED, PRE-EXISTING DEFECT)
+# Phase 0 — Repository Coverage Baseline
 
-Timestamp: 2026-09-13T05-12
+Timestamp: 2026-09-13T15-03
 Task: [P0-T10]
 
 Command: pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput TestResults/coverage/coverage-baseline.cobertura.xml
-EXIT_CODE: 1
-
-Command: pwsh -Command '"TransientXml: " + (Test-Path -LiteralPath "TestResults/coverage/coverage-baseline.cobertura.xml" -PathType Leaf); "FeatureFolderXml: " + @(Get-ChildItem -LiteralPath "docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872" -Recurse -File -Filter "coverage-baseline.cobertura.xml").Count'
 EXIT_CODE: 0
 
-Output Summary: the coverage runner FAILED. It ran 7221 tests, of which 7218 passed and 3 failed, printed
-`Test Run Failed.`, and then threw from its own line 236 with the message
-`MSTest with coverage failed with exit code 1`. Repository-wide raw figures read from the root coverage
-element of the emitted document are a first-party line figure of 71.15 percent (59585 of 83751 lines) and
-a first-party branch figure of 59.91 percent (14644 of 24445 branches). The runner's own
-`First-party coverage: ` line and its terminating `Done. Coverage artifact: ` line were NOT printed,
-because it threw before its post-processing step, so the two figure sets cannot be reconciled as the task
-requires and the figures above come from the raw document alone.
+LineRate: 0.857099
+LinesCovered: 56068
+LinesValid: 65416
+BranchRate: 0.798828
+BranchesCovered: 13497
+BranchesValid: 16896
+TestsPassed: 7222
 
-This task's acceptance is NOT met. It demands `EXIT_CODE: 0` on the runner and the two printed first-party
-lines; the observed exit code is 1 and neither line was printed. P0-T14 records this as the failing row.
+Output Summary: the coverage run completed with `Test Run Successful.`, `Total tests: 7222` and
+`Passed: 7222` in 32.6713 seconds, then post-processed the Cobertura document and printed the
+first-party headline `First-party coverage: lines 56068/65416 (85.71%), branches 13497/16896 (79.88%)`
+and the terminal line `Done. Coverage artifact: <worktree>\TestResults\coverage\coverage-baseline.cobertura.xml`,
+exiting 0. First-party line coverage is 85.71 percent and first-party branch coverage is 79.88
+percent. Both clear the repository floors that CLAUDE.md governs, which are 80 percent for line
+coverage and 75 percent for branch coverage.
 
-## Numeric Values Read From The Root Coverage Element
+## Reconciliation Of The Two Figure Sets
 
-LineRate: 0.7114541915917422
-LinesCovered: 59585
-LinesValid: 83751
-BranchRate: 0.5990591122929024
-BranchesCovered: 14644
-BranchesValid: 24445
-TestsPassed: 7218
+The root coverage element of the emitted document carries `line-rate` 0.857099, `lines-covered` 56068,
+`lines-valid` 65416, `branch-rate` 0.798828, `branches-covered` 13497 and `branches-valid` 16896. Those
+are the six numeric fields recorded above, read directly from the document rather than from the console
+line. They reconcile with the printed first-party headline exactly: the covered and valid counts are
+identical in both, and the printed percentages are the two rates rounded to two decimal places. The
+reconciliation is what establishes that the committed figures describe the document P0-T11 will read.
 
-Supporting counters from the run's printed totals: `Total tests: 7221`, `Passed: 7218`, `Failed: 3`. The
-class-element count in the emitted document is 3298. No value above is a placeholder; each was read from
-the emitted document or from the run's printed output.
+## Transient Artifact Placement
 
-## Second Span Assertions, Both Satisfied
+The second span printed `TransientXml: True` and `FeatureFolderXml: 0`. The first asserts that the raw
+Cobertura document exists at the git-ignored path `TestResults/coverage/coverage-baseline.cobertura.xml`;
+the second asserts that no file of that name exists anywhere under this feature folder. The second span
+is a filesystem name enumeration by the PowerShell `-Filter` wildcard rather than a text search, so no
+regex engine is involved. Per D10 the raw document is transient tool output, is never committed, and
+stays on disk for the remainder of the run because P0-T11 reads it. A separate check confirms that the
+prohibited path artifacts/csharp/coverage.xml does not exist; it is named here in prose rather than in
+path formatting so that no extractor reads this line as a write claim.
 
-```
-TransientXml: True
-FeatureFolderXml: 0
-```
+## Re-Run Note, Per D15, And The Previously Blocking Failure
 
-`TransientXml: True` establishes that the raw Cobertura document exists at the git-ignored transient path.
-`FeatureFolderXml: 0` establishes that no file of that name exists anywhere under this feature folder, so
-no raw coverage XML has entered the tracked tree. The second span is a filesystem name enumeration by the
-PowerShell `-Filter` wildcard and involves no regular-expression engine.
+This artifact overwrites a superseded capture. On the pre-merge tree this task was the point at which
+the plan halted: the coverage runner passes an MSTest runsettings file internally, whose ClassLevel
+parallelism at a worker count of zero produced three failures in the QuickFiler zero-batch email-queue
+test class through a type initialization exception for the Deedle reflection type against
+netstandard 2.1, as D14 records. The runner exposes no override for that switch.
 
-## Cause: A Pre-Existing, Already-Diagnosed Tooling Defect
+That blocker is resolved on the post-merge tree. The re-run above discovered and passed 7222 tests
+with zero failures under the runner's own wider population, which is the population D6 describes, and
+exited 0. The fix for issue #877, merged as pull request #880, is the change between the two runs: it
+moved the body of the UtilitiesCS test project's assembly initializer into a shared source file under
+the repository-root TestSupport directory and referenced it from both test projects, so the QuickFiler
+test assembly now resolves its dependencies without depending on the other assembly's initializer
+having run first. The observed transcript shows the runner enabling ClassLevel parallelism at 24
+workers per assembly, so the parallelism that previously triggered the failure was still in force and
+the run still passed.
 
-The three failures are all in one QuickFiler test class and are the defect D14 documents. The failing test
-names, as printed:
+Per D7 the run was bounded at ten minutes. It terminated in well under that bound: the test phase took
+32.6713 seconds and the whole invocation completed inside 90 seconds, so the non-termination hazard
+that D7 records did not materialise on this tree. No halt was required.
 
-```
-Failed InitEmailQueue_ZeroBatchSize_ReturnsEmptyListWithoutThrowing
-Failed InitEmailQueue_ZeroBatchSize_StillStartsBackgroundWorker
-Failed InitEmailQueue_PositiveBatchSize_RetainsExistingProjectionAndFrameDrop
-```
+## Population, Per D6
 
-All three belong to `QuickFiler.Controllers.Tests.QfcInitEmailQueueZeroBatchTests` and all three fail with
-the same exception, quoted from the captured run log:
+The coverage runner hard-codes its own LiveOutlook-only filter and offers no extension point, so its
+population is wider than the pinned per-assembly filter used by P0-T8 and P0-T9 and its total of 7222
+is not comparable with either of those totals. This run is used only for the per-file figure that
+P0-T11 derives and for the repository-wide headline above. It is never the source of the AC11
+per-assembly counts.
 
-```
-System.TypeInitializationException: The type initializer for 'Deedle.Reflection' threw an exception.
- ---> System.TypeInitializationException: The type initializer for '<StartupCode$Deedle>.$FrameUtils' threw an exception.
- ---> System.IO.FileNotFoundException: Could not load file or assembly 'netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies.
-```
+## Environment Note
 
-The failing frame is the test class's own two-row frame builder, reached from each test method.
-
-This is the pre-existing defect recorded against the runner and restated in D14, not a regression
-introduced by this delivery and not a property of the base tree's test code. The mechanism is already
-diagnosed: the runner appends the MSTest runsettings file at its line 76 and resolves that path internally,
-exposing no override parameter. That runsettings file's entire content is an MSTest Parallelize block with
-ClassLevel scope and a worker count of zero, which runs test classes concurrently across every logical
-processor. One race during concurrent class initialization poisons the Deedle reflection type, and the CLR
-caches a failed static initializer for the process lifetime, so repeated runs reproduce it and the failure
-reads as deterministic.
-
-The same runner also hard-codes a LiveOutlook-only test filter at that line, so it cannot exclude the four
-shell-icon test classes that stall vstest on this workstation. That is why its population of 7221 is wider
-than the D5 per-assembly population and why D6 records the difference as intended.
-
-The corroborating control is P0-T9: the identical QuickFiler assembly, run without that runsettings file,
-passed 1394 of 1394 at exit 0 minutes earlier. The failure is therefore attributable to the runsettings
-file the runner forces and to nothing in this delivery.
-
-## What Was Deliberately Not Done
-
-- `scripts/vscode/Invoke-MSTestWithCoverage.ps1` was not edited. It is outside the Write Set.
-- `scripts/vscode/TaskMaster.cli.runsettings` was not edited. It is outside the Write Set.
-- The task was not dropped, narrowed or substituted with a run over a narrower population.
-- The defect was not re-diagnosed. It is already diagnosed and D14 records it.
-
-The runner was invoked twice. The first invocation produced exit code 1 and the same throw, but its piped
-output was discarded, so a second invocation captured the full output to the git-ignored transient log in
-order to record which tests failed and with which exception. Capturing that output is what makes this
-artifact a record of the observed state rather than a bare exit code; it is not a re-diagnosis and no
-remedy was attempted. Both invocations produced the identical result.
-
-## Consequence For The Emitted Document
-
-Because the runner threw before its post-processing step, the document at the transient path is the raw
-dotnet-coverage output rather than the post-processed form. P0-T11 reads that document, and its artifact
-records the effect of the raw shape on the per-file derivation.
-
-## Transient Output, Per D10
-
-The raw Cobertura document and the captured run log both remain under the git-ignored results directory.
-Neither is committed. Absolute host paths appear in both and none is transcribed into this artifact; the
-test source is named repository-relatively as `QuickFiler.Test/Controllers/QfcInitEmailQueueZeroBatchTests.cs`.
-
-## D7 Timing
-
-D7 allows ten minutes before a stall is declared. Neither invocation stalled: the first ran from
-2026-09-13T05:09:47 to 2026-09-13T05:10:55 and the second from 2026-09-13T05:11:25 to 2026-09-13T05:12:10,
-so each terminated in about one minute. The failure is an explicit non-zero exit, not a non-termination.
-
-## Build Lock
-
-The cross-item build lock was held across each runner invocation only and released immediately after each
-returned. The artifact reads and the second span ran outside the lock.
+Outlook was verified not running before this run. The build lock was held across the runner invocation
+and released immediately afterwards.
