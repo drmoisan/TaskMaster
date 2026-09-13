@@ -977,7 +977,7 @@ This phase runs the full four-step C# toolchain unconditionally and in order, in
 any step fails or rewrites a file, restart this phase from P5-T1. No step in this phase may be
 recorded as skipped.
 
-- [ ] [P5-T1] Run CMD-FORMAT over the whole tree, capturing the porcelain status immediately before
+- [x] [P5-T1] Run CMD-FORMAT over the whole tree, capturing the porcelain status immediately before
       and immediately after the command. **Acceptance:** both porcelain captures are recorded
       verbatim in artifact p5-t1-format.2026-09-12T10-25.md under the qa-gates evidence directory,
       so that a run which rewrote nothing is distinguishable from one that repaired drift; and every
@@ -995,17 +995,17 @@ recorded as skipped.
       is carried into P6-T6 and into P7-T22, because a formatter repair of a file outside the Write
       Set is still a change to that file.
 
-- [ ] [P5-T2] Run CMD-CHECK over the whole tree. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P5-T2] Run CMD-CHECK over the whole tree. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p5-t2-check.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P5-T3] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, with the error and warning counts
+- [x] [P5-T3] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, with the error and warning counts
       captured by the anchored-pattern rule of P0-T9, recorded in artifact
       p5-t3-analyze.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P5-T4] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P5-T4] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p5-t4-nullable.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P5-T5] Run CMD-COVERAGE with the Cobertura output written as
+- [x] [P5-T5] Run CMD-COVERAGE with the Cobertura output written as
       coverage-postchange.2026-09-12T10-25.cobertura.xml under
       `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/evidence/qa-gates/`,
       and interpret it in artifact p5-t5-coverage-postchange.2026-09-12T10-25.md in the same
@@ -1023,7 +1023,7 @@ recorded as skipped.
       recorded by observation under the same rule, and the runner's own repository-wide
       document-level assertion is not this task's gate either way.
 
-- [ ] [P5-T6] Measure with CMD-LINECOUNT, after the final format, every production file in the Write
+- [x] [P5-T6] Measure with CMD-LINECOUNT, after the final format, every production file in the Write
       Set plus the two new test files, namely `QuickFiler/Controllers/QfcQueue.cs`,
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs`, `QuickFiler/Controllers/QfcQueue.Tlp.cs`,
       `QuickFiler/Controllers/QfcQueue.UiIdle.cs`, `QuickFiler/Interfaces/IUiIdleDispatcher.cs`,
@@ -1038,18 +1038,18 @@ recorded as skipped.
       every count is under 500, then re-run P5-T1 through P5-T6 as a fresh pass of the loop. A count
       at or over the ceiling is never recorded as a pass with an explanation.
 
-- [ ] [P5-T7] Run CMD-VSTEST across the whole test assembly followed by CMD-TRXCOUNTERS with a
+- [x] [P5-T7] Run CMD-VSTEST across the whole test assembly followed by CMD-TRXCOUNTERS with a
       results directory named for this task, as the fourth step of the loop. **Acceptance:**
       EXIT_CODE 0 and `failed=0`, with `total`, `executed`, `passed` and `failed` recorded in
       artifact p5-t7-tests-final.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P5-T8] Record the loop outcome. **Acceptance:** artifact
+- [x] [P5-T8] Record the loop outcome. **Acceptance:** artifact
       p5-t8-loop-result.2026-09-12T10-25.md under the qa-gates evidence directory states the number
       of the pass through P5-T1 through P5-T7 that completed with every step exiting as required and
       with P5-T1 rewriting no file, and names the artifact produced by each of those seven tasks in
       that pass. A recorded pass in which the formatter rewrote a file is not a completed loop.
 
-- [ ] [P5-T9] Commit Phase 5 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
+- [x] [P5-T9] Commit Phase 5 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
       and every path it reports satisfies the Scope-lock rule.
 
 ---
