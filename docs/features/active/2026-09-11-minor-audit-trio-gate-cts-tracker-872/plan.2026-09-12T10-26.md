@@ -782,7 +782,7 @@ P2-T1 and every restarted step overwrites its artifact with the values of the pa
 phase, recording the superseded pass in the same artifact. Every command task in this phase is
 unconditional: none carries an in-scope or out-of-scope branch and none has a skipped completion path.
 
-- [ ] [P2-T1] Run the formatter over the tree and write
+- [x] [P2-T1] Run the formatter over the tree and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-csharpier-format.md`.
 
   ```
@@ -816,7 +816,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   because a path excluded from both runs contributes the same figure to each, and it keeps all four
   spans identical in scope.
 
-- [ ] [P2-T2] Verify formatting in read-only mode and write
+- [x] [P2-T2] Verify formatting in read-only mode and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-csharpier-check.md`.
 
   ```
@@ -830,7 +830,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   be at least one, because a run that visited no file would also exit 0 and would report no unformatted
   file.
 
-- [ ] [P2-T3] Run the analyzer rebuild gate and write
+- [x] [P2-T3] Run the analyzer rebuild gate and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-build-analyzers.md`.
 
   ```
@@ -849,7 +849,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   actually ran rather than being skipped as up to date; per D2 the exit code of a warm build cannot
   discharge it. Per D10 the log is not committed.
 
-- [ ] [P2-T4] Run the nullable rebuild gate and write
+- [x] [P2-T4] Run the nullable rebuild gate and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-build-nullable.md`.
 
   ```
@@ -863,7 +863,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   and the artifact records explicitly that the command line contains no Nullable property, per D3.
   Under this gate a warning is promoted to an error, so a zero error count is the operative signal.
 
-- [ ] [P2-T5] Run the UtilitiesCS test assembly and write
+- [x] [P2-T5] Run the UtilitiesCS test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-tests-utilitiescs.md`.
 
   ```
@@ -878,7 +878,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   byte-identical to the P0-T8 filter string, which is what makes the AC11 comparison valid. D9 governs
   a single sporadic failure of the named dictionary-extensions test.
 
-- [ ] [P2-T6] Run the QuickFiler test assembly and write
+- [x] [P2-T6] Run the QuickFiler test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-tests-quickfiler.md`.
 
   ```
@@ -891,7 +891,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   records `TotalTests:` and `Passed:` with the two values equal, plus `Failed: 0` and `Skipped: 0`
   transcribed per D8. The filter string is byte-identical to the P0-T9 filter string.
 
-- [ ] [P2-T7] Capture post-change coverage in Cobertura format, writing the raw XML to the transient
+- [x] [P2-T7] Capture post-change coverage in Cobertura format, writing the raw XML to the transient
   git-ignored path `TestResults/coverage/coverage-postchange.cobertura.xml` and the step artifact to
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-coverage-postchange.md`.
   Per D10 the raw XML is transient tool output written outside the tracked tree and is never committed.
@@ -921,7 +921,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   purpose of the dormant-code issue. Per D7 a non-terminating run is halted at ten minutes and reported
   BLOCKED.
 
-- [ ] [P2-T8] Verify the AC11 per-assembly test-count deltas and write
+- [x] [P2-T8] Verify the AC11 per-assembly test-count deltas and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac11-test-count-delta.md`.
   Acceptance for AC11: the artifact tabulates, for each of the two assemblies, the P0 baseline
   `TotalTests:` value, the P2 value, and their difference; the UtilitiesCS test assembly difference is
@@ -932,7 +932,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   giving minus six; and plus two for the tests added by P1-T2 and P1-T3. A difference other than the
   stated one fails this task.
 
-- [ ] [P2-T9] Derive post-change per-file coverage for `UtilitiesCS/Threading/ProgressPackage.cs`,
+- [x] [P2-T9] Derive post-change per-file coverage for `UtilitiesCS/Threading/ProgressPackage.cs`,
   compare it against the P0-T11 baseline, and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac12-progresspackage-coverage.md`.
 
@@ -983,7 +983,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   exercised: the owned path by P1-T6 and by the parent in P1-T8, and the not-owned path by P1-T7 and by
   the child in P1-T8.
 
-- [ ] [P2-T10] Verify the AC7 Compile-item counts and write
+- [x] [P2-T10] Verify the AC7 Compile-item counts and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac7-compile-item-counts.md`.
 
   ```
@@ -994,7 +994,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   baseline value, and `TrackerReferences:` is 0. A fall of more than one in either file means a sibling
   Compile item was dropped and fails this task. A fall of zero means the item was not removed.
 
-- [ ] [P2-T11] Verify the AC6 deletions and write
+- [x] [P2-T11] Verify the AC6 deletions and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac6-deletions.md`.
 
   ```
@@ -1014,7 +1014,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   file in this worktree's index. The diff carries the base commit recorded by P0-T2 as its ref
   operand.
 
-- [ ] [P2-T12] Verify AC5 structurally and write
+- [x] [P2-T12] Verify AC5 structurally and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac5-using-declaration.md`.
 
   ```
@@ -1037,7 +1037,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   report rather than reported at zero. The diff carries the base commit recorded by P0-T2 as its ref
   operand.
 
-- [ ] [P2-T13] Verify AC3 structurally and write
+- [x] [P2-T13] Verify AC3 structurally and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac3-ownership-structure.md`.
 
   ```
@@ -1057,7 +1057,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   The artifact restates that AC3 is a capability criterion and names the Scope Boundary entry that
   records the residual and its owner.
 
-- [ ] [P2-T14] Verify the three AC4 tests by name and write
+- [x] [P2-T14] Verify the three AC4 tests by name and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac4-disposal-tests.md`.
   Acceptance for AC4: the TRX produced by P2-T5 under the results directory for that task contains a
   unit test result with outcome Passed for each of `Dispose_WhenPackageConstructedTheSource_ReleasesIt`,
@@ -1073,7 +1073,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   records that file's name and the count of TRX files present, so a third party re-running the
   selection obtains the same file.
 
-- [ ] [P2-T15] Verify the AC1 test by name and write
+- [x] [P2-T15] Verify the AC1 test by name and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac1-scan-cap-log.md`.
   Acceptance for AC1: the TRX produced by P2-T6 under the results directory for that task contains a
   unit test result with outcome Passed for
@@ -1087,7 +1087,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   timestamp is the operative one; the artifact records that file's name and the count of TRX files
   present, so a third party re-running the selection obtains the same file.
 
-- [ ] [P2-T16] Verify the AC2 test by name and write
+- [x] [P2-T16] Verify the AC2 test by name and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac2-ceiling-log.md`.
   Acceptance for AC2: the TRX produced by P2-T6 under the results directory for that task contains a
   unit test result with outcome Passed for
@@ -1101,7 +1101,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   most recent last-write timestamp is the operative one; the artifact records that file's name and the
   count of TRX files present, so a third party re-running the selection obtains the same file.
 
-- [ ] [P2-T17] Audit file sizes after the final formatter pass and write
+- [x] [P2-T17] Audit file sizes after the final formatter pass and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/file-size-audit.md`.
 
   ```
@@ -1116,7 +1116,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   task fails and the executor reports BLOCKED rather than adding a new part file, because a new part
   file would require editing the QuickFiler test project file, which is outside the Write Set.
 
-- [ ] [P2-T18] Check off AC1 in
+- [x] [P2-T18] Check off AC1 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md` by changing the AC1
   checkbox from unchecked to checked. Acceptance: exactly one checkbox changes in this task; the AC1
   line matches the literal `- [x] AC1 ` including the trailing space, which does not match the AC10,
@@ -1124,73 +1124,73 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac1-scan-cap-log.md`
   exists and is complete before the box is flipped.
 
-- [ ] [P2-T19] Check off AC2 in
+- [x] [P2-T19] Check off AC2 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC2 line matches the literal `- [x] AC2 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac2-ceiling-log.md`
   exists and is complete.
 
-- [ ] [P2-T20] Check off AC3 in
+- [x] [P2-T20] Check off AC3 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC3 line matches the literal `- [x] AC3 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac3-ownership-structure.md`
   exists and is complete.
 
-- [ ] [P2-T21] Check off AC4 in
+- [x] [P2-T21] Check off AC4 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC4 line matches the literal `- [x] AC4 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac4-disposal-tests.md`
   exists and is complete.
 
-- [ ] [P2-T22] Check off AC5 in
+- [x] [P2-T22] Check off AC5 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC5 line matches the literal `- [x] AC5 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac5-using-declaration.md`
   exists and is complete.
 
-- [ ] [P2-T23] Check off AC6 in
+- [x] [P2-T23] Check off AC6 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC6 line matches the literal `- [x] AC6 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac6-deletions.md`
   exists and is complete.
 
-- [ ] [P2-T24] Check off AC7 in
+- [x] [P2-T24] Check off AC7 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC7 line matches the literal `- [x] AC7 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac7-compile-item-counts.md`
   exists and is complete.
 
-- [ ] [P2-T25] Check off AC8 in
+- [x] [P2-T25] Check off AC8 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC8 line matches the literal `- [x] AC8 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-csharpier-check.md`
   exists and is complete.
 
-- [ ] [P2-T26] Check off AC9 in
+- [x] [P2-T26] Check off AC9 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC9 line matches the literal `- [x] AC9 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-build-analyzers.md`
   exists and is complete.
 
-- [ ] [P2-T27] Check off AC10 in
+- [x] [P2-T27] Check off AC10 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC10 line matches the literal `- [x] AC10 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-build-nullable.md`
   exists and is complete.
 
-- [ ] [P2-T28] Check off AC11 in
+- [x] [P2-T28] Check off AC11 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC11 line matches the literal `- [x] AC11 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac11-test-count-delta.md`
   exists and is complete.
 
-- [ ] [P2-T29] Check off AC12 in
+- [x] [P2-T29] Check off AC12 in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md`. Acceptance: exactly
   one checkbox changes; the AC12 line matches the literal `- [x] AC12 `; and
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac12-progresspackage-coverage.md`
   exists and is complete.
 
-- [ ] [P2-T30] Tick the three Evidence Checklist boxes in
+- [x] [P2-T30] Tick the three Evidence Checklist boxes in
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/issue.md` for baseline,
   targeted verification and end-state. Acceptance: all three lines are checked, and the artifact
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/issue-updates/ac-status-summary.md`
@@ -1199,7 +1199,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   evidence checklist and are not acceptance criteria, which is why they are ticked in a separate task
   from the twelve single-criterion check-offs.
 
-- [ ] [P2-T31] Reconcile the acceptance-criteria state and write
+- [x] [P2-T31] Reconcile the acceptance-criteria state and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/ac-reconciliation.md`.
 
   ```

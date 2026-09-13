@@ -140,7 +140,9 @@ namespace UtilitiesCS.Test
                 stopWatch: stopWatch
             );
             var constructed = package.CancelSource;
-            constructed.Should().NotBeSameAs(trackerSource, "the package constructed its own source");
+            constructed
+                .Should()
+                .NotBeSameAs(trackerSource, "the package constructed its own source");
 
             // Act
             package.Dispose();
@@ -149,7 +151,9 @@ namespace UtilitiesCS.Test
             Action readToken = () => _ = constructed.Token;
             readToken
                 .Should()
-                .Throw<ObjectDisposedException>("a source the package owns is released on disposal");
+                .Throw<ObjectDisposedException>(
+                    "a source the package owns is released on disposal"
+                );
         }
 
         /// <summary>

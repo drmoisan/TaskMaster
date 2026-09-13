@@ -89,15 +89,15 @@ mention of the removed type sits in a code tag in an XML doc comment rather than
 
 ## Acceptance Criteria
 
-- [ ] AC1 — A test in `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.Part4.cs`
+- [x] AC1 — A test in `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.Part4.cs`
   drives the gate to the item-cap bound with a `debugLog` delegate injected, and asserts that the
   captured scan-bound line reports the cutoff in force, the accepted count, the scanned count, the
   bound token `scan-cap`, and the stop decision `Decision=stop`.
-- [ ] AC2 — A test in the same file drives the gate to the time-ceiling bound with a `debugLog`
+- [x] AC2 — A test in the same file drives the gate to the time-ceiling bound with a `debugLog`
   delegate injected, and asserts that the captured scan-bound line reports the bound token
   `zero-acceptance-ceiling` rather than the item-cap token, so that a regression which collapsed the
   two bounds to one value would fail.
-- [ ] AC3 — `UtilitiesCS/Threading/ProgressPackage.cs` records, in per-instance state assigned at the
+- [x] AC3 — `UtilitiesCS/Threading/ProgressPackage.cs` records, in per-instance state assigned at the
   construction site inside each `InitializeAsync` overload, whether the `CancellationTokenSource` it
   holds was constructed by the class or supplied by the caller, and exposes a disposal contract that
   releases the source only when the class constructed it. The ownership state is never assigned
@@ -105,35 +105,35 @@ mention of the removed type sits in a code tag in an XML doc comment rather than
   setter and a child must not claim its parent's source. This is a capability criterion: see the
   Out of Scope section for why the class cannot also guarantee that every constructed source is
   released, and for the residual that is tracked separately.
-- [ ] AC4 — `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` contains three new tests: one
+- [x] AC4 — `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` contains three new tests: one
   proving a source the class constructed is released on disposal, one proving a caller-supplied
   source is left usable after disposal, and one proving a child produced by `SpawnChild` does not
   release the source its parent constructed. All three drive the tracker overload with a non-null
   injected tracker and an explicit stop watch so that no UI thread is touched, and all three probe
   release by observing that the source's `Token` getter throws rather than by inspecting a timer.
-- [ ] AC5 — `UtilitiesCS/EmailIntelligence/SubjectMap/SubjectMapSco.Orchestration.cs` releases the
+- [x] AC5 — `UtilitiesCS/EmailIntelligence/SubjectMap/SubjectMapSco.Orchestration.cs` releases the
   `CancellationTokenSource` that `RebuildAsync` constructs, on the completing path and on the faulting
   path alike, and the release happens after the last use of the token and of the tracker that holds
   the source.
-- [ ] AC6 — `UtilitiesCS/Threading/ProgressTrackerAsync.cs` and
+- [x] AC6 — `UtilitiesCS/Threading/ProgressTrackerAsync.cs` and
   `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` are deleted from the working tree.
-- [ ] AC7 — The Compile item naming the deleted production source is removed from
+- [x] AC7 — The Compile item naming the deleted production source is removed from
   `UtilitiesCS/UtilitiesCS.csproj` and the Compile item naming the deleted test source is removed from
   `UtilitiesCS.Test/UtilitiesCS.Test.csproj`, and the count of Compile items in each of those two
   project files falls by exactly one relative to the base commit, so that no sibling Compile item is
   dropped.
-- [ ] AC8 — `dotnet tool run csharpier check .` reports no unformatted file.
-- [ ] AC9 — The analyzer build of the solution with `/t:Rebuild`, `EnableNETAnalyzers` and
+- [x] AC8 — `dotnet tool run csharpier check .` reports no unformatted file.
+- [x] AC9 — The analyzer build of the solution with `/t:Rebuild`, `EnableNETAnalyzers` and
   `EnforceCodeStyleInBuild` succeeds, and the build log shows compilation actually ran rather than
   being skipped as up to date.
-- [ ] AC10 — The nullable build of the solution with `/t:Rebuild` and `TreatWarningsAsErrors`
+- [x] AC10 — The nullable build of the solution with `/t:Rebuild` and `TreatWarningsAsErrors`
   succeeds. The `Nullable` property is not supplied on the command line, matching the CI workflow.
-- [ ] AC11 — The MSTest run over the affected test assemblies passes with no failed test. Measured
+- [x] AC11 — The MSTest run over the affected test assemblies passes with no failed test. Measured
   against the Phase 0 per-assembly baseline, the UtilitiesCS test assembly's executed-test count
   changes by exactly minus six, being the nine test methods removed with the dormant tracker's test
   class and the three added by AC4, and the QuickFiler test assembly's executed-test count changes
   by exactly plus two, being the tests added by AC1 and AC2.
-- [ ] AC12 — Line coverage on the changed lines of `UtilitiesCS/Threading/ProgressPackage.cs` does not
+- [x] AC12 — Line coverage on the changed lines of `UtilitiesCS/Threading/ProgressPackage.cs` does not
   regress against the baseline captured in Phase 0.
 
 ## Out of Scope — Follow-up Required
@@ -196,6 +196,6 @@ is a generated artifact, it is not compiled, and it is not edited by this delive
 
 ## Evidence Checklist
 
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
