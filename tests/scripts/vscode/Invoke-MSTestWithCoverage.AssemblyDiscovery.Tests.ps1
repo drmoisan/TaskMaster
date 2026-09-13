@@ -39,13 +39,20 @@ Describe 'Invoke-MSTestWithCoverage assembly discovery' {
                 [string]$CoverageConfig,
                 [string]$VsTestPath,
                 [string[]]$TestAssembly,
-                [string]$RunSettingsPath
+                [string]$RunSettingsPath,
+                [string]$ResultsDirectory,
+                [string]$LogFileName
             )
-            $null = $OutputPath, $CoverageConfig, $VsTestPath, $RunSettingsPath
+            $null = $OutputPath, $CoverageConfig, $VsTestPath, $RunSettingsPath, $ResultsDirectory, $LogFileName
             $script:capturedTestAssembly = $TestAssembly
         }
+        # The reader mock is deliberately left unfiltered. It answers the entry point's test-result
+        # read with a document that parses but carries no result-summary node, so the summary write
+        # and the discard both take the non-fatal warning branch and this file needs no further
+        # change. The post-processor value carries the root lines-covered and lines-valid attributes
+        # the reconciliation assertion reads, over one package whose figures sum to them.
         Mock Get-Content { '<coverage />' }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8"><packages /></coverage>' }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>' }
         Mock Set-Content {}
     }
 
