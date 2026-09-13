@@ -24,6 +24,6 @@
     "coverage"
   ],
   "powerquery.client.additionalSymbolsDirectories": [
-    "c:/Users/DanMoisan/repos/TaskMaster/.vscode/excel-pq-symbols"
+    "${workspaceFolder}/.vscode/excel-pq-symbols"
   ]
 }

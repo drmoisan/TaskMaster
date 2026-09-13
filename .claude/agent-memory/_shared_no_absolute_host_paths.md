@@ -100,3 +100,23 @@ Two further verification rules learned the same way:
   committed file exactly the identifiers it just removed. Describe each substituted token by class
   (workspace-root prefix, user-profile path, `computerName` attribute, `runUser`) and keep only the
   `AFTER:` lines.
+
+## Two obligations on the hygiene task itself
+
+The sections above record these as incidents. They are restated here as obligations on the hygiene task
+being authored, because a task author reading an incident note does not necessarily recognise it as a
+requirement on the task in front of them.
+
+1. **A per-plan hygiene task must include the plan file itself in its residual scan.** A scan that
+   excludes the plan by path cannot detect a host path reintroduced into the plan, and the plan is among
+   the files most likely to carry one, because it quotes commands and paths verbatim. Scanning only the
+   evidence subtree while the plan sits beside it leaves the plan unchecked, and the scan still reports
+   a clean result.
+2. **A residual-match count of zero is necessary but not sufficient, and must be paired with a parse
+   check on every XML-family file the sweep rewrites.** The count measures only that the identifiers
+   were removed, never that the file it rewrote still parses, so a sweep that corrupts every XML
+   artifact it touches still reports success. Assert that every rewritten XML-family file re-parses, and
+   treat that assertion as part of the gate rather than as a follow-up check.
+
+No executable sweep is added by this delivery. No such sweep exists in this repository, and building one
+belongs to the repository-wide sweep item rather than to any single bug-fix child.

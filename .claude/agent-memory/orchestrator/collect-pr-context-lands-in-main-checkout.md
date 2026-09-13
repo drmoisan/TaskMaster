@@ -7,7 +7,7 @@ metadata:
 
 Calling `mcp__drm-copilot__collect_pr_context` from a `.claude/worktrees/<agent-id>` worktree returns
 `ok:true` and lists artifact paths **inside that worktree**, but the files it actually writes land in
-the PRIMARY checkout (`C:\Users\DanMoisan\repos\TaskMaster\artifacts\`). The `workspace_root`
+the PRIMARY checkout (`<repo-root>\artifacts\`). The `workspace_root`
 argument does not redirect it. Confirmed again 2026-08-22 (epic child #445): the returned paths had
 an mtime ~10 minutes older than the call, while the primary checkout's copy was freshly written.
 

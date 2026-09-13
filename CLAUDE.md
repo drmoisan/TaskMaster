@@ -387,7 +387,7 @@ For C# work, use these concrete commands for the general policy toolchain loop:
 1. `dotnet tool run csharpier format .` (verify with `dotnet tool run csharpier check .`)
 2. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 3. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
-4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
+4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage /ResultsDirectory:coverage\test-results /Logger:trx;LogFileName=mstest-run.trx`
 
 The loop behavior (restart rules, must-pass requirements, and audit expectations) is defined by the General Code Change Policy above.
 
@@ -405,9 +405,23 @@ The loop behavior (restart rules, must-pass requirements, and audit expectations
 1. **Format**: `dotnet tool run csharpier format .` (verify: `dotnet tool run csharpier check .`; always via `dotnet tool run`, never a global install)
 2. **Analyze**: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 3. **Type-check**: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
-4. **Test**: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
+4. **Test**: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage /ResultsDirectory:coverage\test-results /Logger:trx;LogFileName=mstest-run.trx`
 
 If any step fails, fix and restart from step 1.
+
+## Committed Test Evidence Format
+
+Committed test evidence is a projection of a tool's output, never the tool's raw document. Three forms are permitted:
+
+- **For a coverage run**: a package-level JaCoCo projection of the post-processed Cobertura document.
+- **For a coverage run**: the existing one-line first-party coverage summary, committed alongside that projection.
+- **For a test run**: a test-result summary derived from the trx document.
+
+A raw coverage collector document and a raw test-platform document are both prohibited. Neither may be added to git in any form, including under a feature folder's evidence tree. Both carry absolute host paths and machine-specific identifiers, and both are large enough that a reviewer cannot read a diff of one. The projection and the summary carry every figure the tool reported — the summary states which figures are derived rather than reported — so committing them in place of the document loses no figure a reviewer needs.
+
+This rule lives in this file rather than in the evidence-and-timestamp conventions document or the atomic-plan contract. Both of those are push-down owned from an upstream repository and an edit to either is reverted on the next push-down, whereas this file is owned here and is loaded into every agent session.
+
+The two test-console toolchain steps above pass the results directory and the trx log file name explicitly for the same reason. Left to the console, the test-result document is written under a derived machine-and-timestamp name that no later step can predict or read, so no summary can be produced from it.
 
 ## Key Skills Reference
 
