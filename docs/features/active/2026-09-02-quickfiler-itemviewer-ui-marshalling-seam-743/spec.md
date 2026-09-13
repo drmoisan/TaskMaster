@@ -410,7 +410,7 @@ Per the maintainer decision on issue #671 dated 2026-09-11, this item commits **
 
 Five criteria, consolidated from #592 and restated so each is falsifiable. All five must be satisfied.
 
-- [x] **AC1 — Mechanism identified by measurement, not inference.** An evidence artifact under this
+- [ ] **AC1 — Mechanism identified by measurement, not inference.** An evidence artifact under this
   feature folder's evidence/baseline directory names which of the two candidate mechanisms defined in section 4.2 —
   H-COST (raw elapsed fixture cost) or H-LEAK (a leaked or late-released `TransactionGate` permit) — is
   operative, and does so from a direct instrumented observation. The artifact PASSES only if it contains

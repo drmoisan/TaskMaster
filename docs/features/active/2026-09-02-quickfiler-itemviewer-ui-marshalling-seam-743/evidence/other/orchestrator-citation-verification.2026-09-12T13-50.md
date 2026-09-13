@@ -3,7 +3,8 @@
 Timestamp: 2026-09-12T13-50
 Collected by: orchestrator (preparation mode), independently of `Agent(task-researcher)`
 Method: Read, Grep and Glob against the worktree at
-`C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a190dd2fffe21a25d`
+`.claude/worktrees/agent-a190dd2fffe21a25d` (repository-relative; the absolute host path this line
+originally carried was removed under review finding R-1)
 EXIT_CODE: 0
 
 The delegation prompt supplied a maintainer file list dated 2026-09-11 and instructed that every line
