@@ -436,58 +436,58 @@ command.
 
 ## Acceptance Criteria
 
-- [ ] 1. The absorbed-default path throws `TimeoutException` instead of returning null. Verified by
+- [x] 1. The absorbed-default path throws `TimeoutException` instead of returning null. Verified by
   the new test `GetTableInViewAsync_RunWithTimeoutExhaustsRetries_ThrowsTimeoutException` passing in
   the vstest run, where it asserts the awaited invocation throws `TimeoutException`.
-- [ ] 2. That same test proves the failure originated in the shared helper's internal retry and not
+- [x] 2. That same test proves the failure originated in the shared helper's internal retry and not
   in the method's own recursion, by asserting that the deadline-source factory was invoked exactly
   twice and that the table-read delegate was invoked exactly zero times. Verified by both assertions
   passing inside `GetTableInViewAsync_RunWithTimeoutExhaustsRetries_ThrowsTimeoutException`.
-- [ ] 3. The retry-ceiling branch of the `TaskCanceledException` catch throws `TimeoutException`.
+- [x] 3. The retry-ceiling branch of the `TaskCanceledException` catch throws `TimeoutException`.
   Verified by the new test
   `GetTableInViewAsync_CounterAtRetryCeilingWithTaskCanceled_ThrowsTimeoutException` passing, where it
   asserts the thrown `TimeoutException` message names the retry counter and the millisecond budget.
-- [ ] 4. The retry-ceiling branch of the `TimeoutException` catch throws `TimeoutException` carrying
+- [x] 4. The retry-ceiling branch of the `TimeoutException` catch throws `TimeoutException` carrying
   the caught exception as `InnerException`. Verified by the new test
   `GetTableInViewAsync_CounterAtRetryCeilingWithTimeout_ThrowsTimeoutExceptionPreservingInner`
   passing, where it asserts `InnerException` is the same instance the factory threw.
-- [ ] 5. Outer-token cancellation still surfaces as `OperationCanceledException`, and the cancellation
+- [x] 5. Outer-token cancellation still surfaces as `OperationCanceledException`, and the cancellation
   branch of the `TaskCanceledException` catch rethrows rather than returning null. Verified by two
   passing tests: the existing
   `GetTableInViewAsync_CanceledToken_PropagatesOperationCanceledException`, which must pass with its
   containing file absent from the change diff, and the new
   `GetTableInViewAsync_TimeoutSourceThrowsTaskCanceledAfterCancellingOuterToken_PropagatesCancellation`.
-- [ ] 6. No catch clause for `OperationCanceledException` was added to `GetTableInViewAsync`, and no
+- [x] 6. No catch clause for `OperationCanceledException` was added to `GetTableInViewAsync`, and no
   consumer-side catch list was widened. Verified by a grep of the two production files in the Write
   Set returning zero occurrences of a catch clause naming `OperationCanceledException`, together with
   the absence of QfcDatamodel.FrameBuilding.cs and DfDeedle.cs from the change diff produced by
   `git diff --name-only` against the merge base.
-- [ ] 7. The null-forgiving operator is gone from the return statement of `GetTableInViewAsync`, and
+- [x] 7. The null-forgiving operator is gone from the return statement of `GetTableInViewAsync`, and
   the method compiles clean under the per-file nullable opt-in with warnings treated as errors.
   Verified by a grep of OlTableExtensions.TableAccess.cs returning zero occurrences of a
   null-forgiving suppression on a return statement, and by
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
   completing with exit code 0 and zero CS86 nullable diagnostics.
-- [ ] 8. No existing test assertion was weakened, deleted or relaxed. Verified by
+- [x] 8. No existing test assertion was weakened, deleted or relaxed. Verified by
   `git diff --name-only` against the merge base showing OlTableExtensions_Tests.cs,
   OlTableExtensionsTimeoutDiagnosticsTests.cs and DfDeedleEtlTimeoutTests.cs absent from the diff
   entirely, and by the diff for GetTableInViewAsyncClockTests.cs touching comment lines only, with
   zero changed lines containing an assertion call.
-- [ ] 9. Both stale prose comments are corrected: the comment inside `GetTableInViewAsync` that
+- [x] 9. Both stale prose comments are corrected: the comment inside `GetTableInViewAsync` that
   describes the null-on-timeout condition as a pre-existing latent condition, and the comment in
   GetTableInViewAsyncClockTests.cs stating that advancing past the timeout would make the returned
   table null. Verified by a grep of those two files returning zero occurrences of the phrase
   "pre-existing latent" and zero occurrences of the phrase "making the returned table null".
-- [ ] 10. Each C# file in the Write Set is at or under 500 lines. Verified by a line count of
+- [x] 10. Each C# file in the Write Set is at or under 500 lines. Verified by a line count of
   OlTableExtensions.TableAccess.cs, the new failures partial file, the new failure-contract test file
   and GetTableInViewAsyncClockTests.cs, each returning a value no greater than 500. This criterion
   does not apply to the project files or to the Markdown documents in the Write Set, which the
   general code-change policy exempts.
-- [ ] 11. Both new .cs files are registered for compilation in their owning non-SDK-style project
+- [x] 11. Both new .cs files are registered for compilation in their owning non-SDK-style project
   files. Verified by a grep of UtilitiesCS.csproj returning a Compile item for the new failures
   partial file, a grep of UtilitiesCS.Test.csproj returning a Compile item for the new
   failure-contract test file, and by the analyzer build completing with exit code 0.
-- [ ] 12. The delivered implementation matches the four-step trace in the Proposed Fix section: the
+- [x] 12. The delivered implementation matches the four-step trace in the Proposed Fix section: the
   view-cast guard is the only pre-deadline validation and is unchanged; the deadline expiry is raised
   inside the shared helper; the absorbed default no longer reaches the return statement; and the new
   report is emitted by a guard immediately before the return statement that calls
@@ -512,15 +512,15 @@ command.
   figure contains no unreachable statement. For this criterion only, this amendment supersedes the
   four-item enumeration under Test Strategy: the replacement test is a fifth test in the same new
   failure-contract test class, and criteria 10 and 13 apply to it unchanged.
-- [ ] 13. The new tests introduce no banned-symbol call site and no non-deterministic timing.
+- [x] 13. The new tests introduce no banned-symbol call site and no non-deterministic timing.
   Verified by a grep of the new failure-contract test file returning zero occurrences of
   `CancelAfter`, zero occurrences of a `CancellationTokenSource` constructor invoked with an argument,
   zero occurrences of `Thread.Sleep`, and zero occurrences of `Task.Delay`.
-- [ ] 14. The full C# toolchain passes in order in one clean pass with no step failing and no step
+- [x] 14. The full C# toolchain passes in order in one clean pass with no step failing and no step
   auto-modifying a file: `dotnet tool run csharpier check .` reporting zero files needing formatting,
   then the analyzer msbuild command, then the nullable msbuild command, then the vstest run, each
   returning exit code 0.
-- [ ] 15. Coverage: no regression on changed lines, and the changed and added code in
+- [x] 15. Coverage: no regression on changed lines, and the changed and added code in
   OlTableExtensions.TableAccess.cs and the new failures partial file reaches at least 90 percent line
   coverage, per the CLAUDE.md figure selected by the policy-compliance order. Verified by the vstest
   run with the code-coverage flag, with the resulting figures transcribed into a Markdown artifact in
@@ -528,7 +528,7 @@ command.
   same artifact as a report-only observation against the testable denominator, and this criterion does
   not gate on it; no merge-base coverage baseline for this feature existed at authoring time, so a
   repository-wide blocking threshold cannot be shown satisfiable here.
-- [ ] 16. No raw test-result or raw coverage XML artifact was committed. Verified by
+- [x] 16. No raw test-result or raw coverage XML artifact was committed. Verified by
   `git diff --name-only` against the merge base returning zero added paths with a .trx extension and
   zero added paths with a .cobertura.xml extension, and by every evidence artifact added by this
   change residing in one of the three evidence subdirectories listed in the Write Set.
