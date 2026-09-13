@@ -32,7 +32,7 @@ The synchronous `Init()` path has no live entry point in the shipped product. Ve
 
 The defect is therefore a latent breach of a public initializer's contract, not a currently user-visible failure. It is nevertheless a real defect: `Init()` is public, it is declared on the public interface `IQfcHomeController` (IQfcHomeController.cs line 12), it is covered by an existing test (`Init_InitializesCorrectly`), and it produces a controller whose item loading can never run. This spec neither overstates the impact to justify the work nor understates it.
 
-Known limitation carried forward from the research: git history could not be consulted in the research session, so it is unknown when the synchronous caller lost its last call site.
+The research could not consult git history (Bash was unavailable in that session), so it recorded the date of the last call site as unknown. That gap has since been closed by direct measurement against this worktree and the resolved finding is recorded in Rollout & Follow-up: the last call site was removed in commit 9f34ea06d, dated 2024-09-27, from TaskMaster/Ribbon/RibbonViewer.cs. No statement in this spec rests on the unknown any longer.
 
 ## Repro & Evidence
 

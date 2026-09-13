@@ -38,5 +38,5 @@ As the QuickFiler maintainer, I want the spec to record why the token source is 
 ## What is known and what is not
 
 - Verified by the research: the zero-caller finding for `LoadQuickFiler()`, the three silent early returns, the EfcHomeController precedent, the 500-line file size, and the existing disposal path through `Cleanup()`.
-- Unknown: when `LoadQuickFiler()` lost its last call site. Git history was not available in the research session.
+- Resolved after the research (which had no git access): `LoadQuickFiler()` lost its last call site in commit 9f34ea06d, dated 2024-09-27, which removed the call from TaskMaster/Ribbon/RibbonViewer.cs. Measured by counting the literal call text in that commit and its parent: one occurrence before, zero after.
 - Inherited debt, declared not introduced: `Init()` constructs a real `QfcFormViewer`, so the regression test does too, exactly as the existing `Init_InitializesCorrectly` already does in the same class.
