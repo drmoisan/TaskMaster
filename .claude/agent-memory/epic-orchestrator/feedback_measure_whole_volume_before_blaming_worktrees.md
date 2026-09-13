@@ -11,7 +11,7 @@ any cleanup.** Do not reason from the assumption that accumulated agent worktree
 **Why:** On the quickfiler-bug-family epic I hit 0 bytes free on a 3.7 TiB volume, saw 78 worktrees (66
 `agent-*`, 16 pinned at one stale HEAD) and 288 `bin`/`obj` dirs, and recommended purging them. A child then
 measured properly and found the real cause: a single stray
-`C:\Users\DanMoisan\AppData\Local\Temp\_m8_probe.txt` at **2,756,440,788,820 bytes (2.51 TiB, 68% of the
+`<user-profile>\AppData\Local\Temp\_m8_probe.txt` at **2,756,440,788,820 bytes (2.51 TiB, 68% of the
 volume)** — captured Python interpreter banner output that had ballooned. Everything I proposed purging totalled
 ~370 GB: `.claude/worktrees` 264 GB, the session worktree 52 GB, `.nuget/packages` 9 GB, rest of `%TEMP%`
 44 GB. My recommendation would have destroyed real work to reclaim under 15% of what one junk file held.
