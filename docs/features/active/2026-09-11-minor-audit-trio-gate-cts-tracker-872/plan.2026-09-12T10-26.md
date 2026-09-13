@@ -182,6 +182,28 @@ formatting so that no automated write-claim extractor reads an exclusion as a wr
   calling orchestrator seeds. If that gate blocks a commit, the executor records the block in the step
   artifact and reports BLOCKED to the caller. It does not restructure the commit, split it into exempt
   pathspecs, or attempt any other route around the gate.
+- **D14 — The MSTest runsettings file is not passed to any direct vstest span.** The six direct vstest
+  spans in this plan previously appended the MSTest runsettings file under the vscode scripts
+  directory. That file's entire content is an MSTest Parallelize block with ClassLevel scope and a
+  worker count of zero, which runs test classes concurrently across every logical processor. Under that
+  parallelism three tests in the QuickFiler zero-batch email-queue test class fail with a type
+  initialization exception for the Deedle reflection type against netstandard 2.1: one race during
+  concurrent class initialization poisons the type, and the CLR caches a failed static initializer for
+  the process lifetime, so every later run in the same process reproduces it and the failure reads as
+  deterministic. The same command with only that switch removed was measured at 1393 of 1393 passed and
+  exit 0. The CI MSTest coverage workflow passes no settings file at all, so the defect is invisible to
+  the merge gate and parity is with CI rather than with the repository runner. Retaining the switch
+  would make the exit-zero and zero-failure acceptance conditions of P0-T9, P2-T6 and therefore AC11
+  unsatisfiable by any work this plan performs, which is a gate that cannot pass rather than a gate that
+  cannot fail. The switch is therefore removed from all six spans. Nothing else in those spans changes:
+  the pinned test-case filter is byte-identical in Phase 0 and Phase 2, so the D5 comparability
+  guarantee and the AC11 delta arithmetic are untouched, and parallelism affects which tests pass rather
+  than how many are discovered. Neither the runner script nor the runsettings file is edited by this
+  plan; both are outside the Write Set, and the underlying repository defect that the documented local
+  coverage runner fails on the QuickFiler test assembly is reported to the caller rather than fixed
+  here. That defect still reaches P0-T10 and P2-T7, which invoke the runner and cannot avoid the switch
+  because the runner resolves the runsettings path internally and exposes no override parameter; D7
+  governs a non-terminating run there and the caller owns the residual.
 
 ## Command Reference
 
@@ -362,7 +384,7 @@ must already exist on disk before it is run.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p0-t8-baseline-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p0-t8
+  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p0-t8-baseline-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p0-t8
   ```
 
   Acceptance: `EXIT_CODE: 0`, and the artifact carries `Timestamp:`, `Command:`, `Output Summary:`, a
@@ -377,7 +399,7 @@ must already exist on disk before it is run.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p0-t9-baseline-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p0-t9
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p0-t9-baseline-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p0-t9
   ```
 
   Acceptance: `EXIT_CODE: 0`, and the artifact carries the same field set as P0-T8, including a
@@ -664,7 +686,7 @@ is the first gate after it.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~Dispose_WhenPackageConstructedTheSource_ReleasesIt|FullyQualifiedName~Dispose_WhenCallerSuppliedTheSource_LeavesItUsable|FullyQualifiedName~Dispose_OnSpawnedChild_DoesNotReleaseTheParentsSource" "/Logger:trx;LogFileName=p1-t15-scoped-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p1-t15
+  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~Dispose_WhenPackageConstructedTheSource_ReleasesIt|FullyQualifiedName~Dispose_WhenCallerSuppliedTheSource_LeavesItUsable|FullyQualifiedName~Dispose_OnSpawnedChild_DoesNotReleaseTheParentsSource" "/Logger:trx;LogFileName=p1-t15-scoped-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p1-t15
   ```
 
   Acceptance: the artifact carries `Timestamp:`, `Command:` and `Output Summary:`; `EXIT_CODE: 0` and
@@ -679,7 +701,7 @@ is the first gate after it.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCapReached_LogsScanCapBoundAndStopDecision|FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCeilingReached_LogsCeilingBoundNotScanCapBound" "/Logger:trx;LogFileName=p1-t16-scoped-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p1-t16
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCapReached_LogsScanCapBoundAndStopDecision|FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCeilingReached_LogsCeilingBoundNotScanCapBound" "/Logger:trx;LogFileName=p1-t16-scoped-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p1-t16
   ```
 
   Acceptance: the artifact carries `Timestamp:`, `Command:` and `Output Summary:`; `EXIT_CODE: 0` and
@@ -795,7 +817,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p2-t5-final-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p2-t5
+  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p2-t5-final-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p2-t5
   ```
 
   Acceptance: `EXIT_CODE: 0`, the printed success header reads `Test Run Successful.`, and the artifact
@@ -810,7 +832,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p2-t6-final-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p2-t6
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p2-t6-final-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p2-t6
   ```
 
   Acceptance: `EXIT_CODE: 0`, the printed success header reads `Test Run Successful.`, and the artifact
