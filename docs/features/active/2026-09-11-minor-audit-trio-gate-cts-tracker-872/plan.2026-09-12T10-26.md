@@ -461,9 +461,14 @@ must already exist on disk before it is run.
 
   Acceptance: `EXIT_CODE: 0`, and the artifact records four numbers under the field names
   `UtilitiesCsIncludeCount:`, `UtilitiesCsElementCount:`, `UtilitiesCsTestIncludeCount:` and
-  `UtilitiesCsTestElementCount:`. The expected baseline is 491 for both counts on
-  `UtilitiesCS/UtilitiesCS.csproj` and 476 for both counts on
-  `UtilitiesCS.Test/UtilitiesCS.Test.csproj`. If an observed number differs from the expected value,
+  `UtilitiesCsTestElementCount:`. The expected baseline is 492 for both counts on
+  `UtilitiesCS/UtilitiesCS.csproj` and 477 for both counts on
+  `UtilitiesCS.Test/UtilitiesCS.Test.csproj`. These two expectations were 491 and 476 when this plan
+  was authored and were each raised by one when the mandated reconciliation merged the current main
+  branch into this item's branch: that merge added exactly one Compile item to each of the two project
+  files. The research artifact under this feature folder still records 491 and 476, which is correct as
+  a measurement of the tree at its own timestamp and is deliberately not rewritten; the figures above
+  are the operative ones. If an observed number differs from the expected value,
   the observed number is recorded as the operative baseline and the divergence is reported to the
   caller before Phase 1 begins. The two patterns agreeing establishes that every Compile element uses
   the Include attribute and that no Update or Remove form exists, so a single attribute-form count is a
