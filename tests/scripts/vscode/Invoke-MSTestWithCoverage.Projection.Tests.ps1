@@ -398,6 +398,50 @@ Describe 'Assert-JacocoProjectionReconciliation' {
         $thrownMessage | Should -Match 'expected 4\b'
         $thrownMessage | Should -Match 'observed 3\b'
     }
+
+    It 'throws naming the expected and the observed valid totals when the missed counters disagree' {
+        # AC5, second equality. The function enforces two independent equalities and the covered-total
+        # test above exercises only the first, so a valid-total regression would pass unnoticed. The
+        # projection here is written directly rather than derived, so the summed covered total agrees
+        # with the source root and the first check cannot fire: the valid-total check is the one under
+        # test. Summed missed 3 plus covered 1 is 4 against the root's declared 2 valid lines.
+        [xml]$script:sourceDocument = @'
+<coverage lines-covered="1" lines-valid="2" />
+'@
+
+        $script:disagreeingProjection = @'
+<report name="TaskMaster">
+  <package name="Solo.One">
+    <counter type="LINE" missed="3" covered="1" />
+  </package>
+</report>
+'@
+
+        $thrownMessage = $null
+        try {
+            Assert-JacocoProjectionReconciliation -XmlDocument $script:sourceDocument -ProjectionXml $script:disagreeingProjection
+        }
+        catch {
+            $thrownMessage = $_.Exception.Message
+        }
+
+        $thrownMessage | Should -Not -BeNullOrEmpty
+        $thrownMessage | Should -Match 'valid total'
+        $thrownMessage | Should -Match 'expected 2\b'
+        $thrownMessage | Should -Match 'observed 4\b'
+    }
+}
+
+Describe 'Test-RawCoverageDocumentRetained' {
+    It 'returns false for an output path that has no parent directory' {
+        # Boundary case for the predicate's guard clause. A bare file name yields an empty parent
+        # directory, which can equal no repository coverage directory, so the document is discarded.
+        # The three directory cases live in the results-directory test file; this one does not, and
+        # without it the guard clause is never exercised. The values are in-memory strings and no
+        # path is touched, because the predicate is pure path arithmetic.
+        Test-RawCoverageDocumentRetained -OutputPath 'coverage.cobertura.xml' -RepoRoot 'C:\repo' |
+            Should -BeFalse
+    }
 }
 
 Describe 'Invoke-MSTestWithCoverage.Projection.ps1 counting-rule delegation' {

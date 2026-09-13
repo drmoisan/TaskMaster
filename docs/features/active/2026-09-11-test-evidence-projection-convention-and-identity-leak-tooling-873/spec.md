@@ -285,15 +285,82 @@ New behaviour is asserted in new test files rather than by extending the existin
 - [x] **AC12 — Both argument-builder family members carry the two switches.** The complete family is the two members derived in the research artifact's Numeric Derivation Evidence section, whose primary and cross-check member sets are identical and whose counts both equal 2. A Pester test per member asserts the returned array contains a results-directory switch carrying the supplied directory and a trx logger switch carrying the supplied explicit log file name; and for the coverage member, that the index of each of those two elements is greater than the index of the argument separator. All assertions pass.
 - [x] **AC13 — Results directory is beneath the ignored coverage tree.** A Pester test reads the results-directory parameter default from each entry point's abstract syntax tree and asserts the default text resolves beneath the repository coverage directory. The test passes. Separately, the repository ignore file is unchanged: a name-listing diff anchored to the base commit the plan's Phase 0 records, paired with a porcelain status listing in the same task so untracked additions are also visible, shows no entry for it. The Write Set is not offered as evidence for this, because checking a claim against the document that makes it verifies nothing.
 - [x] **AC14 — Conditional discard invariant.** Two Pester tests assert `Test-RawCoverageDocumentRetained` returns true when the output path's parent directory is the repository coverage directory and false for any other directory. A third test captures call order through the wrapper seams and asserts the discard occurs only after the threshold assertion, the projection write and the reconciliation assertion have all completed. All pass, and no test creates or deletes a file.
-- [ ] **AC15 — Project-file correction, absence paired with a parse check.** `TaskMaster/TaskMaster.csproj` line 37 carries the publish-destination element with the repository-relative value used by the other project file in this repository for the same property; a case-insensitive search of that file for the account, host and employer organization tokens and for a drive-letter-rooted user-profile path returns zero matches; and the file loads without error as an XML document. All three observations hold, and each of the two msbuild passes named in `CLAUDE.md` records an exit code and an error count that are no worse than the Phase 0 baseline recorded for that same command. The comparison is baseline-relative by construction: "no new diagnostics" has no meaning without a recorded prior count, so Phase 0 must capture one per pass as an integer rather than as a prose adjective. An unqualified absence of error from a solution-wide rebuild is deliberately not demanded, because the pre-change state of that rebuild is not this delivery's to repair.
+- [x] **AC15 — Project-file correction, absence paired with a parse check.** `TaskMaster/TaskMaster.csproj` line 37 carries the publish-destination element with the repository-relative value used by the other project file in this repository for the same property; a case-insensitive search of that file for the account, host and employer organization tokens and for a drive-letter-rooted user-profile path returns zero matches; and the file loads without error as an XML document. All three observations hold, and each of the two msbuild passes named in `CLAUDE.md` records an exit code and an error count that are no worse than the Phase 0 baseline recorded for that same command. The comparison is baseline-relative by construction: "no new diagnostics" has no meaning without a recorded prior count, so Phase 0 must capture one per pass as an integer rather than as a prose adjective. An unqualified absence of error from a solution-wide rebuild is deliberately not demanded, because the pre-change state of that rebuild is not this delivery's to repair.
 - [x] **AC16 — Editor settings correction, absence paired with a parse check.** The Power Query additional-symbols array element in `.vscode/settings.json` begins with `${workspaceFolder}` and contains no drive letter and no account token; the file parses as JSON; and the directory the value resolves to exists in the repository and contains its symbols document. All three observations hold.
 - [x] **AC17 — The five named memory files.** Each of the five agent-memory files listed in the Write Set returns zero matches for the account token and the host token under a case-insensitive search, and each remains valid Markdown with balanced inline-code spans. In `.claude/agent-memory/orchestrator/angle-bracket-redaction-breaks-trx-xml.md` the case-sensitivity contrast is preserved by a rewrite: the rewritten sentence describes a case-sensitive search and a case-insensitive search and contains neither the account token nor two copies of the same placeholder in the contrasting positions. These five are the named scope of this item; this criterion does not assert that five is the complete repository population, which R7.1 shows it is not, and the remainder is the repository-wide sweep item's scope.
 - [x] **AC18 — Convention recorded in a TaskMaster-owned document.** `CLAUDE.md` carries a new section that states the permitted committed test-evidence formats — a package-level JaCoCo projection plus the first-party summary line for coverage runs, a test-result summary for test runs, and no raw collector or test-platform document — and its test-console toolchain step names both the explicit results-directory switch and the explicit log-file-name form. Both observations are confirmed by reading the file. Separately, no push-down-owned governance document is edited: a name-listing diff anchored to the base commit the plan's Phase 0 records, paired with a porcelain status listing in the same task, contains no path under the editor-agent rules, skills, agents, hooks or lib directories, no editor-agent settings document, and neither of the two shared configuration documents under the repository configuration directory.
 - [x] **AC19 — Hygiene rule text amended.** `.claude/agent-memory/_shared_no_absolute_host_paths.md` states both rules: that a per-plan hygiene task must include the plan file itself in its residual scan, and that a residual-match count of zero is necessary but not sufficient and must be paired with a parse check on every XML-family file the sweep rewrites. Both statements are present. No executable sweep is added by this delivery.
-- [ ] **AC20 — File-size ceiling and helpers headroom.** Every PowerShell file in the Write Set is at most 500 lines after the change, and the net line growth of `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` is at most 1 line, that line being the dot-source of the new projection part file. Both are confirmed by a line count over the changed files.
-- [ ] **AC21 — New-code coverage.** A direct Pester coverage capture over `scripts/vscode/Invoke-MSTestWithCoverage.Projection.ps1` and `scripts/vscode/Invoke-MSTest.TrxSummary.ps1` reports at least 90% line coverage for each, and the capture is recorded in this feature folder's evidence tree under the qa-gates kind. The qa-gates kind is named deliberately: the canonical evidence kinds are baseline, regression-testing, qa-gates, issue-updates, other and remediation-baseline, and a coverage kind is not among them, so an artifact written under a coverage kind would fail the evidence-path rule.
-- [ ] **AC22 — Full toolchain pass and no temporary files.** A single consecutive pass of `Invoke-Formatter`, `Invoke-ScriptAnalyzer`, and `Invoke-Pester` over the changed script and test files completes with zero new findings and zero failed tests, and the C# format check completes without error. The two msbuild passes named in `CLAUDE.md` are judged against the Phase 0 baseline rather than against absolute zero: each must record an exit code and an error count that are no worse than the Phase 0 baseline recorded for that same command. Absolute success is deliberately not demanded, because the pre-change state of a whole-solution rebuild is not this delivery's to fix and a red baseline would make the clause unsatisfiable for reasons this change does not cause. A review of the seven test files in the Write Set confirms no test creates, writes or deletes a file on disk and no fixture is loaded from a path.
+- [x] **AC20 — File-size ceiling and helpers headroom.** Every PowerShell file in the Write Set is at most 500 lines after the change, and the net line growth of `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` is at most 1 line, that line being the dot-source of the new projection part file. Both are confirmed by a line count over the changed files.
+- [x] **AC21 — New-code coverage.** A direct Pester coverage capture over `scripts/vscode/Invoke-MSTestWithCoverage.Projection.ps1` and `scripts/vscode/Invoke-MSTest.TrxSummary.ps1` reports at least 90% line coverage for each, and the capture is recorded in this feature folder's evidence tree under the qa-gates kind. The qa-gates kind is named deliberately: the canonical evidence kinds are baseline, regression-testing, qa-gates, issue-updates, other and remediation-baseline, and a coverage kind is not among them, so an artifact written under a coverage kind would fail the evidence-path rule.
+- [x] **AC22 — Full toolchain pass and no temporary files.** A single consecutive pass of `Invoke-Formatter`, `Invoke-ScriptAnalyzer`, and `Invoke-Pester` over the changed script and test files completes with zero new findings and zero failed tests, and the C# format check completes without error. The two msbuild passes named in `CLAUDE.md` are judged against the Phase 0 baseline rather than against absolute zero: each must record an exit code and an error count that are no worse than the Phase 0 baseline recorded for that same command. Absolute success is deliberately not demanded, because the pre-change state of a whole-solution rebuild is not this delivery's to fix and a red baseline would make the clause unsatisfiable for reasons this change does not cause. A review of the seven test files in the Write Set confirms no test creates, writes or deletes a file on disk and no fixture is loaded from a path.
 - [ ] **AC23 — End-to-end observation.** The coverage entry point is run twice: once with the coverage output left at its default, after which the raw document is still present in the repository coverage directory and a projection file sits beside it that parses as XML and whose summed LINE counters equal the raw document's root covered-lines and valid-lines attributes; and once with the output pointed at a directory that is not the repository coverage directory itself, after which the raw document is absent and the projection and summary are present. The second run's directory is required to differ from the repository coverage directory; it is not required to sit outside the coverage tree. Invariant 4 states the discard branch as any directory other than the repository coverage directory, so a subdirectory of that tree exercises the discard branch exactly as an unrelated directory would, and keeping the second run inside the already-ignored coverage tree is what stops it adding a path that the footprint inventory and the clean-tree gate would otherwise have to admit. Both runs also produce a test-result summary. Neither run creates a test-result document bearing the default account-and-host file name: the check is scoped to paths that a porcelain status reports as added or modified relative to the base commit the plan's Phase 0 records. A whole-working-tree scan is explicitly not used, because more than one hundred such documents are already tracked from earlier features — one of them still carrying an unredacted default name — so a tree-wide scan would fail no matter what this delivery does. Removing those is the repository-wide sweep item's scope.
+
+## Acceptance Status Summary
+
+Written by plan task [P7-T14] at 2026-09-13T07-24. Every path below is repository-relative and every
+evidence path is relative to
+`docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873/`.
+
+AC_TOTAL: 23
+AC_SATISFIED: 22
+AC_OUTSTANDING: 1
+
+| AC | Status | Evidence |
+|---|---|---|
+| AC1 | SATISFIED | `evidence/regression-testing/p1-t3-projection-shape-tests.md` |
+| AC2 | SATISFIED | `evidence/regression-testing/p1-t3-projection-shape-tests.md` |
+| AC3 | SATISFIED | `evidence/qa-gates/p1-t7-phase1-toolchain.md` |
+| AC4 | SATISFIED | `evidence/regression-testing/p3-t11-ac4-check-off.md` |
+| AC5 | SATISFIED | `evidence/regression-testing/p3-t12-ac5-check-off.md` |
+| AC6 | SATISFIED | `evidence/regression-testing/p1-t4-distinct-wording-set.md` |
+| AC7 | SATISFIED | `evidence/qa-gates/p1-t7-phase1-toolchain.md` |
+| AC8 | SATISFIED | `evidence/qa-gates/p1-t7-phase1-toolchain.md` |
+| AC9 | SATISFIED | `evidence/regression-testing/p2-t2-namespace-tests.md` |
+| AC10 | SATISFIED | `evidence/regression-testing/p2-t3-derivation-tests.md` |
+| AC11 | SATISFIED | `evidence/regression-testing/p2-t4-verdict-and-failed-name-tests.md` |
+| AC12 | SATISFIED | `evidence/regression-testing/p4-t8-ac12-check-off.md` |
+| AC13 | SATISFIED | `evidence/regression-testing/p4-t9-ac13-check-off.md` |
+| AC14 | SATISFIED | `evidence/regression-testing/p3-t13-ac14-check-off.md` |
+| AC15 | SATISFIED | `evidence/regression-testing/p5-t1-project-file-correction.md`, `evidence/qa-gates/p7-t5-final-msbuild-analyzer.md`, `evidence/qa-gates/p7-t6-final-msbuild-nullable.md` |
+| AC16 | SATISFIED | `evidence/regression-testing/p5-t2-editor-settings-correction.md` |
+| AC17 | SATISFIED | `evidence/regression-testing/p5-t6-memory-substitutions.md` |
+| AC18 | SATISFIED | `evidence/regression-testing/p5-t3-convention-section.md`, `evidence/regression-testing/p5-t4-toolchain-step-amendment.md` |
+| AC19 | SATISFIED | `evidence/regression-testing/p5-t5-hygiene-rule-amendment.md` |
+| AC20 | SATISFIED | `evidence/qa-gates/p7-t8-file-size-audit.md` |
+| AC21 | SATISFIED | `evidence/qa-gates/p7-t7-new-code-coverage.md`, `evidence/qa-gates/p7-t7-new-code-coverage.jacoco.xml` |
+| AC22 | SATISFIED | `evidence/qa-gates/p7-t1-final-format.md`, `evidence/qa-gates/p7-t2-final-analyze.md`, `evidence/qa-gates/p7-t3-final-test.md`, `evidence/qa-gates/p7-t4-final-csharpier-check.md`, `evidence/qa-gates/p7-t5-final-msbuild-analyzer.md`, `evidence/qa-gates/p7-t6-final-msbuild-nullable.md`, `evidence/qa-gates/p7-t13-no-temporary-files-review.md` |
+| AC23 | OUTSTANDING | `evidence/qa-gates/p7-t0-phase6-outstanding-disclosure.md`, `evidence/regression-testing/p6-t1-assembly-inventory.md`, `evidence/regression-testing/p6-t2-default-output-run.md` |
+
+### AC23 — reason for OUTSTANDING
+
+AC23 is recorded as OUTSTANDING and is not recorded as satisfied. Its checkbox above is deliberately
+left unmarked.
+
+Reason: plan tasks P6-T2, P6-T3, P6-T4 and P6-T5 have not run. P6-T1 is complete and recorded the
+assembly inventory; P6-T2's first attempt was aborted on a pre-existing defect and is recorded rather
+than repaired, as the plan's Phase 6 flakiness rule directs. AC23's operative observations are the two
+end-to-end runs of the coverage entry point and the default-name scan over their output, and none of
+those observations has been made. The evidence paths listed for AC23 are the artifacts that record
+that absence and its reason, not artifacts that satisfy the criterion.
+
+The Phase 7 pass that produced this summary was taken with those four Phase 6 tasks outstanding. The
+disclosure artifact records that fact, names the tracked paths Phase 6 would modify, and records the
+determination that none of them is a file any Phase 7 gate measures, so the Phase 7 results above
+stand on their own evidence.
+
+### Headline numeric results behind the Phase 7 criteria
+
+| Gate | Result | Baseline |
+|---|---|---|
+| PowerShell analyzer diagnostic set | 16 diagnostics, 0 absent from baseline | 16 (P0-T11) |
+| PowerShell tests | 133 passed, 0 failed, 0 skipped | 103 passed (P0-T12) |
+| C# format check | exit 0, 1626 files checked | exit 0 (P0-T7) |
+| C# analyzer rebuild | exit 0, 0 warnings, 0 errors | exit 0, 0 errors (P0-T8) |
+| C# nullable rebuild | exit 0, 0 warnings, 0 errors | exit 0, 0 errors (P0-T9) |
+| New-code coverage, `Invoke-MSTest.TrxSummary.ps1` | 92.86 percent line | floor 90 |
+| New-code coverage, `Invoke-MSTestWithCoverage.Projection.ps1` | 92.50 percent line | floor 90 |
+| Largest PowerShell file | 498 lines | ceiling 500 |
+| Helpers file growth | +1 line | bound +1 |
 
 ## Risks & Mitigations
 
