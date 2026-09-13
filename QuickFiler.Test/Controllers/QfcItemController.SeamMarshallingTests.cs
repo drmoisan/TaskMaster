@@ -21,9 +21,18 @@ namespace QuickFiler.Controllers.Tests
     /// <see cref="IUiDispatcher"/> seam, with no concrete <see cref="QuickFiler.ItemViewer"/> and
     /// no message pump. Every <c>await</c> on the viewer's <c>UiSyncContext</c> completes inline
     /// because the same context instance the viewer mock returns is installed as the ambient
-    /// <see cref="SynchronizationContext"/> for the duration of each test (the awaiter reports
+    /// <see cref="SynchronizationContext"/> for the duration of each act (the awaiter reports
     /// <c>IsCompleted</c> on reference equality), so no wait, poll, sleep or wall-clock read is
     /// needed anywhere in this class.
+    /// <para>
+    /// Ordering rule: every WinForms control is constructed BEFORE the ambient context is
+    /// installed. A <see cref="Control"/> constructor calls
+    /// <c>WindowsFormsSynchronizationContext.InstallIfNeeded</c>, which replaces an ambient context
+    /// whose exact type is <see cref="SynchronizationContext"/> with a WinForms context; installing
+    /// first would defeat the reference-equality inline path and post every continuation to an
+    /// unpumped context on the STA test thread. This mirrors the arrangement of the UtilitiesCS
+    /// <c>CreateAsync_*_WithMatchingSyncContext_*</c> tests.
+    /// </para>
     /// </summary>
     [TestClass]
     public class QfcItemController_SeamMarshallingTests
@@ -41,18 +50,42 @@ namespace QuickFiler.Controllers.Tests
             return label;
         }
 
+        private static IList<Label> BuildHostedLabels(Panel host, int count)
+        {
+            List<Label> labels = new List<Label>();
+            for (int i = 0; i < count; i++)
+            {
+                labels.Add(BuildHostedLabel(host));
+            }
+            return labels;
+        }
+
         /// <summary>
-        /// Builds a viewer mock whose tip labels are all parented on <paramref name="host"/> (the
+        /// Builds the descendant enumeration the viewer mock returns: one
+        /// <see cref="TableLayoutPanel"/> and one <see cref="Button"/>, both parented on
+        /// <paramref name="host"/> so disposing the host disposes them, so the control-group
+        /// assertions are non-vacuous.
+        /// </summary>
+        private static Control[] BuildDescendants(Panel host)
+        {
+            TableLayoutPanel tableLayoutPanel = new TableLayoutPanel();
+            Button button = new Button();
+            host.Controls.Add(tableLayoutPanel);
+            host.Controls.Add(button);
+            return new Control[] { tableLayoutPanel, button };
+        }
+
+        /// <summary>
+        /// Builds a viewer mock whose tip labels are all parented on a <see cref="Panel"/> (the
         /// tooltip factory's parent resolution accepts exactly a <see cref="TableLayoutPanel"/> or a
-        /// <see cref="Panel"/>), whose <c>UiSyncContext</c> is <paramref name="context"/>, and whose
-        /// descendant enumeration contains one <see cref="TableLayoutPanel"/> and one
-        /// <see cref="Button"/> so the control-group assertions are non-vacuous.
+        /// <see cref="Panel"/>) and whose <c>UiSyncContext</c> is <paramref name="context"/>.
+        /// Constructs no control itself.
         /// </summary>
         private static Mock<IItemViewer> BuildViewer(
-            Panel host,
             SynchronizationContext context,
             IList<Label> tipsLabels,
-            IList<Label> expandedTipsLabels
+            IList<Label> expandedTipsLabels,
+            Control[] descendants
         )
         {
             Mock<IItemViewer> viewer = new Mock<IItemViewer>();
@@ -61,9 +94,7 @@ namespace QuickFiler.Controllers.Tests
             viewer.SetupGet(v => v.TipsLabels).Returns(tipsLabels);
             viewer.SetupGet(v => v.ExpandedTipsLabels).Returns(expandedTipsLabels);
             viewer.SetupGet(v => v.ItemNumberLabel).Returns(tipsLabels[0]);
-            viewer
-                .Setup(v => v.DescendantControls())
-                .Returns(new Control[] { host, new TableLayoutPanel(), new Button() });
+            viewer.Setup(v => v.DescendantControls()).Returns(descendants);
             return viewer;
         }
 
@@ -104,26 +135,22 @@ namespace QuickFiler.Controllers.Tests
         [Timeout(SeamTimeoutMs)]
         public async Task ResolveControlGroupsAsync_WithMockViewerAndSyncDispatcher_CompletesWithoutAConcreteViewer()
         {
-            // Arrange
-            SynchronizationContext previous = SynchronizationContext.Current;
-            SynchronizationContext context = new SynchronizationContext();
-            SynchronizationContext.SetSynchronizationContext(context);
-            try
+            // Arrange — controls first, then the mock, then the ambient context (see class remarks).
+            using (Panel host = new Panel())
             {
-                using (Panel host = new Panel())
+                IList<Label> tips = BuildHostedLabels(host, 2);
+                IList<Label> expanded = BuildHostedLabels(host, 1);
+                Control[] descendants = BuildDescendants(host);
+                SynchronizationContext context = new SynchronizationContext();
+                Mock<IItemViewer> viewer = BuildViewer(context, tips, expanded, descendants);
+                HarnessController controller = BuildController(
+                    viewer,
+                    QfcItemControllerTestSupport.BuildSyncDispatcher()
+                );
+                SynchronizationContext previous = SynchronizationContext.Current;
+                SynchronizationContext.SetSynchronizationContext(context);
+                try
                 {
-                    IList<Label> tips = new List<Label>
-                    {
-                        BuildHostedLabel(host),
-                        BuildHostedLabel(host),
-                    };
-                    IList<Label> expanded = new List<Label> { BuildHostedLabel(host) };
-                    Mock<IItemViewer> viewer = BuildViewer(host, context, tips, expanded);
-                    HarnessController controller = BuildController(
-                        viewer,
-                        QfcItemControllerTestSupport.BuildSyncDispatcher()
-                    );
-
                     // Act
                     await controller.ResolveControlGroupsAsync(viewer.Object);
 
@@ -138,10 +165,10 @@ namespace QuickFiler.Controllers.Tests
                         .Should()
                         .NotBeNull(because: "the item-number tip is built from ItemNumberLabel");
                 }
-            }
-            finally
-            {
-                SynchronizationContext.SetSynchronizationContext(previous);
+                finally
+                {
+                    SynchronizationContext.SetSynchronizationContext(previous);
+                }
             }
         }
 
@@ -154,31 +181,22 @@ namespace QuickFiler.Controllers.Tests
         [Timeout(SeamTimeoutMs)]
         public async Task ResolveControlGroupsAsync_WithMockViewer_PopulatesTipsAndControlGroups()
         {
-            // Arrange
-            SynchronizationContext previous = SynchronizationContext.Current;
-            SynchronizationContext context = new SynchronizationContext();
-            SynchronizationContext.SetSynchronizationContext(context);
-            try
+            // Arrange — controls first, then the mock, then the ambient context (see class remarks).
+            using (Panel host = new Panel())
             {
-                using (Panel host = new Panel())
+                IList<Label> tips = BuildHostedLabels(host, 3);
+                IList<Label> expanded = BuildHostedLabels(host, 2);
+                Control[] descendants = BuildDescendants(host);
+                SynchronizationContext context = new SynchronizationContext();
+                Mock<IItemViewer> viewer = BuildViewer(context, tips, expanded, descendants);
+                HarnessController controller = BuildController(
+                    viewer,
+                    QfcItemControllerTestSupport.BuildSyncDispatcher()
+                );
+                SynchronizationContext previous = SynchronizationContext.Current;
+                SynchronizationContext.SetSynchronizationContext(context);
+                try
                 {
-                    IList<Label> tips = new List<Label>
-                    {
-                        BuildHostedLabel(host),
-                        BuildHostedLabel(host),
-                        BuildHostedLabel(host),
-                    };
-                    IList<Label> expanded = new List<Label>
-                    {
-                        BuildHostedLabel(host),
-                        BuildHostedLabel(host),
-                    };
-                    Mock<IItemViewer> viewer = BuildViewer(host, context, tips, expanded);
-                    HarnessController controller = BuildController(
-                        viewer,
-                        QfcItemControllerTestSupport.BuildSyncDispatcher()
-                    );
-
                     // Act
                     await controller.ResolveControlGroupsAsync(viewer.Object);
 
@@ -195,10 +213,10 @@ namespace QuickFiler.Controllers.Tests
                     controller.Buttons.Should().NotBeNullOrEmpty();
                     viewer.Verify(v => v.DescendantControls(), Times.Once());
                 }
-            }
-            finally
-            {
-                SynchronizationContext.SetSynchronizationContext(previous);
+                finally
+                {
+                    SynchronizationContext.SetSynchronizationContext(previous);
+                }
             }
         }
 
@@ -258,26 +276,25 @@ namespace QuickFiler.Controllers.Tests
         [Timeout(SeamTimeoutMs)]
         public async Task AssignControlsAsync_WithSyncDispatcherDouble_AssignsThroughTheInjectedSeam()
         {
-            // Arrange
-            SynchronizationContext previous = SynchronizationContext.Current;
-            SynchronizationContext context = new SynchronizationContext();
-            SynchronizationContext.SetSynchronizationContext(context);
-            try
+            // Arrange — controls first, then the mock, then the ambient context (see class remarks).
+            using (Panel host = new Panel())
             {
-                using (Panel host = new Panel())
+                IList<Label> tips = BuildHostedLabels(host, 1);
+                IList<Label> expanded = BuildHostedLabels(host, 1);
+                Control[] descendants = BuildDescendants(host);
+                SynchronizationContext context = new SynchronizationContext();
+                Mock<IItemViewer> viewer = BuildViewer(context, tips, expanded, descendants);
+                Mock<IUiDispatcher> dispatcher = QfcItemControllerTestSupport.BuildSyncDispatcher();
+                HarnessController controller = BuildController(viewer, dispatcher);
+                QfcItemControllerTestSupport.SetField(
+                    controller,
+                    "_globals",
+                    BuildGlobals().Object
+                );
+                SynchronizationContext previous = SynchronizationContext.Current;
+                SynchronizationContext.SetSynchronizationContext(context);
+                try
                 {
-                    IList<Label> tips = new List<Label> { BuildHostedLabel(host) };
-                    IList<Label> expanded = new List<Label> { BuildHostedLabel(host) };
-                    Mock<IItemViewer> viewer = BuildViewer(host, context, tips, expanded);
-                    Mock<IUiDispatcher> dispatcher =
-                        QfcItemControllerTestSupport.BuildSyncDispatcher();
-                    HarnessController controller = BuildController(viewer, dispatcher);
-                    QfcItemControllerTestSupport.SetField(
-                        controller,
-                        "_globals",
-                        BuildGlobals().Object
-                    );
-
                     // Act
                     await controller.AssignControlsAsync(new MailItemHelper(), 2);
 
@@ -285,10 +302,10 @@ namespace QuickFiler.Controllers.Tests
                     dispatcher.Verify(d => d.InvokeAsync(It.IsAny<Action>()), Times.Once());
                     viewer.VerifySet(v => v.ItemNumberText = "2", Times.Once());
                 }
-            }
-            finally
-            {
-                SynchronizationContext.SetSynchronizationContext(previous);
+                finally
+                {
+                    SynchronizationContext.SetSynchronizationContext(previous);
+                }
             }
         }
     }

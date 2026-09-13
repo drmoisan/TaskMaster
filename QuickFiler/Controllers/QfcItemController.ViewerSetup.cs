@@ -273,19 +273,23 @@ namespace QuickFiler.Controllers
         // awaits itemViewer.UiSyncContext, which never resumes on a thread-pool MSTest thread. The
         // WinFormsPumpHost test seam supplies that loop, so the member is now covered by
         // QfcItemController_ViewerSetupTests.ResolveControlGroupsAsync_ThroughThePumpHost_*.
+        // #743: the member is now driven through IItemViewer and is covered by both the retained
+        // pump-hosted test ResolveControlGroupsAsync_ThroughThePumpHost_PopulatesTipsAndControlGroups,
+        // which is unchanged, and the new seam test
+        // QfcItemController_SeamMarshallingTests.ResolveControlGroupsAsync_WithMockViewer_PopulatesTipsAndControlGroups.
         internal async Task ResolveControlGroupsAsync(IItemViewer itemViewer)
         {
             Token.ThrowIfCancellationRequested();
 
             _itemPositionTips = await QfcTipsDetails.CreateAsync(
-                ((ItemViewer)itemViewer).LblItemNumber,
+                itemViewer.ItemNumberLabel,
                 _itemViewer.UiSyncContext,
                 Token
             );
             var navColNum = _itemPositionTips.ColumnNumber;
 
             await itemViewer.UiSyncContext;
-            var controls = ((ItemViewer)itemViewer).GetAllChildren();
+            var controls = itemViewer.DescendantControls();
 
             // SelectAwait (System.Linq.Async) is obsolete (CS0618) per the framework's migration
             // guidance ("Use Select... the SelectAwait functionality now exists as overloads of
@@ -368,9 +372,16 @@ namespace QuickFiler.Controllers
             //{
             //    AssignControls(itemInfo, viewerPosition);
             //}
-            await _itemViewer.UiDispatcher.InvokeAsync(() =>
-                AssignControls(itemInfo, viewerPosition)
-            );
+            // #743: injected-seam marshal. The field is unset only via the parameterless harness
+            // constructor; AssignControls self-marshals through InvokeRequired, so this is no no-op.
+            var dispatcher = _uiDispatcher;
+            if (dispatcher is null)
+            {
+                AssignControls(itemInfo, viewerPosition);
+                return;
+            }
+
+            await dispatcher.InvokeAsync(() => AssignControls(itemInfo, viewerPosition));
         }
 
         internal void AssignControls(MailItemHelper itemInfo, int viewerPosition)
