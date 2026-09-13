@@ -267,7 +267,7 @@ This worktree is unbootstrapped: it carries no repo-local SDK directory, no pack
 no build output. Every later `EXIT_CODE: 0` acceptance is unreachable until the five bootstrap
 tasks below complete.
 
-- [ ] [P0-T1] Read, in this exact order, the standing instructions file at the repository root, the
+- [x] [P0-T1] Read, in this exact order, the standing instructions file at the repository root, the
       general code change rule file, the general unit test rule file, the C# rule file and the
       tonality rule file, all four rule files being under the repository rules directory. Write the
       evidence artifact phase0-instructions-read.2026-09-12T10-25.md into
@@ -276,7 +276,7 @@ tasks below complete.
       naming the five documents in the order above, and one line per document giving its
       repository-relative path.
 
-- [ ] [P0-T2] Run CMD-ANCHOR and record the resulting commit sha as the diff anchor for every
+- [x] [P0-T2] Run CMD-ANCHOR and record the resulting commit sha as the diff anchor for every
       anchored diff in this plan, in artifact p0-t2-diff-anchor.2026-09-12T10-25.md under the
       baseline evidence directory. In the same artifact, and before any file in this plan is created
       or edited, record the full verbatim output of the porcelain status span of CMD-DIFF under a
@@ -286,22 +286,22 @@ tasks below complete.
       Every later task that says "the recorded anchor" means the sha; every later task that applies
       the Scope-lock rule means this path set. No sha and no path list is written into this plan.
 
-- [ ] [P0-T3] Run CMD-SDK to provision the repo-local .NET SDK, then CMD-SDK-VERIFY. Record in
+- [x] [P0-T3] Run CMD-SDK to provision the repo-local .NET SDK, then CMD-SDK-VERIFY. Record in
       artifact p0-t3-sdk.2026-09-12T10-25.md under the baseline evidence directory.
       **Acceptance:** the first command of CMD-SDK-VERIFY prints `True`, which is the installer's
       own filesystem marker for the pinned version, and the second prints `8.0.205`.
 
-- [ ] [P0-T4] Run CMD-TOOLRESTORE, then CMD-TOOLVERIFY. Record in artifact
+- [x] [P0-T4] Run CMD-TOOLRESTORE, then CMD-TOOLVERIFY. Record in artifact
       p0-t4-tool-restore.2026-09-12T10-25.md under the baseline evidence directory.
       **Acceptance:** CMD-TOOLRESTORE exits 0 and CMD-TOOLVERIFY prints `1.2.6`, the version pinned
       by the tool manifest.
 
-- [ ] [P0-T5] Run CMD-RESTORE to restore the packages-config NuGet graph for the solution. Record
+- [x] [P0-T5] Run CMD-RESTORE to restore the packages-config NuGet graph for the solution. Record
       in artifact p0-t5-restore.2026-09-12T10-25.md under the baseline evidence directory.
       **Acceptance:** EXIT_CODE 0 and a packages directory now exists at the worktree root
       containing at least one directory whose name begins with the token `Meziantou`.
 
-- [ ] [P0-T6] Run CMD-ANALYZERPATHS to verify that every analyzer include item in every first-party
+- [x] [P0-T6] Run CMD-ANALYZERPATHS to verify that every analyzer include item in every first-party
       project resolves against that project's own directory. Record in artifact
       p0-t6-analyzer-paths.2026-09-12T10-25.md under the baseline evidence directory.
       **Acceptance:** the command emits zero lines beginning with the token `MISSING:`. A missing
@@ -310,14 +310,14 @@ tasks below complete.
       packages directory before this task is checked off. No version number is written into this
       acceptance condition; the enumeration derives the versions from the project files themselves.
 
-- [ ] [P0-T7] Run CMD-COVERAGETOOL to ensure the dotnet-coverage global tool is present. It is a
+- [x] [P0-T7] Run CMD-COVERAGETOOL to ensure the dotnet-coverage global tool is present. It is a
       global tool and is not supplied by the tool manifest restore in P0-T4; the coverage runner
       throws before it runs anything when the tool is absent. Record in artifact
       p0-t7-coverage-tool.2026-09-12T10-25.md under the baseline evidence directory.
       **Acceptance:** a subsequent `Get-Command dotnet-coverage` resolves to a command and prints
       its source path.
 
-- [ ] [P0-T8] Run CMD-CHECK to capture the pre-existing formatting state of the whole tree, and
+- [x] [P0-T8] Run CMD-CHECK to capture the pre-existing formatting state of the whole tree, and
       record the names of every file the tool reports, in artifact
       p0-t8-csharpier-baseline.2026-09-12T10-25.md under the baseline evidence directory.
       **Acceptance:** the artifact carries the four schema fields plus a line whose first token is
@@ -336,18 +336,18 @@ tasks below complete.
       plan on the strength of this record alone, and that the repair puts acceptance criterion AC22
       at risk.
 
-- [ ] [P0-T9] Run CMD-ANALYZE. Record in artifact p0-t9-analyzer-baseline.2026-09-12T10-25.md under
+- [x] [P0-T9] Run CMD-ANALYZE. Record in artifact p0-t9-analyzer-baseline.2026-09-12T10-25.md under
       the baseline evidence directory. **Acceptance:** EXIT_CODE 0, and the artifact records the
       integer captured from the build summary line matching the anchored pattern for the error
       count and the integer captured from the anchored pattern for the warning count. The counts
       must be read by an anchored regular expression over the whole summary line and not by a
       substring search, because a zero-error substring also occurs inside a ten-error line.
 
-- [ ] [P0-T10] Run CMD-NULLABLE. Record in artifact p0-t10-nullable-baseline.2026-09-12T10-25.md
+- [x] [P0-T10] Run CMD-NULLABLE. Record in artifact p0-t10-nullable-baseline.2026-09-12T10-25.md
       under the baseline evidence directory. **Acceptance:** EXIT_CODE 0, with the error and
       warning counts captured by the same anchored-pattern rule as P0-T9.
 
-- [ ] [P0-T11] Run CMD-VSTEST followed by CMD-TRXCOUNTERS, with the results directory named for
+- [x] [P0-T11] Run CMD-VSTEST followed by CMD-TRXCOUNTERS, with the results directory named for
       this task. Record in artifact p0-t11-test-baseline.2026-09-12T10-25.md under the baseline
       evidence directory. **Acceptance:** EXIT_CODE 0 and the counters line reports `failed=0`. The
       artifact records the `total`, `executed`, `passed` and `failed` integers read from the trx
