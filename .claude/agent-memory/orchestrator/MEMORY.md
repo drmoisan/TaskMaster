@@ -1,5 +1,8 @@
 # Orchestrator Memory Index
 
+## Resuming a dead run
+- [Recover a dead agent worktree via shared git](recovering-a-dead-agent-worktree-via-shared-git.md) — its committed work is already in your object store; `git -C` into it is refused but `hash-object` reads its uncommitted files
+
 ## Lifecycle, promotion, checkpoint
 - [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) · [Small-path = minor-audit](small-path-minor-audit-selection.md) — 1-3 prod files = small path
 - [potential_to_issue creates the issue](potential-to-issue-creates-github-issue.md) · [needs an absolute path](potential-to-issue-needs-absolute-path.md) · [maps sections by heading](potential-to-issue-keeps-only-summary-section.md)

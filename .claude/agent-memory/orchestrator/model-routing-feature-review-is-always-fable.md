@@ -34,5 +34,20 @@ four floor signals — `classifier_or_model_logic`, `auth_or_token_handling`,
 `concurrency_or_ordering`, `cross_module_contract_change` — each contributing C3, and anything
 else contributes nothing and leaves the floor at C1.
 
+**At band C4 the overlay is irrelevant and every agent gets fable.** The overlay rewrites only the
+C3 cell, and the base table already maps `C4` to `fable`, so under `preferred` *and* under
+`available` a C4 delegation resolves to `table_model=fable, clamped_from=null, model=fable` for
+**every** agent — including `atomic-executor` and `pr-author`, which are the two that stay opus at
+C3. C4 yields opus only under `disabled`, and then as a clamp (`clamped_from=fable`,
+`clamp_reason=fable_disabled`). Verified 2026-09-12 by reading the module for issue #743, where an
+inherited checkpoint recorded the `disabled` clamp and the new session ran `preferred`; the receipts
+had to be recomputed rather than carried over.
+
+**You may not be able to run the module.** `pwsh` is refused under Agent worktree isolation, in the
+`-Command` form too, so in an isolated worktree resolve the model by READING
+`.claude/lib/model-routing/ModelRouting.psm1` — the two functions are pure and the tables are
+module-scope constants, so reading them is exact, not an approximation. See
+[[worktree-isolation-blocks-pwsh-per-agent-type]].
+
 Related: [[model-routing-scripts-absent-on-epic-integration-base]],
 [[model-routing-hook-reads-canonical-path-only]]
