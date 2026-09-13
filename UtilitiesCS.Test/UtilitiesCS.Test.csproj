@@ -77,6 +77,9 @@
     <Compile Include="TestHelpers\UiThreadDispatcherScope.cs" />
     <Compile Include="TestHelpers\UiThreadStateScope.cs" />
     <Compile Include="TestAssemblyInitializer.cs" />
+    <Compile Include="..\TestSupport\TestAssemblyResolver.cs">
+      <Link>TestSupport\TestAssemblyResolver.cs</Link>
+    </Compile>
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Dialogs\ActionButtonTests.cs" />
     <Compile Include="Dialogs\MyBoxModelessTests.cs" />

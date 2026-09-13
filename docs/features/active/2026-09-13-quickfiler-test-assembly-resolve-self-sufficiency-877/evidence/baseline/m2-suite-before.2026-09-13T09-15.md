@@ -20,3 +20,17 @@ SVG-bearing QuickFiler viewers.
 The suite outcome is order-dependent and therefore not a reliable repro. This run passing does not
 contradict the defect report; it is the expected behaviour whenever an SVG-bearing class is scheduled
 before the Deedle-using class.
+
+## Prior-session observation, disagreeing
+
+- A prior session ran the same command shape recorded in the headline row above, against the same
+  assembly and the same runsettings file, and selected the same total of 1395 tests.
+- That prior-session run observed 1392 passed with 3 FAILED and a non-zero exit.
+- The run recorded in the headline row above observed 1395 passed with 0 failed and a zero exit.
+- The prior-session run is the one the M-matrix in `issue.md` labels the FIRST observation; the headline
+  row of this artifact records the later, second observation.
+- The two observations disagree. Both selected 1395 tests, so the run shape was identical and only the
+  outcome differed.
+- M2 is therefore NONDETERMINISTIC across runs. It is a regression check only, not a discriminator for
+  this fix. A passing M2 run cannot confirm the fix and a failing M2 run cannot refute it. The stable
+  discriminator is the M3 single-class run with no runsettings file.

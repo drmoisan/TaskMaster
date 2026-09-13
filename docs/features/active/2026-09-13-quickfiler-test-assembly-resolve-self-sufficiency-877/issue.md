@@ -98,15 +98,24 @@ Three runs in this worktree at head `c9590a8b7`, before any fix.
 
 | Run | Command shape | Result |
 |---|---|---|
-| M2 | `QuickFiler.Test.dll` alone, `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, `/TestCaseFilter:"TestCategory!=LiveOutlook"` | Total 1395, Passed 1395, exit 0 |
+| M2 | `QuickFiler.Test.dll` alone, `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, `/TestCaseFilter:"TestCategory!=LiveOutlook"` | Total 1395, Passed 1395, exit 0. A prior session ran the identical command shape, also selecting Total 1395, and observed 1392 passed with 3 FAILED and a non-zero exit, so this run shape is NONDETERMINISTIC across runs |
 | M3 | `QuickFiler.Test.dll`, `/TestCaseFilter:"FullyQualifiedName~QfcInitEmailQueueZeroBatchTests"`, `/InIsolation`, no runsettings | Total 3, Failed 3, exit 1, `FileNotFoundException: netstandard, Version=2.1.0.0` |
-| M6 | `QuickFiler.Test.dll`, `/TestCaseFilter:"FullyQualifiedName~QfcInitEmailQueueZeroBatchTests\|FullyQualifiedName~BreadcrumbDropDownIntegrationTests"`, `/InIsolation`, no runsettings | Total 13, Passed 10, Failed 3, exit 1; the zero-batch class executed first and failed |
+| M6 | `QuickFiler.Test.dll`, `/TestCaseFilter:"FullyQualifiedName~QfcInitEmailQueueZeroBatchTests\|FullyQualifiedName~BreadcrumbDropDownIntegrationTests"`, `/InIsolation`, no runsettings | Total 13, Passed 10, Failed 3, exit 1; the zero-batch class executed first and failed. A prior-session run of a different shape, Total 9 against Total 13, selected a different set of tests and is not comparable with this row |
 
-M3 is the discriminating experiment. It is strictly stricter than any suite run, because a suite run
-lets any earlier class rescue the bind invisibly. M2 and M3 differ only in how many classes are in the
-run, and they disagree, which is what localises the defect to intra-assembly ordering. M6 shows the same
-disagreement inside a single sequential run: the zero-batch class fails when it is scheduled first, even
-though an SVG-bearing class is present later in the same run.
+M3 is the stable discriminator. It is strictly stricter than any suite run, because a suite run lets any
+earlier class rescue the bind invisibly. M2 and M3 differ only in how many classes are in the run, and
+they disagree, which is what localises the defect to intra-assembly ordering.
+
+M2 has additionally been observed to disagree with itself. Two runs of the identical M2 command each
+selected 1395 tests; one reported 1395 passed with a zero exit, and the other reported 1392 passed with
+3 FAILED and a non-zero exit. A passing M2 run, and a passing full-suite run, are therefore
+non-probative for this fix: neither can confirm it and neither can refute it. The M2 disagreement alone
+is sufficient to establish that non-probative status, and no other run shape is required for it.
+
+M6 is a single-run demonstration that the zero-batch class fails when the runner schedules it first,
+even though an SVG-bearing class is present later in the same sequential run. Its two recorded
+observations have different totals, 9 against 13, so they did not select the same set of tests. They are
+not offered as a same-command disagreement, and no claim is made that M6 disagreed with itself.
 
 ## Refuted Explanations
 
