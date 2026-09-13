@@ -500,7 +500,7 @@ are referenced only by field initializers on the base part, which do not move.
       count of `#endregion` occurrences. Recorded in artifact
       p1-t9-invariants.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P1-T10] Commit Phase 1 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
+- [x] [P1-T10] Commit Phase 1 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
       and every path it reports satisfies the Scope-lock rule.
 
 ---
@@ -516,7 +516,7 @@ QfcQueue pure-paths test file — resolve the backing field by reflection, asser
 FluentAssertions that the resulting field descriptor is non-null, and then set the field; an
 auto-property would rename the backing field to a compiler-generated name and fail all six.
 
-- [ ] [P2-T1] Add seam S1 to `QuickFiler/Controllers/QfcQueue.cs`: an `internal` property named
+- [x] [P2-T1] Add seam S1 to `QuickFiler/Controllers/QfcQueue.cs`: an `internal` property named
       `MoveMonitor` of the move-monitor interface type, whose getter returns the existing field and
       whose setter assigns the value or throws `ArgumentNullException` when it is null, with an XML
       doc comment recording that the default remains the per-owner instance the field initializer
@@ -526,13 +526,13 @@ auto-property would rename the backing field to a compiler-generated name and fa
       byte-for-byte. Recorded in artifact p2-t1-s1.2026-09-12T10-25.md under the qa-gates evidence
       directory.
 
-- [ ] [P2-T2] In `QuickFiler/Controllers/QfcQueue.Enqueue.cs`, replace the single field read in the
+- [x] [P2-T2] In `QuickFiler/Controllers/QfcQueue.Enqueue.cs`, replace the single field read in the
       hook loop at line 91 of the anchor so that the hook call is made through `MoveMonitor`.
       **Acceptance:** `QuickFiler/Controllers/QfcQueue.Enqueue.cs` contains zero occurrences of the
       move-monitor field name and exactly one occurrence of the literal `MoveMonitor.HookItem`; the
       surrounding `Task.Run` wrapper, the lambda and the `items.ForEach` call are unchanged.
 
-- [ ] [P2-T3] Create `QuickFiler/Interfaces/IUiIdleDispatcher.cs` declaring an `internal` interface
+- [x] [P2-T3] Create `QuickFiler/Interfaces/IUiIdleDispatcher.cs` declaring an `internal` interface
       named `IUiIdleDispatcher` with exactly three members: one taking an action and returning a
       task, one generic member taking a function of the type parameter and returning a task of it,
       and one generic member taking a function returning a task of the type parameter and returning
@@ -547,12 +547,12 @@ auto-property would rename the backing field to a compiler-generated name and fa
       shapes and its adapter forwards them at the framework default, which would silently promote
       two call sites and change when background page construction runs.
 
-- [ ] [P2-T4] Add a `<Compile Include>` item to `QuickFiler/QuickFiler.csproj` for
+- [x] [P2-T4] Add a `<Compile Include>` item to `QuickFiler/QuickFiler.csproj` for
       `QuickFiler/Interfaces/IUiIdleDispatcher.cs`, placed among the existing interface items, which
       begin at line 363 at the recorded anchor. **Acceptance:** a search of
       `QuickFiler/QuickFiler.csproj` finds exactly one item naming that file.
 
-- [ ] [P2-T5] In `QuickFiler/Controllers/QfcQueue.UiIdle.cs`, declare the production adapter class
+- [x] [P2-T5] In `QuickFiler/Controllers/QfcQueue.UiIdle.cs`, declare the production adapter class
       named `UiThreadIdleDispatcher`, `internal` and sealed, implementing the new interface and
       holding the three relocated bodies verbatim, and declare seam S2 as an `internal` property
       named `UiIdleDispatcher` over a private backing field, with a lazy null-coalescing-assignment
@@ -578,25 +578,25 @@ auto-property would rename the backing field to a compiler-generated name and fa
       p2-t5-s2.2026-09-12T10-25.md under the qa-gates evidence directory. Because the getter is
       lazy, constructing a queue still performs no read of the process-wide dispatcher.
 
-- [ ] [P2-T6] Run CMD-FORMAT-SCOPED over the four code paths touched in this phase, capturing the
+- [x] [P2-T6] Run CMD-FORMAT-SCOPED over the four code paths touched in this phase, capturing the
       porcelain status immediately before and after, then CMD-CHECK-SCOPED over the same paths.
       **Acceptance:** both porcelain captures are recorded verbatim in artifact
       p2-t6-format.2026-09-12T10-25.md under the qa-gates evidence directory and CMD-CHECK-SCOPED
       exits 0.
 
-- [ ] [P2-T7] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, counts captured by the anchored-pattern
+- [x] [P2-T7] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, counts captured by the anchored-pattern
       rule, recorded in artifact p2-t7-analyze.2026-09-12T10-25.md under the qa-gates evidence
       directory.
 
-- [ ] [P2-T8] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P2-T8] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p2-t8-nullable.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P2-T9] Run CMD-VSTEST followed by CMD-TRXCOUNTERS with a results directory named for this
+- [x] [P2-T9] Run CMD-VSTEST followed by CMD-TRXCOUNTERS with a results directory named for this
       task. **Acceptance:** EXIT_CODE 0, `failed=0`, and `total` equal to BASELINE_TEST_TOTAL.
       Recorded in artifact p2-t9-tests.2026-09-12T10-25.md under the qa-gates evidence directory.
       This is the gate that proves the three existing QfcQueue test files still pass unmodified.
 
-- [ ] [P2-T10] Measure with CMD-LINECOUNT the four code files touched in this phase.
+- [x] [P2-T10] Measure with CMD-LINECOUNT the four code files touched in this phase.
       **Acceptance:** each measured count is strictly less than 500 and each is recorded as a
       labelled numeric line in artifact p2-t10-line-counts.2026-09-12T10-25.md under the qa-gates
       evidence directory.

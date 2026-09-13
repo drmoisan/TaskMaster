@@ -368,6 +368,7 @@
     <Compile Include="Interfaces\IItemControler.cs" />
     <Compile Include="Interfaces\IKbdAction.cs" />
     <Compile Include="Interfaces\IQfcCollectionController.cs" />
+    <Compile Include="Interfaces\IUiIdleDispatcher.cs" />
     <Compile Include="Interfaces\IQfcDatamodel.cs" />
     <Compile Include="Interfaces\IQfcExplorerController.cs" />
     <Compile Include="Interfaces\IQfcFormController.cs" />

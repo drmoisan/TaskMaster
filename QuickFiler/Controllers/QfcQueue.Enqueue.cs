@@ -88,7 +88,7 @@ namespace QuickFiler.Controllers
             _qfcCollectionController = qfcCollectionController;
 
             await Task.Run(() =>
-                items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x)))
+                items.ForEach(item => MoveMonitor.HookItem(item, async (x) => await RemoveItem(x)))
             );
 
             Interlocked.Increment(ref _jobsRunning);

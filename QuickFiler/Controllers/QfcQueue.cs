@@ -41,6 +41,24 @@ namespace QuickFiler.Controllers
         // Deliberately one monitor instance per owner, not a shared singleton: EmailMoveMonitor.BeforeItemMove dispatches at most one action per MailItem via FirstOrDefault, and UnhookAll is instance-scoped and clears the whole hook list, so a shared instance would both drop sibling owners' actions and unhook them all on any one owner's teardown (issue #731 finding 1, issue #620).
         private IEmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
 
+        /// <summary>
+        /// Issue #871 injectable seam S1 for the move monitor every enqueued item is hooked into.
+        /// The default remains the per-owner <see cref="EmailMoveMonitor"/> instance the field
+        /// initializer immediately above creates, so production behaviour is unchanged; a test
+        /// assigns a substitute so the hook call can be asserted without a live Outlook process.
+        /// The member is <c>internal</c> rather than public because
+        /// <see cref="IEmailMoveMonitor"/> is itself internal and a public member of an internal
+        /// type is an inconsistent-accessibility error. The backing field is retained rather than
+        /// converted to an auto-property because six existing tests resolve it by reflection under
+        /// its current name, which an auto-property would rename to a compiler-generated one.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The assigned value is null.</exception>
+        internal IEmailMoveMonitor MoveMonitor
+        {
+            get => _moveMonitor;
+            set => _moveMonitor = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
         #endregion Constructors and Private Members
 
         #region Queue Functions
