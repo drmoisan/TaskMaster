@@ -1231,7 +1231,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   must neither stage nor be failed by. Staging them would sweep another item's bookkeeping onto this
   branch.
 
-- [ ] [P2-T33] Write the terminal evidence artifact
+- [x] [P2-T33] Write the terminal evidence artifact
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/other/final-commit.md`
   and commit it, leaving the worktree clean.
 
