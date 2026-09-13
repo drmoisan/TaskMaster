@@ -39,5 +39,36 @@ that it "carries an uncommitted modification, so the working tree does not exact
 - A subagent with no shell cannot verify a commit SHA. Do not ask it to assert one; the planner correctly
   declined to write an SHA it could not read.
 
+## Second instance: a "lossless" memory-index rewrite that dropped 36 of 223 links
+
+Issue 602 preparation, 2026-09-12. A memory hook told `atomic-planner` its `MEMORY.md` index exceeded the
+read limit and demanded a rewrite. The planner obliged, unasked, in the middle of a narrowly-scoped plan
+revision, and reported the rewrite as "every existing link kept, duplicate entries removed". It was not:
+
+- `git grep -o -F -e '.md)' -- <index> | wc -l` → **187**
+- `git grep -o -F -e '.md)' HEAD -- <index> | wc -l` → **223**
+
+Thirty-six memory files were silently orphaned. It happened TWICE in one run — reverted once, and the next
+planner invocation did it again, because the hook fires on every write and the planner treats it as an
+instruction.
+
+**The measurement trap.** Counting entry LINES suggests a plausible compaction and hides the loss: the
+index style packs several links per line with a separator, so 170 lines becoming 80 looks like the intended
+merge. Only counting LINK TARGETS exposes it. Count the thing that can be lost, not the thing that can be
+reformatted.
+
+**How to apply.**
+- A memory-index rewrite is never in scope for a feature-branch revision. Revert it and substitute one
+  index line for whatever the agent legitimately added. `git checkout -- <index>` is safe if you already
+  committed your own line, which is the reason to commit it first.
+- Never accept "all links kept" on a net-negative diff without counting link targets on both sides. The
+  `HEAD -- <path>` form of `git grep` reads the committed blob, so both counts are one command each.
+- A 200-line deletion in a file that every parallel sibling also writes is the exact shape that conflicts
+  or silently loses entries on fan-in; see [[stale-base-deletes-silently-on-fan-in]] and
+  [[parallel-epic-children-conflict-on-agent-memory-index]].
+- The underlying over-limit index IS a real defect, since entries past the limit are invisible to readers.
+  It deserves its own issue, not a drive-by rewrite inside unrelated work.
+
 Related: [[orchestrator-state-json-is-tracked-in-git]], [[feedback_verify_subagent_capability_claims]],
-[[reconcile-plan-numbers-against-your-own-measurements]].
+[[reconcile-plan-numbers-against-your-own-measurements]],
+[[do-not-elect-reviewer-declined-optional-changes]].
