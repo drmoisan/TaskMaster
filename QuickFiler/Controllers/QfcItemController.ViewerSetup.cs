@@ -273,19 +273,19 @@ namespace QuickFiler.Controllers
         // awaits itemViewer.UiSyncContext, which never resumes on a thread-pool MSTest thread. The
         // WinFormsPumpHost test seam supplies that loop, so the member is now covered by
         // QfcItemController_ViewerSetupTests.ResolveControlGroupsAsync_ThroughThePumpHost_*.
-        internal async Task ResolveControlGroupsAsync(ItemViewer itemViewer)
+        internal async Task ResolveControlGroupsAsync(IItemViewer itemViewer)
         {
             Token.ThrowIfCancellationRequested();
 
             _itemPositionTips = await QfcTipsDetails.CreateAsync(
-                itemViewer.LblItemNumber,
+                ((ItemViewer)itemViewer).LblItemNumber,
                 _itemViewer.UiSyncContext,
                 Token
             );
             var navColNum = _itemPositionTips.ColumnNumber;
 
             await itemViewer.UiSyncContext;
-            var controls = itemViewer.GetAllChildren();
+            var controls = ((ItemViewer)itemViewer).GetAllChildren();
 
             // SelectAwait (System.Linq.Async) is obsolete (CS0618) per the framework's migration
             // guidance ("Use Select... the SelectAwait functionality now exists as overloads of
