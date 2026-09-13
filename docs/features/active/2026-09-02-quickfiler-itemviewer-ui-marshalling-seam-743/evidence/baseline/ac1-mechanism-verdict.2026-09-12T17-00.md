@@ -4,11 +4,27 @@ Task: [P1-T11]
 Timestamp: 2026-09-13T02-50
 Command: none (verdict authored from the P0-T11 declaration and the P1-T9 and P1-T10 measurement artifacts in this folder)
 EXIT_CODE: 0
-Output Summary: the serial-regime figures select row 1 of the pre-declared decision rule; H-LEAK is REJECTED by direct observation OF THE PRE-DECLARED COUNTER OBSERVABLE — the serial-regime contended count and the balance-test difference declared in advance at P0-T11 — and H-COST (elapsed fixture cost) is the single surviving mechanism. No expiry was observed in either instrumented run.
+Output Summary: both instrumented runs recorded `timeout=0`. No expiry occurred, and therefore NEITHER H-COST NOR H-LEAK WAS DISCRIMINATED by this measurement. There was no expiry event in which to observe whether the one-permit `TransactionGate` was held with no live holder, which is the observable the P0-T11 declaration named. A hypothesis cannot be rejected by the absence of observations. This artifact records a negative result: the mechanism was not identified by measurement. AC1 is NOT marked PASS and its checkbox in `spec.md` is unchecked.
 
-AMENDMENT (review finding R-2, applied 2026-09-13). The phrase "rejected by direct observation" above originally stood without its object, which read as though an expiry had been observed and attributed. It was not. Nothing in this artifact rests on a reproduced expiry: the serial run recorded `timeout=0` over 1394 tests and the parallel run `timeout=0` over 1395, as section (v) states. The rejection of H-LEAK rests entirely on the counter observable, which is a legitimate basis and was declared before the measurement rather than chosen after it.
+## Correction history (this artifact has been corrected twice; both superseded texts are retained below)
 
-CONSEQUENCE FOR AC1, STATED EXPLICITLY SO IT IS NOT INFERRED EITHER WAY. AC1's no-expiry clause is NOT satisfied by this evidence, so AC1 is NOT marked PASS and its checkbox in `spec.md` is unchecked. The defect did not reproduce in 62 targeted runs or in 1394 serial runs. Whether a non-reproducing negative result of this shape discharges AC1 is a judgment reserved to the maintainer; it is escalated and unresolved at the time of this amendment. No agent has ruled on it, and this artifact must not be read as ruling on it.
+**CORRECTION 1 (review finding R-2, applied 2026-09-13, ITSELF SUPERSEDED BY CORRECTION 2).** Its text was:
+
+> AMENDMENT (review finding R-2, applied 2026-09-13). The phrase "rejected by direct observation" above originally stood without its object, which read as though an expiry had been observed and attributed. It was not. Nothing in this artifact rests on a reproduced expiry: the serial run recorded `timeout=0` over 1394 tests and the parallel run `timeout=0` over 1395, as section (v) states. The rejection of H-LEAK rests entirely on the counter observable, which is a legitimate basis and was declared before the measurement rather than chosen after it.
+
+Correction 1 identified the right defect and then defended the wrong claim. Having established that no expiry was reproduced, it went on to assert that the rejection of H-LEAK "rests entirely on the counter observable, which is a legitimate basis". That assertion is withdrawn. It is not a legitimate basis, for the reason Correction 2 states.
+
+**CORRECTION 2 (maintainer ratification of R-2, applied 2026-09-13).** The superseded Output Summary text was:
+
+> Output Summary: the serial-regime figures select row 1 of the pre-declared decision rule; H-LEAK is REJECTED by direct observation OF THE PRE-DECLARED COUNTER OBSERVABLE — the serial-regime contended count and the balance-test difference declared in advance at P0-T11 — and H-COST (elapsed fixture cost) is the single surviving mechanism. No expiry was observed in either instrumented run.
+
+Why both superseded texts are wrong. Section 4.2 of `spec.md` defines H-LEAK as a leak that FOLLOWS a timed-out `async` test whose `finally` MSTest has stopped observing. H-LEAK is therefore conditional on an expiry having already occurred. Both instrumented runs recorded `timeout=0`, so no test was abandoned, so under EITHER hypothesis no leak could have occurred in these runs. The serial reading `contended=0` was consequently PREDETERMINED by the absence of expiry: it would have read zero whether H-LEAK is true of this codebase or false. A reading that is fixed in advance by a condition independent of the hypothesis carries no information about the hypothesis, so it cannot reject it. The counter observable was declared in advance and was measured honestly; what failed is that the run never entered the regime in which the observable becomes discriminating.
+
+The correct statement of what these runs establish: no expiry was reproduced, so the discriminating experiment did not take place. H-COST remains the only available ORIGINATING mechanism within the spec's two-hypothesis frame, because H-LEAK is a cascade conditional on an initial expiry rather than an originating cause; the sufficiency evidence for H-COST is the measured parallel-regime elongation in section (iv). That is a narrower claim than "H-LEAK is rejected". H-LEAK IS NOT REJECTED. Spec unknown U2 — whether a first expiry cascades through a leaked permit — remains OPEN and UNTESTED by this item. It is carried forward as a separate issue; see the ratification record at `evidence/other/maintainer-ratification-ac1.2026-09-13T18-00.md`.
+
+CONSEQUENCE FOR AC1, STATED EXPLICITLY SO IT IS NOT INFERRED EITHER WAY. AC1's no-expiry clause is NOT satisfied by this evidence, so AC1 is NOT marked PASS and its checkbox in `spec.md` is unchecked. The defect did not reproduce in 62 targeted runs or in 1394 serial runs.
+
+ESCALATION OUTCOME (updated by Correction 2). Whether a non-reproducing negative result of this shape discharges AC1 was a judgment reserved to the maintainer. It is no longer unresolved: THE MAINTAINER HAS RULED, on 2026-09-13, ratifying the negative result and accepting the item subject to four conditions recorded in `evidence/other/maintainer-ratification-ac1.2026-09-13T18-00.md`. The ratification is the maintainer accepting the item DESPITE a negative result. It is not a finding that the result was positive, and it does not convert AC1 into a pass. The checkbox stays unchecked because the checkbox records what was measured; the ratification records the maintainer's acceptance. Both statements belong in the record and neither replaces the other.
 
 ## (i) The discriminating observable (restated verbatim from the P0-T11 declaration)
 
@@ -25,7 +41,11 @@ The declaration's item (e) is also restated verbatim: The mechanism names UiThre
 
 Source artifacts: `evidence/baseline/ac1-serial-measurement.2026-09-12T17-00.md` (P1-T9) and `evidence/baseline/ac1-parallel-measurement.2026-09-12T17-00.md` (P1-T10). Both runs were taken from the same instrumented assembly built in P1-T8, on 2026-09-13 between 02:47 and 02:50 local time.
 
-## (iii) Verdict by the pre-declared decision rule
+## (iii) Verdict by the pre-declared decision rule — SUPERSEDED BY CORRECTION 2
+
+The whole of section (iii) as originally written is retained verbatim below for the audit trail and is WITHDRAWN as a verdict. Its conclusion "H-LEAK REJECTED by direct observation" is the claim Correction 2 withdraws. Read it as a record of what was claimed on 2026-09-13, not as a finding. Two specific sentences below do not survive: "A serial run cannot queue a second live holder; therefore a contended count of zero in that regime is a direct observation that the permit was never found held by a leaked transaction" is unsound because with `timeout=0` no transaction could have leaked under either hypothesis, so the zero was predetermined; and "The two hypotheses are not both supported; only H-COST survives" overstates a result that discriminated neither.
+
+A further structural point, from the code review (finding N-3), explains why the decision rule could not have discriminated as written: under H-LEAK the serial-regime signature is the balance test BLOCKING on `WaitAsync` and expiring under its own `[Timeout]` with no `GATECOUNTERS` line printed at all. Rows 2 and 3 of the rule are therefore not observable as printed counter values. Row 1 is the only row that can ever appear as a printed triple, so selecting row 1 is not evidence that rows 2 and 3 were ruled out.
 
 The P1-T9 table, fixed in advance and reproduced in the P0-T11 declaration, is applied to the serial-regime figures only:
 

@@ -56,6 +56,40 @@ about 21 observations does not pin `N` precisely. The honest statement is that 6
 no-effect null at the 5 percent level GIVEN a 4.8 percent base rate, and that the base rate itself is
 an estimate.
 
+COMPLETION OF THE SENSITIVITY NOTE (added 2026-09-13, maintainer ratification condition 3). The paragraph
+above is necessary but not sufficient, because it describes the uncertainty qualitatively without stating
+its provenance or its magnitude. Both are stated here.
+
+**Provenance.** The 4.8 percent figure is a point estimate derived from a SINGLE observed failing run —
+one failure in approximately 21 runs. It is not an average over repeated failures. A rate estimated from
+one event is the weakest form the estimate can take, and the wide interval below is the direct arithmetic
+consequence of that single event rather than an incidental caveat.
+
+**Magnitude.** The exact (Clopper-Pearson) 95 percent confidence interval for 1 of 21 is approximately
+**[0.0012, 0.2382]**, that is 0.12 percent to 23.82 percent. Both endpoints were re-derived here rather
+than carried over:
+
+- Lower endpoint, solving `1 - (1 - p)^21 = 0.025`: `(1 - p) = 0.975^(1/21) = exp(-0.0253178 / 21) =
+  exp(-0.00120561) = 0.9987951`, so `p = 0.0012049`.
+- Upper endpoint, solving `P(X <= 1 | n = 21, p) = 0.025`, that is `(1-p)^21 + 21p(1-p)^20 = 0.025`. At
+  `p = 0.2382`: `(0.7618)^20 = 0.004330`, `(0.7618)^21 = 0.0032993`, `21 x 0.2382 x 0.004330 = 0.021660`,
+  sum `= 0.024959`, which meets the 0.025 target. So `p = 0.2382`.
+
+**Consequence, stated plainly.** The interval spans a factor of roughly 200. If the true per-run failure
+rate sits near the LOW end of that interval — 0.12 percent rather than 4.8 percent — then the expected
+number of failures in 62 runs is about 0.07, so observing zero failures in 62 runs is the overwhelmingly
+likely outcome even if the fix did nothing at all, and the streak establishes little. The `N` values
+derived in the tables above (62 at alpha 0.05, 95 at alpha 0.01) are conditional on the point estimate
+and are not confidence-adjusted. Against the low endpoint the run count required to reach the same
+alpha 0.05 would be `ln(0.05) / ln(1 - 0.0012049) = 2.99573 / 0.00120563`, approximately **2,500** runs,
+which is not achievable in any form within this item. The record must not imply more confidence than the measurement supports: the statistical
+component of AC3 is SUPPORTING evidence conditional on an uncertain base rate, and the blocking weight
+of AC3 rests on component (a), the deterministic single-run assertion, which has no base rate at all.
+
+This completion is recorded in both places the figures are used: here, and in the acceptance-governing
+artifact `evidence/regression-testing/ac3b-consecutive-runs.2026-09-12T19-00.md`, which already carried
+the provenance sentence and the interval as spec AC3 requires.
+
 ## Feasibility consequence for the plan, which is the reason this matters
 
 Sixty-two consecutive full-suite runs is very likely infeasible within this item. The plan must not

@@ -12,7 +12,7 @@ Feature folder: docs/features/active/2026-09-02-quickfiler-itemviewer-ui-marshal
 - `code-review.2026-09-13T15-30.md` — Findings Table rows 1 (Blocking, host path) and 2 (Blocking, AC1 verdict overstated); non-blocking rows N-1 through N-8; observations.
 - `feature-audit.2026-09-13T15-30.md` — `### AC1 — detailed evaluation` (PARTIAL), `## Remediation-Required Findings` (R-1, R-2, R-3), `## Acceptance Criteria Check-off`.
 
-Blocking count at cycle entry: 2 (R-1, R-2). R-3 was resolved by the orchestrator before this cycle opened: `git diff origin/main...HEAD -G "DanMoisan|Users" --name-only -- .claude/agent-memory` printed nothing, so no branch-added line under `.claude/agent-memory` carries the account name or a user-profile path. R-3 needs no task.
+Blocking count at cycle entry: 2 (R-1, R-2). R-3 was resolved by the orchestrator before this cycle opened: `git diff origin/main...HEAD -G "<account>|Users" --name-only -- .claude/agent-memory` printed nothing, so no branch-added line under `.claude/agent-memory` carries the account name or a user-profile path. R-3 needs no task. (Redacted 2026-09-13: the `<account>` token stands for the operator's account name, which this line originally spelled out. Spelling it out reproduced the R-1 defect class — a host identifier in a committed file — in the very document that scoped R-1's repair. The command as run used the literal account name.)
 
 ## Cycle scope decision
 
