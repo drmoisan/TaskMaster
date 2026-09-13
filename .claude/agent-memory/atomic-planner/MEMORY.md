@@ -2,7 +2,7 @@
 
 ## Per-issue plan/preflight seams
 
-- [#743](project_743_itemviewer_marshalling_seam_plan_seams.md) — wildcard test-name comment; commented-out duplicate literal voids zero-count; AssignControls needs `_globals`; hook opening-line path check
+- [#743](project_743_itemviewer_marshalling_seam_plan_seams.md) — wildcard test-name comment; commented-out duplicate literal; AssignControls needs `_globals`; R1: marshal conversion needs null tolerance (harness ctor); designed-contention test excluded; six pump tests; coverage runner takes single-assembly SearchRoot
 - [#826 factory](project_826_factory_outside_try_reachability_seams.md) — seam outside `try` reaches both catches · [#826 R2-R5](project_826_console_out_banned_symbol_plan_seams.md) — `0 Error(s)` substring of `10 Error(s)`; uncompiled control emits nothing
 - [#825 R1-R6](project_825_etl_deadline_mechanics_plan_seams.md) — fixed timer order; green vstest prints no Failed line; test dll not in denominator; comment above cited range shifts it
 - [#824 R1-R5](project_824_ilglobals_static_publication_plan_seams.md) — gate installer FS marker; `--amend` hits preceding commit; later `using` shifts bounds · [#823](project_823_self_anchor_diff_base_seams.md) — self-anchor at P0; never key ExpectedExitCode to a baseline
