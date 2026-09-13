@@ -162,6 +162,77 @@ namespace QuickFiler.Controllers.Tests
             );
         }
 
+        /// <summary>
+        /// Issue #839 regression. Pins the ordering rule that Init() creates the cancellation
+        /// token source before the datamodel loader runs: a call placed after that loader passes
+        /// the not-null assertion but leaves the datamodel and queue tokens with CanBeCanceled
+        /// false. Inherited debt, shared with Init_InitializesCorrectly: Init() constructs a real
+        /// QfcFormViewer, which neither test replaces.
+        /// </summary>
+        [TestMethod]
+        public void Init_CreatesTokenSourceBeforeAnyLoaderObservesIt()
+        {
+            // Arrange
+            CancellationTokenSource capturedSource = null;
+            CancellationToken formControllerToken = default;
+            CancellationToken dataModelToken = default;
+            CancellationToken queueToken = default;
+
+            var mockData = new Mock<IQfcDatamodel>();
+            _controller.QfcDataModelLoader = (globals, token) =>
+            {
+                dataModelToken = token;
+                return mockData.Object;
+            };
+
+            var mockExplorer = new Mock<IQfcExplorerController>();
+            _controller.QfcExplorerControllerLoader = (initType, globals, homeController) =>
+                mockExplorer.Object;
+
+            var mockKeyboardHandler = new Mock<IQfcKeyboardHandler>();
+            _controller.QfcKeyboardHandlerLoader = (viewer, homeController) =>
+                mockKeyboardHandler.Object;
+
+            var mockQueue = new Mock<IQfcQueue>();
+            _controller.QfcQueueLoader = (token, homeController, globals) =>
+            {
+                queueToken = token;
+                return mockQueue.Object;
+            };
+
+            var mockFormController = new Mock<IQfcFormController>();
+            _controller.QfcFormControllerLoader = (
+                globals,
+                viewer,
+                queue,
+                initType,
+                parentCleanup,
+                homeController,
+                tokenSource,
+                token
+            ) =>
+            {
+                capturedSource = tokenSource;
+                formControllerToken = token;
+                return mockFormController.Object;
+            };
+
+            // Act
+            _controller.Init();
+
+            // Assert
+            capturedSource.Should().NotBeNull();
+            formControllerToken.Should().Be(capturedSource.Token);
+            _controller.TokenSource.Should().BeSameAs(capturedSource);
+            dataModelToken.Should().Be(capturedSource.Token);
+            dataModelToken.CanBeCanceled.Should().BeTrue();
+            queueToken.Should().Be(capturedSource.Token);
+            queueToken.CanBeCanceled.Should().BeTrue();
+
+            // Teardown: dispose the source Init() created (QfcHomeController.Cleanup nulls it).
+            _controller.Cleanup();
+        }
+
         //[TestMethod]
         //public async Task LaunchAsync_InitializesCorrectly()
         //{
