@@ -61,6 +61,80 @@ namespace QuickFiler.Controllers
             set => _tlpStates = value;
         }
 
+        private Func<CancellationToken, ItemViewer> _itemViewerFactory = ItemViewerQueue.Dequeue;
+
+        /// <summary>
+        /// Issue #871 injectable seam S3 for the per-row item viewer. The default is the static
+        /// <c>ItemViewerQueue.Dequeue</c> method group, so production behaviour is unchanged; a test
+        /// assigns a factory returning a headless stand-in so that <c>AddAsync</c> is reachable
+        /// without the process-wide viewer queue. The default is a declaration initializer rather
+        /// than a lazy getter because the method group captures no instance state. The member is a
+        /// property over a backing field rather than an auto-property because C# permits no
+        /// accessor body on an auto-property and the null guard is part of the seam contract.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The assigned value is null.</exception>
+        internal Func<CancellationToken, ItemViewer> ItemViewerFactory
+        {
+            get => _itemViewerFactory;
+            set => _itemViewerFactory = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        private Action<TableLayoutPanel, ItemViewer, int> _viewerRowPlacer;
+
+        /// <summary>
+        /// Issue #871 injectable seam S4 for placing a viewer into a row of the table layout panel.
+        /// The default is the <c>AddViewerToTlp</c> method group, which remains declared on this
+        /// part with its body unchanged, so production behaviour is unchanged; a test assigns a
+        /// recording substitute so the panel, viewer and index can be asserted without a live
+        /// WinForms layout pass. The getter is lazy rather than a declaration initializer because
+        /// the default is an instance method and a field or auto-property initializer cannot
+        /// reference the instance.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The assigned value is null.</exception>
+        internal Action<TableLayoutPanel, ItemViewer, int> ViewerRowPlacer
+        {
+            get => _viewerRowPlacer ??= AddViewerToTlp;
+            set => _viewerRowPlacer = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        private Func<TableLayoutPanel, MailItem, int, Task<QfcItemGroup>> _itemGroupFactory;
+
+        /// <summary>
+        /// Issue #871 injectable seam S5 for the per-row item group the loader builds. The default
+        /// is the <c>AddAsync</c> method group, which remains declared on this part with its
+        /// signature unchanged, so production behaviour is unchanged; a test assigns a recording
+        /// substitute so the loader's index mapping and argument flow can be asserted without a
+        /// live viewer. S4 and S5 are both present deliberately: a single coarse seam in place of
+        /// S4 would make the loader coverable while leaving the production default it displaces
+        /// permanently uncovered, which relocates the untestable region rather than closing it. The
+        /// getter is lazy rather than a declaration initializer because the default is an instance
+        /// method and a field or auto-property initializer cannot reference the instance.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The assigned value is null.</exception>
+        internal Func<TableLayoutPanel, MailItem, int, Task<QfcItemGroup>> ItemGroupFactory
+        {
+            get => _itemGroupFactory ??= AddAsync;
+            set => _itemGroupFactory = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        private Func<TableLayoutPanel, TableLayoutPanel> _backgroundTlpFactory = tlp =>
+            tlp.Clone(name: "BackgroundTableLayout");
+
+        /// <summary>
+        /// Issue #871 injectable seam S6 for the background page's table layout panel. The default
+        /// lambda performs the same reflection-driven clone call, with the same named argument, as
+        /// the expression it replaces on the enqueue path, so production behaviour is unchanged; a
+        /// test assigns a factory returning a sentinel panel so the enqueue path is reachable
+        /// without a live WinForms control graph. The default is a declaration initializer rather
+        /// than a lazy getter because the lambda captures no instance state.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The assigned value is null.</exception>
+        internal Func<TableLayoutPanel, TableLayoutPanel> BackgroundTlpFactory
+        {
+            get => _backgroundTlpFactory;
+            set => _backgroundTlpFactory = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
         internal async Task<QfcItemGroup> AddAsync(
             TableLayoutPanel tlp,
             MailItem mailItem,
@@ -70,9 +144,9 @@ namespace QuickFiler.Controllers
             //TraceUtility.LogMethodCall(tlp, mailItem, indexNumber);
 
             var grp = new QfcItemGroup(mailItem);
-            var viewer = ItemViewerQueue.Dequeue(_token);
+            var viewer = ItemViewerFactory(_token);
             grp.ItemViewer = viewer;
-            await UiIdleCallAsync(() => AddViewerToTlp(tlp, viewer, indexNumber));
+            await UiIdleCallAsync(() => ViewerRowPlacer(tlp, viewer, indexNumber));
             return grp;
         }
 

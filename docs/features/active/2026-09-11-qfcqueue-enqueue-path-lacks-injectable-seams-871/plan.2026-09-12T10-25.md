@@ -614,7 +614,7 @@ those two use a lazy null-coalescing-assignment property getter, which does have
 scope and still yields a non-null default on first read. The other two have instance-free defaults
 and use the plain initializer form that the existing item-controller seam uses.
 
-- [ ] [P3-T1] Add seam S3 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` auto-property
+- [x] [P3-T1] Add seam S3 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` auto-property
       named `ItemViewerFactory` of delegate type taking a cancellation token and returning the
       viewer type, initialized to the static dequeue method group of the viewer queue helper class,
       with a setter guard that throws `ArgumentNullException` on null; and substitute the direct
@@ -623,7 +623,7 @@ and use the plain initializer form that the existing item-controller seam uses.
       `ItemViewerFactory` and exactly one call of the form `ItemViewerFactory(_token)`, and zero
       remaining direct calls to the viewer queue helper's dequeue member.
 
-- [ ] [P3-T2] Add seam S4 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` property named
+- [x] [P3-T2] Add seam S4 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` property named
       `ViewerRowPlacer` of delegate type taking the panel, the viewer and an integer, over a private
       backing field, with a lazy null-coalescing-assignment getter defaulting to the
       `AddViewerToTlp` method group and a setter that throws `ArgumentNullException` on null; and
@@ -633,7 +633,7 @@ and use the plain initializer form that the existing item-controller seam uses.
       unchanged, and the call inside `AddAsync` is of the form
       `ViewerRowPlacer(tlp, viewer, indexNumber)` wrapped in the unchanged marshalling call.
 
-- [ ] [P3-T3] Add seam S5 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` property named
+- [x] [P3-T3] Add seam S5 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` property named
       `ItemGroupFactory` of delegate type taking the panel, a mail item and an integer and returning
       a task of the item-group type, over a private backing field, with a lazy
       null-coalescing-assignment getter defaulting to the `AddAsync` method group and a setter that
@@ -643,7 +643,7 @@ and use the plain initializer form that the existing item-controller seam uses.
       make the loader coverable while leaving the production default it displaces permanently
       uncovered, which relocates the untestable region rather than closing it.
 
-- [ ] [P3-T4] Add seam S6 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` auto-property
+- [x] [P3-T4] Add seam S6 to `QuickFiler/Controllers/QfcQueue.Tlp.cs`: an `internal` auto-property
       named `BackgroundTlpFactory` of delegate type taking a panel and returning a panel,
       initialized to a lambda that performs the same clone call with the same named argument as the
       expression it replaces, with a setter guard that throws `ArgumentNullException` on null.
@@ -652,7 +652,7 @@ and use the plain initializer form that the existing item-controller seam uses.
       argument used at line 98 of `QuickFiler/Controllers/QfcQueue.Enqueue.cs` at the recorded
       anchor.
 
-- [ ] [P3-T5] In `QuickFiler/Controllers/QfcQueue.Enqueue.cs`, route the per-row construction at
+- [x] [P3-T5] In `QuickFiler/Controllers/QfcQueue.Enqueue.cs`, route the per-row construction at
       line 177 of the anchor through `ItemGroupFactory`, preserving the index expression exactly.
       **Acceptance:** `QuickFiler/Controllers/QfcQueue.Enqueue.cs` contains exactly one occurrence of
       the single-line token `ItemGroupFactory(` and zero occurrences of the token `AddAsync(`, and
@@ -664,14 +664,14 @@ and use the plain initializer form that the existing item-controller seam uses.
       re-wrapped by P3-T8 and this pre-format capture is not the evidence any acceptance criterion
       cites. The post-format form is captured by P3-T8.
 
-- [ ] [P3-T6] In `QuickFiler/Controllers/QfcQueue.Enqueue.cs`, route the background template clone
+- [x] [P3-T6] In `QuickFiler/Controllers/QfcQueue.Enqueue.cs`, route the background template clone
       at lines 97 through 99 of the anchor through `BackgroundTlpFactory`, leaving the enclosing
       marshalling call unchanged. **Acceptance:** the file contains exactly one occurrence of the
       literal `BackgroundTlpFactory(_tlpTemplate)`, that call sits inside the same marshalling
       wrapper member as before, and the file contains zero occurrences of the clone call it
       replaced.
 
-- [ ] [P3-T7] Verify the separately promoted out-of-scope defect was not fixed and not disturbed.
+- [x] [P3-T7] Verify the separately promoted out-of-scope defect was not fixed and not disturbed.
       The running-jobs increment sits outside the try block whose finally decrements it, at lines 94
       and 103 of the anchor respectively. **Acceptance:** in
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` the line number of the sole increment of the
@@ -686,7 +686,7 @@ and use the plain initializer form that the existing item-controller seam uses.
       artifact p3-t7-out-of-scope-untouched.2026-09-12T10-25.md under the qa-gates evidence
       directory.
 
-- [ ] [P3-T8] Run CMD-FORMAT-SCOPED over the two code paths touched in this phase, capturing the
+- [x] [P3-T8] Run CMD-FORMAT-SCOPED over the two code paths touched in this phase, capturing the
       porcelain status immediately before and after, then CMD-CHECK-SCOPED over the same paths.
       **Acceptance:** both porcelain captures are recorded verbatim in artifact
       p3-t8-format.2026-09-12T10-25.md under the qa-gates evidence directory and CMD-CHECK-SCOPED
@@ -696,23 +696,23 @@ and use the plain initializer form that the existing item-controller seam uses.
       together with its measured column width. This is the form that AC5 evidence cites; the
       pre-format capture in the P3-T5 artifact is retained only to make the re-wrap auditable.
 
-- [ ] [P3-T9] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P3-T9] Run CMD-ANALYZE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p3-t9-analyze.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P3-T10] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
+- [x] [P3-T10] Run CMD-NULLABLE. **Acceptance:** EXIT_CODE 0, recorded in artifact
       p3-t10-nullable.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P3-T11] Run CMD-VSTEST followed by CMD-TRXCOUNTERS with a results directory named for this
+- [x] [P3-T11] Run CMD-VSTEST followed by CMD-TRXCOUNTERS with a results directory named for this
       task. **Acceptance:** EXIT_CODE 0, `failed=0`, and `total` equal to BASELINE_TEST_TOTAL.
       Recorded in artifact p3-t11-tests.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P3-T12] Measure with CMD-LINECOUNT the two code files touched in this phase and also
+- [x] [P3-T12] Measure with CMD-LINECOUNT the two code files touched in this phase and also
       `QuickFiler/Controllers/QfcQueue.cs`, `QuickFiler/Controllers/QfcQueue.UiIdle.cs` and
       `QuickFiler/Interfaces/IUiIdleDispatcher.cs`. **Acceptance:** each measured count is strictly
       less than 500 and each is recorded as a labelled numeric line in artifact
       p3-t12-line-counts.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P3-T13] Commit Phase 3 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
+- [x] [P3-T13] Commit Phase 3 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
       and every path it reports satisfies the Scope-lock rule.
 
 ---
