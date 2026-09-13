@@ -19,6 +19,7 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) · [Resumed child shares your worktree](resumed-child-orchestrator-shares-worktree.md)
 - [MCP tools available to orchestrator](mcp-tools-available-to-orchestrator.md) — run them yourself if a worker can't
 - [Run the real hook, not MCP](run-orchestration-hook-gates-locally.md) — the MCP validator disagrees on the bug route
+- [Preflight-cleared plan can still contradict a spec AC clause](preflight-cleared-plan-can-still-conflict-with-a-spec-acceptance-clause.md) — read each AC's "not a pass" sentence against the claiming task's decision rule before execution (#743 AC1 no-expiry)
 
 ## PR authoring and CI gate
 - [pr-author is a skill, not an agent](pr-author-hook-blocks-gh-in-this-repo.md) · [exact checkpoint schema](pr-author-hook-exact-checkpoint-schema.md) — agents must be a LIST; `relativeFile` required
