@@ -155,13 +155,16 @@ formatting so that no automated write-claim extractor reads an exclusion as a wr
   post-change Cobertura document that P2-T7 writes, so each file must still exist when its reader runs,
   and no task in this plan removes either one. Item 4 asks that a test invocation set an explicit
   results directory and an explicit log file name so that the default account-and-host TRX name is
-  never produced even transiently; every vstest span in this plan sets the results directory and none
-  sets a log file name, so the default name is produced under the git-ignored results directory. No TRX
-  file is committed, but where a Phase 2 restart leaves more than one TRX in a results directory,
-  P2-T14, P2-T15 and P2-T16 transcribe that file name into their committed artifacts, and the account
-  and host tokens it carries are a recorded residual of this delivery rather than a discharged
-  obligation. The prohibition that governs the repository contents is discharged in full: no TRX, no
-  MSBuild log and no raw coverage XML is committed.
+  never produced even transiently. Every vstest span in this plan sets both: an explicit
+  `/ResultsDirectory:` and an explicit log file name supplied inside a quoted
+  `/Logger:trx;LogFileName=` value that names the task which produced it. Item 4 is therefore
+  discharged. The default TRX name that vstest composes from the account name and the host name is
+  never produced, so no account or host token reaches a results directory and none can be transcribed
+  into a committed artifact by P2-T14, P2-T15 or P2-T16. Because each span names a fixed file, a
+  Phase 2 restart overwrites the TRX of the task it restarts rather than adding a second file to that
+  results directory; the most-recent-write selection rule those three tasks state is retained and is
+  inert while one file is present. The prohibition that governs the repository contents is discharged
+  in full as well: no TRX, no MSBuild log and no raw coverage XML is committed.
 - **D11 — AC5 is not verifiable by coverage.** The rebuild method in the subject-map orchestration
   partial carries the ExcludeFromCodeCoverage attribute. An excluded member emits no method element in
   the Cobertura report at all; it is absent rather than reported at zero, so no per-file coverage
@@ -359,7 +362,7 @@ must already exist on disk before it is run.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" /Logger:trx /ResultsDirectory:TestResults\vstest\p0-t8
+  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p0-t8-baseline-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p0-t8
   ```
 
   Acceptance: `EXIT_CODE: 0`, and the artifact carries `Timestamp:`, `Command:`, `Output Summary:`, a
@@ -374,7 +377,7 @@ must already exist on disk before it is run.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" /Logger:trx /ResultsDirectory:TestResults\vstest\p0-t9
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p0-t9-baseline-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p0-t9
   ```
 
   Acceptance: `EXIT_CODE: 0`, and the artifact carries the same field set as P0-T8, including a
@@ -661,7 +664,7 @@ is the first gate after it.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~Dispose_WhenPackageConstructedTheSource_ReleasesIt|FullyQualifiedName~Dispose_WhenCallerSuppliedTheSource_LeavesItUsable|FullyQualifiedName~Dispose_OnSpawnedChild_DoesNotReleaseTheParentsSource" /Logger:trx /ResultsDirectory:TestResults\vstest\p1-t15
+  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~Dispose_WhenPackageConstructedTheSource_ReleasesIt|FullyQualifiedName~Dispose_WhenCallerSuppliedTheSource_LeavesItUsable|FullyQualifiedName~Dispose_OnSpawnedChild_DoesNotReleaseTheParentsSource" "/Logger:trx;LogFileName=p1-t15-scoped-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p1-t15
   ```
 
   Acceptance: the artifact carries `Timestamp:`, `Command:` and `Output Summary:`; `EXIT_CODE: 0` and
@@ -676,7 +679,7 @@ is the first gate after it.
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCapReached_LogsScanCapBoundAndStopDecision|FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCeilingReached_LogsCeilingBoundNotScanCapBound" /Logger:trx /ResultsDirectory:TestResults\vstest\p1-t16
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCapReached_LogsScanCapBoundAndStopDecision|FullyQualifiedName~DequeueAsync_ZeroAcceptedAndCeilingReached_LogsCeilingBoundNotScanCapBound" "/Logger:trx;LogFileName=p1-t16-scoped-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p1-t16
   ```
 
   Acceptance: the artifact carries `Timestamp:`, `Command:` and `Output Summary:`; `EXIT_CODE: 0` and
@@ -792,7 +795,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" /Logger:trx /ResultsDirectory:TestResults\vstest\p2-t5
+  & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p2-t5-final-utilitiescs.trx" /ResultsDirectory:TestResults\vstest\p2-t5
   ```
 
   Acceptance: `EXIT_CODE: 0`, the printed success header reads `Test Run Successful.`, and the artifact
@@ -807,7 +810,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   ```
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest  = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" /Logger:trx /ResultsDirectory:TestResults\vstest\p2-t6
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/Logger:trx;LogFileName=p2-t6-final-quickfiler.trx" /ResultsDirectory:TestResults\vstest\p2-t6
   ```
 
   Acceptance: `EXIT_CODE: 0`, the printed success header reads `Test Run Successful.`, and the artifact
