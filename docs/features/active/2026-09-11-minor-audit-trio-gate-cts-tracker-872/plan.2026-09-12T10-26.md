@@ -948,15 +948,30 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   changed line numbers of that file, read from the plus-side hunk headers of the anchored unified diff
   with zero context, and for each one records either its hits value from the post-change line map or,
   where the line is absent from the line map, its text and a one-line statement of why it is
-  non-executable. The artifact must show a hits value greater than zero for the ownership assignment
-  line inside the tracker overload of InitializeAsync and for every line of the Dispose body; those are
-  the minimum floor and a zero hits value on any of them fails this task. The ownership assignment line
-  inside the pane overload is recorded with its observed hits value and is deliberately excluded from
-  the floor: the pane overload is reached only through CreateAsTuplePaneAsync, whose production call
-  sites all read the application-globals progress tracker and are host-bound, so no unit test executes
-  it. AC4 fixes the three new tests to the tracker overload and AC11 pins the UtilitiesCS executed-test
-  delta at exactly plus three, so a fourth test covering the pane overload is outside this delivery and
-  the uncovered line is a known residual rather than a gate failure. The diff is
+  non-executable. The artifact must show a hits value greater than zero for BOTH ownership assignment
+  lines, the one inside the tracker overload of InitializeAsync and the one inside the pane overload,
+  and for every line of the Dispose body; those are the minimum floor and a zero hits value on any of
+  them fails this task. An earlier revision of this task excluded the pane overload's assignment line
+  from the floor on the stated ground that no unit test executes that overload. That ground was an
+  inference and it is false against measurement, so the exclusion is withdrawn rather than carried
+  forward. The re-anchored P0-T11 baseline line map records every executable line of
+  `UtilitiesCS/Threading/ProgressPackage.cs` at a hits value of 1, including lines 39 through 45, which
+  are the pane overload body, and lines 76 through 80, which are CreateAsTuplePaneAsync. The inference
+  was wrong about the population rather than about the call sites: per D6 the coverage runner's
+  population is repository-wide and wider than the per-assembly runs, so the overload is reached even
+  though no test in `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` calls it and every production
+  call site is one of the host-bound consumers the Scope Boundary names. Withdrawing the exclusion also
+  removes a contradiction inside this task: the aggregate clause above demands a post-change ratio
+  greater than or equal to the baseline ratio, that baseline ratio is exactly 1, and a ratio of exactly
+  1 admits no uncovered line at all, so an exemption granted to a single line could never have been
+  honoured by the aggregate clause it sits beside. The floor and the aggregate clause now agree. The
+  assignment line is expected to be covered on a structural ground rather than an optimistic one: it is
+  a statement with no intervening branch between the already-covered statements at lines 40 and 44 of
+  the pre-change file, so it executes on every invocation on which they execute. AC4 fixes the three
+  new tests to the tracker overload and AC11 pins the UtilitiesCS executed-test delta at exactly plus
+  three, so no fourth test is added and none is needed for this line. If the measured hits value is
+  nevertheless zero, this task fails and the executor reports BLOCKED rather than recording the line as
+  a residual. The diff is
   anchored to the base commit recorded by P0-T2 rather than being left unanchored, because an
   unanchored diff compares the worktree against the index and would pass vacuously after a commit. The
   derivation matches P0-T11 exactly, including the de-duplicating helper and the merge-by-line-number
