@@ -711,7 +711,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       potential-bug entry for this defect is linked from the Rollout & Follow-up section of this
       document.
 
-- [x] AC22 — Untouched files stay untouched. The final diff contains no change to any file outside
+- [ ] AC22 — Untouched files stay untouched. The final diff contains no change to any file outside
       the Write Set. In particular the three existing QfcQueue test files in the QuickFiler test
       project's Controllers folder, the UtilitiesCS threading types, and the UtilitiesCS extension
       that performs the control clone are unmodified, and the full QuickFiler test suite passes with
