@@ -184,11 +184,11 @@ CMD-NULLABLE
 CMD-VSTEST  (scoped to the one test assembly; <RD> is a fresh subdirectory under the gitignored TestResults directory, named for the task id)
   $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
   $vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" /Logger:trx /ResultsDirectory:TestResults\<RD>
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" "/Logger:trx;LogFileName=vstest-run.trx" /ResultsDirectory:TestResults\<RD>
   $exit = $LASTEXITCODE
 
 CMD-VSTEST-CLASS  (the same, with the class filter appended instead)
-  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName~QfcQueueEnqueueTests" /Logger:trx /ResultsDirectory:TestResults\<RD>
+  & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName~QfcQueueEnqueueTests" "/Logger:trx;LogFileName=vstest-class-run.trx" /ResultsDirectory:TestResults\<RD>
 
 CMD-TRXCOUNTERS  (read the counters element of the newest trx under <RD>, sorted by LastWriteTime)
   $trx = Get-ChildItem TestResults\<RD> -Recurse -Filter *.trx | Sort-Object LastWriteTime | Select-Object -Last 1
