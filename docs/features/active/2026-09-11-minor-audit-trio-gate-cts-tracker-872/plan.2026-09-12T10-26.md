@@ -569,7 +569,7 @@ not compile until P1-T12 removes the item. Each Compile item is removed immediat
 it names is deleted, which is what confines the span to that single non-compiling state, and P1-T14
 is the first gate after it.
 
-- [ ] [P1-T1] Record the implementation handoff to the small-path C# implementation engineer persona
+- [x] [P1-T1] Record the implementation handoff to the small-path C# implementation engineer persona
   csharp-typed-engineer and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/other/implementation-handoff.md`.
   Acceptance: the artifact exists and carries `Timestamp:`, the engineer persona name, the eight Write
@@ -578,7 +578,7 @@ is the first gate after it.
   Write Set has been modified. Tests use MSTest, Moq and FluentAssertions; no test creates a temporary
   file, sleeps, waits on a wall clock or touches an external process.
 
-- [ ] [P1-T2] In `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.Part4.cs` add one
+- [x] [P1-T2] In `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.Part4.cs` add one
   test method named `DequeueAsync_ZeroAcceptedAndCapReached_LogsScanCapBoundAndStopDecision` that
   drives the gate to the item-cap bound with a debugLog delegate injected. It reuses the existing
   arrangement of the neighbouring cap test in the same file: a counting take delegate over a ten-item
@@ -600,7 +600,7 @@ is the first gate after it.
   is expected to pass immediately; Defect A is test-only and the production log line already emits
   every field asserted here. Evidence: this task adds no artifact of its own; P1-T16 is its run.
 
-- [ ] [P1-T3] In `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.Part4.cs` add one
+- [x] [P1-T3] In `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.Part4.cs` add one
   test method named `DequeueAsync_ZeroAcceptedAndCeilingReached_LogsCeilingBoundNotScanCapBound` that
   drives the gate to the time-ceiling bound with a debugLog delegate injected. It reuses the existing
   arrangement of the neighbouring ceiling test in the same file: a take delegate returning null, a
@@ -621,7 +621,7 @@ is the first gate after it.
   value would emit the item-cap token and would still satisfy a presence-only assertion. Evidence:
   this task adds no artifact of its own; P1-T16 is its run.
 
-- [ ] [P1-T4] In `UtilitiesCS/Threading/ProgressPackage.cs` add the ownership mechanism. Add a private
+- [x] [P1-T4] In `UtilitiesCS/Threading/ProgressPackage.cs` add the ownership mechanism. Add a private
   boolean field `_ownsCancelSource`. At each of the two construction sites inside the two
   InitializeAsync overloads, immediately alongside the null-coalescing construction of the
   cancellation token source, add the assignment `_ownsCancelSource = cancelSource is null;`. Change the
@@ -637,7 +637,7 @@ is the first gate after it.
   setter using an object initializer, so a setter that claimed ownership would make every child claim
   its parent's source. P2-T13 verifies both structurally.
 
-- [ ] [P1-T5] In `UtilitiesCS/Threading/ProgressPackage.cs` add an XML doc comment to each of the two
+- [x] [P1-T5] In `UtilitiesCS/Threading/ProgressPackage.cs` add an XML doc comment to each of the two
   static tuple factory methods stating that the cancellation token source in the returned tuple is
   transferred to the caller and that the caller owns its release. Acceptance: both static factory
   methods carry a summary element whose text states the transfer, and no executable statement in either
@@ -645,7 +645,7 @@ is the first gate after it.
   only in-Write-Set way to record it. This task adds no dispose call inside either factory: disposing
   there would release the source the factory is contractually returning.
 
-- [ ] [P1-T6] In `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` add one test method named
+- [x] [P1-T6] In `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` add one test method named
   `Dispose_WhenPackageConstructedTheSource_ReleasesIt`. It awaits the tracker overload of
   InitializeAsync with a null cancelSource argument, a non-null injected progressTracker argument
   constructed from a locally created source, and an explicit stopWatch argument, then captures the
@@ -657,7 +657,7 @@ is the first gate after it.
   is started, which is what keeps the test headless and deterministic. The probe is the token getter
   and never a timer or a finalizer.
 
-- [ ] [P1-T7] In `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` add one test method named
+- [x] [P1-T7] In `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` add one test method named
   `Dispose_WhenCallerSuppliedTheSource_LeavesItUsable`. It awaits the tracker overload of
   InitializeAsync with a caller-created cancelSource argument, a non-null injected progressTracker
   argument and an explicit stopWatch argument, then disposes the package. Acceptance: the test asserts
@@ -665,7 +665,7 @@ is the first gate after it.
   on that source sets IsCancellationRequested to true. A caller-supplied source belongs to that caller
   and must never be released by the package.
 
-- [ ] [P1-T8] In `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` add one test method named
+- [x] [P1-T8] In `UtilitiesCS.Test/Threading/ProgressPackage_Tests.cs` add one test method named
   `Dispose_OnSpawnedChild_DoesNotReleaseTheParentsSource`. It awaits the tracker overload of
   InitializeAsync with a null cancelSource argument, a non-null injected progressTracker argument and
   an explicit stopWatch argument so that the parent constructs and owns a source, spawns a child, and
@@ -674,7 +674,7 @@ is the first gate after it.
   that received the reference through the property setter owns nothing and its disposal is a no-op on
   the source.
 
-- [ ] [P1-T9] In `UtilitiesCS/EmailIntelligence/SubjectMap/SubjectMapSco.Orchestration.cs` convert the
+- [x] [P1-T9] In `UtilitiesCS/EmailIntelligence/SubjectMap/SubjectMapSco.Orchestration.cs` convert the
   local cancellation token source construction inside the rebuild method from a plain local declaration
   to a using declaration, so that the line reads
   `using var tokenSource = new CancellationTokenSource();`. Acceptance: the change is a one-line
@@ -688,20 +688,20 @@ is the first gate after it.
   would silently make its cancel button inert. P2-T12 verifies the ordering structurally. Per D11 this
   criterion carries no test obligation and no coverage obligation.
 
-- [ ] [P1-T10] In `UtilitiesCS/UtilitiesCS.csproj` remove the single Compile item naming the dormant
+- [x] [P1-T10] In `UtilitiesCS/UtilitiesCS.csproj` remove the single Compile item naming the dormant
   tracker source. The line to remove is the single-line self-closing element at line 971 whose text is
   `<Compile Include="Threading\ProgressTrackerAsync.cs" />` with four leading spaces. Acceptance:
   exactly one line is removed, the count of lines matching the literal `<Compile Include=` in that file
   falls by exactly one relative to the P0-T12 baseline, and the two neighbouring Compile items at the
   former line 970 and line 972 are unchanged. No other Compile item may be dropped.
 
-- [ ] [P1-T11] Delete `UtilitiesCS/Threading/ProgressTrackerAsync.cs` from the working tree.
+- [x] [P1-T11] Delete `UtilitiesCS/Threading/ProgressTrackerAsync.cs` from the working tree.
   Acceptance: the path does not exist on disk after the task. The type has no construction site outside
   its own declaration file and the test file deleted by P1-T13; the only other occurrence in the tree
   is prose inside a code tag in an XML doc comment in the ProgressTracker report-and-viewer test file,
   which is not a compile-time dependency, and there is no cref-form reference to the type anywhere.
 
-- [ ] [P1-T12] In `UtilitiesCS.Test/UtilitiesCS.Test.csproj` remove the single Compile item naming the
+- [x] [P1-T12] In `UtilitiesCS.Test/UtilitiesCS.Test.csproj` remove the single Compile item naming the
   dormant tracker's test source. The line to remove is the single-line self-closing element at line 499
   whose text is `<Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />` with four leading
   spaces. The line number is 499 and not 496 because the mandated reconciliation that merged the main
@@ -712,11 +712,11 @@ is the first gate after it.
   `<Compile Include=` in that file falls by exactly one relative to the P0-T12 baseline, and the two
   neighbouring Compile items at the former line 498 and line 500 are unchanged.
 
-- [ ] [P1-T13] Delete `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` from the working tree.
+- [x] [P1-T13] Delete `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` from the working tree.
   Acceptance: the path does not exist on disk after the task. Its removal takes with it the nine test
   methods pinned by P0-T13 and one class-level parallelization attribute scoped to that class alone.
 
-- [ ] [P1-T14] Run a progress rebuild of the solution to confirm the tree compiles after the three
+- [x] [P1-T14] Run a progress rebuild of the solution to confirm the tree compiles after the three
   defect groups, and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/other/p1-t14-interim-build.md`.
 
@@ -732,7 +732,7 @@ is the first gate after it.
   found here rather than after the Phase 2 loop has begun. It also produces the assemblies that P1-T15
   and P1-T16 require, because vstest.console.exe never compiles.
 
-- [ ] [P1-T15] Run the three new disposal tests in the UtilitiesCS test assembly and write
+- [x] [P1-T15] Run the three new disposal tests in the UtilitiesCS test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/regression-testing/p1-t15-utilitiescs-scoped.md`.
 
   ```
@@ -747,7 +747,7 @@ is the first gate after it.
   without an obvious error, so the total is asserted explicitly. Filter clauses are joined with the
   vertical bar because this version of the test platform rejects the word OR inside a test case filter.
 
-- [ ] [P1-T16] Run the two new log-assertion tests in the QuickFiler test assembly and write
+- [x] [P1-T16] Run the two new log-assertion tests in the QuickFiler test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/regression-testing/p1-t16-quickfiler-scoped.md`.
 
   ```
@@ -760,7 +760,7 @@ is the first gate after it.
   the artifact records `TotalTests: 2` and `Passed: 2`. A run whose
   total is anything other than 2 is a failure and not a pass.
 
-- [ ] [P1-T17] Record the fail-before exception for Defect B and write
+- [x] [P1-T17] Record the fail-before exception for Defect B and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/regression-testing/fail-before-exception.2026-09-12T10-26.md`.
   Acceptance: the artifact carries `Timestamp:`, a `WhyFailingRunImpossible:` field of one to three
   sentences stating that the three AC4 tests call a Dispose method that does not exist on the progress
