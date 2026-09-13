@@ -227,6 +227,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QfcViewer_Test.cs" />
     <Compile Include="SetupAssemblyInitializer.cs" />
+    <Compile Include="..\TestSupport\TestAssemblyResolver.cs">
+      <Link>TestSupport\TestAssemblyResolver.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
