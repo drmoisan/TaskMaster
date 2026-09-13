@@ -69,3 +69,37 @@ Medium: no incorrect production behavior. Two members on the high-confidence dis
 
 - [x] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
+
+## Outcome (2026-09-13)
+
+Six injectable seams were added to the QfcQueue enqueue path. Each retains its previous construction
+expression as its production default, so production behaviour is unchanged:
+
+| Seam | Member | Production default |
+|---|---|---|
+| S1 | `MoveMonitor` | the per-owner move-monitor instance the existing field initializer builds |
+| S2 | `UiIdleDispatcher` | a lazily constructed `UiThreadIdleDispatcher` |
+| S3 | `ItemViewerFactory` | the static dequeue method group of the item-viewer queue helper |
+| S4 | `ViewerRowPlacer` | the `AddViewerToTlp` method group |
+| S5 | `ItemGroupFactory` | the `AddAsync` method group |
+| S6 | `BackgroundTlpFactory` | a lambda performing the same reflection-driven clone with the same named argument |
+
+Files added. Two new production partial parts of the queue class,
+`QuickFiler/Controllers/QfcQueue.Tlp.cs` and `QuickFiler/Controllers/QfcQueue.UiIdle.cs`, produced by the
+split the 500-line ceiling required: the base part stood at 507 lines before any seam was added, and now
+measures 269. One new interface file, `QuickFiler/Interfaces/IUiIdleDispatcher.cs`, declaring the narrow
+three-member UI-idle dispatcher abstraction that seam S2 substitutes. Two new test files forming one
+partial test class, `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` and
+`QuickFiler.Test/Controllers/QfcQueueEnqueueTests.Harness.cs`, contributing 28 headless regression cases.
+The whole test assembly passes at 1423 of 1423 with `failed=0`, against a baseline of 1395. All seven
+files measure under the 500-line ceiling after the final format.
+
+Coverage. The post-change measurement is recorded in
+p5-t5-coverage-postchange.2026-09-12T10-25.md under the qa-gates evidence directory. The enqueue part
+rose from a line rate of 0.152941 to 1, and the combined base, Tlp and UiIdle parts from 0.496795 to
+0.540299. New-code line coverage is 0.958333, above the 90 percent floor. Every region still reported at
+zero hits, and the reason each remains uncovered, is recorded in
+residual-uncovered-regions.2026-09-12T10-25.md under the regression-testing evidence directory.
+
+The separately promoted job-counter defect was neither fixed nor disturbed, and is now linked from the
+spec's Rollout and Follow-up section.

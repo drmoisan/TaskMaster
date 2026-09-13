@@ -1059,7 +1059,7 @@ recorded as skipped.
 Every task in this phase writes Markdown only. No source, test or project file is modified here, so
 the clean toolchain pass recorded in Phase 5 remains valid through the end of the plan.
 
-- [ ] [P6-T1] Compare the file-level line rates. **Acceptance:** artifact
+- [x] [P6-T1] Compare the file-level line rates. **Acceptance:** artifact
       p6-t1-coverage-file-rates.2026-09-12T10-25.md under the qa-gates evidence directory records,
       as labelled numeric lines: the spec's recorded pre-change rate of 0.152941 for
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs`; the rate P0-T12 measured for that file; the rate
@@ -1074,7 +1074,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       post-change combined rate is not below either 0.503205 or the P0-T12 measurement for the
       pre-split file. A failure of either clause is reported, not waived.
 
-- [ ] [P6-T2] Derive new-code coverage. **Acceptance:** artifact
+- [x] [P6-T2] Derive new-code coverage. **Acceptance:** artifact
       p6-t2-new-code-coverage.2026-09-12T10-25.md under the qa-gates evidence directory carries a
       line-by-line table derived by this procedure, which a third party re-running it obtains the
       same table from. Run an anchored, rename-disabled, zero-context diff of the five production
@@ -1097,7 +1097,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       excluded from measurement; no coverage-exclusion attribute and no assembly-level exclusion is
       introduced anywhere in this change.
 
-- [ ] [P6-T3] Write the residual-region record
+- [x] [P6-T3] Write the residual-region record
       residual-uncovered-regions.2026-09-12T10-25.md into
       `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/evidence/regression-testing/`.
       **Acceptance:** the record names every region on the enqueue path still reported at zero hits
@@ -1114,7 +1114,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` or in `AddAsync` still reported at zero hits.
       Leaving a zero-hit region out of this record is a failure of this task.
 
-- [ ] [P6-T4] Project repository-wide line coverage. A repository-wide measurement cannot be taken
+- [x] [P6-T4] Project repository-wide line coverage. A repository-wide measurement cannot be taken
       on this host, because a whole-solution run stalls on four shell-icon test classes in another
       assembly; the projection below is therefore the instrument. **Acceptance:** artifact
       p6-t4-repo-wide-projection.2026-09-12T10-25.md under the qa-gates evidence directory records:
@@ -1143,7 +1143,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       this plan because the tier manifest those rule files refer to does not exist at the repository
       root.
 
-- [ ] [P6-T5] Write the no-behaviour-change diff review
+- [x] [P6-T5] Write the no-behaviour-change diff review
       p6-t5-diff-review.2026-09-12T10-25.md into the qa-gates evidence directory. **Acceptance:**
       the artifact records the output of an anchored diff of
       `QuickFiler/Controllers/QfcQueue.cs`, `QuickFiler/Controllers/QfcQueue.Enqueue.cs`,
@@ -1164,7 +1164,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       `QuickFiler/Controllers/QfcQueue.cs` and line 105 of
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` are byte-identical to the anchor.
 
-- [ ] [P6-T6] Write the untouched-files record p6-t6-scope-lock.2026-09-12T10-25.md into the
+- [x] [P6-T6] Write the untouched-files record p6-t6-scope-lock.2026-09-12T10-25.md into the
       qa-gates evidence directory. **Acceptance:** the artifact records the full output of CMD-DIFF
       and states, for every path it reports, which clause of the Scope-lock rule admits it; it
       records explicitly that the three existing QfcQueue test files in the QuickFiler test
@@ -1179,7 +1179,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       Write Set that the P5-T1 line does not name, that disagreement is a failure of this task and
       is reported rather than reconciled to `NONE`.
 
-- [ ] [P6-T7] Add the link to the separately promoted out-of-scope defect into the Rollout and
+- [x] [P6-T7] Add the link to the separately promoted out-of-scope defect into the Rollout and
       Follow-up section of
       `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/spec.md`.
       The target is the potential-bug entry captured on 2026-09-12 for the enqueue running-jobs
@@ -1190,7 +1190,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       link whose target resolves to an existing file, verified by a path-existence check recorded in
       artifact p6-t7-followup-link.2026-09-12T10-25.md under the qa-gates evidence directory.
 
-- [ ] [P6-T8] Record the two carried-forward obligations that this item's completion enables but
+- [x] [P6-T8] Record the two carried-forward obligations that this item's completion enables but
       does not itself discharge, in artifact p6-t8-carried-obligations.2026-09-12T10-25.md under the
       qa-gates evidence directory. **Acceptance:** the artifact names the item 678 acceptance
       criterion AC20 and the issue 727 sub-finding 4, states that both are recorded in an archived
@@ -1200,7 +1200,7 @@ the clean toolchain pass recorded in Phase 5 remains valid through the end of th
       records that the out-of-scope counter-leak defect already holds a potential-bug entry in the
       potential features directory, so no new entry is filed by this plan.
 
-- [ ] [P6-T9] Update
+- [x] [P6-T9] Update
       `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/issue.md`
       with an outcome note naming the six seams, the two new production partial files, the new
       interface file and the two new test files, and pointing at the P5-T5 coverage artifact and the
@@ -1217,83 +1217,83 @@ records that AC's evidence pointer beside the check-off in the completion record
 checked off only when the named evidence exists on disk and its acceptance condition is met.
 Markdown only; no code file is touched.
 
-- [ ] [P7-T1] Check off AC1 in the spec. **Acceptance:** the AC1 checkbox reads checked and the
+- [x] [P7-T1] Check off AC1 in the spec. **Acceptance:** the AC1 checkbox reads checked and the
       completion record cites the P2-T1 artifact, the P4-T4 artifact and the P2-T9 artifact.
 
-- [ ] [P7-T2] Check off AC2 in the spec. **Acceptance:** the AC2 checkbox reads checked and the
+- [x] [P7-T2] Check off AC2 in the spec. **Acceptance:** the AC2 checkbox reads checked and the
       completion record cites the P2-T3 acceptance, the P2-T5 acceptance, the P4-T18 artifact and
       the P6-T5 diff review.
 
-- [ ] [P7-T3] Check off AC3 in the spec. **Acceptance:** the AC3 checkbox reads checked and the
+- [x] [P7-T3] Check off AC3 in the spec. **Acceptance:** the AC3 checkbox reads checked and the
       completion record cites the P3-T1 acceptance, the P4-T6 artifact and the P4-T17 artifact.
 
-- [ ] [P7-T4] Check off AC4 in the spec. **Acceptance:** the AC4 checkbox reads checked and the
+- [x] [P7-T4] Check off AC4 in the spec. **Acceptance:** the AC4 checkbox reads checked and the
       completion record cites the P3-T2 acceptance, the P4-T4 artifact and the P4-T17 artifact.
 
-- [ ] [P7-T5] Check off AC5 in the spec. **Acceptance:** the AC5 checkbox reads checked and the
+- [x] [P7-T5] Check off AC5 in the spec. **Acceptance:** the AC5 checkbox reads checked and the
       completion record cites the P3-T3 acceptance, the P3-T5 acceptance, the `PostFormatStatement:`
       line of the P3-T8 artifact, the P4-T4 artifact and the P4-T16 artifact.
 
-- [ ] [P7-T6] Check off AC6 in the spec. **Acceptance:** the AC6 checkbox reads checked and the
+- [x] [P7-T6] Check off AC6 in the spec. **Acceptance:** the AC6 checkbox reads checked and the
       completion record cites the P3-T4 acceptance, the P3-T6 acceptance and the P4-T19 artifact.
 
-- [ ] [P7-T7] Check off AC7 in the spec. **Acceptance:** the AC7 checkbox reads checked and the
+- [x] [P7-T7] Check off AC7 in the spec. **Acceptance:** the AC7 checkbox reads checked and the
       completion record cites the P4-T4 artifact and the P4-T5 artifact.
 
-- [ ] [P7-T8] Check off AC8 in the spec. **Acceptance:** the AC8 checkbox reads checked and the
+- [x] [P7-T8] Check off AC8 in the spec. **Acceptance:** the AC8 checkbox reads checked and the
       completion record cites the P5-T6 artifact, which carries the seven post-format measured line
       counts; no predicted figure is cited.
 
-- [ ] [P7-T9] Check off AC9 in the spec. **Acceptance:** the AC9 checkbox reads checked and the
+- [x] [P7-T9] Check off AC9 in the spec. **Acceptance:** the AC9 checkbox reads checked and the
       completion record cites the P1-T3 acceptance, the P2-T4 acceptance, the P4-T2 acceptance, the
       P4-T3 analyzer-build artifact as the positive verification of the three production entries,
       the P4-T4 artifact as the positive verification of the two test-project entries, and the
       P4-T5 artifact as the positive reference from a test to a type declared in each new
       production file.
 
-- [ ] [P7-T10] Check off AC10 in the spec. **Acceptance:** the AC10 checkbox reads checked and the
+- [x] [P7-T10] Check off AC10 in the spec. **Acceptance:** the AC10 checkbox reads checked and the
       completion record cites the P4-T7 artifact.
 
-- [ ] [P7-T11] Check off AC11 in the spec. **Acceptance:** the AC11 checkbox reads checked and the
+- [x] [P7-T11] Check off AC11 in the spec. **Acceptance:** the AC11 checkbox reads checked and the
       completion record cites the P4-T8 artifact.
 
-- [ ] [P7-T12] Check off AC12 in the spec. **Acceptance:** the AC12 checkbox reads checked and the
+- [x] [P7-T12] Check off AC12 in the spec. **Acceptance:** the AC12 checkbox reads checked and the
       completion record cites the P4-T10 artifact.
 
-- [ ] [P7-T13] Check off AC13 in the spec. **Acceptance:** the AC13 checkbox reads checked and the
+- [x] [P7-T13] Check off AC13 in the spec. **Acceptance:** the AC13 checkbox reads checked and the
       completion record cites the P4-T9 artifact, the P4-T8 artifact and the P4-T10 artifact.
 
-- [ ] [P7-T14] Check off AC14 in the spec. **Acceptance:** the AC14 checkbox reads checked and the
+- [x] [P7-T14] Check off AC14 in the spec. **Acceptance:** the AC14 checkbox reads checked and the
       completion record cites the P4-T11 artifact.
 
-- [ ] [P7-T15] Check off AC15 in the spec. **Acceptance:** the AC15 checkbox reads checked and the
+- [x] [P7-T15] Check off AC15 in the spec. **Acceptance:** the AC15 checkbox reads checked and the
       completion record cites the P4-T12 artifact.
 
-- [ ] [P7-T16] Check off AC16 in the spec. **Acceptance:** the AC16 checkbox reads checked and the
+- [x] [P7-T16] Check off AC16 in the spec. **Acceptance:** the AC16 checkbox reads checked and the
       completion record cites the P4-T13 artifact, the P4-T14 artifact and the P4-T15 artifact.
 
-- [ ] [P7-T17] Check off AC17 in the spec. **Acceptance:** the AC17 checkbox reads checked and the
+- [x] [P7-T17] Check off AC17 in the spec. **Acceptance:** the AC17 checkbox reads checked and the
       completion record cites the P4-T17 artifact.
 
-- [ ] [P7-T18] Check off AC18 in the spec. **Acceptance:** the AC18 checkbox reads checked and the
+- [x] [P7-T18] Check off AC18 in the spec. **Acceptance:** the AC18 checkbox reads checked and the
       completion record cites the P6-T5 diff review and the P5-T8 loop result.
 
-- [ ] [P7-T19] Check off AC19 in the spec. **Acceptance:** the AC19 checkbox reads checked and the
+- [x] [P7-T19] Check off AC19 in the spec. **Acceptance:** the AC19 checkbox reads checked and the
       completion record cites the P0-T12 baseline Cobertura artifact, the P5-T5 post-change
       Cobertura artifact, the P6-T1 file-rate comparison, the P6-T2 new-code derivation and the
       P6-T4 repository-wide projection, and names both Cobertura artifacts by file name.
 
-- [ ] [P7-T20] Check off AC20 in the spec. **Acceptance:** the AC20 checkbox reads checked and the
+- [x] [P7-T20] Check off AC20 in the spec. **Acceptance:** the AC20 checkbox reads checked and the
       completion record cites the P6-T3 residual record.
 
-- [ ] [P7-T21] Check off AC21 in the spec. **Acceptance:** the AC21 checkbox reads checked and the
+- [x] [P7-T21] Check off AC21 in the spec. **Acceptance:** the AC21 checkbox reads checked and the
       completion record cites the P3-T7 artifact, the P6-T7 follow-up link and an explicit statement
       that no test in either `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` or
       `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.Harness.cs` asserts the counter-leak
       behaviour as correct, supported by the P4-T10 task text which confines both throws to the
       substituted item-group factory inside the try block.
 
-- [ ] [P7-T22] Check off AC22 in the spec. **Acceptance:** the
+- [x] [P7-T22] Check off AC22 in the spec. **Acceptance:** the
       `FormatterRepairedPreExistingDrift:` line in the P6-T6 record reads `NONE`, and the AC22
       checkbox reads checked, and the completion record cites the P6-T6 scope-lock record and the
       P5-T7 full-assembly test result. When that line is not `NONE`, AC22 is not checked off: the
@@ -1302,13 +1302,13 @@ Markdown only; no code file is touched.
       which is a conflict between two repository rules that this item cannot resolve and must
       escalate rather than waive.
 
-- [ ] [P7-T23] Write the completion record
+- [x] [P7-T23] Write the completion record
       p7-t23-completion-record.2026-09-12T10-25.md into the qa-gates evidence directory, carrying
       one row per acceptance criterion with its evidence pointers as recorded by P7-T1 through
       P7-T22. **Acceptance:** the record carries exactly 22 rows, one per criterion, with no
       criterion absent and none duplicated.
 
-- [ ] [P7-T24] Reconcile the spec against the evidence on disk. **Acceptance:** every one of the 22
+- [x] [P7-T24] Reconcile the spec against the evidence on disk. **Acceptance:** every one of the 22
       checkboxes in the spec's `## Acceptance Criteria` section reads checked, with one admitted
       exception: AC22 reads unchecked when, and only when, P7-T22 recorded the escalation branch
       because the `FormatterRepairedPreExistingDrift:` line in the P6-T6 record is not `NONE`. In

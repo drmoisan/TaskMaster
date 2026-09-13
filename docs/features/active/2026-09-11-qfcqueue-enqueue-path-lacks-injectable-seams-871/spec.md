@@ -547,7 +547,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       methods in the QuickFiler test project that reflect on the field name continuing to pass
       unmodified.
 
-- [ ] AC2 — S2 UI idle dispatcher seam and interface. `QuickFiler/Interfaces/IUiIdleDispatcher.cs`
+- [x] AC2 — S2 UI idle dispatcher seam and interface. `QuickFiler/Interfaces/IUiIdleDispatcher.cs`
       declares an `internal` interface with exactly the members `InvokeIdleAsync(Action)`,
       `InvokeIdleAsync<T>(Func<T>)` and `InvokeIdleAsync<T>(Func<Task<T>>)`. Its production adapter,
       declared in `QuickFiler/Controllers/QfcQueue.UiIdle.cs`, reproduces the three current bodies
@@ -602,7 +602,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       still performs no read of the static WPF dispatcher and no Outlook COM call, verified by a named
       test that constructs a queue in the headless test host and asserts no exception is thrown.
 
-- [ ] AC8 — File-size ceiling. After the change, the measured physical line count of every production
+- [x] AC8 — File-size ceiling. After the change, the measured physical line count of every production
       file in the Write Set is strictly under 500:
       `QuickFiler/Controllers/QfcQueue.cs` (507 before the change),
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` (200 before the change),
@@ -668,7 +668,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       criterion exists because a coarse seam alone would relocate the uncovered region into `AddAsync`
       rather than close it.
 
-- [ ] AC18 — No behaviour change on the success path. A reviewer-checkable diff of
+- [x] AC18 — No behaviour change on the success path. A reviewer-checkable diff of
       `QuickFiler/Controllers/QfcQueue.cs`, `QuickFiler/Controllers/QfcQueue.Enqueue.cs`,
       `QuickFiler/Controllers/QfcQueue.Tlp.cs` and `QuickFiler/Controllers/QfcQueue.UiIdle.cs` shows
       that: every relocated member moved verbatim apart from the named seam substitutions; no
@@ -679,7 +679,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       resigned. The full toolchain passes in a single pass in the order format, analyzers, nullable
       type-check, test, with the logs captured under the evidence qa-gates directory.
 
-- [ ] AC19 — Coverage floors met and improvement measured. New code reaches >= 90% line coverage and
+- [x] AC19 — Coverage floors met and improvement measured. New code reaches >= 90% line coverage and
       repository-wide line coverage remains >= 80%, per CLAUDE.md. The measured file-level line rate
       for `QuickFiler/Controllers/QfcQueue.Enqueue.cs` is strictly greater than the recorded baseline
       of 0.152941, and the combined rate for `QuickFiler/Controllers/QfcQueue.cs`,
@@ -691,7 +691,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       quality-tiers rule file are recorded here as a known divergence and are not the governing
       figures for this item.
 
-- [ ] AC20 — Residual unreachable regions recorded explicitly. A document committed under
+- [x] AC20 — Residual unreachable regions recorded explicitly. A document committed under
       `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/evidence/regression-testing/`
       names every region on the enqueue path that remains uncovered after this change, states why, and
       cites the post-change Cobertura artifact for each. At minimum it must address: the reflection
@@ -701,7 +701,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` still reported at zero hits. Silently leaving a
       region uncovered without an entry in that document fails this criterion.
 
-- [ ] AC21 — Out-of-scope defect untouched and not codified. The running-jobs counter increment in
+- [x] AC21 — Out-of-scope defect untouched and not codified. The running-jobs counter increment in
       `QuickFiler/Controllers/QfcQueue.Enqueue.cs` remains outside the `try` block whose `finally`
       decrements it, exactly as it is today; the diff shows no change to that control flow. No test in
       either `QuickFiler.Test/Controllers/QfcQueueEnqueueTests.cs` or
@@ -711,7 +711,7 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
       potential-bug entry for this defect is linked from the Rollout & Follow-up section of this
       document.
 
-- [ ] AC22 — Untouched files stay untouched. The final diff contains no change to any file outside
+- [x] AC22 — Untouched files stay untouched. The final diff contains no change to any file outside
       the Write Set. In particular the three existing QfcQueue test files in the QuickFiler test
       project's Controllers folder, the UtilitiesCS threading types, and the UtilitiesCS extension
       that performs the control clone are unmodified, and the full QuickFiler test suite passes with
@@ -771,4 +771,6 @@ vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCove
   the move-monitor per-owner invariant issues #731 and #620; the dispatcher synchronization-context
   hazard issues #781 and #784, which this item neither introduces nor mitigates because every
   production default is preserved; the research artifact in this feature folder's research directory,
-  which is authoritative over the issue document wherever the two disagree.
+  which is authoritative over the issue document wherever the two disagree; and the separately promoted
+  job-counter defect, whose potential-bug entry is
+  [2026-09-12-qfcqueue-enqueueasync-jobsrunning-counter-leak.md](../../potential/2026-09-12-qfcqueue-enqueueasync-jobsrunning-counter-leak.md).
