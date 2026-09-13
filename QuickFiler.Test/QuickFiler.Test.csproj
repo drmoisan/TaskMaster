@@ -118,6 +118,8 @@
     <Compile Include="Controllers\QfcFormControllerUndoHandoffTests.cs" />
     <Compile Include="Controllers\QfcQueueCoverageExpansionTests.cs" />
     <Compile Include="Controllers\QfcQueuePurePathsTests.cs" />
+    <Compile Include="Controllers\QfcQueueEnqueueTests.cs" />
+    <Compile Include="Controllers\QfcQueueEnqueueTests.Harness.cs" />
     <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />
