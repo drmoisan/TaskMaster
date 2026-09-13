@@ -32,6 +32,16 @@ The observable is whether any acquisition of the one-permit `TransactionGate` (t
 
 The declaration's item (e) is also restated verbatim: The mechanism names UiThreadDispatcherGate and SwapUiThreadDispatcher are invalid: correction C1 of spec.md records that both exist in zero .cs files in this tree.
 
+CITATION NOTE (added 2026-09-13, after merging `main` at e6d86049e). The line numbers in the verbatim restatement above are PRE-INSTRUMENTATION and no longer resolve. They were correct when the P0-T11 declaration was authored and were shifted by this item's own P1 instrumentation, which inserted the three monotonic counters into the same file. They were NOT shifted by the merge: the merge changed no file this artifact cites. The restatement is left exactly as declared, because the in-advance declaration is the record of what was declared in advance and must not be rewritten after the fact. The current locations, re-derived against the merged tree on 2026-09-13, are:
+
+| Element | Cited above (pre-instrumentation) | Current line(s) in `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs` |
+|---|---|---|
+| `SemaphoreSlim(1, 1)` declaration of `TransactionGate` | 32 | 32 (unchanged) |
+| `ReleaseTransactionGate` | 88-91 | declared at 107; releases the permit at 110 |
+| `BeginTransactionAsync` | 122-126 | declared at 142; awaits `TransactionGate.WaitAsync()` at 149 |
+
+Line 32 is unchanged and is the citation that matters for correction C2 of `spec.md`: `TransactionGate` is still `new SemaphoreSlim(1, 1)`, and line 149 confirms it is still awaited with no timeout argument and no `CancellationToken` overload. Both were re-verified against the merged tree.
+
 ## (ii) Measured counter triples
 
 | Regime | Exact command | Load condition | acquisitions | releases | contended | Balance test |
