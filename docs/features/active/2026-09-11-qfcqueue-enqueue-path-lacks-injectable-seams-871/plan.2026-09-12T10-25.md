@@ -1321,7 +1321,7 @@ Markdown only; no code file is touched.
       whose named evidence is absent is a reconciliation failure and must be un-checked, not
       explained.
 
-- [ ] [P7-T25] Commit the Phase 6 and Phase 7 documents and evidence with a single-line message.
+- [x] [P7-T25] Commit the Phase 6 and Phase 7 documents and evidence with a single-line message.
       **Acceptance:** CMD-DIFF is run afterwards, every path it reports satisfies the Scope-lock
       rule, and the porcelain output contains no line naming a path under the three canonical
       evidence directories, proving that every artifact written after the Phase 5 commit has itself
