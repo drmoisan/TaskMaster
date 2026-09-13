@@ -601,7 +601,7 @@ auto-property would rename the backing field to a compiler-generated name and fa
       labelled numeric line in artifact p2-t10-line-counts.2026-09-12T10-25.md under the qa-gates
       evidence directory.
 
-- [ ] [P2-T11] Commit Phase 2 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
+- [x] [P2-T11] Commit Phase 2 with a single-line message. **Acceptance:** CMD-DIFF is run afterwards
       and every path it reports satisfies the Scope-lock rule.
 
 ---
