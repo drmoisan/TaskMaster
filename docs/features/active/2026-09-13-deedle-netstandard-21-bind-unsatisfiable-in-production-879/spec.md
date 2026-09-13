@@ -546,7 +546,7 @@ harness measures the resolver, not the redirect. `AppDomain.Unload` runs in `[Te
       `Thread.Sleep`, `Task.Delay` or a wall-clock wait.
 - [ ] Line coverage for `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` is `>= 90%`, read from the
       Cobertura artifact produced by the final coverage run and recorded under the feature folder's
-      `evidence/coverage/` directory.
+      `evidence/qa-gates/` directory.
 - [ ] A full four-step toolchain pass completes with no failures and no auto-fixes in the final pass,
       using the exact commands listed in Test Strategy, with console logs captured under the feature
       folder's `evidence/qa-gates/` directory. The analyzer and nullable logs must each show zero
