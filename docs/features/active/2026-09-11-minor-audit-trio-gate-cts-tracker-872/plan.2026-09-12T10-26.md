@@ -132,12 +132,36 @@ formatting so that no automated write-claim extractor reads an exclusion as a wr
   high-worker coverage runs and is tracked as issue #780. If that test and only that test fails, the
   executor re-runs the same command once, records both runs in the same artifact, and takes the
   acceptance on the second run. Any other failing test is a real failure and restarts the Phase 2 loop.
-- **D10 — Transient log files are written to a git-ignored directory.** MSBuild file logs and vstest
+- **D10 — Transient tool output is written to a git-ignored directory.** MSBuild file logs and vstest
   TRX files carry absolute host paths. Writing them under the feature folder would commit host paths
   into the repository and would require a sanitisation pass. They are therefore written under the
   repository-root TestResults directory, whose name matches a git-ignore directory class, and the
-  acceptance-bearing values are transcribed into the canonical evidence artifact. No TRX and no MSBuild
-  log is committed.
+  acceptance-bearing values are transcribed into the canonical evidence artifact. The raw Cobertura
+  coverage XML produced by P0-T10 and P2-T7 is routed to the same directory for a second reason: the
+  maintainer decision recorded on issue 671 on 2026-09-11 moved this repository to projection-only
+  coverage evidence, effective immediately, under which no new raw Cobertura XML and no new TRX file is
+  added to git. Item 1 of that decision names the committed projection as the package-level JaCoCo XML
+  used by item #646 together with the one-line first-party summary emitted by the first-party coverage
+  report helper, and item 2 names a passed, failed, skipped and total count summary in place of a TRX.
+  The two transient coverage paths are `TestResults/coverage/coverage-baseline.cobertura.xml` and
+  `TestResults/coverage/coverage-postchange.cobertura.xml`; both resolve to the git-ignore pattern
+  `[Tt]est[Rr]esult*/` on line 39 of `.gitignore`. This plan does not conform to that decision in full,
+  and the gaps are stated here so that a reviewer does not read the citation above as full conformance.
+  Of the two projection forms item 1 names, this plan commits only the one-line first-party summary,
+  which P0-T10 and P2-T7 transcribe into their Markdown step artifacts; it commits no package-level
+  JaCoCo XML, and producing that projection is not part of this delivery. Item 3 asks that raw output
+  be discarded once its projection is written rather than retained under a git-ignored path, and this
+  plan retains it: P0-T11 reads the baseline Cobertura document that P0-T10 writes and P2-T9 reads the
+  post-change Cobertura document that P2-T7 writes, so each file must still exist when its reader runs,
+  and no task in this plan removes either one. Item 4 asks that a test invocation set an explicit
+  results directory and an explicit log file name so that the default account-and-host TRX name is
+  never produced even transiently; every vstest span in this plan sets the results directory and none
+  sets a log file name, so the default name is produced under the git-ignored results directory. No TRX
+  file is committed, but where a Phase 2 restart leaves more than one TRX in a results directory,
+  P2-T14, P2-T15 and P2-T16 transcribe that file name into their committed artifacts, and the account
+  and host tokens it carries are a recorded residual of this delivery rather than a discharged
+  obligation. The prohibition that governs the repository contents is discharged in full: no TRX, no
+  MSBuild log and no raw coverage XML is committed.
 - **D11 — AC5 is not verifiable by coverage.** The rebuild method in the subject-map orchestration
   partial carries the ExcludeFromCodeCoverage attribute. An excluded member emits no method element in
   the Cobertura report at all; it is absent rather than reported at zero, so no per-file coverage
@@ -356,16 +380,25 @@ must already exist on disk before it is run.
   Acceptance: `EXIT_CODE: 0`, and the artifact carries the same field set as P0-T8, including a
   `TotalTests:` line. This value is the AC11 baseline for the QuickFiler test assembly.
 
-- [ ] [P0-T10] Capture the repository-wide coverage baseline in Cobertura format, writing the XML to
-  `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/coverage-baseline.cobertura.xml`
-  and the step artifact to
+- [ ] [P0-T10] Capture the repository-wide coverage baseline in Cobertura format, writing the raw XML
+  to the transient git-ignored path `TestResults/coverage/coverage-baseline.cobertura.xml` and the step
+  artifact to
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/coverage-baseline.md`.
+  Per D10 the raw XML is transient tool output written outside the tracked tree and is never committed.
+  It is read by P0-T11 and must therefore still exist on disk when P0-T11 runs. No task in this plan
+  removes it and the executor does not remove it: it stays in the git-ignored directory for the
+  remainder of the run, exactly as the MSBuild file logs and the vstest TRX files already do.
 
   ```
-  pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/coverage-baseline.cobertura.xml
+  pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput TestResults/coverage/coverage-baseline.cobertura.xml
+  pwsh -Command '"TransientXml: " + (Test-Path -LiteralPath "TestResults/coverage/coverage-baseline.cobertura.xml" -PathType Leaf); "FeatureFolderXml: " + @(Get-ChildItem -LiteralPath "docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872" -Recurse -File -Filter "coverage-baseline.cobertura.xml").Count'
   ```
 
-  Acceptance: `EXIT_CODE: 0`, the Cobertura XML exists, and the artifact carries `Timestamp:`,
+  Acceptance: `EXIT_CODE: 0` on the runner; the second span prints `TransientXml: True`, asserting that
+  the transient XML exists at the ignored path, and `FeatureFolderXml: 0`, asserting that no file named
+  `coverage-baseline.cobertura.xml` exists anywhere under the feature folder (the second span is a
+  filesystem name enumeration by the PowerShell `-Filter` wildcard, not a text search, so no regex
+  engine is involved); and the artifact carries `Timestamp:`,
   `Command:`, `Output Summary:` and numeric `LineRate:`, `LinesCovered:`, `LinesValid:`, `BranchRate:`,
   `BranchesCovered:`, `BranchesValid:` and `TestsPassed:` lines, all read from the root coverage element
   of the emitted XML and from the run's printed totals. The success-case output prints a line beginning
@@ -381,7 +414,7 @@ must already exist on disk before it is run.
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/coverage-baseline-progresspackage.md`.
 
   ```
-  pwsh -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; [xml]$x = Get-Content -Raw "docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/coverage-baseline.cobertura.xml"; $c = @($x.SelectNodes("//class") | Where-Object { $_.GetAttribute("filename") -like "*Threading\ProgressPackage.cs" }); "ClassElements: " + $c.Count; foreach ($n in $c) { $s = Get-CoberturaClassLineSummary -ClassNode $n; "LineRateAttribute: " + $n.GetAttribute("line-rate"); "TotalLines: " + $s.TotalLines; "CoveredLines: " + $s.CoveredLines }'
+  pwsh -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; [xml]$x = Get-Content -Raw "TestResults/coverage/coverage-baseline.cobertura.xml"; $c = @($x.SelectNodes("//class") | Where-Object { $_.GetAttribute("filename") -like "*Threading\ProgressPackage.cs" }); "ClassElements: " + $c.Count; foreach ($n in $c) { $s = Get-CoberturaClassLineSummary -ClassNode $n; "LineRateAttribute: " + $n.GetAttribute("line-rate"); "TotalLines: " + $s.TotalLines; "CoveredLines: " + $s.CoveredLines }'
   ```
 
   Acceptance: `EXIT_CODE: 0`, and the artifact carries `Timestamp:`, `Command:`, `Output Summary:`, a
@@ -781,16 +814,24 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   records `TotalTests:` and `Passed:` with the two values equal, plus `Failed: 0` and `Skipped: 0`
   transcribed per D8. The filter string is byte-identical to the P0-T9 filter string.
 
-- [ ] [P2-T7] Capture post-change coverage in Cobertura format, writing the XML to
-  `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/coverage-postchange.cobertura.xml`
-  and the step artifact to
+- [ ] [P2-T7] Capture post-change coverage in Cobertura format, writing the raw XML to the transient
+  git-ignored path `TestResults/coverage/coverage-postchange.cobertura.xml` and the step artifact to
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/qc-coverage-postchange.md`.
+  Per D10 the raw XML is transient tool output written outside the tracked tree and is never committed.
+  It is read by P2-T9 and must therefore still exist on disk when P2-T9 runs. No task in this plan
+  removes it and the executor does not remove it: it stays in the git-ignored directory for the
+  remainder of the run, exactly as the MSBuild file logs and the vstest TRX files already do.
 
   ```
-  pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/coverage-postchange.cobertura.xml
+  pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput TestResults/coverage/coverage-postchange.cobertura.xml
+  pwsh -Command '"TransientXml: " + (Test-Path -LiteralPath "TestResults/coverage/coverage-postchange.cobertura.xml" -PathType Leaf); "FeatureFolderXml: " + @(Get-ChildItem -LiteralPath "docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872" -Recurse -File -Filter "coverage-postchange.cobertura.xml").Count'
   ```
 
-  Acceptance: `EXIT_CODE: 0`, the Cobertura XML exists, and the artifact carries numeric `LineRate:`,
+  Acceptance: `EXIT_CODE: 0` on the runner; the second span prints `TransientXml: True`, asserting that
+  the transient XML exists at the ignored path, and `FeatureFolderXml: 0`, asserting that no file named
+  `coverage-postchange.cobertura.xml` exists anywhere under the feature folder (a filesystem name
+  enumeration by the PowerShell `-Filter` wildcard, not a text search, so no regex engine is involved);
+  and the artifact carries numeric `LineRate:`,
   `LinesCovered:`, `LinesValid:`, `BranchRate:`, `BranchesCovered:`, `BranchesValid:` and
   `TestsPassed:` lines read from the root coverage element and the run's printed totals, quoting the
   line beginning `First-party coverage: ` and the line beginning `Done. Coverage artifact: `. The
@@ -821,7 +862,7 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   ```
   $b = ((Select-String -Path 'docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/base-commit.md' -Pattern 'BaseCommit: ' -SimpleMatch | Select-Object -First 1).Line -split ' ')[-1]
   git diff -U0 $b -- UtilitiesCS/Threading/ProgressPackage.cs
-  pwsh -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; [xml]$x = Get-Content -Raw "docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/qa-gates/coverage-postchange.cobertura.xml"; $c = @($x.SelectNodes("//class") | Where-Object { $_.GetAttribute("filename") -like "*Threading\ProgressPackage.cs" }); "ClassElements: " + $c.Count; foreach ($n in $c) { $s = Get-CoberturaClassLineSummary -ClassNode $n; "LineRateAttribute: " + $n.GetAttribute("line-rate"); "TotalLines: " + $s.TotalLines; "CoveredLines: " + $s.CoveredLines; foreach ($k in ($s.LineMap.Keys | Sort-Object)) { "Line " + $k + " hits " + $s.LineMap[$k].Hits } }'
+  pwsh -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; [xml]$x = Get-Content -Raw "TestResults/coverage/coverage-postchange.cobertura.xml"; $c = @($x.SelectNodes("//class") | Where-Object { $_.GetAttribute("filename") -like "*Threading\ProgressPackage.cs" }); "ClassElements: " + $c.Count; foreach ($n in $c) { $s = Get-CoberturaClassLineSummary -ClassNode $n; "LineRateAttribute: " + $n.GetAttribute("line-rate"); "TotalLines: " + $s.TotalLines; "CoveredLines: " + $s.CoveredLines; foreach ($k in ($s.LineMap.Keys | Sort-Object)) { "Line " + $k + " hits " + $s.LineMap[$k].Hits } }'
   ```
 
   Acceptance for AC12: the artifact records `BaselineCoveredLines:`, `BaselineTotalLines:`,
@@ -1119,8 +1160,8 @@ unconditional: none carries an in-scope or out-of-scope branch and none has a sk
   necessarily written after this span runs and no commit inside this plan can capture it. The staging
   span includes the plan file so that the check-off of P2-T32 is committed here.
   This task exists as a separate commit because an artifact written after the first commit would
-  otherwise leave the terminal state as a worktree with an uncommitted evidence file. No TRX and no
-  MSBuild log is committed by either commit task, per D10.
+  otherwise leave the terminal state as a worktree with an uncommitted evidence file. No TRX, no
+  MSBuild log and no raw coverage XML is committed by either commit task, per D10.
 
 ---
 
