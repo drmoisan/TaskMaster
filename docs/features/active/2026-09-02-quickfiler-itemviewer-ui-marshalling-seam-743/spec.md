@@ -410,7 +410,7 @@ Per the maintainer decision on issue #671 dated 2026-09-11, this item commits **
 
 Five criteria, consolidated from #592 and restated so each is falsifiable. All five must be satisfied.
 
-- [ ] **AC1 — Mechanism identified by measurement, not inference.** An evidence artifact under this
+- [x] **AC1 — Mechanism identified by measurement, not inference.** An evidence artifact under this
   feature folder's evidence/baseline directory names which of the two candidate mechanisms defined in section 4.2 —
   H-COST (raw elapsed fixture cost) or H-LEAK (a leaked or late-released `TransactionGate` permit) — is
   operative, and does so from a direct instrumented observation. The artifact PASSES only if it contains
@@ -424,7 +424,7 @@ Five criteria, consolidated from #592 and restated so each is falsifiable. All f
   agreement with both hypotheses. If the instrumented run produces no expiry at all, that is a recorded
   negative result, not a pass.
 
-- [ ] **AC2 — Deterministic regression test, no sleep, no retry, no timing tolerance.** A named test,
+- [x] **AC2 — Deterministic regression test, no sleep, no retry, no timing tolerance.** A named test,
   cited as file path plus test-method name, reproduces the mechanism identified under AC1. It PASSES
   only if all four hold: (i) it fails on the pre-change tree and passes on the post-change tree, in each
   of 3 consecutive pre-change runs and 3 consecutive post-change runs on the same machine in the same
@@ -435,7 +435,7 @@ Five criteria, consolidated from #592 and restated so each is falsifiable. All f
   time-valued construct in the test is a single `[Timeout(...)]` attribute serving as a deadlock bound;
   and (iv) the test asserts a structural property, not an elapsed duration.
 
-- [ ] **AC3 — Efficacy demonstrated, with the run-count scope named.** Two components, of which the
+- [x] **AC3 — Efficacy demonstrated, with the run-count scope named.** Two components, of which the
   first is blocking.
   **(a) BLOCKING, deterministic, single run.** The member named in AC2 completes when driven with the
   synchronous `IUiDispatcher` double and **no** `WinFormsPumpHost`, and constructs zero instances of the
@@ -455,7 +455,7 @@ Five criteria, consolidated from #592 and restated so each is falsifiable. All f
   also record that the 4.8 % base rate is a point estimate from a single observed failure, with exact
   95 % interval approximately [0.0012, 0.2382].
 
-- [ ] **AC4 — Coverage of the two named controller partials retained or improved, against a named
+- [x] **AC4 — Coverage of the two named controller partials retained or improved, against a named
   denominator and named tests.** The subject files are `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`
   and the Initialization controller partial at QuickFiler/Controllers/QfcItemController.Initialization.cs,
   which is measured but not edited by this item. PASSES only if all five hold: (i) a **fresh** pre-change
@@ -475,7 +475,7 @@ Five criteria, consolidated from #592 and restated so each is falsifiable. All f
   `ItemViewer` coverage, which is unmeasurable: its type-level exclusion at line 20 of
   `QuickFiler/Viewers/ItemViewer.cs` means the type emits no Cobertura element at all.
 
-- [ ] **AC5 — #511 and #571 reconciled.** This is predominantly a verification plus a forward-pointer
+- [x] **AC5 — #511 and #571 reconciled.** This is predominantly a verification plus a forward-pointer
   update; the existing closing comments are **not** wrong and must not be described as such. PASSES only
   if all three hold: (i) an artifact under this feature folder's evidence/issue-updates directory
   records, quoting each,
