@@ -65,6 +65,8 @@
 - [A session may have NO Agent tool](orchestrator-session-may-lack-agent-tool.md) — block, never implement the plan yourself
 - [PowerShell batch budget caps plan helper scripts](powershell-batch-budget-caps-plan-helper-scripts.md) · [tracked + carries stale paths](powershell-batch-budget-is-tracked-and-carries-stale-paths.md) — put throwaway helpers in the session scratchpad
 - [Get-PlanPaths truncates spaced paths](get-planpaths-truncates-paths-containing-spaces.md)
+- [pwsh starts in the SESSION worktree, not yours](pwsh-starts-in-session-worktree-not-yours.md) — sibling has its own .sln; unqualified msbuild builds the wrong checkout, green and meaningless
+- [Applying a delta is itself a defect source](delta-application-is-itself-a-defect-source.md) — 16/7/2/0 on #877; budget a scoped round to review your OWN application
 
 ## Coverage
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) · [lines-covered is nondeterministic](coverage-lines-covered-is-nondeterministic.md) · [#457 coverage moved UP](project_457_coverage_moved_up_not_down.md)
