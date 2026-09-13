@@ -205,6 +205,32 @@ formatting so that no automated write-claim extractor reads an exclusion as a wr
   because the runner resolves the runsettings path internally and exposes no override parameter; D7
   governs a non-terminating run there and the caller owns the residual.
 
+- **D15 — Phase 0 is re-anchored against the second main merge, and every baseline figure is
+  re-measured rather than carried forward.** The blocker that halted this plan at P0-T10 was diagnosed
+  and fixed on the main branch as issue #877, merged as pull request #880. That fix moved the body of
+  the UtilitiesCS test project's assembly initializer into a new shared source file under the
+  repository-root TestSupport directory and referenced it from both test projects, so it changed the
+  test project file this plan declares in its Write Set, changed a UtilitiesCS test source file, and
+  changed how assemblies resolve for every test in both projects. Three consequences follow and each is
+  handled explicitly rather than assumed away. First, the Compile-item and line-number citations this
+  plan pinned describe a superseded tree; they are corrected in P0-T12, P0-T13 and P1-T12 above, and
+  the correction is a measurement of the post-merge tree rather than an adjustment of the old figure by
+  an assumed delta. Second, every Phase 0 baseline that measures the tree or runs the toolchain is
+  re-run against the post-merge tree, so P0-T2 through P0-T14 are unchecked and re-executed and their
+  artifacts are overwritten with post-merge values. P0-T1 is not re-run: it records which policy
+  documents were read in which order, no policy document changed in the merge, and its artifact
+  therefore still describes the current tree. Third, the executed-test counts this plan previously
+  recorded are superseded: the P0-T8 UtilitiesCS figure of 4903 was measured before the fix and is not
+  the AC11 baseline. The re-run figure is, whatever it turns out to be. The AC11 delta arithmetic is
+  unaffected by the shift, because that arithmetic compares a Phase 2 figure against a Phase 0 figure
+  measured on the same tree and asserts their difference, not either absolute value. Likewise the AC12
+  per-file coverage baseline recorded by P0-T11 is re-derived from the post-merge coverage document
+  that the re-run P0-T10 produces, and is not reused: AC12 demands a post-change ratio greater than or
+  equal to the baseline ratio with no tolerance, so a baseline measured against a superseded tree is
+  not a like-for-like comparand. A failure observed in the re-run that was not observed before the
+  merge is reported to the caller as a possible consequence of that fix and is neither worked around
+  locally nor absorbed into this delivery.
+
 ## Command Reference
 
 These forms are pinned once and referenced by the task bodies. A span in this preamble is not itself an
@@ -291,7 +317,7 @@ must already exist on disk before it is run.
   Acceptance: the artifact exists and carries `Timestamp:`, a `Policy Order:` line, and an explicit
   bulleted list naming all seven files read, in the order above.
 
-- [x] [P0-T2] Record the base commit anchor into
+- [ ] [P0-T2] Record the base commit anchor into
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/base-commit.md`.
 
   ```
@@ -305,7 +331,7 @@ must already exist on disk before it is run.
   porcelain result is recorded rather than suppressed, and any pre-existing modification to a Write Set
   path is a BLOCKED condition reported to the caller.
 
-- [x] [P0-T3] Restore the pinned dotnet tool manifest and write
+- [ ] [P0-T3] Restore the pinned dotnet tool manifest and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/dotnet-tool-restore.md`.
 
   ```
@@ -318,7 +344,7 @@ must already exist on disk before it is run.
   The exit code alone is not the observation, because the command exits 0 whether or not it installed
   anything.
 
-- [x] [P0-T4] Restore NuGet packages for the packages.config projects and write
+- [ ] [P0-T4] Restore NuGet packages for the packages.config projects and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/restore.md`.
 
   ```
@@ -330,7 +356,7 @@ must already exist on disk before it is run.
   disk after the run, plus the installed package count printed by NuGet. An unbootstrapped worktree
   produces CS0006 reference errors in the later rebuild gates, so this task must complete before P0-T6.
 
-- [x] [P0-T5] Capture the CSharpier baseline in read-only check mode and write
+- [ ] [P0-T5] Capture the CSharpier baseline in read-only check mode and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/csharpier-check.md`.
 
   ```
@@ -345,7 +371,7 @@ must already exist on disk before it is run.
   tree that P0-T14 evaluates. The check subcommand is read-only and does not repair drift, which is
   why it and not the format subcommand is used for the baseline.
 
-- [x] [P0-T6] Capture the analyzer rebuild baseline and write
+- [ ] [P0-T6] Capture the analyzer rebuild baseline and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/build-analyzers.md`.
 
   ```
@@ -365,7 +391,7 @@ must already exist on disk before it is run.
   from a build whose CoreCompile was skipped as up to date, and the exit code cannot distinguish them.
   Per D10 the detailed log stays in the git-ignored TestResults directory and is not committed.
 
-- [x] [P0-T7] Capture the nullable rebuild baseline and write
+- [ ] [P0-T7] Capture the nullable rebuild baseline and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/build-nullable.md`.
 
   ```
@@ -378,7 +404,7 @@ must already exist on disk before it is run.
   `WarningCount:` line and an `ErrorCount:` line read by the same start-anchored match as P0-T6, and
   the same two non-vacuity log observations. Per D3 the command line contains no Nullable property.
 
-- [x] [P0-T8] Capture the baseline executed-test count for the UtilitiesCS test assembly and write
+- [ ] [P0-T8] Capture the baseline executed-test count for the UtilitiesCS test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/tests-utilitiescs.md`.
 
   ```
@@ -393,7 +419,7 @@ must already exist on disk before it is run.
   artifact also records that the printed success header reads `Test Run Successful.` and that the
   passed count equals the total count. This `TotalTests:` value is the AC11 baseline for this assembly.
 
-- [x] [P0-T9] Capture the baseline executed-test count for the QuickFiler test assembly and write
+- [ ] [P0-T9] Capture the baseline executed-test count for the QuickFiler test assembly and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/tests-quickfiler.md`.
 
   ```
@@ -434,7 +460,7 @@ must already exist on disk before it is run.
   resolving a named field. Placeholder values are prohibited. Per D7, if the run has not terminated
   within ten minutes, halt, record the observed state and report BLOCKED.
 
-- [x] [P0-T11] Derive the per-file coverage baseline for `UtilitiesCS/Threading/ProgressPackage.cs` and
+- [ ] [P0-T11] Derive the per-file coverage baseline for `UtilitiesCS/Threading/ProgressPackage.cs` and
   write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/coverage-baseline-progresspackage.md`.
 
@@ -452,7 +478,7 @@ must already exist on disk before it is run.
   hits value, and the merge is stated even when the class-element count is one. This is the AC12
   baseline and it is captured before any Phase 1 edit, so it describes the pre-change file.
 
-- [x] [P0-T12] Capture the Compile-item count baseline for the two project files and write
+- [ ] [P0-T12] Capture the Compile-item count baseline for the two project files and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/compile-item-counts.md`.
 
   ```
@@ -462,19 +488,29 @@ must already exist on disk before it is run.
   Acceptance: `EXIT_CODE: 0`, and the artifact records four numbers under the field names
   `UtilitiesCsIncludeCount:`, `UtilitiesCsElementCount:`, `UtilitiesCsTestIncludeCount:` and
   `UtilitiesCsTestElementCount:`. The expected baseline is 492 for both counts on
-  `UtilitiesCS/UtilitiesCS.csproj` and 477 for both counts on
-  `UtilitiesCS.Test/UtilitiesCS.Test.csproj`. These two expectations were 491 and 476 when this plan
-  was authored and were each raised by one when the mandated reconciliation merged the current main
-  branch into this item's branch: that merge added exactly one Compile item to each of the two project
-  files. The research artifact under this feature folder still records 491 and 476, which is correct as
-  a measurement of the tree at its own timestamp and is deliberately not rewritten; the figures above
-  are the operative ones. If an observed number differs from the expected value,
+  `UtilitiesCS/UtilitiesCS.csproj` and 478 for both counts on
+  `UtilitiesCS.Test/UtilitiesCS.Test.csproj`. These two expectations have been reconciled twice against
+  a merge of the current main branch into this item's branch, and each reconciliation is recorded here
+  so that a reviewer can tell a stale figure from a corrected one. They were 491 and 476 when this plan
+  was authored. The first mandated reconciliation raised each by one, because that merge added exactly
+  one Compile item to each of the two project files, giving 492 and 477. The second mandated
+  reconciliation, which merged the main branch carrying the fix for issue #877, raised only the test
+  project figure by one, from 477 to 478: that fix added the Compile item naming the shared assembly
+  resolver source under the repository-root TestSupport directory to the test project alone and added
+  no item to `UtilitiesCS/UtilitiesCS.csproj`, which therefore stays at 492. The research artifact
+  under this feature folder still records 491 and 476, which is correct as a measurement of the tree at
+  its own timestamp and is deliberately not rewritten; the figures above are the operative ones. If an
+  observed number differs from the expected value,
   the observed number is recorded as the operative baseline and the divergence is reported to the
-  caller before Phase 1 begins. The two patterns agreeing establishes that every Compile element uses
-  the Include attribute and that no Update or Remove form exists, so a single attribute-form count is a
-  sound basis for the AC7 comparison.
+  caller before Phase 1 begins. The two patterns agreeing establishes that no Update or Remove form
+  exists, so a single attribute-form count is a sound basis for the AC7 comparison. Agreement no longer
+  establishes that every Compile element is self-closing, and that weaker reading is recorded here so
+  that a reviewer does not draw the stronger one: the resolver item the #877 fix added is a multi-line
+  element carrying a Link child and a separate closing tag, and its closing tag is not counted by
+  either pattern because the closing-tag text does not contain the opening-tag literal. The two counts
+  therefore still agree at 478 while one of the 478 elements is not self-closing.
 
-- [x] [P0-T13] Pin the source facts the later comparisons depend on and write
+- [ ] [P0-T13] Pin the source facts the later comparisons depend on and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/pinned-source-facts.md`.
 
   ```
@@ -497,13 +533,20 @@ must already exist on disk before it is run.
   quotes the two Compile lines to be removed verbatim, each with four leading spaces and in the
   single-line self-closing form: the line at `UtilitiesCS/UtilitiesCS.csproj` line 971 reads
   `<Compile Include="Threading\ProgressTrackerAsync.cs" />` and the line at
-  `UtilitiesCS.Test/UtilitiesCS.Test.csproj` line 496 reads
+  `UtilitiesCS.Test/UtilitiesCS.Test.csproj` line 499 reads
   `<Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />`. It also records the neighbours that
-  must not be touched: line 970 and line 972 of the first file, and line 495 and line 497 of the
-  second. A divergence between an observed value and an expected value is recorded and reported before
-  Phase 1 begins.
+  must not be touched: line 970 and line 972 of the first file, and line 498 and line 500 of the
+  second. The second file's citation was line 496 with neighbours 495 and 497 before the mandated
+  reconciliation that merged the main branch carrying the fix for issue #877. That fix inserted a
+  three-line Compile element for the shared assembly resolver source higher in the same item group, so
+  every Compile item below it shifted down by exactly three lines and the citation moved from 496 to
+  499. The first file is unchanged by that fix and its citation stays at 971. The executor does not
+  rely on either line number alone: it locates the item by its quoted text and confirms the line number
+  matches before removing it, because a line number is invalidated by any edit above it and the quoted
+  text is not. A divergence between an observed value and an expected value is recorded and reported
+  before Phase 1 begins.
 
-- [x] [P0-T14] Evaluate the Phase 0 halt gate and write
+- [ ] [P0-T14] Evaluate the Phase 0 halt gate and write
   `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/evidence/baseline/phase0-gate.md`.
   Acceptance: the artifact tabulates the recorded `EXIT_CODE:` of P0-T5, P0-T6, P0-T7, P0-T8, P0-T9 and
   P0-T10 and states, per row, whether it is zero. If every row is zero the artifact records
@@ -659,11 +702,15 @@ is the first gate after it.
   which is not a compile-time dependency, and there is no cref-form reference to the type anywhere.
 
 - [ ] [P1-T12] In `UtilitiesCS.Test/UtilitiesCS.Test.csproj` remove the single Compile item naming the
-  dormant tracker's test source. The line to remove is the single-line self-closing element at line 496
+  dormant tracker's test source. The line to remove is the single-line self-closing element at line 499
   whose text is `<Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />` with four leading
-  spaces. Acceptance: exactly one line is removed, the count of lines matching the literal
+  spaces. The line number is 499 and not 496 because the mandated reconciliation that merged the main
+  branch carrying the fix for issue #877 inserted a three-line Compile element higher in the same item
+  group; the quoted text is unchanged by that insertion and is the authoritative locator, so the
+  executor matches on the text and confirms the line number rather than removing line 499 blind.
+  Acceptance: exactly one line is removed, the count of lines matching the literal
   `<Compile Include=` in that file falls by exactly one relative to the P0-T12 baseline, and the two
-  neighbouring Compile items at the former line 495 and line 497 are unchanged.
+  neighbouring Compile items at the former line 498 and line 500 are unchanged.
 
 - [ ] [P1-T13] Delete `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` from the working tree.
   Acceptance: the path does not exist on disk after the task. Its removal takes with it the nine test
