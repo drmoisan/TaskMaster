@@ -282,21 +282,21 @@ expression embodies.
 
 ## Acceptance Criteria
 
-- [ ] AC1: The recorded maintainer decision (retain the Contains guard, correct the offset
+- [x] AC1: The recorded maintainer decision (retain the Contains guard, correct the offset
   arithmetic) is reflected in the implementation; the branch-one guard text is unchanged and
   no StartsWith call is introduced in `QuickFiler/Controllers/KaStringAsync.cs`.
-- [ ] AC2: KaStringAsync's KeyEquals branch-one derives its Update argument from the match
+- [x] AC2: KaStringAsync's KeyEquals branch-one derives its Update argument from the match
   position via Key.IndexOf(other), so the character passed to Update is the last character of
   the matched span for a non-prefix match as well as for a prefix match.
-- [ ] AC3: A regression test in `QuickFiler.Test/Controllers/KaStringAsyncTests.cs` covers the
+- [x] AC3: A regression test in `QuickFiler.Test/Controllers/KaStringAsyncTests.cs` covers the
   two-digit-width non-prefix case described in the Regression Case section above, with a
   non-null Update, and asserts that the received argument equals the corrected value stated
   there.
-- [ ] AC4: The pre-existing prefix-case behavior is preserved: for a Key equal to "abc" and an
+- [x] AC4: The pre-existing prefix-case behavior is preserved: for a Key equal to "abc" and an
   other equal to "ab", Update still receives "b".
-- [ ] AC5: The pinned keyboard-matching test in the QuickFiler.Test KbdActionsTests file passes
+- [x] AC5: The pinned keyboard-matching test in the QuickFiler.Test KbdActionsTests file passes
   unchanged, and that file is not modified by this change.
-- [ ] AC6: The full C# toolchain passes in order: CSharpier check, the analyzer rebuild, the
+- [x] AC6: The full C# toolchain passes in order: CSharpier check, the analyzer rebuild, the
   nullable rebuild, and the MSTest run.
 
 ## Write Set

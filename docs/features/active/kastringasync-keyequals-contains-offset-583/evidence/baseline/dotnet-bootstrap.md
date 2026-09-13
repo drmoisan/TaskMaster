@@ -11,7 +11,7 @@ task ran). Fallback provisioner scripts/vscode/Install-RepoDotNetSdk.ps1 was run
 - Output: "Downloading .NET SDK 8.0.205 from
   https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.205/dotnet-sdk-8.0.205-win-x64.zip...",
   "Installed repo-local .NET SDK 8.0.205 to
-  C:\Users\DanMoisan\repos\TaskMaster-wt\bugs-2026-09-11-item-583\.dotnet-sdk."
+  <repo-root>\.dotnet-sdk."
 - Resolved dotnet executable: .dotnet-sdk/dotnet.exe (repo-relative), version switch confirms
   8.0.205.
 - EXIT_CODE: 0

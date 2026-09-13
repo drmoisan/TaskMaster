@@ -365,7 +365,7 @@ file.
   CoreCompile" count of exactly 0, matching the recorded shape at
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/baseline/msbuild-nullable.2026-08-22T09-23.md.
 
-- [ ] [P5-T5] Run a coverage-instrumented test capture of the whole QuickFiler.Test.dll assembly,
+- [x] [P5-T5] Run a coverage-instrumented test capture of the whole QuickFiler.Test.dll assembly,
   identical in form to P0-T8. The coverage tool still writes its Cobertura-format output, but to a
   transient file in a session-specific folder beneath the operating system's per-user temporary
   directory, resolved at run time from the runtime's temporary-path lookup, never to any path
@@ -409,7 +409,7 @@ file.
   a labelled boolean with neither operand path, the existence check as a boolean, and the directory
   listing as entry names only.
 
-- [ ] [P5-T6] Run the same scoped, non-instrumented vstest filter used at P0-T9 (selecting every
+- [x] [P5-T6] Run the same scoped, non-instrumented vstest filter used at P0-T9 (selecting every
   test whose fully qualified name contains the pinned KbdActions test class name, against the
   QuickFiler.Test build output assembly, with InIsolation and the TaskMaster CLI runsettings file)
   after the fix, and compare its Passed count against the P0-T9 baseline, without ever diffing the
@@ -420,7 +420,7 @@ file.
   identical to the P0-T9 baseline with 0 Failed and a delta of 0 — this is the AC5 evidence,
   obtained solely from the test-run outcome and never from a diff of the pinned file.
 
-- [ ] [P5-T7] Compute the coverage delta from the two markdown evidence artifacts
+- [x] [P5-T7] Compute the coverage delta from the two markdown evidence artifacts
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/baseline/coverage-baseline.md`
   (P0-T8) and
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/coverage-postchange.md`
@@ -461,55 +461,55 @@ file.
   docs/features/archive/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/coverage-delta.2026-08-22T10-40.md
   with the per-line hit source being the recorded projections rather than a raw document.
 
-- [ ] [P5-T8] Check off AC1 in
+- [x] [P5-T8] Check off AC1 in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md`'s Acceptance Criteria
   section ("The recorded maintainer decision ... is reflected in the implementation ...") by
   changing its unchecked box to a checked box, citing P2-T1's diff (guard text unchanged, no
   StartsWith introduced) as the verifying evidence.
   Acceptance: only that one checkbox line changes in the file; no criterion text is altered.
 
-- [ ] [P5-T9] Check off AC2 in
+- [x] [P5-T9] Check off AC2 in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md`'s Acceptance Criteria
   section ("KaStringAsync's KeyEquals branch-one derives its Update argument from the match
   position via Key.IndexOf(other) ...") by changing its unchecked box to a checked box, citing
   P2-T1's diff and P4-T1's green run as the verifying evidence.
   Acceptance: only that one checkbox line changes in the file; no criterion text is altered.
 
-- [ ] [P5-T10] Check off AC3 in
+- [x] [P5-T10] Check off AC3 in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md`'s Acceptance Criteria
   section ("A regression test in QuickFiler.Test/Controllers/KaStringAsyncTests.cs covers the
   two-digit-width non-prefix case ...") by changing its unchecked box to a checked box, citing
   P1-T1 (test added) and P4-T1 (passes post-fix) as the verifying evidence.
   Acceptance: only that one checkbox line changes in the file; no criterion text is altered.
 
-- [ ] [P5-T11] Check off AC4 in
+- [x] [P5-T11] Check off AC4 in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md`'s Acceptance Criteria
   section ("The pre-existing prefix-case behavior is preserved ...") by changing its unchecked box
   to a checked box, citing P3-T1's reword (asserted value unchanged) and P4-T1's green run as the
   verifying evidence.
   Acceptance: only that one checkbox line changes in the file; no criterion text is altered.
 
-- [ ] [P5-T12] Check off AC5 in
+- [x] [P5-T12] Check off AC5 in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md`'s Acceptance Criteria
   section ("The pinned keyboard-matching test in the QuickFiler.Test KbdActionsTests file passes
   unchanged, and that file is not modified ...") by changing its unchecked box to a checked box,
   citing P0-T9 and P5-T6's matching Passed counts (0 delta) as the verifying evidence.
   Acceptance: only that one checkbox line changes in the file; no criterion text is altered.
 
-- [ ] [P5-T13] Check off AC6 in
+- [x] [P5-T13] Check off AC6 in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md`'s Acceptance Criteria
   section ("The full C# toolchain passes in order ...") by changing its unchecked box to a checked
   box, citing P5-T1 through P5-T7's four gate artifacts as the verifying evidence.
   Acceptance: only that one checkbox line changes in the file; no criterion text is altered.
 
-- [ ] [P5-T14] Verify all six acceptance criteria in
+- [x] [P5-T14] Verify all six acceptance criteria in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/spec.md` are checked, and
   report the AC Status Summary (Source, Total AC items, Checked off, Remaining, Items remaining)
   per the acceptance-criteria-tracking skill in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/ac-status-summary.md`.
   Acceptance: the artifact reports Total AC items 6, Checked off 6, Remaining 0.
 
-- [ ] [P5-T15] Attest, in
+- [x] [P5-T15] Attest, in
   `docs/features/active/kastringasync-keyequals-contains-offset-583/evidence/qa-gates/final-qc-pass-attestation.md`,
   that P5-T1 through P5-T7 each recorded an exit code of 0 (or, for P5-T1, a measured rewrite count
   of 0), by running an anchored name-status git diff against the origin main ref together with a

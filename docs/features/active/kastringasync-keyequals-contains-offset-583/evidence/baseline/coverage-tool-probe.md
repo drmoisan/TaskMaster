@@ -7,7 +7,7 @@
 ## Result
 
 - Present: yes (already installed as a global dotnet tool; no install step was needed)
-- Resolved path: C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe
+- Resolved path: <user-profile>\.dotnet\tools\dotnet-coverage.exe
 - Version string: 18.10.0+f4cc39224845ffa74bf246c9da2399d50e5d6342
 
 ## Output Summary
