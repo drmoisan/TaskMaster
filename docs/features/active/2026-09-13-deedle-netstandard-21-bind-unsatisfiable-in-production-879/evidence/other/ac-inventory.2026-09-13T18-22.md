@@ -135,3 +135,51 @@ Host Substitution: HOST=TaskMaster.Test
 The `Decision:` field of `evidence/baseline/write-set-decision.2026-09-13T18-22.md` reads
 `HOST=TaskMaster.Test`, so write-set item 14 is not taken and is not reproduced here. Items 7
 through 10 stand exactly as listed above.
+
+## AC10 Revision R2 Rewrite:
+
+Timestamp: 2026-09-14T09-42
+
+Command:
+
+```
+pwsh -NoProfile -Command '
+$p = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/spec.md"
+$lines = @(Get-Content -LiteralPath $p)
+Write-Output ("AC10_LINE_515_PREFIX=[" + $lines[514].Substring(0,6) + "]")
+Write-Output ("AC11_LINE_521_PREFIX=[" + $lines[520].Substring(0,6) + "]")
+Write-Output ("AC_HEADING_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "## Acceptance Criteria").Count)
+Write-Output ("DEEPEST_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "deepest").Count)
+Write-Output ("BIND_FAILURE_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "bind failure").Count)
+Write-Output ("RUNCLASSCONSTRUCTOR_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "RunClassConstructor").Count)
+'
+```
+
+The payload additionally carries a leading `Set-Location` to the item worktree, for the reason
+recorded in `deedle-member-surface.2026-09-13T18-22.md`: the executor was launched without worktree
+isolation, so pwsh would otherwise resolve every repository-relative path in the coordinator session
+worktree. That statement changes no measurement.
+
+EXIT_CODE: 0
+
+Output Summary:
+
+```
+AC10_LINE_515_PREFIX=[- [ ] ]
+AC11_LINE_521_PREFIX=[- [ ] ]
+AC_HEADING_HITS=1
+DEEPEST_HITS=1
+BIND_FAILURE_HITS=1
+RUNCLASSCONSTRUCTOR_HITS=0
+```
+
+Acceptance Condition: MET. Both prefix readings are the six characters of an unchecked markdown
+checkbox, so the Revision R2 rewrite of AC10 occupied exactly six lines and displaced no sibling
+criterion; every acceptance-criterion line number recorded above remains valid.
+`AC_HEADING_HITS=1` is the positive control proving the file path and the search mechanism are
+live. `DEEPEST_HITS=1` and `BIND_FAILURE_HITS=1` confirm the two single-line tokens the rewrite
+introduced are each present exactly once.
+
+`RUNCLASSCONSTRUCTOR_HITS=0` is recorded and deliberately not gated, per the task text: the literal
+never appeared in `spec.md`, so a zero-hit assertion on it could not fail whatever the executor
+does.

@@ -1040,7 +1040,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       Acceptance: that section exists, lists thirteen numbered items, carries the quoted sentence, and
       carries a `Host Substitution:` line holding exactly one of `HOST=TaskMaster.Test` or
       `HOST=ToDoModel.Test`. When the value is `HOST=ToDoModel.Test`, item 14 is reproduced beneath it.
-- [ ] [P1-T5] Preserve the superseded `[P2-T11]` run artifact before the re-run overwrites it. The
+- [x] [P1-T5] Preserve the superseded `[P2-T11]` run artifact before the re-run overwrites it. The
       existing artifact records `Acceptance Condition: NOT MET` and is the only record of the measurement
       that identified Defect 1, so it is copied rather than lost. Command:
 
@@ -1063,7 +1063,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       and contains the literal `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` exactly once,
       which is the vacuous-pass observation this copy exists to retain. The original
       `expect-fail-run.2026-09-13T18-22.md` is left byte-identical by this task.
-- [ ] [P1-T6] Measure the Deedle member surface from metadata, before `[P2-T5]` is authored against it.
+- [x] [P1-T6] Measure the Deedle member surface from metadata, before `[P2-T5]` is authored against it.
       The read is metadata-only through `System.Reflection.Metadata`: it never executes Deedle code, never
       runs a type initializer and never resolves `FSharp.Core`, so this measurement cannot itself trip the
       bind under test, and it works regardless of the target framework of the deployed `Deedle.dll`.
@@ -1117,7 +1117,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       recorded and not gated: `[P2-T5]`'s lookup passes
       `BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static`, which covers either
       accessibility this line can report.
-- [ ] [P1-T7] Confirm the planner's AC10 rewrite is present and that it displaced no sibling criterion.
+- [x] [P1-T7] Confirm the planner's AC10 rewrite is present and that it displaced no sibling criterion.
       The planner rewrote acceptance criterion AC10 at `spec.md` lines 515-520 in place, in exactly six
       lines, so every acceptance-criterion line number recorded by `[P1-T2]` and consumed by `[P6-T6]`
       through `[P6-T24]` is unchanged. Command:
