@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-14T04-10
-- **Status:** Ready for preflight (revision R2)
+- **Status:** Ready for preflight (revision R4)
 - **Version:** 1.1
 - **Work Mode:** full-bug (spec.md is the sole acceptance-criteria source; `user-story.md` is correctly absent)
 - **Complexity band:** C3
@@ -29,8 +29,8 @@ a reading convenience for this document and never a literal a command may contai
 
 **Evidence timestamp token (binding).** Every artifact filename this plan names carries the fixed token
 `2026-09-13T18-22`, which is the plan's own token and is deliberately NOT the `Last Updated` value above.
-Revision R2 does not rename any artifact. An executor that invents a new token for an artifact this plan
-names has written to a path no task reads.
+Revisions R2, R3 and R4 rename no artifact. An executor that invents a new token for an artifact this
+plan names has written to a path no task reads.
 
 ---
 
@@ -368,7 +368,14 @@ to a plain `Assembly` local at lines 57, 81, 111, 131, 149, 169 and 256, and the
 `.../evidence/baseline/nullable-baseline.2026-09-13T18-22.md` records `EXIT_CODE: 0` with
 `0 Warning(s)`. A nullable-oblivious file therefore takes an `Assembly?` result into an `Assembly` local
 with no diagnostic in this solution today, which is exactly what line 187 of that test file will do once
-`AssemblyBindingFallback.Resolve` becomes `Assembly?`. No test file changes.
+`AssemblyBindingFallback.Resolve` becomes `Assembly?`. The nullable conversion requires no test file
+change; `[P2-T3]` amends that same file for an unrelated reason, adding an eleventh test method and
+rewriting the class-level comment, and neither edit introduces a nullable diagnostic in a file that
+carries no `#nullable enable` directive. The eight test-file line numbers this paragraph cites — 57, 81,
+111, 131, 149, 169, 187 and 256 — describe the file as it stands at branch head `260005b6a`, before
+`[P2-T3]` runs, and `[P2-T3]` shifts them. They are recorded as the measured grounds for the
+nullable-obliviousness argument and no acceptance condition in this plan keys on them, so the shift
+invalidates no gate.
 
 One site inside the production file does change with it: line 158 declares
 `Assembly resolved = Resolve(new AssemblyName(args.Name));` inside the nullable-ENABLED region, which
@@ -596,6 +603,12 @@ gate task; `[P5-T1]` re-gates it before the final loop.
 - `git commit` with zero pathspec operands is denied. Every commit task in this plan appends
   `-- <explicit paths>`.
 - Paths are repository-relative and commands run from the repository root of the item worktree.
+  An executor launched without worktree isolation inherits a different checkout as its working directory,
+  in which case every repository-relative path in this plan resolves into the wrong tree silently. Before
+  `[P0-T1]`, and again after any tool or shell restart, confirm the working directory with
+  `git rev-parse --show-toplevel` and require the result to end with the item worktree directory name
+  `bugs-2026-09-11-item-879`. If it does not, report blocked rather than adapting the paths: a plan whose
+  evidence was written into another checkout cannot be audited.
 
 **MSBuild and vstest resolution.** `msbuild` and `vstest.console.exe` are not assumed to be on `PATH`,
 and no shell variable survives between tasks, so every gated task resolves its own tool path through
@@ -1240,10 +1253,20 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       file, uses no `Thread.Sleep`, no `Task.Delay` and no wall-clock wait, so AC16 at `spec.md` line 545
       is unaffected. The prose sentence above about touching neither the GAC nor the filesystem is
       scoped to the ten delegate-driven tests for this reason; this eleventh test reads the binder's
-      probing paths, which is what makes it cover the production entry point.
+      probing paths, which is what makes it cover the production entry point. The class-level XML
+      documentation comment at `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` lines 11-15
+      states that every rung is driven through the ladder's injected delegates so no test
+      reaches the GAC, the filesystem or a real bind. That sentence becomes false once the eleventh test
+      exists, so this task rewrites it: the claim is scoped to the ten delegate-driven ladder tests, and
+      a second sentence states that one further test drives the subscribed handler through the real CLR
+      binder in order to cover the production entry point. The rewritten comment must not contain any
+      token on `[P4-T9]`'s banned list, whose sweep is textual and covers comments.
       Acceptance: the file exists and contains at least eleven occurrences of `[TestMethod]`. The
       tree currently carries exactly ten, which is what makes this count discriminating rather than
-      already satisfied.
+      already satisfied. Additionally, `Select-String -SimpleMatch -CaseSensitive` on that file returns
+      exactly 0 hits for `reaches the GAC`. That literal is present in the tree now at line 14, which is
+      what makes its zero-hit assertion discriminating rather than vacuous, and it is a single-line
+      fragment that no CSharpier pass reflows.
 - [x] [P2-T4] Register the new unit-test file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` into the `ItemGroup` in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
@@ -2240,8 +2263,24 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       Acceptance: `spec.md` line 477 begins with `- [x] `.
 - [ ] [P6-T8] Mark the acceptance criterion at `spec.md` line 481 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 481 begins with `- [x] `.
-- [ ] [P6-T9] Mark the acceptance criterion at `spec.md` line 484 as complete, as in `[P6-T6]`.
-      Acceptance: `spec.md` line 484 begins with `- [x] `.
+- [ ] [P6-T9] Mark the acceptance criterion at `spec.md` line 484 as complete, as in `[P6-T6]`. AC4's
+      closing sentence at `spec.md` lines 489-490 — that all rungs are exercised through injected
+      delegates, touching neither the GAC nor the filesystem — is read as a property of the ten
+      delegate-driven tests that exercise the ladder rungs, and not of the eleventh test `[P2-T3]` adds,
+      which drives the subscribed handler through the real CLR binder to cover
+      `AssemblyBindingFallback.OnAssemblyResolve` and `AssemblyBindingFallback.CreateProductionLadder`.
+      Under that reading all four rungs retain injected-delegate coverage and AC4 is satisfied.
+      `spec.md` lines 447-448 note that only pure ladder logic belongs in this assembly because it is
+      masked by the PR #880 handler; that ground does not reach the eleventh test, whose asserted
+      outcome is that a display name matching nothing fails to load, which no masking handler can
+      change. `spec.md` is not amended: AC4 spans lines 484-490 and a re-wrap would move the fifteen
+      criteria that follow it, every one of which this plan cites by line number. Append this reading to
+      `.../evidence/other/ac-inventory.2026-09-13T18-22.md` under an `AC4 Reading:` heading, together
+      with the line `AC4 READING: ten delegate-driven tests, eleventh test excluded`, which is quoted
+      here in prose because it is absent from the tree until this task runs.
+      Acceptance: `spec.md` line 484 begins with the six characters `- [x] `, the `AC4 Reading:` heading
+      exists in that artifact, and that artifact contains the line
+      `AC4 READING: ten delegate-driven tests, eleventh test excluded` exactly once.
 - [ ] [P6-T10] Mark the acceptance criterion at `spec.md` line 491 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 491 begins with `- [x] `.
 - [ ] [P6-T11] Mark the acceptance criterion at `spec.md` line 495 as complete, as in `[P6-T6]`.
@@ -2322,7 +2361,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 ## Task Counts
 
 Counted mechanically over lines matching either task prefix pattern, `- [ ] [P#-T#]` or `- [x] [P#-T#]`,
-and re-derived after the Revision R3 delta rather than carried forward:
+and re-derived after the Revision R4 delta rather than carried forward:
 
 - Phase 0: 16 tasks, all 16 complete
 - Phase 1: 7 tasks, 4 complete — `[P1-T5]`, `[P1-T6]` and `[P1-T7]` are new in Revision R2
@@ -2343,6 +2382,14 @@ new tasks were appended to the end of Phase 1, which leaves every `[P2-T#]` thro
 that this plan and its evidence artifacts already cite unchanged, and Revision R3 edited task bodies
 only.
 
+Revision R4 added no task, removed none, and checked or unchecked none, so the total remains 89 with 25
+complete. It edited the bodies of `[P2-T3]` and `[P6-T9]` and added prose to the shell-discipline bullet
+list and to the acceptance-criteria traceability section. `[P6-T9]` was replaced in full but kept its
+identifier and its position between `[P6-T8]` and `[P6-T10]`, so Phase 6 remains 27 sequentially numbered
+tasks and no cross-reference to a `[P6-T#]` identifier is stale. The per-phase figures above were
+re-counted mechanically after the Revision R4 edits: Phase 0 16, Phase 1 7, Phase 2 12, Phase 3 5,
+Phase 4 12, Phase 5 10, Phase 6 27, which sum to 89.
+
 ## Acceptance-Criteria Traceability
 
 | AC | spec.md line | Implementation task | Test or check task | Evidence task |
@@ -2350,7 +2397,7 @@ only.
 | AC1 | 473 | P2-T1, P2-T2 | P2-T1, P2-T2 | P6-T6 |
 | AC2 | 477 | P3-T3 | P4-T7 | P4-T7 |
 | AC3 | 481 | P3-T3 | P4-T8 | P4-T8 |
-| AC4 | 484 | P2-T3, P3-T1, P3-T2 | P4-T2 | P4-T2 |
+| AC4 | 484 | P2-T3, P3-T1, P3-T2 | P4-T2 | P4-T2, P6-T9 |
 | AC5 | 491 | P2-T5, P2-T6 | P4-T3 | P4-T3 |
 | AC6 | 495 | P2-T6 | P2-T12, P4-T3 | P2-T12 |
 | AC7 | 499 | P2-T5, P2-T6 | P2-T12, P4-T3 | P2-T12 |
@@ -2378,6 +2425,11 @@ something false about a gate no executor can perform.
 AC18 is discharged on the reading `[P5-T7]` states: "no failures" is read against the two baseline
 failures recorded at `[P0-T8]`, which are outside this plan's authorised write set. `[P6-T23]` checks
 AC18 off on that reading, and the status summary reports it as delivered with that qualification named.
+
+AC4 is discharged on the reading `[P6-T9]` states: its closing sentence about injected delegates is read
+as a property of the ten tests that exercise the ladder rungs, not of the eleventh test `[P2-T3]` adds to
+cover the production entry point. The status summary reports AC4 as delivered with that qualification
+named.
 
 ## Planner Notes
 
@@ -2409,6 +2461,19 @@ AC18 off on that reading, and the status summary reports it as delivered with th
   six-line block. It is seven lines: 484 through 490 inclusive, with AC5 beginning at line 491. The
   constraint the delta drew from that figure — preserve the block's line count if it is amended — is
   unaffected, and the question is moot because AC4 is not amended.
+- **Revision R4 amends no acceptance criterion and moves no `spec.md` line.** Revision R4 edits
+  `plan.2026-09-13T18-22.md` only. `spec.md` is not written by this revision, so every
+  acceptance-criterion line number the plan cites — 473, 477, 481, 484, 491, 495, 499, 504, 509, 515,
+  521, 528, 534, 536, 543, 545, 547, 550 and 554 — is unchanged, and that was verified by re-reading
+  `spec.md` lines 440-494 after the revision's edits rather than inferred from the absence of a write.
+  Revision R4 closes one defect that survived two rounds: Revision R3 scoped the claim that the tests
+  touch neither the GAC nor the filesystem to the ten delegate-driven tests in the plan's own copy of the
+  sentence, but the same claim lives in two further places. `[P2-T3]` now rewrites the copy in the test
+  file's class-level XML documentation comment at
+  `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` lines 11-15, and `[P6-T9]` records the
+  reading for the copy in AC4's closing sentence at `spec.md` lines 489-490. The `spec.md` copy is not
+  edited, for the line-number reason `[P6-T5]` records for AC14: AC4 spans lines 484-490 and a re-wrap
+  would move the fifteen criteria that follow it.
 - **Validator status.** The `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool is not present
   in this planner session's tool surface, so the validator gate was NOT RUN by the planner. It must be run
   before the plan is treated as approved.
