@@ -445,7 +445,9 @@ done; only the citation was stale.
 `.../evidence/baseline/analyzer-baseline-console.2026-09-13T18-22.txt` and
 `.../evidence/baseline/nullable-baseline-console.2026-09-13T18-22.txt`. Neither defect touches those two
 tasks and this revision does not re-run them, so both files are left exactly as committed and no task in
-this revision rewrites, projects or deletes them.
+this revision rewrites, projects or deletes them. **Superseded by Revision R5**, which adds `[P5-T11]` and
+`[P5-T12]`: both files are projected and then removed, for the reason `## R6.5` records. Neither task
+re-runs `[P0-T6]` or `[P0-T7]`, and both tasks remain checked.
 
 ### R4.6 — Constraints re-checked against the post-merge tree and deliberately left unchanged
 
@@ -680,6 +682,17 @@ The three risks named against re-rooting were measured:
   metadata before `[P2-T5]` is authored against it.
 - A ninth harness test, `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory`, makes the re-rooting
   itself falsifiable. It is criterion 6 in `## R1`.
+- **The build-output premise moves with the root, and is re-established rather than left stale.**
+  `[P0-T10]` recorded the existence of `Deedle.dll`, `TaskMaster.Test.dll.config` and
+  `TaskMaster.dll.config` under `TaskMaster.Test/bin/Debug`, and `[P0-T14]` selected
+  `HOST=TaskMaster.Test` from that record. Both remain checked and both remain true: Revision R5 moves the
+  child domains' `ApplicationBase`, not the project that hosts the harness, and `[P2-T8]`'s
+  `AppConfig_DeclaresNetstandardRedirect` still resolves `TaskMaster.dll.config` from the PARENT domain's
+  base directory, which is still `TaskMaster.Test/bin/Debug`. The premise the re-rooted child domains need
+  is a different one, and it is established twice rather than assumed: `[P1-T6]` gates
+  `DEEDLE_DLL_PRESENT=True` on `QuickFiler.Test/bin/Debug/Deedle.dll`, and `[P2-T6]`'s fail-loud
+  precondition helper throws `InvalidOperationException` at run time if that directory, its
+  `QuickFiler.Test.dll.config`, its `Deedle.dll` or its `FSharp.Core.dll` is missing.
 
 ### R6.4 — OPEN RISK: which `FSharp.Core` flavour reaches `TaskMaster/bin/Debug` is nondeterministic
 
@@ -1749,7 +1762,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       call `InstallProductionFallback()` at all: an `ApplicationBase` is fixed at domain creation and no
       later call can change it, so ordering relative to the installer is not merely unconstrained here but
       meaningless, and omitting the call keeps that domain's loaded set at its minimum for this
-      observation. Every one of the nine methods therefore has a stated domain.
+      observation.
 
       `AfterInstall_BothNetstandardVersionsBind` and `AfterInstall_DeedleTypeInitializerSucceeds` run in
       the POSITIVE domain, and each calls `InstallProductionFallback()` before the observation it makes,
@@ -2575,6 +2588,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       $body.Add("``````")
       Set-Content -LiteralPath $out -Value $body -Encoding UTF8
       Write-Output ("PROJECTION_WRITTEN=" + $out)
+      Write-Output ("PROJECTION_ABSOLUTE_PATH_HITS=" + @(@(Get-Content -LiteralPath $out).Where({ $_.Contains("C:\") })).Count)
       Write-Output ("PROJECTION_SOURCE_LINES=" + $lines.Count)
       Write-Output ("PROJECTION_SUMMARY_LINES_KEPT=" + $kept.Count)
       Write-Output ("PROJECTION_TOTAL_LINES=" + @(Get-Content -LiteralPath $out).Count) }
@@ -2587,12 +2601,14 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `PROJECTION_SUMMARY_LINES_KEPT=`, `PROJECTION_TOTAL_LINES=`, `SOURCE_LOG=`, `SOURCE_LINES=`,
       `SUMMARY_LINES_KEPT=`, `SKIPPING_CORECOMPILE_COUNT=`, `DIAGNOSTIC_LINE_COUNT=` and
       `HOST_PATH_LINE_COUNT=` are quoted here in prose because they are absent from the tree until this
-      task runs. Write
+      task runs, as is `PROJECTION_ABSOLUTE_PATH_HITS=`. Write
       `.../evidence/other/console-log-projections.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:` and an `Output Summary:` reproducing every `PROJECTION_WRITTEN=`,
-      `PROJECTION_SOURCE_LINES=`, `PROJECTION_SUMMARY_LINES_KEPT=` and `PROJECTION_TOTAL_LINES=` line
-      verbatim.
+      `PROJECTION_ABSOLUTE_PATH_HITS=`, `PROJECTION_SOURCE_LINES=`, `PROJECTION_SUMMARY_LINES_KEPT=` and
+      `PROJECTION_TOTAL_LINES=` line verbatim.
       Acceptance: the artifact records exactly six `PROJECTION_WRITTEN=` lines; every
+      `PROJECTION_ABSOLUTE_PATH_HITS=` value is `0`, which is the no-absolute-host-path invariant measured
+      on the written projection rather than assumed from the substitution; every
       `PROJECTION_TOTAL_LINES=` value is at most 500; every `PROJECTION_SOURCE_LINES=` value is greater
       than 0; and every `PROJECTION_SUMMARY_LINES_KEPT=` value is greater than 0. The last of these is the
       positive control on the line-matching mechanism: it proves the four retained-line patterns matched
@@ -2617,7 +2633,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       $logs = @("$base/baseline/analyzer-baseline-console.2026-09-13T18-22.txt","$base/baseline/nullable-baseline-console.2026-09-13T18-22.txt","$base/regression-testing/expect-fail-build-console.2026-09-13T18-22.txt","$base/regression-testing/pass-after-build-console.2026-09-13T18-22.txt","$base/qa-gates/analyzer-final-console.2026-09-13T18-22.txt","$base/qa-gates/nullable-final-console.2026-09-13T18-22.txt")
       foreach ($log in $logs) { if (Test-Path -LiteralPath $log) { Remove-Item -LiteralPath $log -Force } }
       Write-Output ("RESIDUAL_TXT_COUNT=" + @(Get-ChildItem -LiteralPath $base -Filter "*.txt" -Recurse).Count)
-      Write-Output ("PROJECTION_COUNT=" + @(Get-ChildItem -LiteralPath $base -Filter "*.projection.md" -Recurse).Count)
+      Write-Output ("PROJECTION_COUNT=" + @(@(Get-ChildItem -LiteralPath $base -Filter "*.md" -Recurse).Where({ $_.Name.EndsWith(".projection.md") })).Count)
       '
       ```
 
@@ -2823,34 +2839,34 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 ## Task Counts
 
 Counted mechanically over lines matching either task prefix pattern, `- [ ] [P#-T#]` or `- [x] [P#-T#]`,
-and re-derived after the Revision R4 delta rather than carried forward:
+and re-derived after the Revision R5 delta rather than carried forward:
 
 - Phase 0: 16 tasks, all 16 complete
-- Phase 1: 7 tasks, 4 complete — `[P1-T5]`, `[P1-T6]` and `[P1-T7]` are new in Revision R2
-- Phase 2: 12 tasks, 5 complete — the five complete are `[P2-T2]`, `[P2-T4]`, `[P2-T7]`, `[P2-T8]` and
-  `[P2-T9]`. `[P2-T1]`, `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and `[P2-T12]` were unchecked by Revision R2,
-  `[P2-T11]` was already unchecked, and `[P2-T3]` was unchecked by Revision R3 because that revision
-  adds an eleventh test method to a file the version 1.0 execution had already completed
+- Phase 1: 7 tasks, 5 complete — the five complete are `[P1-T1]` through `[P1-T5]`. `[P1-T6]` and
+  `[P1-T7]` were unchecked by Revision R5
+- Phase 2: 12 tasks, 7 complete — the seven complete are `[P2-T1]`, `[P2-T2]`, `[P2-T3]`, `[P2-T4]`,
+  `[P2-T7]`, `[P2-T8]` and `[P2-T9]`. `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and `[P2-T12]` were unchecked by
+  Revision R5, and `[P2-T11]` was already unchecked
 - Phase 3: 5 tasks, 0 complete
 - Phase 4: 12 tasks, 0 complete
-- Phase 5: 10 tasks, 0 complete
+- Phase 5: 12 tasks, 0 complete
 - Phase 6: 27 tasks, 0 complete
-- Total: 89 tasks, 25 complete
+- Total: 91 tasks, 28 complete
 
-Revision R2 added three tasks and removed none, so the total moved from 86 to 89. Revision R3 added no
-task and removed none, so the total is unchanged at 89; it unchecked exactly one task, `[P2-T3]`, which
-moved the complete count from 26 to 25. No task was renumbered in either revision: Revision R2's three
-new tasks were appended to the end of Phase 1, which leaves every `[P2-T#]` through `[P6-T#]` identifier
-that this plan and its evidence artifacts already cite unchanged, and Revision R3 edited task bodies
-only.
+Revision history of these figures. Revision R2 added three tasks and removed none, so the total moved from
+86 to 89. Revision R3 added no task and removed none and unchecked exactly one, `[P2-T3]`. Revision R4
+added no task, removed none, and checked or unchecked none.
 
-Revision R4 added no task, removed none, and checked or unchecked none, so the total remains 89 with 25
-complete. It edited the bodies of `[P2-T3]` and `[P6-T9]` and added prose to the shell-discipline bullet
-list and to the acceptance-criteria traceability section. `[P6-T9]` was replaced in full but kept its
-identifier and its position between `[P6-T8]` and `[P6-T10]`, so Phase 6 remains 27 sequentially numbered
-tasks and no cross-reference to a `[P6-T#]` identifier is stale. The per-phase figures above were
-re-counted mechanically after the Revision R4 edits: Phase 0 16, Phase 1 7, Phase 2 12, Phase 3 5,
-Phase 4 12, Phase 5 10, Phase 6 27, which sum to 89.
+Revision R5 adds two tasks, `[P5-T11]` and `[P5-T12]`, and removes none, so the total moves from 89 to 91.
+Both were APPENDED to the end of Phase 5 rather than inserted, so no task is renumbered and every
+`[P#-T#]` identifier this plan and its evidence artifacts already cite is unchanged. Revision R5 unchecks
+six tasks — `[P1-T6]`, `[P1-T7]`, `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and `[P2-T12]` — and checks none, so
+the complete count moves from 34, which was the checklist state on disk before this revision, to 28. The
+figure 25 recorded for the previous revision described the checklist as Revision R4 left it; the executor
+subsequently completed `[P1-T6]`, `[P1-T7]`, `[P2-T1]`, `[P2-T3]`, `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and
+`[P2-T12]`, which is how 25 became 34, and that state was re-counted mechanically in this pass rather than
+carried forward. The per-phase figures above were likewise re-counted mechanically after the Revision R5
+edits: Phase 0 16, Phase 1 7, Phase 2 12, Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, which sum to 91.
 
 ## Acceptance-Criteria Traceability
 
@@ -2873,7 +2889,7 @@ Phase 4 12, Phase 5 10, Phase 6 27, which sum to 89.
 | AC15 | 543 | P3-T4 | P4-T11 | P4-T11 |
 | AC16 | 545 | P2-T3, P2-T5, P2-T6, P2-T8 | P4-T9 | P4-T9 |
 | AC17 | 547 | P3-T1 | P5-T9 | P5-T9, P5-T10 |
-| AC18 | 550 | P5-T2 to P5-T7 | P5-T5, P5-T6, P5-T7 | P5-T5, P5-T6, P5-T7 |
+| AC18 | 550 | P5-T2 to P5-T7 | P5-T5, P5-T6, P5-T7 | P5-T5, P5-T6, P5-T7, P5-T11 |
 | AC19 | 554 | P6-T4 | P6-T4 | P6-T4 |
 
 AC19 is the only conditionally discharged criterion in this table. `[P6-T24]` checks it off only when
@@ -2888,6 +2904,16 @@ AC18 is discharged on the reading `[P5-T7]` states: "no failures" is read agains
 failures recorded at `[P0-T8]`, which are outside this plan's authorised write set. `[P6-T23]` checks
 AC18 off on that reading, and the status summary reports it as delivered with that qualification named.
 
+AC18 carries a second stated reading, introduced by Revision R5. Its phrase "with console logs captured
+under the feature folder's `evidence/qa-gates/` directory" is discharged by the projections `[P5-T11]`
+writes, not by the raw console dumps `[P5-T12]` removes. The operative half of the criterion — that the
+analyzer and nullable logs each show zero `Skipping target "CoreCompile"` occurrences — is carried
+forward literally: `[P5-T5]` and `[P5-T6]` each gate that figure on the raw log while it exists, and each
+`qa-gates` projection records it as `SKIPPING_CORECOMPILE_COUNT=0`, which `[P5-T11]` gates a second time.
+AC18's text is NOT amended, for the line-number reason `[P6-T5]` records for AC14: AC18 spans `spec.md`
+lines 550-553 and a re-wrap would move AC19 and every `[P6-T#]` citation that follows it. The status
+summary reports AC18 as delivered with this qualification named alongside the `[P5-T7]` one.
+
 AC4 is discharged on the reading `[P6-T9]` states: its closing sentence about injected delegates is read
 as a property of the ten tests that exercise the ladder rungs, not of the eleventh test `[P2-T3]` adds to
 cover the production entry point. The status summary reports AC4 as delivered with that qualification
@@ -2895,15 +2921,19 @@ named.
 
 ## Planner Notes
 
-- **Revision R2 spec amendment recorded.** The planner rewrote acceptance criterion AC10 at `spec.md`
-  lines 515-520 in place, in exactly six lines, so every acceptance-criterion line number this plan cites
-  is unchanged. The prior text asserted that "a Deedle type initializes without
-  `TypeInitializationException`", which the measured `[P2-T11]` run satisfied against a build carrying no
-  fix. The new text asserts that invoking `Deedle.Reflection.convertRecordSequence`, closed over a
-  concrete record type and given a one-element `IEnumerable<T>`, raises no `netstandard` bind failure and
-  completes without throwing. The criterion is amended by the planner and verified read-only by
-  `[P1-T7]`; no executor task edits acceptance-criterion text. No criterion was added or removed and the
-  inventory remains nineteen. AC1 at `spec.md` lines 473-476 and the write-set entry at `spec.md`
+- **Revision R2 spec amendment recorded; its AC10 text is SUPERSEDED by Revision R5.** The planner
+  rewrote acceptance criterion AC10 at `spec.md` lines 515-520 in place, in exactly six lines, so every
+  acceptance-criterion line number this plan cites is unchanged. The text it replaced asserted that "a
+  Deedle type initializes without `TypeInitializationException`", which the measured `[P2-T11]` run
+  satisfied against a build carrying no fix. The Revision R2 replacement asserted that invoking
+  `Deedle.Reflection.convertRecordSequence`, closed over a concrete record type and given a one-element
+  `IEnumerable<T>`, raises no `netstandard` bind failure. That replacement was itself satisfied against a
+  build carrying no fix, for the reason `## R6.1` measures, and it is no longer the text of AC10; the
+  current text is the Revision R5 one described in the Revision R5 note above. This note is retained as
+  the record of the intermediate state and must not be read as a description of the criterion as it now
+  stands. The criterion is amended by the planner and verified read-only by `[P1-T7]`; no executor task
+  edits acceptance-criterion text. No criterion was added or removed and the inventory remains nineteen.
+  AC1 at `spec.md` lines 473-476 and the write-set entry at `spec.md`
   line 315 both name the internal `Resolve` seam without a return type, so Defect 2 required no spec
   amendment; that was checked rather than assumed.
 - **Spec correction recorded.** One acceptance criterion directed the coverage artifact to
@@ -2936,9 +2966,46 @@ named.
   reading for the copy in AC4's closing sentence at `spec.md` lines 489-490. The `spec.md` copy is not
   edited, for the line-number reason `[P6-T5]` records for AC14: AC4 spans lines 484-490 and a re-wrap
   would move the fifteen criteria that follow it.
+- **Revision R5 amends acceptance criterion AC10 and two non-criterion `spec.md` regions, and moves no
+  `spec.md` line.** AC10 at `spec.md` lines 515-520 is rewritten in place in exactly six lines, so AC11
+  still begins at line 521 and every acceptance-criterion line number this plan cites — 473, 477, 481,
+  484, 491, 495, 499, 504, 509, 515, 521, 528, 534, 536, 543, 545, 547, 550 and 554 — is unchanged. That
+  was verified after the edit by re-listing every line in `spec.md` that begins with the six characters
+  `- [ ] ` and comparing the resulting line numbers against the `[P1-T2]` inventory, rather than inferred
+  from the shape of the replacement. The prior AC10 text asserted that invoking
+  `Deedle.Reflection.convertRecordSequence` raises no `netstandard` bind failure, without naming the
+  domain configuration that determines whether that bind is reachable; the measured `[P2-T11]` run
+  satisfied it against a build carrying no fix. The new text names the `ApplicationBase` as the
+  load-bearing element and names `Deedle.Frame.FromRecords`, which is production's entry point. Two
+  sibling regions the re-rooting invalidated were rewritten line for line in the same pass: the
+  build-output assumption at lines 392-394, which asserted an unverified fact about `TaskMaster.Test`
+  output and now records the measured `QuickFiler.Test` one; and the Test Strategy domain-configuration
+  paragraph at lines 431-434, which stated the superseded `ApplicationBase` rule. Both replacements have
+  the same line count as the text they replace. No criterion was added or removed and the inventory
+  remains nineteen. The criteria are amended by the planner and verified read-only by `[P1-T7]`; no
+  executor task edits acceptance-criterion text.
+- **The `FSharp.Core` `HintPath` alignment is declined as out of scope, not overlooked.** Aligning all six
+  `HintPath` values on `lib/netstandard2.0` is the root-cause fix and it is tracked as a separate issue.
+  Three of the six files are outside this plan's authorised write set and may be owned by sibling items,
+  so editing them is a stop-and-report condition rather than a judgement call. `## R6.4` records the
+  nondeterminism this leaves open, records that the remedy does not depend on which flavour is currently
+  deployed, and records that issue 879 must not be reported as having closed the split.
 - **Validator status.** The `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool is not present
   in this planner session's tool surface, so the validator gate was NOT RUN by the planner. It must be run
   before the plan is treated as approved.
+- **Two inbound figures corrected, per the authentication rule.** First, the delegation brief gave the
+  branch head as `cdbe96835`. The loose ref at
+  `.git/worktrees/bugs-2026-09-11-item-879` resolves
+  `refs/heads/bug/deedle-netstandard-21-bind-unsatisfiable-in-production-879` to
+  `e6a24be68a7d5607eb9eb5427f10b00e2ea061be`, so every citation in this revision was re-derived against
+  the working tree as it stands rather than against the named commit, and the tree is the authority for
+  every line number this revision cites. Second, the brief stated that the two Phase 0 console logs carry
+  absolute host paths in the same way the Phase 2 one does. They do not: both were already redacted to
+  `<repo-root>` for the repository path and contain zero occurrences of the host user name, while
+  `expect-fail-build-console.2026-09-13T18-22.txt` contains 7,747 such lines out of 11,961. Each Phase 0
+  log does retain about 140 lines of absolute toolchain paths beginning `C:\Program Files`, so both are
+  still in scope for `[P5-T11]` and `[P5-T12]`, but for size and for toolchain paths rather than for the
+  host user name.
 - **Issue source.** The Bash tool is disabled in this session, so `gh issue view 879` could not be run.
   The material content of issue 879 and its two comments was taken from the spec's
   `### Update since issue.md was written` section, which the delegation brief authorises as a faithful
