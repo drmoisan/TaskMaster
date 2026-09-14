@@ -473,7 +473,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       `Warning(s)`/`Error(s)` summary counts read from the console log.
       Acceptance: both the `.txt` console log and the `.md` artifact exist, and the `.md` records the
       integer baseline error count.
-- [ ] [P0-T7] LOCK-ACQUIRE, then capture the nullable baseline with the console log redirected to the
+- [x] [P0-T7] LOCK-ACQUIRE, then capture the nullable baseline with the console log redirected to the
       evidence tree. Then LOCK-RELEASE. Same pwsh shape as `[P0-T6]` with the final msbuild line replaced
       by:
 
