@@ -51,7 +51,12 @@ jobs:
           "PESTER Passed=$($result.PassedCount) Failed=$($result.FailedCount) Skipped=$($result.SkippedCount) Total=$($result.TotalCount)"
 
           [xml]$jacoco = Get-Content 'coverage/pester-coverage.xml' -Raw
-          $lineCounter = @($jacoco.report.counter) | Where-Object { $_.type -eq 'LINE' }
+          # Selected by XPath rather than by dotted property access. A JaCoCo document declares
+          # <!DOCTYPE report ...>, so $jacoco.report resolves to a two-element array holding the
+          # document-type node and the document element, and member access across that array
+          # throws under Set-StrictMode -Version Latest. The XPath form names the report element's
+          # own counter children unambiguously and reads the same report-level LINE counter.
+          $lineCounter = @($jacoco.SelectNodes('/report/counter')) | Where-Object { $_.type -eq 'LINE' }
           $coveredLines = [int]$lineCounter.covered
           $totalLines = $coveredLines + [int]$lineCounter.missed
           $linePercent = if ($totalLines -gt 0) { 100 * $coveredLines / $totalLines } else { 0 }
