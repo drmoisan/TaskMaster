@@ -389,26 +389,26 @@ because it is absent from the tree until `[P2-T6]` runs.
 
 ### Phase 0 — Policy Reading, Baseline Capture, and Premise Closure
 
-- [ ] [P0-T1] Read, in this exact order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
+- [x] [P0-T1] Read, in this exact order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
       `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/csharp.md`,
       `.claude/rules/tonality.md`, and `.claude/rules/plan-acceptance-gates.md`. Write
       `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/baseline/phase0-instructions-read.2026-09-13T18-22.md`
       containing `Timestamp:`, `Policy Order:` and the explicit list of the seven files read.
       Acceptance: the artifact exists and names all seven files.
-- [ ] [P0-T2] Read `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/issue.md`,
+- [x] [P0-T2] Read `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/issue.md`,
       `.../spec.md` and
       `.../research/2026-09-13T19-05-deedle-netstandard-bind-research.md` in full, and append to the
       `[P0-T1]` artifact a `Requirements Sources:` section listing those three paths and the line
       `AC source: spec.md section "## Acceptance Criteria", 19 criteria`.
       Acceptance: the artifact carries that section and that exact count.
-- [ ] [P0-T3] Outlook-closed gate. Confirm no `OUTLOOK` process is running, by closing the Outlook window
+- [x] [P0-T3] Outlook-closed gate. Confirm no `OUTLOOK` process is running, by closing the Outlook window
       if one is open. Never kill the process. Command:
       `pwsh -NoProfile -Command '@(Get-Process -Name OUTLOOK -ErrorAction SilentlyContinue).Count'`.
       Write
       `.../evidence/baseline/outlook-closed-gate.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:` and `Output Summary:` recording the observed count.
       Acceptance: the recorded count is `0` and the artifact exists.
-- [ ] [P0-T4] LOCK-ACQUIRE, bootstrap the toolchain in four steps beginning with scripts/vscode/Install-RepoDotNetSdk.ps1, then LOCK-RELEASE. This
+- [x] [P0-T4] LOCK-ACQUIRE, bootstrap the toolchain in four steps beginning with scripts/vscode/Install-RepoDotNetSdk.ps1, then LOCK-RELEASE. This
       worktree is fresh: `.dotnet-sdk` and `packages/` are both absent, `global.json` pins SDK
       `8.0.205` with `paths` `.dotnet-sdk` and `$host$`, and every `dotnet` invocation fails with the
       `global.json` `errorMessage` until the repo-local SDK is installed. Steps, in this order:
@@ -448,7 +448,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       `CSHARPIER_PINNED_VERSION=1.2.6` and `PACKAGES_DIR_PRESENT=True`. A failure of any of the four
       blocks: the analyzer, nullable and test baselines below all depend on a restored SDK and a
       restored `packages` tree.
-- [ ] [P0-T5] LOCK-ACQUIRE, then capture the format baseline read-only:
+- [x] [P0-T5] LOCK-ACQUIRE, then capture the format baseline read-only:
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .'`. Then LOCK-RELEASE. Write
       `.../evidence/baseline/format-baseline.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `ExpectedExitCode:` and `Output Summary:` recording the number of files reported as
@@ -456,7 +456,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       tree from a drifted one; no file is rewritten by this task.
       Acceptance: the artifact exists and records the observed exit code and the unformatted-file count
       as an integer. A non-zero baseline is recorded, not repaired, at this point.
-- [ ] [P0-T6] LOCK-ACQUIRE, then capture the analyzer baseline with the console log redirected to the
+- [x] [P0-T6] LOCK-ACQUIRE, then capture the analyzer baseline with the console log redirected to the
       evidence tree. Then LOCK-RELEASE.
 
       ```
