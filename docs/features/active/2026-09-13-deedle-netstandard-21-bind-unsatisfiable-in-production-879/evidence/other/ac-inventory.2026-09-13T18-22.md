@@ -183,3 +183,64 @@ introduced are each present exactly once.
 `RUNCLASSCONSTRUCTOR_HITS=0` is recorded and deliberately not gated, per the task text: the literal
 never appeared in `spec.md`, so a zero-hit assertion on it could not fail whatever the executor
 does.
+
+## AC10 Revision R5 Rewrite:
+
+Timestamp: 2026-09-14T11-19
+
+This block is appended alongside the Revision R2 block above rather than replacing it, as `[P1-T7]`
+directs. Revision R5 rewrote AC10 a second time, so the two content tokens the R2 block measured
+(`deepest`, `bind failure`) no longer describe the criterion; the R5 tokens are `netstandard2.1` and
+`Deedle.Frame.FromRecords`. Revision R5 additionally rewrote two sibling regions of `spec.md` that the
+re-rooting invalidated, each line for line: the build-output assumption at lines 392-394 and the Test
+Strategy domain-configuration paragraph at lines 431-434. Neither is an acceptance criterion and
+neither changed the file's line count; `QuickFiler.Test.dll.config` is the token that rewrite
+introduced.
+
+Command:
+
+```
+pwsh -NoProfile -Command '
+$p = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/spec.md"
+$lines = @(Get-Content -LiteralPath $p)
+Write-Output ("AC10_LINE_515_PREFIX=[" + $lines[514].Substring(0,6) + "]")
+Write-Output ("AC11_LINE_521_PREFIX=[" + $lines[520].Substring(0,6) + "]")
+Write-Output ("AC_HEADING_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "## Acceptance Criteria").Count)
+Write-Output ("NETSTANDARD21_FLAVOUR_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "netstandard2.1").Count)
+Write-Output ("FROMRECORDS_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "Deedle.Frame.FromRecords").Count)
+Write-Output ("QUICKFILER_TEST_CONFIG_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "QuickFiler.Test.dll.config").Count)
+Write-Output ("RUNCLASSCONSTRUCTOR_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "RunClassConstructor").Count)
+'
+```
+
+The payload additionally carries a leading `Set-Location` to the item worktree, for the reason
+recorded in the Revision R2 block above. That statement changes no measurement.
+
+EXIT_CODE: 0
+
+Output Summary:
+
+```
+AC10_LINE_515_PREFIX=[- [ ] ]
+AC11_LINE_521_PREFIX=[- [ ] ]
+AC_HEADING_HITS=1
+NETSTANDARD21_FLAVOUR_HITS=1
+FROMRECORDS_HITS=1
+QUICKFILER_TEST_CONFIG_HITS=1
+RUNCLASSCONSTRUCTOR_HITS=0
+```
+
+Acceptance Condition: MET. Both prefix readings are the six characters of an unchecked markdown
+checkbox, so the Revision R5 rewrite of AC10 again occupied exactly six lines and displaced no sibling
+criterion; every acceptance-criterion line number recorded in the `## Inventory` table above remains
+valid, and the line numbers `[P6-T6]` through `[P6-T24]` consume are unchanged.
+`AC_HEADING_HITS=1` is the positive control proving the file path and the search mechanism are live.
+`NETSTANDARD21_FLAVOUR_HITS=1`, `FROMRECORDS_HITS=1` and `QUICKFILER_TEST_CONFIG_HITS=1` confirm the
+three single-line tokens the R5 rewrites introduced are each present exactly once. All three had zero
+hits in `spec.md` before the rewrite, which is what makes those counts discriminating rather than
+already satisfied.
+
+`RUNCLASSCONSTRUCTOR_HITS=0` is recorded and deliberately not gated, per the task text, for the same
+reason as in the Revision R2 block.
+
+No acceptance criterion is checked off by this task. The plan assigns every check-off to Phase 6.

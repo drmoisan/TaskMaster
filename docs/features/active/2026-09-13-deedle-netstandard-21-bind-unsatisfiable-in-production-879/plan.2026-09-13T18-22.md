@@ -1298,7 +1298,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       and contains the literal `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` exactly once,
       which is the vacuous-pass observation this copy exists to retain. The original
       `expect-fail-run.2026-09-13T18-22.md` is left byte-identical by this task.
-- [ ] [P1-T6] Measure the Deedle member surface from metadata, before `[P2-T5]` is authored against it.
+- [x] [P1-T6] Measure the Deedle member surface from metadata, before `[P2-T5]` is authored against it.
       **Revision R5 repoints this task twice** and it is therefore unchecked and re-run: the file read moves
       from `TaskMaster.Test/bin/Debug/Deedle.dll` to `QuickFiler.Test/bin/Debug/Deedle.dll`, which is the
       file the re-rooted child domain loads, and the member measured moves from
@@ -1373,7 +1373,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       accessibility this line can report. The literals `TYPE_FOUND=Deedle.Frame`,
       `FROMRECORDS_GENERIC_ARITY_1_COUNT=`, `FROMRECORDS_DEFINITIONS=` and `DEEDLE_FRAME_LIKE_TYPE=` are
       quoted here in prose because they are absent from the tree until this task runs.
-- [ ] [P1-T7] Confirm the planner's AC10 rewrite is present and that it displaced no sibling criterion.
+- [x] [P1-T7] Confirm the planner's AC10 rewrite is present and that it displaced no sibling criterion.
       **Revision R5 rewrote AC10 a second time** and this task is therefore unchecked and re-run against
       the new text; its two content tokens change, so the recorded Revision R2 result no longer describes
       the file. The planner rewrote acceptance criterion AC10 at `spec.md` lines 515-520 in place, in
