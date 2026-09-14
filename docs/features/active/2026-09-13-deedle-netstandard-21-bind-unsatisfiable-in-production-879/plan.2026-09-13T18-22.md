@@ -3060,11 +3060,11 @@ verification, config side-effect check, analyzers, nullable, tests with coverage
 `[P5-T9]` and `[P5-T10]` then re-run. Each re-executed task overwrites its own artifact; no artifact path
 changes and no task is renumbered.
 
-- [ ] [P5-T1] Re-gate Outlook closed before the loop, by the same command and rule as `[P0-T3]`. Append
+- [x] [P5-T1] Re-gate Outlook closed before the loop, by the same command and rule as `[P0-T3]`. Append
       the observation to `.../evidence/qa-gates/outlook-closed-gate.2026-09-13T18-22.md` with the four
       required fields.
       Acceptance: the recorded running-process count is `0`.
-- [ ] [P5-T2] Step 1, format. LOCK-ACQUIRE, then
+- [x] [P5-T2] Step 1, format. LOCK-ACQUIRE, then
       `pwsh -NoProfile -Command 'dotnet tool run csharpier format .'`, then LOCK-RELEASE. This is a
       write-mode command whose exit code is identical whether it rewrote files or not, so the acceptance
       condition observes the tree rather than the exit code.
@@ -3092,11 +3092,11 @@ changes and no task is renumbered.
       any other tracked file means the format pass was not scoped as expected: restore that file with
       `git checkout --` against its own pathspec, record the restoration in the artifact, and restart
       the loop from step 1.
-- [ ] [P5-T3] Step 1 verification, read-only.
+- [x] [P5-T3] Step 1 verification, read-only.
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .'` under LOCK-ACQUIRE/LOCK-RELEASE.
       Append `Check EXIT_CODE:` and the reported unformatted-file count to the `[P5-T2]` artifact.
       Acceptance: `Check EXIT_CODE: 0`.
-- [ ] [P5-T4] Step 1 side-effect check on the hand-edited config. Confirm the format pass did not rewrite
+- [x] [P5-T4] Step 1 side-effect check on the hand-edited config. Confirm the format pass did not rewrite
       any existing line of `TaskMaster/app.config`. Commands, in this order:
 
       ```
@@ -3114,7 +3114,7 @@ changes and no task is renumbered.
       `TaskMaster/app.config` and an addition count between 1 and 12 inclusive. A non-zero deletion count
       means CSharpier rewrote an existing line in that file: rewrite the new block to match the existing
       attribute form used for `FSharp.Core` at line 69 and restart the loop from step 1.
-- [ ] [P5-T5] Step 2, analyzers. LOCK-ACQUIRE, then the exact command, redirecting the console log to
+- [x] [P5-T5] Step 2, analyzers. LOCK-ACQUIRE, then the exact command, redirecting the console log to
       `.../evidence/qa-gates/analyzer-final-console.2026-09-13T18-22.txt`, then LOCK-RELEASE:
 
       ```
@@ -3146,14 +3146,14 @@ changes and no task is renumbered.
       `EXIT_CODE:` and an `Output Summary:` carrying the three counts.
       Acceptance: `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0, `SKIPPED_CORECOMPILE=0`, and
       `CONTROL_BUILD_OUTPUT` greater than 0.
-- [ ] [P5-T6] Step 3, nullable. Identical to `[P5-T5]` with the msbuild property list replaced by
+- [x] [P5-T6] Step 3, nullable. Identical to `[P5-T5]` with the msbuild property list replaced by
       `/p:TreatWarningsAsErrors=true` and the console log path replaced by
       `.../evidence/qa-gates/nullable-final-console.2026-09-13T18-22.txt`. Do not add
       `/p:Nullable=enable`. Write `.../evidence/qa-gates/nullable-final.2026-09-13T18-22.md` with the four
       required fields and the same three counts measured against the nullable log.
       Acceptance: `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0, `SKIPPED_CORECOMPILE=0`, and
       `CONTROL_BUILD_OUTPUT` greater than 0.
-- [ ] [P5-T7] Step 4, tests with coverage. LOCK-ACQUIRE, then
+- [x] [P5-T7] Step 4, tests with coverage. LOCK-ACQUIRE, then
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`,
       leaving `-CoverageOutput` at its default so the raw Cobertura document is retained, then
       LOCK-RELEASE. Write `.../evidence/qa-gates/test-final.2026-09-13T18-22.md` with `Timestamp:`,
@@ -3183,7 +3183,7 @@ changes and no task is renumbered.
       The runner's repository-wide threshold assertion runs after the Cobertura
       document has been written, so a non-zero exit caused by that assertion is recorded against a
       matching `ExpectedExitCode:` and does not block.
-- [ ] [P5-T8] Post-format file-size audit. Repeat the SEVEN-path file-size command stated at `[P4-T18]`,
+- [x] [P5-T8] Post-format file-size audit. Repeat the SEVEN-path file-size command stated at `[P4-T18]`,
       not the six-path one at `[P4-T12]`, after the final format pass, and append the result to
       `.../evidence/other/file-size-audit.2026-09-13T18-22.md` under a `Post-Format Line Counts:` heading.
       Revision R7 repoints this task from `[P4-T12]` to `[P4-T18]` because the seven-path list is the one
@@ -3208,7 +3208,7 @@ changes and no task is renumbered.
       equal to the `BASELINE_FSHARP_REDIRECT_LINES` integer recorded at `[P0-T15]`, every banned-token
       line ending `HITS=0` across all five paths, and every `CONTROL_AppDomain` line ending with a count
       greater than 0 across all five paths.
-- [ ] [P5-T9] Extract the per-file coverage figure for the new module. Command:
+- [x] [P5-T9] Extract the per-file coverage figure for the new module. Command:
 
       ```
       pwsh -NoProfile -Command '
@@ -3246,7 +3246,7 @@ changes and no task is renumbered.
       `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` and deletes none. A materially different
       `LINES_VALID` on this re-run means the production file was edited by something outside this
       revision's authority: stop and report rather than adapting the figure.
-- [ ] [P5-T10] Coverage delta and no-regression record. Write
+- [x] [P5-T10] Coverage delta and no-regression record. Write
       `.../evidence/qa-gates/coverage-delta.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:` and an `Output Summary:` carrying five labelled figures: `BASELINE_LINE_RATE` and
       `BASELINE_LINES_VALID` copied from `.../evidence/baseline/test-coverage-baseline.2026-09-13T18-22.md`;
@@ -3307,7 +3307,7 @@ changes and no task is renumbered.
       `0.7125753506415995` over `83775`, and `0.858327` over `65616` — as numbers rather than as
       descriptions. The literal `Document State Flip:` is quoted here in prose because it is absent from
       the tree until this task runs.
-- [ ] [P5-T11] Project every raw build console log this plan produces under the feature folder's
+- [x] [P5-T11] Project every raw build console log this plan produces under the feature folder's
       `evidence/` tree. **This task and `[P5-T12]` run after the four-step loop has completed cleanly and
       are not part of it**; they are placed here rather than in Phase 6 so they precede `[P6-T1]`, which is
       the first task that commits. Every gate that reads a raw console log — `[P0-T6]`, `[P0-T7]`,
@@ -3386,7 +3386,7 @@ changes and no task is renumbered.
       projections must each record `SKIPPING_CORECOMPILE_COUNT=0`, which is the figure AC18 requires and
       the figure `[P5-T5]` and `[P5-T6]` already gated on the raw logs; any other value blocks, because it
       would mean the analyzer or nullable gate was vacuous.
-- [ ] [P5-T12] Remove the six raw build console logs from the feature folder's `evidence/` tree, now that
+- [x] [P5-T12] Remove the six raw build console logs from the feature folder's `evidence/` tree, now that
       `[P5-T11]` has projected each of them and every gate that reads one has run. The reason is the
       standing directive that evidence artifacts carry projections rather than raw dumps and carry no
       absolute host path:

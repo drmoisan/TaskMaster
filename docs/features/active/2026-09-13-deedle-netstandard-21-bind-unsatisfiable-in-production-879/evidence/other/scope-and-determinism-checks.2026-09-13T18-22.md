@@ -155,14 +155,15 @@ tracked source across the whole tree. CSharpier 1.2.6 accepts and processes `pac
 and `*.xml` as well as `*.cs`, which is why the `packages.config` half of the sweep is
 re-measured rather than carried forward.
 
-Timestamp: 2026-09-14T11-54
+Timestamp: 2026-09-14T12-55
 
-Commands: the `[P4-T9]` command and the `[P4-T11]` command, each repeated verbatim, run from
-`<worktree-root>` via `Set-Location -LiteralPath <worktree-root>`.
+Commands: the FIVE-path determinism command stated at `[P4-T18]` and the `[P4-T11]` command,
+each repeated verbatim, run from `<worktree-root>` via
+`Set-Location -LiteralPath <worktree-root>`.
 
 EXIT_CODE: 0
 
-Determinism and no-filesystem-write sweep, re-run of `[P4-T9]`:
+Determinism and no-filesystem-write sweep, re-run of the FIVE-path command stated at `[P4-T18]`:
 
 ```
 UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Thread.Sleep HITS=0
@@ -182,6 +183,23 @@ UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Path.GetTempPath HITS
 UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs StreamWriter HITS=0
 UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs DateTime.Now HITS=0
 UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs DateTime.UtcNow HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs Thread.Sleep HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs Task.Delay HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.WriteAllText HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.WriteAllLines HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.WriteAllBytes HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.AppendAllText HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.Create HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.Delete HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.Move HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs File.Copy HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs Directory.CreateDirectory HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs Directory.Delete HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs Path.GetTempFileName HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs Path.GetTempPath HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs StreamWriter HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs DateTime.Now HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs DateTime.UtcNow HITS=0
 TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Thread.Sleep HITS=0
 TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Task.Delay HITS=0
 TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.WriteAllText HITS=0
@@ -234,6 +252,7 @@ TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs StreamWriter HITS=0
 TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs DateTime.Now HITS=0
 TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs DateTime.UtcNow HITS=0
 UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs CONTROL_AppDomain HITS=4
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs CONTROL_AppDomain HITS=1
 TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs CONTROL_AppDomain HITS=7
 TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs CONTROL_AppDomain HITS=9
 TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs CONTROL_AppDomain HITS=1
@@ -248,23 +267,26 @@ NETSTANDARD_DLL_IN_PROJECTS=0
 FSHARP_REDIRECT_LINES=15
 ```
 
-Acceptance Condition: MET on the terminal state. All 68 banned-token lines end with `HITS=0`,
-and all four `CONTROL_AppDomain` lines end with a count greater than 0, so the zero counts are
-evidence rather than an artefact of a broken search or an unreadable path.
+Acceptance Condition: MET on the terminal state. All 85 banned-token lines end with `HITS=0`,
+and all five `CONTROL_AppDomain` lines end with a count greater than 0, so the zero counts are
+evidence rather than an artefact of a broken search or an unreadable path. The counts are 85
+and five rather than the superseded pass's 68 and four because Revision R7 repoints this
+re-run from the `[P4-T9]` four-path list to the `[P4-T18]` FIVE-path list, which includes
+`UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`.
 `PACKAGES_CONFIG_CHANGED=0`, `PORCELAIN_PACKAGES_CONFIG=0` and
 `NETSTANDARD_DLL_IN_PROJECTS=0`, and `FSHARP_REDIRECT_LINES` is 15, exactly equal to the
 `BASELINE_FSHARP_REDIRECT_LINES` integer of 15 recorded at `[P0-T15]`, so this work including
 the format pass changed that figure by zero. The baseline figure is 15 rather than 0, so the
 comparison is discriminating.
 
-The format pass rewrote two of the four files in the determinism sweep,
-`TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` among them, and introduced no banned
-token into either. It rewrote no `packages.config`.
+The Revision R7 format pass rewrote exactly one of the five files in the determinism sweep,
+`UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`, and introduced no banned
+token into it. It rewrote no `packages.config`.
 
 ## Revision R7 Project-File Registration:
 
 Timestamp: 2026-09-14T10-05
-Command: Set-Location -LiteralPath "C:/Users/DanMoisan/repos/TaskMaster-wt/bugs-2026-09-11-item-879"; git add -- UtilitiesCS.Test/UtilitiesCS.Test.csproj; git diff --numstat --cached -- UtilitiesCS.Test/UtilitiesCS.Test.csproj; pwsh -NoProfile -Command (four Select-String counts); git diff --numstat origin/main...HEAD -- UtilitiesCS.Test/UtilitiesCS.Test.csproj
+Command: Set-Location -LiteralPath <worktree-root>; git add -- UtilitiesCS.Test/UtilitiesCS.Test.csproj; git diff --numstat --cached -- UtilitiesCS.Test/UtilitiesCS.Test.csproj; pwsh -NoProfile -Command (four Select-String counts); git diff --numstat origin/main...HEAD -- UtilitiesCS.Test/UtilitiesCS.Test.csproj
 EXIT_CODE: 0
 
 Select-String counts, taken after the single-line insertion:

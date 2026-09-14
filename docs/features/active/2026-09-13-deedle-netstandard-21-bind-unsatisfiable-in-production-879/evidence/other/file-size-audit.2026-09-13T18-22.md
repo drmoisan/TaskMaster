@@ -55,13 +55,16 @@ began and no Phase 3 or Phase 4 task edits it.
 
 ## Post-Format Line Counts
 
-Recorded by `[P5-T8]` after the final format pass at `[P5-T2]`, which rewrote
-`UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` and
-`TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs`.
+Recorded by `[P5-T8]` after the final format pass at `[P5-T2]`. Revision R7 repoints this task
+from the `[P4-T12]` six-path command to the `[P4-T18]` SEVEN-path command, because the
+seven-path list is the one that includes
+`UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`. The six-path result
+recorded here by the superseded loop is replaced rather than kept alongside, so exactly one
+`Post-Format Line Counts` heading exists and its acceptance condition reads a single list.
 
-Timestamp: 2026-09-14T11-54
+Timestamp: 2026-09-14T12-54
 
-Command: the `[P4-T12]` command, repeated verbatim, run from `<worktree-root>` via
+Command: the `[P4-T18]` seven-path command, repeated verbatim, run from `<worktree-root>` via
 `Set-Location -LiteralPath <worktree-root>`.
 
 EXIT_CODE: 0
@@ -69,28 +72,32 @@ EXIT_CODE: 0
 ```
 UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs LINES=455
 UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs LINES=383
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs LINES=284
 TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs LINES=364
 TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs LINES=466
 TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs LINES=123
 TaskMaster/ThisAddIn.cs LINES=318
 ```
 
-Every `LINES=` value is at most 500, so the acceptance condition is met. No file was split, no
-write-set amendment was required, and no `csproj` registration changed.
+Every one of the seven `LINES=` values is at most 500, so the acceptance condition is met. No
+file was split, no further write-set amendment was required, and no `csproj` registration
+changed in this task.
 
 | File | Pre-format | Post-format | Headroom |
 |---|---|---|---|
 | `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` | 466 | 466 | 34 |
-| `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` | 458 | 455 | 45 |
+| `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` | 455 | 455 | 45 |
 | `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` | 383 | 383 | 117 |
-| `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` | 361 | 364 | 136 |
+| `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` | 364 | 364 | 136 |
 | `TaskMaster/ThisAddIn.cs` | 318 | 318 | 182 |
+| `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs` | 284 | 284 | 216 |
 | `TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs` | 123 | 123 | 377 |
 
-The format pass did not push either watched file over the ceiling. It reduced
-`AssemblyBindingFallback.cs` by three lines and added three to `ChildDomainBindProbe.cs`, and
-it left `NetstandardBindChildDomainTests.cs` unchanged at 466, that file not having been
-rewritten by the formatter. The largest post-format file is therefore
+The Revision R7 format pass rewrote exactly one file,
+`UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`, and the rewrite was
+confined to line endings: its line count is 284 both before and after. The other six files were
+already at the formatter's fixpoint from the superseded pass, which is why every pre-format and
+post-format figure above is equal. The largest file remains
 `NetstandardBindChildDomainTests.cs` at 466 lines with 34 lines of headroom. No hand-formatting
 was applied against CSharpier output at any point.
 

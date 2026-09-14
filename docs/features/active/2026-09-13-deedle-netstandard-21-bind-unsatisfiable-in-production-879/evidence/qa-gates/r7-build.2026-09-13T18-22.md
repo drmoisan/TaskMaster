@@ -4,7 +4,7 @@ Timestamp: 2026-09-14T12-41
 
 Command:
 ```
-pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/Users/DanMoisan/repos/TaskMaster-wt/bugs-2026-09-11-item-879"
+pwsh -NoProfile -Command 'Set-Location -LiteralPath <worktree-root>
 $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
 $msb = @(& $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\amd64\MSBuild.exe")[0]
 & $msb TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" *> "TestResults/r7-build/r7-build-console.txt"

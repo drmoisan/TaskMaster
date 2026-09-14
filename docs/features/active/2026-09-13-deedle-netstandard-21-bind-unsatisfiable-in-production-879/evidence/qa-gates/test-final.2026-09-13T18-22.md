@@ -1,92 +1,66 @@
 # Phase 5 Step 4 — Tests With Coverage, Final Toolchain Loop
 
-Recorded by `[P5-T7]`.
+Recorded by `[P5-T7]`. This artifact records the Revision R7 re-execution of the loop; each
+attempt overwrites its own artifact.
 
-Timestamp: 2026-09-14T11-52
+Timestamp: 2026-09-14T12-53
 
-Build lock: ACQUIRED 879 at 2026-09-14T11:52:31, RELEASED by 879 at 2026-09-14T11:54:08.
+Build lock: ACQUIRED 879 at 2026-09-14T12:50:37, RELEASED by 879 at 2026-09-14T12:53:12.
 
-Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
-
-Run from `<worktree-root>` via `Set-Location -LiteralPath <worktree-root>`. `-CoverageOutput`
-was left at its default, `coverage\coverage.cobertura.xml`. Issue #873's
-`Test-RawCoverageDocumentRetained` deletes the raw Cobertura document unless its parent
-directory is exactly the repository `coverage` directory, by equality and not containment, so
-the default is load-bearing and was not changed. `-SearchRoot .` is the solution-wide scope
-that `[P0-T8]` used, and it was not narrowed: narrowing it would change the coverage
-denominator `[P5-T10]` compares.
+Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath <worktree-root>
+& "scripts/vscode/Invoke-MSTestWithCoverage.ps1" -SearchRoot . -Configuration Debug'`
 
 EXIT_CODE: 0
-
 ExpectedExitCode: 0
 
-Cobertura Document State: POSTPROCESSED
+`-CoverageOutput` was left at its default so the raw Cobertura document is retained, for the
+issue 873 reason recorded at `## R4.6`: `Test-RawCoverageDocumentRetained` deletes the raw
+document unless its parent directory is exactly `<repoRoot>\coverage`, by equality and not by
+containment.
+
+The runner's repository-wide threshold assertion runs after the Cobertura document has been
+written. It did not fire on this run: zero tests failed, so the runner did not throw on a
+non-zero collection exit code, post-processing ran, and
+`Assert-CoberturaLineCoverageThreshold` asserted against the post-processed first-party
+document-level rate of `0.858647`, which clears its hard-coded 80 percent threshold. Issue #891
+remains unfixed by this plan; this run simply did not meet its failing condition.
 
 Output Summary:
 
 ```
-Discovered 9 test assemblies.
-line-rate      = 0.858327
-lines-valid    = 65616
-lines-covered  = 56320
-branch-rate    = 0.79973
-test total     = 7283
-test failed    = 0
-test passed    = 7283
+DOC_LINE_RATE=0.858647
+DOC_LINES_VALID=65616
+DOC_LINES_COVERED=56341
+DOC_BRANCH_RATE=0.800376
+DOC_BRANCHES_VALID=17022
+DOC_BRANCHES_COVERED=13624
+TRX_MATCH_COUNT=1
+RESULT_SUMMARY_OUTCOME=Completed
+COUNTERS_TOTAL=7293
+COUNTERS_PASSED=7293
+COUNTERS_FAILED=0
 ```
+
+The document-level `line-rate`, `lines-valid` and `lines-covered` are read from
+`coverage/coverage.cobertura.xml`. The total, failed and passed counts are read from
+`coverage/test-results/mstest-coverage-run.trx`. The runner's own console line reports the same
+first-party figures: lines 56341/65616 (85.86%), branches 13624/17022 (80.04%).
 
 Failing Test Names: NONE
 
-## Acceptance
-
-All six numeric values are present as numbers rather than placeholders: `line-rate`,
-`lines-valid` and `lines-covered` read from `coverage/coverage.cobertura.xml`, and the total,
-failed and passed counts read from `coverage/test-results/mstest-coverage-run.trx`.
-
-The `Failing Test Names:` field records the literal `NONE` because the failed count is zero.
-The empty set is a subset of the two failures recorded at `[P0-T8]`, namely
+The failed count is zero, so the list is recorded as the literal `NONE`. An empty set is a
+subset of the two baseline failures recorded at `[P0-T8]`,
 `ConfigureBreadcrumbDropDown_WorkerThread_ThrowsBoundaryDiagnostic` and
-`InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic`, so the subset condition
-is satisfied and this task does not block. The subset formulation rather than an equality on
-the count is what makes that so: those two are intermittent, and this run is the case the plan
-anticipated in which the intermittent pair happens to pass. No third name appeared, and no
-name outside those two appeared, so the loop was not restarted.
+`InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic`, so the acceptance
+condition is satisfied. Both of those tests passed on this run. They are intermittent, which is
+why the acceptance condition is written as a subset rather than as an equality on the count: a
+run in which the pair happens to pass must not block for that reason either.
 
-The failing-name list was derived mechanically from the TRX rather than from the console
-tail: every `UnitTestResult` whose `outcome` is not `Passed` was enumerated and the count was
-zero, which agrees with the `ResultSummary` counters above.
+Cobertura Document State: POSTPROCESSED. The runner reached its post-processing step because no
+test failed, so the retained document is first-party only rather than raw collector output.
+This differs from the `[P0-T8]` baseline document state, and `[P5-T10]` records the consequence
+for the rate comparison.
 
-## Exit-Code Path Observed
-
-The run exited 0, which is a different path from the one `[P0-T8]` observed and the difference
-is attributable and recorded rather than assumed.
-
-`Invoke-MSTestWithCoverage.ps1` line 262 throws on a non-zero collection exit code, which is
-the path `[P0-T8]` took because two tests failed there; that throw happens before
-post-processing at lines 383-384, which is why the baseline document is raw collector output.
-Here no test failed, so the collection exit code was zero, the throw did not occur, and
-post-processing ran. `Cobertura Document State: POSTPROCESSED` is confirmed independently of
-the exit path by a fixed-string search of the document for the literal `<sources>`, which
-post-processing injects and the raw document does not carry: that search returned 1 hit,
-against 0 hits at baseline.
-
-Issue #891's `Assert-CoberturaLineCoverageThreshold` at line 386 therefore did run in this
-invocation, and it did not throw: it asserts against the DOCUMENT-LEVEL line-rate of the
-post-processed document, which is the first-party rate of `0.858327`, and that clears its
-hard-coded threshold. The runner reported
-`First-party coverage: lines 56320/65616 (85.83%), branches 13613/17022 (79.97%)`. Issue #891
-is named here rather than worked around; no runner parameter was added and
-`scripts/vscode/Invoke-MSTestWithCoverage.ps1` was not edited, it being outside the
-authorised write set.
-
-## Denominator Note for `[P5-T10]`
-
-The figures above are POST-PROCESSED, first-party only. `[P0-T8]`'s figures are RAW collector
-output over all modules including third-party. The two document-level rates are therefore not
-directly comparable, and `[P5-T10]` records that rather than asserting a comparison.
-
-## Evidence Hygiene
-
-Neither the raw Cobertura document nor the TRX is committed. Both live under `coverage/`,
-which `.gitignore` line 144 excludes via `coverage/*`. Only the projected figures above are
-retained in this artifact.
+No raw `.trx` and no raw `.cobertura.xml` is added to git by this task. `coverage/` is
+git-ignored by `coverage/*` at `.gitignore` line 144 and `TestResults/` by the
+`[Tt]est[Rr]esult*/` pattern at line 39.

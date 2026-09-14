@@ -53,7 +53,10 @@ Re-run by `[P5-T8]` after the final format pass at `[P5-T2]`. The re-run is requ
 `packages.config` and `*.xml` as well as `*.cs`, so a shape check taken before the format pass
 describes the Phase 4 state rather than the terminal one.
 
-Timestamp: 2026-09-14T11-54
+Timestamp: 2026-09-14T12-54
+
+Re-taken on the Revision R7 re-execution of the loop. The figures below replace the superseded
+pass's readings; they are identical, and the timestamp records the run that produced them.
 
 Command: the `[P4-T8]` command, repeated verbatim, run from `<worktree-root>` via
 `Set-Location -LiteralPath <worktree-root>`.

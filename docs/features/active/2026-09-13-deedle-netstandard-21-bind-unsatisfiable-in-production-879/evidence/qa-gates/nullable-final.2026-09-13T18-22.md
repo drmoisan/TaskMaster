@@ -1,20 +1,17 @@
-# Phase 5 Step 3 — Nullable / Type-Check, Final Toolchain Loop
+# Phase 5 Step 3 — Nullable / Type Check, Final Toolchain Loop
 
-Recorded by `[P5-T6]`.
+Recorded by `[P5-T6]`. This artifact records the Revision R7 re-execution of the loop; each
+attempt overwrites its own artifact.
 
-Timestamp: 2026-09-14T11-51
+Timestamp: 2026-09-14T12-49
 
-Build lock: ACQUIRED 879 at 2026-09-14T11:51:32, RELEASED by 879 at 2026-09-14T11:52:00.
+Build lock: ACQUIRED 879 at 2026-09-14T12:49:41, RELEASED by 879 at 2026-09-14T12:50:14.
 
 Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath <worktree-root>
 $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
 $msb = @(& $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\amd64\MSBuild.exe")[0]
-& $msb TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true *> "<feature-folder>/evidence/qa-gates/nullable-final-console.2026-09-13T18-22.txt"
+& $msb TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true *> <nullable console log>
 $LASTEXITCODE'`
-
-`/p:Nullable=enable` was NOT added. No project in this repository carries a `Nullable`
-element, so that property would be a solution-wide opt-in conscripting every file that has
-never adopted the pragma. The command above is character-for-character CI's.
 
 EXIT_CODE: 0
 
@@ -26,32 +23,20 @@ SKIPPED_CORECOMPILE=0
 CONTROL_BUILD_OUTPUT=100
 ```
 
-Build summary lines read from the console log:
+`/p:Nullable=enable` was deliberately not added, matching `.github/workflows/_build-nullable.yml`
+character for character. Nullable enforcement in this repository is per-file opt-in: a file
+participates when it carries a `#nullable enable` directive, and `/p:TreatWarningsAsErrors=true`
+then promotes its `CS86xx` diagnostics to build errors.
 
-```
-0 Warning(s)
-0 Error(s)
-Build succeeded.
-```
+`UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` carries the directive on line 1 and therefore
+participates. `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`, added by
+`[P4-T13]`, deliberately carries no directive and no `?` annotation on any reference type, so it
+does not opt in and cannot raise CS8632.
 
-Acceptance conditions, each measured rather than inferred:
+`ZERO_ERRORS_LINES=1` is greater than zero: zero errors were reported with warnings treated as
+errors. `SKIPPED_CORECOMPILE=0` establishes that no project skipped compilation, which is what
+makes this gate non-vacuous; `/t:Rebuild` is used for that reason. `CONTROL_BUILD_OUTPUT=100` is
+the positive control that the log is a real build log and the search mechanism is live.
 
-- `EXIT_CODE: 0` — observed.
-- `ZERO_ERRORS_LINES` greater than 0 — observed as 1, matched on the anchored summary pattern
-  `^\s+0 Error\(s\)$`.
-- `SKIPPED_CORECOMPILE=0` — observed. `/t:Rebuild` was used rather than `/t:Build`, so no
-  project skipped `CoreCompile` and the nullable-flow analysis actually ran under
-  `/p:TreatWarningsAsErrors=true`.
-- `CONTROL_BUILD_OUTPUT` greater than 0 — observed as 100, the positive control on the log
-  and on the search mechanism.
-
-This result covers the Revision R2 nullable conversion recorded at `## R4.2`:
-`AssemblyBindingFallback.Resolve` returning `Assembly?`, the `Assembly? resolved` declaration
-inside the nullable-enabled region, and the three `null!` returns retained on the
-`OnAssemblyResolve` handler as a boundary suppression against the un-annotated net48
-`ResolveEventHandler` contract. Zero warnings and zero errors under
-`/p:TreatWarningsAsErrors=true` confirms the conversion introduced no CS86xx diagnostic, and
-that no `?` annotation leaked into the two nullable-oblivious test files, which would have
-raised CS8632 and been promoted to a build error here.
-
-The raw console log is 11,815 lines. It is projected by `[P5-T11]` and removed by `[P5-T12]`.
+The raw console log is projected by `[P5-T11]` and removed by `[P5-T12]`, so this artifact
+carries the measured counts rather than the dump.
