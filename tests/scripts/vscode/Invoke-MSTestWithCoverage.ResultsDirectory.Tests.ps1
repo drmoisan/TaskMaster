@@ -40,7 +40,7 @@ BeforeAll {
     # the reconciliation the entry point runs holds exactly. The test-result document declares the
     # default TeamTest namespace, as a real one does. Both are in-memory here-strings.
     $script:postProcessedCoverageXml = @'
-<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>
+<coverage line-rate="0.8" branch-rate="0.8" lines-covered="4" lines-valid="5" branches-valid="10"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>
 '@
     $script:coverageTrxFixture = @'
 <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
