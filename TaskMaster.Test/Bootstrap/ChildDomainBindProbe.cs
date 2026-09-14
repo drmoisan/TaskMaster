@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 namespace TaskMaster.Test.Bootstrap
@@ -32,10 +31,47 @@ namespace TaskMaster.Test.Bootstrap
         /// <summary>Outcome string returned when a load succeeded.</summary>
         public const string LoadedOutcome = "LOADED";
 
-        /// <summary>Outcome string returned when a type initializer ran without throwing.</summary>
-        public const string OkOutcome = "OK";
+        /// <summary>
+        /// Outcome string returned when the record conversion was invoked and returned without
+        /// throwing.
+        /// </summary>
+        public const string InvokedOutcome = "INVOKED-NO-EXCEPTION";
+
+        /// <summary>
+        /// Prefix of the outcome string returned when the conversion failed because a
+        /// <c>netstandard</c> identity could not be bound.
+        /// </summary>
+        public const string BindFailurePrefix = "NETSTANDARD-BIND-FAILURE:";
+
+        /// <summary>
+        /// Prefix of the outcome string returned when the conversion failed for any other
+        /// reason. Keeping the two classes apart is what stops an unrelated exception being
+        /// read as evidence about the bind.
+        /// </summary>
+        public const string OtherFailurePrefix = "OTHER-FAILURE:";
 
         private const string AssemblyResolveFieldName = "_AssemblyResolve";
+
+        /// <summary>
+        /// Record-shaped input of the same kind production supplies to Deedle's frame builder
+        /// at <c>UtilitiesCS/Extensions/DfDeedle.cs</c>.
+        /// </summary>
+        /// <remarks>
+        /// This is not a copy of production's shape: production's record type is a private
+        /// struct exposing public fields, whereas this one is a sealed class exposing
+        /// auto-properties. Deedle's member accepts either, and a public class is used here
+        /// because the cross-domain proxy must be able to close the generic method over the
+        /// type. It carries no date-valued member, so the determinism sweep over this file
+        /// stays clean.
+        /// </remarks>
+        public sealed class DeedleProbeRecord
+        {
+            /// <summary>An arbitrary text column.</summary>
+            public string Label { get; set; }
+
+            /// <summary>An arbitrary numeric column.</summary>
+            public double Value { get; set; }
+        }
 
         /// <summary>
         /// Counts assemblies loaded in this domain whose simple name matches
@@ -125,16 +161,22 @@ namespace TaskMaster.Test.Bootstrap
         }
 
         /// <summary>
-        /// Loads Deedle from the supplied absolute path and forces the class constructor of
-        /// <c>Deedle.Reflection</c>, which is the initializer the reported production failure
-        /// occurs in.
+        /// Loads Deedle from the supplied absolute path and invokes
+        /// <c>Deedle.Reflection.convertRecordSequence</c> closed over
+        /// <see cref="DeedleProbeRecord"/>, which is the deepest caller frame of the reported
+        /// production trace.
         /// </summary>
         /// <returns>
-        /// <see cref="OkOutcome"/> when the initializer ran without throwing, otherwise the
-        /// simple name of the exception type that was raised.
+        /// <see cref="InvokedOutcome"/> when the invocation returned without throwing;
+        /// otherwise <see cref="BindFailurePrefix"/> or <see cref="OtherFailurePrefix"/>
+        /// followed by the simple name of the unwrapped exception type.
         /// </returns>
-        /// <exception cref="InvalidOperationException">The file is absent.</exception>
-        public string DeedleTypeInitializerOutcome(string deedleDllPath)
+        /// <exception cref="InvalidOperationException">
+        /// The file is absent, or the member could not be resolved in the expected shape. Both
+        /// are broken-probe conditions rather than measurements, so they are raised rather
+        /// than classified.
+        /// </exception>
+        public string DeedleRecordConversionOutcome(string deedleDllPath)
         {
             if (string.IsNullOrEmpty(deedleDllPath) || !File.Exists(deedleDllPath))
             {
@@ -143,18 +185,150 @@ namespace TaskMaster.Test.Bootstrap
                 );
             }
 
+            var records = new[] { new DeedleProbeRecord { Label = "probe", Value = 1.0 } };
+
             try
             {
                 Assembly deedle = Assembly.LoadFrom(deedleDllPath);
                 Type reflection = deedle.GetType("Deedle.Reflection", throwOnError: true);
-                RuntimeHelpers.RunClassConstructor(reflection.TypeHandle);
-                return OkOutcome;
+                MethodInfo definition = ResolveConvertRecordSequence(reflection);
+                MethodInfo closed = definition.MakeGenericMethod(typeof(DeedleProbeRecord));
+                closed.Invoke(null, new object[] { records });
+                return InvokedOutcome;
+            }
+            catch (InvalidOperationException)
+            {
+                // Fail loud, and deliberately first: a lookup miss means the probe is broken,
+                // not that the bind failed. Letting it escape past the classifier is what
+                // stops a broken probe being reported as a measurement.
+                throw;
             }
             catch (Exception ex)
             {
-                // Boundary catch: the outcome of the initializer is the measurement.
-                return ex.GetType().Name;
+                // Boundary catch: the outcome of the invocation is the measurement.
+                return ClassifyConversionFailure(ex);
             }
+        }
+
+        /// <summary>
+        /// Resolves the generic method definition the probe invokes, failing loudly when the
+        /// member is missing, ambiguous, or not of the expected shape.
+        /// </summary>
+        /// <remarks>
+        /// Resolving a <see cref="MethodInfo"/> does not run a class constructor, which is why
+        /// this helper can sit inside the caller's try block without itself triggering the bind
+        /// under test; the invocation is what triggers it. The non-public binding flag is
+        /// load-bearing: the member is internal to Deedle, so a public-only lookup returns null
+        /// and this helper throws.
+        /// </remarks>
+        private static MethodInfo ResolveConvertRecordSequence(Type reflection)
+        {
+            const string MemberName = "convertRecordSequence";
+            MethodInfo method;
+
+            try
+            {
+                method = reflection.GetMethod(
+                    MemberName,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static
+                );
+            }
+            catch (AmbiguousMatchException ex)
+            {
+                throw new InvalidOperationException(
+                    "More than one overload of "
+                        + reflection.FullName
+                        + "."
+                        + MemberName
+                        + " was found, so the probe cannot name the overload it means.",
+                    ex
+                );
+            }
+
+            if (method == null)
+            {
+                throw new InvalidOperationException(
+                    "The member " + reflection.FullName + "." + MemberName + " was not found."
+                );
+            }
+
+            if (!method.IsGenericMethodDefinition || method.GetGenericArguments().Length != 1)
+            {
+                throw new InvalidOperationException(
+                    "The member "
+                        + reflection.FullName
+                        + "."
+                        + MemberName
+                        + " is not a generic method definition taking exactly one generic argument."
+                );
+            }
+
+            if (method.GetParameters().Length != 1)
+            {
+                throw new InvalidOperationException(
+                    "The member "
+                        + reflection.FullName
+                        + "."
+                        + MemberName
+                        + " does not take exactly one parameter."
+                );
+            }
+
+            return method;
+        }
+
+        /// <summary>
+        /// Classifies a conversion failure into one of the two structured outcome strings.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="TargetInvocationException"/> is unwrapped before the type name is
+        /// reported, because <c>Invoke</c> wraps the real exception and without the unwrap every
+        /// failure would read as that wrapper and carry no information. The whole inner
+        /// exception chain of the original exception is walked rather than only its outermost
+        /// layer, because the production shape nests the file-not-found failure two type
+        /// initializers deep.
+        /// </remarks>
+        private static string ClassifyConversionFailure(Exception thrown)
+        {
+            Exception unwrapped = thrown;
+            var invocation = thrown as TargetInvocationException;
+            if (invocation != null && invocation.InnerException != null)
+            {
+                unwrapped = invocation.InnerException;
+            }
+
+            string reported = unwrapped.GetType().Name;
+
+            for (Exception current = thrown; current != null; current = current.InnerException)
+            {
+                var missing = current as FileNotFoundException;
+                if (missing == null)
+                {
+                    continue;
+                }
+
+                if (NamesNetstandard(missing.FileName) || NamesNetstandard(missing.Message))
+                {
+                    return BindFailurePrefix + reported;
+                }
+            }
+
+            return OtherFailurePrefix + reported;
+        }
+
+        /// <summary>
+        /// True when the supplied text names the <c>netstandard</c> identity, compared
+        /// case-insensitively.
+        /// </summary>
+        /// <remarks>
+        /// The caller inspects both the file name and the message, because the runtime does not
+        /// guarantee the file name is populated on every binding failure, while the failing
+        /// display name appears verbatim in the message text in either case.
+        /// </remarks>
+        private static bool NamesNetstandard(string text)
+        {
+            return text != null
+                && text.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         /// <summary>

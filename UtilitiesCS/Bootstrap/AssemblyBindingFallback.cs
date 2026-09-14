@@ -92,32 +92,33 @@ namespace UtilitiesCS.Bootstrap
         /// </summary>
         /// <param name="requested">The identity the CLR binder failed to resolve.</param>
         /// <returns>
-        /// A loaded assembly, or <c>null</c>. The declared return type is non-nullable
-        /// because it mirrors the un-annotated <see cref="ResolveEventHandler"/> contract,
-        /// for which <c>null</c> is the documented "not resolved" result.
+        /// A loaded assembly, or <c>null</c> when no ladder rung applies. The declared return
+        /// type is nullable because returning <c>null</c> is the ordinary result on this seam,
+        /// not an exceptional one: every guard clause and every exhausted ladder declines by
+        /// returning <c>null</c>. Callers must handle a <c>null</c> result.
         /// </returns>
-        internal static Assembly Resolve(AssemblyName requested)
+        internal static Assembly? Resolve(AssemblyName requested)
         {
             if (requested is null)
             {
-                return null!;
+                return null;
             }
 
             string? simpleName = requested.Name;
             if (string.IsNullOrEmpty(simpleName))
             {
-                return null!;
+                return null;
             }
 
             if (string.Equals(_resolvingSimpleName, simpleName, StringComparison.OrdinalIgnoreCase))
             {
-                return null!;
+                return null;
             }
 
             _resolvingSimpleName = simpleName;
             try
             {
-                return CreateProductionLadder().Resolve(requested)!;
+                return CreateProductionLadder().Resolve(requested);
             }
             finally
             {
@@ -155,7 +156,7 @@ namespace UtilitiesCS.Bootstrap
                     return null!;
                 }
 
-                Assembly resolved = Resolve(new AssemblyName(args.Name));
+                Assembly? resolved = Resolve(new AssemblyName(args.Name));
                 if (resolved is null)
                 {
                     Trace.WriteLine("Unresolved: " + args.Name, TraceCategory);

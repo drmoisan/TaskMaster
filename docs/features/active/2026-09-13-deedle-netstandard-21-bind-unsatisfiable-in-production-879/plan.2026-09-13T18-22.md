@@ -1158,7 +1158,7 @@ needs. Phase 3 supplies the behaviour.
 Phase 2 runs a targeted build and a targeted test run only. It does not run the analyzer gate, the
 nullable gate or the full suite: those gates would be evaluated against a deliberately incomplete seam.
 
-- [ ] [P2-T1] Amend `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` in place — the file already exists
+- [x] [P2-T1] Amend `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` in place — the file already exists
       from the version 1.0 execution of this plan and must NOT be recreated — so that it declares
       `public static class AssemblyBindingFallback` in namespace `UtilitiesCS.Bootstrap`, with:
       a public `static void Install()` guarded for idempotence by `Interlocked.Exchange` on a private
@@ -1221,7 +1221,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       items; an unregistered file silently does not build.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallback.cs"` on
       `UtilitiesCS/UtilitiesCS.csproj` returns exactly 1 hit.
-- [ ] [P2-T3] Amend `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` in place — the file
+- [x] [P2-T3] Amend `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` in place — the file
       already exists from the version 1.0 execution of this plan, carrying exactly ten `[TestMethod]`
       occurrences, and must NOT be recreated — so that it remains MSTest with Moq and
       FluentAssertions, one `[TestClass]` named `AssemblyBindingFallbackTests` in namespace
@@ -1277,7 +1277,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       project file. Only the anchor citation was stale.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallbackTests.cs"` on
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` returns exactly 1 hit.
-- [ ] [P2-T5] Amend `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` in place — the file already
+- [x] [P2-T5] Amend `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` in place — the file already
       exists from the version 1.0 execution of this plan and must NOT be recreated — so that it declares
       `public sealed class ChildDomainBindProbe : MarshalByRefObject` in namespace
       `TaskMaster.Test.Bootstrap`. It exposes separate public methods so that the negative-control path
@@ -1391,7 +1391,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       occurring at lines 137, 150, 36 and 5 respectively. The remaining two, `FluentAssertions` and
       `Microsoft.VisualStudio.TestTools`, are carried forward from the version 1.0 acceptance condition as
       standing guards on the child-domain emptiness rule rather than as new measurements.
-- [ ] [P2-T6] Amend `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` in place — the file
+- [x] [P2-T6] Amend `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` in place — the file
       already exists from the version 1.0 execution of this plan and must NOT be recreated — declaring
       `[TestClass] public class NetstandardBindChildDomainTests` in namespace `TaskMaster.Test.Bootstrap`,
       creating each child domain with `AppDomain.CreateDomain` using an `AppDomainSetup` whose
@@ -1553,7 +1553,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `Select-String -SimpleMatch -CaseSensitive` returns exactly 1 hit for each of the three file names
       `ChildDomainBindProbe.cs`, `NetstandardBindChildDomainTests.cs` and
       `AddInEagerInstallShapeTests.cs`.
-- [ ] [P2-T10] Re-run after the Revision R2 amendments to `[P2-T1]`, `[P2-T5]` and `[P2-T6]`, all three of
+- [x] [P2-T10] Re-run after the Revision R2 amendments to `[P2-T1]`, `[P2-T5]` and `[P2-T6]`, all three of
       which change compiled source after the build recorded by the version 1.0 execution of this task.
       The artifact at the path named below is overwritten by this re-run.
       LOCK-ACQUIRE, then create the evidence/regression-testing directory this task and `[P2-T11]` redirect into,
@@ -1668,7 +1668,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `DEEDLE_RECORD_CONVERSION_OUTCOME=` value begins with `OTHER-FAILURE:` the executor halts and
       reports blocked rather than adapting: the probe reached an exception that is not the bind, and the
       plan, not the run, needs correcting.
-- [ ] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
+- [x] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
       it. Read the `[P2-T11]` artifact. This task is re-run under Revision R2 and MUST read the
       REGENERATED `[P2-T11]` artifact, not the superseded copy `[P1-T5]` preserved: the five isolation
       outcomes are properties of the run, and the run changed. This task's own artifact at the path named

@@ -10,8 +10,13 @@ namespace UtilitiesCS.Test.Bootstrap
 {
     /// <summary>
     /// Unit tests for the host-neutral resolution ladder in
-    /// <see cref="AssemblyBindingFallback"/>. Every rung is driven through the ladder's
-    /// injected delegates, so no test reaches the GAC, the filesystem or a real bind.
+    /// <see cref="AssemblyBindingFallback"/>. Ten of these tests drive every ladder rung
+    /// through the ladder's injected delegates, so none of those ten touches the assembly
+    /// cache, the file system or a real bind. One further test drives the subscribed handler
+    /// through the real CLR binder, and is the only test here that does so: it exists to cover
+    /// the production entry point and the production ladder factory, neither of which any
+    /// delegate-driven test can reach, because both run only when a genuine failed bind raises
+    /// the domain's assembly-resolution event.
     /// </summary>
     [TestClass]
     public class AssemblyBindingFallbackTests
@@ -258,6 +263,39 @@ namespace UtilitiesCS.Test.Bootstrap
             // Assert
             act.Should().NotThrow();
             resolved.Should().BeNull();
+        }
+
+        /// <summary>
+        /// The subscribed production handler declines an identity no rung can supply, and
+        /// declines by returning null rather than by letting an exception reach the CLR
+        /// binder. This is the only test in this class that drives a real bind, and it is the
+        /// only one that executes
+        /// <c>AssemblyBindingFallback.OnAssemblyResolve</c> and
+        /// <c>AssemblyBindingFallback.CreateProductionLadder</c>, because both are reachable
+        /// only through a failed bind raising the domain's assembly-resolution event. The CLR
+        /// consumes the handler's return value, so the observable outcome is the load failing
+        /// rather than a value this test can inspect.
+        /// </summary>
+        [TestMethod]
+        public void Install_ThenLoadOfUnresolvableName_LeavesTheLoadFailingWithoutHandlerThrowing()
+        {
+            // Arrange: a fixed display name matching no assembly in the repository, in the
+            // assembly cache or beside the test assembly, so the outcome is deterministic.
+            InstalledField.SetValue(null, 0);
+            AssemblyBindingFallback.Install();
+            const string Unresolvable =
+                "UtilitiesCS.Test.NoSuchAssembly.7f3a2b1c, Version=1.0.0.0, "
+                + "Culture=neutral, PublicKeyToken=b77a5c561934e089";
+
+            // Act
+            Action act = () => Assembly.Load(Unresolvable);
+
+            // Assert: the binder reports the miss. Had the handler propagated an exception
+            // instead of returning null, the thrown type would not be this one.
+            act.Should()
+                .Throw<FileNotFoundException>(
+                    "the handler declines an unresolvable identity by returning null"
+                );
         }
 
         /// <summary>

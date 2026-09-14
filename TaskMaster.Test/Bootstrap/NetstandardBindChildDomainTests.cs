@@ -176,9 +176,16 @@ namespace TaskMaster.Test.Bootstrap
         }
 
         /// <summary>
-        /// The end-to-end assertion: the Deedle type initializer reported in the production
-        /// failure runs without throwing once the fallback is installed.
+        /// The end-to-end assertion: the Deedle member invocation at the deepest caller frame
+        /// of the reported production trace completes once the fallback is installed.
         /// </summary>
+        /// <remarks>
+        /// The observation is a member invocation rather than a forced class-constructor run.
+        /// Forcing the class constructor returned a success token against a build carrying no
+        /// fix, so it could not distinguish a fixed build from a broken one; invoking the
+        /// member closed over a record type reaches the binding failure the production trace
+        /// reports.
+        /// </remarks>
         [TestMethod]
         public void AfterInstall_DeedleTypeInitializerSucceeds()
         {
@@ -187,14 +194,27 @@ namespace TaskMaster.Test.Bootstrap
 
             // Act
             probe.InstallProductionFallback();
-            string outcome = probe.DeedleTypeInitializerOutcome(DeedlePath);
+            string outcome = probe.DeedleRecordConversionOutcome(DeedlePath);
 
-            // Assert
+            // Record the observed value before asserting, so it is recoverable from the TRX
+            // whether this test passes or fails.
+            TestContext.WriteLine("DEEDLE_RECORD_CONVERSION_OUTCOME=" + outcome);
+
+            // Assert: the class assertion first, then the completion assertion. FluentAssertions
+            // reports the first failing assertion, so a bind failure names the bind class while
+            // an unrelated exception passes the first and fails the second carrying its own type
+            // name. Neither failure can be mistaken for the other.
+            outcome
+                .Should()
+                .NotStartWith(
+                    ChildDomainBindProbe.BindFailurePrefix,
+                    "a netstandard identity must be bindable once the fallback is installed"
+                );
             outcome
                 .Should()
                 .Be(
-                    ChildDomainBindProbe.OkOutcome,
-                    "the reported production failure is a TypeInitializationException here"
+                    ChildDomainBindProbe.InvokedOutcome,
+                    "the record conversion must complete without throwing"
                 );
         }
 
