@@ -1,11 +1,14 @@
-# claude-md-coverage-thresholds-and-toolchain-command-corrections (Potential Bug)
+# claude-md-coverage-thresholds-and-toolchain-command-corrections (Issue #870)
 
 - Date captured: 2026-09-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/claude-md-coverage-thresholds-and-toolchain-command-corrections/ (Issue #870)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #870
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/870
+- Last Updated: 2026-09-12
 ## Summary
 
 `CLAUDE.md` names a test command the repository deliberately never runs (#828), states coverage thresholds that the maintainer has now settled differently from two rules files (#563, decision recorded 2026-09-11), and cites `.globalconfig` twice as an analyzer-severity source when that file does not exist (#727 sub-finding 5). All three are documentation-only corrections to one file this repository owns.
