@@ -52,3 +52,44 @@ The two files with the least headroom are the ones Phase 5 must watch. `Assembly
 from 289 lines to 458 in `[P3-T1]`, which implemented the four ladder rungs and three private helpers in
 place of the behaviour-empty seams. `NetstandardBindChildDomainTests.cs` was already at 466 when Phase 3
 began and no Phase 3 or Phase 4 task edits it.
+
+## Post-Format Line Counts
+
+Recorded by `[P5-T8]` after the final format pass at `[P5-T2]`, which rewrote
+`UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` and
+`TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs`.
+
+Timestamp: 2026-09-14T11-54
+
+Command: the `[P4-T12]` command, repeated verbatim, run from `<worktree-root>` via
+`Set-Location -LiteralPath <worktree-root>`.
+
+EXIT_CODE: 0
+
+```
+UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs LINES=455
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs LINES=383
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs LINES=364
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs LINES=466
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs LINES=123
+TaskMaster/ThisAddIn.cs LINES=318
+```
+
+Every `LINES=` value is at most 500, so the acceptance condition is met. No file was split, no
+write-set amendment was required, and no `csproj` registration changed.
+
+| File | Pre-format | Post-format | Headroom |
+|---|---|---|---|
+| `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` | 466 | 466 | 34 |
+| `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` | 458 | 455 | 45 |
+| `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` | 383 | 383 | 117 |
+| `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` | 361 | 364 | 136 |
+| `TaskMaster/ThisAddIn.cs` | 318 | 318 | 182 |
+| `TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs` | 123 | 123 | 377 |
+
+The format pass did not push either watched file over the ceiling. It reduced
+`AssemblyBindingFallback.cs` by three lines and added three to `ChildDomainBindProbe.cs`, and
+it left `NetstandardBindChildDomainTests.cs` unchanged at 466, that file not having been
+rewritten by the formatter. The largest post-format file is therefore
+`NetstandardBindChildDomainTests.cs` at 466 lines with 34 lines of headroom. No hand-formatting
+was applied against CSharpier output at any point.

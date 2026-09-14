@@ -317,10 +317,7 @@ namespace UtilitiesCS.Bootstrap
 
                 try
                 {
-                    string path = Path.Combine(
-                        _getRuntimeDirectory(),
-                        NetstandardFacadeFileName
-                    );
+                    string path = Path.Combine(_getRuntimeDirectory(), NetstandardFacadeFileName);
                     if (!_fileExists(path))
                     {
                         return null;

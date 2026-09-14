@@ -2457,11 +2457,11 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 Run steps 1 to 4 in this exact order. If any step fails, or changes any file, fix and restart from step 1.
 Each attempt overwrites its own artifact; the committed artifact is the final, clean pass.
 
-- [ ] [P5-T1] Re-gate Outlook closed before the loop, by the same command and rule as `[P0-T3]`. Append
+- [x] [P5-T1] Re-gate Outlook closed before the loop, by the same command and rule as `[P0-T3]`. Append
       the observation to `.../evidence/qa-gates/outlook-closed-gate.2026-09-13T18-22.md` with the four
       required fields.
       Acceptance: the recorded running-process count is `0`.
-- [ ] [P5-T2] Step 1, format. LOCK-ACQUIRE, then
+- [x] [P5-T2] Step 1, format. LOCK-ACQUIRE, then
       `pwsh -NoProfile -Command 'dotnet tool run csharpier format .'`, then LOCK-RELEASE. This is a
       write-mode command whose exit code is identical whether it rewrote files or not, so the acceptance
       condition observes the tree rather than the exit code.
@@ -2486,11 +2486,11 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       any other tracked file means the format pass was not scoped as expected: restore that file with
       `git checkout --` against its own pathspec, record the restoration in the artifact, and restart
       the loop from step 1.
-- [ ] [P5-T3] Step 1 verification, read-only.
+- [x] [P5-T3] Step 1 verification, read-only.
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .'` under LOCK-ACQUIRE/LOCK-RELEASE.
       Append `Check EXIT_CODE:` and the reported unformatted-file count to the `[P5-T2]` artifact.
       Acceptance: `Check EXIT_CODE: 0`.
-- [ ] [P5-T4] Step 1 side-effect check on the hand-edited config. Confirm the format pass did not rewrite
+- [x] [P5-T4] Step 1 side-effect check on the hand-edited config. Confirm the format pass did not rewrite
       any existing line of `TaskMaster/app.config`. Commands, in this order:
 
       ```
@@ -2508,7 +2508,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `TaskMaster/app.config` and an addition count between 1 and 12 inclusive. A non-zero deletion count
       means CSharpier rewrote an existing line in that file: rewrite the new block to match the existing
       attribute form used for `FSharp.Core` at line 69 and restart the loop from step 1.
-- [ ] [P5-T5] Step 2, analyzers. LOCK-ACQUIRE, then the exact command, redirecting the console log to
+- [x] [P5-T5] Step 2, analyzers. LOCK-ACQUIRE, then the exact command, redirecting the console log to
       `.../evidence/qa-gates/analyzer-final-console.2026-09-13T18-22.txt`, then LOCK-RELEASE:
 
       ```
@@ -2540,14 +2540,14 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `EXIT_CODE:` and an `Output Summary:` carrying the three counts.
       Acceptance: `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0, `SKIPPED_CORECOMPILE=0`, and
       `CONTROL_BUILD_OUTPUT` greater than 0.
-- [ ] [P5-T6] Step 3, nullable. Identical to `[P5-T5]` with the msbuild property list replaced by
+- [x] [P5-T6] Step 3, nullable. Identical to `[P5-T5]` with the msbuild property list replaced by
       `/p:TreatWarningsAsErrors=true` and the console log path replaced by
       `.../evidence/qa-gates/nullable-final-console.2026-09-13T18-22.txt`. Do not add
       `/p:Nullable=enable`. Write `.../evidence/qa-gates/nullable-final.2026-09-13T18-22.md` with the four
       required fields and the same three counts measured against the nullable log.
       Acceptance: `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0, `SKIPPED_CORECOMPILE=0`, and
       `CONTROL_BUILD_OUTPUT` greater than 0.
-- [ ] [P5-T7] Step 4, tests with coverage. LOCK-ACQUIRE, then
+- [x] [P5-T7] Step 4, tests with coverage. LOCK-ACQUIRE, then
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`,
       leaving `-CoverageOutput` at its default so the raw Cobertura document is retained, then
       LOCK-RELEASE. Write `.../evidence/qa-gates/test-final.2026-09-13T18-22.md` with `Timestamp:`,
@@ -2577,7 +2577,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       The runner's repository-wide threshold assertion runs after the Cobertura
       document has been written, so a non-zero exit caused by that assertion is recorded against a
       matching `ExpectedExitCode:` and does not block.
-- [ ] [P5-T8] Post-format file-size audit. Repeat the `[P4-T12]` command after the final format pass and
+- [x] [P5-T8] Post-format file-size audit. Repeat the `[P4-T12]` command after the final format pass and
       append the result to `.../evidence/other/file-size-audit.2026-09-13T18-22.md` under a
       `Post-Format Line Counts:` heading.
       Acceptance: the heading exists and every `LINES=` value under it is at most 500.

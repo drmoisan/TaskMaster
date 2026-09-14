@@ -145,3 +145,118 @@ The baseline figure is 15 rather than 0, so the comparison is discriminating.
 No `netstandard.dll` entered any project and no `packages.config` was changed or created. The porcelain
 span is the companion the name-listing diff needs: the diff enumerates tracked changes only and cannot
 report a `packages.config` this work might have created, so the two spans together cover both states.
+
+## Post-Format Sweep
+
+Re-run by `[P5-T8]` after the final format pass at `[P5-T2]`. Both the `[P4-T9]` determinism
+sweep and the `[P4-T11]` no-new-deployment sweep are repeated here because their acceptance
+conditions describe the terminal state rather than the Phase 4 state, and `[P5-T2]` rewrites
+tracked source across the whole tree. CSharpier 1.2.6 accepts and processes `packages.config`
+and `*.xml` as well as `*.cs`, which is why the `packages.config` half of the sweep is
+re-measured rather than carried forward.
+
+Timestamp: 2026-09-14T11-54
+
+Commands: the `[P4-T9]` command and the `[P4-T11]` command, each repeated verbatim, run from
+`<worktree-root>` via `Set-Location -LiteralPath <worktree-root>`.
+
+EXIT_CODE: 0
+
+Determinism and no-filesystem-write sweep, re-run of `[P4-T9]`:
+
+```
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Thread.Sleep HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Task.Delay HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.WriteAllText HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.WriteAllLines HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.WriteAllBytes HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.AppendAllText HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.Create HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.Delete HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.Move HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs File.Copy HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Directory.CreateDirectory HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Directory.Delete HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Path.GetTempFileName HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs Path.GetTempPath HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs StreamWriter HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs DateTime.Now HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs DateTime.UtcNow HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Thread.Sleep HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Task.Delay HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.WriteAllText HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.WriteAllLines HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.WriteAllBytes HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.AppendAllText HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.Create HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.Delete HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.Move HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs File.Copy HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Directory.CreateDirectory HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Directory.Delete HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Path.GetTempFileName HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs Path.GetTempPath HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs StreamWriter HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs DateTime.Now HITS=0
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs DateTime.UtcNow HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs Thread.Sleep HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs Task.Delay HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.WriteAllText HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.WriteAllLines HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.WriteAllBytes HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.AppendAllText HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.Create HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.Delete HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.Move HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs File.Copy HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs Directory.CreateDirectory HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs Directory.Delete HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs Path.GetTempFileName HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs Path.GetTempPath HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs StreamWriter HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs DateTime.Now HITS=0
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs DateTime.UtcNow HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs Thread.Sleep HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs Task.Delay HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.WriteAllText HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.WriteAllLines HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.WriteAllBytes HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.AppendAllText HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.Create HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.Delete HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.Move HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs File.Copy HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs Directory.CreateDirectory HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs Directory.Delete HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs Path.GetTempFileName HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs Path.GetTempPath HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs StreamWriter HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs DateTime.Now HITS=0
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs DateTime.UtcNow HITS=0
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs CONTROL_AppDomain HITS=4
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs CONTROL_AppDomain HITS=7
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs CONTROL_AppDomain HITS=9
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs CONTROL_AppDomain HITS=1
+```
+
+No-new-deployment sweep, re-run of `[P4-T11]`:
+
+```
+PACKAGES_CONFIG_CHANGED=0
+PORCELAIN_PACKAGES_CONFIG=0
+NETSTANDARD_DLL_IN_PROJECTS=0
+FSHARP_REDIRECT_LINES=15
+```
+
+Acceptance Condition: MET on the terminal state. All 68 banned-token lines end with `HITS=0`,
+and all four `CONTROL_AppDomain` lines end with a count greater than 0, so the zero counts are
+evidence rather than an artefact of a broken search or an unreadable path.
+`PACKAGES_CONFIG_CHANGED=0`, `PORCELAIN_PACKAGES_CONFIG=0` and
+`NETSTANDARD_DLL_IN_PROJECTS=0`, and `FSHARP_REDIRECT_LINES` is 15, exactly equal to the
+`BASELINE_FSHARP_REDIRECT_LINES` integer of 15 recorded at `[P0-T15]`, so this work including
+the format pass changed that figure by zero. The baseline figure is 15 rather than 0, so the
+comparison is discriminating.
+
+The format pass rewrote two of the four files in the determinism sweep,
+`TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` among them, and introduced no banned
+token into either. It rewrote no `packages.config`.

@@ -199,7 +199,10 @@ namespace TaskMaster.Test.Bootstrap
                 );
             }
 
-            var records = new[] { new DeedleProbeRecord { Label = "probe", Value = 1.0 } };
+            var records = new[]
+            {
+                new DeedleProbeRecord { Label = "probe", Value = 1.0 },
+            };
 
             try
             {
