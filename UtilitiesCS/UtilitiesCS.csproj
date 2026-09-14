@@ -991,6 +991,7 @@
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.Orchestration.cs" />
+    <Compile Include="Bootstrap\AssemblyBindingFallback.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\DfDeedle.FrameUtilities.cs" />
