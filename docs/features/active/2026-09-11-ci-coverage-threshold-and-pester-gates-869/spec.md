@@ -187,6 +187,7 @@ Each gate is independently revertible by reverting its workflow file. Reverting 
 `tests/scripts/vscode/Invoke-Restore.Tests.ps1`
 `tests/scripts/vscode/TestProcessCleanup.Tests.ps1`
 `tests/scripts/vscode/Install-RepoDotNetSdk.Tests.ps1`
+`tests/scripts/vscode/Invoke-MSTestWithCoverage.ResultsDirectory.Tests.ps1`
 `docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869/issue.md`
 `docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869/spec.md`
 `docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869/user-story.md`
@@ -197,6 +198,8 @@ Each gate is independently revertible by reverting its workflow file. Reverting 
 `docs/features/potential/2026-09-11-ci-coverage-threshold-and-pester-gates.md`
 
 The last entry is a deletion performed by the promotion step; it is listed because the diff touches it.
+
+The entry `tests/scripts/vscode/Invoke-MSTestWithCoverage.ResultsDirectory.Tests.ps1` was added to this write set after the set was first fixed. That file arrived in the worktree with the merged evidence-projection item, after this write set was authored, so the original survey of affected mocked documents did not reach it. It carries the same mocked post-processed Cobertura document with no `branch-rate` attribute that plan tasks P2-T3 and P2-T4 repair in two sibling files, which the branch assertion added by P2-T1 and wired into the entry point by P2-T2 turns red. The same minimal in-place repair was applied: the two attributes `branch-rate="0.8"` and `branches-valid="10"` were added to the root coverage element of the existing literal, and the file remained at 268 lines. The executor escalated the addition rather than absorbing it silently.
 
 Two further paths are created only if the tracked-fixture contingency described under decision D8 is taken. They are listed here so the declared path set stays complete in that case:
 
