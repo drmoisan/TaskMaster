@@ -200,6 +200,7 @@
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part2.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part3.cs" />
     <Compile Include="Controllers\QfcItemController.ViewerSetupTests.cs" />
+    <Compile Include="Controllers\QuickFilerInvariantCultureIssue742Tests.cs" />
     <Compile Include="Controllers\QfcItemController.EventHandlersTests.cs" />
     <Compile Include="Controllers\QfcItemController.SearchFocusRegressionTests.cs" />
     <Compile Include="Controllers\QfcItemController.SearchDismissalTests.cs" />
