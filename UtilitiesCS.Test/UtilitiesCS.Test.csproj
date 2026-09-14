@@ -187,6 +187,7 @@
     <Compile Include="EmailIntelligence\EmailDataMiner_TestSupport.cs" />
     <Compile Include="EmailIntelligence\OlFolderClassifierGroup_Tests.cs" />
     <Compile Include="Extensions\ArrayExtensions_Tests.cs" />
+    <Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />
     <Compile Include="Extensions\ArrayExtensionsCoverageTests.cs" />
     <Compile Include="Extensions\AsyncSerialization_Tests.cs" />
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />

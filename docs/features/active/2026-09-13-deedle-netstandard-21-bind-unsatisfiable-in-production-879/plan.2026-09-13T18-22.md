@@ -759,7 +759,7 @@ needs. Phase 3 supplies the behaviour.
 Phase 2 runs a targeted build and a targeted test run only. It does not run the analyzer gate, the
 nullable gate or the full suite: those gates would be evaluated against a deliberately incomplete seam.
 
-- [ ] [P2-T1] Create `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` declaring
+- [x] [P2-T1] Create `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` declaring
       `public static class AssemblyBindingFallback` in namespace `UtilitiesCS.Bootstrap`, with:
       a public `static void Install()` guarded for idempotence by `Interlocked.Exchange` on a private
       `int` field; an `internal static Assembly Resolve(AssemblyName requested)` seam; a private
@@ -782,14 +782,14 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `public static void Install()`, `internal static Assembly Resolve(`,
       `internal sealed class AssemblyBindingLadder` and `[ThreadStatic]`, and zero hits for
       `System.Windows.Forms`, `Microsoft.Office.Interop` and `log4net`.
-- [ ] [P2-T2] Register the new production file. Insert
+- [x] [P2-T2] Register the new production file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallback.cs" />` into the `ItemGroup` in
       `UtilitiesCS/UtilitiesCS.csproj` that already contains
       `<Compile Include="Extensions\DfDeedle.cs" />` at line 996. This project uses explicit `Compile`
       items; an unregistered file silently does not build.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallback.cs"` on
       `UtilitiesCS/UtilitiesCS.csproj` returns exactly 1 hit.
-- [ ] [P2-T3] Create `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs`, MSTest with Moq and
+- [x] [P2-T3] Create `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs`, MSTest with Moq and
       FluentAssertions, one `[TestClass]` named `AssemblyBindingFallbackTests` in namespace
       `UtilitiesCS.Test.Bootstrap`, with one separately named `[TestMethod]` for each of: already-loaded
       match wins over a fresh load; the full-display-name rung; the runtime-directory load-from-path rung;
@@ -800,13 +800,13 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       delegates, so the tests touch neither the GAC nor the filesystem. A `[TestCleanup]` resets any
       mutated seam. The class carries Arrange-Act-Assert structure and a short intent comment per test.
       Acceptance: the file exists and contains at least ten occurrences of `[TestMethod]`.
-- [ ] [P2-T4] Register the new unit-test file. Insert
+- [x] [P2-T4] Register the new unit-test file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` into the `ItemGroup` in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
       `<Compile Include="Extensions\DfDeedle_Tests.cs" />` at line 193.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallbackTests.cs"` on
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` returns exactly 1 hit.
-- [ ] [P2-T5] Create `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` declaring
+- [x] [P2-T5] Create `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` declaring
       `public sealed class ChildDomainBindProbe : MarshalByRefObject` in namespace
       `TaskMaster.Test.Bootstrap`. It exposes separate public methods so that the negative-control path
       never JIT-resolves `UtilitiesCS`: `CountLoadedAssembliesNamed(string simpleName)`;
@@ -832,7 +832,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       outcomes as plain strings.
       Acceptance: the file exists, contains `: MarshalByRefObject`, contains `InvalidOperationException`
       at least three times, and returns zero hits for `FluentAssertions` and for `Microsoft.VisualStudio.TestTools`.
-- [ ] [P2-T6] Create `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` declaring
+- [x] [P2-T6] Create `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` declaring
       `[TestClass] public class NetstandardBindChildDomainTests` in namespace `TaskMaster.Test.Bootstrap`,
       creating each child domain with `AppDomain.CreateDomain` using an `AppDomainSetup` whose
       `ApplicationBase` is `AppDomain.CurrentDomain.BaseDirectory` and whose `ConfigurationFile` is
@@ -913,7 +913,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       once, the literal `CountLoadedAssembliesNamed("UtilitiesCS")` exactly twice, and the literal
       `CountAssemblyResolveHandlers()` exactly twice. Those four literals are quoted here in prose
       because they are absent from the tree until this task runs.
-- [ ] [P2-T7] Add the in-file isolation warning required by the spec's negative-control criterion, worded
+- [x] [P2-T7] Add the in-file isolation warning required by the spec's negative-control criterion, worded
       unambiguously. Immediately above `NegativeControl_WithoutInstall_Netstandard21Throws` in
       `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs`, add a comment stating that if the
       load in this negative-control domain ever succeeds without a code change — that is, if this test
@@ -925,7 +925,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `Select-String -SimpleMatch -CaseSensitive -Pattern "ISOLATION-LOST-INVARIANT"` returns exactly 1
       hit. The literal the task creates is `ISOLATION-LOST-INVARIANT`, quoted here in prose because it is
       absent from the tree until this task runs.
-- [ ] [P2-T8] Create `TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs` declaring
+- [x] [P2-T8] Create `TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs` declaring
       `[TestClass] public class AddInEagerInstallShapeTests` in namespace `TaskMaster.Test.Bootstrap`,
       with `[TestMethod] public void ThisAddIn_HasExplicitStaticConstructor()` asserting that
       `typeof(ThisAddIn).Attributes.HasFlag(TypeAttributes.BeforeFieldInit)` is `false` and
@@ -939,7 +939,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       test reads the deployed image of `TaskMaster/app.config`, which is the file the CLR actually
       consults; an in-file comment says so.
       Acceptance: the file exists and contains both method names exactly.
-- [ ] [P2-T9] Register the three new harness files. Insert
+- [x] [P2-T9] Register the three new harness files. Insert
       `<Compile Include="Bootstrap\ChildDomainBindProbe.cs" />`,
       `<Compile Include="Bootstrap\NetstandardBindChildDomainTests.cs" />` and
       `<Compile Include="Bootstrap\AddInEagerInstallShapeTests.cs" />` into the `ItemGroup` in
@@ -949,7 +949,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `Select-String -SimpleMatch -CaseSensitive` returns exactly 1 hit for each of the three file names
       `ChildDomainBindProbe.cs`, `NetstandardBindChildDomainTests.cs` and
       `AddInEagerInstallShapeTests.cs`.
-- [ ] [P2-T10] LOCK-ACQUIRE, then create the evidence/regression-testing directory this task and `[P2-T11]` redirect into,
+- [x] [P2-T10] LOCK-ACQUIRE, then create the evidence/regression-testing directory this task and `[P2-T11]` redirect into,
       then rebuild the solution with the plain Debug configuration and no analyzer or nullable
       properties, then LOCK-RELEASE. This task is NOT tagged `[expect-fail]`: the seam is
       declaration-complete, so the expected outcome here is a successful build. The deliberately
@@ -1008,7 +1008,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`. These are the fail-before observations:
       they fail at runtime against a behaviour-empty installer, not at compile time. The run's own exit
       code is recorded against `ExpectedExitCode: 1` and is not itself a gate.
-- [ ] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
+- [x] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
       it. Read the `[P2-T11]` artifact.
       Acceptance: it records all five of
       `ChildDomain_HasNoSvgControlAssemblyLoaded OUTCOME=Passed`,
