@@ -693,7 +693,7 @@ because it is absent from the tree until `[P2-T6]` runs.
 
 ### Phase 1 — Spec Correction and Acceptance-Criteria Inventory
 
-- [ ] [P1-T1] Confirm the planner's spec correction is present. The acceptance criterion at `spec.md`
+- [x] [P1-T1] Confirm the planner's spec correction is present. The acceptance criterion at `spec.md`
       line 547-549 previously directed the coverage artifact to `evidence/coverage/`, which is not a
       canonical evidence kind. The planner changed that one directory reference to `evidence/qa-gates/`
       and changed nothing else in that criterion. Verify with:
@@ -709,7 +709,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       The literals asserted are `evidence/coverage/` and `evidence/qa-gates/`, quoted here in prose so the
       assertion is exonerated for a literal the tree is expected not to contain.
       Acceptance: `COVERAGE_DIR_HITS=0` and `QA_GATES_DIR_HITS` is greater than 1.
-- [ ] [P1-T2] Record the acceptance-criteria inventory by `spec.md` line number, so every later check-off
+- [x] [P1-T2] Record the acceptance-criteria inventory by `spec.md` line number, so every later check-off
       task names a determinate target. Write
       `.../evidence/other/ac-inventory.2026-09-13T18-22.md` listing exactly these nineteen pairs:
       AC1 line 473, AC2 line 477, AC3 line 481, AC4 line 484, AC5 line 491, AC6 line 495, AC7 line 499,
@@ -717,7 +717,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       line 536, AC15 line 543, AC16 line 545, AC17 line 547, AC18 line 550, AC19 line 554.
       Acceptance: the artifact exists and carries exactly nineteen `AC` entries, and a spot check confirms
       that each named line currently begins with the six characters `- [ ] `.
-- [ ] [P1-T3] Confirm no non-canonical evidence directory remains in `spec.md`. Command:
+- [x] [P1-T3] Confirm no non-canonical evidence directory remains in `spec.md`. Command:
 
       ```
       pwsh -NoProfile -Command '
@@ -736,7 +736,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       Append the output to the `[P1-T2]` artifact under a `Non-Canonical Evidence Path Sweep:` heading.
       Acceptance: the heading exists, exactly eight lines are emitted, and every line ends with
       `HITS=0`.
-- [ ] [P1-T4] Lock the scope. Append to the `[P1-T2]` artifact a `Scope Lock:` section reproducing this
+- [x] [P1-T4] Lock the scope. Append to the `[P1-T2]` artifact a `Scope Lock:` section reproducing this
       plan's `## Authorised Write Set` items 1 to 13 verbatim, plus the sentence
       `No file outside this list, and outside the inherited-path rule, may be created or modified by this plan.`
       Then read the `Decision:` field of `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md`
