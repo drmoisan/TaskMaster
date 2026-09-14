@@ -3,9 +3,9 @@
 - **Issue:** #879
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-13T18-22
-- **Status:** Ready for preflight
-- **Version:** 1.0
+- **Last Updated:** 2026-09-14T04-10
+- **Status:** Ready for preflight (revision R2)
+- **Version:** 1.1
 - **Work Mode:** full-bug (spec.md is the sole acceptance-criteria source; `user-story.md` is correctly absent)
 - **Complexity band:** C3
 - **Branch:** `bug/deedle-netstandard-21-bind-unsatisfiable-in-production-879`
@@ -26,6 +26,11 @@ in one of the six canonical kinds `baseline`, `regression-testing`, `qa-gates`, 
 and `remediation-baseline`. No path under `artifacts/` is a valid evidence location, and no task in this
 plan names one. Where a shell command needs the path it is written out in full, because the shorthand is
 a reading convenience for this document and never a literal a command may contain.
+
+**Evidence timestamp token (binding).** Every artifact filename this plan names carries the fixed token
+`2026-09-13T18-22`, which is the plan's own token and is deliberately NOT the `Last Updated` value above.
+Revision R2 does not rename any artifact. An executor that invents a new token for an artifact this plan
+names has written to a path no task reads.
 
 ---
 
@@ -248,6 +253,196 @@ with `EXIT_CODE:` and an `Output Summary:` naming the last test that started, an
 caller. Do not edit `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, which is outside the authorised write
 set, and do not substitute a narrower discovery scope for the full-suite run, which would change the
 coverage denominator that `[P5-T10]` compares.
+
+---
+
+## R4 — REVISION R2: two verified defects folded into one round
+
+Phases 0, 1 and 2 were executed against version 1.0 of this plan, and 31 of the 32 tasks those three
+phases contained in version 1.0 completed: Phase 0's 16, Phase 1's 4, and 11 of Phase 2's 12.
+`[P2-T11]` did not complete, and the executor halted correctly rather than adapting. Two defects were
+then verified against the tree at branch `bug/deedle-netstandard-21-bind-unsatisfiable-in-production-879`
+after `origin/main` was merged. Both are defects in this plan, not in the executor's work.
+
+### R4.1 — Defect 1: acceptance criterion AC10 was vacuous
+
+`[P2-T5]` specified the probe member `DeedleTypeInitializerOutcome` as "obtains the type
+`Deedle.Reflection` and forces its class constructor through `RuntimeHelpers.RunClassConstructor`". The
+executor implemented exactly that, at `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` lines 146-151 in
+the tree as it stood at the halt. In the `[P2-T11]` fail-before run, against a build carrying NO fix, that
+probe returned the success token and `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` was
+recorded at
+`docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/regression-testing/expect-fail-run.2026-09-13T18-22.md`
+line 31. The sibling test in the same run and the same child domain recorded
+`AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed` (line 22 of that artifact) with a
+`FileNotFoundException` on the `2.1.0.0` identity, so the bind genuinely is unsatisfiable in that domain
+and the probe simply does not reach it.
+
+A criterion that is satisfied with no fix present measures nothing. `CLAUDE.md`'s Bugfix Workflow requires
+a failing regression test first and states that the test must fail before the fix and pass after, so an
+AC whose test passes on the unfixed tree violates that requirement directly.
+
+**The equivalence that produced the defect is empirically false and must not be re-adopted.**
+`Deedle.Reflection..cctor()` appears in the production chain, yet `RunClassConstructor` on that exact type
+returned the success token in the child domain. Forcing a class constructor is therefore NOT equivalent to
+invoking the member, in this harness. The evidenced path is the member invocation at the deepest caller
+frame of the trace captured by sibling item 877 at
+`docs/features/active/2026-09-13-quickfiler-test-assembly-resolve-self-sufficiency-877/evidence/regression-testing/m3-fail-before.2026-09-13T09-14.md`
+lines 22-31, excerpted here with the wrapped continuation line and the two `QuickFiler.Test` frames
+omitted:
+
+```
+System.TypeInitializationException: The type initializer for 'Deedle.Reflection' threw an exception.
+ ---> System.TypeInitializationException: The type initializer for '<StartupCode$Deedle>.$FrameUtils' threw an exception.
+ ---> System.IO.FileNotFoundException: Could not load file or assembly
+      'netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51'
+   at <StartupCode$Deedle>.$FrameUtils..cctor()
+   at Deedle.Reflection..cctor()
+   at Deedle.Reflection.convertRecordSequence[T](IEnumerable`1 data)
+```
+
+The member is a generic method definition with one type parameter and one `IEnumerable<T>` parameter. The
+repository reaches it through `Deedle.Frame.FromRecords`, at
+`UtilitiesCS/Extensions/DfDeedle.cs` lines 123 and 237 in production and at
+`QuickFiler.Test/Controllers/QfcInitEmailQueueZeroBatchTests.cs` line 86 in the sibling reproduction.
+
+**What the revision changes.** The probe member is repointed from a class-constructor run to a closed
+generic invocation of that member, its outcome contract becomes a three-class structured string, and the
+`spec.md` AC10 text is rewritten by the planner to describe what is actually tested. `[P2-T11]`'s
+acceptance still requires `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`, so the
+demonstration against the unfixed tree is preserved rather than removed.
+
+**Why the replacement cannot be vacuous in the other direction.** Five properties are specified in
+`[P2-T5]` and each is separately checkable:
+
+1. A member-lookup miss throws `InvalidOperationException` naming the type and the member, and that
+   exception is deliberately re-thrown past the classifying catch, so a miss can never be reported as
+   success.
+2. The generic method definition is closed over a concrete type declared in the probe file and supplied a
+   one-element `IEnumerable<T>`, so the input is a well-formed record sequence of the same shape
+   production passes to `Frame.FromRecords` rather than an empty or degenerate sequence.
+3. `MethodInfo.Invoke` wraps the real exception in `TargetInvocationException`, so the probe unwraps that
+   wrapper before naming a failure class. Without the unwrap every failure would be reported as
+   `TargetInvocationException` and the outcome would carry no information.
+4. The outcome names the failure CLASS, so a `netstandard` bind failure is distinguishable from an
+   unrelated functional exception. Both the class assertion and the completion assertion are made, in
+   that order, so a bind failure and an unrelated throw produce different and unambiguous failure
+   messages.
+5. The success token is returned on the statement immediately following the invocation and on no other
+   path, so it cannot be returned when the invocation did not execute.
+
+**The existing `[P2-T11]` artifact is superseded, not deleted.** It currently records
+`Acceptance Condition: NOT MET`. `[P1-T5]` copies it to a superseded-named artifact with a header stating
+why, before `[P2-T11]` overwrites the plan-named path on its re-run. Both the original observation and
+the re-run therefore remain auditable.
+
+### R4.2 — Defect 2: a pinned literal forced a signature that contradicts the contract
+
+`[P2-T1]` pinned the literal `internal static Assembly Resolve(` as an acceptance condition, which pins a
+non-nullable return on a method whose contract is to return null for every name it cannot resolve.
+`UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` carries `#nullable enable` at line 1, so the executor
+satisfied the literal with `return null!;` at lines 103, 109 and 114 and
+`return CreateProductionLadder().Resolve(requested)!;` at line 120. That is null-forgiving on the dominant
+path, not a boundary suppression.
+
+The inner `AssemblyBindingLadder` in the same file already has the correct shape:
+`internal Assembly? Resolve(AssemblyName requested)` at line 223 and `private Assembly? From...` at lines
+242, 254, 266 and 278, each returning a plain `null`. Only the two outer static members deviate. AC1 at
+`spec.md` lines 473-476 requires "a public `Install()` and an internal `Resolve` seam" and pins no return
+type, and `spec.md` line 315 likewise names the seam without a return type, so this correction needs no
+spec amendment.
+
+**Resolution of the `OnAssemblyResolve` question, with the rationale stated rather than assumed.**
+`Resolve` becomes `Assembly?`. `OnAssemblyResolve` does NOT. The two members occupy different roles:
+`Resolve` is the internal seam the unit tests drive and the ladder feeds, where null is the ordinary
+"not resolved" result on the dominant path; `OnAssemblyResolve` is the genuine `ResolveEventHandler`
+boundary, and on net48 that delegate is declared in reference assemblies that carry no nullable
+annotations, so its return type is oblivious. Keeping the handler's declared return type `Assembly` with
+three `null!` returns is therefore a boundary suppression against an un-annotated framework contract,
+which is the case the rule carves out, rather than a suppression on a dominant path.
+
+Whether the conversion is warning-free under `[P5-T6]`'s `/p:TreatWarningsAsErrors=true` gate is settled
+by a measurement already on disk rather than by assumption. `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs`
+carries no `#nullable enable` directive and already assigns the ladder's `Assembly?`-returning `Resolve`
+to a plain `Assembly` local at lines 57, 81, 111, 131, 149, 169 and 256, and the nullable baseline at
+`.../evidence/baseline/nullable-baseline.2026-09-13T18-22.md` records `EXIT_CODE: 0` with
+`0 Warning(s)`. A nullable-oblivious file therefore takes an `Assembly?` result into an `Assembly` local
+with no diagnostic in this solution today, which is exactly what line 187 of that test file will do once
+`AssemblyBindingFallback.Resolve` becomes `Assembly?`. No test file changes.
+
+One site inside the production file does change with it: line 158 declares
+`Assembly resolved = Resolve(new AssemblyName(args.Name));` inside the nullable-ENABLED region, which
+would become CS8600 once `Resolve` returns `Assembly?`, and `[P5-T6]` promotes that warning to a build
+error. The declaration becomes `Assembly? resolved`. The `return resolved;` at line 165 stays warning-free
+because the preceding `if (resolved is null)` return makes the flow state not-null at that point.
+
+### R4.3 — Nullable-annotation constraint on the two test-project files
+
+`TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` and
+`TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` carry NO `#nullable enable` directive, and
+this revision adds none. Any `?` annotation on a reference type written into either file would raise
+CS8632, which `[P5-T6]` promotes to a build error. Every member this revision specifies in those two
+files is therefore written without nullable reference annotations. This constraint is stated here once and
+is binding on `[P2-T5]` and `[P2-T6]`.
+
+### R4.4 — Checklist state changed by this revision
+
+Unchecked and to be re-executed, with the reason for each:
+
+- `[P2-T1]` — the seam signature is amended (Defect 2). The file exists; the task is now an amendment of
+  four named sites in it.
+- `[P2-T5]` — the probe surface is repointed (Defect 1). The file exists; the task is now an amendment of
+  one member plus one new nested record type.
+- `[P2-T6]` — the harness test that consumes the repointed member is amended (Defect 1).
+- `[P2-T10]` — the targeted rebuild must be re-run, because `[P2-T1]`, `[P2-T5]` and `[P2-T6]` all change
+  compiled source after the recorded build.
+- `[P2-T12]` — it reads the `[P2-T11]` artifact, which is regenerated, so its five isolation outcomes must
+  be re-confirmed against the regenerated artifact rather than against the superseded one.
+
+Left checked and NOT re-executed, because both defects leave them untouched: `[P0-T1]` through
+`[P0-T16]`, `[P1-T1]` through `[P1-T4]`, `[P2-T2]`, `[P2-T3]`, `[P2-T4]`, `[P2-T7]`, `[P2-T8]` and
+`[P2-T9]`. `[P2-T11]` was already unchecked and stays unchecked.
+
+`[P2-T4]`'s cited anchor line is corrected from 193 to 194 without unchecking the task: the merge of
+`origin/main` at `a49c9729e` moved `<Compile Include="Extensions\DfDeedle_Tests.cs" />` in
+`UtilitiesCS.Test/UtilitiesCS.Test.csproj` by one line, and the task's own product,
+`<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />`, is present at line 190. The work is
+done; only the citation was stale.
+
+### R4.5 — Evidence artifacts this revision does not touch
+
+`[P0-T6]` and `[P0-T7]` committed two console logs,
+`.../evidence/baseline/analyzer-baseline-console.2026-09-13T18-22.txt` and
+`.../evidence/baseline/nullable-baseline-console.2026-09-13T18-22.txt`. Neither defect touches those two
+tasks and this revision does not re-run them, so both files are left exactly as committed and no task in
+this revision rewrites, projects or deletes them.
+
+### R4.6 — Constraints re-checked against the post-merge tree and deliberately left unchanged
+
+- **`-CoverageOutput` stays at its default** in `[P0-T8]` and `[P5-T7]`. Issue #873's
+  `Test-RawCoverageDocumentRetained` deletes the raw Cobertura document unless its parent directory is
+  exactly the repository `coverage` directory, by equality and not containment. No task in this revision
+  changes that parameter or introduces a subdirectory under it.
+- **Issue #891 is named rather than worked around.** `Assert-CoberturaLineCoverageThreshold`, invoked at
+  `scripts/vscode/Invoke-MSTestWithCoverage.ps1` line 386, throws unless the DOCUMENT-LEVEL Cobertura
+  line-rate clears a hard-coded threshold, so a `-SearchRoot`-scoped invocation of that runner cannot exit
+  0 however well its tests do. That is issue #891, it is not this item's defect and this plan does not fix
+  it. Both runner invocations in this plan pass `-SearchRoot .`, which is the solution-wide scope, and
+  both already record a non-zero exit against a matching `ExpectedExitCode:` rather than treating it as a
+  failure. No task added by Revision R2 invokes that runner at all: `[P2-T11]`, `[P4-T3]`, `[P4-T6]` and
+  `[P4-T7]` call `vstest.console.exe` directly, which applies no coverage threshold.
+- **No `artifacts/csharp/coverage.xml` is created.** A repository hook activates an 85 percent floor only
+  when that file exists, and repository-wide raw coverage is far below it, so creating the file would
+  manufacture a failure. No task in this plan names that path. The governing thresholds remain `CLAUDE.md`'s:
+  line 80 percent on the testable denominator, new code 90 percent, no regression on changed lines.
+- **Every diff anchor is `origin/main`.** No task uses local `main` or `git merge-base HEAD main`. Local
+  `main` in a worktree-per-item run is stale, and Revision R2 introduces no new diff anchor of any kind.
+- **One Phase 0 figure is now stale and is deliberately not re-run.** `[P0-T16]` recorded the line counts
+  of the five files this plan edits in place, before `origin/main` was merged. The merge changed at least
+  `UtilitiesCS.Test/UtilitiesCS.Test.csproj`, whose `<Compile Include="Extensions\DfDeedle_Tests.cs" />`
+  anchor moved from line 193 to line 194. No acceptance condition in this plan compares a later count
+  against the `[P0-T16]` figures — `[P4-T12]` and `[P5-T8]` each assert an absolute ceiling of 500 lines
+  and nothing else — so no gate is affected and the task is left checked rather than re-run.
 
 ---
 
@@ -691,7 +886,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       `Baseline Line Counts:` heading.
       Acceptance: the heading exists and carries exactly five `LINES=` lines.
 
-### Phase 1 — Spec Correction and Acceptance-Criteria Inventory
+### Phase 1 — Spec Correction, Acceptance-Criteria Inventory, and Revision R2 Preconditions
 
 - [x] [P1-T1] Confirm the planner's spec correction is present. The acceptance criterion at `spec.md`
       line 547-549 previously directed the coverage artifact to `evidence/coverage/`, which is not a
@@ -747,6 +942,112 @@ because it is absent from the tree until `[P2-T6]` runs.
       Acceptance: that section exists, lists thirteen numbered items, carries the quoted sentence, and
       carries a `Host Substitution:` line holding exactly one of `HOST=TaskMaster.Test` or
       `HOST=ToDoModel.Test`. When the value is `HOST=ToDoModel.Test`, item 14 is reproduced beneath it.
+- [ ] [P1-T5] Preserve the superseded `[P2-T11]` run artifact before the re-run overwrites it. The
+      existing artifact records `Acceptance Condition: NOT MET` and is the only record of the measurement
+      that identified Defect 1, so it is copied rather than lost. Command:
+
+      ```
+      pwsh -NoProfile -Command '
+      $src = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/regression-testing/expect-fail-run.2026-09-13T18-22.md"
+      $dst = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/regression-testing/expect-fail-run-superseded-probe-surface.2026-09-13T18-22.md"
+      Copy-Item -LiteralPath $src -Destination $dst -Force
+      Write-Output ("SUPERSEDED_COPY_PRESENT=" + (Test-Path -LiteralPath $dst))
+      Write-Output ("SUPERSEDED_COPY_LINES=" + @(Get-Content -LiteralPath $dst).Count)
+      '
+      ```
+
+      Then edit the copy only, never the original, inserting immediately after its `Timestamp:` line this
+      one line:
+      `Superseded: yes - revision R2 repointed the probe member that [P2-T5] specifies, and [P2-T11] was re-run against the repointed probe.`
+      The literal `Superseded: yes` is quoted here in prose because it is absent from the tree until this
+      task runs.
+      Acceptance: the copy exists at the path above, contains the literal `Superseded: yes` exactly once,
+      and contains the literal `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` exactly once,
+      which is the vacuous-pass observation this copy exists to retain. The original
+      `expect-fail-run.2026-09-13T18-22.md` is left byte-identical by this task.
+- [ ] [P1-T6] Measure the Deedle member surface from metadata, before `[P2-T5]` is authored against it.
+      The read is metadata-only through `System.Reflection.Metadata`: it never executes Deedle code, never
+      runs a type initializer and never resolves `FSharp.Core`, so this measurement cannot itself trip the
+      bind under test, and it works regardless of the target framework of the deployed `Deedle.dll`.
+      Command:
+
+      ```
+      pwsh -NoProfile -Command '
+      $p = "TaskMaster.Test/bin/Debug/Deedle.dll"
+      Write-Output ("DEEDLE_DLL_PRESENT=" + (Test-Path -LiteralPath $p))
+      $fs = [System.IO.File]::OpenRead((Resolve-Path -LiteralPath $p).Path)
+      $pe = New-Object System.Reflection.PortableExecutable.PEReader($fs)
+      $md = [System.Reflection.Metadata.PEReaderExtensions]::GetMetadataReader($pe)
+      Write-Output ("TYPEDEF_COUNT=" + @($md.TypeDefinitions).Count)
+      $found = 0
+      foreach ($h in $md.TypeDefinitions) {
+      $td = $md.GetTypeDefinition($h)
+      if (($md.GetString($td.Namespace) -eq "Deedle") -and ($md.GetString($td.Name) -eq "Reflection")) {
+      Write-Output ("TYPE_FOUND=Deedle.Reflection")
+      Write-Output ("TYPE_ATTRS=" + $td.Attributes)
+      foreach ($mh in $td.GetMethods()) {
+      $m = $md.GetMethodDefinition($mh)
+      if ($md.GetString($m.Name) -eq "convertRecordSequence") {
+      $found = $found + 1
+      Write-Output ("MEMBER_ATTRS=" + $m.Attributes)
+      Write-Output ("MEMBER_GENERIC_PARAM_COUNT=" + @($m.GetGenericParameters()).Count) } } } }
+      Write-Output ("CONVERT_RECORD_SEQUENCE_DEFINITIONS=" + $found)
+      $pe.Dispose()
+      $fs.Dispose()
+      '
+      ```
+
+      `TYPEDEF_COUNT` is the positive control: it proves the reader opened a real assembly and the name
+      comparison mechanism is live, so a zero member count would be an observation rather than an artefact
+      of an unreadable file.
+
+      One bounded adaptation is authorised here and nowhere else in this plan. `System.Reflection.Metadata`
+      ships in the .NET shared framework, but a pwsh host resolves a type name only against assemblies it
+      has already loaded. If either `[System.Reflection.PortableExecutable.PEReader]` or
+      `[System.Reflection.Metadata.PEReaderExtensions]` reports that the type cannot be found, prepend
+      `[void][System.Reflection.Assembly]::Load("System.Reflection.Metadata")` as the first statement of
+      the payload, re-run, and record that the adaptation was taken in the artifact's `Command:` field.
+      Nothing else about the command or the acceptance condition may change. Write
+      `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/other/deedle-member-surface.2026-09-13T18-22.md`
+      with `Timestamp:`, `Command:`, `EXIT_CODE:` and an `Output Summary:` reproducing every emitted line
+      verbatim.
+      Acceptance: the artifact records `DEEDLE_DLL_PRESENT=True`, a `TYPEDEF_COUNT` greater than 0, one
+      `TYPE_FOUND=Deedle.Reflection` line, `CONVERT_RECORD_SEQUENCE_DEFINITIONS=1` and
+      `MEMBER_GENERIC_PARAM_COUNT=1`. A value of `0` blocks, because `[P2-T5]` cannot be authored against a
+      member that does not exist; a value greater than `1` also blocks, because `[P2-T5]`'s single-member
+      lookup would then be ambiguous and the plan would have to name the overload. `MEMBER_ATTRS` is
+      recorded and not gated: `[P2-T5]`'s lookup passes
+      `BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static`, which covers either
+      accessibility this line can report.
+- [ ] [P1-T7] Confirm the planner's AC10 rewrite is present and that it displaced no sibling criterion.
+      The planner rewrote acceptance criterion AC10 at `spec.md` lines 515-520 in place, in exactly six
+      lines, so every acceptance-criterion line number recorded by `[P1-T2]` and consumed by `[P6-T6]`
+      through `[P6-T24]` is unchanged. Command:
+
+      ```
+      pwsh -NoProfile -Command '
+      $p = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/spec.md"
+      $lines = @(Get-Content -LiteralPath $p)
+      Write-Output ("AC10_LINE_515_PREFIX=[" + $lines[514].Substring(0,6) + "]")
+      Write-Output ("AC11_LINE_521_PREFIX=[" + $lines[520].Substring(0,6) + "]")
+      Write-Output ("AC_HEADING_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "## Acceptance Criteria").Count)
+      Write-Output ("DEEPEST_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "deepest").Count)
+      Write-Output ("BIND_FAILURE_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "bind failure").Count)
+      Write-Output ("RUNCLASSCONSTRUCTOR_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "RunClassConstructor").Count)
+      '
+      ```
+
+      `deepest` and `bind failure` are each a single-line token introduced by the rewrite and present
+      nowhere else in `spec.md`; `AC_HEADING_HITS` is the positive control proving the file path and the
+      search mechanism are live. `RUNCLASSCONSTRUCTOR_HITS` is recorded and deliberately NOT gated: the
+      literal never appeared in `spec.md`, so a zero-hit assertion on it could not fail whatever the
+      executor does. Append the output to
+      `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/other/ac-inventory.2026-09-13T18-22.md`
+      under an `AC10 Revision R2 Rewrite:` heading.
+      Acceptance: the heading exists, `AC10_LINE_515_PREFIX=[- [ ] ]`, `AC11_LINE_521_PREFIX=[- [ ] ]`,
+      `AC_HEADING_HITS=1`, `DEEPEST_HITS=1` and `BIND_FAILURE_HITS=1`. Any other value for the two prefix
+      lines blocks: it would mean the rewrite changed the line count and every `spec.md` line number this
+      plan cites would be stale.
 
 ### Phase 2 — Regression Harness First (fails before the fix)
 
@@ -759,10 +1060,11 @@ needs. Phase 3 supplies the behaviour.
 Phase 2 runs a targeted build and a targeted test run only. It does not run the analyzer gate, the
 nullable gate or the full suite: those gates would be evaluated against a deliberately incomplete seam.
 
-- [x] [P2-T1] Create `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` declaring
+- [ ] [P2-T1] Amend `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` in place — the file already exists
+      from the version 1.0 execution of this plan and must NOT be recreated — so that it declares
       `public static class AssemblyBindingFallback` in namespace `UtilitiesCS.Bootstrap`, with:
       a public `static void Install()` guarded for idempotence by `Interlocked.Exchange` on a private
-      `int` field; an `internal static Assembly Resolve(AssemblyName requested)` seam; a private
+      `int` field; an `internal static Assembly? Resolve(AssemblyName requested)` seam; a private
       `[ThreadStatic]` re-entrance guard; and an `internal sealed class AssemblyBindingLadder` whose
       constructor takes five injectable delegates — get-loaded-assemblies, load-by-display-name,
       load-from-path, file-exists, and get-runtime-directory — with production defaults supplied by
@@ -776,12 +1078,44 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       property is unaffected: a subscribed handler whose every rung returns `null` resolves no
       `netstandard` identity, so `AfterInstall_BothNetstandardVersionsBind` and
       `AfterInstall_DeedleTypeInitializerSucceeds` still fail at runtime in `[P2-T11]`. The file carries
-      `#nullable enable` and XML documentation on the public surface. No
+      `#nullable enable` at line 1 and XML documentation on the public surface. No
       WinForms type, no Outlook Interop type, no log4net reference.
-      Acceptance: the file exists, `Select-String -SimpleMatch` on it returns at least one hit each for
-      `public static void Install()`, `internal static Assembly Resolve(`,
-      `internal sealed class AssemblyBindingLadder` and `[ThreadStatic]`, and zero hits for
-      `System.Windows.Forms`, `Microsoft.Office.Interop` and `log4net`.
+
+      **Revision R2 amendment (Defect 2), four named sites and nothing else.** The version 1.0 text of
+      this task pinned `internal static Assembly Resolve(`, a non-nullable return on a method whose
+      contract is to return null for every name it cannot resolve, and the executor satisfied it with
+      null-forgiving operators on the dominant path. The rationale and the measured evidence are in
+      `## R4.2`. Change exactly these four sites and no other line of the file:
+
+      1. The declaration at line 99 becomes `internal static Assembly? Resolve(AssemblyName requested)`.
+      2. The three `return null!;` statements inside `Resolve`, at lines 103, 109 and 114, become
+         `return null;`.
+      3. Line 120 becomes `return CreateProductionLadder().Resolve(requested);`. The trailing
+         null-forgiving operator is unnecessary once the declared return type is nullable, because
+         `AssemblyBindingLadder.Resolve` at line 223 already returns `Assembly?`.
+      4. Line 158 becomes `Assembly? resolved = Resolve(new AssemblyName(args.Name));`. Without this the
+         nullable gate at `[P5-T6]` fails with CS8600 promoted to an error.
+
+      `OnAssemblyResolve` keeps its declared return type `Assembly` and its three `null!` returns at lines
+      155, 162 and 172, for the role-based reason stated in `## R4.2`: it is the `ResolveEventHandler`
+      boundary and that delegate is oblivious on net48, so the suppression there is a boundary suppression
+      rather than a dominant-path one. The `<returns>` prose at lines 94-98 currently justifies the
+      non-nullable return as mirroring `ResolveEventHandler`; rewrite that prose so it describes the
+      nullable seam instead, or the file contradicts itself. `return resolved;` at line 165 needs no
+      change: the preceding `if (resolved is null)` return makes the flow state not-null there.
+
+      Acceptance: the file exists, and `Select-String -SimpleMatch -CaseSensitive` on
+      `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` returns: at least one hit each for
+      `public static void Install()`, `internal sealed class AssemblyBindingLadder` and `[ThreadStatic]`;
+      exactly 1 hit for `internal static Assembly? Resolve(`; exactly 0 hits for
+      `internal static Assembly Resolve(`; exactly 1 hit for `private static Assembly OnAssemblyResolve(`;
+      exactly 3 hits for `null!`; exactly 0 hits for `Resolve(requested)!`; exactly 1 hit for
+      `Assembly? resolved =`; and zero hits for `System.Windows.Forms`, `Microsoft.Office.Interop` and
+      `log4net`. The three surviving `null!` hits are the three inside `OnAssemblyResolve` and are the
+      declared boundary suppression. The literals `internal static Assembly? Resolve(` and
+      `Assembly? resolved =` are quoted here in prose because they are absent from the tree until this
+      task runs; `internal static Assembly Resolve(` is present in the tree now, which is what makes its
+      zero-hit assertion discriminating rather than vacuous.
 - [x] [P2-T2] Register the new production file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallback.cs" />` into the `ItemGroup` in
       `UtilitiesCS/UtilitiesCS.csproj` that already contains
@@ -803,10 +1137,15 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 - [x] [P2-T4] Register the new unit-test file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` into the `ItemGroup` in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
-      `<Compile Include="Extensions\DfDeedle_Tests.cs" />` at line 193.
+      `<Compile Include="Extensions\DfDeedle_Tests.cs" />` at line 194. The citation read 193 in version
+      1.0 of this plan; the merge of `origin/main` at `a49c9729e` moved the anchor by one line. This task
+      remains complete: its own product,
+      `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />`, is present at line 190 of that
+      project file. Only the anchor citation was stale.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallbackTests.cs"` on
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` returns exactly 1 hit.
-- [x] [P2-T5] Create `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` declaring
+- [ ] [P2-T5] Amend `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` in place — the file already
+      exists from the version 1.0 execution of this plan and must NOT be recreated — so that it declares
       `public sealed class ChildDomainBindProbe : MarshalByRefObject` in namespace
       `TaskMaster.Test.Bootstrap`. It exposes separate public methods so that the negative-control path
       never JIT-resolves `UtilitiesCS`: `CountLoadedAssembliesNamed(string simpleName)`;
@@ -816,10 +1155,9 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       the length of `Delegate.GetInvocationList()`; `InstallProductionFallback()` which calls
       `UtilitiesCS.Bootstrap.AssemblyBindingFallback.Install()` and nothing else;
       `TryLoadDisplayName(string displayName)` returning a marshalled outcome string that is either
-      `LOADED` or the exception type name; `DeedleTypeInitializerOutcome(string deedleDllPath)` which
-      checks `File.Exists`, throws `InvalidOperationException` when absent, loads the assembly by absolute
-      path, obtains the type `Deedle.Reflection` and forces its class constructor through
-      `RuntimeHelpers.RunClassConstructor`, returning `OK` or the exception type name; and
+      `LOADED` or the exception type name; `DeedleRecordConversionOutcome(string deedleDllPath)`, whose
+      full specification is the Revision R2 block below and which REPLACES the version 1.0 member
+      `DeedleTypeInitializerOutcome` and the `OkOutcome` constant it returned; and
       `ConfigurationFileNetstandardEntryCount(string configPath)` which throws
       `InvalidOperationException` when the file is absent and otherwise parses it as XML and returns the
       number of `dependentAssembly` elements whose `assemblyIdentity` name is `netstandard`.
@@ -830,9 +1168,93 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       rungs 2 or 3 executing. The probe's own error reporting honours the same rule: it throws
       `InvalidOperationException`, a BCL type that marshals across the domain boundary, and returns
       outcomes as plain strings.
-      Acceptance: the file exists, contains `: MarshalByRefObject`, contains `InvalidOperationException`
-      at least three times, and returns zero hits for `FluentAssertions` and for `Microsoft.VisualStudio.TestTools`.
-- [x] [P2-T6] Create `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` declaring
+
+      **Revision R2 amendment (Defect 1): the repointed probe member.** The rationale and the measured
+      evidence are in `## R4.1`. The file carries no `#nullable enable` directive and this task adds none,
+      so no member specified here is written with a nullable reference annotation; a `?` on a reference
+      type in this file raises CS8632, which `[P5-T6]` promotes to a build error. Specify:
+
+      1. Three public string constants replacing `OkOutcome`, named exactly `InvokedOutcome`,
+         `BindFailurePrefix` and `OtherFailurePrefix`, whose values are exactly `INVOKED-NO-EXCEPTION`,
+         `NETSTANDARD-BIND-FAILURE:` and `OTHER-FAILURE:` in that order. The identifiers are fixed here
+         because `[P2-T6]` references `InvokedOutcome` and `BindFailurePrefix` by name rather than
+         repeating their values. `LoadedOutcome` and its value `LOADED` are unchanged and still used by
+         `TryLoadDisplayName`.
+      2. A public nested type `public sealed class DeedleProbeRecord` carrying exactly two public
+         auto-properties, a `string` and a `double`. It mirrors the shape production passes to
+         `Deedle.Frame.FromRecords` at `UtilitiesCS/Extensions/DfDeedle.cs` lines 123 and 237. It carries
+         no `DateTime` member, because `[P4-T9]`'s determinism sweep is textual and bans `DateTime.Now`
+         and `DateTime.UtcNow` in this file.
+      3. `public string DeedleRecordConversionOutcome(string deedleDllPath)`, which:
+         checks `string.IsNullOrEmpty` and `File.Exists` BEFORE its try block and throws
+         `InvalidOperationException` naming the path when either fails;
+         builds a one-element array of `DeedleProbeRecord`;
+         then, inside the try, calls `Assembly.LoadFrom(deedleDllPath)`, obtains the type
+         `Deedle.Reflection` with `throwOnError: true`, resolves the member through the helper in item 4,
+         closes it with `MakeGenericMethod` over `typeof(DeedleProbeRecord)`, invokes it through
+         `MethodInfo.Invoke` with the one-element array as the single argument, and returns the
+         `INVOKED-NO-EXCEPTION` constant on the statement immediately after that invocation and on no
+         other path;
+         carries `catch (InvalidOperationException) { throw; }` as its FIRST catch clause, so a
+         fail-loud lookup miss escapes past the classifier and can never be reported as an outcome;
+         and carries a general `catch (Exception)` whose only action is to return the classifier in
+         item 5.
+      4. A private static helper that resolves the member and fails loudly. It calls
+         `Type.GetMethod` with the member name and
+         `BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static`, which covers either
+         accessibility `[P1-T6]` may have recorded. It wraps that call in
+         `catch (AmbiguousMatchException)` and rethrows as `InvalidOperationException` naming the
+         overload problem. It then throws `InvalidOperationException`, naming the type and the member, if
+         the result is null, if the result is not a generic method definition with exactly one generic
+         argument, or if it does not take exactly one parameter. Resolving a `MethodInfo` does not run a
+         class constructor, which is why this helper can sit inside the try without itself triggering the
+         bind; the invocation in item 3 is what triggers it.
+      5. A private static classifier taking the thrown exception and returning one structured string.
+         It first unwraps `TargetInvocationException` — `MethodInfo.Invoke` wraps the real exception, so
+         without the unwrap every failure would be reported as `TargetInvocationException` and the
+         outcome would carry no information. It then walks the whole `InnerException` chain of the
+         ORIGINAL exception looking for a `FileNotFoundException` whose `FileName` or `Message` contains
+         `netstandard`, compared with `StringComparison.OrdinalIgnoreCase`; the chain rather than the
+         outermost exception is walked because the production shape is
+         `TargetInvocationException` wrapping `TypeInitializationException` wrapping
+         `TypeInitializationException` wrapping `FileNotFoundException`. On a match it returns the
+         `NETSTANDARD-BIND-FAILURE:` prefix followed by the unwrapped exception's simple type name;
+         otherwise it returns the `OTHER-FAILURE:` prefix followed by that same name. Both `FileName` and
+         `Message` are inspected because the CLR does not guarantee `FileName` is populated on every
+         binding failure, and the failing display name appears verbatim in the message text in either
+         case.
+      6. `using System.Runtime.CompilerServices;` is removed, because `RuntimeHelpers` is no longer
+         referenced anywhere in the file.
+
+      This member is the only part of the probe that changes. `CountLoadedAssembliesNamed`,
+      `CountAssemblyResolveHandlers`, `InstallProductionFallback`, `TryLoadDisplayName` and
+      `ConfigurationFileNetstandardEntryCount` are left exactly as they stand, and the fail-loud rule
+      recorded at `[P0-T13]` continues to bind `CountAssemblyResolveHandlers`.
+
+      Acceptance: the file exists, contains `: MarshalByRefObject`, and
+      `Select-String -SimpleMatch -CaseSensitive` on `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs`
+      returns: at least 1 hit for `DeedleRecordConversionOutcome`; exactly 0 hits for
+      `DeedleTypeInitializerOutcome`; exactly 0 hits for `RunClassConstructor`; exactly 0 hits for
+      `OkOutcome`; exactly 0 hits for `System.Runtime.CompilerServices`; at least 1 hit each for
+      `InvokedOutcome`, `BindFailurePrefix`, `OtherFailurePrefix`, `INVOKED-NO-EXCEPTION`,
+      `NETSTANDARD-BIND-FAILURE:` and `OTHER-FAILURE:`; at least 2 hits for `DeedleProbeRecord`; at least 1 hit each for
+      `AmbiguousMatchException`, `TargetInvocationException`, `MakeGenericMethod` and
+      `convertRecordSequence`; at least 3 hits for `InvalidOperationException`; and zero hits for
+      `FluentAssertions` and for `Microsoft.VisualStudio.TestTools`. The literals
+      `DeedleRecordConversionOutcome`, `InvokedOutcome`, `BindFailurePrefix`, `OtherFailurePrefix`,
+      `INVOKED-NO-EXCEPTION`, `NETSTANDARD-BIND-FAILURE:`,
+      `OTHER-FAILURE:`, `DeedleProbeRecord`, `AmbiguousMatchException`, `TargetInvocationException`,
+      `MakeGenericMethod` and `convertRecordSequence` are quoted here in prose because they are absent
+      from this file until this task runs. Each asserted token is a single identifier or a single short
+      string literal rather than a multi-word phrase, so no CSharpier reflow of the surrounding statement
+      can split it across two lines. Four of the six zero-hit assertions are discriminating rather than
+      vacuous: `DeedleTypeInitializerOutcome`, `RunClassConstructor`, `OkOutcome` and
+      `System.Runtime.CompilerServices` are all present in this file in the tree as it stands now, first
+      occurring at lines 137, 150, 36 and 5 respectively. The remaining two, `FluentAssertions` and
+      `Microsoft.VisualStudio.TestTools`, are carried forward from the version 1.0 acceptance condition as
+      standing guards on the child-domain emptiness rule rather than as new measurements.
+- [ ] [P2-T6] Amend `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` in place — the file
+      already exists from the version 1.0 execution of this plan and must NOT be recreated — declaring
       `[TestClass] public class NetstandardBindChildDomainTests` in namespace `TaskMaster.Test.Bootstrap`,
       creating each child domain with `AppDomain.CreateDomain` using an `AppDomainSetup` whose
       `ApplicationBase` is `AppDomain.CurrentDomain.BaseDirectory` and whose `ConfigurationFile` is
@@ -906,13 +1328,57 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       outcome string is non-empty. The outcome value itself is an observation for the open `2.0.0.0`
       risk, not a gate; asserting a particular value would be asserting something this work does not
       know.
+      **Revision R2 amendment (Defect 1): one test body, and nothing else in this file.** Only
+      `AfterInstall_DeedleTypeInitializerSucceeds` changes. Its name, its POSITIVE domain assignment and
+      its `InstallProductionFallback()`-before-observation ordering are all unchanged, which is why AC10,
+      `[P2-T11]`, `[P2-T12]`, `[P4-T3]` and `[P4-T6]` continue to name it without amendment. Inside that
+      method:
+
+      1. The observation call becomes `probe.DeedleRecordConversionOutcome(DeedlePath)`. The version 1.0
+         call to `DeedleTypeInitializerOutcome` no longer compiles, which is deliberate: renaming the
+         probe member makes a half-applied amendment a build failure rather than a silently stale
+         observation.
+      2. The outcome string is written to the TRX standard output with
+         `TestContext.WriteLine("DEEDLE_RECORD_CONVERSION_OUTCOME=" + outcome);`, before the assertions,
+         so the observed value is recoverable from the TRX whether the test passes or fails. `[P4-T6]`
+         reads exactly that line.
+      3. Two assertions are made, in this order. First
+         `outcome.Should().NotStartWith(ChildDomainBindProbe.BindFailurePrefix, ...)`, which is the
+         load-bearing class assertion: it is what fails on the unfixed tree and what distinguishes a
+         `netstandard` bind failure from every other outcome. Second
+         `outcome.Should().Be(ChildDomainBindProbe.InvokedOutcome, ...)`, which is the completion
+         assertion. The order matters and is fixed here rather than left open: FluentAssertions reports
+         the first failing assertion, so a bind failure produces a message naming the bind class, while
+         an unrelated functional exception passes the first assertion and fails the second with a message
+         carrying the `OTHER-FAILURE:` token and the real exception type. Neither failure can be mistaken
+         for the other. Asserting only the second would make a bind failure and an unrelated throw
+         indistinguishable; asserting only the first would let a remedy that satisfies the bind but
+         cannot complete the conversion report as a pass.
+      4. The method's XML summary is updated to describe a member invocation rather than a class
+         constructor run, so the file does not contradict itself.
+
+      The `ISOLATION-LOST-INVARIANT` comment block that `[P2-T7]` placed immediately above
+      `NegativeControl_WithoutInstall_Netstandard21Throws` is not touched by this amendment and must
+      survive it; the acceptance condition below re-asserts it so a re-run of this task cannot drop it.
+
       Acceptance: the file exists, contains exactly those eight method names, contains `AppDomain.CreateDomain`
       and `AppDomain.Unload`, contains `TaskMaster.Test.dll.config`, and returns zero hits for
       `TaskMaster.dll.config`. The file additionally contains the literal `[DoNotParallelize]` exactly
       once, the literal `CountLoadedAssembliesNamed("SVGControl")` exactly
-      once, the literal `CountLoadedAssembliesNamed("UtilitiesCS")` exactly twice, and the literal
-      `CountAssemblyResolveHandlers()` exactly twice. Those four literals are quoted here in prose
-      because they are absent from the tree until this task runs.
+      once, the literal `CountLoadedAssembliesNamed("UtilitiesCS")` exactly twice, the literal
+      `CountAssemblyResolveHandlers()` exactly twice, and the literal `ISOLATION-LOST-INVARIANT` exactly
+      once. Those five literals are present in the tree as it stands, having been created by the version
+      1.0 execution of this task and of `[P2-T7]`, and the acceptance condition is that this amendment
+      leaves every one of them at its stated count.
+      The amendment additionally requires, on the same file and with
+      `Select-String -SimpleMatch -CaseSensitive`: at least 1 hit for `DeedleRecordConversionOutcome`;
+      exactly 0 hits for `DeedleTypeInitializerOutcome`; exactly 0 hits for `OkOutcome`; exactly 1 hit for
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=`; at least 1 hit for `BindFailurePrefix`; and at least 1 hit for
+      `InvokedOutcome`. The literals `DeedleRecordConversionOutcome`,
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=`, `BindFailurePrefix` and `InvokedOutcome` are quoted here in
+      prose because they are absent from this file until this task runs, and the two zero-hit assertions
+      are discriminating because `DeedleTypeInitializerOutcome` and `OkOutcome` are both present in this
+      file in the tree as it stands now.
 - [x] [P2-T7] Add the in-file isolation warning required by the spec's negative-control criterion, worded
       unambiguously. Immediately above `NegativeControl_WithoutInstall_Netstandard21Throws` in
       `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs`, add a comment stating that if the
@@ -949,7 +1415,10 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `Select-String -SimpleMatch -CaseSensitive` returns exactly 1 hit for each of the three file names
       `ChildDomainBindProbe.cs`, `NetstandardBindChildDomainTests.cs` and
       `AddInEagerInstallShapeTests.cs`.
-- [x] [P2-T10] LOCK-ACQUIRE, then create the evidence/regression-testing directory this task and `[P2-T11]` redirect into,
+- [ ] [P2-T10] Re-run after the Revision R2 amendments to `[P2-T1]`, `[P2-T5]` and `[P2-T6]`, all three of
+      which change compiled source after the build recorded by the version 1.0 execution of this task.
+      The artifact at the path named below is overwritten by this re-run.
+      LOCK-ACQUIRE, then create the evidence/regression-testing directory this task and `[P2-T11]` redirect into,
       then rebuild the solution with the plain Debug configuration and no analyzer or nullable
       properties, then LOCK-RELEASE. This task is NOT tagged `[expect-fail]`: the seam is
       declaration-complete, so the expected outcome here is a successful build. The deliberately
@@ -1001,15 +1470,48 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       '
       ```
 
+      Then, in a third span, extract the fail-before failure CLASS from the same TRX, so the artifact
+      records why the Deedle line failed and not merely that it failed:
+
+      ```
+      pwsh -NoProfile -Command '
+      $trx = @(Get-ChildItem -LiteralPath "TestResults/p2-expect-fail" -Filter "*.trx" -Recurse)[0]
+      $x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
+      foreach ($r in @($x.TestRun.Results.UnitTestResult)) {
+      if ($r.testName -eq "AfterInstall_DeedleTypeInitializerSucceeds") {
+      foreach ($line in @(($r.Output.StdOut -split "`r?`n"))) {
+      if ($line.StartsWith("DEEDLE_RECORD_CONVERSION_OUTCOME=")) { Write-Output $line } } } }
+      '
+      ```
+
       Write `.../evidence/regression-testing/expect-fail-run.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1` and an `Output Summary:` reproducing every
-      `OUTCOME=` line verbatim.
-      Acceptance: the artifact records `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed` and
-      `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`. These are the fail-before observations:
-      they fail at runtime against a behaviour-empty installer, not at compile time. The run's own exit
-      code is recorded against `ExpectedExitCode: 1` and is not itself a gate.
-- [x] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
-      it. Read the `[P2-T11]` artifact.
+      `OUTCOME=` line verbatim plus the single `DEEDLE_RECORD_CONVERSION_OUTCOME=` line.
+
+      **This is a Revision R2 re-run and it overwrites the artifact at that path.** `[P1-T5]` must
+      already have copied the superseded version 1.0 artifact to
+      `.../evidence/regression-testing/expect-fail-run-superseded-probe-surface.2026-09-13T18-22.md`. If
+      that copy is absent, this task does not run: the record of the vacuous pass that produced Defect 1
+      would be destroyed.
+
+      Acceptance: the artifact records `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed`,
+      `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`, and exactly one
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=` line whose value begins with `NETSTANDARD-BIND-FAILURE:`. These
+      are the fail-before observations: they fail at runtime against a behaviour-empty installer, not at
+      compile time. The third condition is what makes the second non-vacuous — it states that the Deedle
+      line failed because the `netstandard` bind is unsatisfiable and not because of an unrelated
+      exception — and it is the condition the version 1.0 probe could not produce, because forcing
+      `Deedle.Reflection`'s class constructor returned the success token while the sibling bind assertion
+      in the same domain raised `FileNotFoundException` on the `2.1.0.0` identity. The run's own exit
+      code is recorded against `ExpectedExitCode: 1` and is not itself a gate. If the
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=` value begins with `OTHER-FAILURE:` the executor halts and
+      reports blocked rather than adapting: the probe reached an exception that is not the bind, and the
+      plan, not the run, needs correcting.
+- [ ] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
+      it. Read the `[P2-T11]` artifact. This task is re-run under Revision R2 and MUST read the
+      REGENERATED `[P2-T11]` artifact, not the superseded copy `[P1-T5]` preserved: the five isolation
+      outcomes are properties of the run, and the run changed. This task's own artifact at the path named
+      below is overwritten by the re-run.
       Acceptance: it records all five of
       `ChildDomain_HasNoSvgControlAssemblyLoaded OUTCOME=Passed`,
       `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall OUTCOME=Passed`,
@@ -1123,10 +1625,34 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 - [ ] [P4-T5] Verify the both-versions criterion specifically. Read the `[P4-T3]` artifact.
       Acceptance: it records `AfterInstall_BothNetstandardVersionsBind OUTCOME=Passed`. This is the
       criterion that forbids reporting a `2.1.0.0`-only remedy as a fix.
-- [ ] [P4-T6] Verify the Deedle end-to-end criterion specifically. Read the `[P4-T3]` artifact.
-      Acceptance: it records `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed`. A
-      `NotExecuted` or `Inconclusive` outcome is a failure of this task, not a pass: the test is required
-      to fail rather than skip when `Deedle.dll` is absent from the domain's `ApplicationBase`.
+- [ ] [P4-T6] Verify the Deedle end-to-end criterion specifically. Read the `[P4-T3]` artifact, then
+      extract the outcome VALUE the probe reported, so this criterion is recorded as a measured class and
+      not only as a pass mark. Command:
+
+      ```
+      pwsh -NoProfile -Command '
+      $trx = @(Get-ChildItem -LiteralPath "TestResults/p4-harness" -Filter "*.trx" -Recurse)[0]
+      $x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
+      foreach ($r in @($x.TestRun.Results.UnitTestResult)) {
+      if ($r.testName -eq "AfterInstall_DeedleTypeInitializerSucceeds") {
+      foreach ($line in @(($r.Output.StdOut -split "`r?`n"))) {
+      if ($line.StartsWith("DEEDLE_RECORD_CONVERSION_OUTCOME=")) { Write-Output $line } } } }
+      '
+      ```
+
+      Append the emitted line to
+      `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/regression-testing/pass-after-harness.2026-09-13T18-22.md`
+      under a `Deedle Record Conversion Outcome:` heading.
+      Acceptance: the `[P4-T3]` artifact records
+      `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed`, the heading exists, and it carries
+      exactly one `DEEDLE_RECORD_CONVERSION_OUTCOME=` line whose value is exactly
+      `INVOKED-NO-EXCEPTION`. A `NotExecuted` or `Inconclusive` outcome is a failure of this task, not a
+      pass: the test is required to fail rather than skip when `Deedle.dll` or the member is absent from
+      the domain's `ApplicationBase`. The recorded value is gated rather than merely observed because the
+      pre-fix value recorded by `[P2-T11]` begins with `NETSTANDARD-BIND-FAILURE:` and the post-fix value
+      is the completion token: the pair of recorded values is the fail-before/pass-after evidence for
+      AC10, and a value beginning `OTHER-FAILURE:` would mean the remedy satisfied the bind but the
+      conversion still could not complete, which is a stop-and-report condition rather than a pass.
 - [ ] [P4-T7] LOCK-ACQUIRE, run the `AddInEagerInstallShapeTests` class alone with
       `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, and not the repository-root
       `TaskMaster.runsettings`, with
@@ -1564,16 +2090,22 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 
 ## Task Counts
 
-Counted mechanically over lines matching the task prefix pattern `- [ ] [P#-T#]`:
+Counted mechanically over lines matching either task prefix pattern, `- [ ] [P#-T#]` or `- [x] [P#-T#]`,
+and re-derived after the Revision R2 delta rather than carried forward:
 
-- Phase 0: 16 tasks
-- Phase 1: 4 tasks
-- Phase 2: 12 tasks
-- Phase 3: 5 tasks
-- Phase 4: 12 tasks
-- Phase 5: 10 tasks
-- Phase 6: 27 tasks
-- Total: 86 tasks
+- Phase 0: 16 tasks, all 16 complete
+- Phase 1: 7 tasks, 4 complete — `[P1-T5]`, `[P1-T6]` and `[P1-T7]` are new in Revision R2
+- Phase 2: 12 tasks, 6 complete — `[P2-T1]`, `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and `[P2-T12]` were
+  unchecked by Revision R2 and `[P2-T11]` was already unchecked
+- Phase 3: 5 tasks, 0 complete
+- Phase 4: 12 tasks, 0 complete
+- Phase 5: 10 tasks, 0 complete
+- Phase 6: 27 tasks, 0 complete
+- Total: 89 tasks, 26 complete
+
+Revision R2 added three tasks and removed none, so the total moved from 86 to 89. No task was renumbered:
+the three new tasks were appended to the end of Phase 1, which leaves every `[P2-T#]` through `[P6-T#]`
+identifier that this plan and its evidence artifacts already cite unchanged.
 
 ## Acceptance-Criteria Traceability
 
@@ -1588,7 +2120,7 @@ Counted mechanically over lines matching the task prefix pattern `- [ ] [P#-T#]`
 | AC7 | 499 | P2-T5, P2-T6 | P2-T12, P4-T3 | P2-T12 |
 | AC8 | 504 | P2-T5, P2-T6 | P2-T12, P4-T3 | P2-T12 |
 | AC9 | 509 | P3-T1 | P4-T5 | P4-T3 |
-| AC10 | 515 | P3-T1 | P4-T6 | P4-T3 |
+| AC10 | 515 | P2-T5, P2-T6, P3-T1 | P2-T11, P4-T6 | P1-T6, P1-T7, P2-T11, P4-T3, P4-T6 |
 | AC11 | 521 | P2-T6, P2-T7 | P2-T12, P4-T4 | P2-T12 |
 | AC12 | 528 | P3-T4 | P4-T7, P4-T8 | P4-T8 |
 | AC13 | 534 | P3-T5 | P3-T5 | P3-T5 |
@@ -1601,6 +2133,17 @@ Counted mechanically over lines matching the task prefix pattern `- [ ] [P#-T#]`
 
 ## Planner Notes
 
+- **Revision R2 spec amendment recorded.** The planner rewrote acceptance criterion AC10 at `spec.md`
+  lines 515-520 in place, in exactly six lines, so every acceptance-criterion line number this plan cites
+  is unchanged. The prior text asserted that "a Deedle type initializes without
+  `TypeInitializationException`", which the measured `[P2-T11]` run satisfied against a build carrying no
+  fix. The new text asserts that invoking `Deedle.Reflection.convertRecordSequence`, closed over a
+  concrete record type and given a one-element `IEnumerable<T>`, raises no `netstandard` bind failure and
+  completes without throwing. The criterion is amended by the planner and verified read-only by
+  `[P1-T7]`; no executor task edits acceptance-criterion text. No criterion was added or removed and the
+  inventory remains nineteen. AC1 at `spec.md` lines 473-476 and the write-set entry at `spec.md`
+  line 315 both name the internal `Resolve` seam without a return type, so Defect 2 required no spec
+  amendment; that was checked rather than assumed.
 - **Spec correction recorded.** One acceptance criterion directed the coverage artifact to
   `evidence/coverage/`, which is not a canonical evidence kind. The planner changed that single directory
   reference to `evidence/qa-gates/`, changed nothing else in the criterion's text, added no criterion and

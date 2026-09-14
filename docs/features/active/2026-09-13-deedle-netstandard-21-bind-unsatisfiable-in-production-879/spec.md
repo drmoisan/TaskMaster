@@ -513,11 +513,11 @@ harness measures the resolver, not the redirect. `AppDomain.Unload` runs in `[Te
       and `Assembly.Load("netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")`
       return a non-null assembly.
 - [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.AfterInstall_DeedleTypeInitializerSucceeds`
-      passes, asserting inside the same child domain that a Deedle type initializes without
-      `TypeInitializationException` (for example the member already exercised by
-      QuickFiler.Test/Controllers/QfcInitEmailQueueZeroBatchTests.cs,
-      `Deedle.Reflection.convertRecordSequence`). The test asserts `Deedle.dll` is present in the
-      domain's `ApplicationBase` and **fails** rather than skipping if it is not.
+      passes, asserting inside the same child domain that invoking `Deedle.Reflection.convertRecordSequence`
+      — closed over a concrete record type and given a one-element `IEnumerable<T>`, which is the deepest
+      caller frame of the reported production trace — raises no `netstandard` bind failure and completes
+      without throwing. The test asserts `Deedle.dll` is present in the domain's `ApplicationBase` and
+      **fails** rather than skipping when either that file or that member is absent.
 - [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.NegativeControl_WithoutInstall_Netstandard21Throws`
       passes, asserting in a **second** child domain, with the installer **not** run, that
       `Assembly.Load("netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")`
