@@ -11,8 +11,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | max_concurrency | 3 |
 | current_cohort | 0 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-13T22-50 |
-| next_step | AWAIT_742_PLAN_AMENDMENT_RULING_THEN_872_PR_THEN_869_CLEARANCE |
+| last_updated | 2026-09-13T23-45 |
+| next_step | HOLD_FOR_QUOTA_RESET_THEN_ROUTE_THREE_PLAN_REVISIONS_742_870_879 |
 
 ## Items
 
@@ -31,7 +31,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 871 | `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871` | 0 | C3 | opus | merged | worktree_removed | 883 | 10cf351c155e |
 | 872 | `docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872` | 0 | C3 | opus | in_flight | worktree_created |  |  |
 | 873 | `docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873` | 0 | C3 | opus | merged | worktree_removed | 881 | e6d86049e310 |
-| 879 | `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879` | 0 | C3 | opus | in_flight | worktree_created |  |  |
+| 879 | `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879` | 0 | C3 | opus | blocked | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
 
