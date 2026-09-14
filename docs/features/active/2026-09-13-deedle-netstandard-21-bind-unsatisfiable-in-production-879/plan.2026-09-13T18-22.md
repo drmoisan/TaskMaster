@@ -3593,7 +3593,7 @@ changes and no task is renumbered.
       and `PostedAs: unknown` when it has not been posted.
       Acceptance: the artifact exists, carries `Timestamp:` and a `PostedAs:` field, and contains that
       sentence verbatim.
-- [ ] [P6-T26] Commit the acceptance check-offs, the Phase 6 evidence, and the plan's task check-offs.
+- [x] [P6-T26] Commit the acceptance check-offs, the Phase 6 evidence, and the plan's task check-offs.
       Commands:
 
       ```
