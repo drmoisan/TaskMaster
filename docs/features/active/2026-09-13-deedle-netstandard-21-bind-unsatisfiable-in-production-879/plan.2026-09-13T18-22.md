@@ -484,7 +484,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       Write `.../evidence/baseline/nullable-baseline.2026-09-13T18-22.md` with the four required fields
       plus `ExpectedExitCode:`.
       Acceptance: both artifacts exist and the `.md` records the integer baseline error count.
-- [ ] [P0-T8] LOCK-ACQUIRE, then capture the coverage-bearing test baseline:
+- [x] [P0-T8] LOCK-ACQUIRE, then capture the coverage-bearing test baseline:
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`.
       Leave `-CoverageOutput` at its default, `coverage\coverage.cobertura.xml`: the runner deletes the
       raw Cobertura document unless its parent directory is exactly the repository `coverage` directory.
@@ -511,13 +511,13 @@ because it is absent from the tree until `[P2-T6]` runs.
       injects and the raw document does not. A non-zero exit code caused by the runner's
       repository-wide threshold assertion is recorded with a matching `ExpectedExitCode:` and does not
       block; a missing numeric value does block.
-- [ ] [P0-T9] Record the baseline for the changed-line and new-module coverage obligations. Append to the
+- [x] [P0-T9] Record the baseline for the changed-line and new-module coverage obligations. Append to the
       `[P0-T8]` artifact a `Coverage Obligations:` section stating: repository-wide line coverage floor
       per `CLAUDE.md` is `>= 80%` on the testable denominator; new modules target `>= 90%`; changed lines
       must not regress; `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` does not yet exist, so its
       baseline per-file line coverage is recorded as `NOT PRESENT AT BASELINE`.
       Acceptance: that section exists and carries that exact status string for the new file.
-- [ ] [P0-T10] Close the build-output premise for the harness host. Using the build produced by `[P0-T7]`,
+- [x] [P0-T10] Close the build-output premise for the harness host. Using the build produced by `[P0-T7]`,
       record whether each of these three files exists:
       `TaskMaster.Test/bin/Debug/Deedle.dll`, `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll.config`,
       `TaskMaster.Test/bin/Debug/TaskMaster.dll.config`. Command:
@@ -532,7 +532,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       Write `.../evidence/baseline/build-output-premises.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:` and an `Output Summary:` reproducing the three `EXISTS=` lines verbatim.
       Acceptance: the artifact exists and carries exactly three `EXISTS=` lines.
-- [ ] [P0-T11] Record the premise that `TaskMaster.Test/app.config` carries no `netstandard` entry, which
+- [x] [P0-T11] Record the premise that `TaskMaster.Test/app.config` carries no `netstandard` entry, which
       is what keeps the negative control valid after the Phase 3 hardening lands. Command:
 
       ```
@@ -549,7 +549,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       artifact.
       Acceptance: `TASKMASTER_TEST_APPCONFIG_NETSTANDARD_HITS=0` and
       `TASKMASTER_TEST_APPCONFIG_FSHARPCORE_HITS` is greater than 0.
-- [ ] [P0-T12] Indicative probe of the private `AppDomain` assembly-resolution field. Command:
+- [x] [P0-T12] Indicative probe of the private `AppDomain` assembly-resolution field. Command:
 
       ```
       pwsh -NoProfile -Command '
@@ -564,14 +564,14 @@ because it is absent from the tree until `[P2-T6]` runs.
       sentence: `The runtime observed here is the pwsh host runtime, not net481; this observation is
       indicative only and the decisive net481 observation is task [P2-T12].`
       Acceptance: the artifact exists, carries both `PWSH_HOST_` lines, and carries that sentence.
-- [ ] [P0-T13] Record the fail-loud rule for the isolation assertion, so no later task can weaken it.
+- [x] [P0-T13] Record the fail-loud rule for the isolation assertion, so no later task can weaken it.
       Append to the `[P0-T12]` artifact a `Fail-Loud Rule:` section stating: the child-domain probe
       resolves the field by the name `_AssemblyResolve` with `BindingFlags.Instance | BindingFlags.NonPublic`;
       if the lookup returns `null` the probe throws `InvalidOperationException` naming the field; it must
       never call `Assert.Inconclusive`, never return a sentinel that the test treats as success, and never
       skip. A silently skipped isolation check makes every positive test in the harness vacuous.
       Acceptance: that section exists and contains the literal token `InvalidOperationException`.
-- [ ] [P0-T14] Write-set decision record for the harness host.
+- [x] [P0-T14] Write-set decision record for the harness host.
       Write `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md` with `Timestamp:` and a
       `Decision:` field whose value is exactly one of `HOST=TaskMaster.Test` or `HOST=ToDoModel.Test`.
       The rule is mechanical and leaves the executor no choice: `HOST=TaskMaster.Test` if and only if the
@@ -620,7 +620,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       `CHILD DOMAIN CONFIGURATION FILE` line above already fix. `[P4-T7]` is in neither list: it
       filters on `FullyQualifiedName~AddInEagerInstallShapeTests`, and that class stays in
       `TaskMaster.Test` under this substitution.
-- [ ] [P0-T15] Record the baseline scope-boundary state. Command:
+- [x] [P0-T15] Record the baseline scope-boundary state. Command:
 
       ```
       git rev-parse --verify origin/main
@@ -677,7 +677,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       `BASELINE_FSHARP_REDIRECT_LINES` is recorded as an integer greater than 0. A value of 0 blocks,
       because it would mean the search mechanism found nothing at baseline and no later comparison
       against it would prove anything.
-- [ ] [P0-T16] Record the baseline line counts of the five files this plan will edit in place, so the
+- [x] [P0-T16] Record the baseline line counts of the five files this plan will edit in place, so the
       Phase 5 file-size audit has a comparison point. Command:
 
       ```
