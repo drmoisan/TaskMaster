@@ -1,10 +1,10 @@
 # GitHub Actions Workflows
 
-This directory holds the CI orchestrator and the five callee reusable workflows
+This directory holds the CI orchestrator and the six callee reusable workflows
 it invokes. The split was introduced by issue #553 to replace a single
 sequential `quality-gates` job, whose measured wall clock was 444s, with
 independent gate jobs that GitHub Actions schedules concurrently and that report
-as separate status checks.
+as separate status checks. Issue #869 added the sixth callee, `_pester.yml`.
 
 ## Pipeline overview
 
@@ -14,12 +14,13 @@ references each gate with `uses:`. It contains no inline `steps:`.
 
 | File | Runner | Gate | Timeout |
 | --- | --- | --- | --- |
-| `ci.yml` | n/a (orchestrator) | Invokes the five callees below | n/a |
+| `ci.yml` | n/a (orchestrator) | Invokes the six callees below | n/a |
 | `_actionlint.yml` | `ubuntu-latest` | Downloads actionlint 1.7.7 and lints every workflow file | 10 min |
 | `_format-check.yml` | `windows-latest` | `dotnet csharpier check .` | 10 min |
 | `_build-analyzers.yml` | `windows-latest` | `msbuild /t:Build` with `EnableNETAnalyzers` and `EnforceCodeStyleInBuild` | 30 min |
 | `_build-nullable.yml` | `windows-latest` | `msbuild /t:Rebuild` with `TreatWarningsAsErrors` | 30 min |
-| `_mstest-coverage.yml` | `windows-latest` | Plain `msbuild /t:Build`, then `vstest.console.exe` with `/EnableCodeCoverage`; uploads the `test-results` artifact | 30 min |
+| `_mstest-coverage.yml` | `windows-latest` | Plain `msbuild /t:Build`, then `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, which runs the suite under `dotnet-coverage`, post-processes the result into a first-party Cobertura projection, and asserts 80% line and 75% branch against it; uploads the Cobertura document as the `test-results` artifact | 30 min |
+| `_pester.yml` | `windows-latest` | Pester over `tests/scripts/vscode` with JaCoCo coverage scoped to `scripts/vscode`; asserts the `LINE` figure at 80% and exits non-zero on any test failure; uploads the JaCoCo document as the `pester-coverage` artifact | 10 min |
 
 Structural properties that are deliberate and should not be changed casually:
 
@@ -42,12 +43,41 @@ Structural properties that are deliberate and should not be changed casually:
   `nuget restore`. Each job installs only what its gate consumes. If a gate ever
   fails because a trimmed setup step was in fact required, restore that specific
   step to that specific callee rather than restoring full setup everywhere.
-- **Gate commands are byte-identical to their pre-split forms.** The two msbuild
-  invocations (including the `/t:Rebuild` rationale comment and both
-  `$LASTEXITCODE` guards), the csharpier invocation, and the vstest invocation
-  (including the test-assembly discovery filter and the zero-assembly `throw`)
-  were moved, not edited. Treat any change to those blocks as a change to the
-  gate's pass criterion.
+- **Gate commands were byte-identical to their pre-split forms, with one
+  deliberate exception.** The two msbuild invocations (including the
+  `/t:Rebuild` rationale comment and both `$LASTEXITCODE` guards) and the
+  csharpier invocation are unchanged from the pre-split forms. The vstest
+  invocation in `_mstest-coverage.yml` is **not**: issue #869 replaced it
+  outright with an invocation of `scripts/vscode/Invoke-MSTestWithCoverage.ps1`,
+  so that CI runs the same route as the local tooling and so that the Cobertura
+  document the coverage thresholds are asserted against exists in CI. That
+  replacement **changed the gate's pass criterion**: the job now also fails when
+  first-party line coverage is below 80% or first-party branch coverage is below
+  75%, and it fails when the coverage document is absent or carries no valid
+  branches. Two consequences arrived with it and were accepted deliberately:
+  the runsettings file the script passes declares class-level test scope with
+  one worker per core, which CI did not previously apply; and the `/Logger:trx`
+  argument is no longer passed, which is why the upload step now publishes
+  `coverage/coverage.cobertura.xml` with `if-no-files-found: error` instead of
+  globbing for trx files with `if-no-files-found: warn`. Treat any further
+  change to those blocks as a change to the gate's pass criterion.
+
+- **Pinned tool versions.** Two external tools are pinned in the workflow files
+  so a runner image bump cannot change a gate silently. Bumping either is a
+  reviewable change to both the workflow and this table.
+
+  | Tool | Pinned version | Pinned in |
+  | --- | --- | --- |
+  | `dotnet-coverage` | `18.10.0` | `_mstest-coverage.yml`, install step |
+  | Pester | `5.6.1` | `_pester.yml`, install step and import step |
+
+  The Pester pin is load-bearing beyond drift control: `windows-latest` also
+  ships the legacy Pester 3.4.0 with Windows PowerShell, which provides neither
+  `New-PesterConfiguration` nor the JaCoCo coverage output format the gate
+  depends on, so the version is pinned on the import as well as the install.
+  The `dotnet-coverage` pin is the NuGet package version. The tool's own
+  `--version` output carries a build-metadata suffix that is not part of package
+  identity and does not resolve when passed to `--version`; do not pin it.
 
 ## Per-stage workflow_dispatch procedure
 
@@ -85,7 +115,7 @@ Two caveats:
 
 The required context names take the form `<caller job id> / <callee job name>` —
 the job id used in `ci.yml`, then the `name:` of the job inside the callee. The
-five contexts this pipeline reports are, verbatim:
+six contexts this pipeline reports are, verbatim:
 
 ```
 actionlint / actionlint
@@ -93,7 +123,16 @@ format-check / Verify formatting
 build-analyzers / Build with analyzers and code style enforcement
 build-nullable / Build with nullable warnings treated as errors
 mstest-coverage / Run MSTest suite with coverage
+pester / Run Pester suite with coverage
 ```
+
+The sixth entry is the one context issue #869 adds. It is **predicted** until a
+live run against the pull request head SHA confirms it with the check-runs query
+in step 2 of the next section; the first five are unchanged and continue to
+report under their existing names. Issue #869 changes no job name, so its C#
+threshold assertion adds no context of its own: the issue text's expectation of
+two new contexts is superseded, and only `pester / Run Pester suite with
+coverage` needs adding to the ruleset.
 
 Do not hand-write these strings when editing branch protection; capture them from
 a live run as described in the next section.

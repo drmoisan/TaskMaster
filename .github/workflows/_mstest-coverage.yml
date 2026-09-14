@@ -24,6 +24,22 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install dotnet-coverage
+        shell: pwsh
+        run: |
+          # Pinned so a runner image bump cannot change the gate silently. The value is the
+          # NuGet package version; the tool's own --version output carries a build-metadata
+          # suffix that is not part of package identity and does not resolve with --version.
+          dotnet tool install --global dotnet-coverage --version 18.10.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # Made explicit rather than relying on the runner image default.
+          "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
@@ -70,43 +86,18 @@ jobs:
       - name: Run MSTest suite with coverage
         shell: pwsh
         run: |
-          Set-StrictMode -Version Latest
-          $ErrorActionPreference = 'Stop'
+          # The local route is adopted verbatim so CI and the developer workstation run the same
+          # code path. The script post-processes the collector output into a first-party Cobertura
+          # projection and then asserts the line and branch floors against that projection, so the
+          # gate's pass criterion now includes those two thresholds. Deliberate change: see
+          # .github/workflows/README.md.
+          & ./scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-          $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-          if (-not (Test-Path $vswherePath)) {
-              throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
-          }
-
-          $vstestPath = & $vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-          if (-not $vstestPath) {
-              throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
-          }
-
-          $testAssemblies = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter '*.Test.dll' |
-              Where-Object {
-                  $_.FullName -match "\\bin\\$($env:BUILD_CONFIGURATION)\\" -and
-                  $_.FullName -notmatch '\\obj\\' -and
-                  $_.FullName -notmatch '\\ref\\'
-              } |
-              Select-Object -ExpandProperty FullName
-
-          if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
-              throw "No test assemblies found under '$env:GITHUB_WORKSPACE' for configuration '$env:BUILD_CONFIGURATION'."
-          }
-
-          New-Item -ItemType Directory -Path 'TestResults' -Force | Out-Null
-          & $vstestPath $testAssemblies /EnableCodeCoverage /InIsolation /Logger:trx /TestCaseFilter:"TestCategory!=LiveOutlook"
-          if ($LASTEXITCODE -ne 0) {
-              throw "MSTest execution failed with exit code $LASTEXITCODE"
-          }
-
-      - name: Upload test results
+      - name: Upload coverage document
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: |
-            TestResults/**/*.trx
-            TestResults/**/*.coverage
-          if-no-files-found: warn
+          path: coverage/coverage.cobertura.xml
+          if-no-files-found: error
