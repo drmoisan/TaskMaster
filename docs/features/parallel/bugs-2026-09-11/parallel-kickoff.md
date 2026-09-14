@@ -5,8 +5,22 @@ research complete, spec and user-story written, atomic plans approved, preflight
 radii declared and V1/V2-clear. Planning state:
 artifacts/orchestration/parallel-planner-state.json (run branch: parallel/bugs-2026-09-11-plan).
 
-Thirteen items, four generation-0 cohorts, eighteen conflict edges over seventy-eight pairs. The
-five potential entries were promoted to issues 869, 870, 871, 872 and 873. Base commit 2405a829d.
+Thirteen items were prepared. Item 602 was WITHDRAWN on 2026-09-13 before execution started, so
+**twelve items execute**, in three generation-1 cohorts. The five potential entries were promoted to
+issues 869, 870, 871, 872 and 873. Base commit 2405a829d.
+
+Schedule in force (`recolor_generation: 1`) — launch from this, not from the generation-0 table:
+
+| cohort | items |
+| --- | --- |
+| 0 | 583, 743, 838, 839, 871, 872, 873 |
+| 1 | 742, 816, 869, 870 |
+| 2 | 792 |
+
+Do not launch item 602. It is `state: withdrawn`, holds no generation-1 cohort membership, and is
+excluded from the completion predicate. Its twelve conflict edges are retained in the planner
+checkpoint as derived record and are inert, because a neighbour with no current-generation cohort
+constrains nothing.
 
 ## Invocation Prompt
 
@@ -43,37 +57,46 @@ Each of these was verified during preparation and several will silently break th
    including it during preparation makes the pre-implementation gate evaluate against the
    parallel-orchestrator checkpoint and deny with checkpoint-absent.
 
-## Open Decisions
+## Resolved Decisions
 
-1. ORDERING. Item 602 conflicts with all twelve other items and is placed in cohort 0, so it
-   executes FIRST. Its scope note requires it to land AFTER item 873, which delivers half of its
-   acceptance criteria. compute_cohorts is Welsh-Powell and colours the highest-degree vertex first,
-   so the most contended item is scheduled earliest. The intake handoff assumed the opposite. No
-   permitted planner action can move it. Withdrawing 602 costs the run nothing in parallelism, since
-   it occupies a cohort alone either way, and yields three cohorts instead of four.
-2. TRX FILENAME LEAK. Items 743, 838, 871 and 872 pass /Logger:trx with no LogFileName= across
-   seventeen command spans, so vstest emits a filename carrying the account and host tokens. Item
-   816 is the only item that authored LogFileName correctly. The fix is mechanical and
-   acceptance-condition-neutral. Relying on item 602 to sweep the leak afterwards does not work,
-   because 602 currently runs first.
+1. ORDERING — RESOLVED by withdrawing item 602. 602 conflicted with all twelve other items, and
+   compute_cohorts is Welsh-Powell, which colours the highest-degree vertex first, so the most
+   contended item was scheduled earliest and 602 took cohort 0 alone. No permitted planner action
+   could move it. It was withdrawn before execution; the unstarted subgraph was recoloured at
+   `recolor_generation: 1` and the remaining twelve items keep the same partition, shifted down one
+   index. Withdrawal cost no parallelism.
+
+   The reason recorded at intake — that 602's AC4 depends on the results-directory and
+   log-file-name behavior item 873 delivers — was checked and is NOT supported by 602's own
+   documents; see the "Two corrections to the record" section of `parallel.md`. The real reason is
+   that six of 602's fifteen criteria are repository-wide present-tense searches over the tracked
+   tree, which this run's own document-adding siblings falsify if 602 merges first. Four such
+   sibling files were already measured on the preparation branches.
+2. TRX FILENAME LEAK — RESOLVED in the favourable direction by the same withdrawal. Items 743, 838,
+   871 and 872 pass /Logger:trx with no LogFileName= across seventeen command spans, so vstest emits
+   a filename carrying the account and host tokens; item 816 is the only item that authored
+   LogFileName correctly. This decision previously recorded that relying on item 602 to sweep the
+   leak afterwards did not work *because* 602 ran first. With 602 deferred to a follow-on run after
+   these twelve merge, the afterwards-sweep is now the actual order. The inline fix remains
+   mechanical and acceptance-condition-neutral if an item prefers to make it directly.
 
 ## Item Summary
 
 | issue_num | feature_folder | cohort | complexity | branch | plan-path |
 | --- | --- | --- | --- | --- | --- |
-| 602 | docs/features/active/2026-09-12-host-identifier-leakage-sweep-602 | 0 | C3 | bug/host-identifier-leakage-sweep-602 | docs/features/active/2026-09-12-host-identifier-leakage-sweep-602/plan.2026-09-12T16-14.md |
-| 583 | docs/features/active/kastringasync-keyequals-contains-offset-583 | 1 | C2 | bug/kastringasync-keyequals-contains-offset-583 | docs/features/active/kastringasync-keyequals-contains-offset-583/plan.2026-09-12T10-25.md |
-| 743 | docs/features/active/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam-743 | 1 | C4 | bug/quickfiler-itemviewer-ui-marshalling-seam-743 | docs/features/active/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam-743/plan.2026-09-12T13-23.md |
-| 838 | docs/features/active/2026-09-09-gettableinviewasync-returns-null-on-timeout-838 | 1 | C3 | bug/gettableinviewasync-returns-null-on-timeout-838 | docs/features/active/2026-09-09-gettableinviewasync-returns-null-on-timeout-838/plan.2026-09-12T16-09.md |
-| 839 | docs/features/active/2026-09-09-createcancellationtoken-has-no-production-caller-839 | 1 | C3 | bug/createcancellationtoken-has-no-production-caller-839 | docs/features/active/2026-09-09-createcancellationtoken-has-no-production-caller-839/plan.2026-09-12T22-14.md |
-| 871 | docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871 | 1 | C3 | bug/qfcqueue-enqueue-path-lacks-injectable-seams-871 | docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/plan.2026-09-12T10-25.md |
-| 872 | docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872 | 1 | C3 | bug/minor-audit-trio-gate-cts-tracker-872 | docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/plan.2026-09-12T10-26.md |
-| 873 | docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873 | 1 | C3 | bug/test-evidence-projection-convention-and-identity-leak-tooling-873 | docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873/plan.2026-09-12T10-26.md |
-| 742 | docs/features/active/2026-09-02-quickfiler-date-time-format-missing-invariant-culture-742 | 2 | C2 | bug/quickfiler-date-time-format-missing-invariant-culture-742 | docs/features/active/2026-09-02-quickfiler-date-time-format-missing-invariant-culture-742/plan.2026-09-12T16-09.md |
-| 816 | docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816 | 2 | C3 | bug/uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816 | docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816/plan.2026-09-12T13-23.md |
-| 869 | docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869 | 2 | C3 | bug/ci-coverage-threshold-and-pester-gates-869 | docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869/plan.2026-09-12T10-25.md |
-| 870 | docs/features/active/2026-09-11-claude-md-coverage-thresholds-and-toolchain-command-corrections-870 | 2 | C2 | bug/claude-md-coverage-thresholds-and-toolchain-command-corrections-870 | docs/features/active/2026-09-11-claude-md-coverage-thresholds-and-toolchain-command-corrections-870/plan.2026-09-12T10-25.md |
-| 792 | docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792 | 3 | C4 | bug/breadcrumb-webview2-init-fails-resource-not-in-correct-state-792 | docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792/plan.2026-09-12T13-21.md |
+| 602 | docs/features/active/2026-09-12-host-identifier-leakage-sweep-602 | withdrawn | C3 | bug/host-identifier-leakage-sweep-602 | docs/features/active/2026-09-12-host-identifier-leakage-sweep-602/plan.2026-09-12T16-14.md |
+| 583 | docs/features/active/kastringasync-keyequals-contains-offset-583 | 0 | C2 | bug/kastringasync-keyequals-contains-offset-583 | docs/features/active/kastringasync-keyequals-contains-offset-583/plan.2026-09-12T10-25.md |
+| 743 | docs/features/active/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam-743 | 0 | C4 | bug/quickfiler-itemviewer-ui-marshalling-seam-743 | docs/features/active/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam-743/plan.2026-09-12T13-23.md |
+| 838 | docs/features/active/2026-09-09-gettableinviewasync-returns-null-on-timeout-838 | 0 | C3 | bug/gettableinviewasync-returns-null-on-timeout-838 | docs/features/active/2026-09-09-gettableinviewasync-returns-null-on-timeout-838/plan.2026-09-12T16-09.md |
+| 839 | docs/features/active/2026-09-09-createcancellationtoken-has-no-production-caller-839 | 0 | C3 | bug/createcancellationtoken-has-no-production-caller-839 | docs/features/active/2026-09-09-createcancellationtoken-has-no-production-caller-839/plan.2026-09-12T22-14.md |
+| 871 | docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871 | 0 | C3 | bug/qfcqueue-enqueue-path-lacks-injectable-seams-871 | docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/plan.2026-09-12T10-25.md |
+| 872 | docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872 | 0 | C3 | bug/minor-audit-trio-gate-cts-tracker-872 | docs/features/active/2026-09-11-minor-audit-trio-gate-cts-tracker-872/plan.2026-09-12T10-26.md |
+| 873 | docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873 | 0 | C3 | bug/test-evidence-projection-convention-and-identity-leak-tooling-873 | docs/features/active/2026-09-11-test-evidence-projection-convention-and-identity-leak-tooling-873/plan.2026-09-12T10-26.md |
+| 742 | docs/features/active/2026-09-02-quickfiler-date-time-format-missing-invariant-culture-742 | 1 | C2 | bug/quickfiler-date-time-format-missing-invariant-culture-742 | docs/features/active/2026-09-02-quickfiler-date-time-format-missing-invariant-culture-742/plan.2026-09-12T16-09.md |
+| 816 | docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816 | 1 | C3 | bug/uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816 | docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816/plan.2026-09-12T13-23.md |
+| 869 | docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869 | 1 | C3 | bug/ci-coverage-threshold-and-pester-gates-869 | docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869/plan.2026-09-12T10-25.md |
+| 870 | docs/features/active/2026-09-11-claude-md-coverage-thresholds-and-toolchain-command-corrections-870 | 1 | C2 | bug/claude-md-coverage-thresholds-and-toolchain-command-corrections-870 | docs/features/active/2026-09-11-claude-md-coverage-thresholds-and-toolchain-command-corrections-870/plan.2026-09-12T10-25.md |
+| 792 | docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792 | 2 | C4 | bug/breadcrumb-webview2-init-fails-resource-not-in-correct-state-792 | docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792/plan.2026-09-12T13-21.md |
 
 ## Integrity
 

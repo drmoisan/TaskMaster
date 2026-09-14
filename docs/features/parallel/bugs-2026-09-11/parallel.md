@@ -20,7 +20,7 @@ items:
   - issue_num: 602
     feature_folder: docs/features/active/2026-09-12-host-identifier-leakage-sweep-602
     kind: bug
-    state: prepared
+    state: withdrawn
     blast_radius:
       paths:
         - ".claude/agent-memory/**/*.md"
@@ -382,9 +382,66 @@ co-scheduled two items onto the same file:
 - paths whose directory segment contains a space, which the whitespace-free token extractor splits
   into fragments naming no tracked file.
 
-## Known scheduling limitation
+## Resolved scheduling limitation — item 602 withdrawn
 
-Item 602 conflicts with all twelve other items and is placed in cohort 0, so it executes FIRST. Its
-own scope note requires it to land AFTER item 873, which delivers half of its acceptance criteria.
-The parallel surface cannot express ordering, and no permitted planner action can move it. See the
-planner checkpoint under `ordering_assumption_refuted` and `ordering_counterfactual`.
+Item 602 conflicted with all twelve other items, so Welsh-Powell coloured it first and it occupied
+generation-0 cohort 0 alone, executing FIRST. It was withdrawn on 2026-09-13 before execution
+started, and the unstarted subgraph was recoloured at `recolor_generation: 1` into three cohorts:
+
+| cohort | items |
+| --- | --- |
+| 0 | 583, 743, 838, 839, 871, 872, 873 |
+| 1 | 742, 816, 869, 870 |
+| 2 | 792 |
+
+Because 602 occupied a cohort alone either way, the withdrawal costs no parallelism; it removes a
+serialized cohort and leaves the other twelve items partitioned exactly as before, shifted down one
+index. 602's twelve conflict edges are retained in the planner checkpoint as derived record and are
+inert, since a neighbour holding no current-generation cohort constrains nothing.
+
+### Why 602 must not run first
+
+Six of 602's fifteen spec criteria — AC1, AC2, AC3, AC4, AC5, and AC7's reconciliation premise —
+are repository-wide, present-tense assertions over the tracked tree, of the form "lists no tracked
+file". They are unbounded by 602's own diff. A sibling that merges after 602 and adds a file
+carrying an identifier therefore *falsifies* those criteria on `main` rather than merely dating
+them, leaving 602 checked off against a condition that no longer holds.
+
+That is already realized rather than hypothetical. Measured against base `2405a829d`, four of the
+twelve sibling preparation branches already add files carrying the account identifier: 742, 871 and
+743 in the user-profile-path form, breaking AC1, and 873 as a bare account name inside a
+`SearchPatterns` regex, breaking AC2. All four land inside 602's own declared globs
+`docs/features/active/**/*.md` and `docs/features/**/evidence/**`, and execution will add more.
+602's spec concedes the mechanism in its Known Contention section: "because the criterion is
+repository-wide a partial correction leaves it unmet. Whichever item lands second must re-measure
+rather than assume."
+
+Raw-evidence-class exposure — `.trx`, `evidence/**/*.xml`, `*.txt`, `*.process-tree.json` — measured
+zero across all twelve preparation branches, so AC5 and AC7 exposure is latent and depends on what
+execution commits. Re-measure rather than assume.
+
+Withdrawal also resolves the trx-filename leak in the kickoff's Open Decisions: that note recorded
+that relying on 602 to sweep the leak afterwards did not work *because* 602 ran first. Re-run 602 as
+a follow-on run once these twelve items merge.
+
+### Two corrections to the record
+
+**The stated dependency is not the real one.** The ordering requirement was stated as "602's AC4
+depends on the results-directory and log-file-name behavior item 873 delivers". That premise is not
+supported by 602's own documents: its `spec.md` AC4 is an 8.3 short-name residual-search criterion
+naming neither symbol, its plan references neither symbol nor item 873, and both its `issue.md` and
+`spec.md` place that half explicitly out of scope as the sibling's work. Item 873 is indeed the
+writer of that behavior, but 602 is not a consumer of it. The same unsupported claim appears in the
+planner checkpoint under `unexpressible_ordering` and `ordering_assumption_refuted` and in kickoff
+Open Decision 1; it originated in the intake handoff and propagated unchecked. The distinction
+matters operationally: the stated reason would justify withdrawing 602 only from a run containing
+873, whereas the real reason scales with the number of document-adding siblings and applies to all
+twelve.
+
+**602's Ordering Risk section does not mean what it appears to mean.** Its AC13 and its Ordering
+Risk prose assert self-consistency "in either landing order", but both rest on a single axis — that
+no criterion asserts anything about the test runner's argument list. They do not defend the
+tree-wide residual searches in AC1 through AC5, which are exactly the criteria a later merge breaks.
+Reading AC13 as general order-independence would have wrongly cleared 602 to run first.
+
+See the planner checkpoint under `items[].withdrawal` and `planner_notes.item_602_withdrawn`.
