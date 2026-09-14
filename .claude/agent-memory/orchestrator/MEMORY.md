@@ -1,5 +1,9 @@
 # Orchestrator Memory Index
 
+## Resuming a dead run
+- [Recover a dead agent worktree via shared git](recovering-a-dead-agent-worktree-via-shared-git.md) — its committed work is already in your object store; `git -C` into it is refused but `hash-object` reads its uncommitted files
+- [Blast-radius audit must cover the PLAN too](blast-radius-audit-must-cover-the-plan-too.md) — spec-only audit missed 5 stray paths; a BACKSLASH path is dropped by the extractor
+
 ## Lifecycle, promotion, checkpoint
 - [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) · [Small-path = minor-audit](small-path-minor-audit-selection.md) — 1-3 prod files = small path
 - [potential_to_issue creates the issue](potential-to-issue-creates-github-issue.md) · [needs an absolute path](potential-to-issue-needs-absolute-path.md) · [maps sections by heading](potential-to-issue-keeps-only-summary-section.md)
@@ -15,6 +19,7 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) · [Resumed child shares your worktree](resumed-child-orchestrator-shares-worktree.md)
 - [MCP tools available to orchestrator](mcp-tools-available-to-orchestrator.md) — run them yourself if a worker can't
 - [Run the real hook, not MCP](run-orchestration-hook-gates-locally.md) — the MCP validator disagrees on the bug route
+- [Preflight-cleared plan can still contradict a spec AC clause](preflight-cleared-plan-can-still-conflict-with-a-spec-acceptance-clause.md) — read each AC's "not a pass" sentence against the claiming task's decision rule before execution (#743 AC1 no-expiry)
 
 ## PR authoring and CI gate
 - [pr-author is a skill, not an agent](pr-author-hook-blocks-gh-in-this-repo.md) · [exact checkpoint schema](pr-author-hook-exact-checkpoint-schema.md) — agents must be a LIST; `relativeFile` required
