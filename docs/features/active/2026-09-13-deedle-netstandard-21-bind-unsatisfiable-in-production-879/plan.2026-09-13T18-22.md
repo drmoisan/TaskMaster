@@ -107,10 +107,16 @@ Documents and evidence:
 Conditional, only if the Phase 0 build-output premise check fails and the recorded substitution is taken:
 
 14. `ToDoModel.Test/Bootstrap/ChildDomainBindProbe.cs`,
-    `ToDoModel.Test/Bootstrap/NetstandardBindChildDomainTests.cs`,
-    `ToDoModel.Test/Bootstrap/AddInEagerInstallShapeTests.cs` and `ToDoModel.Test/ToDoModel.Test.csproj`
-    replace items 7-10. This substitution is a recorded amendment (task `[P0-T14]`), never a silent
-    change.
+    `ToDoModel.Test/Bootstrap/NetstandardBindChildDomainTests.cs` and
+    `ToDoModel.Test/ToDoModel.Test.csproj` replace items 7, 8 and 10. Item 9
+    (`TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs`) is NOT moved and stays in
+    `TaskMaster.Test`: `ToDoModel.Test/ToDoModel.Test.csproj` carries ProjectReferences to
+    `ToDoModel` (line 310) and `UtilitiesCS` (line 314) only and does not reference `TaskMaster`, so
+    `typeof(ThisAddIn)` would not compile there, and `TaskMaster.dll.config` is not in that project's
+    build output. Under this substitution the child domains' `ConfigurationFile` is
+    `ToDoModel.Test.dll.config` in `AppDomain.CurrentDomain.BaseDirectory`, and the file-name
+    prohibition in `[P2-T6]` binds to `TaskMaster.dll.config` exactly as it does under the primary
+    host. This substitution is a recorded amendment (task `[P0-T14]`), never a silent change.
 
 Inherited-path rule (not a list): any path the executor's own harness writes as a side effect of running
 — for example agent-memory files the executor maintains under `.claude/agent-memory/` — is outside this
@@ -134,7 +140,7 @@ rescuer and masks the result. That masking is how this defect hid inside the tes
 handler does not propagate into a child domain, so the PR #880 resolver linked into `QuickFiler.Test` and
 `UtilitiesCS.Test` cannot reach it, and neither can anything a sibling test class did in the parent.
 
-**The guarantee is made checkable by four falsifiable assertions, not by assumption:**
+**The guarantee is made checkable by five falsifiable assertions, not by assumption:**
 
 1. `ChildDomain_HasNoSvgControlAssemblyLoaded` — inside the child domain, no loaded assembly has simple
    name `SVGControl`. `SvgRenderer`'s type initializer cannot have run if its assembly is not loaded, so
@@ -146,6 +152,10 @@ handler does not propagate into a child domain, so the PR #880 resolver linked i
    attributable to the installer and not to the `TaskMaster/app.config` hardening.
 4. `NegativeControl_WithoutInstall_Netstandard21Throws` — in a second child domain, with the installer
    not run, the `2.1.0.0` load throws `FileNotFoundException` naming `netstandard`.
+5. `NegativeControl_HasNoUtilitiesCsAssemblyLoaded` — inside the installer-free second child domain, no
+   loaded assembly has simple name `UtilitiesCS`. This is the checkable form of the design claim that
+   keeping the installer call in its own probe method prevents `UtilitiesCS` from being JIT-resolved in
+   that domain.
 
 **The negative control is the load-bearing criterion.** It is the only thing that distinguishes a fixed
 build from an unfixed one. It has its own task with its own acceptance condition, and it is verified in
@@ -171,12 +181,16 @@ domains set `ApplicationBase` to the directory of the test assembly and `Configu
 
 **One design correction made here rather than inherited.** The proxy evaluates every listed condition
 **inside** the child domain and marshals primitive results back; FluentAssertions and the MSTest
-assertion types are used only in the parent domain. Loading an assertion library into the child domain
-would add assemblies to a domain whose emptiness is the whole point of the harness, and FluentAssertions
-itself carries a `netstandard` reference, so loading it could supply the very facade the negative control
-must not find. For the same reason `ChildDomainBindProbe` keeps the installer call in a method separate
-from the bind attempt, so `UtilitiesCS` is never JIT-resolved in the negative-control domain, and the
-negative-control path additionally observes that no loaded assembly has simple name `UtilitiesCS`.
+assertion types are used only in the parent domain. Loading an assertion library into the child domain would add assemblies to a domain whose emptiness is
+the whole point of the harness. The consequence is specific and is in the positive domain rather than
+the negative one: if an assertion library dragged a `netstandard 2.0.0.0` facade into the positive
+domain, ladder rung 1 would return it from the already-loaded set and
+`AfterInstall_BothNetstandardVersionsBind` would pass without rungs 2 or 3 ever executing. The
+negative control is not at risk from this: a `2.1.0.0` full-strong-name request is not satisfied by an
+already-loaded `2.0.0.0` under the default binder. For the same reason `ChildDomainBindProbe` keeps
+the installer call in a method separate from the bind attempt, so `UtilitiesCS` is never JIT-resolved
+in the negative-control domain, and `NegativeControl_HasNoUtilitiesCsAssemblyLoaded` makes that
+checkable rather than asserted.
 
 ---
 
@@ -208,6 +222,26 @@ Consequences carried deliberately into the task list:
 
 **Issue #879 must not be reported as closed on the strength of a `2.1.0.0` result alone.** The issue
 comment written by `[P6-T25]` reproduces the `2.0.0.0` limit statement verbatim.
+
+---
+
+## R3 — EXECUTION RISK: the full-suite runs may stall on the shell-icon test classes
+
+`[P0-T8]` and `[P5-T7]` run the full suite through `scripts/vscode/Invoke-MSTestWithCoverage.ps1` with
+`-SearchRoot .`, which discovers every `*.Test.dll` under `Debug`. There is recorded history on this
+machine of four shell-icon test classes in `UtilitiesCS.Test` stalling `vstest.console.exe` inside
+`SHGetFileInfo`, and the runner exposes no `TestCaseFilter` parameter and no `/Blame` parameter, so this
+plan has no lever inside the runner if the stall recurs. Whether it reproduces in this worktree has not
+been measured.
+
+This is recorded as an execution risk and is deliberately **not** an acceptance condition of any task.
+No task in this plan asserts anything about it, and no task adds a runner parameter that does not exist.
+The stated response for the executor is: if either full-suite task fails to produce a TRX and a Cobertura
+document within the executor's own timeout, stop the run, record the observation in that task's artifact
+with `EXIT_CODE:` and an `Output Summary:` naming the last test that started, and report blocked to the
+caller. Do not edit `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, which is outside the authorised write
+set, and do not substitute a narrower discovery scope for the full-suite run, which would change the
+coverage denominator that `[P5-T10]` compares.
 
 ---
 
@@ -294,6 +328,42 @@ rewrites `csproj` HintPaths.
 - CSharpier is pinned to 1.2.6 by `dotnet-tools.json` at the repository root and requires a subcommand.
   Run `dotnet tool restore` once per worktree before the first invocation.
 
+**Runsettings selection for targeted runs.** The targeted `vstest.console.exe` runs in Phases 2 and 4
+pass `scripts/vscode/TaskMaster.cli.runsettings`, not the repository-root `TaskMaster.runsettings`.
+The root file declares a `DataCollector` named `Code Coverage` with no `enabled` attribute, which
+defaults to enabled, so it activates profiler-based instrumentation in the process hosting the child
+`AppDomain` whose minimality the harness measures. The CLI file carries the MSTest parallelisation
+block only and no data collector, which is why `scripts/vscode/Invoke-MSTestWithCoverage.ps1` uses it
+for the inner vstest invocation. `scripts/vscode/TaskMaster.cli.runsettings` is read here and never
+modified; it remains in the non-goals as an unmodifiable file.
+
+The substitution removes the collector but not parallelism. Both files carry the same MSTest block,
+`<Workers>0</Workers>` with `<Scope>ClassLevel</Scope>`, read directly from
+`scripts/vscode/TaskMaster.cli.runsettings` lines 3 to 7. Class-level scope means test methods within
+one class run sequentially while separate classes in the same assembly run concurrently on worker
+threads of the one host process. Ordering-dependent masking of exactly that shape is what issue #877
+recorded, so the question is answered explicitly rather than assumed. **This plan takes option (b): the
+harness class is pinned with `[DoNotParallelize]`.** The reason is that the two mechanisms in play
+separate cleanly and only one of them is closed by AppDomain isolation:
+
+- The observations the probe makes — the loaded-assembly set read through `AppDomain.GetAssemblies()`
+  and the invocation list of the `AppDomain` assembly-resolution event — are per-`AppDomain` state
+  reached through the child domain's own `AppDomain` instance. A sibling class running concurrently in
+  the default domain loads assemblies into the default domain and subscribes handlers to the default
+  domain's event, and neither is visible through the child domain's instance. That mechanism is closed
+  by isolation and needs no pinning.
+- What isolation does not close is the host process itself. `AppDomain.Unload`, which `[TestCleanup]`
+  calls on every created domain, suspends the runtime and aborts the threads executing in the target
+  domain, and it raises `CannotUnloadAppDomainException` when a thread cannot be aborted in time. Run
+  concurrently with sibling classes on a machine under load, that is a failure mode of the harness that
+  has nothing to do with the bind under test, and the harness's positive and negative domain pair is
+  the only load-bearing evidence this plan produces. A single attribute removes it.
+
+The pinning is made checkable by `[P2-T6]`'s acceptance condition, which requires the literal
+`[DoNotParallelize]` to appear exactly once in
+`TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs`. The literal is quoted here in prose
+because it is absent from the tree until `[P2-T6]` runs.
+
 ---
 
 ### Phase 0 — Policy Reading, Baseline Capture, and Premise Closure
@@ -317,11 +387,46 @@ rewrites `csproj` HintPaths.
       `.../evidence/baseline/outlook-closed-gate.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:` and `Output Summary:` recording the observed count.
       Acceptance: the recorded count is `0` and the artifact exists.
-- [ ] [P0-T4] LOCK-ACQUIRE, then bootstrap the toolchain: `dotnet tool restore`. Then LOCK-RELEASE.
+- [ ] [P0-T4] LOCK-ACQUIRE, bootstrap the toolchain in three steps beginning with scripts/vscode/Install-RepoDotNetSdk.ps1, then LOCK-RELEASE. This
+      worktree is fresh: `.dotnet-sdk` and `packages/` are both absent, `global.json` pins SDK
+      `8.0.205` with `paths` `.dotnet-sdk` and `$host$`, and every `dotnet` invocation fails with the
+      `global.json` `errorMessage` until the repo-local SDK is installed. Steps, in this order:
+
+      ```
+      pwsh -NoProfile -File scripts/vscode/Install-RepoDotNetSdk.ps1
+      ```
+
+      ```
+      pwsh -NoProfile -Command 'dotnet tool restore'
+      ```
+
+      ```
+      pwsh -NoProfile -Command '
+      $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+      $msb = @(& $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\amd64\MSBuild.exe")[0]
+      & $msb TaskMaster.sln /t:Restore /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:RestorePackagesConfig=true
+      $LASTEXITCODE
+      '
+      ```
+
+      Then record the pinned CSharpier version from the manifest rather than from the restore output,
+      because the restore command's success-case output has not been observed in this worktree:
+
+      ```
+      pwsh -NoProfile -Command '
+      $m = Get-Content -LiteralPath "dotnet-tools.json" -Raw | ConvertFrom-Json
+      Write-Output ("CSHARPIER_PINNED_VERSION=" + $m.tools.csharpier.version)
+      Write-Output ("PACKAGES_DIR_PRESENT=" + (Test-Path -LiteralPath "packages"))
+      '
+      ```
+
       Write `.../evidence/baseline/toolchain-bootstrap.2026-09-13T18-22.md` with `Timestamp:`,
-      `Command:`, `EXIT_CODE:` and `Output Summary:`.
-      Acceptance: `EXIT_CODE: 0` and the `Output Summary:` records that the restored CSharpier version is
-      `1.2.6`.
+      `Command:` listing all four commands, `EXIT_CODE:` for each, and an `Output Summary:` carrying
+      both emitted lines.
+      Acceptance: every one of the four commands exits 0, and the `Output Summary:` records
+      `CSHARPIER_PINNED_VERSION=1.2.6` and `PACKAGES_DIR_PRESENT=True`. A failure of any of the four
+      blocks: the analyzer, nullable and test baselines below all depend on a restored SDK and a
+      restored `packages` tree.
 - [ ] [P0-T5] LOCK-ACQUIRE, then capture the format baseline read-only:
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .'`. Then LOCK-RELEASE. Write
       `.../evidence/baseline/format-baseline.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
@@ -363,17 +468,28 @@ rewrites `csproj` HintPaths.
       Leave `-CoverageOutput` at its default, `coverage\coverage.cobertura.xml`: the runner deletes the
       raw Cobertura document unless its parent directory is exactly the repository `coverage` directory.
       Then LOCK-RELEASE.
-      Note the runner's observed behaviour, which the acceptance condition is written against: it
-      post-processes and writes the Cobertura document **before** it asserts the repository-wide 80
-      percent line-rate threshold, so the document exists on disk even when that assertion throws.
+      Note the runner's observed behaviour, which the acceptance condition is written against. There
+      are two distinct non-zero-exit paths and they differ in what they leave on disk:
+      (a) `Invoke-MSTestWithCoverage.ps1` line 262 throws on a non-zero collection exit code, which
+      happens BEFORE post-processing at lines 383-384, so on a run with any failing test the document
+      at `coverage/coverage.cobertura.xml` is the RAW collector output, carrying absolute paths and
+      third-party packages;
+      (b) the repository-wide 80 percent line-rate assertion at line 386 runs AFTER post-processing, so
+      on that path the document on disk is the post-processed one.
+      The artifact must state which path it observed, because the two carry different denominators and
+      `[P5-T10]` compares this figure against a post-processed one.
       Write `.../evidence/baseline/test-coverage-baseline.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `ExpectedExitCode:` and an `Output Summary:` carrying these numeric
       headline values read from `coverage/coverage.cobertura.xml`: the document-level `line-rate`, the
       document-level `lines-valid`, the document-level `lines-covered`, and the total test count, failed
       count and passed count read from the TRX under `coverage/test-results`.
-      Acceptance: the artifact exists and all six numeric values are present as numbers, not placeholders.
-      A non-zero exit code caused by the runner's repository-wide threshold assertion is recorded with a
-      matching `ExpectedExitCode:` and does not block; a missing numeric value does block.
+      Acceptance: the artifact exists, all six numeric values are present as numbers rather than
+      placeholders, and the artifact carries a `Cobertura Document State:` field whose value is exactly
+      one of `POSTPROCESSED` or `RAW-COLLECTOR-OUTPUT`, determined by whether
+      `coverage/coverage.cobertura.xml` contains the literal `<sources>`, which post-processing
+      injects and the raw document does not. A non-zero exit code caused by the runner's
+      repository-wide threshold assertion is recorded with a matching `ExpectedExitCode:` and does not
+      block; a missing numeric value does block.
 - [ ] [P0-T9] Record the baseline for the changed-line and new-module coverage obligations. Append to the
       `[P0-T8]` artifact a `Coverage Obligations:` section stating: repository-wide line coverage floor
       per `CLAUDE.md` is `>= 80%` on the testable denominator; new modules target `>= 90%`; changed lines
@@ -441,20 +557,48 @@ rewrites `csproj` HintPaths.
       `[P0-T10]` artifact records `TaskMaster.Test/bin/Debug/Deedle.dll EXISTS=True` and
       `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll.config EXISTS=True`; otherwise
       `HOST=ToDoModel.Test`, and the artifact additionally carries an `Amendment:` section reproducing
-      write-set item 14 of this plan verbatim and stating that items 7-10 are replaced.
-      Acceptance: the artifact exists, `Decision:` carries exactly one of the two permitted values, and
-      when the value is `HOST=ToDoModel.Test` the `Amendment:` section is present.
+      write-set item 14 of this plan verbatim and stating that items 7, 8 and 10 are replaced.
+      Independently of the host decision, the artifact carries a `Deployed Add-In Config:` field whose
+      value is the `TaskMaster.Test/bin/Debug/TaskMaster.dll.config EXISTS=` line copied verbatim from
+      the `[P0-T10]` artifact. If that line reads `EXISTS=False`, the executor reports blocked before
+      Phase 2 rather than proceeding: `[P2-T8]`'s `AppConfig_DeclaresNetstandardRedirect` resolves that
+      file from `AppDomain.CurrentDomain.BaseDirectory` and fails loudly when it is absent, so the
+      absence is a build-configuration problem to be resolved before the harness is written, not a
+      test failure to be discovered at `[P4-T7]`.
+      Acceptance: the artifact exists, `Decision:` carries exactly one of the two permitted values,
+      `Deployed Add-In Config:` is present and reads `EXISTS=True`, and when the value is
+      `HOST=ToDoModel.Test` the `Amendment:` section is present. When the value is
+      `HOST=ToDoModel.Test` the `Amendment:` section must additionally state, in its
+      own line, `AddInEagerInstallShapeTests REMAINS IN TaskMaster.Test` and
+      `CHILD DOMAIN CONFIGURATION FILE = ToDoModel.Test.dll.config`, and `[P2-T6]` and `[P2-T9]` are
+      read with those two substitutions applied.
 - [ ] [P0-T15] Record the baseline scope-boundary state. Command:
 
       ```
+      git rev-parse --verify origin/main
+      git status --porcelain --untracked-files=all -- UtilitiesCS TaskMaster UtilitiesCS.Test TaskMaster.Test docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
       git diff --name-only origin/main...HEAD
       ```
 
-      Preceded in the same task by `git rev-parse --verify origin/main`, whose exit 0 is a gate: if
-      `origin/main` does not resolve, the executor reports blocked rather than substituting another ref.
-      Append the command output to `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md` under a
-      `Baseline Merge-Base Diff:` heading. In the same task also capture the two unchanged-baseline
-      comparators the Phase 4 sweep will compare against:
+      The `git rev-parse --verify origin/main` exit 0 is a gate: if `origin/main` does not resolve, the
+      executor reports blocked rather than substituting another ref. The porcelain span is the
+      companion the name-listing diff needs, and the two mechanisms are complementary because each
+      alone is wrong in one state: the anchored diff enumerates tracked committed changes only and is
+      blind to a file this plan has created but not yet committed, and porcelain status goes empty once
+      the change is committed. At Phase 0 nothing has been created yet, so both are expected to be
+      empty here and the pair establishes the starting state against which `[P6-T5]` compares. Append
+      both outputs to `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md`, the diff under a
+      `Baseline Merge-Base Diff:` heading and the porcelain output under a
+      `Baseline Porcelain Status:` heading, each empty output recorded as the literal `NONE`.
+
+      Three-dot behaviour was verified by the planner: `origin/main` and the merge base with `HEAD`
+      differ at authoring time, so `origin/main...HEAD` resolves to merge-base-to-HEAD; after a later
+      merge of `main` the merge base becomes `origin/main` itself and the three-dot form degenerates to
+      `origin/main..HEAD`, which still enumerates exactly the branch's own changes. The three-dot form
+      is correct in both states.
+
+      In the same task also capture the two unchanged-baseline comparators the Phase 4 sweep will
+      compare against:
 
       ```
       pwsh -NoProfile -Command '
@@ -466,12 +610,14 @@ rewrites `csproj` HintPaths.
       The pattern is a regular expression whose leading and trailing `.` match the quotation marks; the
       literal is `oldVersion="0.0.0.0-11.0.0.0"`. Append both lines to the same artifact under a
       `Baseline Comparators:` heading.
-      Acceptance: `git rev-parse --verify origin/main` exits 0; the `Baseline Merge-Base Diff:` heading
-      exists with the raw output beneath it, empty output recorded as the literal `NONE`; and
+      Acceptance: `git rev-parse --verify origin/main` exits 0; both the `Baseline Merge-Base Diff:`
+      and the `Baseline Porcelain Status:` headings exist with the raw output beneath them, empty
+      output recorded as the literal `NONE`; the `Baseline Porcelain Status:` output names no path
+      other than this feature folder's `plan.2026-09-13T18-22.md` and `spec.md`; and
       `BASELINE_FSHARP_REDIRECT_LINES` is recorded as an integer greater than 0. A value of 0 blocks,
-      because it would mean the search mechanism found nothing at baseline and no later comparison against
-      it would prove anything.
-- [ ] [P0-T16] Record the baseline line counts of the four files this plan will edit in place, so the
+      because it would mean the search mechanism found nothing at baseline and no later comparison
+      against it would prove anything.
+- [ ] [P0-T16] Record the baseline line counts of the five files this plan will edit in place, so the
       Phase 5 file-size audit has a comparison point. Command:
 
       ```
@@ -511,23 +657,36 @@ rewrites `csproj` HintPaths.
       line 536, AC15 line 543, AC16 line 545, AC17 line 547, AC18 line 550, AC19 line 554.
       Acceptance: the artifact exists and carries exactly nineteen `AC` entries, and a spot check confirms
       that each named line currently begins with the six characters `- [ ] `.
-- [ ] [P1-T3] Confirm no non-canonical evidence directory remains anywhere in `spec.md` or in this plan.
-      Command:
+- [ ] [P1-T3] Confirm no non-canonical evidence directory remains in `spec.md`. Command:
 
       ```
       pwsh -NoProfile -Command '
-      $paths = @("docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/spec.md","docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/plan.2026-09-13T18-22.md")
+      $p = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/spec.md"
       $bad = @("artifacts/baselines/","artifacts/baseline/","artifacts/qa/","artifacts/qa-gates/","artifacts/evidence/","artifacts/coverage/","evidence/coverage/","evidence/post-change/")
-      foreach ($p in $paths) { foreach ($b in $bad) { Write-Output ($p + " " + $b + " HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -Pattern $b).Count) } }
+      foreach ($b in $bad) { Write-Output ($p + " " + $b + " HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -Pattern $b).Count) }
       '
       ```
 
+      The sweep covers `spec.md` alone and deliberately never covers this plan file. This plan file
+      quotes all eight non-canonical literals — in this task's own search list and again in `[P1-T1]` —
+      so a zero-hit sweep over it could not pass whatever the executor does, and would gate nothing.
+      The plan side of the obligation is discharged by the binding evidence-path shorthand paragraph
+      near the top of this plan, which fixes every evidence path this plan names to one of the six
+      canonical kinds, and by `[P1-T4]`, which reproduces the authorised write set.
       Append the output to the `[P1-T2]` artifact under a `Non-Canonical Evidence Path Sweep:` heading.
-      Acceptance: every emitted line ends with `HITS=0`.
+      Acceptance: the heading exists, exactly eight lines are emitted, and every line ends with
+      `HITS=0`.
 - [ ] [P1-T4] Lock the scope. Append to the `[P1-T2]` artifact a `Scope Lock:` section reproducing this
       plan's `## Authorised Write Set` items 1 to 13 verbatim, plus the sentence
       `No file outside this list, and outside the inherited-path rule, may be created or modified by this plan.`
-      Acceptance: that section exists and lists thirteen numbered items.
+      Then read the `Decision:` field of `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md`
+      and append a `Host Substitution:` line whose value is that field verbatim. When the value is
+      `HOST=ToDoModel.Test`, the `Scope Lock:` section additionally reproduces write-set item 14
+      verbatim and states which of items 7 to 10 it replaces, so the lock and the recorded amendment do
+      not contradict each other.
+      Acceptance: that section exists, lists thirteen numbered items, carries the quoted sentence, and
+      carries a `Host Substitution:` line holding exactly one of `HOST=TaskMaster.Test` or
+      `HOST=ToDoModel.Test`. When the value is `HOST=ToDoModel.Test`, item 14 is reproduced beneath it.
 
 ### Phase 2 — Regression Harness First (fails before the fix)
 
@@ -597,7 +756,11 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       number of `dependentAssembly` elements whose `assemblyIdentity` name is `netstandard`.
       The type references no FluentAssertions type and no MSTest assertion type, because loading an
       assertion library into the child domain would add assemblies to a domain whose emptiness is the
-      point of the harness, and FluentAssertions itself carries a `netstandard` reference.
+      point of the harness, and a `netstandard` facade arriving that way in the POSITIVE domain would
+      be returned by ladder rung 1, letting `AfterInstall_BothNetstandardVersionsBind` pass without
+      rungs 2 or 3 executing. The probe's own error reporting honours the same rule: it throws
+      `InvalidOperationException`, a BCL type that marshals across the domain boundary, and returns
+      outcomes as plain strings.
       Acceptance: the file exists, contains `: MarshalByRefObject`, contains `InvalidOperationException`
       at least three times, and returns zero hits for `FluentAssertions` and for `Microsoft.VisualStudio.TestTools`.
 - [ ] [P2-T6] Create `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` declaring
@@ -612,9 +775,40 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall`,
       `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect`,
       `AfterInstall_BothNetstandardVersionsBind`, `AfterInstall_DeedleTypeInitializerSucceeds`,
-      `NegativeControl_WithoutInstall_Netstandard21Throws`, and
-      `NegativeControl_Netstandard20Observation_IsRecorded`. Assertions in the parent domain use
-      FluentAssertions over the primitive values the probe marshals back.
+      `NegativeControl_WithoutInstall_Netstandard21Throws`,
+      `NegativeControl_Netstandard20Observation_IsRecorded`, and
+      `NegativeControl_HasNoUtilitiesCsAssemblyLoaded`, which runs in the installer-free domain and
+      asserts that `CountLoadedAssembliesNamed("UtilitiesCS")` returns 0. This is the checkable form
+      of the design claim that keeping the installer call in its own probe method prevents
+      `UtilitiesCS` from being JIT-resolved in that domain; without it the claim is prose.
+
+      Domain assignment is fixed by this plan and is not the executor's choice.
+      `ChildDomain_HasNoSvgControlAssemblyLoaded`,
+      `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall` and
+      `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect` run in the POSITIVE domain, and
+      `ChildDomain_HasNoSvgControlAssemblyLoaded` calls `InstallProductionFallback()` first and
+      `CountLoadedAssembliesNamed("SVGControl")` second, in that order, so it observes the domain in
+      the state in which `AfterInstall_BothNetstandardVersionsBind` measures the bind. Asserting it
+      before the installer call, or in the installer-free domain, would pass because `UtilitiesCS` was
+      never loaded, and would establish nothing about the domain the positive result comes from.
+      `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall` is the one method that observes the
+      positive domain BEFORE `InstallProductionFallback()`, which is what its name states.
+      `NegativeControl_WithoutInstall_Netstandard21Throws` and
+      `NegativeControl_Netstandard20Observation_IsRecorded` run in the installer-free domain.
+
+      `ChildDomain_HasNoSvgControlAssemblyLoaded` additionally records
+      `CountLoadedAssembliesNamed("UtilitiesCS")` as a positive control on the counting mechanism and
+      asserts it is greater than 0. The control is sound because `InstallProductionFallback()` cannot
+      be JIT-compiled without loading `UtilitiesCS` into that domain, so after the call the count must
+      be non-zero. The same helper therefore returns a non-zero count in the positive domain and 0 in
+      `NegativeControl_HasNoUtilitiesCsAssemblyLoaded`, which is what makes the zero an observation
+      rather than an artefact of a helper that always returns 0.
+
+      The class carries `[DoNotParallelize]`, for the reason given under
+      `## Run Environment Constraints`: the runsettings in force set `<Scope>ClassLevel</Scope>`, so
+      sibling classes in this assembly run concurrently in the host process, and `AppDomain.Unload` in
+      `[TestCleanup]` is the one harness operation that concurrency reaches. Assertions in the parent
+      domain use FluentAssertions over the primitive values the probe marshals back.
       `NegativeControl_Netstandard20Observation_IsRecorded` runs in the same installer-free second child
       domain, attempts the full display name at `Version=2.0.0.0`, writes the single line
       `NETSTANDARD_2_0_0_0_NEGATIVE_DOMAIN_RESULT=` followed by the marshalled outcome string through
@@ -622,9 +816,12 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       outcome string is non-empty. The outcome value itself is an observation for the open `2.0.0.0`
       risk, not a gate; asserting a particular value would be asserting something this work does not
       know.
-      Acceptance: the file exists, contains exactly those seven method names, contains `AppDomain.CreateDomain`
+      Acceptance: the file exists, contains exactly those eight method names, contains `AppDomain.CreateDomain`
       and `AppDomain.Unload`, contains `TaskMaster.Test.dll.config`, and returns zero hits for
-      `TaskMaster.dll.config`.
+      `TaskMaster.dll.config`. The file additionally contains the literal `[DoNotParallelize]` exactly
+      once, the literal `CountLoadedAssembliesNamed("SVGControl")` exactly
+      once and the literal `CountLoadedAssembliesNamed("UtilitiesCS")` exactly twice. Those three
+      literals are quoted here in prose because they are absent from the tree until this task runs.
 - [ ] [P2-T7] Add the in-file isolation warning required by the spec's negative-control criterion, worded
       unambiguously. Immediately above `NegativeControl_WithoutInstall_Netstandard21Throws` in
       `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs`, add a comment stating that if the
@@ -661,10 +858,20 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `Select-String -SimpleMatch -CaseSensitive` returns exactly 1 hit for each of the three file names
       `ChildDomainBindProbe.cs`, `NetstandardBindChildDomainTests.cs` and
       `AddInEagerInstallShapeTests.cs`.
-- [ ] [P2-T10] [expect-fail] LOCK-ACQUIRE, then rebuild the solution with the plain Debug configuration
-      and no analyzer or nullable properties, then LOCK-RELEASE. The analyzer and nullable gates are
-      deliberately not run in this phase: they would be evaluated against a deliberately behaviour-empty
-      seam.
+- [ ] [P2-T10] LOCK-ACQUIRE, then create the evidence/regression-testing directory this task and `[P2-T11]` redirect into,
+      then rebuild the solution with the plain Debug configuration and no analyzer or nullable
+      properties, then LOCK-RELEASE. This task is NOT tagged `[expect-fail]`: the seam is
+      declaration-complete, so the expected outcome here is a successful build. The deliberately
+      failing observations belong to `[P2-T11]`. The analyzer and nullable gates are deliberately not
+      run in this phase: they would be evaluated against a deliberately behaviour-empty seam.
+
+      ```
+      pwsh -NoProfile -Command '
+      $d = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/regression-testing"
+      if (-not (Test-Path -LiteralPath $d)) { New-Item -ItemType Directory -Path $d -Force > $null }
+      Write-Output ("REGRESSION_EVIDENCE_DIR_PRESENT=" + (Test-Path -LiteralPath $d))
+      '
+      ```
 
       ```
       pwsh -NoProfile -Command '
@@ -677,9 +884,10 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
       Write `.../evidence/regression-testing/expect-fail-build.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 0` and `Output Summary:`.
-      Acceptance: `EXIT_CODE: 0`, and the console log contains at least one line matching
-      `^\s+0 Error\(s\)$`. The build must succeed: the seam is declaration-complete, so a compile failure
-      here is a defect in the seam, not the fail-before signal this phase is looking for.
+      Acceptance: the directory-creation span records `REGRESSION_EVIDENCE_DIR_PRESENT=True`;
+      `EXIT_CODE: 0`; and the console log contains at least one line matching `^\s+0 Error\(s\)$`. A
+      compile failure here is a defect in the seam, not the fail-before signal this phase is looking
+      for.
 - [ ] [P2-T11] [expect-fail] LOCK-ACQUIRE, then run the harness class alone and capture the TRX, then
       LOCK-RELEASE.
 
@@ -687,7 +895,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       pwsh -NoProfile -Command '
       $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
       $vstest = @(& $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe")[0]
-      & $vstest "TaskMaster.Test/bin/Debug/TaskMaster.Test.dll" /Settings:TaskMaster.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~TaskMaster.Test.Bootstrap" /Logger:trx /ResultsDirectory:TestResults/p2-expect-fail
+      & $vstest "TaskMaster.Test/bin/Debug/TaskMaster.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~TaskMaster.Test.Bootstrap" /Logger:trx /ResultsDirectory:TestResults/p2-expect-fail
       $LASTEXITCODE
       '
       ```
@@ -711,16 +919,17 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       code is recorded against `ExpectedExitCode: 1` and is not itself a gate.
 - [ ] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
       it. Read the `[P2-T11]` artifact.
-      Acceptance: it records all four of
+      Acceptance: it records all five of
       `ChildDomain_HasNoSvgControlAssemblyLoaded OUTCOME=Passed`,
       `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall OUTCOME=Passed`,
-      `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect OUTCOME=Passed` and
-      `NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed`. Write
+      `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect OUTCOME=Passed`,
+      `NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed` and
+      `NegativeControl_HasNoUtilitiesCsAssemblyLoaded OUTCOME=Passed`. Write
       `.../evidence/regression-testing/isolation-field-decisive-check.2026-09-13T18-22.md` with
       `Timestamp:`, `Command: (read of the [P2-T11] artifact)`, `EXIT_CODE: 0` and an `Output Summary:`
-      reproducing those four lines plus the sentence
+      reproducing those five lines plus the sentence
       `The private AppDomain assembly-resolution field is present and readable on net481; the isolation
-      assertion did not skip.` If any of the four is not `Passed`, the executor halts and reports blocked:
+      assertion did not skip.` If any of the five is not `Passed`, the executor halts and reports blocked:
       the harness has no isolation and no later positive result would mean anything.
 
 ### Phase 3 — Minimal Production Fix
@@ -793,7 +1002,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       pwsh -NoProfile -Command '
       $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
       $vstest = @(& $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe")[0]
-      & $vstest "UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll" /Settings:TaskMaster.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~UtilitiesCS.Test.Bootstrap" /Logger:trx /ResultsDirectory:TestResults/p4-ladder
+      & $vstest "UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~UtilitiesCS.Test.Bootstrap" /Logger:trx /ResultsDirectory:TestResults/p4-ladder
       $LASTEXITCODE
       '
       ```
@@ -804,11 +1013,13 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       Acceptance: `EXIT_CODE: 0`, the TRX `ResultSummary` `outcome` is `Completed`, the `Counters` `failed`
       value is `0`, and the `passed` value is at least 10.
 - [ ] [P4-T3] LOCK-ACQUIRE, run the child-domain harness class alone, LOCK-RELEASE. Same command shape as
-      `[P2-T11]` with `/ResultsDirectory:TestResults/p4-harness`. Read the TRX and write
+      `[P2-T11]`, which means the same `/Settings:scripts/vscode/TaskMaster.cli.runsettings` operand and
+      not the repository-root `TaskMaster.runsettings`, with
+      `/ResultsDirectory:TestResults/p4-harness`. Read the TRX and write
       `.../evidence/regression-testing/pass-after-harness.2026-09-13T18-22.md` with the four required
       fields plus every `OUTCOME=` line.
       Acceptance: `EXIT_CODE: 0`, the `Counters` `failed` value is `0`, and the artifact records
-      `OUTCOME=Passed` for all seven method names listed in `[P2-T6]`.
+      `OUTCOME=Passed` for all eight method names listed in `[P2-T6]`.
 - [ ] [P4-T4] Verify the load-bearing negative control specifically. Read the `[P4-T3]` artifact.
       Acceptance: it records `NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed`. If it
       records any other outcome, the executor halts and reports blocked, because the load in the
@@ -822,6 +1033,8 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `NotExecuted` or `Inconclusive` outcome is a failure of this task, not a pass: the test is required
       to fail rather than skip when `Deedle.dll` is absent from the domain's `ApplicationBase`.
 - [ ] [P4-T7] LOCK-ACQUIRE, run the `AddInEagerInstallShapeTests` class alone with
+      `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, and not the repository-root
+      `TaskMaster.runsettings`, with
       `/ResultsDirectory:TestResults/p4-shape` and `/TestCaseFilter:"FullyQualifiedName~AddInEagerInstallShapeTests"`,
       LOCK-RELEASE. Write `.../evidence/regression-testing/pass-after-shape.2026-09-13T18-22.md` with the
       four required fields plus every `OUTCOME=` line.
@@ -874,9 +1087,22 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       fields and the full output.
       Acceptance: every banned-token line ends with `HITS=0`, and every `CONTROL_AppDomain` line ends with
       a count greater than 0.
-- [ ] [P4-T10] Record the free `2.0.0.0` measurement that narrows the open risk. Read the `[P4-T3]`
-      artifact and the TRX standard output captured for
-      `NegativeControl_Netstandard20Observation_IsRecorded`. Write
+- [ ] [P4-T10] Record the free `2.0.0.0` measurement that narrows the open risk. The `[P4-T3]` TRX
+      reader emits `testName` and `outcome` only, so the observation is extracted from the TRX
+      directly. Command:
+
+      ```
+      pwsh -NoProfile -Command '
+      $trx = @(Get-ChildItem -LiteralPath "TestResults/p4-harness" -Filter "*.trx" -Recurse)[0]
+      $x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
+      foreach ($r in @($x.TestRun.Results.UnitTestResult)) {
+      if ($r.testName -eq "NegativeControl_Netstandard20Observation_IsRecorded") {
+      foreach ($line in @(($r.Output.StdOut -split "`r?`n"))) {
+      if ($line.StartsWith("NETSTANDARD_2_0_0_0_NEGATIVE_DOMAIN_RESULT=")) { Write-Output $line } } } }
+      '
+      ```
+
+      Write
       `.../evidence/other/netstandard-2-0-0-0-child-domain-observation.2026-09-13T18-22.md` with
       `Timestamp:`, `Command:`, `EXIT_CODE:` and an `Output Summary:` containing exactly one line of the
       form `NETSTANDARD_2_0_0_0_NEGATIVE_DOMAIN_RESULT=` followed by the marshalled outcome string the
@@ -935,14 +1161,28 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 - [ ] [P5-T2] Step 1, format. LOCK-ACQUIRE, then
       `pwsh -NoProfile -Command 'dotnet tool run csharpier format .'`, then LOCK-RELEASE. This is a
       write-mode command whose exit code is identical whether it rewrote files or not, so the acceptance
-      condition observes the tree rather than the exit code. Immediately afterwards run
-      `git status --porcelain --untracked-files=all -- UtilitiesCS TaskMaster UtilitiesCS.Test TaskMaster.Test`
-      and record its output. Write `.../evidence/qa-gates/format-final.2026-09-13T18-22.md` with
-      `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and a `Tree Observation:` field carrying
-      the porcelain output verbatim, or the literal `NONE` when it is empty.
-      Acceptance: `EXIT_CODE: 0` and the `Tree Observation:` field lists no path other than the files this
-      plan's write set already authorises. A formatter rewrite of any other tracked file means the format
-      pass was not scoped as expected and the loop restarts.
+      condition observes the tree rather than the exit code.
+      Immediately afterwards run the repository-wide porcelain span, excluding only the two path
+      classes the inherited-path rule places outside every scope assertion in this plan:
+
+      ```
+      git status --porcelain --untracked-files=all -- . ":(exclude).claude" ":(exclude)docs/features"
+      ```
+
+      The exclusions are pathspec magic and are supported by the repository's git; `.claude` is excluded
+      because agent-memory files the executor's own harness maintains are outside this write set, and
+      `docs/features` is excluded because this plan's own evidence tree is written there continuously.
+      A repository-wide span is required rather than the four-directory span: `csharpier format .`
+      formats the whole tree, and `[P0-T5]` records the format baseline without repairing it, so any
+      pre-existing drift outside those four directories is repaired by this task and would otherwise be
+      reported by no span in this plan. Write `.../evidence/qa-gates/format-final.2026-09-13T18-22.md`
+      with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and a `Tree Observation:` field
+      carrying the porcelain output verbatim, or the literal `NONE` when it is empty.
+      Acceptance: `EXIT_CODE: 0` and every path the `Tree Observation:` field lists is one of the ten
+      repository-relative paths in items 1 to 10 of `## Authorised Write Set`. A formatter rewrite of
+      any other tracked file means the format pass was not scoped as expected: restore that file with
+      `git checkout --` against its own pathspec, record the restoration in the artifact, and restart
+      the loop from step 1.
 - [ ] [P5-T3] Step 1 verification, read-only.
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .'` under LOCK-ACQUIRE/LOCK-RELEASE.
       Append `Check EXIT_CODE:` and the reported unformatted-file count to the `[P5-T2]` artifact.
@@ -1020,6 +1260,21 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       append the result to `.../evidence/other/file-size-audit.2026-09-13T18-22.md` under a
       `Post-Format Line Counts:` heading.
       Acceptance: the heading exists and every `LINES=` value under it is at most 500.
+
+      In the same task, re-run the three pre-format sweeps whose acceptance conditions describe the
+      terminal state rather than the Phase 4 state, because `[P5-T2]` rewrites tracked source across
+      the whole tree and CSharpier 1.2.6 processes `packages.config` as well as `*.cs` and `*.xml`:
+      re-run the `[P4-T8]` command and append its seven `NAME=count` lines to
+      `.../evidence/other/static-shape-checks.2026-09-13T18-22.md` under a `Post-Format Shape Checks:`
+      heading; re-run the `[P4-T9]` command and the `[P4-T11]` command and append both outputs to
+      `.../evidence/other/scope-and-determinism-checks.2026-09-13T18-22.md` under a
+      `Post-Format Sweep:` heading.
+      Acceptance: the `Post-Format Line Counts:` heading exists and every `LINES=` value under it is at
+      most 500; the `Post-Format Shape Checks:` heading records the same seven values `[P4-T8]`
+      requires; and the `Post-Format Sweep:` heading records `PACKAGES_CONFIG_CHANGED=0`,
+      `PORCELAIN_PACKAGES_CONFIG=0`, `NETSTANDARD_DLL_IN_PROJECTS=0`, a `FSHARP_REDIRECT_LINES` value
+      equal to the `BASELINE_FSHARP_REDIRECT_LINES` integer recorded at `[P0-T15]`, every banned-token
+      line ending `HITS=0`, and every `CONTROL_AppDomain` line ending with a count greater than 0.
 - [ ] [P5-T9] Extract the per-file coverage figure for the new module. Command:
 
       ```
@@ -1059,6 +1314,11 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `POST_CHANGE_LINES_VALID` differs from `BASELINE_LINES_VALID` the artifact records
       `DENOMINATORS DIFFER` and the no-regression judgment rests on `NEW_MODULE_LINE_PERCENT` and on the
       changed-line evidence in `[P5-T9]`.
+      When the `[P0-T8]` artifact records `Cobertura Document State: RAW-COLLECTOR-OUTPUT`, the
+      artifact additionally records `BASELINE DENOMINATOR NOT COMPARABLE` and the no-regression
+      judgment rests solely on `NEW_MODULE_LINE_PERCENT` and on `[P5-T9]`. Comparing a raw
+      document-level `line-rate` against a post-processed one would compare two different
+      denominators.
 
 ### Phase 6 — Open Risk, Manual Gates, Commit, and Acceptance Check-Off
 
@@ -1111,15 +1371,20 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 
       ```
       git rev-parse --verify origin/main
-      git status --porcelain --untracked-files=all -- UtilitiesCS TaskMaster UtilitiesCS.Test TaskMaster.Test docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
+      git status --porcelain --untracked-files=all -- . ":(exclude).claude" ":(exclude)docs/features"
       git diff --name-only origin/main...HEAD
       ```
 
-      The porcelain span is the companion the name-listing diff needs: an anchored `git diff --name-only`
-      enumerates tracked changes only, so a path this plan created is invisible to it until it is
-      committed, and `[P6-T1]` has committed it. Write
+      The porcelain span is the companion the name-listing diff needs, and its pathspec is
+      repository-wide rather than scoped to the four source directories: every path this task's
+      acceptance condition prohibits sits outside those four directories, so a span scoped to them
+      could not report an uncommitted change to any of them. The two exclusions are the two path
+      classes the inherited-path rule places outside every scope assertion in this plan. An anchored
+      `git diff --name-only` enumerates tracked committed changes only, so a path this plan created is
+      invisible to it until it is committed, and `[P6-T1]` has committed it. Write
       `.../evidence/other/scope-boundary-diff.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
-      `EXIT_CODE:` and an `Output Summary:` reproducing the full diff list verbatim.
+      `EXIT_CODE:` and an `Output Summary:` reproducing the full diff list and the full porcelain
+      output verbatim, empty output recorded as the literal `NONE`.
       Acceptance: `git rev-parse --verify origin/main` exits 0; the porcelain span returns no output; and
       the diff list contains none of `SVGControl/SvgAssemblyResolver.cs`, `SVGControl/SvgRenderer.cs`,
       `SVGControl/SvgAssemblyProbe.cs`, `TestSupport/TestAssemblyResolver.cs`,
