@@ -118,6 +118,8 @@
     <Compile Include="Controllers\QfcFormControllerUndoHandoffTests.cs" />
     <Compile Include="Controllers\QfcQueueCoverageExpansionTests.cs" />
     <Compile Include="Controllers\QfcQueuePurePathsTests.cs" />
+    <Compile Include="Controllers\QfcQueueEnqueueTests.cs" />
+    <Compile Include="Controllers\QfcQueueEnqueueTests.Harness.cs" />
     <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />
@@ -192,11 +194,13 @@
     <Compile Include="Controllers\QfcItemController.PropertiesTests.cs" />
     <Compile Include="Controllers\QfcItemController.TestSupport.cs" />
     <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixture.cs" />
+    <Compile Include="Controllers\QfcItemController.SeamMarshallingTests.cs" />
     <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixtureTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part2.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part3.cs" />
     <Compile Include="Controllers\QfcItemController.ViewerSetupTests.cs" />
+    <Compile Include="Controllers\QuickFilerInvariantCultureIssue742Tests.cs" />
     <Compile Include="Controllers\QfcItemController.EventHandlersTests.cs" />
     <Compile Include="Controllers\QfcItemController.SearchFocusRegressionTests.cs" />
     <Compile Include="Controllers\QfcItemController.SearchDismissalTests.cs" />

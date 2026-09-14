@@ -321,6 +321,9 @@
     <Compile Include="Ribbon\EngineCommandRefreshPlannerTests.cs" />
     <Compile Include="Ribbon\EngineGatedCommandRunnerTests.cs" />
     <Compile Include="Ribbon\RibbonCommandBoundaryTests.cs" />
+    <Compile Include="Bootstrap\ChildDomainBindProbe.cs" />
+    <Compile Include="Bootstrap\NetstandardBindChildDomainTests.cs" />
+    <Compile Include="Bootstrap\AddInEagerInstallShapeTests.cs" />
     <Compile Include="Ribbon\EngineReadinessGateTests.cs" />
     <Compile Include="Ribbon\EngineToggleCatalogTests.cs" />
     <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.cs" />
