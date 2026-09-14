@@ -3,9 +3,9 @@
 - **Issue:** #879
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-14T16-05
-- **Status:** Ready for preflight (revision R5)
-- **Version:** 1.2
+- **Last Updated:** 2026-09-14T19-40
+- **Status:** Ready for preflight (revision R7)
+- **Version:** 1.3
 - **Work Mode:** full-bug (spec.md is the sole acceptance-criteria source; `user-story.md` is correctly absent)
 - **Complexity band:** C3
 - **Branch:** `bug/deedle-netstandard-21-bind-unsatisfiable-in-production-879`
@@ -96,7 +96,10 @@ Production:
 Tests:
 
 5. `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` (new)
-6. `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (one new `Compile Include` item)
+6. `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (two new `Compile Include` items; the first registers item
+   5 and was added by `[P2-T4]`, the second registers item 14 and is added by `[P4-T14]`. Revision R7
+   raised this count from one to two. No other line of that project file is written by any task in this
+   plan, and `[P4-T14]` gates the `FSharp.Core` `HintPath` at line 598 as unchanged.)
 7. `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` (new)
 8. `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` (new)
 9. `TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs` (new)
@@ -109,9 +112,18 @@ Documents and evidence:
 13. Any path under
     `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/`
 
-Conditional, only if the Phase 0 build-output premise check fails and the recorded substitution is taken:
+Added by Revision R7 (tests):
 
-14. `ToDoModel.Test/Bootstrap/ChildDomainBindProbe.cs` and
+14. `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs` (new). This is a SIBLING of item
+    5, not a replacement for it. Item 5 is not written by any Revision R7 task and its two standing guards
+    in `[P2-T3]` are left intact. `## R7` records why a sibling file rather than an amendment of item 5.
+
+Conditional, only if the Phase 0 build-output premise check fails and the recorded substitution is taken.
+Revision R7 renumbered this entry from 14 to 15 when it appended item 14 above; its internal references to
+items 7, 8, 9 and 10 are unchanged and still point at the same entries, because Revision R7 renumbered no
+entry in the range 1 to 13:
+
+15. `ToDoModel.Test/Bootstrap/ChildDomainBindProbe.cs` and
     `ToDoModel.Test/Bootstrap/NetstandardBindChildDomainTests.cs` replace items 7 and 8, and
     `ToDoModel.Test/ToDoModel.Test.csproj` joins the write set carrying those two new
     `Compile Include` items. Item 10 (`TaskMaster.Test/TaskMaster.Test.csproj`) is NOT replaced: it
@@ -770,6 +782,213 @@ amendment and `[P2-T6]`'s acceptance re-asserts its count.
   invocation.
 - The live-Outlook step at `[P6-T4]` remains a manual stop-and-report gate with a `PENDING-MAINTAINER`
   branch.
+
+---
+
+## R7 — REVISION R7: the new module misses AC17's own 90 percent floor, and how that is closed
+
+`[P5-T9]` ran the command this plan pins against the post-processed `coverage/coverage.cobertura.xml` and
+recorded `ASSEMBLYBINDINGFALLBACK_CLASS_ROWS=1`, `ASSEMBLYBINDINGFALLBACK_LINES_VALID=201`,
+`ASSEMBLYBINDINGFALLBACK_LINES_COVERED=166`, a computed 82.59 percent against AC17's floor of 90. The task
+is correctly left unchecked and the verdict is BLOCKED. AC17 at `spec.md` line 547 states the floor, so the
+plan must meet it; **no task in this revision amends any acceptance-criterion text and `spec.md` is not
+written by this revision.**
+
+### R7.1 — The uncovered set, re-derived from the Cobertura document rather than carried forward
+
+Every line below was re-derived in this pass from `coverage/coverage.cobertura.xml`, whose single `class`
+row for `UtilitiesCS.Bootstrap.AssemblyBindingFallback` begins at document line 112946 and carries
+`line-rate="0.825871"`, which agrees with 166/201. The per-method `lines-valid` figures sum to 201 and the
+`hits="0"` entries sum to 35, so the enumeration is complete rather than a sample.
+
+| Member | Uncovered lines | Count | Reachable by an injected-delegate or direct-invocation test? |
+|---|---|---|---|
+| `Install` boundary `catch` | 83, 84, 87, 88 | 4 | **No.** `Interlocked.Exchange` and the event subscription cannot be made to throw from a test. |
+| `Resolve` null-identity guard | 105, 106 | 2 | Yes — `Resolve(null)`. |
+| `Resolve` empty-simple-name guard | 111, 112 | 2 | Yes — `Resolve(new AssemblyName())`. |
+| `OnAssemblyResolve` null-or-empty-name guard | 157, 158 | 2 | Yes — invoke the handler delegate directly with degenerate `ResolveEventArgs`. |
+| `OnAssemblyResolve` boundary `catch` | 170, 171, 174, 175 | 4 | **Not with certainty.** The only throw source is `new AssemblyName(args.Name)`, whose throwing inputs were not observed in this pass. Excluded deliberately. |
+| `AssemblyBindingLadder.Resolve` null guard | 229, 230 | 2 | Yes — `ladder.Resolve(null)`. |
+| Rung 3 `!_fileExists(path)` early return | 322, 323 | 2 | Yes — `fileExists` returning false on a `netstandard` request. |
+| Rung 3 rung-local `catch` | 328, 329, 331, 332 | 4 | Yes — `loadFromPath` throwing on the runtime-directory path. |
+| Rung 4 empty-simple-name guard | 345, 346 | 2 | Yes — `ladder.Resolve(new AssemblyName())`. |
+| Rung 4 empty-directory guard | 355, 356 | 2 | **No.** `Path.GetDirectoryName(typeof(AssemblyBindingFallback).Assembly.Location)` is not injectable and is non-empty for a file-loaded assembly. |
+| Rung 4 success path | 365 | 1 | Yes — `fileExists` true and `loadFromPath` returning a sentinel. |
+| Rung 4 rung-local `catch` | 367, 368, 370, 371 | 4 | Yes — `fileExists` true and `loadFromPath` throwing. |
+| `TokensAreEqual` null guard | 434, 435 | 2 | **No.** Its only caller passes a non-null requested token, and `Assembly.GetName().GetPublicKeyToken()` returns a zero-length array rather than `null` for an unsigned assembly. |
+| `TokensAreEqual` length guard | 439, 440 | 2 | Yes — a three-byte requested token against the eight-byte `mscorlib` token. |
+
+Reachable with certainty: 105, 106, 111, 112, 157, 158, 229, 230, 322, 323, 328, 329, 331, 332, 345, 346,
+365, 367, 368, 370, 371, 439, 440. That is **23 lines**. The twelve lines declared unreachable or uncertain
+— 83, 84, 87, 88, 170, 171, 174, 175, 355, 356, 434, 435 — are named here rather than quietly omitted, so a
+reader can check the claim instead of taking it.
+
+### R7.2 — The arithmetic, stated so it can be checked rather than trusted
+
+- Floor: 90 percent of 201 instrumented lines. `ceil(0.90 x 201) = 181` covered lines.
+- Measured: 166 covered. Shortfall to the floor: **15** lines.
+- Projected: 166 + 23 = **189** covered, which is `189 / 201 = 94.03` percent.
+- Margin above the floor: 8 lines. The plan clears 90 percent even if any 8 of the 23 lines fail to be
+  recorded as covered for a reason this pass did not anticipate.
+- The DENOMINATOR does not move. All 23 lines are existing production lines in
+  `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs`; Revision R7 adds no production line and deletes none,
+  so `ASSEMBLYBINDINGFALLBACK_LINES_VALID` remains 201 and the floor is not reached by shrinking the
+  denominator.
+
+### R7.3 — Decision: a SIBLING test file, not an amendment of `AssemblyBindingFallbackTests.cs`
+
+Two options were put to this planner. Option (a) re-opens `[P2-T3]` and raises its pinned test count.
+Option (b) adds a new task later in the plan that amends the same test file while leaving Phase 2's
+checklist untouched. **Revision R7 takes option (b), realised as a new SIBLING FILE rather than as an
+amendment of item 5.** The reasoning, with two inbound premises corrected first:
+
+1. **Correction of the first inbound premise.** `[P2-T3]`'s acceptance reads "the file exists and contains
+   **at least** eleven occurrences of `[TestMethod]`", not "exactly eleven". Re-derived in this pass at the
+   line that carries it. A twelfth test method therefore falsifies neither that standing guard nor
+   `[P4-T2]`'s, whose floor likewise reads "the `passed` value is at least 11". Neither guard is the reason
+   to avoid amending item 5, and neither needs converting from a standing guard to a point-in-time reading.
+   `[P2-T3]`'s second guard, exactly 0 hits for `reaches the GAC`, is a fixed-string absence gate that no
+   sibling file can disturb.
+2. **The actual binding constraint is the 500-line ceiling.** `AssemblyBindingFallbackTests.cs` is 383
+   lines post-format, measured in this pass, leaving 117 lines of headroom against the ceiling that
+   `[P4-T12]` and `[P5-T8]` audit. The ten tests specified below cost roughly 150 to 200 lines in the
+   existing file's documented Arrange-Act-Assert style, and the file also carries a class-level comment
+   that an amendment would have to rewrite. Amending item 5 would land it between 490 and 500 lines before
+   `[P5-T2]` reformats it, and CSharpier reflow of a single long statement would then breach the ceiling in
+   a task, `[P5-T8]`, that runs after the whole toolchain loop. A sibling file removes that exposure
+   entirely rather than managing it.
+3. **The sibling file preserves the fail-before evidence by construction.** `[P2-T10]` and `[P2-T11]` are
+   NOT unchecked by this revision and nothing in it causes them to re-run. `[P2-T11]` holds this item's only
+   fail-before measurement, `DEEDLE_RECORD_CONVERSION_OUTCOME=NETSTANDARD-BIND-FAILURE:TypeInitializationException`,
+   taken against a build carrying no fix; Phase 3 has since landed the fix, so a re-run would record a PASS
+   and destroy the single artifact this second orchestration attempt exists to produce. Revision R7 writes
+   no file in `TaskMaster.Test`, changes no task in Phases 0 through 3, and appends every new task to the
+   END of Phase 4, which is after `[P2-T11]` in execution order and cannot reach back to it.
+4. **It also keeps AC4 out of scope.** AC4 at `spec.md` lines 484-490 names
+   `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` specifically. A sibling class is not that
+   class, so AC4's enumerated scenario list and its closing injected-delegate sentence are untouched, and
+   `[P6-T9]`'s pinned reading line, `AC4 READING: ten delegate-driven tests, eleventh test excluded`,
+   remains exactly correct with no edit.
+5. **The cost is one `Compile Include` line.** `UtilitiesCS.Test/UtilitiesCS.Test.csproj` uses explicit
+   `Compile` items with no wildcard glob — re-derived in this pass, `[P2-T4]`'s own product sits at line
+   190 among a hand-maintained list — so an unregistered file silently does not build. This is the same
+   remedy `[P4-T12]`'s own acceptance condition already prescribes for a file-size overflow: "split the
+   offending type into a second file, record the split as a write-set amendment ... and register the new
+   file in the owning `csproj`". Revision R7 applies that prescribed remedy before the overflow rather than
+   after it.
+
+### R7.4 — The `.csproj` boundary, stated mechanically rather than promised
+
+The `FSharp.Core` `HintPath` split recorded at `## R6.1` and `## R6.4` is the root cause and is OUT OF
+SCOPE, tracked as a separate issue. Revision R7's single `.csproj` edit is a `Compile Include` registration
+and touches no `Reference`, no `HintPath` and no package version. That boundary is made checkable rather
+than asserted: `[P4-T14]` gates that `UtilitiesCS.Test/UtilitiesCS.Test.csproj` line 598 still reads
+`<HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>`, which is the
+value re-derived from that file in this pass; that the `lib\netstandard2.1` spelling of that same
+`HintPath` is absent from the file; and that a before-and-after `git diff --numstat --cached` reading of
+that file reports zero deletions and an addition count exactly one greater after the insertion than before
+it. `[P4-T11]` and `[P5-T8]` already gate `FSHARP_REDIRECT_LINES` against the `[P0-T15]` baseline and
+`NETSTANDARD_DLL_IN_PROJECTS=0`, and neither figure is affected by a `Compile Include` line.
+
+### R7.5 — The ten new tests, each named with the construct it covers
+
+All ten live in the new file `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`, in one
+`[TestClass]` named `AssemblyBindingFallbackEdgeCaseTests` in namespace `UtilitiesCS.Test.Bootstrap`. The
+namespace matters: `[P4-T2]` and `[P4-T17]` filter on `FullyQualifiedName~UtilitiesCS.Test.Bootstrap`, so
+the class is discovered by that filter without any runner change.
+
+| # | Test method | Production lines it covers | Mechanism |
+|---|---|---|---|
+| 1 | `Resolve_WhenRequestedIdentityIsNull_ReturnsNullBeforeAnyRung` | 105, 106 | direct call to the internal static seam |
+| 2 | `Resolve_WhenRequestedSimpleNameIsAbsent_ReturnsNullBeforeAnyRung` | 111, 112 | direct call to the internal static seam |
+| 3 | `LadderResolve_WhenRequestedIdentityIsNull_ReturnsNull` | 229, 230 | injected delegates |
+| 4 | `LadderResolve_WhenRuntimeFacadeFileIsAbsent_RungThreeDeclinesWithoutLoading` | 322, 323 | injected delegates |
+| 5 | `LadderResolve_WhenRuntimeFacadeLoadThrows_RungThreeAbsorbsAndDeclines` | 328, 329, 331, 332 | injected delegates |
+| 6 | `LadderResolve_WhenRequestedSimpleNameIsAbsent_RungFourDeclinesOnTheNameGuard` | 345, 346 | injected delegates |
+| 7 | `LadderResolve_WhenProbeDirectoryHoldsTheAssembly_RungFourLoadsItByPath` | 365 | injected delegates |
+| 8 | `LadderResolve_WhenProbeDirectoryLoadThrows_RungFourAbsorbsAndDeclines` | 367, 368, 370, 371 | injected delegates |
+| 9 | `LadderResolve_WhenLoadedTokenLengthDiffers_RungOneRejectsTheLoadedAssembly` | 439, 440 | injected delegates |
+| 10 | `OnAssemblyResolve_WhenEventArgsCarryNoName_ReturnsNullWithoutResolving` | 157, 158 | direct delegate invocation, no bind |
+
+Tests 7 and 8 are both retained although test 8 alone would enter line 365 on its way to throwing. The
+duplication is deliberate and is the reason the 23-line claim does not depend on how the collector records
+a line whose statement throws part-way through: test 7 reaches 365 on a non-throwing path.
+
+**Constraint compliance, stated per constraint.**
+
+- **Injected delegates only, and the eleventh test stays the single stated exception.** Tests 3 to 9 drive
+  `AssemblyBindingLadder` through its five constructor delegates and reach no rung by any other route.
+  Tests 1, 2 and 10 never reach a rung at all: each returns at a guard clause before the ladder is
+  constructed. No test in the new file calls `Assembly.Load`, `Assembly.LoadFrom` or `File.Exists`, so
+  none touches the GAC or the filesystem, and
+  `Install_ThenLoadOfUnresolvableName_LeavesTheLoadFailingWithoutHandlerThrowing` in item 5 remains the
+  only test in this work that drives a real bind.
+- **AC16 determinism.** No test creates, writes or deletes a file; none uses `Thread.Sleep`, `Task.Delay`,
+  a wall-clock read or any other token on `[P4-T9]`'s banned list, in code or in a comment. `[P4-T18]`
+  re-runs that sweep with the new file added to the path list, so the claim is measured and not asserted.
+- **The 500-line ceiling.** The new file is a fresh file and is budgeted at roughly 200 lines. `[P4-T18]`
+  audits it pre-format and `[P5-T8]` audits it post-format, both against the same 500-line ceiling.
+- **Order independence.** No new test mutates a static of the type under test: tests 1, 2 and 10 return at
+  a guard before `_resolvingSimpleName` is written at line 120, and none calls `Install()`. The new class
+  therefore needs no `[TestCleanup]` and cannot interfere with item 5's class under the `ClassLevel`
+  parallel scope both files run under.
+
+### R7.6 — What must re-run, stated rather than left to be inferred
+
+The new tests change the compiled `UtilitiesCS.Test` assembly. A completed toolchain loop measured a tree
+that no longer exists, so:
+
+- **The entire Phase 5 loop restarts from step 1.** `[P5-T1]` through `[P5-T8]` are unchecked by this
+  revision and re-execute in order: Outlook gate, format, format verification, config side-effect check,
+  analyzers, nullable, tests with coverage, post-format audits. `[P5-T9]` and `[P5-T10]` then re-run; both
+  were already unchecked.
+- **The ladder unit-test run is re-taken at `[P4-T17]` with a floor raised to match.** `[P4-T2]` is left
+  CHECKED and is not re-executed in place. Re-executing it in place was considered and rejected on an
+  ordering ground: `[P4-T2]` sits at numeric position 2 of Phase 4 and the tasks that author the new tests
+  are appended at positions 13 to 18, so an executor working the list in order would re-run `[P4-T2]`
+  against an assembly that does not yet contain the new tests, and a raised floor there would be
+  unsatisfiable at the moment it ran. `[P4-T17]` performs the same measurement after the new tests exist,
+  against its own pinned TRX name, its own results directory and its own artifact, with a floor of 21
+  passed and 0 failed. `[P4-T2]`'s recorded "at least 11" acceptance remains true and is not weakened;
+  `[P4-T17]` supersedes it as the ladder suite's measurement of record.
+- **The two path-list sweeps are re-taken at `[P4-T18]`.** `[P4-T9]`'s determinism sweep names four test
+  files and `[P4-T12]`'s size audit names six files; both are left checked with their recorded four- and
+  six-path outputs intact, and `[P4-T18]` runs the five-path and seven-path versions that include the new
+  file. `[P5-T8]` is repointed to re-run `[P4-T18]`'s commands post-format rather than `[P4-T9]`'s and
+  `[P4-T12]`'s.
+
+### R7.7 — Checklist state changed by this revision
+
+Unchecked and to be re-executed: `[P5-T1]`, `[P5-T2]`, `[P5-T3]`, `[P5-T4]`, `[P5-T5]`, `[P5-T6]`,
+`[P5-T7]` and `[P5-T8]` — eight tasks, all for the single reason that a source change invalidates a
+completed toolchain loop. `[P5-T9]` through `[P5-T12]` and all of Phase 6 were already unchecked.
+
+Added and unchecked: `[P4-T13]` through `[P4-T18]` — six tasks, all appended to the END of Phase 4 so that
+no existing `[P#-T#]` identifier is renumbered and every identifier this plan and its evidence artifacts
+already cite is unchanged.
+
+**Left checked and NOT re-executed:** `[P0-T1]` through `[P0-T16]`, `[P1-T1]` through `[P1-T7]`, `[P2-T1]`
+through `[P2-T12]`, `[P3-T1]` through `[P3-T5]`, and `[P4-T1]` through `[P4-T12]`. `[P2-T10]` and
+`[P2-T11]` are named explicitly in that set: `[P2-T11]` is the only fail-before measurement this item has,
+it was taken against a build carrying no fix, and re-running it now would record a PASS and destroy it.
+`[P2-T10]` is the targeted rebuild `[P2-T11]` depends on, so unchecking it would force `[P2-T11]` to
+re-run as well. Revision R7 writes no file either task compiles or runs: the new test file is in
+`UtilitiesCS.Test`, and `[P2-T10]` and `[P2-T11]` operate on `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll`
+under a `FullyQualifiedName~TaskMaster.Test.Bootstrap` filter, which discovers no class in
+`UtilitiesCS.Test`. Four task bodies gain Revision R7 cross-reference notes without changing state —
+`[P2-T3]`, `[P4-T2]`, `[P4-T9]` and `[P4-T12]` — because a body note that adds no acceptance condition
+cannot falsify a recorded result.
+
+### R7.8 — Constraints re-checked and deliberately left unchanged
+
+- The harness re-rooting at `QuickFiler.Test/bin/Debug`, the probe, the pre-run TRX removal spans and their
+  `PRERUN_TRX_COUNT=0` clauses, `-CoverageOutput` at its default, the `origin/main` diff anchors, the manual
+  live-Outlook gate at `[P6-T4]` and the conditional `[P6-T24]` are all unchanged by Revision R7.
+- No acceptance-criterion text is amended and `spec.md` is not written. Every `spec.md` line number this
+  plan cites — 473, 477, 481, 484, 491, 495, 499, 504, 509, 515, 521, 528, 534, 536, 543, 545, 547, 550 and
+  554 — is unchanged, because no write to that file occurs in this revision.
+- `[P4-T17]` and `[P4-T18]` introduce no new diff anchor and invoke no coverage runner, so issue #891's
+  document-level threshold is not engaged by either.
 
 ---
 
@@ -1543,6 +1762,17 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       as the record of why each condition was authored and are not restated here as current
       measurements; the guards themselves are retained so that a later edit to this file cannot regress
       them.
+
+      **Revision R7 note — no state change, no acceptance change.** Both guards are retained verbatim and
+      this task remains checked. The `[TestMethod]` guard reads "at least eleven", not "exactly eleven",
+      so it is not a ceiling and it does not forbid a later task from adding test methods to this file.
+      Revision R7 nonetheless adds no test method here: the ten coverage tests it specifies live in a
+      sibling file, `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`, written by
+      `[P4-T13]`. The reason is the 500-line ceiling rather than either guard — this file is 383 lines
+      post-format and ten tests in its documented style would land it within a CSharpier reflow of the
+      ceiling that `[P5-T8]` audits after the whole toolchain loop has run. `## R7.3` records the full
+      reasoning. No Revision R7 task writes this file, so neither guard is re-measured and neither
+      `[P2-T10]` nor `[P2-T11]` is disturbed.
 - [x] [P2-T4] Register the new unit-test file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` into the `ItemGroup` in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
@@ -2203,6 +2433,17 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       artifact records `TRX_MATCH_COUNT=1`, the TRX `ResultSummary`
       `outcome` is `Completed`, the `Counters` `failed` value is `0`, and the `passed` value is at
       least 11.
+
+      **Revision R7 note — no state change, no acceptance change.** This task remains checked and is NOT
+      re-executed. Its recorded run measured the ladder suite as it stood before Revision R7 added a
+      sibling test class, and its "at least 11" floor is still satisfied by that assembly, so nothing it
+      recorded has become false. Re-executing it in place was considered and rejected on an ordering
+      ground: this task sits at numeric position 2 of Phase 4 while the tasks that author the new tests
+      are appended at positions 13 to 18, so an executor working the list in order would re-run it against
+      an assembly that does not yet contain those tests, and a raised floor here would be unsatisfiable at
+      the moment it ran. `[P4-T17]` re-takes the same measurement after the new tests exist, with a floor
+      of 21 passed, against its own pinned TRX name, its own results directory and its own artifact, and
+      supersedes this task as the ladder suite's measurement of record. `## R7.6` records the reasoning.
 - [x] [P4-T3] LOCK-ACQUIRE, run the child-domain harness class alone, LOCK-RELEASE.
 
       First, remove every TRX already in the results directory and record the emptied count:
@@ -2385,6 +2626,13 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       fields and the full output.
       Acceptance: every banned-token line ends with `HITS=0`, and every `CONTROL_AppDomain` line ends with
       a count greater than 0.
+
+      **Revision R7 note — no state change, no acceptance change.** This task remains checked with its
+      four-path list and its recorded 68 banned-token lines intact. Revision R7 adds a fifth test file,
+      `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`, which this recorded run did not
+      sweep because it did not exist. `[P4-T18]` runs the five-path version of exactly this command, and
+      `[P5-T8]` is repointed to re-run `[P4-T18]`'s five-path version post-format rather than this
+      four-path one, so the new file is swept twice and no recorded output is retrospectively re-labelled.
 - [x] [P4-T10] Record the free `2.0.0.0` measurement that narrows the open risk. The `[P4-T3]` TRX
       reader emits `testName` and `outcome` only, so the observation is extracted from the TRX
       directly. Command:
@@ -2452,16 +2700,371 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md`, and register the new file in the
       owning `csproj`.
 
+      **Revision R7 note — no state change, no acceptance change.** This task remains checked with its
+      six-path list and its recorded pre-format counts intact. Revision R7 adds a seventh file,
+      `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`. `[P4-T18]` runs the seven-path
+      version of exactly this command, and `[P5-T8]` is repointed to re-run `[P4-T18]`'s seven-path version
+      post-format rather than this six-path one. The remedy clause above — split into a second file, record
+      a write-set amendment, register the new file in the owning `csproj` — is the mechanism Revision R7
+      applies at `[P4-T13]`, `[P4-T14]` and `[P4-T15]`, before an overflow rather than after one.
+- [ ] [P4-T13] Create `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`. This is a NEW
+      file and a SIBLING of `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs`. **Do not write,
+      reformat or otherwise touch that sibling file in this task or in any other Revision R7 task**: it is
+      pinned by two standing guards in `[P2-T3]`, it is 383 lines against a 500-line ceiling, and it is
+      compiled into the assembly `[P2-T11]`'s fail-before evidence does not depend on. `## R7.3` records
+      why a sibling file rather than an amendment.
+
+      Declare one `[TestClass]` named `AssemblyBindingFallbackEdgeCaseTests` in namespace
+      `UtilitiesCS.Test.Bootstrap`. The namespace is load-bearing: `[P4-T17]` and `[P4-T2]` filter on
+      `FullyQualifiedName~UtilitiesCS.Test.Bootstrap`, so a class in any other namespace is not discovered
+      by either run. Use MSTest attributes, FluentAssertions for every assertion, and Arrange-Act-Assert
+      structure with a short intent comment on each test, matching the sibling file's style.
+
+      The file carries NO `#nullable enable` directive and no `?` annotation on any reference type, for the
+      reason `## R4.3` states for the two `TaskMaster.Test` files: `[P5-T6]` promotes CS8632 to a build
+      error in a file that has not opted in.
+
+      **The class-level XML documentation comment must name `AppDomain.AssemblyResolve`**, stating that the
+      tests below cover the decline paths of the resolution ladder and of the handler attached to that
+      event, and that every one of them reaches its target through injected delegates or through a guard
+      clause rather than through a real bind. This is not decoration: `[P4-T18]`'s determinism sweep carries
+      a `CONTROL_AppDomain` positive control that counts occurrences of the token `AppDomain` in each swept
+      file, and a file carrying none would make that control read zero and the sweep unsatisfiable. The
+      comment is the natural place for the token because the event is what the tested code attaches to. Do
+      not write the token `File.Exists` anywhere in the file, including in a comment, because the acceptance
+      condition below gates it at zero and that search is textual.
+
+      **Private helpers.** Declare, as `private static` members of the new class, a `CreateLadder` factory
+      whose five parameters default to miss behaviours exactly as the sibling file's does, a `NameOf`
+      factory that builds a fully specified `AssemblyName` from a simple name, a version and a token, a
+      `Sentinel` assembly property returning `typeof(Uri).Assembly`, a `LoadedMscorlib` property returning
+      `typeof(string).Assembly`, and the three constants for the `netstandard` token `cc7b13ffcd2ddd51`,
+      the `mscorlib` token `b77a5c561934e089` and a fake runtime directory literal. These deliberately
+      mirror the sibling file's private helpers rather than reusing them; add a one-line comment giving the
+      reason, which is that the sibling's copies are `private` and that file must not be edited. Do not
+      widen the sibling's members to `internal` to avoid the duplication.
+
+      **The ten tests, named, with the construct each exists to cover.** Every one of them drives either the
+      ladder's injected delegates or a guard clause that returns before the ladder is constructed. None
+      calls `Assembly.Load`, `Assembly.LoadFrom` or `File.Exists`, so none touches the GAC or the file
+      system, and the sibling file's
+      `Install_ThenLoadOfUnresolvableName_LeavesTheLoadFailingWithoutHandlerThrowing` remains the only test
+      in this work that drives a real bind.
+
+      1. `Resolve_WhenRequestedIdentityIsNull_ReturnsNullBeforeAnyRung` — call the internal static seam
+         `AssemblyBindingFallback.Resolve(null)` and assert the result is null. Covers the null-identity
+         guard at `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` lines 105-106.
+      2. `Resolve_WhenRequestedSimpleNameIsAbsent_ReturnsNullBeforeAnyRung` — call
+         `AssemblyBindingFallback.Resolve(new AssemblyName())`, whose `Name` is null, and assert the result
+         is null. Covers the empty-simple-name guard at lines 111-112. The parameterless `AssemblyName`
+         constructor is the mechanism; do not attempt `new AssemblyName("")`, which throws.
+      3. `LadderResolve_WhenRequestedIdentityIsNull_ReturnsNull` — `CreateLadder().Resolve(null)` returns
+         null. Covers the ladder's own null guard at lines 229-230.
+      4. `LadderResolve_WhenRuntimeFacadeFileIsAbsent_RungThreeDeclinesWithoutLoading` — a ladder whose
+         load-by-display-name delegate throws `FileNotFoundException`, whose file-exists delegate returns
+         false and whose load-from-path delegate records its invocations; resolve a `netstandard` identity
+         at `Version=2.1.0.0` with the `netstandard` token. Assert the result is null and that the
+         load-from-path delegate was never invoked. Covers the rung-3 early return at lines 322-323.
+      5. `LadderResolve_WhenRuntimeFacadeLoadThrows_RungThreeAbsorbsAndDeclines` — a ladder whose
+         load-by-display-name delegate throws, whose load-from-path delegate throws
+         `BadImageFormatException`, and whose file-exists delegate returns true ONLY for a path beginning
+         with the fake runtime directory and false otherwise; resolve the same `netstandard` identity.
+         Assert the call does not throw and returns null. Covers the rung-3 rung-local catch at lines
+         328-332. The path-discriminating file-exists delegate is what keeps rung 4 out of this test, so
+         the covered set is exactly rung 3's catch.
+      6. `LadderResolve_WhenRequestedSimpleNameIsAbsent_RungFourDeclinesOnTheNameGuard` —
+         `CreateLadder().Resolve(new AssemblyName())` returns null after rungs 1 to 3 decline. Covers the
+         rung-4 empty-simple-name guard at lines 345-346.
+      7. `LadderResolve_WhenProbeDirectoryHoldsTheAssembly_RungFourLoadsItByPath` — a ladder whose
+         file-exists delegate returns true and whose load-from-path delegate records the path and returns
+         the sentinel assembly; resolve a NON-`netstandard` identity carrying the `mscorlib` token, so rung
+         3 declines on its identity check. Assert the result is the sentinel and that the recorded path
+         ends with the requested simple name plus `.dll`. Covers the rung-4 success path at line 365.
+      8. `LadderResolve_WhenProbeDirectoryLoadThrows_RungFourAbsorbsAndDeclines` — identical to test 7
+         except the load-from-path delegate throws `BadImageFormatException`. Assert the call does not
+         throw and returns null. Covers the rung-4 rung-local catch at lines 367-371.
+      9. `LadderResolve_WhenLoadedTokenLengthDiffers_RungOneRejectsTheLoadedAssembly` — build an
+         `AssemblyName` for `mscorlib` and call `SetPublicKeyToken` with a three-byte array, so the request
+         carries a non-empty token of a length no real assembly has; supply the already-loaded set as the
+         single element `LoadedMscorlib`, whose token is eight bytes. Assert the result is null. Covers the
+         token-length guard at lines 439-440.
+      10. `OnAssemblyResolve_WhenEventArgsCarryNoName_ReturnsNullWithoutResolving` — obtain the private
+          static `OnAssemblyResolve` method by reflection, bind it to a `ResolveEventHandler` with
+          `Delegate.CreateDelegate` exactly as the sibling file's detach helper already does, then invoke
+          it once with a null second argument and once with a `ResolveEventArgs` carrying
+          `string.Empty`, asserting null both times. Covers the null-or-empty-name guard at lines 157-158.
+          Both invocations return at that guard, so neither reaches a bind, a rung or the production ladder
+          factory.
+
+      Tests 7 and 8 are both required even though test 8 alone enters line 365 on its way to throwing: test
+      7 reaches that line on a non-throwing path, which is what makes the covered-line claim independent of
+      how the collector records a line whose statement throws part-way through.
+
+      No test in this file mutates a static of the type under test. Tests 1, 2 and 10 return at a guard
+      before `_resolvingSimpleName` is assigned at line 120, and no test calls `Install()`, so the class
+      needs no `[TestCleanup]` and cannot interfere with the sibling class under the `ClassLevel` parallel
+      scope both run in.
+
+      Acceptance: the file exists. All counts below are taken with `Select-String -SimpleMatch
+      -CaseSensitive` on `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`. Exactly 10
+      hits for `[TestMethod]`. At least 1 hit for `class AssemblyBindingFallbackEdgeCaseTests`. Exactly 1
+      hit for `namespace UtilitiesCS.Test.Bootstrap`. At least 1 hit for each of the ten method names, each
+      of which is a single identifier written on one source line that no CSharpier reflow can split. The
+      "at least" form on the ten names and on the class name is deliberate: a doc comment on one test may
+      legitimately name a sibling test, and an equality there would turn ordinary documentation into a
+      failure. The ten names are:
+      `Resolve_WhenRequestedIdentityIsNull_ReturnsNullBeforeAnyRung`,
+      `Resolve_WhenRequestedSimpleNameIsAbsent_ReturnsNullBeforeAnyRung`,
+      `LadderResolve_WhenRequestedIdentityIsNull_ReturnsNull`,
+      `LadderResolve_WhenRuntimeFacadeFileIsAbsent_RungThreeDeclinesWithoutLoading`,
+      `LadderResolve_WhenRuntimeFacadeLoadThrows_RungThreeAbsorbsAndDeclines`,
+      `LadderResolve_WhenRequestedSimpleNameIsAbsent_RungFourDeclinesOnTheNameGuard`,
+      `LadderResolve_WhenProbeDirectoryHoldsTheAssembly_RungFourLoadsItByPath`,
+      `LadderResolve_WhenProbeDirectoryLoadThrows_RungFourAbsorbsAndDeclines`,
+      `LadderResolve_WhenLoadedTokenLengthDiffers_RungOneRejectsTheLoadedAssembly` and
+      `OnAssemblyResolve_WhenEventArgsCarryNoName_ReturnsNullWithoutResolving`. Exactly 0 hits for each of
+      `Assembly.Load(`, `Assembly.LoadFrom(`, `File.Exists` and `#nullable enable`, which together are the
+      no-real-bind, no-filesystem and no-nullable-opt-in gates. At least 1 hit for `AppDomain`, which is the
+      token `[P4-T18]`'s `CONTROL_AppDomain` positive control counts in this file; a count of zero here
+      would make that later sweep unsatisfiable, so it is gated at the point the file is authored rather
+      than discovered two tasks later. Every literal in this acceptance condition
+      is absent from the tree until this task runs and is quoted here in prose for that reason; the file
+      itself does not exist yet, which is what makes every count above a measurement of this task's product
+      rather than a condition already satisfied.
+- [ ] [P4-T14] Register the new unit-test file, and gate the `.csproj` boundary mechanically. Insert
+      `<Compile Include="Bootstrap\AssemblyBindingFallbackEdgeCaseTests.cs" />` into the `ItemGroup` in
+      `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
+      `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` at line 190. This project uses
+      explicit `Compile` items with no wildcard glob; an unregistered file silently does not build.
+      **Insert one line and change nothing else in this file.** In particular, do not touch the
+      `FSharp.Core` `Reference` at lines 597-599: the `HintPath` split between `lib/netstandard2.0` and
+      `lib/netstandard2.1` recorded at `## R6.1` is the root cause of this defect and is OUT OF SCOPE,
+      tracked as a separate issue, and `## R6.4` records why.
+
+      **Take the BEFORE reading first, before the insertion.** The gate below is a delta rather than an
+      absolute, because the planner could not observe the file's current committed-versus-working state in
+      its own session and will not assert a figure it has not measured. Run these two commands BEFORE
+      editing the file and record their output as `PRE_INSERT`:
+
+      ```
+      git add -- UtilitiesCS.Test/UtilitiesCS.Test.csproj
+      git diff --numstat --cached -- UtilitiesCS.Test/UtilitiesCS.Test.csproj
+      ```
+
+      `--numstat` prints added and deleted line counts as the first two tab-separated columns; `--stat`
+      prints a graph rather than two readable integers. The `git add` span is what makes the `--cached`
+      diff a reading of the current working state rather than of the index as it happened to stand, and it
+      is also the companion a name-listing diff would need. When the command prints nothing, the file is
+      identical to `HEAD` and both `PRE_INSERT` counts are `0`; record that as `PRE_INSERT ADDED=0
+      DELETED=0` rather than as an empty field.
+
+      Then insert the single `<Compile Include>` line, then take the AFTER readings:
+
+      ```
+      pwsh -NoProfile -Command '
+      $p = "UtilitiesCS.Test/UtilitiesCS.Test.csproj"
+      Write-Output ("NEW_COMPILE_ITEM=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "Bootstrap\AssemblyBindingFallbackEdgeCaseTests.cs").Count)
+      Write-Output ("EXISTING_COMPILE_ITEM=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "Bootstrap\AssemblyBindingFallbackTests.cs").Count)
+      Write-Output ("FSHARP_CORE_NETSTANDARD20_HINTPATH=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll").Count)
+      Write-Output ("FSHARP_CORE_NETSTANDARD21_HINTPATH=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "packages\FSharp.Core.11.0.100\lib\netstandard2.1\FSharp.Core.dll").Count)
+      '
+      ```
+
+      ```
+      git add -- UtilitiesCS.Test/UtilitiesCS.Test.csproj
+      git diff --numstat --cached -- UtilitiesCS.Test/UtilitiesCS.Test.csproj
+      git diff --numstat origin/main...HEAD -- UtilitiesCS.Test/UtilitiesCS.Test.csproj
+      ```
+
+      Record the second command's output as `POST_INSERT`. The third command is recorded as an observation
+      and is NOT gated: a merge-base diff compares two commits and is blind to a change that has not been
+      committed, and nothing in this plan commits source before `[P6-T1]`, so it may legitimately print
+      nothing here. It is retained because it is the only span that shows what this branch has already
+      committed to that file. Append all four `Select-String` counts, the `PRE_INSERT` pair, the
+      `POST_INSERT` pair and the merge-base output to
+      `.../evidence/other/scope-and-determinism-checks.2026-09-13T18-22.md` under a
+      `Revision R7 Project-File Registration:` heading.
+
+      Acceptance: `NEW_COMPILE_ITEM=1`, `EXISTING_COMPILE_ITEM=1`,
+      `FSHARP_CORE_NETSTANDARD20_HINTPATH=1`, `FSHARP_CORE_NETSTANDARD21_HINTPATH=0`; the `PRE_INSERT`
+      deletion count is `0` and the `POST_INSERT` deletion count is `0`; and the `POST_INSERT` addition
+      count is **exactly one greater** than the `PRE_INSERT` addition count. The delta form is what makes
+      this gate independent of whether `[P2-T4]`'s line is already committed. A `POST_INSERT` deletion
+      count above zero, or an addition delta other than one, means a line was rewritten or more than one
+      line was added, which is outside this task's authority: restore the file with
+      `git checkout -- UtilitiesCS.Test/UtilitiesCS.Test.csproj`, re-apply the single insertion and
+      re-measure. `NEW_COMPILE_ITEM` reads 0 in the tree as it stands and
+      `FSHARP_CORE_NETSTANDARD20_HINTPATH` reads 1 at line 598, both re-derived in this pass, which is what
+      makes the first assertion discriminating and the third a real guard rather than a restatement.
+- [ ] [P4-T15] Record the write-set amendment, as `[P4-T12]`'s own remedy clause requires. Append to
+      `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md` a section headed
+      `Revision R7 Write-Set Amendment:` recording: that
+      `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs` is added as item 14 of
+      `## Authorised Write Set`; that `UtilitiesCS.Test/UtilitiesCS.Test.csproj` now carries two
+      `Compile Include` items added by this plan rather than one; that
+      `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` is NOT written by any Revision R7 task
+      and its `[P2-T3]` standing guards are intact; and the reason for the split, which is that the
+      existing file is 383 lines against a 500-line ceiling and ten further tests in its style would land
+      it within a CSharpier reflow of that ceiling. Include the line
+      `R7 WRITE-SET AMENDMENT: sibling test file added, existing test file untouched`.
+      Acceptance: the heading exists in that artifact, all four recorded statements are present, and the
+      artifact contains the line
+      `R7 WRITE-SET AMENDMENT: sibling test file added, existing test file untouched` exactly once. That
+      literal is absent from the tree until this task runs and is quoted here in prose for that reason.
+- [ ] [P4-T16] LOCK-ACQUIRE, rebuild the solution so the new test file is compiled, LOCK-RELEASE. Identical
+      to `[P2-T10]`'s msbuild span in every respect except the console-log path, which is
+      `TestResults/r7-build/r7-build-console.txt`. That path is under the git-ignored `TestResults/` scratch
+      tree — the `[Tt]est[Rr]esult*/` pattern at `.gitignore` line 39 — deliberately, so this task adds no
+      raw console dump to the feature folder's `evidence/` tree and neither `[P5-T11]` nor `[P5-T12]` gains
+      a seventh log to project and remove.
+
+      ```
+      pwsh -NoProfile -Command '
+      $d = "TestResults/r7-build"
+      if (-not (Test-Path -LiteralPath $d)) { New-Item -ItemType Directory -Path $d -Force > $null }
+      Write-Output ("R7_BUILD_LOG_DIR_PRESENT=" + (Test-Path -LiteralPath $d))
+      '
+      ```
+
+      ```
+      pwsh -NoProfile -Command '
+      $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+      $msb = @(& $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\amd64\MSBuild.exe")[0]
+      & $msb TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" *> "TestResults/r7-build/r7-build-console.txt"
+      $LASTEXITCODE
+      '
+      ```
+
+      ```
+      pwsh -NoProfile -Command '
+      $log = "TestResults/r7-build/r7-build-console.txt"
+      Write-Output ("ZERO_ERRORS_LINES=" + @(Select-String -LiteralPath $log -Pattern "^\s+0 Error\(s\)$").Count)
+      Write-Output ("SKIPPED_CORECOMPILE=" + @(Select-String -LiteralPath $log -Pattern "Skipping target .CoreCompile.").Count)
+      Write-Output ("CONTROL_BUILD_OUTPUT=" + @(Select-String -LiteralPath $log -SimpleMatch -Pattern "UtilitiesCS.Test.dll").Count)
+      '
+      ```
+
+      `CONTROL_BUILD_OUTPUT` is the positive control that the log is a real build log of the project this
+      revision changes and that the search mechanism is live, so a zero `SKIPPED_CORECOMPILE` count is
+      evidence rather than an artefact of an empty or unreadable file. Write
+      `.../evidence/qa-gates/r7-build.2026-09-13T18-22.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`,
+      `ExpectedExitCode: 0` and an `Output Summary:` carrying the four counts.
+      Acceptance: `R7_BUILD_LOG_DIR_PRESENT=True`, `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0,
+      `SKIPPED_CORECOMPILE=0`, and `CONTROL_BUILD_OUTPUT` greater than 0. A compile failure here is a defect
+      in the new test file: fix it and re-run this task before proceeding to `[P4-T17]`.
+- [ ] [P4-T17] LOCK-ACQUIRE, re-take the ladder unit-test measurement now that the new tests exist,
+      LOCK-RELEASE. This task supersedes `[P4-T2]` as the ladder suite's measurement of record; `## R7.6`
+      records why `[P4-T2]` is not re-executed in place.
+
+      First, remove every TRX already in the results directory and record the emptied count:
+
+      ```
+      pwsh -NoProfile -Command '
+      $d = "TestResults/p4-ladder-r7"
+      foreach ($f in @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue)) { Remove-Item -LiteralPath $f.FullName -Force }
+      Write-Output ("PRERUN_TRX_COUNT=" + @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue).Count)
+      '
+      ```
+
+      `TestResults/p4-ladder-r7` does not exist in the tree as it stands, so on a first execution this span
+      enumerates nothing and emits `PRERUN_TRX_COUNT=0`; `-ErrorAction SilentlyContinue` on both
+      enumerations is what makes an absent directory a zero count rather than an error. The span is
+      required for the re-execution state, for the reason `[P4-T2]` records: `TRX_MATCH_COUNT=1` reads `1`
+      whether this run wrote a fresh TRX or wrote none, so without the removal a run that failed to emit
+      would leave the reader replaying an earlier run's outcomes.
+
+      Then run the tests:
+
+      ```
+      pwsh -NoProfile -Command '
+      $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+      $vstest = @(& $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe")[0]
+      & $vstest "UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~UtilitiesCS.Test.Bootstrap" "/Logger:trx;LogFileName=p4-ladder-r7.trx" /ResultsDirectory:TestResults/p4-ladder-r7
+      $LASTEXITCODE
+      '
+      ```
+
+      The `;` inside `"/Logger:trx;LogFileName=p4-ladder-r7.trx"` must stay inside the double quotes, for
+      the reason `[P2-T11]` states: unquoted, PowerShell reads it as a statement separator. The filter is
+      character-for-character `[P4-T2]`'s, which is why the new class must be in namespace
+      `UtilitiesCS.Test.Bootstrap`.
+
+      Read the TRX with the same pinned reader `[P4-T2]` uses, substituting `TestResults/p4-ladder-r7` and
+      `p4-ladder-r7.trx` for its two literals, so the reader is
+      `@(Get-ChildItem -LiteralPath "TestResults/p4-ladder-r7" -Filter "p4-ladder-r7.trx" -Recurse)` with
+      the same `TRX_MATCH_COUNT=` emission before `[0]` is taken. A `-Filter "*.trx"` selection is
+      prohibited here for the reason `[P2-T11]` records. Write
+      `.../evidence/regression-testing/pass-after-ladder-r7.2026-09-13T18-22.md` with the four required
+      fields plus the `PRERUN_TRX_COUNT=` line, the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line. The
+      literals `p4-ladder-r7.trx` and `TestResults/p4-ladder-r7` are quoted here in prose because both are
+      absent from the tree until this task runs.
+      Acceptance: `EXIT_CODE: 0`; the artifact records `PRERUN_TRX_COUNT=0`, taken before the run, which is
+      what makes the `TRX_MATCH_COUNT=1` below a measurement of this run rather than of a residue; the
+      artifact records `TRX_MATCH_COUNT=1`; the TRX `ResultSummary` `outcome` is `Completed`; the
+      `Counters` `failed` value is `0`; the `passed` value is at least 21; and the artifact's `OUTCOME=`
+      lines include one `Passed` line for each of the ten method names `[P4-T13]` pins. The floor of 21 is
+      eleven existing methods in `AssemblyBindingFallbackTests` plus the ten `[P4-T13]` adds; it is stated
+      as a floor rather than an equality so that a later task adding a further test does not make this
+      condition unsatisfiable. It is discriminating against the pre-Revision-R7 assembly, which carries
+      eleven.
+- [ ] [P4-T18] Re-take the determinism sweep and the file-size audit over the path lists that include the
+      new test file. Two commands, run in this order:
+
+      ```
+      pwsh -NoProfile -Command '
+      $paths = @("UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs","UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs","TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs","TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs","TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs")
+      $banned = @("Thread.Sleep","Task.Delay","File.WriteAllText","File.WriteAllLines","File.WriteAllBytes","File.AppendAllText","File.Create","File.Delete","File.Move","File.Copy","Directory.CreateDirectory","Directory.Delete","Path.GetTempFileName","Path.GetTempPath","StreamWriter","DateTime.Now","DateTime.UtcNow")
+      foreach ($p in $paths) { foreach ($b in $banned) { Write-Output ($p + " " + $b + " HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern $b).Count) } }
+      foreach ($p in $paths) { Write-Output ($p + " CONTROL_AppDomain HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "AppDomain").Count) }
+      '
+      ```
+
+      ```
+      pwsh -NoProfile -Command '
+      $paths = @("UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs","UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs","UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs","TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs","TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs","TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs","TaskMaster/ThisAddIn.cs")
+      foreach ($p in $paths) { Write-Output ($p + " LINES=" + @(Get-Content -LiteralPath $p).Count) }
+      '
+      ```
+
+      The first is `[P4-T9]`'s command with the new file added, giving five paths and 85 banned-token
+      lines; the second is `[P4-T12]`'s command with the new file added, giving seven paths. The trailing
+      `CONTROL_AppDomain` lines remain the positive control that each path is live and the search mechanism
+      works, so a zero banned-token count is evidence rather than an artefact. In the new file the
+      `AppDomain` token is carried by the class-level XML documentation comment, which `[P4-T13]` requires
+      to name `AppDomain.AssemblyResolve` and whose presence `[P4-T13]`'s own acceptance gates at a count of
+      at least 1. That ordering is deliberate: the control is guaranteed by the task that writes the file
+      rather than discovered to be missing by this one, which would make this sweep unsatisfiable through no
+      fault of its own.
+
+      Append the first output to `.../evidence/other/scope-and-determinism-checks.2026-09-13T18-22.md`
+      under a `Revision R7 Five-Path Sweep:` heading, and the second to
+      `.../evidence/other/file-size-audit.2026-09-13T18-22.md` under a
+      `Revision R7 Seven-Path Pre-Format Line Counts:` heading.
+      Acceptance: both headings exist; under the first, every banned-token line ends with `HITS=0` and
+      every `CONTROL_AppDomain` line ends with a count greater than 0, across all five paths; under the
+      second, every `LINES=` value is at most 500, across all seven paths. If any `LINES=` value exceeds
+      500 the offending type is split into a further file, the split is recorded in
+      `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md`, and the new file is registered in
+      the owning `csproj`.
+
 ### Phase 5 — Full Four-Step C# Toolchain Loop
 
 Run steps 1 to 4 in this exact order. If any step fails, or changes any file, fix and restart from step 1.
 Each attempt overwrites its own artifact; the committed artifact is the final, clean pass.
 
-- [x] [P5-T1] Re-gate Outlook closed before the loop, by the same command and rule as `[P0-T3]`. Append
+**Revision R7 restart, stated so it is not left to be inferred.** This phase completed once, through
+`[P5-T8]`, against a tree that no longer exists: `[P4-T13]` and `[P4-T14]` change compiled source in
+`UtilitiesCS.Test` after that loop ran. A source change invalidates a completed loop, so **`[P5-T1]`
+through `[P5-T8]` are unchecked and the loop restarts from step 1** — Outlook gate, format, format
+verification, config side-effect check, analyzers, nullable, tests with coverage, post-format audits — and
+`[P5-T9]` and `[P5-T10]` then re-run. Each re-executed task overwrites its own artifact; no artifact path
+changes and no task is renumbered.
+
+- [ ] [P5-T1] Re-gate Outlook closed before the loop, by the same command and rule as `[P0-T3]`. Append
       the observation to `.../evidence/qa-gates/outlook-closed-gate.2026-09-13T18-22.md` with the four
       required fields.
       Acceptance: the recorded running-process count is `0`.
-- [x] [P5-T2] Step 1, format. LOCK-ACQUIRE, then
+- [ ] [P5-T2] Step 1, format. LOCK-ACQUIRE, then
       `pwsh -NoProfile -Command 'dotnet tool run csharpier format .'`, then LOCK-RELEASE. This is a
       write-mode command whose exit code is identical whether it rewrote files or not, so the acceptance
       condition observes the tree rather than the exit code.
@@ -2481,16 +3084,19 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       reported by no span in this plan. Write `.../evidence/qa-gates/format-final.2026-09-13T18-22.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and a `Tree Observation:` field
       carrying the porcelain output verbatim, or the literal `NONE` when it is empty.
-      Acceptance: `EXIT_CODE: 0` and every path the `Tree Observation:` field lists is one of the ten
-      repository-relative paths in items 1 to 10 of `## Authorised Write Set`. A formatter rewrite of
+      Acceptance: `EXIT_CODE: 0` and every path the `Tree Observation:` field lists is one of the eleven
+      repository-relative paths in items 1 to 10 and item 14 of `## Authorised Write Set`. Item 14 is the
+      Revision R7 sibling test file `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`,
+      which `[P4-T13]` creates before this phase re-runs and which CSharpier therefore formats in this
+      pass. A formatter rewrite of
       any other tracked file means the format pass was not scoped as expected: restore that file with
       `git checkout --` against its own pathspec, record the restoration in the artifact, and restart
       the loop from step 1.
-- [x] [P5-T3] Step 1 verification, read-only.
+- [ ] [P5-T3] Step 1 verification, read-only.
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .'` under LOCK-ACQUIRE/LOCK-RELEASE.
       Append `Check EXIT_CODE:` and the reported unformatted-file count to the `[P5-T2]` artifact.
       Acceptance: `Check EXIT_CODE: 0`.
-- [x] [P5-T4] Step 1 side-effect check on the hand-edited config. Confirm the format pass did not rewrite
+- [ ] [P5-T4] Step 1 side-effect check on the hand-edited config. Confirm the format pass did not rewrite
       any existing line of `TaskMaster/app.config`. Commands, in this order:
 
       ```
@@ -2508,7 +3114,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `TaskMaster/app.config` and an addition count between 1 and 12 inclusive. A non-zero deletion count
       means CSharpier rewrote an existing line in that file: rewrite the new block to match the existing
       attribute form used for `FSharp.Core` at line 69 and restart the loop from step 1.
-- [x] [P5-T5] Step 2, analyzers. LOCK-ACQUIRE, then the exact command, redirecting the console log to
+- [ ] [P5-T5] Step 2, analyzers. LOCK-ACQUIRE, then the exact command, redirecting the console log to
       `.../evidence/qa-gates/analyzer-final-console.2026-09-13T18-22.txt`, then LOCK-RELEASE:
 
       ```
@@ -2540,14 +3146,14 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `EXIT_CODE:` and an `Output Summary:` carrying the three counts.
       Acceptance: `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0, `SKIPPED_CORECOMPILE=0`, and
       `CONTROL_BUILD_OUTPUT` greater than 0.
-- [x] [P5-T6] Step 3, nullable. Identical to `[P5-T5]` with the msbuild property list replaced by
+- [ ] [P5-T6] Step 3, nullable. Identical to `[P5-T5]` with the msbuild property list replaced by
       `/p:TreatWarningsAsErrors=true` and the console log path replaced by
       `.../evidence/qa-gates/nullable-final-console.2026-09-13T18-22.txt`. Do not add
       `/p:Nullable=enable`. Write `.../evidence/qa-gates/nullable-final.2026-09-13T18-22.md` with the four
       required fields and the same three counts measured against the nullable log.
       Acceptance: `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0, `SKIPPED_CORECOMPILE=0`, and
       `CONTROL_BUILD_OUTPUT` greater than 0.
-- [x] [P5-T7] Step 4, tests with coverage. LOCK-ACQUIRE, then
+- [ ] [P5-T7] Step 4, tests with coverage. LOCK-ACQUIRE, then
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`,
       leaving `-CoverageOutput` at its default so the raw Cobertura document is retained, then
       LOCK-RELEASE. Write `.../evidence/qa-gates/test-final.2026-09-13T18-22.md` with `Timestamp:`,
@@ -2577,25 +3183,31 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       The runner's repository-wide threshold assertion runs after the Cobertura
       document has been written, so a non-zero exit caused by that assertion is recorded against a
       matching `ExpectedExitCode:` and does not block.
-- [x] [P5-T8] Post-format file-size audit. Repeat the `[P4-T12]` command after the final format pass and
-      append the result to `.../evidence/other/file-size-audit.2026-09-13T18-22.md` under a
-      `Post-Format Line Counts:` heading.
-      Acceptance: the heading exists and every `LINES=` value under it is at most 500.
+- [ ] [P5-T8] Post-format file-size audit. Repeat the SEVEN-path file-size command stated at `[P4-T18]`,
+      not the six-path one at `[P4-T12]`, after the final format pass, and append the result to
+      `.../evidence/other/file-size-audit.2026-09-13T18-22.md` under a `Post-Format Line Counts:` heading.
+      Revision R7 repoints this task from `[P4-T12]` to `[P4-T18]` because the seven-path list is the one
+      that includes `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`, and a post-format
+      ceiling audit that omits the file this revision adds would gate nothing about it.
+      Acceptance: the heading exists and every `LINES=` value under it is at most 500, across all seven
+      paths.
 
       In the same task, re-run the three pre-format sweeps whose acceptance conditions describe the
       terminal state rather than the Phase 4 state, because `[P5-T2]` rewrites tracked source across
       the whole tree and CSharpier 1.2.6 processes `packages.config` as well as `*.cs` and `*.xml`:
       re-run the `[P4-T8]` command and append its seven `NAME=count` lines to
       `.../evidence/other/static-shape-checks.2026-09-13T18-22.md` under a `Post-Format Shape Checks:`
-      heading; re-run the `[P4-T9]` command and the `[P4-T11]` command and append both outputs to
+      heading; re-run the FIVE-path determinism command stated at `[P4-T18]`, not the four-path one at
+      `[P4-T9]`, and the `[P4-T11]` command, and append both outputs to
       `.../evidence/other/scope-and-determinism-checks.2026-09-13T18-22.md` under a
       `Post-Format Sweep:` heading.
       Acceptance: the `Post-Format Line Counts:` heading exists and every `LINES=` value under it is at
-      most 500; the `Post-Format Shape Checks:` heading records the same seven values `[P4-T8]`
-      requires; and the `Post-Format Sweep:` heading records `PACKAGES_CONFIG_CHANGED=0`,
+      most 500, across all seven paths; the `Post-Format Shape Checks:` heading records the same seven
+      values `[P4-T8]` requires; and the `Post-Format Sweep:` heading records `PACKAGES_CONFIG_CHANGED=0`,
       `PORCELAIN_PACKAGES_CONFIG=0`, `NETSTANDARD_DLL_IN_PROJECTS=0`, a `FSHARP_REDIRECT_LINES` value
       equal to the `BASELINE_FSHARP_REDIRECT_LINES` integer recorded at `[P0-T15]`, every banned-token
-      line ending `HITS=0`, and every `CONTROL_AppDomain` line ending with a count greater than 0.
+      line ending `HITS=0` across all five paths, and every `CONTROL_AppDomain` line ending with a count
+      greater than 0 across all five paths.
 - [ ] [P5-T9] Extract the per-file coverage figure for the new module. Command:
 
       ```
@@ -2621,6 +3233,19 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       Acceptance: `ASSEMBLYBINDINGFALLBACK_CLASS_ROWS` is at least 1, `ASSEMBLYBINDINGFALLBACK_LINES_VALID`
       is greater than 0, and the computed percentage is at least 90. A class-row count of zero blocks: it
       means the file was not instrumented and the figure would be unmeasurable, which is not a pass.
+
+      **Revision R7 note — the gate is unchanged; the code that must clear it is not.** The first execution
+      of this task recorded `ASSEMBLYBINDINGFALLBACK_CLASS_ROWS=1`,
+      `ASSEMBLYBINDINGFALLBACK_LINES_VALID=201`, `ASSEMBLYBINDINGFALLBACK_LINES_COVERED=166` and a computed
+      82.59 percent, and blocked correctly. The floor is AC17's own and is NOT lowered, the aggregation is
+      NOT re-scoped, and no more favourable denominator is substituted. Revision R7 closes the shortfall by
+      adding tests: `[P4-T13]` covers 23 of the 35 uncovered lines, which projects 189 of 201 covered, or
+      94.03 percent. `## R7.1` enumerates every uncovered line and states which of them the new tests reach;
+      `## R7.2` states the arithmetic. `ASSEMBLYBINDINGFALLBACK_LINES_VALID` is expected to remain 201,
+      because Revision R7 adds no production line to
+      `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` and deletes none. A materially different
+      `LINES_VALID` on this re-run means the production file was edited by something outside this
+      revision's authority: stop and report rather than adapting the figure.
 - [ ] [P5-T10] Coverage delta and no-regression record. Write
       `.../evidence/qa-gates/coverage-delta.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:` and an `Output Summary:` carrying five labelled figures: `BASELINE_LINE_RATE` and
@@ -2649,6 +3274,39 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `NEW_MODULE_LINE_PERCENT` and `[P5-T9]` rather than on the rate comparison. The literal
       `BASELINE MEASURED ON A DIFFERENT BASE` is quoted here in prose because it is absent from the tree
       until this task runs.
+
+      **Revision R7 addition — the two rates also differ in DOCUMENT STATE, and the concrete pairs are
+      named.** This is a recording change and not a gate change: no acceptance condition below is added,
+      removed or relaxed by it. The artifact additionally records a heading
+      `Document State Flip:` carrying, verbatim, these three statements and the two figure pairs that
+      support them.
+
+      First, the two runs took different exit paths through
+      `scripts/vscode/Invoke-MSTestWithCoverage.ps1` and therefore produced documents in different states.
+      `[P0-T8]` ran with two failing tests, so the runner threw at line 262 on a non-zero collection exit
+      code, BEFORE the post-processing at lines 383-384, and the document it left behind is
+      `RAW-COLLECTOR-OUTPUT`: all modules including third-party, with `line-rate = 0.7125753506415995`,
+      `lines-valid = 83775` and `lines-covered = 59696`. `[P5-T7]` ran with zero failures, so the throw did
+      not occur, post-processing ran, and the document is `POSTPROCESSED`: first-party only, with
+      `line-rate = 0.858327`, `lines-valid = 65616` and `lines-covered = 56320`, and branches
+      `13613 / 17022 = 79.97` percent. The two documents therefore differ in DENOMINATOR, in DOCUMENT
+      STATE and in BASE COMMIT, three independent ways, and a direct comparison of their document-level
+      rates measures none of the three cleanly.
+
+      Second, issue #891 did not fire in the `[P5-T7]` run, and the reason is recorded rather than left
+      implicit: `Assert-CoberturaLineCoverageThreshold` at line 386 asserts against the document-level
+      rate of the POST-PROCESSED document, which is the first-party `0.858327`, and that clears its
+      hard-coded 80 percent threshold. Issue #891 remains unfixed by this plan; this run simply did not
+      meet its failing condition.
+
+      Third, the no-regression judgment is unaffected by all of the above, because it already rests on
+      `NEW_MODULE_LINE_PERCENT` and on `[P5-T9]` rather than on the document-level comparison.
+
+      Acceptance addition: the `Document State Flip:` heading exists, names the baseline document state as
+      `RAW-COLLECTOR-OUTPUT` and the post-change one as `POSTPROCESSED`, and carries both figure pairs —
+      `0.7125753506415995` over `83775`, and `0.858327` over `65616` — as numbers rather than as
+      descriptions. The literal `Document State Flip:` is quoted here in prose because it is absent from
+      the tree until this task runs.
 - [ ] [P5-T11] Project every raw build console log this plan produces under the feature folder's
       `evidence/` tree. **This task and `[P5-T12]` run after the four-step loop has completed cleanly and
       are not part of it**; they are placed here rather than in Phase 6 so they precede `[P6-T1]`, which is
@@ -2761,9 +3419,16 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 - [ ] [P6-T1] Commit the source and test changes together with the evidence produced so far. Commands:
 
       ```
-      git add -- UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs UtilitiesCS/UtilitiesCS.csproj TaskMaster/ThisAddIn.cs TaskMaster/app.config UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs UtilitiesCS.Test/UtilitiesCS.Test.csproj TaskMaster.Test/Bootstrap TaskMaster.Test/TaskMaster.Test.csproj docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
-      git commit -m "fix(879): install an eager self-sufficient assembly-binding fallback in production" -- UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs UtilitiesCS/UtilitiesCS.csproj TaskMaster/ThisAddIn.cs TaskMaster/app.config UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs UtilitiesCS.Test/UtilitiesCS.Test.csproj TaskMaster.Test/Bootstrap TaskMaster.Test/TaskMaster.Test.csproj docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
+      git add -- UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs UtilitiesCS/UtilitiesCS.csproj TaskMaster/ThisAddIn.cs TaskMaster/app.config UtilitiesCS.Test/Bootstrap UtilitiesCS.Test/UtilitiesCS.Test.csproj TaskMaster.Test/Bootstrap TaskMaster.Test/TaskMaster.Test.csproj docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
+      git commit -m "fix(879): install an eager self-sufficient assembly-binding fallback in production" -- UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs UtilitiesCS/UtilitiesCS.csproj TaskMaster/ThisAddIn.cs TaskMaster/app.config UtilitiesCS.Test/Bootstrap UtilitiesCS.Test/UtilitiesCS.Test.csproj TaskMaster.Test/Bootstrap TaskMaster.Test/TaskMaster.Test.csproj docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
       ```
+
+      Revision R7 widened one pathspec from the single file
+      `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` to the directory
+      `UtilitiesCS.Test/Bootstrap`, mirroring the `TaskMaster.Test/Bootstrap` operand already present, so
+      that the sibling file `[P4-T13]` creates is committed. A file-level pathspec would have left the new
+      file untracked and the acceptance condition below would have failed on it. That directory holds only
+      the two files this plan authors.
 
       Acceptance: `git status --porcelain --untracked-files=all -- UtilitiesCS TaskMaster UtilitiesCS.Test TaskMaster.Test`
       returns no output.
@@ -2866,6 +3531,14 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `.../evidence/other/ac-inventory.2026-09-13T18-22.md` under an `AC4 Reading:` heading, together
       with the line `AC4 READING: ten delegate-driven tests, eleventh test excluded`, which is quoted
       here in prose because it is absent from the tree until this task runs.
+      **Revision R7 note — the reading and its pinned literal are unchanged.** AC4 names the class
+      `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` specifically. The ten tests `[P4-T13]` adds
+      live in a different class, `AssemblyBindingFallbackEdgeCaseTests`, so they are outside AC4's subject
+      and neither extend nor contradict its enumerated scenario list. The reading above therefore still
+      describes exactly eleven tests in exactly the class AC4 names, and the pinned literal below is
+      unchanged. For completeness the artifact also records that the ten sibling tests are themselves
+      delegate-driven or guard-clause tests and that none of them drives a real bind, so the eleventh test
+      remains the single exception this reading carves out across the whole work.
       Acceptance: `spec.md` line 484 begins with the six characters `- [x] `, the `AC4 Reading:` heading
       exists in that artifact, and that artifact contains the line
       `AC4 READING: ten delegate-driven tests, eleventh test excluded` exactly once.
@@ -2949,19 +3622,19 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 ## Task Counts
 
 Counted mechanically over lines matching either task prefix pattern, `- [ ] [P#-T#]` or `- [x] [P#-T#]`,
-and re-derived after the Revision R6 delta rather than carried forward:
+and re-derived after the Revision R7 delta rather than carried forward:
 
 - Phase 0: 16 tasks, all 16 complete
-- Phase 1: 7 tasks, 5 complete — the five complete are `[P1-T1]` through `[P1-T5]`. `[P1-T6]` and
-  `[P1-T7]` were unchecked by Revision R5
-- Phase 2: 12 tasks, 7 complete — the seven complete are `[P2-T1]`, `[P2-T2]`, `[P2-T3]`, `[P2-T4]`,
-  `[P2-T7]`, `[P2-T8]` and `[P2-T9]`. `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and `[P2-T12]` were unchecked by
-  Revision R5, and `[P2-T11]` was already unchecked
-- Phase 3: 5 tasks, 0 complete
-- Phase 4: 12 tasks, 0 complete
-- Phase 5: 12 tasks, 0 complete
+- Phase 1: 7 tasks, all 7 complete
+- Phase 2: 12 tasks, all 12 complete
+- Phase 3: 5 tasks, all 5 complete
+- Phase 4: 18 tasks, 12 complete — the twelve complete are `[P4-T1]` through `[P4-T12]`. `[P4-T13]`
+  through `[P4-T18]` were APPENDED and left unchecked by Revision R7
+- Phase 5: 12 tasks, 0 complete — `[P5-T1]` through `[P5-T8]` were unchecked by Revision R7 because a
+  source change invalidates a completed toolchain loop; `[P5-T9]` through `[P5-T12]` were already
+  unchecked, `[P5-T9]` having blocked on the coverage floor
 - Phase 6: 27 tasks, 0 complete
-- Total: 91 tasks, 28 complete
+- Total: 97 tasks, 52 complete
 
 Revision history of these figures. Revision R2 added three tasks and removed none, so the total moved from
 86 to 89. Revision R3 added no task and removed none and unchecked exactly one, `[P2-T3]`. Revision R4
@@ -2979,8 +3652,21 @@ carried forward. The per-phase figures above were likewise re-counted mechanical
 edits: Phase 0 16, Phase 1 7, Phase 2 12, Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, which sum to 91.
 
 Revision R6 adds no task, removes none, and checks or unchecks none. The per-phase figures above were
-re-counted mechanically after the Revision R6 edits and are unchanged: Phase 0 16, Phase 1 7, Phase 2 12,
-Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, summing to 91, of which 28 are complete.
+re-counted mechanically after the Revision R6 edits and were: Phase 0 16, Phase 1 7, Phase 2 12,
+Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, summing to 91, of which 28 were complete at that time.
+
+Revision R7 adds six tasks, `[P4-T13]` through `[P4-T18]`, and removes none, so the total moves from 91 to
+97. All six were APPENDED to the end of Phase 4 rather than inserted, so no task is renumbered and every
+`[P#-T#]` identifier this plan and its evidence artifacts already cite is unchanged. Revision R7 unchecks
+eight tasks — `[P5-T1]` through `[P5-T8]` — and checks none.
+
+The complete count was re-derived mechanically from the checkboxes on disk in this pass rather than
+carried forward from the figure 28, which described the checklist as Revision R6 left it. The executor
+subsequently completed all of Phases 1 through 4 and the first eight tasks of Phase 5, so the on-disk state
+before this revision was 60 complete of 91: Phase 0 16, Phase 1 7, Phase 2 12, Phase 3 5, Phase 4 12,
+Phase 5 8, Phase 6 0. Unchecking the eight Phase 5 tasks moves that to 52, and appending six unchecked
+tasks leaves 52 complete of 97. The per-phase totals above were likewise re-counted after the Revision R7
+edits: 16 + 7 + 12 + 5 + 18 + 12 + 27 = 97, of which 16 + 7 + 12 + 5 + 12 + 0 + 0 = 52 are complete.
 
 ## Acceptance-Criteria Traceability
 
@@ -2989,7 +3675,7 @@ Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, summing to 91, of which 28 are co
 | AC1 | 473 | P2-T1, P2-T2 | P2-T1, P2-T2 | P6-T6 |
 | AC2 | 477 | P3-T3 | P4-T7 | P4-T7 |
 | AC3 | 481 | P3-T3 | P4-T8 | P4-T8 |
-| AC4 | 484 | P2-T3, P3-T1, P3-T2 | P4-T2 | P4-T2, P6-T9 |
+| AC4 | 484 | P2-T3, P3-T1, P3-T2 | P4-T2, P4-T17 | P4-T2, P4-T17, P6-T9 |
 | AC5 | 491 | P2-T5, P2-T6 | P4-T3 | P4-T3 |
 | AC6 | 495 | P2-T6 | P2-T12, P4-T3 | P2-T12 |
 | AC7 | 499 | P2-T5, P2-T6 | P2-T12, P4-T3 | P2-T12 |
@@ -3001,8 +3687,8 @@ Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, summing to 91, of which 28 are co
 | AC13 | 534 | P3-T5 | P3-T5 | P3-T5 |
 | AC14 | 536 | P1-T4 | P6-T5 | P6-T5 |
 | AC15 | 543 | P3-T4 | P4-T11 | P4-T11 |
-| AC16 | 545 | P2-T3, P2-T5, P2-T6, P2-T8 | P4-T9 | P4-T9 |
-| AC17 | 547 | P3-T1 | P5-T9 | P5-T9, P5-T10 |
+| AC16 | 545 | P2-T3, P2-T5, P2-T6, P2-T8, P4-T13 | P4-T9, P4-T18 | P4-T9, P4-T18, P5-T8 |
+| AC17 | 547 | P3-T1, P4-T13, P4-T14 | P5-T9 | P4-T17, P5-T9, P5-T10 |
 | AC18 | 550 | P5-T2 to P5-T7 | P5-T5, P5-T6, P5-T7 | P5-T5, P5-T6, P5-T7, P5-T11 |
 | AC19 | 554 | P6-T4 | P6-T4 | P6-T4 |
 
@@ -3031,9 +3717,68 @@ summary reports AC18 as delivered with this qualification named alongside the `[
 AC4 is discharged on the reading `[P6-T9]` states: its closing sentence about injected delegates is read
 as a property of the ten tests that exercise the ladder rungs, not of the eleventh test `[P2-T3]` adds to
 cover the production entry point. The status summary reports AC4 as delivered with that qualification
-named.
+named. Revision R7 does not extend that reading. AC4 names
+`UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` specifically, and the ten tests `[P4-T13]` adds
+are in a different class, so they are outside the criterion's subject; they are nonetheless delegate-driven
+or guard-clause tests and none of them drives a real bind, so the eleventh test remains the single stated
+exception across the whole work.
+
+AC17 is the criterion Revision R7 exists to satisfy. Its 90 percent floor was measured at 82.59 percent on
+the first `[P5-T9]` run and the task blocked correctly. The floor is not lowered and the measurement is not
+re-scoped: `[P4-T13]` and `[P4-T14]` add and register ten tests that cover 23 of the 35 uncovered lines,
+projecting 189 of 201 covered or 94.03 percent, and `[P5-T9]` re-runs its unchanged command against the
+unchanged 201-line denominator. `## R7.1` and `## R7.2` carry the line-by-line inventory and the
+arithmetic.
 
 ## Planner Notes
+
+- **Revision R7 recorded: AC17's coverage floor closed by new tests, no criterion text amended.** Revision
+  R7 amends no acceptance-criterion text and writes no `spec.md` edit, so every `spec.md` line number this
+  plan cites — 473, 477, 481, 484, 491, 495, 499, 504, 509, 515, 521, 528, 534, 536, 543, 545, 547, 550 and
+  554 — is unchanged; the absence of a write to that file is the ground, and `spec.md` was re-read at lines
+  470 through 554 in this pass to confirm the inventory is still nineteen and still at those line numbers
+  rather than inferring it from the absence of a write. Revision R7 adds six tasks, `[P4-T13]` through
+  `[P4-T18]`, all appended to the end of Phase 4; unchecks eight, `[P5-T1]` through `[P5-T8]`; adds one
+  path to `## Authorised Write Set` as item 14 and renumbers the conditional entry from 14 to 15; and adds
+  Revision R7 cross-reference notes to `[P2-T3]`, `[P4-T2]`, `[P4-T9]`, `[P4-T12]`, `[P5-T9]` and
+  `[P6-T9]` without changing any of their checklist states or acceptance conditions.
+- **Two inbound premises corrected, per the authentication rule.** First, the delegation brief stated that
+  Revision R6 relabelled `[P2-T3]`'s acceptance as "a standing guard pinning exactly eleven `[TestMethod]`
+  occurrences" and that "a twelfth test falsifies both" that guard and `[P4-T2]`'s floor. Re-derived from
+  the task text in this pass, `[P2-T3]`'s condition reads "contains **at least** eleven occurrences of
+  `[TestMethod]`" and `[P4-T2]`'s reads "the `passed` value is at least 11". Both are floors, not
+  ceilings, and neither is falsified by an additional test. The `[P5-T9]` evidence artifact repeats the
+  same misreading in its own prose. The correction does not change the option this revision takes: the
+  binding constraint on amending
+  `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` is the 500-line ceiling against a measured
+  383 lines, not either guard, and `## R7.3` records that. Second, the brief listed rung-4 lines 355-356
+  among the cheapest lines to cover. They are not reachable: line 351 reads
+  `Path.GetDirectoryName(typeof(AssemblyBindingFallback).Assembly.Location)`, which is not an injected
+  delegate and is non-empty for a file-loaded assembly, so no test can drive the guard at line 354 to its
+  true branch. Those two lines are excluded from the covered-line claim and named as unreachable in
+  `## R7.1`. The brief's other cited lines were confirmed against the Cobertura document.
+- **One deviation from the brief, with its reason.** The brief directed that `[P4-T2]` be re-run with a
+  raised floor. `[P4-T2]` is instead left checked and superseded by a new task, `[P4-T17]`, carrying the
+  same command shape with a floor of 21. The reason is an ordering defect the directed form would have
+  created: `[P4-T2]` is at numeric position 2 of Phase 4 while the tasks that author the new tests are
+  appended at positions 13 to 18, so an executor working the checklist in order would have re-run
+  `[P4-T2]` against an assembly that does not yet contain the new tests, and a floor of 21 would have been
+  unsatisfiable at the moment it ran. `[P4-T17]` achieves the brief's actual objective — a ladder-suite run
+  that includes and passes the new tests, gated at a floor raised to match — in a position where the
+  condition can be satisfied.
+- **One `.csproj` edit is planned, and it is not the excluded one.** The brief's "Do not change" list ends
+  "and no `.csproj` — the `FSharp.Core` HintPath skew is the root cause but is OUT OF SCOPE and tracked as
+  issue #895." Revision R7 plans exactly one `.csproj` change, at `[P4-T14]`: a single
+  `<Compile Include>` line in `UtilitiesCS.Test/UtilitiesCS.Test.csproj` registering the new test file. It
+  touches no `Reference`, no `HintPath` and no package version, and `[P4-T14]` gates that the `FSharp.Core`
+  `HintPath` at line 598 still reads the `lib\netstandard2.0` value and that the `lib\netstandard2.1` value
+  is absent, plus a `--numstat` deletion count of zero. The edit is unavoidable if a sibling file is used
+  at all: that project uses explicit `Compile` items with no wildcard glob, re-derived in this pass, so an
+  unregistered file silently does not build. It is also the remedy `[P4-T12]`'s own acceptance condition
+  already prescribes for a file-size overflow. This is flagged rather than assumed: if the brief intended a
+  blanket prohibition on every `.csproj` line, the only remaining route is to amend
+  `AssemblyBindingFallbackTests.cs` in place and accept a post-format file of roughly 490 to 500 lines
+  against a ceiling `[P5-T8]` audits after the whole toolchain loop has run.
 
 - **Revision R6 recorded: TRX residue removal, and no criterion or task change.** Revision R6 amends no
   acceptance-criterion text, writes no `spec.md` edit, adds and removes no task, and changes no task's
