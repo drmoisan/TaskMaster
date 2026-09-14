@@ -3,9 +3,9 @@
 - **Issue:** #879
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-14T04-10
-- **Status:** Ready for preflight (revision R4)
-- **Version:** 1.1
+- **Last Updated:** 2026-09-14T16-05
+- **Status:** Ready for preflight (revision R5)
+- **Version:** 1.2
 - **Work Mode:** full-bug (spec.md is the sole acceptance-criteria source; `user-story.md` is correctly absent)
 - **Complexity band:** C3
 - **Branch:** `bug/deedle-netstandard-21-bind-unsatisfiable-in-production-879`
@@ -121,10 +121,14 @@ Conditional, only if the Phase 0 build-output premise check fails and the record
     `ToDoModel.Test/ToDoModel.Test.csproj` carries ProjectReferences to
     `ToDoModel` (line 310) and `UtilitiesCS` (line 314) only and does not reference `TaskMaster`, so
     `typeof(ThisAddIn)` would not compile there, and `TaskMaster.dll.config` is not in that project's
-    build output. Under this substitution the child domains' `ConfigurationFile` is
-    `ToDoModel.Test.dll.config` in `AppDomain.CurrentDomain.BaseDirectory`, and the file-name
-    prohibition in `[P2-T6]` binds to `TaskMaster.dll.config` exactly as it does under the primary
-    host. This substitution is a recorded amendment (task `[P0-T14]`), never a silent change.
+    build output. Revision R5 makes this substitution's domain configuration independent of the host:
+    under either host the child domains' `ApplicationBase` is the `QuickFiler.Test` build output
+    directory and their `ConfigurationFile` is `QuickFiler.Test.dll.config` in that directory, the probe
+    assembly is loaded by absolute path with `CreateInstanceFromAndUnwrap`, and the file-name prohibition
+    in `[P2-T6]` binds to `TaskMaster.dll.config` exactly as it does under the primary host. This
+    substitution is a recorded amendment (task `[P0-T14]`), never a silent change. `[P0-T14]` is left
+    checked by Revision R5, which moves the child domains' `ApplicationBase` and not the project that
+    hosts the harness.
 
 Inherited-path rule (not a list): any path the executor's own harness writes as a side effect of running
 — for example agent-memory files the executor maintains under `.claude/agent-memory/` — is outside this
@@ -148,7 +152,7 @@ rescuer and masks the result. That masking is how this defect hid inside the tes
 handler does not propagate into a child domain, so the PR #880 resolver linked into `QuickFiler.Test` and
 `UtilitiesCS.Test` cannot reach it, and neither can anything a sibling test class did in the parent.
 
-**The guarantee is made checkable by five falsifiable assertions, not by assumption:**
+**The guarantee is made checkable by six falsifiable assertions, not by assumption:**
 
 1. `ChildDomain_HasNoSvgControlAssemblyLoaded` — inside the child domain, no loaded assembly has simple
    name `SVGControl`. `SvgRenderer`'s type initializer cannot have run if its assembly is not loaded, so
@@ -167,6 +171,13 @@ handler does not propagate into a child domain, so the PR #880 resolver linked i
    loaded assembly has simple name `UtilitiesCS`. This is the checkable form of the design claim that
    keeping the installer call in its own probe method prevents `UtilitiesCS` from being JIT-resolved in
    that domain.
+6. `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory` — the child domain reports an
+   `ApplicationBase` equal to the `QuickFiler.Test` build output directory, and that directory holds
+   `Deedle.dll`, `FSharp.Core.dll` and `QuickFiler.Test.dll.config`. Revision R5 added this assertion
+   because the `ApplicationBase`, and not the Deedle call shape, is what determines whether the bind under
+   test is reachable at all. Without it a silent regression of the `ApplicationBase` back to the host test
+   assembly's own directory would make every positive result in this harness vacuous again, which is
+   exactly the failure that consumed two fail-before rounds.
 
 **The negative control is the load-bearing criterion.** It is the only thing that distinguishes a fixed
 build from an unfixed one. It has its own task with its own acceptance condition, and it is verified in
@@ -176,19 +187,29 @@ the negative-control domain ever succeeds without a code change, that is, if
 raised, isolation has been lost, every positive assertion in the harness is vacuous, and no positive
 result from this harness may be trusted.** The test carries that statement as an in-file comment.
 
-**Verification of the `ConfigurationFile` choice, checked against the post-hardening tree.** Both child
-domains set `ApplicationBase` to the directory of the test assembly and `ConfigurationFile` to
-`TaskMaster.Test.dll.config` in that same directory. This was checked rather than inherited:
+**Verification of the `ApplicationBase` and `ConfigurationFile` choice, checked against the tree at
+revision R5.** Both child domains set `ApplicationBase` to the `QuickFiler.Test` build output directory
+and `ConfigurationFile` to `QuickFiler.Test.dll.config` in that same directory. Revision R5 moved both
+values off the host test assembly's own directory; `## R6` records the measurement that forced the move.
+This was checked rather than inherited:
 
-- `TaskMaster.Test/app.config` exists and carries a `FSharp.Core` redirect at line 62. Its only
-  `assemblyIdentity` names relevant here is `FSharp.Core`; the file contains no occurrence of the string
-  `netstandard`. It is outside the write set and outside the non-goals' permitted edits, so it cannot
-  gain one during this work.
-- The build output directory also contains `TaskMaster.dll.config`, the deployed image of
-  `TaskMaster/app.config`, which **does** gain the `netstandard` redirect in Phase 3. Selecting that file
-  by mistake would silently void the negative control. The design therefore pins the file name
-  `TaskMaster.Test.dll.config` explicitly, and criterion 3 above fails loudly if the selected file
-  carries a `netstandard` entry.
+- `QuickFiler.Test/app.config` carries the `FSharp.Core` `assemblyIdentity` at line 46 and contains zero
+  occurrences of the string `netstandard`, measured on the file itself. Its deployed image
+  `QuickFiler.Test/bin/Debug/QuickFiler.Test.dll.config` likewise carries the `FSharp.Core`
+  `assemblyIdentity` at line 46 with the `bindingRedirect` at line 47 and zero occurrences of
+  `netstandard`, measured on the deployed file the child domain actually reads. `QuickFiler.Test/app.config`
+  is named in the non-goals as an unmodifiable file, so it cannot gain a `netstandard` entry during this
+  work.
+- `TaskMaster.dll.config`, the deployed image of `TaskMaster/app.config`, **does** gain the `netstandard`
+  redirect in Phase 3. It is present in `TaskMaster.Test/bin/Debug` and absent from
+  `QuickFiler.Test/bin/Debug`, both measured. Selecting it by mistake would silently void the negative
+  control, so the file-name prohibition on `TaskMaster.dll.config` in `[P2-T6]` is retained unchanged
+  across the re-rooting, and criterion 3 above fails loudly if the selected file carries a `netstandard`
+  entry.
+- The harness assembly `TaskMaster.Test.dll` is **not** present in `QuickFiler.Test/bin/Debug`, measured.
+  A child domain rooted there therefore cannot resolve it by display name, which is why `[P2-T6]` loads
+  the probe with `CreateInstanceFromAndUnwrap` over `typeof(ChildDomainBindProbe).Assembly.Location`
+  rather than with `CreateInstanceAndUnwrap`.
 
 **One design correction made here rather than inherited.** The proxy evaluates every listed condition
 **inside** the child domain and marshals primitive results back; FluentAssertions and the MSTest
@@ -535,6 +556,207 @@ passed floor rises from 10 to 11. `spec.md` AC4 at lines 484-490 is NOT amended:
 enumerated scenarios be covered as separately named test methods, and an additional test method beyond
 that enumeration does not falsify it. Leaving AC4 alone also preserves its seven-line block and every
 subsequent `spec.md` line number this plan cites.
+
+---
+
+## R6 — REVISION R5: the `ApplicationBase` is the discriminator, not the Deedle call shape
+
+Revision R2 repointed the probe from a forced class-constructor run to a member invocation, and `[P2-T11]`
+was re-run. It recorded `DEEDLE_RECORD_CONVERSION_OUTCOME=INVOKED-NO-EXCEPTION` at
+`.../evidence/regression-testing/expect-fail-run.2026-09-13T18-22.md` line 54, against a build carrying no
+fix. That is the same vacuity the original probe had, on a different member. A bounded investigation then
+established the cause by measurement rather than by reasoning, and the cause is not the member.
+
+### R6.1 — What was measured
+
+`packages/FSharp.Core.11.0.100` ships two binaries and this repository's six `HintPath` values are split
+between them. Every line below was re-derived against the tree in this worktree:
+
+| Project | `HintPath` line | Flavour | `netstandard` reference |
+|---|---|---|---|
+| `QuickFiler/QuickFiler.csproj` | 52 | `lib/netstandard2.1` | **2.1.0.0** |
+| `QuickFiler.Test/QuickFiler.Test.csproj` | 259 | `lib/netstandard2.1` | **2.1.0.0** |
+| `ToDoModel/ToDoModel.csproj` | 42 | `lib/netstandard2.1` | **2.1.0.0** |
+| `UtilitiesCS/UtilitiesCS.csproj` | 70 | `lib/netstandard2.0` | 2.0.0.0 |
+| `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | 598 | `lib/netstandard2.0` | 2.0.0.0 |
+| `ToDoModel.Test/ToDoModel.Test.csproj` | 96 | `lib/netstandard2.0` | 2.0.0.0 |
+
+`Deedle.dll` 3.0.0.0 references `netstandard 2.0.0.0` and `FSharp.Core 4.5.0.0`, so **Deedle is never the
+source of the `2.1.0.0` request; `FSharp.Core` is.** The same conclusion is stated independently, and was
+reached independently by sibling item 877, in the XML documentation of
+`TestSupport/TestAssemblyResolver.cs` lines 20 to 27: "The requirement enters the closure through that
+FSharp.Core redirect and NOT through Deedle, which asks only for netstandard 2.0.0.0."
+
+`TaskMaster.Test/bin/Debug` received the `netstandard2.0` flavour, so nothing rooted there ever requests
+`netstandard 2.1.0.0` on its own and every Deedle probe rooted there succeeds. With one fresh child domain
+per observation and no fix installed, the measured outcomes were:
+
+| Observation | rooted at `TaskMaster.Test/bin/Debug` | rooted at `QuickFiler.Test/bin/Debug` |
+|---|---|---|
+| `Frame.FromRecords<struct with public fields>` | `INVOKED-NO-EXCEPTION` | **`netstandard 2.1.0.0` chain** |
+| `Frame.FromRecords<class with auto-properties>` | `INVOKED-NO-EXCEPTION` | **`netstandard 2.1.0.0` chain** |
+| `convertRecordSequence<either shape>` | `INVOKED-NO-EXCEPTION` | **`netstandard 2.1.0.0` chain** |
+| `RunClassConstructor(Deedle.Reflection)` | `OK` | **`netstandard 2.1.0.0` chain** |
+| `Assembly.Load` `netstandard 2.0.0.0` | `LOADED` from the GAC | `LOADED` from the GAC |
+| `Assembly.Load` `netstandard 2.1.0.0` | `FileNotFoundException` | `FileNotFoundException` |
+
+The record shape is irrelevant and all three probe designs were correct. They were pointed at the wrong
+directory. In the failing domain the exception chain is byte-for-byte the reported production one, ending
+`FileNotFoundException [netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51]`.
+The pass-after control was measured as well: in a `QuickFiler.Test/bin/Debug`-rooted domain, after a
+handler returning the `2.0.0.0` facade for any `netstandard` request is subscribed, the same call returns
+`INVOKED-NO-EXCEPTION`. That is a genuine fail-before / pass-after pair.
+
+### R6.2 — Decision: every child domain re-roots, not only the Deedle one
+
+**Decision: all child domains created by `NetstandardBindChildDomainTests` are rooted at the
+`QuickFiler.Test` build output directory.** The alternative considered was re-rooting only the domain the
+Deedle observation runs in and leaving the other observations on the host test assembly's own directory.
+It was rejected on the following grounds, each checked rather than assumed.
+
+- **A split root breaks the harness's own design argument.** `## R1` requires
+  `ChildDomain_HasNoSvgControlAssemblyLoaded` and `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall`
+  to observe the domain **in the state in which the bind is measured**; that is why
+  `ChildDomain_HasNoSvgControlAssemblyLoaded` calls `InstallProductionFallback()` before it counts. Under
+  a split root those two observations would describe a differently configured domain from the one the
+  Deedle result comes from, and criterion 3, which asserts over "the configuration file supplied to both
+  child domains", would have two different files to assert over. The isolation evidence would stop being
+  evidence about the positive domain.
+- **The other direction is not a loss.** `AfterInstall_BothNetstandardVersionsBind` currently fails in the
+  host-rooted domain only because it issues an explicit `Assembly.Load` of the `2.1.0.0` identity, a
+  request nothing in that directory makes on its own. The measurement above shows that identity raises
+  `FileNotFoundException` in **both** directories, so re-rooting preserves that criterion's fail-before
+  exactly and additionally makes the request one the directory's own closure would raise.
+
+The three risks named against re-rooting were measured:
+
+1. **`SVGControl`.** `SVGControl.dll` **is** present in `QuickFiler.Test/bin/Debug`. It is **equally**
+   present in `TaskMaster.Test/bin/Debug`, so re-rooting changes that exposure by nothing.
+   `ChildDomain_HasNoSvgControlAssemblyLoaded` asserts that no assembly named `SVGControl` is **loaded**,
+   not that the file is absent. `UtilitiesCS/UtilitiesCS.csproj` line 1126 carries a `ProjectReference` to
+   `SVGControl`, so `UtilitiesCS.dll` references it in both directories alike; a CLR assembly reference is
+   resolved on first use of a type from it, and `AssemblyBindingFallback.Install()` uses no `SVGControl`
+   type. The empirical demonstration is already on disk: the `[P2-T11]` run recorded
+   `ChildDomain_HasNoSvgControlAssemblyLoaded OUTCOME=Passed` in a domain whose directory contained that
+   same file. The assertion remains the falsifiable check and is not weakened.
+2. **`NegativeControl_HasNoUtilitiesCsAssemblyLoaded`.** `UtilitiesCS.dll` is present in both directories,
+   again identically, and the property depends on `InstallProductionFallback()` never being JIT-compiled
+   in that domain rather than on the directory. One new consideration arises: `TaskMaster.Test.dll` is
+   **not** present in `QuickFiler.Test/bin/Debug`, so the probe assembly is loaded into the child by
+   absolute path. Loading `TaskMaster.Test` does not load `UtilitiesCS`, because assembly references
+   resolve lazily on first use. The control therefore still holds and remains falsifiable.
+3. **The item 877 resolver.** `TestSupport/TestAssemblyResolver.cs` is `Compile`-linked into
+   `QuickFiler.Test/QuickFiler.Test.csproj` at line 234 and installed from
+   `QuickFiler.Test/SetupAssemblyInitializer.cs` line 20 inside the `[AssemblyInitialize]` at line 14.
+   Two independent measured reasons put it out of reach of the probe domain. First, `Install()` at
+   `TestSupport/TestAssemblyResolver.cs` line 45 subscribes to `AppDomain.CurrentDomain.AssemblyResolve`,
+   which is the **current domain's** event; the "process-wide" wording in that file's XML summary at line 8
+   describes intent and not mechanism, and an `AssemblyResolve` subscription does not cross an `AppDomain`
+   boundary. Second, the only assembly operand in `[P2-T11]`, `[P4-T3]` and `[P4-T7]` is
+   `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll`, so `QuickFiler.Test`'s `[AssemblyInitialize]` does not
+   run in the host process at all, and nothing in the child requests `QuickFiler.Test.dll`. Re-rooting puts
+   that assembly on the child's probing path without anything asking for it. The harness already carries
+   the falsifiable check for exactly this: `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall` asserts
+   the assembly-resolution invocation list is empty **before** the installer runs, so a resolver active in
+   the probe domain would fail that assertion rather than silently masking the bind.
+
+### R6.3 — Mechanical consequences
+
+- `ApplicationBase` is `Path.GetFullPath` of the host base directory joined with `..`, `..`, `..`,
+  `QuickFiler.Test`, `bin`, `Debug`. The host base directory is `<repo>\TaskMaster.Test\bin\Debug\` and
+  both projects declare `<OutputPath>bin\Debug\</OutputPath>`, measured at
+  `QuickFiler.Test/QuickFiler.Test.csproj` line 36, so three parent steps reach the repository root. The
+  derivation is a fixed expression in the test file rather than a value the executor selects.
+- `ConfigurationFile` is `QuickFiler.Test.dll.config` in that directory.
+- The probe is created with `CreateInstanceFromAndUnwrap` over
+  `typeof(ChildDomainBindProbe).Assembly.Location`, because `TaskMaster.Test.dll` is absent from the new
+  `ApplicationBase` and a display-name creation would raise `FileNotFoundException`.
+- The probe's Deedle surface is repointed from `Deedle.Reflection.convertRecordSequence` to
+  `Deedle.Frame.FromRecords`, which is production's actual entry point at
+  `UtilitiesCS/Extensions/DfDeedle.cs` lines 123 and 237, both re-read in this pass and both reading
+  `var df = Frame.FromRecords(records);`. `Deedle.Frame` also carries an overload taking two generic
+  arguments, so a name-only `Type.GetMethod` lookup would raise `AmbiguousMatchException`; `[P2-T5]`
+  therefore selects the overload by shape and `[P1-T6]` is re-pointed to measure that overload set from
+  metadata before `[P2-T5]` is authored against it.
+- A ninth harness test, `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory`, makes the re-rooting
+  itself falsifiable. It is criterion 6 in `## R1`.
+
+### R6.4 — OPEN RISK: which `FSharp.Core` flavour reaches `TaskMaster/bin/Debug` is nondeterministic
+
+The root-cause fix is to align all six `FSharp.Core` `HintPath` values on `lib/netstandard2.0`. **That is
+out of scope for this item and is tracked as a separate issue.** `QuickFiler/QuickFiler.csproj`,
+`QuickFiler.Test/QuickFiler.Test.csproj` and `ToDoModel/ToDoModel.csproj` are outside this plan's
+authorised write set and may be owned by sibling items; under the hook-satisfaction rule, editing them is a
+stop-and-report condition and not a judgement call. **No task in this plan changes any `.csproj`
+`HintPath`.**
+
+The risk this leaves open, named rather than worked around:
+
+- **The nondeterminism.** Two projects in the add-in's reference closure resolve `FSharp.Core` to different
+  files of the same assembly identity. Which copy reaches `TaskMaster/bin/Debug` is MSB3277-class
+  last-writer-wins behaviour across a parallel build, not a declared outcome. The reported production trace
+  proves the add-in did fail, so `TaskMaster/bin/Debug` carried the `netstandard2.1` flavour at report time;
+  it carries the `netstandard2.0` flavour now. Either flavour can be deployed by any subsequent rebuild.
+- **The remedy does not depend on which flavour is currently deployed.** `AssemblyBindingFallback` resolves
+  any `netstandard` request by simple name plus public key token and, at rung 3, loads the facade from
+  `RuntimeEnvironment.GetRuntimeDirectory()` by absolute path. The `TaskMaster/app.config` redirect covers
+  `0.0.0.0-2.1.0.0` declaratively. Together they make the add-in robust under either deployment. That is
+  defence in depth against a nondeterministic input, not a workaround for a defect this item declines to
+  fix.
+- **What this item therefore does and does not close.** It closes the add-in's exposure to an unsatisfiable
+  `netstandard` bind. It does not close the `HintPath` split that produces the exposure, and issue 879 must
+  not be reported as having fixed that split.
+
+### R6.5 — Evidence hygiene: console dumps are replaced by projections
+
+`.../evidence/regression-testing/expect-fail-build-console.2026-09-13T18-22.txt` is 11,961 lines and 7,747
+of those lines contain the absolute worktree path including the host user name, both counted in this pass.
+The two Phase 0 console logs are 5,030 lines
+(`.../evidence/baseline/analyzer-baseline-console.2026-09-13T18-22.txt`) and 11,842 lines
+(`.../evidence/baseline/nullable-baseline-console.2026-09-13T18-22.txt`); both were already redacted to
+`<repo-root>` for the repository path and carry zero occurrences of the host user name, but each retains
+about 140 lines carrying absolute toolchain paths beginning `C:\Program Files`. The standing directive and
+the issue 671 decision require projections, and require artifacts to carry no absolute host paths.
+
+`[P5-T11]` writes one projection per console log and `[P5-T12]` deletes the raw logs, after every gate that
+reads a raw log has run. No raw `.trx` and no raw `.cobertura.xml` is added to git by any task in this plan.
+
+### R6.6 — Checklist state changed by this revision
+
+Unchecked and to be re-executed, with the reason for each:
+
+- `[P1-T6]` — its measurement is repointed from `Deedle.Reflection.convertRecordSequence` in
+  `TaskMaster.Test/bin/Debug/Deedle.dll` to the `Deedle.Frame.FromRecords` overload set in
+  `QuickFiler.Test/bin/Debug/Deedle.dll`. Its recorded artifact measures a member `[P2-T5]` no longer uses.
+- `[P1-T7]` — it verifies the AC10 rewrite by token search, and AC10 is rewritten again with different
+  tokens, so its gates must be re-derived against the new text.
+- `[P2-T5]` — the probe surface gains `ApplicationBaseDirectory()` and its Deedle member is repointed.
+- `[P2-T6]` — the domain configuration, the instantiation call and the test list all change.
+- `[P2-T10]` — the targeted rebuild must be re-run, because `[P2-T5]` and `[P2-T6]` change compiled source
+  after the recorded build.
+- `[P2-T12]` — it reads the `[P2-T11]` artifact, which is regenerated, and it gains a sixth outcome.
+
+`[P2-T11]` was already unchecked and stays unchecked.
+
+Left checked and NOT re-executed, because this revision leaves them untouched: `[P0-T1]` through
+`[P0-T16]`, `[P1-T1]` through `[P1-T5]`, `[P2-T1]`, `[P2-T2]`, `[P2-T3]`, `[P2-T4]`, `[P2-T7]`, `[P2-T8]`
+and `[P2-T9]`. `[P2-T1]` is untouched because Revision R5 changes nothing in
+`UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs`; the seam signature correction it carries from
+Revision R2 is already applied. `[P2-T7]`'s `ISOLATION-LOST-INVARIANT` comment survives the `[P2-T6]`
+amendment and `[P2-T6]`'s acceptance re-asserts its count.
+
+### R6.7 — Constraints re-checked and deliberately left unchanged
+
+- `-CoverageOutput` stays at its default in `[P0-T8]` and `[P5-T7]`, for the issue 873 reason recorded at
+  `## R4.6`. Revision R5 changes neither task.
+- Every diff anchor remains `origin/main`. Revision R5 introduces no new diff anchor.
+- No `artifacts/csharp/coverage.xml` is created, and no task in this plan names that path.
+- Every `vstest.console.exe` span keeps its explicit `/ResultsDirectory:`, its pinned `LogFileName=` inside
+  a double-quoted `"/Logger:trx;LogFileName=..."`, its `TRX_MATCH_COUNT=1` gate and its `/InIsolation`.
+  Revision R5 changes no vstest command line: the re-rooting is inside the test source, not in the runner
+  invocation.
+- The live-Outlook step at `[P6-T4]` remains a manual stop-and-report gate with a `PENDING-MAINTAINER`
+  branch.
 
 ---
 
@@ -1063,7 +1285,13 @@ because it is absent from the tree until `[P2-T6]` runs.
       and contains the literal `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` exactly once,
       which is the vacuous-pass observation this copy exists to retain. The original
       `expect-fail-run.2026-09-13T18-22.md` is left byte-identical by this task.
-- [x] [P1-T6] Measure the Deedle member surface from metadata, before `[P2-T5]` is authored against it.
+- [ ] [P1-T6] Measure the Deedle member surface from metadata, before `[P2-T5]` is authored against it.
+      **Revision R5 repoints this task twice** and it is therefore unchecked and re-run: the file read moves
+      from `TaskMaster.Test/bin/Debug/Deedle.dll` to `QuickFiler.Test/bin/Debug/Deedle.dll`, which is the
+      file the re-rooted child domain loads, and the member measured moves from
+      `Deedle.Reflection.convertRecordSequence` to the `Deedle.Frame.FromRecords` overload set, which is
+      production's entry point at `UtilitiesCS/Extensions/DfDeedle.cs` lines 123 and 237. The artifact at
+      the path named below is overwritten by this re-run.
       The read is metadata-only through `System.Reflection.Metadata`: it never executes Deedle code, never
       runs a type initializer and never resolves `FSharp.Core`, so this measurement cannot itself trip the
       bind under test, and it works regardless of the target framework of the deployed `Deedle.dll`.
@@ -1071,25 +1299,32 @@ because it is absent from the tree until `[P2-T6]` runs.
 
       ```
       pwsh -NoProfile -Command '
-      $p = "TaskMaster.Test/bin/Debug/Deedle.dll"
+      $p = "QuickFiler.Test/bin/Debug/Deedle.dll"
       Write-Output ("DEEDLE_DLL_PRESENT=" + (Test-Path -LiteralPath $p))
       $fs = [System.IO.File]::OpenRead((Resolve-Path -LiteralPath $p).Path)
       $pe = New-Object System.Reflection.PortableExecutable.PEReader($fs)
       $md = [System.Reflection.Metadata.PEReaderExtensions]::GetMetadataReader($pe)
       Write-Output ("TYPEDEF_COUNT=" + @($md.TypeDefinitions).Count)
-      $found = 0
+      $defs = 0
+      $arity1 = 0
       foreach ($h in $md.TypeDefinitions) {
       $td = $md.GetTypeDefinition($h)
-      if (($md.GetString($td.Namespace) -eq "Deedle") -and ($md.GetString($td.Name) -eq "Reflection")) {
-      Write-Output ("TYPE_FOUND=Deedle.Reflection")
+      $ns = $md.GetString($td.Namespace)
+      $n = $md.GetString($td.Name)
+      if (($ns -eq "Deedle") -and $n.StartsWith("Frame")) { Write-Output ("DEEDLE_FRAME_LIKE_TYPE=" + $ns + "." + $n) }
+      if (($ns -eq "Deedle") -and ($n -eq "Frame")) {
+      Write-Output ("TYPE_FOUND=Deedle.Frame")
       Write-Output ("TYPE_ATTRS=" + $td.Attributes)
       foreach ($mh in $td.GetMethods()) {
       $m = $md.GetMethodDefinition($mh)
-      if ($md.GetString($m.Name) -eq "convertRecordSequence") {
-      $found = $found + 1
+      if ($md.GetString($m.Name) -eq "FromRecords") {
+      $g = @($m.GetGenericParameters()).Count
+      $defs = $defs + 1
+      if ($g -eq 1) { $arity1 = $arity1 + 1 }
       Write-Output ("MEMBER_ATTRS=" + $m.Attributes)
-      Write-Output ("MEMBER_GENERIC_PARAM_COUNT=" + @($m.GetGenericParameters()).Count) } } } }
-      Write-Output ("CONVERT_RECORD_SEQUENCE_DEFINITIONS=" + $found)
+      Write-Output ("FROMRECORDS_MEMBER_GENERIC_PARAM_COUNT=" + $g) } } } }
+      Write-Output ("FROMRECORDS_DEFINITIONS=" + $defs)
+      Write-Output ("FROMRECORDS_GENERIC_ARITY_1_COUNT=" + $arity1)
       $pe.Dispose()
       $fs.Dispose()
       '
@@ -1097,7 +1332,11 @@ because it is absent from the tree until `[P2-T6]` runs.
 
       `TYPEDEF_COUNT` is the positive control: it proves the reader opened a real assembly and the name
       comparison mechanism is live, so a zero member count would be an observation rather than an artefact
-      of an unreadable file.
+      of an unreadable file. The `DEEDLE_FRAME_LIKE_TYPE=` lines are a recorded diagnostic and are
+      deliberately NOT gated: F# compiles a module whose name collides with a type to a suffixed name, so
+      if the static surface this repository calls as `Frame.FromRecords` is not spelled `Deedle.Frame` in
+      metadata, these lines name what it is actually spelled and the correction can be made in one round
+      rather than two.
 
       One bounded adaptation is authorised here and nowhere else in this plan. `System.Reflection.Metadata`
       ships in the .NET shared framework, but a pwsh host resolves a type name only against assemblies it
@@ -1109,18 +1348,27 @@ because it is absent from the tree until `[P2-T6]` runs.
       `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/other/deedle-member-surface.2026-09-13T18-22.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and an `Output Summary:` reproducing every emitted line
       verbatim.
-      Acceptance: the artifact records `DEEDLE_DLL_PRESENT=True`, a `TYPEDEF_COUNT` greater than 0, one
-      `TYPE_FOUND=Deedle.Reflection` line, `CONVERT_RECORD_SEQUENCE_DEFINITIONS=1` and
-      `MEMBER_GENERIC_PARAM_COUNT=1`. A value of `0` blocks, because `[P2-T5]` cannot be authored against a
-      member that does not exist; a value greater than `1` also blocks, because `[P2-T5]`'s single-member
-      lookup would then be ambiguous and the plan would have to name the overload. `MEMBER_ATTRS` is
-      recorded and not gated: `[P2-T5]`'s lookup passes
+      Acceptance: the artifact records `DEEDLE_DLL_PRESENT=True`, a `TYPEDEF_COUNT` greater than 0, exactly
+      one `TYPE_FOUND=Deedle.Frame` line, and `FROMRECORDS_GENERIC_ARITY_1_COUNT=1`. A value of `0` blocks,
+      because `[P2-T5]` cannot be authored against a member that does not exist; a value greater than `1`
+      also blocks, because `[P2-T5]`'s shape-filtered lookup would then select more than one candidate and
+      the plan would have to name the overload by parameter type. `FROMRECORDS_DEFINITIONS` is recorded and
+      deliberately not gated: `Deedle.Frame` is expected to carry more than one `FromRecords` overload, and
+      `[P2-T5]`'s selector discriminates on generic arity and parameter count rather than on the total.
+      `MEMBER_ATTRS` is recorded and not gated: `[P2-T5]`'s lookup passes
       `BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static`, which covers either
-      accessibility this line can report.
-- [x] [P1-T7] Confirm the planner's AC10 rewrite is present and that it displaced no sibling criterion.
-      The planner rewrote acceptance criterion AC10 at `spec.md` lines 515-520 in place, in exactly six
-      lines, so every acceptance-criterion line number recorded by `[P1-T2]` and consumed by `[P6-T6]`
-      through `[P6-T24]` is unchanged. Command:
+      accessibility this line can report. The literals `TYPE_FOUND=Deedle.Frame`,
+      `FROMRECORDS_GENERIC_ARITY_1_COUNT=`, `FROMRECORDS_DEFINITIONS=` and `DEEDLE_FRAME_LIKE_TYPE=` are
+      quoted here in prose because they are absent from the tree until this task runs.
+- [ ] [P1-T7] Confirm the planner's AC10 rewrite is present and that it displaced no sibling criterion.
+      **Revision R5 rewrote AC10 a second time** and this task is therefore unchecked and re-run against
+      the new text; its two content tokens change, so the recorded Revision R2 result no longer describes
+      the file. The planner rewrote acceptance criterion AC10 at `spec.md` lines 515-520 in place, in
+      exactly six lines, so every acceptance-criterion line number recorded by `[P1-T2]` and consumed by
+      `[P6-T6]` through `[P6-T24]` is unchanged. Revision R5 additionally rewrote two sibling regions of
+      `spec.md` that the re-rooting invalidated, each line for line: the build-output assumption at lines
+      392-394 and the Test Strategy domain-configuration paragraph at lines 431-434. Neither is an
+      acceptance criterion and neither changed the file's line count. Command:
 
       ```
       pwsh -NoProfile -Command '
@@ -1129,23 +1377,30 @@ because it is absent from the tree until `[P2-T6]` runs.
       Write-Output ("AC10_LINE_515_PREFIX=[" + $lines[514].Substring(0,6) + "]")
       Write-Output ("AC11_LINE_521_PREFIX=[" + $lines[520].Substring(0,6) + "]")
       Write-Output ("AC_HEADING_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "## Acceptance Criteria").Count)
-      Write-Output ("DEEPEST_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "deepest").Count)
-      Write-Output ("BIND_FAILURE_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "bind failure").Count)
+      Write-Output ("NETSTANDARD21_FLAVOUR_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "netstandard2.1").Count)
+      Write-Output ("FROMRECORDS_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "Deedle.Frame.FromRecords").Count)
+      Write-Output ("QUICKFILER_TEST_CONFIG_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "QuickFiler.Test.dll.config").Count)
       Write-Output ("RUNCLASSCONSTRUCTOR_HITS=" + @(Select-String -LiteralPath $p -SimpleMatch -CaseSensitive -Pattern "RunClassConstructor").Count)
       '
       ```
 
-      `deepest` and `bind failure` are each a single-line token introduced by the rewrite and present
-      nowhere else in `spec.md`; `AC_HEADING_HITS` is the positive control proving the file path and the
-      search mechanism are live. `RUNCLASSCONSTRUCTOR_HITS` is recorded and deliberately NOT gated: the
-      literal never appeared in `spec.md`, so a zero-hit assertion on it could not fail whatever the
-      executor does. Append the output to
+      `netstandard2.1` and `Deedle.Frame.FromRecords` are each a single-line token introduced by the
+      Revision R5 rewrite and present nowhere else in `spec.md`; each is one identifier or one hyphenated
+      word rather than a multi-word phrase, so no re-wrap of the surrounding sentence can split it.
+      `QuickFiler.Test.dll.config` is the token introduced by the sibling Test Strategy rewrite at lines
+      431-434 and is likewise present nowhere else. All three had zero hits in `spec.md` before the
+      rewrite, which is what makes their expected counts discriminating rather than already satisfied.
+      `AC_HEADING_HITS` is the positive control proving the file path and the search mechanism are live.
+      `RUNCLASSCONSTRUCTOR_HITS` is recorded and deliberately NOT gated: the literal never appeared in
+      `spec.md`, so a zero-hit assertion on it could not fail whatever the executor does. Append the output
+      to
       `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/other/ac-inventory.2026-09-13T18-22.md`
-      under an `AC10 Revision R2 Rewrite:` heading.
+      under an `AC10 Revision R5 Rewrite:` heading. The heading names R5 rather than R2 so the earlier
+      Revision R2 block in the same artifact is preserved alongside it rather than overwritten.
       Acceptance: the heading exists, `AC10_LINE_515_PREFIX=[- [ ] ]`, `AC11_LINE_521_PREFIX=[- [ ] ]`,
-      `AC_HEADING_HITS=1`, `DEEPEST_HITS=1` and `BIND_FAILURE_HITS=1`. Any other value for the two prefix
-      lines blocks: it would mean the rewrite changed the line count and every `spec.md` line number this
-      plan cites would be stale.
+      `AC_HEADING_HITS=1`, `NETSTANDARD21_FLAVOUR_HITS=1`, `FROMRECORDS_HITS=1` and
+      `QUICKFILER_TEST_CONFIG_HITS=1`. Any other value for the two prefix lines blocks: it would mean the
+      rewrite changed the line count and every `spec.md` line number this plan cites would be stale.
 
 ### Phase 2 — Regression Harness First (fails before the fix)
 
@@ -1277,7 +1532,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       project file. Only the anchor citation was stale.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallbackTests.cs"` on
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` returns exactly 1 hit.
-- [x] [P2-T5] Amend `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` in place — the file already
+- [ ] [P2-T5] Amend `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` in place — the file already
       exists from the version 1.0 execution of this plan and must NOT be recreated — so that it declares
       `public sealed class ChildDomainBindProbe : MarshalByRefObject` in namespace
       `TaskMaster.Test.Bootstrap`. It exposes separate public methods so that the negative-control path
@@ -1290,7 +1545,10 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `TryLoadDisplayName(string displayName)` returning a marshalled outcome string that is either
       `LOADED` or the exception type name; `DeedleRecordConversionOutcome(string deedleDllPath)`, whose
       full specification is the Revision R2 block below and which REPLACES the version 1.0 member
-      `DeedleTypeInitializerOutcome` and the `OkOutcome` constant it returned; and
+      `DeedleTypeInitializerOutcome` and the `OkOutcome` constant it returned;
+      `ApplicationBaseDirectory()`, added by Revision R5, which returns
+      `AppDomain.CurrentDomain.BaseDirectory` read **inside** the child domain and nothing else, and is what
+      makes the re-rooting falsifiable rather than asserted; and
       `ConfigurationFileNetstandardEntryCount(string configPath)` which throws
       `InvalidOperationException` when the file is absent and otherwise parses it as XML and returns the
       number of `dependentAssembly` elements whose `assemblyIdentity` name is `netstandard`.
@@ -1302,8 +1560,14 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `InvalidOperationException`, a BCL type that marshals across the domain boundary, and returns
       outcomes as plain strings.
 
-      **Revision R2 amendment (Defect 1): the repointed probe member.** The rationale and the measured
-      evidence are in `## R4.1`. The file carries no `#nullable enable` directive and this task adds none,
+      **Revision R2 amendment (Defect 1), as further repointed by Revision R5: the probe member.** The
+      Revision R2 rationale is in `## R4.1` and the Revision R5 measurement that supersedes its choice of
+      member is in `## R6.1`. Revision R5 changes the member the probe invokes from
+      `Deedle.Reflection.convertRecordSequence` to `Deedle.Frame.FromRecords`, which is production's actual
+      entry point at `UtilitiesCS/Extensions/DfDeedle.cs` lines 123 and 237. The measurement in `## R6.1`
+      records that both members reach the same bind, so this change is for fidelity to production rather
+      than for discrimination; what supplies the discrimination is the `ApplicationBase` that `[P2-T6]`
+      sets. The file carries no `#nullable enable` directive and this task adds none,
       so no member specified here is written with a nullable reference annotation; a `?` on a reference
       type in this file raises CS8632, which `[P5-T6]` promotes to a build error. Specify:
 
@@ -1328,25 +1592,31 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
          `InvalidOperationException` naming the path when either fails;
          builds a one-element array of `DeedleProbeRecord`;
          then, inside the try, calls `Assembly.LoadFrom(deedleDllPath)`, obtains the type
-         `Deedle.Reflection` with `throwOnError: true`, resolves the member through the helper in item 4,
+         `Deedle.Frame` with `throwOnError: true`, resolves the member through the helper in item 4,
          closes it with `MakeGenericMethod` over `typeof(DeedleProbeRecord)`, invokes it through
          `MethodInfo.Invoke` with the one-element array as the single argument, and returns the
          `INVOKED-NO-EXCEPTION` constant on the statement immediately after that invocation and on no
-         other path;
+         other path. The invocation's return value is discarded rather than marshalled: it is a
+         `Deedle.Frame<int,string>`, which is not serialisable across the domain boundary, and the
+         measurement is whether the invocation completed rather than what it produced;
          carries `catch (InvalidOperationException) { throw; }` as its FIRST catch clause, so a
          fail-loud lookup miss escapes past the classifier and can never be reported as an outcome;
          and carries a general `catch (Exception)` whose only action is to return the classifier in
          item 5.
-      4. A private static helper that resolves the member and fails loudly. It calls
-         `Type.GetMethod` with the member name and
-         `BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static`, which covers either
-         accessibility `[P1-T6]` may have recorded. It wraps that call in
-         `catch (AmbiguousMatchException)` and rethrows as `InvalidOperationException` naming the
-         overload problem. It then throws `InvalidOperationException`, naming the type and the member, if
-         the result is null, if the result is not a generic method definition with exactly one generic
-         argument, or if it does not take exactly one parameter. Resolving a `MethodInfo` does not run a
-         class constructor, which is why this helper can sit inside the try without itself triggering the
-         bind; the invocation in item 3 is what triggers it.
+      4. A private static helper that resolves the member by SHAPE and fails loudly. `Deedle.Frame`
+         carries more than one `FromRecords` overload, so a name-only `Type.GetMethod` lookup raises
+         `AmbiguousMatchException` and cannot be used. The helper calls
+         `Type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)`, which
+         covers either accessibility `[P1-T6]` may have recorded, then keeps only the members whose name is
+         `FromRecords`, which are generic method definitions, whose `GetGenericArguments()` length is
+         exactly 1, and whose `GetParameters()` length is exactly 1. It throws `InvalidOperationException`,
+         naming the type, the member and the surviving count, unless exactly one member survives the
+         filter. `GetMethods` does not raise `AmbiguousMatchException`, so no catch for that type is
+         written and none may be. The surviving count is the same figure `[P1-T6]` gates as
+         `FROMRECORDS_GENERIC_ARITY_1_COUNT=1`, so the plan and the probe select the same member by the
+         same rule. Resolving a `MethodInfo` does not run a class constructor, which is why this helper can
+         sit inside the try without itself triggering the bind; the invocation in item 3 is what triggers
+         it.
       5. A private static classifier taking the thrown exception and returning one structured string.
          It first unwraps `TargetInvocationException` — `MethodInfo.Invoke` wraps the real exception, so
          without the unwrap every failure would be reported as `TargetInvocationException` and the
@@ -1361,48 +1631,87 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
          `Message` are inspected because the CLR does not guarantee `FileName` is populated on every
          binding failure, and the failing display name appears verbatim in the message text in either
          case.
-      6. `using System.Runtime.CompilerServices;` is removed, because `RuntimeHelpers` is no longer
-         referenced anywhere in the file.
+      6. `public string ApplicationBaseDirectory()` returns `AppDomain.CurrentDomain.BaseDirectory`, read
+         inside the child domain, and does nothing else. It takes no argument, touches no file, and loads
+         no assembly, so it is safe to call in the installer-free domain as well as the positive one. It
+         exists so that `[P2-T6]`'s ninth test can assert the re-rooting rather than assume it.
 
-      This member is the only part of the probe that changes. `CountLoadedAssembliesNamed`,
-      `CountAssemblyResolveHandlers`, `InstallProductionFallback`, `TryLoadDisplayName` and
-      `ConfigurationFileNetstandardEntryCount` are left exactly as they stand, and the fail-loud rule
-      recorded at `[P0-T13]` continues to bind `CountAssemblyResolveHandlers`.
+      The Deedle member and `ApplicationBaseDirectory` are the only parts of the probe that change.
+      `CountLoadedAssembliesNamed`, `CountAssemblyResolveHandlers`, `InstallProductionFallback`,
+      `TryLoadDisplayName` and `ConfigurationFileNetstandardEntryCount` are left exactly as they stand, and
+      the fail-loud rule recorded at `[P0-T13]` continues to bind `CountAssemblyResolveHandlers`.
 
       Acceptance: the file exists, contains `: MarshalByRefObject`, and
       `Select-String -SimpleMatch -CaseSensitive` on `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs`
-      returns: at least 1 hit for `DeedleRecordConversionOutcome`; exactly 0 hits for
-      `DeedleTypeInitializerOutcome`; exactly 0 hits for `RunClassConstructor`; exactly 0 hits for
-      `OkOutcome`; exactly 0 hits for `System.Runtime.CompilerServices`; at least 1 hit each for
+      returns each of the following exact counts.
+
+      Discriminating zero-hit assertions. Each of these four literals is present in this file in the tree
+      as it stands now, at the line given, so a zero count is a measurement of this task's work rather than
+      a condition that was already satisfied: exactly 0 hits for `Deedle.Reflection`, present at lines 165
+      and 193; exactly 0 hits for `convertRecordSequence`, present at lines 165 and 226; exactly 0 hits for
+      `AmbiguousMatchException`, present at line 236; and exactly 0 hits for `ResolveConvertRecordSequence`,
+      present at lines 194 and 224.
+
+      Discriminating at-least-one assertions. Each of these three literals is absent from this file in the
+      tree as it stands now, and is quoted here in prose for that reason: at least 1 hit for `Deedle.Frame`,
+      at least 1 hit for `FromRecords`, and at least 1 hit for `ApplicationBaseDirectory`.
+
+      Standing guards, carried forward and stated as guards rather than as new measurements because the
+      tree already satisfies them: at least 1 hit each for `DeedleRecordConversionOutcome`,
       `InvokedOutcome`, `BindFailurePrefix`, `OtherFailurePrefix`, `INVOKED-NO-EXCEPTION`,
-      `NETSTANDARD-BIND-FAILURE:` and `OTHER-FAILURE:`; at least 2 hits for `DeedleProbeRecord`; at least 1 hit each for
-      `AmbiguousMatchException`, `TargetInvocationException`, `MakeGenericMethod` and
-      `convertRecordSequence`; at least 3 hits for `InvalidOperationException`; and zero hits for
-      `FluentAssertions` and for `Microsoft.VisualStudio.TestTools`. The literals
-      `DeedleRecordConversionOutcome`, `InvokedOutcome`, `BindFailurePrefix`, `OtherFailurePrefix`,
-      `INVOKED-NO-EXCEPTION`, `NETSTANDARD-BIND-FAILURE:`,
-      `OTHER-FAILURE:`, `DeedleProbeRecord`, `AmbiguousMatchException`, `TargetInvocationException`,
-      `MakeGenericMethod` and `convertRecordSequence` are quoted here in prose because they are absent
-      from this file until this task runs. Each asserted token is a single identifier or a single short
-      string literal rather than a multi-word phrase, so no CSharpier reflow of the surrounding statement
-      can split it across two lines. Four of the six zero-hit assertions are discriminating rather than
-      vacuous: `DeedleTypeInitializerOutcome`, `RunClassConstructor`, `OkOutcome` and
-      `System.Runtime.CompilerServices` are all present in this file in the tree as it stands now, first
-      occurring at lines 137, 150, 36 and 5 respectively. The remaining two, `FluentAssertions` and
-      `Microsoft.VisualStudio.TestTools`, are carried forward from the version 1.0 acceptance condition as
-      standing guards on the child-domain emptiness rule rather than as new measurements.
-- [x] [P2-T6] Amend `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` in place — the file
+      `NETSTANDARD-BIND-FAILURE:`, `OTHER-FAILURE:`, `TargetInvocationException` and `MakeGenericMethod`;
+      at least 2 hits for `DeedleProbeRecord`; at least 3 hits for `InvalidOperationException`; and exactly
+      0 hits for `DeedleTypeInitializerOutcome`, `RunClassConstructor`, `OkOutcome`,
+      `System.Runtime.CompilerServices`, `FluentAssertions` and `Microsoft.VisualStudio.TestTools`. These
+      eleven guards were discriminating in Revision R2 and were discharged by the Revision R2 execution;
+      they are retained so that a re-run of this task cannot regress them, and they are labelled as guards
+      so no reader mistakes them for evidence that this task ran.
+
+      Each asserted token is a single identifier, a single dotted identifier or a single short string
+      literal rather than a multi-word phrase, so no CSharpier reflow of the surrounding statement can
+      split it across two lines.
+- [ ] [P2-T6] Amend `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` in place — the file
       already exists from the version 1.0 execution of this plan and must NOT be recreated — declaring
       `[TestClass] public class NetstandardBindChildDomainTests` in namespace `TaskMaster.Test.Bootstrap`,
-      creating each child domain with `AppDomain.CreateDomain` using an `AppDomainSetup` whose
-      `ApplicationBase` is `AppDomain.CurrentDomain.BaseDirectory` and whose `ConfigurationFile` is
-      `TaskMaster.Test.dll.config` in that same directory, driving `ChildDomainBindProbe` through
-      `CreateInstanceAndUnwrap`, and unloading every created domain in `[TestCleanup]` with
-      `AppDomain.Unload`. The file must not name `TaskMaster.dll.config`, which after Phase 3 carries the
-      `netstandard` redirect and whose selection would void the negative control. Test methods, named
-      exactly: `ChildDomain_HasNoSvgControlAssemblyLoaded`,
+      creating each child domain with `AppDomain.CreateDomain`, and unloading every created domain in
+      `[TestCleanup]` with `AppDomain.Unload`.
+
+      **Revision R5 amendment: the child domains are re-rooted.** The rationale and the measurement are in
+      `## R6.1` and `## R6.2`. Every child domain this class creates uses an `AppDomainSetup` whose
+      `ApplicationBase` is the `QuickFiler.Test` build output directory and whose `ConfigurationFile` is
+      `QuickFiler.Test.dll.config` in that same directory. Specify, exactly:
+
+      - A private static read-only expression that computes the probe application base as
+        `Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..",
+        "QuickFiler.Test", "bin", "Debug"))`. The host base directory is `<repo>\TaskMaster.Test\bin\Debug\`
+        and `QuickFiler.Test/QuickFiler.Test.csproj` line 36 declares `<OutputPath>bin\Debug\</OutputPath>`,
+        so three parent steps reach the repository root. The expression is fixed here and is not the
+        executor's to choose.
+      - A private helper run before every `AppDomain.CreateDomain` call that throws
+        `InvalidOperationException` naming the missing path when the computed directory does not exist, or
+        when `QuickFiler.Test.dll.config`, `Deedle.dll` or `FSharp.Core.dll` is missing from it. It fails
+        loudly and never skips: a skipped precondition here would make every result in this class vacuous.
+      - The probe is instantiated with
+        `domain.CreateInstanceFromAndUnwrap(typeof(ChildDomainBindProbe).Assembly.Location,
+        typeof(ChildDomainBindProbe).FullName)`, **not** with `CreateInstanceAndUnwrap`.
+        `TaskMaster.Test.dll` is not present in the new `ApplicationBase`, measured, so a display-name
+        creation would raise `FileNotFoundException` before any observation was taken.
+      - The two paths the class passes to the probe are re-pointed to the same directory: the
+        configuration path handed to `ConfigurationFileNetstandardEntryCount` becomes
+        `QuickFiler.Test.dll.config` under the computed probe application base, and the path handed to
+        `DeedleRecordConversionOutcome` becomes `Deedle.dll` under that same directory. Both currently
+        resolve against `AppDomain.CurrentDomain.BaseDirectory`, which is the host test assembly's own
+        output directory, and leaving either there would measure a different directory from the one the
+        child domain is rooted at.
+
+      The file must not name `TaskMaster.dll.config`, which after Phase 3 carries the `netstandard`
+      redirect and whose selection would void the negative control. That prohibition is retained unchanged
+      across the re-rooting and is the reason `QuickFiler.Test.dll.config` is named explicitly rather than
+      derived from the host assembly's own name. Test methods, named exactly:
+      `ChildDomain_HasNoSvgControlAssemblyLoaded`,
       `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall`,
       `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect`,
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory`,
       `AfterInstall_BothNetstandardVersionsBind`, `AfterInstall_DeedleTypeInitializerSucceeds`,
       `NegativeControl_WithoutInstall_Netstandard21Throws`,
       `NegativeControl_Netstandard20Observation_IsRecorded`, and
@@ -1410,6 +1719,18 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       asserts that `CountLoadedAssembliesNamed("UtilitiesCS")` returns 0. This is the checkable form
       of the design claim that keeping the installer call in its own probe method prevents
       `UtilitiesCS` from being JIT-resolved in that domain; without it the claim is prose.
+
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory` is new in Revision R5 and is the ninth
+      method. It runs in the POSITIVE domain, before `InstallProductionFallback()` because the installer
+      cannot change an `ApplicationBase`, and asserts three things: that
+      `probe.ApplicationBaseDirectory()` trimmed of any trailing directory separator equals the computed
+      probe application base trimmed the same way, compared with `StringComparison.OrdinalIgnoreCase`
+      because Windows paths are case-insensitive; and, in the PARENT domain with `File.Exists`, that
+      `Deedle.dll` and `FSharp.Core.dll` are both present in that directory. The two file checks are made
+      in the parent rather than in the child so that no filesystem helper is added to the child domain's
+      loaded set. This is criterion 6 in `## R1`: without it, a silent regression of the `ApplicationBase`
+      back to the host assembly's own directory would make every positive result in this class vacuous
+      again, which is the failure that consumed two fail-before rounds.
 
       Domain assignment is fixed by this plan and is not the executor's choice.
       `ChildDomain_HasNoSvgControlAssemblyLoaded`,
@@ -1420,17 +1741,22 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       the state in which `AfterInstall_BothNetstandardVersionsBind` measures the bind. Asserting it
       before the installer call, or in the installer-free domain, would pass because `UtilitiesCS` was
       never loaded, and would establish nothing about the domain the positive result comes from.
-      `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall` is the one method that observes the
-      positive domain BEFORE `InstallProductionFallback()`, which is what its name states.
+      `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall` is the one method that observes a handler
+      count in the positive domain BEFORE `InstallProductionFallback()`, which is what its name states.
       `NegativeControl_WithoutInstall_Netstandard21Throws` and
       `NegativeControl_Netstandard20Observation_IsRecorded` run in the installer-free domain.
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory` runs in the POSITIVE domain and does not
+      call `InstallProductionFallback()` at all: an `ApplicationBase` is fixed at domain creation and no
+      later call can change it, so ordering relative to the installer is not merely unconstrained here but
+      meaningless, and omitting the call keeps that domain's loaded set at its minimum for this
+      observation. Every one of the nine methods therefore has a stated domain.
 
       `AfterInstall_BothNetstandardVersionsBind` and `AfterInstall_DeedleTypeInitializerSucceeds` run in
       the POSITIVE domain, and each calls `InstallProductionFallback()` before the observation it makes,
       in that order. `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect` runs in the POSITIVE
       domain and its position relative to `InstallProductionFallback()` is deliberately unconstrained,
       because it reads the configuration file supplied at domain creation and the installer neither
-      reads nor writes that file. Every one of the eight methods therefore has a stated domain, and
+      reads nor writes that file. Every one of the nine methods therefore has a stated domain, and
       every method whose result can depend on the installer has a stated order relative to it.
 
       `ChildDomain_HasNoSvgControlAssemblyLoaded` additionally records
@@ -1499,24 +1825,37 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `NegativeControl_WithoutInstall_Netstandard21Throws` is not touched by this amendment and must
       survive it; the acceptance condition below re-asserts it so a re-run of this task cannot drop it.
 
-      Acceptance: the file exists, contains exactly those eight method names, contains `AppDomain.CreateDomain`
-      and `AppDomain.Unload`, contains `TaskMaster.Test.dll.config`, and returns zero hits for
-      `TaskMaster.dll.config`. The file additionally contains the literal `[DoNotParallelize]` exactly
-      once, the literal `CountLoadedAssembliesNamed("SVGControl")` exactly
-      once, the literal `CountLoadedAssembliesNamed("UtilitiesCS")` exactly twice, the literal
-      `CountAssemblyResolveHandlers()` exactly twice, and the literal `ISOLATION-LOST-INVARIANT` exactly
-      once. Those five literals are present in the tree as it stands, having been created by the version
-      1.0 execution of this task and of `[P2-T7]`, and the acceptance condition is that this amendment
-      leaves every one of them at its stated count.
-      The amendment additionally requires, on the same file and with
-      `Select-String -SimpleMatch -CaseSensitive`: at least 1 hit for `DeedleRecordConversionOutcome`;
-      exactly 0 hits for `DeedleTypeInitializerOutcome`; exactly 0 hits for `OkOutcome`; exactly 1 hit for
-      `DEEDLE_RECORD_CONVERSION_OUTCOME=`; at least 1 hit for `BindFailurePrefix`; and at least 1 hit for
-      `InvokedOutcome`. The literals `DeedleRecordConversionOutcome`,
-      `DEEDLE_RECORD_CONVERSION_OUTCOME=`, `BindFailurePrefix` and `InvokedOutcome` are quoted here in
-      prose because they are absent from this file until this task runs, and the two zero-hit assertions
-      are discriminating because `DeedleTypeInitializerOutcome` and `OkOutcome` are both present in this
-      file in the tree as it stands now.
+      Acceptance: the file exists, contains exactly those nine method names, and contains
+      `AppDomain.CreateDomain` and `AppDomain.Unload`. All counts below are taken with
+      `Select-String -SimpleMatch -CaseSensitive` on
+      `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs`.
+
+      Discriminating assertions on the Revision R5 re-rooting. Each literal's count in the tree as it
+      stands now is stated, so each condition is a measurement of this task's work rather than a condition
+      already satisfied: exactly 1 hit for `QuickFiler.Test.dll.config`, absent from this file now and
+      quoted here in prose for that reason; exactly 1 hit for
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory`, likewise absent now and quoted here;
+      at least 1 hit for `ApplicationBaseDirectory`, likewise absent now and quoted here; exactly 1 hit for
+      `CreateInstanceFromAndUnwrap`, likewise absent now and quoted here; exactly 0 hits for
+      `TaskMaster.Test.dll.config`, present at line 47 now; and exactly 0 hits for
+      `CreateInstanceAndUnwrap`, present at line 324 now. The two zero-hit literals and
+      `CreateInstanceFromAndUnwrap` do not collide as substrings: `CreateInstanceFromAndUnwrap` does not
+      contain `CreateInstanceAndUnwrap`, and `TaskMaster.Test.dll.config` does not contain
+      `TaskMaster.dll.config`.
+
+      Standing guards, carried forward and stated as guards because the tree already satisfies them; the
+      acceptance condition is that this amendment leaves every one of them at its stated count: exactly 0
+      hits for `TaskMaster.dll.config`; exactly 1 hit for `[DoNotParallelize]`; exactly 1 hit for
+      `CountLoadedAssembliesNamed("SVGControl")`; exactly 2 hits for
+      `CountLoadedAssembliesNamed("UtilitiesCS")`; exactly 2 hits for `CountAssemblyResolveHandlers()`;
+      exactly 1 hit for `ISOLATION-LOST-INVARIANT`, which `[P2-T7]` created and which this amendment must
+      not drop; at least 1 hit for `DeedleRecordConversionOutcome`; exactly 1 hit for
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=`; at least 1 hit each for `BindFailurePrefix` and
+      `InvokedOutcome`; and exactly 0 hits for `DeedleTypeInitializerOutcome` and for `OkOutcome`.
+
+      Every asserted token is a single identifier, a single dotted file name, a single attribute literal or
+      a single short call expression written on one source line, so no CSharpier reflow can split one
+      across two lines.
 - [x] [P2-T7] Add the in-file isolation warning required by the spec's negative-control criterion, worded
       unambiguously. Immediately above `NegativeControl_WithoutInstall_Netstandard21Throws` in
       `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs`, add a comment stating that if the
@@ -1553,8 +1892,9 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `Select-String -SimpleMatch -CaseSensitive` returns exactly 1 hit for each of the three file names
       `ChildDomainBindProbe.cs`, `NetstandardBindChildDomainTests.cs` and
       `AddInEagerInstallShapeTests.cs`.
-- [x] [P2-T10] Re-run after the Revision R2 amendments to `[P2-T1]`, `[P2-T5]` and `[P2-T6]`, all three of
-      which change compiled source after the build recorded by the version 1.0 execution of this task.
+- [ ] [P2-T10] Re-run after the Revision R5 amendments to `[P2-T5]` and `[P2-T6]`, both of which change
+      compiled source after the build recorded by the Revision R2 execution of this task. `[P2-T1]` is
+      unchanged by Revision R5 and is not a reason for this re-run.
       The artifact at the path named below is overwritten by this re-run.
       LOCK-ACQUIRE, then create the evidence/regression-testing directory this task and `[P2-T11]` redirect into,
       then rebuild the solution with the plain Debug configuration and no analyzer or nullable
@@ -1648,42 +1988,52 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `OUTCOME=` line verbatim, the `TRX_MATCH_COUNT=` line, and the single
       `DEEDLE_RECORD_CONVERSION_OUTCOME=` line.
 
-      **This is a Revision R2 re-run and it overwrites the artifact at that path.** `[P1-T5]` must
+      **This is a Revision R5 re-run and it overwrites the artifact at that path.** `[P1-T5]` must
       already have copied the superseded version 1.0 artifact to
       `.../evidence/regression-testing/expect-fail-run-superseded-probe-surface.2026-09-13T18-22.md`. If
       that copy is absent, this task does not run: the record of the vacuous pass that produced Defect 1
-      would be destroyed.
+      would be destroyed. The Revision R2 run's own artifact, which recorded
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=INVOKED-NO-EXCEPTION` and `Acceptance Condition: NOT MET`, is the
+      current content of the plan-named path and is overwritten here; the observation it carries is
+      reproduced in `## R6.1` and in the Revision R2 measurement table there, so no measurement is lost.
 
       Acceptance: the artifact records `TRX_MATCH_COUNT=1`,
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed`,
       `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed`,
       `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`, and exactly one
       `DEEDLE_RECORD_CONVERSION_OUTCOME=` line whose value begins with `NETSTANDARD-BIND-FAILURE:`. These
       are the fail-before observations: they fail at runtime against a behaviour-empty installer, not at
-      compile time. The third condition is what makes the second non-vacuous — it states that the Deedle
-      line failed because the `netstandard` bind is unsatisfiable and not because of an unrelated
-      exception — and it is the condition the version 1.0 probe could not produce, because forcing
-      `Deedle.Reflection`'s class constructor returned the success token while the sibling bind assertion
-      in the same domain raised `FileNotFoundException` on the `2.1.0.0` identity. The run's own exit
-      code is recorded against `ExpectedExitCode: 1` and is not itself a gate. If the
-      `DEEDLE_RECORD_CONVERSION_OUTCOME=` value begins with `OTHER-FAILURE:` the executor halts and
-      reports blocked rather than adapting: the probe reached an exception that is not the bind, and the
-      plan, not the run, needs correcting.
-- [x] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
-      it. Read the `[P2-T11]` artifact. This task is re-run under Revision R2 and MUST read the
-      REGENERATED `[P2-T11]` artifact, not the superseded copy `[P1-T5]` preserved: the five isolation
-      outcomes are properties of the run, and the run changed. This task's own artifact at the path named
-      below is overwritten by the re-run.
-      Acceptance: it records all five of
+      compile time. The first of the four is the Revision R5 addition and it is ordered first
+      deliberately: if the child domain is not rooted at the `QuickFiler.Test` build output directory then
+      the other three describe a domain in which the bind under test is not reachable, which is exactly
+      how two earlier fail-before attempts produced a success token against an unfixed build. The
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=` condition is what makes the `OUTCOME=Failed` condition above it
+      non-vacuous: it states that the Deedle line failed because the `netstandard` bind is unsatisfiable
+      and not because of an unrelated exception. The run's own exit code is recorded against
+      `ExpectedExitCode: 1` and is not itself a gate. If the `DEEDLE_RECORD_CONVERSION_OUTCOME=` value
+      begins with `OTHER-FAILURE:` the executor halts and reports blocked rather than adapting: the probe
+      reached an exception that is not the bind, and the plan, not the run, needs correcting. If
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory` records anything other than `Passed` the
+      executor halts and reports blocked for the same reason, without evaluating the other three
+      conditions as evidence.
+- [ ] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
+      it. Read the `[P2-T11]` artifact. This task is re-run under Revision R5 and MUST read the
+      REGENERATED `[P2-T11]` artifact, not the superseded copy `[P1-T5]` preserved and not the Revision R2
+      content of the plan-named path: the isolation outcomes are properties of the run, and the run
+      changed. This task's own artifact at the path named below is overwritten by the re-run.
+      Acceptance: it records all six of
       `ChildDomain_HasNoSvgControlAssemblyLoaded OUTCOME=Passed`,
       `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall OUTCOME=Passed`,
       `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect OUTCOME=Passed`,
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed`,
       `NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed` and
-      `NegativeControl_HasNoUtilitiesCsAssemblyLoaded OUTCOME=Passed`. Write
+      `NegativeControl_HasNoUtilitiesCsAssemblyLoaded OUTCOME=Passed`. The fourth is the Revision R5
+      addition and corresponds to criterion 6 in `## R1`. Write
       `.../evidence/regression-testing/isolation-field-decisive-check.2026-09-13T18-22.md` with
       `Timestamp:`, `Command: (read of the [P2-T11] artifact)`, `EXIT_CODE: 0` and an `Output Summary:`
-      reproducing those five lines plus the sentence
+      reproducing those six lines plus the sentence
       `The private AppDomain assembly-resolution field is present and readable on net481; the isolation
-      assertion did not skip.` If any of the five is not `Passed`, the executor halts and reports blocked:
+      assertion did not skip.` If any of the six is not `Passed`, the executor halts and reports blocked:
       the harness has no isolation and no later positive result would mean anything.
 
 ### Phase 3 — Minimal Production Fix
@@ -1797,8 +2147,11 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       fields plus the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line. The literal `p4-harness.trx`
       is quoted here in prose because it is absent from the tree until this task runs.
       Acceptance: `EXIT_CODE: 0`, the artifact records `TRX_MATCH_COUNT=1`, the `Counters` `failed`
-      value is `0`, and the artifact records `OUTCOME=Passed` for all eight method names listed in
-      `[P2-T6]`.
+      value is `0`, and the artifact records `OUTCOME=Passed` for all nine method names listed in
+      `[P2-T6]`, which includes the Revision R5 addition
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory`. Nine rather than eight: a run reporting
+      eight passes and no ninth result would mean the re-rooting assertion did not execute, which is the
+      state in which every other result in this run is vacuous.
 - [ ] [P4-T4] Verify the load-bearing negative control specifically. Read the `[P4-T3]` artifact.
       Acceptance: it records `NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed`. If it
       records any other outcome, the executor halts and reports blocked, because the load in the
@@ -1839,6 +2192,12 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       is the completion token: the pair of recorded values is the fail-before/pass-after evidence for
       AC10, and a value beginning `OTHER-FAILURE:` would mean the remedy satisfied the bind but the
       conversion still could not complete, which is a stop-and-report condition rather than a pass.
+      The pair is evidence only because both readings come from a child domain rooted at the
+      `QuickFiler.Test` build output directory, which is what `## R6.1` measured and what
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory` asserts in both runs. This task therefore
+      additionally requires that the `[P4-T3]` artifact records
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed`; without it the post-fix
+      reading is not comparable with the pre-fix one.
 - [ ] [P4-T7] LOCK-ACQUIRE, run the `AddInEagerInstallShapeTests` class alone with
       `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, and not the repository-root
       `TaskMaster.runsettings`, with
@@ -2167,6 +2526,109 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       `NEW_MODULE_LINE_PERCENT` and `[P5-T9]` rather than on the rate comparison. The literal
       `BASELINE MEASURED ON A DIFFERENT BASE` is quoted here in prose because it is absent from the tree
       until this task runs.
+- [ ] [P5-T11] Project every raw build console log this plan produces under the feature folder's
+      `evidence/` tree. **This task and `[P5-T12]` run after the four-step loop has completed cleanly and
+      are not part of it**; they are placed here rather than in Phase 6 so they precede `[P6-T1]`, which is
+      the first task that commits. Every gate that reads a raw console log — `[P0-T6]`, `[P0-T7]`,
+      `[P2-T10]`, `[P4-T1]`, `[P5-T5]` and `[P5-T6]` — has already run and has already recorded its figure
+      in its own `.md` artifact, so projecting and then removing the raw logs invalidates no acceptance
+      condition in this plan.
+
+      The six raw logs are named here rather than discovered, so the executor selects nothing:
+      `.../evidence/baseline/analyzer-baseline-console.2026-09-13T18-22.txt`,
+      `.../evidence/baseline/nullable-baseline-console.2026-09-13T18-22.txt`,
+      `.../evidence/regression-testing/expect-fail-build-console.2026-09-13T18-22.txt`,
+      `.../evidence/regression-testing/pass-after-build-console.2026-09-13T18-22.txt`,
+      `.../evidence/qa-gates/analyzer-final-console.2026-09-13T18-22.txt` and
+      `.../evidence/qa-gates/nullable-final-console.2026-09-13T18-22.txt`.
+
+      Command, run once. The repository root is derived at run time with `(Resolve-Path .).Path` rather
+      than written as a literal, because this plan contains no absolute host path other than the two
+      build-lock paths:
+
+      ```
+      pwsh -NoProfile -Command '
+      $root = (Resolve-Path .).Path
+      $base = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence"
+      $logs = @("$base/baseline/analyzer-baseline-console.2026-09-13T18-22.txt","$base/baseline/nullable-baseline-console.2026-09-13T18-22.txt","$base/regression-testing/expect-fail-build-console.2026-09-13T18-22.txt","$base/regression-testing/pass-after-build-console.2026-09-13T18-22.txt","$base/qa-gates/analyzer-final-console.2026-09-13T18-22.txt","$base/qa-gates/nullable-final-console.2026-09-13T18-22.txt")
+      foreach ($log in $logs) {
+      $out = [System.IO.Path]::ChangeExtension($log, ".projection.md")
+      $lines = @(Get-Content -LiteralPath $log)
+      $body = New-Object System.Collections.Generic.List[string]
+      $body.Add("# Console log projection")
+      $body.Add("")
+      $body.Add("Timestamp: 2026-09-13T18-22")
+      $body.Add("Command: (projection of the raw console log named below)")
+      $body.Add("EXIT_CODE: 0")
+      $body.Add("SOURCE_LOG=" + $log)
+      $body.Add("SOURCE_LINES=" + $lines.Count)
+      $body.Add("SKIPPING_CORECOMPILE_COUNT=" + @($lines.Where({ $_.Contains("Skipping target ""CoreCompile""") })).Count)
+      $body.Add("DIAGNOSTIC_LINE_COUNT=" + @($lines.Where({ $_.Contains(" error ") -or $_.Contains(" warning ") })).Count)
+      $body.Add("HOST_PATH_LINE_COUNT=" + @($lines.Where({ $_.Contains($root) })).Count)
+      $kept = @($lines.Where({ ($_ -match "^MSBuild version") -or ($_ -match "^\s+\d+ Warning\(s\)$") -or ($_ -match "^\s+\d+ Error\(s\)$") -or ($_ -match "^(Build succeeded|Build FAILED)") }))
+      $body.Add("SUMMARY_LINES_KEPT=" + $kept.Count)
+      $body.Add("")
+      $body.Add("Output Summary:")
+      $body.Add("")
+      $body.Add("``````")
+      foreach ($l in $kept) { $body.Add($l.Replace($root, "<repo-root>")) }
+      $body.Add("``````")
+      Set-Content -LiteralPath $out -Value $body -Encoding UTF8
+      Write-Output ("PROJECTION_WRITTEN=" + $out)
+      Write-Output ("PROJECTION_SOURCE_LINES=" + $lines.Count)
+      Write-Output ("PROJECTION_SUMMARY_LINES_KEPT=" + $kept.Count)
+      Write-Output ("PROJECTION_TOTAL_LINES=" + @(Get-Content -LiteralPath $out).Count) }
+      '
+      ```
+
+      Every retained line is passed through `.Replace($root, "<repo-root>")` before it is written, and the
+      only other values written are counts and the repository-relative log path, so no projection can
+      carry the absolute worktree path. The literals `PROJECTION_WRITTEN=`, `PROJECTION_SOURCE_LINES=`,
+      `PROJECTION_SUMMARY_LINES_KEPT=`, `PROJECTION_TOTAL_LINES=`, `SOURCE_LOG=`, `SOURCE_LINES=`,
+      `SUMMARY_LINES_KEPT=`, `SKIPPING_CORECOMPILE_COUNT=`, `DIAGNOSTIC_LINE_COUNT=` and
+      `HOST_PATH_LINE_COUNT=` are quoted here in prose because they are absent from the tree until this
+      task runs. Write
+      `.../evidence/other/console-log-projections.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
+      `EXIT_CODE:` and an `Output Summary:` reproducing every `PROJECTION_WRITTEN=`,
+      `PROJECTION_SOURCE_LINES=`, `PROJECTION_SUMMARY_LINES_KEPT=` and `PROJECTION_TOTAL_LINES=` line
+      verbatim.
+      Acceptance: the artifact records exactly six `PROJECTION_WRITTEN=` lines; every
+      `PROJECTION_TOTAL_LINES=` value is at most 500; every `PROJECTION_SOURCE_LINES=` value is greater
+      than 0; and every `PROJECTION_SUMMARY_LINES_KEPT=` value is greater than 0. The last of these is the
+      positive control on the line-matching mechanism: it proves the four retained-line patterns matched
+      real content, so a zero `SKIPPING_CORECOMPILE_COUNT` in the same projection is an observation rather
+      than an artefact of a projection that matched nothing. A `PROJECTION_SOURCE_LINES=0` for any log
+      blocks: it would mean the projection read an empty or absent file. Additionally, the two `qa-gates`
+      projections must each record `SKIPPING_CORECOMPILE_COUNT=0`, which is the figure AC18 requires and
+      the figure `[P5-T5]` and `[P5-T6]` already gated on the raw logs; any other value blocks, because it
+      would mean the analyzer or nullable gate was vacuous.
+- [ ] [P5-T12] Remove the six raw build console logs from the feature folder's `evidence/` tree, now that
+      `[P5-T11]` has projected each of them and every gate that reads one has run. The reason is the
+      standing directive that evidence artifacts carry projections rather than raw dumps and carry no
+      absolute host path:
+      `.../evidence/regression-testing/expect-fail-build-console.2026-09-13T18-22.txt` is 11,961 lines of
+      which 7,747 carry the absolute worktree path including the host user name, and the two Phase 0 logs
+      are 5,030 and 11,842 lines each retaining about 140 lines of absolute toolchain paths beginning
+      `C:\Program Files`. Command:
+
+      ```
+      pwsh -NoProfile -Command '
+      $base = "docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence"
+      $logs = @("$base/baseline/analyzer-baseline-console.2026-09-13T18-22.txt","$base/baseline/nullable-baseline-console.2026-09-13T18-22.txt","$base/regression-testing/expect-fail-build-console.2026-09-13T18-22.txt","$base/regression-testing/pass-after-build-console.2026-09-13T18-22.txt","$base/qa-gates/analyzer-final-console.2026-09-13T18-22.txt","$base/qa-gates/nullable-final-console.2026-09-13T18-22.txt")
+      foreach ($log in $logs) { if (Test-Path -LiteralPath $log) { Remove-Item -LiteralPath $log -Force } }
+      Write-Output ("RESIDUAL_TXT_COUNT=" + @(Get-ChildItem -LiteralPath $base -Filter "*.txt" -Recurse).Count)
+      Write-Output ("PROJECTION_COUNT=" + @(Get-ChildItem -LiteralPath $base -Filter "*.projection.md" -Recurse).Count)
+      '
+      ```
+
+      Append the output to `.../evidence/other/console-log-projections.2026-09-13T18-22.md` under a
+      `Raw Console Log Removal:` heading. The deletions are staged by `[P6-T1]`, whose `git add` pathspec
+      already covers the whole feature folder, so no `git rm` is needed and none is written here.
+      Acceptance: the heading exists, the appended output records `RESIDUAL_TXT_COUNT=0` and
+      `PROJECTION_COUNT=6`. No task in this plan adds a raw `.trx` or a raw `.cobertura.xml` to git, and
+      this task adds none: `TestResults/` is git-ignored by the `[Tt]est[Rr]esult*/` pattern at
+      `.gitignore` line 39 and `coverage/` by `coverage/*` at line 144, and no task copies a file out of
+      either directory into the feature folder.
 
 ### Phase 6 — Open Risk, Manual Gates, Commit, and Acceptance Check-Off
 

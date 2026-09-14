@@ -389,9 +389,9 @@ Resolution ladder, evaluated in order, first non-null wins:
   - The VSTO runtime sets the add-in AppDomain's `ConfigurationFile` to `TaskMaster.dll.config`. This is
     **not** confirmed from primary Microsoft documentation; it is confirmed empirically by the FSharp.Core
     argument in Context item 2. Stated as inference, not citation.
-  - `TaskMaster.Test` build output contains `Deedle.dll` transitively through its `UtilitiesCS` and
-    `ToDoModel` references. **Unverified**: no `bin` output exists in this worktree, so it could not be
-    checked. See Risks & Mitigations for the named fallback host.
+  - `QuickFiler.Test` build output contains `Deedle.dll`, `FSharp.Core.dll` and `UtilitiesCS.dll`, and no
+    `TaskMaster.Test.dll`. Verified by directory listing in this worktree; the child domains are rooted
+    there and the harness assembly is therefore loaded into them by absolute path.
 - Constraints (budget, performance, compatibility):
   - Repository policy prohibits temporary files in tests; the child-`AppDomain` harness writes none, as
     its `ApplicationBase` points at an existing build output directory.
@@ -428,10 +428,10 @@ worse than none.
 
 Design: a fresh child `AppDomain` created with `AppDomain.CreateDomain` and driven through a
 `MarshalByRefObject` proxy, because the parent domain's handler does not propagate into a child domain.
-Both child domains set `ApplicationBase` to the directory of the test assembly and `ConfigurationFile` to
-that test assembly's own `.dll.config`, which carries no `netstandard` redirect and is out of scope to
-change. This keeps the negative control valid after the `TaskMaster/app.config` hardening lands: the
-harness measures the resolver, not the redirect. `AppDomain.Unload` runs in `[TestCleanup]`.
+Both child domains set `ApplicationBase` to the `QuickFiler.Test` build output directory, which deploys the
+2.1 flavour of `FSharp.Core`, and `ConfigurationFile` to `QuickFiler.Test.dll.config` in that directory,
+which carries no `netstandard` redirect and is out of scope to change. The harness therefore measures the
+resolver, not the redirect, and the negative control survives the hardening. `AppDomain.Unload` in cleanup.
 
 - Regression tests to add or update:
   - `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` - positive harness and negative
@@ -513,11 +513,11 @@ harness measures the resolver, not the redirect. `AppDomain.Unload` runs in `[Te
       and `Assembly.Load("netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")`
       return a non-null assembly.
 - [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.AfterInstall_DeedleTypeInitializerSucceeds`
-      passes, asserting inside the same child domain that invoking `Deedle.Reflection.convertRecordSequence`
-      — closed over a concrete record type and given a one-element `IEnumerable<T>`, which is the deepest
-      caller frame of the reported production trace — raises no `netstandard` bind failure and completes
-      without throwing. The test asserts `Deedle.dll` is present in the domain's `ApplicationBase` and
-      **fails** rather than skipping when either that file or that member is absent.
+      passes in a child domain whose `ApplicationBase` is the `QuickFiler.Test` build output directory. That
+      directory is the load-bearing element: it deploys the `netstandard2.1` flavour of `FSharp.Core`, whose
+      `netstandard 2.1.0.0` reference nothing on the machine satisfies. The test asserts that invoking
+      `Deedle.Frame.FromRecords`, closed over a concrete record type, raises no netstandard bind failure, and
+      **fails** rather than skipping when that directory, its configuration file or `Deedle.dll` is absent.
 - [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.NegativeControl_WithoutInstall_Netstandard21Throws`
       passes, asserting in a **second** child domain, with the installer **not** run, that
       `Assembly.Load("netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")`
