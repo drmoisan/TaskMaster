@@ -30,3 +30,6 @@ jobs:
   mstest-coverage:
     name: mstest-coverage
     uses: ./.github/workflows/_mstest-coverage.yml
+  pester:
+    name: pester
+    uses: ./.github/workflows/_pester.yml
