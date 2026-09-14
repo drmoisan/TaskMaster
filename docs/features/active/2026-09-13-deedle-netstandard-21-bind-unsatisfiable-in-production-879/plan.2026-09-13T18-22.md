@@ -3604,7 +3604,7 @@ changes and no task is renumbered.
       Acceptance: `git status --porcelain --untracked-files=all -- UtilitiesCS TaskMaster UtilitiesCS.Test TaskMaster.Test docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879`
       returns at most one line, and if one line is returned its path is
       `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/plan.2026-09-13T18-22.md`.
-- [ ] [P6-T27] Close the plan file. Mark `[P6-T26]` complete, then commit the plan file alone:
+- [x] [P6-T27] Close the plan file. Mark `[P6-T26]` complete, then commit the plan file alone:
 
       ```
       git add -- docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/plan.2026-09-13T18-22.md
