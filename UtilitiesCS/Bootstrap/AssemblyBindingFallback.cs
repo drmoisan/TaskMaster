@@ -2,9 +2,11 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 
 namespace UtilitiesCS.Bootstrap
@@ -237,13 +239,46 @@ namespace UtilitiesCS.Bootstrap
             /// <summary>
             /// Rung 1: an already-loaded assembly whose simple name matches
             /// case-insensitively and whose public key token is equal. Version is
-            /// deliberately not compared.
+            /// deliberately not compared, because supplying a same-token assembly of a
+            /// different version is the whole purpose of this fallback.
             /// </summary>
-            /// <remarks>Behaviour-empty seam; the ladder is implemented in Phase 3.</remarks>
+            /// <param name="requested">The identity the CLR binder failed to resolve.</param>
             private Assembly? FromAlreadyLoaded(AssemblyName requested)
             {
-                _ = requested;
-                _ = _getLoadedAssemblies;
+                byte[]? requestedToken = requested.GetPublicKeyToken();
+                if (requestedToken is null || requestedToken.Length == 0)
+                {
+                    // A request carrying no strong-name token cannot be matched against a
+                    // strongly named loaded assembly without weakening the comparison to the
+                    // simple name alone, which would return arbitrary assemblies.
+                    return null;
+                }
+
+                try
+                {
+                    foreach (Assembly candidate in _getLoadedAssemblies())
+                    {
+                        AssemblyName candidateName = candidate.GetName();
+                        bool sameSimpleName = string.Equals(
+                            candidateName.Name,
+                            requested.Name,
+                            StringComparison.OrdinalIgnoreCase
+                        );
+                        if (
+                            sameSimpleName
+                            && TokensAreEqual(candidateName.GetPublicKeyToken(), requestedToken)
+                        )
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Rung-local catch: a failure of one source must not stop the ladder.
+                    Trace.WriteLine("Rung 1 (already loaded) failed: " + ex, TraceCategory);
+                }
+
                 return null;
             }
 
@@ -251,37 +286,172 @@ namespace UtilitiesCS.Bootstrap
             /// Rung 2: <see cref="Assembly.Load(string)"/> of the full display name, using
             /// <c>Version=2.0.0.0</c> for the <c>netstandard</c> identity specifically.
             /// </summary>
-            /// <remarks>Behaviour-empty seam; the ladder is implemented in Phase 3.</remarks>
+            /// <param name="requested">The identity the CLR binder failed to resolve.</param>
             private Assembly? FromFullDisplayName(AssemblyName requested)
             {
-                _ = requested;
-                _ = _loadByDisplayName;
-                return null;
+                try
+                {
+                    return _loadByDisplayName(BuildDisplayName(requested));
+                }
+                catch (Exception ex)
+                {
+                    // Rung-local catch: a miss here is ordinary and the ladder continues.
+                    Trace.WriteLine("Rung 2 (display name) failed: " + ex, TraceCategory);
+                    return null;
+                }
             }
 
             /// <summary>
             /// Rung 3: the runtime-directory facade, loaded from an absolute path, for the
-            /// <c>netstandard</c> identity only.
+            /// <c>netstandard</c> identity only. This rung bypasses assembly-cache lookup
+            /// entirely, which is why it is robust to whatever the reported
+            /// <c>2.0.0.0</c> lookup failure turns out to mean.
             /// </summary>
-            /// <remarks>Behaviour-empty seam; the ladder is implemented in Phase 3.</remarks>
+            /// <param name="requested">The identity the CLR binder failed to resolve.</param>
             private Assembly? FromRuntimeDirectory(AssemblyName requested)
             {
-                _ = requested;
-                _ = _getRuntimeDirectory;
-                return null;
+                if (!IsNetstandard(requested))
+                {
+                    return null;
+                }
+
+                try
+                {
+                    string path = Path.Combine(
+                        _getRuntimeDirectory(),
+                        NetstandardFacadeFileName
+                    );
+                    if (!_fileExists(path))
+                    {
+                        return null;
+                    }
+
+                    return _loadFromPath(path);
+                }
+                catch (Exception ex)
+                {
+                    // Rung-local catch: a failure of one source must not stop the ladder.
+                    Trace.WriteLine("Rung 3 (runtime directory) failed: " + ex, TraceCategory);
+                    return null;
+                }
             }
 
             /// <summary>
             /// Rung 4: a directory probe for the simple name plus <c>.dll</c> next to the
             /// executing assembly.
             /// </summary>
-            /// <remarks>Behaviour-empty seam; the ladder is implemented in Phase 3.</remarks>
+            /// <param name="requested">The identity the CLR binder failed to resolve.</param>
             private Assembly? FromProbeDirectory(AssemblyName requested)
             {
-                _ = requested;
-                _ = _fileExists;
-                _ = _loadFromPath;
-                return null;
+                string? simpleName = requested.Name;
+                if (string.IsNullOrEmpty(simpleName))
+                {
+                    return null;
+                }
+
+                try
+                {
+                    string? directory = Path.GetDirectoryName(
+                        typeof(AssemblyBindingFallback).Assembly.Location
+                    );
+                    if (string.IsNullOrEmpty(directory))
+                    {
+                        return null;
+                    }
+
+                    string path = Path.Combine(directory, simpleName + ".dll");
+                    if (!_fileExists(path))
+                    {
+                        return null;
+                    }
+
+                    return _loadFromPath(path);
+                }
+                catch (Exception ex)
+                {
+                    // Rung-local catch: a failure of one source must not stop the ladder.
+                    Trace.WriteLine("Rung 4 (probe directory) failed: " + ex, TraceCategory);
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// Reports whether <paramref name="requested"/> names the facade assembly this
+            /// fallback exists to supply.
+            /// </summary>
+            private static bool IsNetstandard(AssemblyName requested)
+            {
+                return string.Equals(
+                    requested.Name,
+                    NetstandardSimpleName,
+                    StringComparison.OrdinalIgnoreCase
+                );
+            }
+
+            /// <summary>
+            /// Composes the full display name rung 2 asks for: the requested simple name,
+            /// culture and public key token, with the version pinned to the facade version
+            /// for the <c>netstandard</c> identity and taken from the request otherwise.
+            /// </summary>
+            private static string BuildDisplayName(AssemblyName requested)
+            {
+                string simpleName = requested.Name ?? string.Empty;
+                string version = IsNetstandard(requested)
+                    ? NetstandardFacadeVersion
+                    : (requested.Version?.ToString() ?? "0.0.0.0");
+
+                return simpleName
+                    + ", Version="
+                    + version
+                    + ", Culture=neutral, PublicKeyToken="
+                    + FormatToken(requested.GetPublicKeyToken());
+            }
+
+            /// <summary>
+            /// Renders a public key token as the lower-case hexadecimal form an assembly
+            /// display name uses, or the literal <c>null</c> when there is no token.
+            /// </summary>
+            private static string FormatToken(byte[]? token)
+            {
+                if (token is null || token.Length == 0)
+                {
+                    return "null";
+                }
+
+                var builder = new StringBuilder(token.Length * 2);
+                foreach (byte value in token)
+                {
+                    builder.Append(value.ToString("x2", CultureInfo.InvariantCulture));
+                }
+
+                return builder.ToString();
+            }
+
+            /// <summary>
+            /// Compares two public key tokens for byte equality, treating an absent or
+            /// zero-length token as never equal.
+            /// </summary>
+            private static bool TokensAreEqual(byte[]? candidate, byte[]? requested)
+            {
+                if (candidate is null || requested is null)
+                {
+                    return false;
+                }
+
+                if (candidate.Length == 0 || candidate.Length != requested.Length)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < candidate.Length; i++)
+                {
+                    if (candidate[i] != requested[i])
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
     }

@@ -2083,7 +2083,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
 ### Phase 3 — Minimal Production Fix
 
-- [ ] [P3-T1] Implement the resolution ladder in
+- [x] [P3-T1] Implement the resolution ladder in
       `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs`, replacing the behaviour-empty rungs from
       `[P2-T1]`. Order, first non-null wins: (1) an already-loaded assembly whose simple name matches
       case-insensitively and whose public key token is equal, version deliberately not compared;
@@ -2097,7 +2097,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       binder. No log4net anywhere in the file: log4net inside an `AssemblyResolve` handler can itself
       re-enter assembly loading.
       Acceptance: `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` passes in `[P4-T2]`.
-- [ ] [P3-T2] Implement `Install()` in the same file so that it subscribes the handler to
+- [x] [P3-T2] Implement `Install()` in the same file so that it subscribes the handler to
       `AppDomain.CurrentDomain.AssemblyResolve` exactly once per AppDomain, guarded by
       `Interlocked.Exchange` on the private counter, and so that it never throws: an exception escaping it
       becomes a `TypeInitializationException` on `ThisAddIn` and would take the whole add-in down. The
@@ -2107,7 +2107,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       never throws, which is measured by the two named tests rather than by inspection.
       Acceptance: the idempotence test and the never-throws test in
       `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` pass in `[P4-T2]`.
-- [ ] [P3-T3] Add the eager installation point. In `TaskMaster/ThisAddIn.cs`, inside
+- [x] [P3-T3] Add the eager installation point. In `TaskMaster/ThisAddIn.cs`, inside
       `public partial class ThisAddIn`, add an explicit static constructor whose body is exactly one
       statement calling the installer. The statement to add is
       `UtilitiesCS.Bootstrap.AssemblyBindingFallback.Install();` and the constructor declaration is
@@ -2118,7 +2118,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       returns exactly 1 hit, `Select-String -SimpleMatch -Pattern "AssemblyBindingFallback.Install();"`
       returns exactly 1 hit, and `Select-String -SimpleMatch -Pattern "[ExcludeFromCodeCoverage]"` returns
       at least 1 hit.
-- [ ] [P3-T4] Add the declarative hardening. In `TaskMaster/app.config`, inside the existing
+- [x] [P3-T4] Add the declarative hardening. In `TaskMaster/app.config`, inside the existing
       `assemblyBinding` element that opens at line 27 and closes at line 468, add one new
       `dependentAssembly` block declaring `assemblyIdentity` with `name="netstandard"`,
       `publicKeyToken="cc7b13ffcd2ddd51"`, `culture="neutral"` and `bindingRedirect` with
@@ -2129,7 +2129,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       Acceptance: `Select-String -SimpleMatch` on `TaskMaster/app.config` returns exactly 1 hit for
       `name="netstandard"`, exactly 1 hit for `oldVersion="0.0.0.0-2.1.0.0"`, exactly 1 hit for
       `newVersion="2.0.0.0"`, and still exactly 1 hit for `oldVersion="0.0.0.0-11.0.0.0"`.
-- [ ] [P3-T5] Record that the hardening is not the fix. Verify that `spec.md` already states the ground,
+- [x] [P3-T5] Record that the hardening is not the fix. Verify that `spec.md` already states the ground,
       and write `.../evidence/other/hardening-not-the-fix.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:` and an `Output Summary:` naming the `spec.md` line numbers at which the
       literal `cannot manufacture an assembly` appears. Command:
@@ -2145,11 +2145,11 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
 ### Phase 4 — Targeted Verification of the Fix
 
-- [ ] [P4-T1] LOCK-ACQUIRE, rebuild the solution with the plain Debug configuration, LOCK-RELEASE. Same
+- [x] [P4-T1] LOCK-ACQUIRE, rebuild the solution with the plain Debug configuration, LOCK-RELEASE. Same
       pwsh shape as `[P2-T10]`, redirecting to
       `.../evidence/regression-testing/pass-after-build-console.2026-09-13T18-22.txt`.
       Acceptance: the console log contains at least one line matching `^\s+0 Error\(s\)$`.
-- [ ] [P4-T2] LOCK-ACQUIRE, run the `UtilitiesCS.Test` ladder unit tests alone, LOCK-RELEASE.
+- [x] [P4-T2] LOCK-ACQUIRE, run the `UtilitiesCS.Test` ladder unit tests alone, LOCK-RELEASE.
 
       First, remove every TRX already in the results directory and record the emptied count:
 
@@ -2203,7 +2203,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       artifact records `TRX_MATCH_COUNT=1`, the TRX `ResultSummary`
       `outcome` is `Completed`, the `Counters` `failed` value is `0`, and the `passed` value is at
       least 11.
-- [ ] [P4-T3] LOCK-ACQUIRE, run the child-domain harness class alone, LOCK-RELEASE.
+- [x] [P4-T3] LOCK-ACQUIRE, run the child-domain harness class alone, LOCK-RELEASE.
 
       First, remove every TRX already in the results directory and record the emptied count:
 
@@ -2251,15 +2251,15 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory`. Nine rather than eight: a run reporting
       eight passes and no ninth result would mean the re-rooting assertion did not execute, which is the
       state in which every other result in this run is vacuous.
-- [ ] [P4-T4] Verify the load-bearing negative control specifically. Read the `[P4-T3]` artifact.
+- [x] [P4-T4] Verify the load-bearing negative control specifically. Read the `[P4-T3]` artifact.
       Acceptance: it records `NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed`. If it
       records any other outcome, the executor halts and reports blocked, because the load in the
       negative-control domain succeeded without a code change, which means isolation has been lost and
       every positive result in `[P4-T3]` is vacuous.
-- [ ] [P4-T5] Verify the both-versions criterion specifically. Read the `[P4-T3]` artifact.
+- [x] [P4-T5] Verify the both-versions criterion specifically. Read the `[P4-T3]` artifact.
       Acceptance: it records `AfterInstall_BothNetstandardVersionsBind OUTCOME=Passed`. This is the
       criterion that forbids reporting a `2.1.0.0`-only remedy as a fix.
-- [ ] [P4-T6] Verify the Deedle end-to-end criterion specifically. Read the `[P4-T3]` artifact, then
+- [x] [P4-T6] Verify the Deedle end-to-end criterion specifically. Read the `[P4-T3]` artifact, then
       extract the outcome VALUE the probe reported, so this criterion is recorded as a measured class and
       not only as a pass mark. Command:
 
@@ -2297,7 +2297,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       additionally requires that the `[P4-T3]` artifact records
       `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed`; without it the post-fix
       reading is not comparable with the pre-fix one.
-- [ ] [P4-T7] LOCK-ACQUIRE, run the `AddInEagerInstallShapeTests` class alone, LOCK-RELEASE.
+- [x] [P4-T7] LOCK-ACQUIRE, run the `AddInEagerInstallShapeTests` class alone, LOCK-RELEASE.
 
       First, remove every TRX already in the results directory and record the emptied count:
 
@@ -2339,7 +2339,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       artifact records `TRX_MATCH_COUNT=1`, and the artifact records
       `ThisAddIn_HasExplicitStaticConstructor OUTCOME=Passed` and
       `AppConfig_DeclaresNetstandardRedirect OUTCOME=Passed`.
-- [ ] [P4-T8] Static shape checks for the criteria a test cannot carry. Command:
+- [x] [P4-T8] Static shape checks for the criteria a test cannot carry. Command:
 
       ```
       pwsh -NoProfile -Command '
@@ -2366,7 +2366,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `NETSTANDARD_IDENTITY=1`, `OLD_VERSION_2_1=1`, `NEW_VERSION_2_0=1` and `FSHARP_REDIRECT=1`.
       `FSHARP_REDIRECT=1` is the unchanged-baseline control: the `FSharp.Core` redirect at
       `TaskMaster/app.config` line 70 must survive this work untouched.
-- [ ] [P4-T9] Determinism and no-filesystem-write sweep over exactly the four files this work adds under
+- [x] [P4-T9] Determinism and no-filesystem-write sweep over exactly the four files this work adds under
       a test project. Command:
 
       ```
@@ -2385,7 +2385,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       fields and the full output.
       Acceptance: every banned-token line ends with `HITS=0`, and every `CONTROL_AppDomain` line ends with
       a count greater than 0.
-- [ ] [P4-T10] Record the free `2.0.0.0` measurement that narrows the open risk. The `[P4-T3]` TRX
+- [x] [P4-T10] Record the free `2.0.0.0` measurement that narrows the open risk. The `[P4-T3]` TRX
       reader emits `testName` and `outcome` only, so the observation is extracted from the TRX
       directly. Command:
 
@@ -2412,7 +2412,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       Acceptance: the artifact records `TRX_MATCH_COUNT=1` and carries exactly one such line with a
       non-empty value. The `NETSTANDARD_2_0_0_0_NEGATIVE_DOMAIN_RESULT` value
       itself is an observation, not a gate: either value is recorded and neither blocks.
-- [ ] [P4-T11] No-new-deployment sweep. Confirm no `netstandard.dll` entered any project or any
+- [x] [P4-T11] No-new-deployment sweep. Confirm no `netstandard.dll` entered any project or any
       `packages.config`, and no `FSharp.Core` version changed. Command:
 
       ```
@@ -2435,7 +2435,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       because the planner did not measure it; the gate is that this work changes the figure by zero, and
       the baseline figure is the comparator. A `BASELINE_FSHARP_REDIRECT_LINES` value of `0` blocks: it
       would mean the search found nothing at baseline and the comparison would prove nothing.
-- [ ] [P4-T12] File-size audit of every file this work creates or edits. Command:
+- [x] [P4-T12] File-size audit of every file this work creates or edits. Command:
 
       ```
       pwsh -NoProfile -Command '
