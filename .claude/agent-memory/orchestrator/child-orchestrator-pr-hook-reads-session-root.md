@@ -138,6 +138,27 @@ blocks then a pass:
    accepted.
 3. Mirroring body and receipt into the session-root `artifacts/` → PR created.
 
+**Item 872, 2026-09-13, run `bugs-2026-09-11`: both halves of the gate were unsound in the same call, and
+the directive forbade the mirroring remedy.** Spawned NON-isolated, so env "Working directory" was the
+session worktree while the item lived in `bugs-2026-09-11-item-872`. A single `gh pr create` with a
+relative `--body-file artifacts/pr_body_872.md` returned `PR_AUTHOR_RECEIPT_MISSING` naming
+`artifacts/pr_body_872.receipt.json`, which existed beside the body in the item worktree; a two-tree
+`Test-Path` confirmed both artifacts present in the item worktree and both absent from the session root.
+
+Two conclusions, and the first is the one worth carrying:
+
+- Reaching a *receipt* error is positive evidence that the checkpoint half already PASSED, because the
+  hook's own header (line 24) states the `--require-pr-creation-ready` preflight runs "before receipt
+  verification runs". The session-root checkpoint held a different item's state, so the gate admitted this
+  item on a sibling's evidence — the #736 false green again, and confirmable from the deny string alone
+  without the exported-preflight diagnostic. Read the deny string as a two-part verdict: which check
+  blocked you also tells you every earlier check silently passed, and on a shared session root "passed" may
+  mean "passed on someone else's file".
+- The mirroring remedy was unavailable: the operator directive forbade writing anything into the session
+  worktree, as in the #733 counter-case. Correct action is #733's — record the block, report the exact deny
+  string, hand PR creation to the coordinator that runs in the session root and satisfies the gate
+  natively. Do not mirror, and do not touch the shared checkpoint.
+
 So `Set-Location` relocates `gh`'s own path resolution but not the hook's: the hook is a separate process
 whose cwd stays the session root regardless. The body check follows `gh`; the receipt check follows the hook.
 Mirror to the session root and let both land there rather than trying to move the process cwd. `Set-Location`

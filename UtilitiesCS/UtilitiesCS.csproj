@@ -968,7 +968,6 @@
       <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="NewtonsoftHelpers\AppGlobalsConverter.cs" />
-    <Compile Include="Threading\ProgressTrackerAsync.cs" />
     <Compile Include="Threading\ProgressTrackerPane.cs" />
     <Compile Include="Threading\ProgressViewer.cs">
       <SubType>Form</SubType>
