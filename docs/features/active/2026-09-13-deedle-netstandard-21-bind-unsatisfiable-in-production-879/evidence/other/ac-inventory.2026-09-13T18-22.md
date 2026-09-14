@@ -244,3 +244,45 @@ already satisfied.
 reason as in the Revision R2 block.
 
 No acceptance criterion is checked off by this task. The plan assigns every check-off to Phase 6.
+
+## AC4 Reading:
+
+Recorded by `[P6-T9]` at the point AC4 is checked off at `spec.md` line 484.
+
+AC4 READING: ten delegate-driven tests, eleventh test excluded
+
+AC4's closing sentence at `spec.md` lines 489-490 — that all rungs are exercised through
+injected delegates, touching neither the GAC nor the filesystem — is read as a property of the
+ten delegate-driven tests that exercise the ladder rungs, and not of the eleventh test `[P2-T3]`
+adds. That eleventh test,
+`Install_ThenLoadOfUnresolvableName_LeavesTheLoadFailingWithoutHandlerThrowing`, drives the
+subscribed handler through the real CLR binder in order to cover
+`AssemblyBindingFallback.OnAssemblyResolve` and `AssemblyBindingFallback.CreateProductionLadder`,
+neither of which any delegate-driven test can reach, because both run only when a genuine failed
+bind raises the domain's assembly-resolution event.
+
+Under that reading all four rungs retain injected-delegate coverage and AC4 is satisfied.
+
+`spec.md` lines 447-448 note that only pure ladder logic belongs in this assembly because it is
+masked by the PR #880 handler. That ground does not reach the eleventh test, whose asserted
+outcome is that a display name matching nothing fails to load, which no masking handler can
+change.
+
+`spec.md` is not amended for this reading. AC4 spans lines 484-490 and a re-wrap would move the
+fifteen criteria that follow it, every one of which this plan cites by line number.
+
+### Revision R7 note — the reading and its pinned literal are unchanged
+
+AC4 names the class `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` specifically. The
+ten tests `[P4-T13]` adds live in a different class,
+`UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackEdgeCaseTests`, so they are outside AC4's
+subject and neither extend nor contradict its enumerated scenario list. The reading above
+therefore still describes exactly eleven tests in exactly the class AC4 names, and the pinned
+literal above is unchanged.
+
+For completeness: the ten sibling tests are themselves delegate-driven or guard-clause tests, and
+none of them drives a real bind. Each reaches its target either through the ladder's five
+injected delegates or through a guard clause that returns before any rung runs, and the class
+contains zero occurrences of a load-by-display-name call, a load-from-path call and a
+file-existence call, as `[P4-T13]`'s own acceptance gates at zero. The eleventh test therefore
+remains the single exception this reading carves out across the whole work.

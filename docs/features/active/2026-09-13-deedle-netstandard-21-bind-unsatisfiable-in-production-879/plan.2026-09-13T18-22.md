@@ -3416,7 +3416,7 @@ changes and no task is renumbered.
 
 ### Phase 6 — Open Risk, Manual Gates, Commit, and Acceptance Check-Off
 
-- [ ] [P6-T1] Commit the source and test changes together with the evidence produced so far. Commands:
+- [x] [P6-T1] Commit the source and test changes together with the evidence produced so far. Commands:
 
       ```
       git add -- UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs UtilitiesCS/UtilitiesCS.csproj TaskMaster/ThisAddIn.cs TaskMaster/app.config UtilitiesCS.Test/Bootstrap UtilitiesCS.Test/UtilitiesCS.Test.csproj TaskMaster.Test/Bootstrap TaskMaster.Test/TaskMaster.Test.csproj docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
@@ -3432,7 +3432,7 @@ changes and no task is renumbered.
 
       Acceptance: `git status --porcelain --untracked-files=all -- UtilitiesCS TaskMaster UtilitiesCS.Test TaskMaster.Test`
       returns no output.
-- [ ] [P6-T2] Write the explicit statement of what this work does and does not establish about the
+- [x] [P6-T2] Write the explicit statement of what this work does and does not establish about the
       `netstandard 2.0.0.0` leg. Write
       `.../evidence/other/netstandard-2-0-0-0-open-risk.2026-09-13T18-22.md` with `Timestamp:` and a body
       containing, as its own paragraphs: that the maintainer's reproduced production trace shows the chain
@@ -3446,7 +3446,7 @@ changes and no task is renumbered.
       sentence `Issue 879 must not be reported as closed on the strength of a 2.1.0.0 result alone.`
       Acceptance: the artifact exists and contains all six elements, including that final sentence
       verbatim.
-- [ ] [P6-T3] Record the Fusion binding log measurement and its status. Write
+- [x] [P6-T3] Record the Fusion binding log measurement and its status. Write
       `.../evidence/other/fusion-binding-log-request.2026-09-13T18-22.md` with `Timestamp:` and these
       fields: `Procedure:` naming the registry key `HKLM\SOFTWARE\Microsoft\Fusion` and the values
       `EnableLog=1` and `ForceLog=1`, plus the reproduction steps (fresh Outlook session, no SVG-bearing
@@ -3459,7 +3459,7 @@ changes and no task is renumbered.
       making the remedy robust to whatever the log would show.
       Acceptance: the artifact exists and carries all four fields, with `RESULT:` holding one of the two
       permitted values.
-- [ ] [P6-T4] Record the manual live-Outlook human gate. Write
+- [x] [P6-T4] Record the manual live-Outlook human gate. Write
       `.../evidence/other/manual-live-outlook-gate.2026-09-13T18-22.md` with `Timestamp:`, `Procedure:`
       (start a fresh Outlook session with the rebuilt add-in registered; open no SVG-bearing surface
       first, meaning no `MyBox` dialog, no config viewer, no folder-not-found dialog and no prior
@@ -3468,7 +3468,7 @@ changes and no task is renumbered.
       `PENDING-MAINTAINER`, and `Gate Type: human`.
       Acceptance: the artifact exists and carries all four fields. An unrecorded result does not discharge
       this gate.
-- [ ] [P6-T5] Verify the scope boundary against the merge base and record it. Commands, in this order:
+- [x] [P6-T5] Verify the scope boundary against the merge base and record it. Commands, in this order:
 
       ```
       git rev-parse --verify origin/main
@@ -3509,14 +3509,14 @@ changes and no task is renumbered.
       `scripts/vscode/TaskMaster.cli.runsettings`, `TaskMaster.runsettings`, `coverage.config`, any path
       beginning `.github/`, any path beginning `.claude/hooks/`, any path beginning `.claude/rules/`, and
       any path ending `packages.config`.
-- [ ] [P6-T6] Mark the acceptance criterion at `spec.md` line 473 as complete by changing its leading
+- [x] [P6-T6] Mark the acceptance criterion at `spec.md` line 473 as complete by changing its leading
       `- [ ] ` to `- [x] `. Change no other character on that line.
       Acceptance: `spec.md` line 473 begins with the six characters `- [x] `.
-- [ ] [P6-T7] Mark the acceptance criterion at `spec.md` line 477 as complete, as in `[P6-T6]`.
+- [x] [P6-T7] Mark the acceptance criterion at `spec.md` line 477 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 477 begins with `- [x] `.
-- [ ] [P6-T8] Mark the acceptance criterion at `spec.md` line 481 as complete, as in `[P6-T6]`.
+- [x] [P6-T8] Mark the acceptance criterion at `spec.md` line 481 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 481 begins with `- [x] `.
-- [ ] [P6-T9] Mark the acceptance criterion at `spec.md` line 484 as complete, as in `[P6-T6]`. AC4's
+- [x] [P6-T9] Mark the acceptance criterion at `spec.md` line 484 as complete, as in `[P6-T6]`. AC4's
       closing sentence at `spec.md` lines 489-490 — that all rungs are exercised through injected
       delegates, touching neither the GAC nor the filesystem — is read as a property of the ten
       delegate-driven tests that exercise the ladder rungs, and not of the eleventh test `[P2-T3]` adds,
@@ -3542,35 +3542,35 @@ changes and no task is renumbered.
       Acceptance: `spec.md` line 484 begins with the six characters `- [x] `, the `AC4 Reading:` heading
       exists in that artifact, and that artifact contains the line
       `AC4 READING: ten delegate-driven tests, eleventh test excluded` exactly once.
-- [ ] [P6-T10] Mark the acceptance criterion at `spec.md` line 491 as complete, as in `[P6-T6]`.
+- [x] [P6-T10] Mark the acceptance criterion at `spec.md` line 491 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 491 begins with `- [x] `.
-- [ ] [P6-T11] Mark the acceptance criterion at `spec.md` line 495 as complete, as in `[P6-T6]`.
+- [x] [P6-T11] Mark the acceptance criterion at `spec.md` line 495 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 495 begins with `- [x] `.
-- [ ] [P6-T12] Mark the acceptance criterion at `spec.md` line 499 as complete, as in `[P6-T6]`.
+- [x] [P6-T12] Mark the acceptance criterion at `spec.md` line 499 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 499 begins with `- [x] `.
-- [ ] [P6-T13] Mark the acceptance criterion at `spec.md` line 504 as complete, as in `[P6-T6]`.
+- [x] [P6-T13] Mark the acceptance criterion at `spec.md` line 504 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 504 begins with `- [x] `.
-- [ ] [P6-T14] Mark the acceptance criterion at `spec.md` line 509 as complete, as in `[P6-T6]`.
+- [x] [P6-T14] Mark the acceptance criterion at `spec.md` line 509 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 509 begins with `- [x] `.
-- [ ] [P6-T15] Mark the acceptance criterion at `spec.md` line 515 as complete, as in `[P6-T6]`.
+- [x] [P6-T15] Mark the acceptance criterion at `spec.md` line 515 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 515 begins with `- [x] `.
-- [ ] [P6-T16] Mark the acceptance criterion at `spec.md` line 521 as complete, as in `[P6-T6]`.
+- [x] [P6-T16] Mark the acceptance criterion at `spec.md` line 521 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 521 begins with `- [x] `.
-- [ ] [P6-T17] Mark the acceptance criterion at `spec.md` line 528 as complete, as in `[P6-T6]`.
+- [x] [P6-T17] Mark the acceptance criterion at `spec.md` line 528 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 528 begins with `- [x] `.
-- [ ] [P6-T18] Mark the acceptance criterion at `spec.md` line 534 as complete, as in `[P6-T6]`.
+- [x] [P6-T18] Mark the acceptance criterion at `spec.md` line 534 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 534 begins with `- [x] `.
-- [ ] [P6-T19] Mark the acceptance criterion at `spec.md` line 536 as complete, as in `[P6-T6]`.
+- [x] [P6-T19] Mark the acceptance criterion at `spec.md` line 536 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 536 begins with `- [x] `.
-- [ ] [P6-T20] Mark the acceptance criterion at `spec.md` line 543 as complete, as in `[P6-T6]`.
+- [x] [P6-T20] Mark the acceptance criterion at `spec.md` line 543 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 543 begins with `- [x] `.
-- [ ] [P6-T21] Mark the acceptance criterion at `spec.md` line 545 as complete, as in `[P6-T6]`.
+- [x] [P6-T21] Mark the acceptance criterion at `spec.md` line 545 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 545 begins with `- [x] `.
-- [ ] [P6-T22] Mark the acceptance criterion at `spec.md` line 547 as complete, as in `[P6-T6]`.
+- [x] [P6-T22] Mark the acceptance criterion at `spec.md` line 547 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 547 begins with `- [x] `.
-- [ ] [P6-T23] Mark the acceptance criterion at `spec.md` line 550 as complete, as in `[P6-T6]`.
+- [x] [P6-T23] Mark the acceptance criterion at `spec.md` line 550 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 550 begins with `- [x] `.
-- [ ] [P6-T24] Conditionally mark the acceptance criterion at `spec.md` line 554. Read the `RESULT:`
+- [x] [P6-T24] Conditionally mark the acceptance criterion at `spec.md` line 554. Read the `RESULT:`
       field of `.../evidence/other/manual-live-outlook-gate.2026-09-13T18-22.md`. When that value is
       `DEEDLE LOADED AND DATA MODEL POPULATED`, change line 554's leading `- [ ] ` to `- [x] `, changing
       no other character. When it is `FAILED` or `PENDING-MAINTAINER`, leave line 554 as `- [ ] ` and
@@ -3584,7 +3584,7 @@ changes and no task is renumbered.
       runs. `spec.md` lines 554-556 state that this is a human gate and that an unrecorded result does
       not discharge it, so an unconditional check-off would make the plan's own artifact assert
       something false about a gate no executor can perform.
-- [ ] [P6-T25] Mirror the issue update locally. Write
+- [x] [P6-T25] Mirror the issue update locally. Write
       `.../evidence/issue-updates/issue-879.2026-09-13T18-22.md` with `Timestamp:`, the exact text
       intended for the issue — a summary of the remedy, the evidence paths for the negative control and
       the both-versions criterion, the manual-gate status, and the `2.0.0.0` limit statement reproduced

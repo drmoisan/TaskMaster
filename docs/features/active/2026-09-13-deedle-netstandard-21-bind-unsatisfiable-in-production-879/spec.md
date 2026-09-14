@@ -470,84 +470,84 @@ resolver, not the redirect, and the negative control survives the hardening. `Ap
 
 ## Acceptance Criteria
 
-- [ ] `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` exists, declares a host-neutral
+- [x] `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` exists, declares a host-neutral
       `UtilitiesCS.Bootstrap.AssemblyBindingFallback` with a public `Install()` and an internal
       `Resolve` seam, references no WinForms or Outlook Interop type, and is registered as a
       `<Compile Include>` item in `UtilitiesCS/UtilitiesCS.csproj`.
-- [ ] `TaskMaster.Test.Bootstrap.AddInEagerInstallShapeTests.ThisAddIn_HasExplicitStaticConstructor`
+- [x] `TaskMaster.Test.Bootstrap.AddInEagerInstallShapeTests.ThisAddIn_HasExplicitStaticConstructor`
       passes, asserting that `typeof(ThisAddIn).Attributes.HasFlag(TypeAttributes.BeforeFieldInit)` is
       `false` and `typeof(ThisAddIn).TypeInitializer` is not `null`. This guards the eager install point
       against deletion without depending on a prose phrase search.
-- [ ] `TaskMaster/ThisAddIn.cs` declares `static ThisAddIn()` whose body is exactly one call to
+- [x] `TaskMaster/ThisAddIn.cs` declares `static ThisAddIn()` whose body is exactly one call to
       `UtilitiesCS.Bootstrap.AssemblyBindingFallback.Install()`, and `ThisAddIn` retains its
       `[ExcludeFromCodeCoverage]` attribute.
-- [ ] `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` passes and covers, as separately named
+- [x] `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` passes and covers, as separately named
       test methods: already-loaded match wins over a fresh load; the full-display-name rung; the
       runtime-directory `LoadFrom` rung; a mismatched public key token is rejected; null and empty
       requested tokens; the `[ThreadStatic]` re-entrance guard returns `null`; `Install()` is idempotent;
       an internally throwing rung is absorbed and the ladder continues; an unresolvable name returns
       `null` without throwing. All rungs are exercised through injected delegates, touching neither the
       GAC nor the filesystem.
-- [ ] `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` declares a public `MarshalByRefObject` proxy
+- [x] `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` declares a public `MarshalByRefObject` proxy
       that performs every assertion listed below **inside** the child domain and marshals the results
       back, and `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` creates each domain with
       `AppDomain.CreateDomain` and unloads it in `[TestCleanup]`.
-- [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.ChildDomain_HasNoSvgControlAssemblyLoaded`
+- [x] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.ChildDomain_HasNoSvgControlAssemblyLoaded`
       passes, asserting inside the child domain that `AppDomain.CurrentDomain.GetAssemblies()` contains
       no assembly whose simple name is `SVGControl`. Because `SvgRenderer`'s type initializer cannot have
       run if the assembly is not loaded, this is a complete proof that no SVG rendering occurred.
-- [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall`
+- [x] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall`
       passes, asserting inside the child domain that the `AppDomain` assembly-resolution event has an
       empty invocation list before the installer under test runs. Read the private `_AssemblyResolve`
       instance field by reflection (net481 is a frozen runtime) and assert
       `Delegate.GetInvocationList()` length is zero, or that the field is `null`.
-- [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect`
+- [x] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect`
       passes, asserting that the configuration file supplied to both child domains contains no
       `netstandard` `<dependentAssembly>` entry. This makes the isolation guarantee checkable rather than
       assumed, and keeps the positive result attributable to the installer rather than to the
       `TaskMaster/app.config` hardening.
-- [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.AfterInstall_BothNetstandardVersionsBind`
+- [x] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.AfterInstall_BothNetstandardVersionsBind`
       passes, asserting inside the child domain that after
       `UtilitiesCS.Bootstrap.AssemblyBindingFallback.Install()` runs, **both**
       `Assembly.Load("netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")`
       and `Assembly.Load("netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")`
       return a non-null assembly.
-- [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.AfterInstall_DeedleTypeInitializerSucceeds`
+- [x] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.AfterInstall_DeedleTypeInitializerSucceeds`
       passes in a child domain whose `ApplicationBase` is the `QuickFiler.Test` build output directory. That
       directory is the load-bearing element: it deploys the `netstandard2.1` flavour of `FSharp.Core`, whose
       `netstandard 2.1.0.0` reference nothing on the machine satisfies. The test asserts that invoking
       `Deedle.Frame.FromRecords`, closed over a concrete record type, raises no netstandard bind failure, and
       **fails** rather than skipping when that directory, its configuration file or `Deedle.dll` is absent.
-- [ ] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.NegativeControl_WithoutInstall_Netstandard21Throws`
+- [x] `TaskMaster.Test.Bootstrap.NetstandardBindChildDomainTests.NegativeControl_WithoutInstall_Netstandard21Throws`
       passes, asserting in a **second** child domain, with the installer **not** run, that
       `Assembly.Load("netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")`
       throws `FileNotFoundException` naming `netstandard`. This is the load-bearing criterion: it is what
       distinguishes a fixed build from an unfixed one. The test carries an in-file comment stating that if
       this negative control ever starts passing without a code change, isolation has been lost and the
       positive tests above are vacuous and must not be trusted.
-- [ ] `TaskMaster/app.config` declares, inside the existing `<assemblyBinding>` element, a
+- [x] `TaskMaster/app.config` declares, inside the existing `<assemblyBinding>` element, a
       `<dependentAssembly>` with `name="netstandard"`, `publicKeyToken="cc7b13ffcd2ddd51"`,
       `culture="neutral"` and `<bindingRedirect oldVersion="0.0.0.0-2.1.0.0" newVersion="2.0.0.0" />`,
       verified by `TaskMaster.Test.Bootstrap.AddInEagerInstallShapeTests.AppConfig_DeclaresNetstandardRedirect`
       which parses the config as XML and asserts on the element and attribute values, not on a text
       phrase.
-- [ ] This spec records that the `app.config` redirect is hardening and not the fix, on the stated ground
+- [x] This spec records that the `app.config` redirect is hardening and not the fix, on the stated ground
       that a `<bindingRedirect>` rewrites an identity and cannot manufacture an assembly.
-- [ ] `git diff --name-only` against the merge base with `main` lists none of:
+- [x] `git diff --name-only` against the merge base with `main` lists none of:
       SVGControl/SvgAssemblyResolver.cs, SVGControl/SvgRenderer.cs, SVGControl/SvgAssemblyProbe.cs,
       TestSupport/TestAssemblyResolver.cs, QuickFiler.Test/SetupAssemblyInitializer.cs,
       UtilitiesCS.Test/TestAssemblyInitializer.cs, QuickFiler.Test/app.config,
       UtilitiesCS.Test/app.config, scripts/vscode/TaskMaster.cli.runsettings, TaskMaster.runsettings,
       coverage.config, any path under .github/, .claude/hooks/, or .claude/rules/, and no
       `packages.config` anywhere.
-- [ ] No `FSharp.Core` version or binding-redirect value changes in any `*.config` or `*.csproj`, and no
+- [x] No `FSharp.Core` version or binding-redirect value changes in any `*.config` or `*.csproj`, and no
       `netstandard.dll` is added to any `bin` output or to any project as a deployed item.
-- [ ] No test added by this work creates, writes or deletes a file on disk, and no test uses
+- [x] No test added by this work creates, writes or deletes a file on disk, and no test uses
       `Thread.Sleep`, `Task.Delay` or a wall-clock wait.
-- [ ] Line coverage for `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` is `>= 90%`, read from the
+- [x] Line coverage for `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs` is `>= 90%`, read from the
       Cobertura artifact produced by the final coverage run and recorded under the feature folder's
       `evidence/qa-gates/` directory.
-- [ ] A full four-step toolchain pass completes with no failures and no auto-fixes in the final pass,
+- [x] A full four-step toolchain pass completes with no failures and no auto-fixes in the final pass,
       using the exact commands listed in Test Strategy, with console logs captured under the feature
       folder's `evidence/qa-gates/` directory. The analyzer and nullable logs must each show zero
       `Skipping target "CoreCompile"` occurrences, proving the gate was not vacuous.
