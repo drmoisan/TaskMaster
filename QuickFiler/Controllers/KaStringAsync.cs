@@ -78,8 +78,10 @@ namespace QuickFiler.Controllers
         /// </para>
         /// <para>
         /// <b>Argument contract.</b> <paramref name="other"/> must be non-null and non-empty. The
-        /// guard clause at the top of this method rejects both fail-fast, so branch 1's substring
-        /// offset expression is never evaluated with a negative start index.
+        /// guard clause at the top of this method rejects both fail-fast, so branch 1's derived
+        /// offset (Key.IndexOf(other) plus the matched length) is never evaluated with a
+        /// negative start index: IndexOf is non-negative because branch 1 only runs when
+        /// Contains already matched, and other.Length is at least 1 because of the guard above.
         /// </para>
         /// <para>
         /// <b>Consequence for callers.</b> <c>KbdActions</c> methods whose key type is
@@ -125,7 +127,12 @@ namespace QuickFiler.Controllers
             if (Key.Contains(other))
             {
                 if (Activated && Update is not null)
-                    Update(Key.Substring(other.Length - 1, 1));
+                    Update(
+                        Key.Substring(
+                            Key.IndexOf(other, StringComparison.Ordinal) + other.Length - 1,
+                            1
+                        )
+                    );
                 return true;
             }
             else if (other.Length == 1)
