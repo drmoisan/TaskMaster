@@ -167,6 +167,58 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
+        /// Issue #872 AC1. The bounded zero-acceptance exit must record which bound stopped the scan
+        /// and that the decision was to stop, alongside the counts and the cutoff in force. Asserted
+        /// through the injected <c>debugLog</c> delegate. The captured list is filtered on the full
+        /// four-word opening phrase of the scan-bound message before any field is asserted: the
+        /// checkpoint message opens with the same first word, and the launch line this run does emit
+        /// carries <c>Cutoff=900</c> and a scan-cap field spelled <c>ScanCap</c>, so an unfiltered
+        /// field assertion could be satisfied by the wrong line.
+        /// </summary>
+        [TestMethod]
+        public async Task DequeueAsync_ZeroAcceptedAndCapReached_LogsScanCapBoundAndStopDecision()
+        {
+            // Arrange
+            var source = new Queue<MailItem>(BuildCandidates(10));
+            var fakeTime = new FakeTimeProvider();
+            var takeCount = 0;
+            var logs = new List<string>();
+
+            object gate = CreateGate(
+                () =>
+                {
+                    takeCount++;
+                    return source.Count == 0 ? null : source.Dequeue();
+                },
+                (mail, token) => Scored(100L),
+                threshold: 0.90,
+                timeProvider: fakeTime,
+                debugLog: logs.Add,
+                sourceActive: () => true,
+                maxScanWithoutAcceptance: 4
+            );
+
+            // Act
+            QfcGateBatch batch = await DequeueBatchAsync(gate, 5, 0, CancellationToken.None);
+
+            // Assert
+            batch.Accepted.Should().BeEmpty("no candidate reached the cutoff");
+            List<string> bounds = logs.Where(log =>
+                    log.Contains("Zero-acceptance scan bound reached")
+                )
+                .ToList();
+            bounds
+                .Should()
+                .ContainSingle("the bounded exit is logged exactly once per dequeue")
+                .Which.Should()
+                .Contain("Accepted=0")
+                .And.Contain("Scanned=4")
+                .And.Contain("Cutoff=900")
+                .And.Contain("Bound=scan-cap", "the item cap is the bound that stopped this scan")
+                .And.Contain("Decision=stop");
+        }
+
+        /// <summary>
         /// Issue #791 AC1. The scan cap alone cannot bound the pre-UI wait, because the empty-queue
         /// wait path does not increment the scored count while the loader is still refilling. The
         /// time ceiling is what terminates that wait: the source never yields and reports itself
@@ -204,6 +256,57 @@ namespace QuickFiler.Controllers.Tests
                 );
             batch.Accepted.Should().BeEmpty("nothing was ever takeable");
             batch.Scanned.Should().Be(0, "the wait path scores nothing");
+        }
+
+        /// <summary>
+        /// Issue #872 AC2. The time ceiling and the item cap are distinct bounds and the log must say
+        /// which one stopped the scan. The negative assertion is the discriminating one: a regression
+        /// that collapsed the two bounds to a single value would emit the item-cap token and would
+        /// still satisfy a presence-only assertion.
+        /// </summary>
+        [TestMethod]
+        public async Task DequeueAsync_ZeroAcceptedAndCeilingReached_LogsCeilingBoundNotScanCapBound()
+        {
+            // Arrange
+            var fakeTime = new FakeTimeProvider();
+            var logs = new List<string>();
+
+            object gate = CreateGate(
+                () => null,
+                (mail, token) => Scored(950L),
+                threshold: 0.90,
+                timeProvider: fakeTime,
+                debugLog: logs.Add,
+                sourceActive: () => true,
+                zeroAcceptanceCeiling: TimeSpan.FromSeconds(120)
+            );
+
+            // Act — the gate parks on the injected empty-source delay, then the clock passes the
+            // ceiling. Advancing the fake clock is the only thing that releases the delay, so the
+            // test carries no wall-clock wait and no sleep.
+            Task<QfcGateBatch> pending = DequeueBatchAsync(gate, 1, 200, CancellationToken.None);
+            pending.IsCompleted.Should().BeFalse("the gate is parked on the empty-source delay");
+
+            fakeTime.Advance(TimeSpan.FromSeconds(121));
+            _ = await pending;
+
+            // Assert
+            List<string> bounds = logs.Where(log =>
+                    log.Contains("Zero-acceptance scan bound reached")
+                )
+                .ToList();
+            bounds
+                .Should()
+                .ContainSingle("the bounded exit is logged exactly once per dequeue")
+                .Which.Should()
+                .Contain(
+                    "Bound=zero-acceptance-ceiling",
+                    "the time ceiling is the bound that stopped this scan"
+                )
+                .And.NotContain(
+                    "Bound=scan-cap",
+                    "collapsing the two bounds to one value must be detectable"
+                );
         }
 
         /// <summary>

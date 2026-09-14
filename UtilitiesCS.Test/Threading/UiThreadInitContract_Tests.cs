@@ -309,13 +309,17 @@ namespace UtilitiesCS.Test.Threading
         public void Init_WhenFirstInitializeThrows_SecondInitWithWorkingFactorySucceedsAndPopulatesAllFourCaptureFields()
         {
             // Arrange: the first factory fails during capture, the second succeeds.
+            Thread.CurrentThread.GetApartmentState().Should().Be(ApartmentState.STA);
             using (UiThreadStateScope.Enter())
             using (var host = new SharedStaDispatcherHost())
             {
                 UiThread.SyncContextFormFactory = () =>
                     new FakeUiCaptureSource { ThrowOnCapture = true };
                 Action failing = () => UiThread.Init();
-                failing.Should().Throw<InvalidOperationException>();
+                failing
+                    .Should()
+                    .Throw<InvalidOperationException>()
+                    .WithMessage(FakeUiCaptureSource.CaptureFailureMessage);
 
                 FakeUiCaptureSource working = null;
                 UiThread.SyncContextFormFactory = () =>
