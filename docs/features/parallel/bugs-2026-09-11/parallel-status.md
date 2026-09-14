@@ -11,8 +11,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | max_concurrency | 3 |
 | current_cohort | 0 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-13T23-45 |
-| next_step | HOLD_FOR_QUOTA_RESET_THEN_ROUTE_THREE_PLAN_REVISIONS_742_870_879 |
+| last_updated | 2026-09-14T00-27 |
+| next_step | HOLD_FOR_QUOTA_RESET_816_PR_890_CI_RUNNING_THEN_ROUTE_THREE_PLAN_REVISIONS |
 
 ## Items
 
@@ -23,7 +23,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 742 | `docs/features/active/2026-09-02-quickfiler-date-time-format-missing-invariant-culture-742` | 1 | C2 | sonnet | blocked | worktree_created |  |  |
 | 743 | `docs/features/active/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam-743` | 0 | C4 | fable | merged | merged | 888 | b63eaa4630d1 |
 | 792 | `docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792` | 2 | C4 | fable | scheduled | not_started |  |  |
-| 816 | `docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816` | 1 | C3 | opus | in_flight | worktree_created |  |  |
+| 816 | `docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816` | 1 | C3 | opus | in_flight | pr_open | 890 |  |
 | 838 | `docs/features/active/2026-09-09-gettableinviewasync-returns-null-on-timeout-838` | 0 | C3 | opus | merged | worktree_removed | 875 | 5cc7dcd6330b |
 | 839 | `docs/features/active/2026-09-09-createcancellationtoken-has-no-production-caller-839` | 0 | C3 | opus | merged | worktree_removed | 876 | e4349a62c0fe |
 | 869 | `docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869` | 1 | C3 | opus | blocked | worktree_created |  |  |
