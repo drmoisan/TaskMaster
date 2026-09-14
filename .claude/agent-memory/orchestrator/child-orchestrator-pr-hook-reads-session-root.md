@@ -72,6 +72,27 @@ lines exactly while the item checkpoint returned `HasErrors=False`.
 Use only the **exported** entry point. `Get-OrchestratorStatePrCreationReadinessError` is not exported;
 calling it leaves the error variable `$null`, which renders as a PASS-looking line and is a false green.
 
+**Exact signature, confirmed 2026-09-13 on parallel item #871.** `Invoke-OrchestratorStatePreflight` takes
+`-CheckpointPath` and `-Invoker` only. There is no `-RequirePrCreationReady` switch — passing one fails with
+`A parameter cannot be found that matches parameter name`. The function applies PR-creation readiness
+unconditionally, so `-CheckpointPath` alone reproduces the hook's text. That run confirmed the diagnostic
+works exactly as described: the item checkpoint returned `HasErrors=False` with empty `ErrorText`, while the
+session-root checkpoint reproduced all five denial lines character-for-character.
+
+**The #733 counter-case recurred on #871, same shape.** Run `bugs-2026-09-11`, three items live. The
+session-root occupant was item #872's checkpoint (`bug/minor-audit-trio-gate-cts-tracker-872`) reading
+`step7_status=blocked`, `step8_status=pending`, `blocked_reason=validator_failed`, plus two
+`complexity_assessments` both carrying `floor C3` against a computed `C1`. Every one of the five denial lines
+traced to #872 and contradicted #871, whose own checkpoint was ready. Those statuses mark a **live,
+mid-execution** sibling, so the swap-and-restore remedy was unavailable for the same reason it was on #733,
+and the #871 run brief independently forbade writing into the session worktree. Disposition: record the
+blocked state, leave the branch pushed and clean with the body and receipt already authored, and hand
+pull-request creation to the coordinator, which runs in the session root and satisfies the gate natively.
+
+Treat that as the default disposition rather than a last resort. Two of the three recorded outcomes on this
+gate are now "hand it to the parent"; the swap-and-restore dance applies only when the occupant is provably
+STALE, and checking that precondition is cheaper than discovering mid-swap that it is not.
+
 `enforce-pr-author-skill.ps1` has no parallel/epic branch at all — no run-checkpoint lookup, no
 `Parallel mode: true` marker, no derivation of the item worktree from `--body-file`. It is the sibling that
 `enforce-model-routing-receipt.ps1` already received and this one did not. Fix it upstream in drm-copilot;
