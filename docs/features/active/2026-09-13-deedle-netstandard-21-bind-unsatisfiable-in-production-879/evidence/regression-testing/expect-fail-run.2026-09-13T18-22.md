@@ -1,18 +1,32 @@
-# Phase 2 — Fail-Before Harness Run (expect-fail), Revision R2 re-run
+# Phase 2 — Fail-Before Harness Run (expect-fail)
 
-Timestamp: 2026-09-14T10-04
+Timestamp: 2026-09-14T11-26
 
-Build lock: ACQUIRED 879 at 2026-09-14T10:03:26, RELEASED by 879 at 2026-09-14T10:04:28.
+This artifact was overwritten by the Revision R5 re-run of `[P2-T11]`, as that task directs. The
+precondition was checked before the run: `[P1-T5]`'s copy of the superseded version 1.0 artifact exists
+at
+`docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/regression-testing/expect-fail-run-superseded-probe-surface.2026-09-13T18-22.md`
+(`P1T5_SUPERSEDED_COPY_PRESENT=True`), so the record of the vacuous pass that produced Defect 1 is not
+destroyed. The Revision R2 run's own artifact, which recorded
+`DEEDLE_RECORD_CONVERSION_OUTCOME=INVOKED-NO-EXCEPTION` and `Acceptance Condition: NOT MET`, was the
+previous content of this path and is overwritten here; its observation is reproduced in the plan's
+`## R6.1`, so no measurement is lost.
 
-Outlook gate: `@(Get-Process -Name OUTLOOK -ErrorAction SilentlyContinue).Count` returned `0` before
-the build that produced the assembly under test.
-
-This run overwrites the version 1.0 artifact at this path. The superseded artifact was preserved by
-`[P1-T5]` at
-`evidence/regression-testing/expect-fail-run-superseded-probe-surface.2026-09-13T18-22.md`, and its
-presence was confirmed before this task ran.
+The build lock was acquired for item `879` before the spans below and released after them.
 
 Command:
+
+Span 1, pre-run TRX removal:
+
+```
+pwsh -NoProfile -Command '
+$d = "TestResults/p2-expect-fail"
+foreach ($f in @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue)) { Remove-Item -LiteralPath $f.FullName -Force }
+Write-Output ("PRERUN_TRX_COUNT=" + @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue).Count)
+'
+```
+
+Span 2, the harness run:
 
 ```
 pwsh -NoProfile -Command '
@@ -23,15 +37,36 @@ $LASTEXITCODE
 '
 ```
 
-TRX reader span, and the failure-class extraction span, were run exactly as the task specifies, both
-pinned to the file name `p2-expect-fail.trx`. All three payloads additionally carry a leading
-`Set-Location` to the item worktree, because the executor was launched without worktree isolation.
+Span 3, per-test outcomes:
 
-Pinning was load-bearing and is confirmed to have worked. Before this run,
-`TestResults/p2-expect-fail` contained exactly one TRX,
-`DanMoisan_MEGALODON4_2026-09-13_23_35_52_net481.trx`, written by the superseded version 1.0 run, and
-zero files matching `p2-expect-fail.trx`. `TRX_MATCH_COUNT=1` after the run therefore reads this
-run's TRX and not the superseded one.
+```
+pwsh -NoProfile -Command '
+$m = @(Get-ChildItem -LiteralPath "TestResults/p2-expect-fail" -Filter "p2-expect-fail.trx" -Recurse)
+Write-Output ("TRX_MATCH_COUNT=" + $m.Count)
+$trx = $m[0]
+$x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
+foreach ($r in @($x.TestRun.Results.UnitTestResult)) { Write-Output ($r.testName + " OUTCOME=" + $r.outcome) }
+'
+```
+
+Span 4, failure class:
+
+```
+pwsh -NoProfile -Command '
+$m = @(Get-ChildItem -LiteralPath "TestResults/p2-expect-fail" -Filter "p2-expect-fail.trx" -Recurse)
+Write-Output ("TRX_MATCH_COUNT=" + $m.Count)
+$trx = $m[0]
+$x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
+foreach ($r in @($x.TestRun.Results.UnitTestResult)) {
+if ($r.testName -eq "AfterInstall_DeedleTypeInitializerSucceeds") {
+foreach ($line in @(($r.Output.StdOut -split "`r?`n"))) {
+if ($line.StartsWith("DEEDLE_RECORD_CONVERSION_OUTCOME=")) { Write-Output $line } } } }
+'
+```
+
+Every payload additionally carries a leading `Set-Location` to the item worktree, because the executor
+was launched without worktree isolation and pwsh would otherwise resolve every repository-relative path
+in the coordinator session worktree. That statement changes no measurement.
 
 EXIT_CODE: 1
 
@@ -40,75 +75,57 @@ ExpectedExitCode: 1
 Output Summary:
 
 ```
+PRERUN_TRX_COUNT=0
 TRX_MATCH_COUNT=1
-ChildDomain_HasNoSvgControlAssemblyLoaded OUTCOME=Passed
-NegativeControl_Netstandard20Observation_IsRecorded OUTCOME=Passed
-AppConfig_DeclaresNetstandardRedirect OUTCOME=Failed
-AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed
-ThisAddIn_HasExplicitStaticConstructor OUTCOME=Failed
 ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall OUTCOME=Passed
-ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect OUTCOME=Passed
-AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed
+AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed
+AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed
 NegativeControl_HasNoUtilitiesCsAssemblyLoaded OUTCOME=Passed
 NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed
-DEEDLE_RECORD_CONVERSION_OUTCOME=INVOKED-NO-EXCEPTION
+ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed
+AppConfig_DeclaresNetstandardRedirect OUTCOME=Failed
+ChildDomain_HasNoSvgControlAssemblyLoaded OUTCOME=Passed
+NegativeControl_Netstandard20Observation_IsRecorded OUTCOME=Passed
+ThisAddIn_HasExplicitStaticConstructor OUTCOME=Failed
+ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect OUTCOME=Passed
+DEEDLE_RECORD_CONVERSION_OUTCOME=NETSTANDARD-BIND-FAILURE:TypeInitializationException
 ```
 
-Acceptance Condition: NOT MET.
+The vstest console summary for the same run reads `Total tests: 11`, `Passed: 7`, `Failed: 4`, matching
+the eleven `OUTCOME=` lines above.
 
-Condition-by-condition:
+Acceptance Condition: MET.
 
-- `TRX_MATCH_COUNT=1` — MET.
-- `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed` — MET.
-- `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed` — NOT MET. The recorded outcome is
-  `Passed`.
-- exactly one `DEEDLE_RECORD_CONVERSION_OUTCOME=` line whose value begins with
-  `NETSTANDARD-BIND-FAILURE:` — NOT MET. Exactly one such line is present, and its value is
-  `INVOKED-NO-EXCEPTION`, which is the completion token rather than either failure class.
+- `PRERUN_TRX_COUNT=0`, taken before the run. The results directory previously held two superseded TRX
+  files, one of which already bore the pinned logger name and carried the vacuous outcome. Emptying the
+  directory first is what makes the `TRX_MATCH_COUNT=1` below a measurement of this run rather than of a
+  residue.
+- `TRX_MATCH_COUNT=1`.
+- `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed`. This is the Revision R5
+  addition and it is evaluated first. The child domain is rooted at the `QuickFiler.Test` build output
+  directory, so the bind under test is reachable in the domain the other three observations describe.
+  Two earlier fail-before attempts produced a success token against an unfixed build precisely because
+  that was not true and nothing measured it.
+- `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed`. The console message records
+  `outcome21` as `FileNotFoundException` against an expected `LOADED`.
+- `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`.
+- Exactly one `DEEDLE_RECORD_CONVERSION_OUTCOME=` line, and its value is
+  `NETSTANDARD-BIND-FAILURE:TypeInitializationException`, which begins with the
+  `NETSTANDARD-BIND-FAILURE:` prefix. This is what makes the two `OUTCOME=Failed` conditions above it
+  non-vacuous: the Deedle line failed because the `netstandard` bind is unsatisfiable, not because of an
+  unrelated exception. Had the value begun with `OTHER-FAILURE:` this task would have halted and reported
+  blocked.
 
-The task is left unchecked in the plan and the executor halts here, which is the branch the task
-text and the delegation both require.
+The run's own exit code is `1`, recorded against `ExpectedExitCode: 1` and not itself a gate.
 
-The recorded value is neither failure class, so the `OTHER-FAILURE:` halt branch the task describes
-is not the branch taken. The probe did not reach an unrelated exception; it reached no exception at
-all.
+These are fail-before observations. They fail at runtime against the behaviour-empty installer supplied
+by `[P2-T1]`, not at compile time: `[P2-T10]` recorded a clean build of the same tree.
 
-## Why this is the same defect class as version 1.0, on a different member
-
-Revision R2 repointed the probe from `RuntimeHelpers.RunClassConstructor` on `Deedle.Reflection` to an
-invocation of `Deedle.Reflection.convertRecordSequence` closed over a property-only record type,
-because the version 1.0 member returned its success token against a build carrying no fix. The
-repointed member returns its success token against the same unfixed build. The measurement is
-therefore still not discriminating between a fixed build and an unfixed one, which is the property
-`[P2-T11]` exists to establish.
-
-The run rules out the two explanations that would have made this an artefact rather than an
-observation:
-
-- Isolation is intact. `NegativeControl_WithoutInstall_Netstandard21Throws` passed, so the
-  installer-free domain still cannot bind the `2.1.0.0` identity, and
-  `NegativeControl_HasNoUtilitiesCsAssemblyLoaded` passed, so that domain never loaded
-  `UtilitiesCS`. All five isolation outcomes `[P2-T12]` gates are `Passed`.
-- The bind really is unsatisfiable in the positive domain where the Deedle observation was taken.
-  `AfterInstall_BothNetstandardVersionsBind` failed in that same domain with
-  `"FileNotFoundException"` observed for the `2.1.0.0` identity against an expected `"LOADED"`.
-
-So in one and the same child domain, the `netstandard 2.1.0.0` identity is unbindable, and
-`Deedle.Reflection.convertRecordSequence` closed over a record type completes without raising. The
-member is reachable and the harness is sound; what the member does not do is transit the code path
-whose `netstandard 2.1.0.0` dependency the reported production trace names.
-
-This is consistent with, rather than contradicted by, the preflight observation the plan relies on.
-Preflight invoked the same member closed over a property-only type on an unfixed tree and recorded
-`INVOKED-NO-EXCEPTION`, and read that as evidence the post-fix gate is reachable. The same
-measurement is also evidence that the pre-fix gate is not discriminating, because the tree preflight
-measured carried no fix. The plan's acceptance condition and the preflight observation it cites
-disagree, and this run resolves the disagreement in favour of the preflight observation.
-
-## What this does not establish
-
-It does not establish that the production defect is absent. `AfterInstall_BothNetstandardVersionsBind`
-independently demonstrates the unsatisfiable `2.1.0.0` bind that the issue reports. What is
-unestablished is a Deedle-level observation that changes value when the fix is applied. Selecting
-that observation is a planning decision, not an execution one, so the probe was not adapted and the
-acceptance condition was not weakened.
+Two further failures in this run, `ThisAddIn_HasExplicitStaticConstructor OUTCOME=Failed` and
+`AppConfig_DeclaresNetstandardRedirect OUTCOME=Failed`, belong to the sibling class
+`AddInEagerInstallShapeTests` created by `[P2-T8]`. They are discovered by this task's
+`FullyQualifiedName~TaskMaster.Test.Bootstrap` filter and are recorded here for completeness. They are
+also fail-before observations: the explicit static constructor is added by `[P3-T3]` and the
+`netstandard` redirect by `[P3-T4]`, neither of which exists yet. `[P4-T7]` is the task that runs that
+class after the fix. They are outside this task's acceptance condition and were not treated as evidence
+about the bind.

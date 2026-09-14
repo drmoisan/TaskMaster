@@ -1553,7 +1553,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       project file. Only the anchor citation was stale.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallbackTests.cs"` on
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` returns exactly 1 hit.
-- [ ] [P2-T5] Amend `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` in place — the file already
+- [x] [P2-T5] Amend `TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs` in place — the file already
       exists from the version 1.0 execution of this plan and must NOT be recreated — so that it declares
       `public sealed class ChildDomainBindProbe : MarshalByRefObject` in namespace
       `TaskMaster.Test.Bootstrap`. It exposes separate public methods so that the negative-control path
@@ -1691,7 +1691,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       Each asserted token is a single identifier, a single dotted identifier or a single short string
       literal rather than a multi-word phrase, so no CSharpier reflow of the surrounding statement can
       split it across two lines.
-- [ ] [P2-T6] Amend `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` in place — the file
+- [x] [P2-T6] Amend `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` in place — the file
       already exists from the version 1.0 execution of this plan and must NOT be recreated — declaring
       `[TestClass] public class NetstandardBindChildDomainTests` in namespace `TaskMaster.Test.Bootstrap`,
       creating each child domain with `AppDomain.CreateDomain`, and unloading every created domain in
@@ -1913,7 +1913,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `Select-String -SimpleMatch -CaseSensitive` returns exactly 1 hit for each of the three file names
       `ChildDomainBindProbe.cs`, `NetstandardBindChildDomainTests.cs` and
       `AddInEagerInstallShapeTests.cs`.
-- [ ] [P2-T10] Re-run after the Revision R5 amendments to `[P2-T5]` and `[P2-T6]`, both of which change
+- [x] [P2-T10] Re-run after the Revision R5 amendments to `[P2-T5]` and `[P2-T6]`, both of which change
       compiled source after the build recorded by the Revision R2 execution of this task. `[P2-T1]` is
       unchanged by Revision R5 and is not a reason for this re-run.
       The artifact at the path named below is overwritten by this re-run.
@@ -1947,7 +1947,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `EXIT_CODE: 0`; and the console log contains at least one line matching `^\s+0 Error\(s\)$`. A
       compile failure here is a defect in the seam, not the fail-before signal this phase is looking
       for.
-- [ ] [P2-T11] [expect-fail] LOCK-ACQUIRE, then run the harness class alone and capture the TRX, then
+- [x] [P2-T11] [expect-fail] LOCK-ACQUIRE, then run the harness class alone and capture the TRX, then
       LOCK-RELEASE.
 
       First, remove every TRX already in the results directory and record the emptied count:
@@ -2061,7 +2061,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory` records anything other than `Passed` the
       executor halts and reports blocked for the same reason, without evaluating the other three
       conditions as evidence.
-- [ ] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
+- [x] [P2-T12] Decisive net481 isolation check, taken before the fix exists so it cannot be confounded by
       it. Read the `[P2-T11]` artifact. This task is re-run under Revision R5 and MUST read the
       REGENERATED `[P2-T11]` artifact, not the superseded copy `[P1-T5]` preserved and not the Revision R2
       content of the plan-named path: the isolation outcomes are properties of the run, and the run

@@ -38,15 +38,20 @@ namespace TaskMaster.Test.Bootstrap
             "netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51";
 
         /// <summary>
-        /// The configuration file supplied to every child domain. This is the test
-        /// assembly's own deployed configuration, which carries no <c>netstandard</c> entry
-        /// and is out of scope for this work to change. The add-in's deployed configuration
-        /// image, which does gain a <c>netstandard</c> entry, is deliberately not named here:
-        /// selecting it would void the negative control.
+        /// The configuration file supplied to every child domain. It is the deployed
+        /// configuration of the assembly whose output directory the child domains are rooted
+        /// at; it carries no <c>netstandard</c> entry and is out of scope for this work to
+        /// change. The add-in's deployed configuration image, which does gain a
+        /// <c>netstandard</c> entry, is deliberately not named here: selecting it would void
+        /// the negative control. The name is stated explicitly rather than derived from the
+        /// host assembly's own name, so that the prohibition on naming the add-in's image
+        /// cannot be defeated by a change of host.
         /// </summary>
-        private const string HostConfigFileName = "TaskMaster.Test.dll.config";
+        private const string HostConfigFileName = "QuickFiler.Test.dll.config";
 
         private const string DeedleFileName = "Deedle.dll";
+
+        private const string FSharpCoreFileName = "FSharp.Core.dll";
 
         private readonly List<AppDomain> _createdDomains = new List<AppDomain>();
 
@@ -147,6 +152,59 @@ namespace TaskMaster.Test.Bootstrap
                 .Be(
                     0,
                     "the harness must measure the resolver, not a binding redirect it did not install"
+                );
+        }
+
+        /// <summary>
+        /// Proves the child domains are rooted where this harness intends, rather than at this
+        /// test assembly's own output directory.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// It runs in the positive domain and deliberately does not install the fallback. An
+        /// application base is fixed at domain creation and no later call can change it, so
+        /// ordering relative to the installer is not merely unconstrained here but meaningless,
+        /// and omitting the call keeps this domain's loaded set at its minimum for the
+        /// observation.
+        /// </para>
+        /// <para>
+        /// The two file checks are made in the parent domain rather than in the child, so no
+        /// filesystem helper is added to the child domain's loaded set. Without this method a
+        /// silent regression of the application base back to the host assembly's own directory
+        /// would make every positive result in this class vacuous, which is the failure this
+        /// harness has already suffered twice.
+        /// </para>
+        /// </remarks>
+        [TestMethod]
+        public void ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory()
+        {
+            // Arrange
+            ChildDomainBindProbe probe = CreateChildDomainProbe("positive-application-base");
+            string expectedBase = ProbeApplicationBase;
+
+            // Act
+            string observedBase = probe.ApplicationBaseDirectory();
+
+            // Assert: paths are compared case-insensitively because Windows paths are.
+            string.Equals(
+                    TrimSeparator(observedBase),
+                    TrimSeparator(expectedBase),
+                    StringComparison.OrdinalIgnoreCase
+                )
+                .Should()
+                .BeTrue(
+                    "the child domain must be rooted at {0} but reported {1}",
+                    expectedBase,
+                    observedBase
+                );
+            File.Exists(Path.Combine(expectedBase, DeedleFileName))
+                .Should()
+                .BeTrue("the harness loads Deedle from the directory the domain is rooted at");
+            File.Exists(Path.Combine(expectedBase, FSharpCoreFileName))
+                .Should()
+                .BeTrue(
+                    "the flavour of FSharp.Core deployed beside Deedle is what determines "
+                        + "whether the identity under test is requested at all"
                 );
         }
 
@@ -299,21 +357,99 @@ namespace TaskMaster.Test.Bootstrap
                 );
         }
 
-        private static string HostConfigPath =>
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, HostConfigFileName);
+        /// <summary>
+        /// The directory every child domain is rooted at.
+        /// </summary>
+        /// <remarks>
+        /// It is deliberately not this test assembly's own output directory. The discriminating
+        /// property is which flavour of <c>FSharp.Core</c> the directory deploys: the directory
+        /// named here deploys the flavour that references the unsatisfiable
+        /// <c>netstandard 2.1.0.0</c> identity, whereas this test assembly's own output
+        /// directory deploys a flavour that never requests it, so a probe rooted there reports
+        /// success whether or not a fix is present. The host base directory is this assembly's
+        /// <c>bin\Debug</c>, so three parent steps reach the repository root.
+        /// </remarks>
+        private static string ProbeApplicationBase =>
+            Path.GetFullPath(
+                Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "..",
+                    "..",
+                    "..",
+                    "QuickFiler.Test",
+                    "bin",
+                    "Debug"
+                )
+            );
 
-        private static string DeedlePath =>
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DeedleFileName);
+        private static string HostConfigPath =>
+            Path.Combine(ProbeApplicationBase, HostConfigFileName);
+
+        private static string DeedlePath => Path.Combine(ProbeApplicationBase, DeedleFileName);
 
         /// <summary>
-        /// Creates a child domain rooted at this test assembly's output directory and
-        /// unwraps the cross-domain probe inside it.
+        /// Trims any trailing directory separator, so a path that reports one and a path that
+        /// does not can be compared.
         /// </summary>
+        private static string TrimSeparator(string path)
+        {
+            return path == null
+                ? null
+                : path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+
+        /// <summary>
+        /// Verifies that the directory the child domains are rooted at exists and deploys every
+        /// file this harness depends on.
+        /// </summary>
+        /// <remarks>
+        /// It throws rather than skipping. A skipped precondition here would leave every result
+        /// in this class vacuous while still reporting as a pass.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The directory, or one of the three required files in it, is missing.
+        /// </exception>
+        private static void EnsureProbeApplicationBaseIsComplete()
+        {
+            string applicationBase = ProbeApplicationBase;
+            if (!Directory.Exists(applicationBase))
+            {
+                throw new InvalidOperationException(
+                    "The directory the child domains must be rooted at was not found: "
+                        + applicationBase
+                );
+            }
+
+            string[] required = new[] { HostConfigFileName, DeedleFileName, FSharpCoreFileName };
+            foreach (string fileName in required)
+            {
+                string candidate = Path.Combine(applicationBase, fileName);
+                if (!File.Exists(candidate))
+                {
+                    throw new InvalidOperationException(
+                        "A file this harness depends on was not found: " + candidate
+                    );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates a child domain rooted at the directory named by
+        /// <see cref="ProbeApplicationBase"/> and unwraps the cross-domain probe inside it.
+        /// </summary>
+        /// <remarks>
+        /// The probe is created from its assembly's file location rather than from its display
+        /// name, because this test assembly is not deployed to the directory the domain is
+        /// rooted at and a display-name creation would therefore fail before any observation
+        /// could be taken.
+        /// </remarks>
         private ChildDomainBindProbe CreateChildDomainProbe(string friendlyName)
         {
+            EnsureProbeApplicationBaseIsComplete();
+
             var setup = new AppDomainSetup
             {
-                ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
+                ApplicationBase = ProbeApplicationBase,
                 ConfigurationFile = HostConfigPath,
             };
 
@@ -321,8 +457,8 @@ namespace TaskMaster.Test.Bootstrap
             _createdDomains.Add(domain);
 
             return (ChildDomainBindProbe)
-                domain.CreateInstanceAndUnwrap(
-                    typeof(ChildDomainBindProbe).Assembly.FullName,
+                domain.CreateInstanceFromAndUnwrap(
+                    typeof(ChildDomainBindProbe).Assembly.Location,
                     typeof(ChildDomainBindProbe).FullName
                 );
         }

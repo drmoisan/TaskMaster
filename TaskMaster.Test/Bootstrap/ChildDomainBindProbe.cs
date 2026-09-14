@@ -122,6 +122,20 @@ namespace TaskMaster.Test.Bootstrap
         }
 
         /// <summary>
+        /// Returns the application base directory of this domain, read inside the domain.
+        /// </summary>
+        /// <remarks>
+        /// It takes no argument, touches no file and loads no assembly, so it is safe to call in
+        /// the installer-free negative-control domain as well as in the positive one. It exists
+        /// so the harness can assert the directory the child domain is actually rooted at rather
+        /// than assume the configured value took effect.
+        /// </remarks>
+        public string ApplicationBaseDirectory()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        /// <summary>
         /// Installs the production binding fallback in this domain, and does nothing else.
         /// </summary>
         /// <remarks>
@@ -161,10 +175,10 @@ namespace TaskMaster.Test.Bootstrap
         }
 
         /// <summary>
-        /// Loads Deedle from the supplied absolute path and invokes
-        /// <c>Deedle.Reflection.convertRecordSequence</c> closed over
-        /// <see cref="DeedleProbeRecord"/>, which is the deepest caller frame of the reported
-        /// production trace.
+        /// Loads Deedle from the supplied absolute path and invokes the single-generic-argument,
+        /// single-parameter <c>FromRecords</c> member of <c>Deedle.Frame</c>, closed over
+        /// <see cref="DeedleProbeRecord"/>. That member is production's own entry point, called
+        /// from <c>UtilitiesCS/Extensions/DfDeedle.cs</c>.
         /// </summary>
         /// <returns>
         /// <see cref="InvokedOutcome"/> when the invocation returned without throwing;
@@ -190,8 +204,8 @@ namespace TaskMaster.Test.Bootstrap
             try
             {
                 Assembly deedle = Assembly.LoadFrom(deedleDllPath);
-                Type reflection = deedle.GetType("Deedle.Reflection", throwOnError: true);
-                MethodInfo definition = ResolveConvertRecordSequence(reflection);
+                Type frame = deedle.GetType("Deedle.Frame", throwOnError: true);
+                MethodInfo definition = ResolveFromRecords(frame);
                 MethodInfo closed = definition.MakeGenericMethod(typeof(DeedleProbeRecord));
                 closed.Invoke(null, new object[] { records });
                 return InvokedOutcome;
@@ -211,70 +225,52 @@ namespace TaskMaster.Test.Bootstrap
         }
 
         /// <summary>
-        /// Resolves the generic method definition the probe invokes, failing loudly when the
-        /// member is missing, ambiguous, or not of the expected shape.
+        /// Resolves the generic method definition the probe invokes, selecting it by shape and
+        /// failing loudly unless exactly one member survives the filter.
         /// </summary>
         /// <remarks>
+        /// <para>
+        /// The declaring type carries more than one <c>FromRecords</c> overload, so a name-only
+        /// lookup cannot be used: it would have to report an ambiguity rather than a member. The
+        /// members are enumerated instead and filtered on generic arity and parameter count,
+        /// which is the same rule the plan's metadata measurement applies, so the plan and the
+        /// probe select the same member by the same rule.
+        /// </para>
+        /// <para>
         /// Resolving a <see cref="MethodInfo"/> does not run a class constructor, which is why
         /// this helper can sit inside the caller's try block without itself triggering the bind
-        /// under test; the invocation is what triggers it. The non-public binding flag is
-        /// load-bearing: the member is internal to Deedle, so a public-only lookup returns null
-        /// and this helper throws.
+        /// under test; the invocation is what triggers it. The non-public binding flag covers
+        /// either accessibility the member may carry.
+        /// </para>
         /// </remarks>
-        private static MethodInfo ResolveConvertRecordSequence(Type reflection)
+        private static MethodInfo ResolveFromRecords(Type frame)
         {
-            const string MemberName = "convertRecordSequence";
-            MethodInfo method;
+            const string MemberName = "FromRecords";
 
-            try
-            {
-                method = reflection.GetMethod(
-                    MemberName,
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static
-                );
-            }
-            catch (AmbiguousMatchException ex)
+            MethodInfo[] candidates = frame
+                .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                .Where(m =>
+                    m.Name == MemberName
+                    && m.IsGenericMethodDefinition
+                    && m.GetGenericArguments().Length == 1
+                    && m.GetParameters().Length == 1
+                )
+                .ToArray();
+
+            if (candidates.Length != 1)
             {
                 throw new InvalidOperationException(
-                    "More than one overload of "
-                        + reflection.FullName
+                    "The shape filter over "
+                        + frame.FullName
                         + "."
                         + MemberName
-                        + " was found, so the probe cannot name the overload it means.",
-                    ex
+                        + " left "
+                        + candidates.Length
+                        + " members, so the probe cannot name the overload it means."
                 );
             }
 
-            if (method == null)
-            {
-                throw new InvalidOperationException(
-                    "The member " + reflection.FullName + "." + MemberName + " was not found."
-                );
-            }
-
-            if (!method.IsGenericMethodDefinition || method.GetGenericArguments().Length != 1)
-            {
-                throw new InvalidOperationException(
-                    "The member "
-                        + reflection.FullName
-                        + "."
-                        + MemberName
-                        + " is not a generic method definition taking exactly one generic argument."
-                );
-            }
-
-            if (method.GetParameters().Length != 1)
-            {
-                throw new InvalidOperationException(
-                    "The member "
-                        + reflection.FullName
-                        + "."
-                        + MemberName
-                        + " does not take exactly one parameter."
-                );
-            }
-
-            return method;
+            return candidates[0];
         }
 
         /// <summary>
