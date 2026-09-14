@@ -400,8 +400,10 @@ Unchecked and to be re-executed, with the reason for each:
   be re-confirmed against the regenerated artifact rather than against the superseded one.
 
 Left checked and NOT re-executed, because both defects leave them untouched: `[P0-T1]` through
-`[P0-T16]`, `[P1-T1]` through `[P1-T4]`, `[P2-T2]`, `[P2-T3]`, `[P2-T4]`, `[P2-T7]`, `[P2-T8]` and
-`[P2-T9]`. `[P2-T11]` was already unchecked and stays unchecked.
+`[P0-T16]`, `[P1-T1]` through `[P1-T4]`, `[P2-T2]`, `[P2-T4]`, `[P2-T7]`, `[P2-T8]` and
+`[P2-T9]`. `[P2-T11]` was already unchecked and stays unchecked. `[P2-T3]` was also left checked by
+Revision R2 on the same ground and was subsequently unchecked by Revision R3 for an unrelated reason
+recorded in `## R5`.
 
 `[P2-T4]`'s cited anchor line is corrected from 193 to 194 without unchecking the task: the merge of
 `origin/main` at `a49c9729e` moved `<Compile Include="Extensions\DfDeedle_Tests.cs" />` in
@@ -443,6 +445,89 @@ this revision rewrites, projects or deletes them.
   anchor moved from line 193 to line 194. No acceptance condition in this plan compares a later count
   against the `[P0-T16]` figures — `[P4-T12]` and `[P5-T8]` each assert an absolute ceiling of 500 lines
   and nothing else — so no gate is affected and the task is left checked rather than re-run.
+
+---
+
+## R5 — REVISION R3: four blocking and three minor deltas, no new task and no renumbering
+
+Revision R3 edits task bodies only. It adds no task, removes no task, and renumbers nothing, so every
+`[P#-T#]` identifier this plan and its evidence artifacts cite is unchanged. It unchecks exactly one
+task, `[P2-T3]`.
+
+### R5.1 — TRX selection is pinned by name (blocking)
+
+Four read-backs selected their TRX with `-Filter "*.trx"` followed by `[0]`. `Get-ChildItem` returns
+results in name-ascending order rather than write-time order, and `TestResults/p2-expect-fail` already
+holds `DanMoisan_MEGALODON4_2026-09-13_23_35_52_net481.trx` from the superseded version 1.0 run — the
+run that recorded the vacuous `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` and that
+carries no `DEEDLE_RECORD_CONVERSION_OUTCOME=` line. A TRX written on 2026-09-14 sorts after that name,
+so the unpinned selection would have read the superseded run and reported a false negative
+indistinguishable from a genuine one. Each producing run now passes
+`"/Logger:trx;LogFileName=<fixed name>.trx"` and each reader filters on that fixed name and emits
+`TRX_MATCH_COUNT=`, which its acceptance gates at `1`. The four producing tasks are `[P2-T11]`
+(`p2-expect-fail.trx`), `[P4-T2]` (`p4-ladder.trx`), `[P4-T3]` (`p4-harness.trx`) and `[P4-T7]`
+(`p4-shape.trx`); the two additional readers of the `[P4-T3]` TRX, `[P4-T6]` and `[P4-T10]`, are
+repointed to `p4-harness.trx`.
+
+This treatment is deliberately NOT applied to the `[P0-T8]` and `[P5-T7]` runner reads.
+`Invoke-MSTestWithCoverage.ps1` writes a single fixed-name `mstest-coverage-run.trx` under
+`coverage/test-results/` and overwrites it, so those reads are already deterministic and pinning them
+would add a literal the runner does not control.
+
+### R5.2 — `[P5-T7]` is gated against the recorded baseline failures, not against zero (blocking)
+
+`[P0-T8]` recorded `test failed = 2`. Both failures are declared at
+`QuickFiler.Test/Viewers/ItemViewerBreadcrumbThreadAffinityTests.cs` lines 204 and 237, a file no task
+in this plan writes and which `[P6-T1]`'s pathspec does not name, so they survive this work unrepaired.
+A gate demanding zero failures would have been unsatisfiable and its stated remedy, restarting the
+toolchain loop, would not have terminated. `[P5-T7]` now gates on the failing-name list being a SUBSET
+of those two, so a third failure blocks and an intermittent pass of either does not.
+
+### R5.3 — `[P4-T7]` states its command (blocking)
+
+`[P4-T7]` named a results directory and a test-case filter but no assembly operand, no `/InIsolation`
+and no logger, while its acceptance demanded `OUTCOME=` lines that only a TRX can supply. The task now
+names the full command shape it inherits from `[P2-T11]` and the one operand that differs.
+
+### R5.4 — `[P6-T24]` is conditional on the human gate (blocking)
+
+`spec.md` lines 554-556 state that the live-Outlook gate is a human gate and that an unrecorded result
+does not discharge it, and `[P6-T4]` permits `RESULT: PENDING-MAINTAINER`. `[P6-T24]` nevertheless
+marked AC19 delivered unconditionally, which would have made the plan's own artifact assert something
+false. It now branches on the recorded `RESULT:` value and, on the withholding branch, appends a
+`Check-Off Withheld:` field instead of checking the criterion off.
+
+### R5.5 — Minor deltas
+
+- `[P5-T10]` additionally records `BASELINE MEASURED ON A DIFFERENT BASE`. The `[P0-T8]` baseline carries
+  `Timestamp: 2026-09-13T23-15` and predates the merge of `origin/main` at `a49c9729e` into this branch
+  at `f02cee3fe`, so the two document-level rates measure different code bases as well as different
+  denominators. The baseline is not re-captured, because it already records
+  `Cobertura Document State: RAW-COLLECTOR-OUTPUT` and the no-regression judgment therefore already
+  rests on `NEW_MODULE_LINE_PERCENT` and `[P5-T9]`.
+- `[P2-T5]` item 2 no longer claims the probe record mirrors production's shape. `EmailRecord` at
+  `UtilitiesCS/Extensions/DfDeedle.cs` line 266 is a `private struct` exposing six public fields at
+  lines 290-295, whereas the probe type is a sealed class exposing auto-properties. The design is
+  unchanged — preflight invoked `Deedle.Reflection.convertRecordSequence` closed over a property-only
+  type without exception — but the justification is now accurate.
+- `[P6-T5]` records that `origin/main` is its anchor and why, rather than `spec.md` line 536 being
+  re-worded. AC14's text is left alone because every `[P6-T#]` check-off addresses `spec.md` by line
+  number and a re-wrap at line 536 would move the five criteria that follow it.
+
+### R5.6 — `[P2-T3]` gains an eleventh test and is unchecked (coverage-floor risk closed)
+
+`[P5-T9]` asserts a 90 percent line floor on `UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs`. None of
+the ten tests the version 1.0 execution wrote reaches `OnAssemblyResolve` at lines 149-174 or
+`CreateProductionLadder` at lines 134-143, because both are reachable only through a real failed bind
+raising `AppDomain.AssemblyResolve`; the ten drive `AssemblyBindingLadder` through injected delegates.
+An eleventh test is added rather than leaving the risk open, because a Phase 5 coverage failure would
+cost a full round plus a rebuild, whereas Phase 2 is already being re-executed for Revision R2.
+`[P2-T3]` is therefore unchecked, its acceptance count rises from ten to eleven `[TestMethod]`
+occurrences — the file carries exactly ten today, which keeps the count discriminating — and `[P4-T2]`'s
+passed floor rises from 10 to 11. `spec.md` AC4 at lines 484-490 is NOT amended: AC4 requires that its
+enumerated scenarios be covered as separately named test methods, and an additional test method beyond
+that enumeration does not falsify it. Leaving AC4 alone also preserves its seven-line block and every
+subsequent `spec.md` line number this plan cites.
 
 ---
 
@@ -1123,17 +1208,42 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       items; an unregistered file silently does not build.
       Acceptance: `Select-String -SimpleMatch -Pattern "Bootstrap\AssemblyBindingFallback.cs"` on
       `UtilitiesCS/UtilitiesCS.csproj` returns exactly 1 hit.
-- [x] [P2-T3] Create `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs`, MSTest with Moq and
+- [ ] [P2-T3] Amend `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` in place — the file
+      already exists from the version 1.0 execution of this plan, carrying exactly ten `[TestMethod]`
+      occurrences, and must NOT be recreated — so that it remains MSTest with Moq and
       FluentAssertions, one `[TestClass]` named `AssemblyBindingFallbackTests` in namespace
       `UtilitiesCS.Test.Bootstrap`, with one separately named `[TestMethod]` for each of: already-loaded
       match wins over a fresh load; the full-display-name rung; the runtime-directory load-from-path rung;
       a mismatched public key token is rejected; a null requested token; an empty requested token; the
       re-entrance guard returns null on a nested request for the same simple name; `Install()` called
       twice attaches one handler; a rung that throws internally is absorbed and the ladder continues; an
-      unresolvable name returns null without throwing. Every rung is driven through the injected
-      delegates, so the tests touch neither the GAC nor the filesystem. A `[TestCleanup]` resets any
+      unresolvable name returns null without throwing. Every ladder rung in those ten tests is driven
+      through the injected
+      delegates, so those tests touch neither the GAC nor the filesystem. A `[TestCleanup]` resets any
       mutated seam. The class carries Arrange-Act-Assert structure and a short intent comment per test.
-      Acceptance: the file exists and contains at least ten occurrences of `[TestMethod]`.
+
+      **Revision R3 amendment: one added test, closing the `[P5-T9]` coverage-floor risk.** Add an
+      eleventh `[TestMethod]`, separately named, asserting that the subscribed handler returns null for
+      an unresolvable name, driven by attempting `Assembly.Load` of a display name that no rung can
+      satisfy after `Install()` has run. This is the only test in the class that goes through the real
+      CLR binder rather than through the injected delegates, and it is added deliberately: the ten
+      existing tests drive `AssemblyBindingLadder` directly and none of them executes
+      `AssemblyBindingFallback.OnAssemblyResolve` at lines 149-174 or
+      `AssemblyBindingFallback.CreateProductionLadder` at lines 134-143, both of which are reachable only
+      through a real failed bind raising `AppDomain.AssemblyResolve`. Those two members are roughly
+      twenty-five lines of the new module, so leaving them uncovered risks `[P5-T9]`'s 90 percent
+      per-file floor failing in Phase 5, after the toolchain loop has already run.
+      Constraints on the added test: the display name is a fixed literal that names no assembly in the
+      repository, in the GAC or beside the test assembly, so the outcome is deterministic; the test
+      asserts the `Assembly.Load` call throws rather than inspecting the handler's return value
+      directly, because the CLR consumes that return value; and the test creates, writes and deletes no
+      file, uses no `Thread.Sleep`, no `Task.Delay` and no wall-clock wait, so AC16 at `spec.md` line 545
+      is unaffected. The prose sentence above about touching neither the GAC nor the filesystem is
+      scoped to the ten delegate-driven tests for this reason; this eleventh test reads the binder's
+      probing paths, which is what makes it cover the production entry point.
+      Acceptance: the file exists and contains at least eleven occurrences of `[TestMethod]`. The
+      tree currently carries exactly ten, which is what makes this count discriminating rather than
+      already satisfied.
 - [x] [P2-T4] Register the new unit-test file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` into the `ItemGroup` in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
@@ -1181,8 +1291,13 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
          repeating their values. `LoadedOutcome` and its value `LOADED` are unchanged and still used by
          `TryLoadDisplayName`.
       2. A public nested type `public sealed class DeedleProbeRecord` carrying exactly two public
-         auto-properties, a `string` and a `double`. It mirrors the shape production passes to
-         `Deedle.Frame.FromRecords` at `UtilitiesCS/Extensions/DfDeedle.cs` lines 123 and 237. It carries
+         auto-properties, a `string` and a `double`. It is a record-shaped input of the same kind
+         production supplies to `Deedle.Frame.FromRecords` at `UtilitiesCS/Extensions/DfDeedle.cs`
+         lines 123 and 237. It is not a copy of production's shape: `EmailRecord` at `DfDeedle.cs`
+         line 266 is a `private struct` exposing public fields, whereas this probe type is a sealed
+         class exposing auto-properties. Deedle's member accepts either, and a class with
+         auto-properties is used here because the probe type must be public for the cross-domain proxy
+         to close the generic method over it. It carries
          no `DateTime` member, because `[P4-T9]`'s determinism sweep is textual and bans `DateTime.Now`
          and `DateTime.UtcNow` in this file.
       3. `public string DeedleRecordConversionOutcome(string deedleDllPath)`, which:
@@ -1455,16 +1570,23 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       pwsh -NoProfile -Command '
       $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
       $vstest = @(& $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe")[0]
-      & $vstest "TaskMaster.Test/bin/Debug/TaskMaster.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~TaskMaster.Test.Bootstrap" /Logger:trx /ResultsDirectory:TestResults/p2-expect-fail
+      & $vstest "TaskMaster.Test/bin/Debug/TaskMaster.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~TaskMaster.Test.Bootstrap" "/Logger:trx;LogFileName=p2-expect-fail.trx" /ResultsDirectory:TestResults/p2-expect-fail
       $LASTEXITCODE
       '
       ```
 
-      Then read the single TRX in `TestResults/p2-expect-fail` and record the per-test outcomes:
+      The `;` inside `"/Logger:trx;LogFileName=p2-expect-fail.trx"` must stay inside the double quotes.
+      Unquoted, PowerShell reads `;` as a statement separator and would terminate the `& $vstest` call
+      at `/Logger:trx`, so the run would write an ambient-named TRX and then attempt to execute
+      `LogFileName=p2-expect-fail.trx` as a command.
+
+      Then read the pinned TRX in `TestResults/p2-expect-fail` and record the per-test outcomes:
 
       ```
       pwsh -NoProfile -Command '
-      $trx = @(Get-ChildItem -LiteralPath "TestResults/p2-expect-fail" -Filter "*.trx" -Recurse)[0]
+      $m = @(Get-ChildItem -LiteralPath "TestResults/p2-expect-fail" -Filter "p2-expect-fail.trx" -Recurse)
+      Write-Output ("TRX_MATCH_COUNT=" + $m.Count)
+      $trx = $m[0]
       $x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
       foreach ($r in @($x.TestRun.Results.UnitTestResult)) { Write-Output ($r.testName + " OUTCOME=" + $r.outcome) }
       '
@@ -1475,7 +1597,9 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
       ```
       pwsh -NoProfile -Command '
-      $trx = @(Get-ChildItem -LiteralPath "TestResults/p2-expect-fail" -Filter "*.trx" -Recurse)[0]
+      $m = @(Get-ChildItem -LiteralPath "TestResults/p2-expect-fail" -Filter "p2-expect-fail.trx" -Recurse)
+      Write-Output ("TRX_MATCH_COUNT=" + $m.Count)
+      $trx = $m[0]
       $x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
       foreach ($r in @($x.TestRun.Results.UnitTestResult)) {
       if ($r.testName -eq "AfterInstall_DeedleTypeInitializerSucceeds") {
@@ -1484,9 +1608,22 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       '
       ```
 
+      **Why the TRX name is pinned rather than selected.** `TestResults/p2-expect-fail` already contains
+      `DanMoisan_MEGALODON4_2026-09-13_23_35_52_net481.trx`, written by the superseded version 1.0 run —
+      the run that recorded the vacuous `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` and
+      that carries no `DEEDLE_RECORD_CONVERSION_OUTCOME=` line at all. `Get-ChildItem` returns its
+      results in name-ascending order rather than in write-time order, and a TRX written on 2026-09-14
+      sorts after a name beginning `DanMoisan_MEGALODON4_2026-09-13`, so an unpinned
+      `-Filter "*.trx"` followed by `[0]` selects the superseded file. Both of this task's acceptance
+      conditions would then read the old run and fail while the fix was in fact present, which is a
+      false negative indistinguishable from a genuine one, and `[P2-T12]` would re-confirm against the
+      wrong run. The literal `p2-expect-fail.trx` is quoted here in prose because it is absent from the
+      tree until this task runs.
+
       Write `.../evidence/regression-testing/expect-fail-run.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1` and an `Output Summary:` reproducing every
-      `OUTCOME=` line verbatim plus the single `DEEDLE_RECORD_CONVERSION_OUTCOME=` line.
+      `OUTCOME=` line verbatim, the `TRX_MATCH_COUNT=` line, and the single
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=` line.
 
       **This is a Revision R2 re-run and it overwrites the artifact at that path.** `[P1-T5]` must
       already have copied the superseded version 1.0 artifact to
@@ -1494,7 +1631,8 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       that copy is absent, this task does not run: the record of the vacuous pass that produced Defect 1
       would be destroyed.
 
-      Acceptance: the artifact records `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed`,
+      Acceptance: the artifact records `TRX_MATCH_COUNT=1`,
+      `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed`,
       `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`, and exactly one
       `DEEDLE_RECORD_CONVERSION_OUTCOME=` line whose value begins with `NETSTANDARD-BIND-FAILURE:`. These
       are the fail-before observations: they fail at runtime against a behaviour-empty installer, not at
@@ -1599,24 +1737,45 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       pwsh -NoProfile -Command '
       $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
       $vstest = @(& $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe")[0]
-      & $vstest "UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~UtilitiesCS.Test.Bootstrap" /Logger:trx /ResultsDirectory:TestResults/p4-ladder
+      & $vstest "UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~UtilitiesCS.Test.Bootstrap" "/Logger:trx;LogFileName=p4-ladder.trx" /ResultsDirectory:TestResults/p4-ladder
       $LASTEXITCODE
       '
       ```
 
-      Read the TRX in `TestResults/p4-ladder` with the same reader used in `[P2-T11]` and write
+      The `;` inside `"/Logger:trx;LogFileName=p4-ladder.trx"` must stay inside the double quotes, for
+      the reason `[P2-T11]` states: unquoted, PowerShell reads it as a statement separator.
+
+      Read the TRX in `TestResults/p4-ladder` with the same pinned reader `[P2-T11]` uses, substituting
+      `TestResults/p4-ladder` and `p4-ladder.trx` for its two literals, so the reader is
+      `@(Get-ChildItem -LiteralPath "TestResults/p4-ladder" -Filter "p4-ladder.trx" -Recurse)` with the
+      same `TRX_MATCH_COUNT=` emission before `[0]` is taken. A `-Filter "*.trx"` selection is
+      prohibited here for the reason `[P2-T11]` records: `Get-ChildItem` orders by name, not by write
+      time, so a re-run leaves the task reading whichever TRX name sorts first. Write
       `.../evidence/regression-testing/pass-after-ladder.2026-09-13T18-22.md` with the four required
-      fields plus every `OUTCOME=` line.
-      Acceptance: `EXIT_CODE: 0`, the TRX `ResultSummary` `outcome` is `Completed`, the `Counters` `failed`
-      value is `0`, and the `passed` value is at least 10.
+      fields plus the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line. The literal
+      `p4-ladder.trx` is quoted here in prose because it is absent from the tree until this task runs.
+      Acceptance: `EXIT_CODE: 0`, the artifact records `TRX_MATCH_COUNT=1`, the TRX `ResultSummary`
+      `outcome` is `Completed`, the `Counters` `failed` value is `0`, and the `passed` value is at
+      least 11.
 - [ ] [P4-T3] LOCK-ACQUIRE, run the child-domain harness class alone, LOCK-RELEASE. Same command shape as
-      `[P2-T11]`, which means the same `/Settings:scripts/vscode/TaskMaster.cli.runsettings` operand and
-      not the repository-root `TaskMaster.runsettings`, with
-      `/ResultsDirectory:TestResults/p4-harness`. Read the TRX and write
+      `[P2-T11]`, which means the same `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll` assembly operand,
+      the same `/InIsolation`, the same `/TestCaseFilter:"FullyQualifiedName~TaskMaster.Test.Bootstrap"`,
+      and the same `/Settings:scripts/vscode/TaskMaster.cli.runsettings` operand and not the
+      repository-root `TaskMaster.runsettings`. The shape is no longer identical in one operand, so that
+      operand is named here rather than inherited: the logger operand is
+      `"/Logger:trx;LogFileName=p4-harness.trx"`, with `/ResultsDirectory:TestResults/p4-harness`. The
+      `;` must stay inside the double quotes, for the reason `[P2-T11]` states.
+      Read the TRX with the same pinned reader `[P2-T11]` uses, substituting `TestResults/p4-harness`
+      and `p4-harness.trx` for its two literals, so the reader is
+      `@(Get-ChildItem -LiteralPath "TestResults/p4-harness" -Filter "p4-harness.trx" -Recurse)` with
+      the same `TRX_MATCH_COUNT=` emission before `[0]` is taken. A `-Filter "*.trx"` selection is
+      prohibited here for the reason `[P2-T11]` records. Write
       `.../evidence/regression-testing/pass-after-harness.2026-09-13T18-22.md` with the four required
-      fields plus every `OUTCOME=` line.
-      Acceptance: `EXIT_CODE: 0`, the `Counters` `failed` value is `0`, and the artifact records
-      `OUTCOME=Passed` for all eight method names listed in `[P2-T6]`.
+      fields plus the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line. The literal `p4-harness.trx`
+      is quoted here in prose because it is absent from the tree until this task runs.
+      Acceptance: `EXIT_CODE: 0`, the artifact records `TRX_MATCH_COUNT=1`, the `Counters` `failed`
+      value is `0`, and the artifact records `OUTCOME=Passed` for all eight method names listed in
+      `[P2-T6]`.
 - [ ] [P4-T4] Verify the load-bearing negative control specifically. Read the `[P4-T3]` artifact.
       Acceptance: it records `NegativeControl_WithoutInstall_Netstandard21Throws OUTCOME=Passed`. If it
       records any other outcome, the executor halts and reports blocked, because the load in the
@@ -1631,7 +1790,9 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
       ```
       pwsh -NoProfile -Command '
-      $trx = @(Get-ChildItem -LiteralPath "TestResults/p4-harness" -Filter "*.trx" -Recurse)[0]
+      $m = @(Get-ChildItem -LiteralPath "TestResults/p4-harness" -Filter "p4-harness.trx" -Recurse)
+      Write-Output ("TRX_MATCH_COUNT=" + $m.Count)
+      $trx = $m[0]
       $x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
       foreach ($r in @($x.TestRun.Results.UnitTestResult)) {
       if ($r.testName -eq "AfterInstall_DeedleTypeInitializerSucceeds") {
@@ -1642,10 +1803,12 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
       Append the emitted line to
       `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/evidence/regression-testing/pass-after-harness.2026-09-13T18-22.md`
-      under a `Deedle Record Conversion Outcome:` heading.
-      Acceptance: the `[P4-T3]` artifact records
-      `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed`, the heading exists, and it carries
-      exactly one `DEEDLE_RECORD_CONVERSION_OUTCOME=` line whose value is exactly
+      under a `Deedle Record Conversion Outcome:` heading, together with the `TRX_MATCH_COUNT=` line
+      this span emits. The TRX name is pinned rather than selected with `-Filter "*.trx"` for the
+      reason `[P2-T11]` records: `Get-ChildItem` orders by name, not by write time.
+      Acceptance: the appended `TRX_MATCH_COUNT=` line reads `TRX_MATCH_COUNT=1`, the `[P4-T3]` artifact
+      records `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed`, the heading exists, and it
+      carries exactly one `DEEDLE_RECORD_CONVERSION_OUTCOME=` line whose value is exactly
       `INVOKED-NO-EXCEPTION`. A `NotExecuted` or `Inconclusive` outcome is a failure of this task, not a
       pass: the test is required to fail rather than skip when `Deedle.dll` or the member is absent from
       the domain's `ApplicationBase`. The recorded value is gated rather than merely observed because the
@@ -1657,9 +1820,18 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, and not the repository-root
       `TaskMaster.runsettings`, with
       `/ResultsDirectory:TestResults/p4-shape` and `/TestCaseFilter:"FullyQualifiedName~AddInEagerInstallShapeTests"`,
-      LOCK-RELEASE. Write `.../evidence/regression-testing/pass-after-shape.2026-09-13T18-22.md` with the
-      four required fields plus every `OUTCOME=` line.
-      Acceptance: `EXIT_CODE: 0` and the artifact records
+      LOCK-RELEASE. Same command shape as `[P2-T11]`, which means the same assembly operand
+      `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll`, the same `/InIsolation`, and
+      `"/Logger:trx;LogFileName=p4-shape.trx"` with `/ResultsDirectory:TestResults/p4-shape`. The `;`
+      must stay inside the double quotes, for the reason `[P2-T11]` states. Read the TRX with the same
+      pinned reader `[P2-T11]` uses, substituting `TestResults/p4-shape` and `p4-shape.trx`, so the
+      reader is `@(Get-ChildItem -LiteralPath "TestResults/p4-shape" -Filter "p4-shape.trx" -Recurse)`
+      with the same `TRX_MATCH_COUNT=` emission before `[0]` is taken, and record `TRX_MATCH_COUNT` in
+      the artifact. The literal `p4-shape.trx` is quoted here in prose because it is absent from the
+      tree until this task runs.
+      Write `.../evidence/regression-testing/pass-after-shape.2026-09-13T18-22.md` with the
+      four required fields plus the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line.
+      Acceptance: `EXIT_CODE: 0`, the artifact records `TRX_MATCH_COUNT=1`, and the artifact records
       `ThisAddIn_HasExplicitStaticConstructor OUTCOME=Passed` and
       `AppConfig_DeclaresNetstandardRedirect OUTCOME=Passed`.
 - [ ] [P4-T8] Static shape checks for the criteria a test cannot carry. Command:
@@ -1714,7 +1886,9 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
       ```
       pwsh -NoProfile -Command '
-      $trx = @(Get-ChildItem -LiteralPath "TestResults/p4-harness" -Filter "*.trx" -Recurse)[0]
+      $m = @(Get-ChildItem -LiteralPath "TestResults/p4-harness" -Filter "p4-harness.trx" -Recurse)
+      Write-Output ("TRX_MATCH_COUNT=" + $m.Count)
+      $trx = $m[0]
       $x = [xml](Get-Content -LiteralPath $trx.FullName -Raw)
       foreach ($r in @($x.TestRun.Results.UnitTestResult)) {
       if ($r.testName -eq "NegativeControl_Netstandard20Observation_IsRecorded") {
@@ -1725,10 +1899,13 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
       Write
       `.../evidence/other/netstandard-2-0-0-0-child-domain-observation.2026-09-13T18-22.md` with
-      `Timestamp:`, `Command:`, `EXIT_CODE:` and an `Output Summary:` containing exactly one line of the
+      `Timestamp:`, `Command:`, `EXIT_CODE:` and an `Output Summary:` containing the `TRX_MATCH_COUNT=`
+      line and exactly one line of the
       form `NETSTANDARD_2_0_0_0_NEGATIVE_DOMAIN_RESULT=` followed by the marshalled outcome string the
-      probe returned, which is either `LOADED` or the exception type name.
-      Acceptance: the artifact exists and carries exactly one such line with a non-empty value. The value
+      probe returned, which is either `LOADED` or the exception type name. The TRX name is pinned rather
+      than selected with `-Filter "*.trx"` for the reason `[P2-T11]` records.
+      Acceptance: the artifact records `TRX_MATCH_COUNT=1` and carries exactly one such line with a
+      non-empty value. The `NETSTANDARD_2_0_0_0_NEGATIVE_DOMAIN_RESULT` value
       itself is an observation, not a gate: either value is recorded and neither blocks.
 - [ ] [P4-T11] No-new-deployment sweep. Confirm no `netstandard.dll` entered any project or any
       `packages.config`, and no `FSharp.Core` version changed. Command:
@@ -1870,13 +2047,31 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       leaving `-CoverageOutput` at its default so the raw Cobertura document is retained, then
       LOCK-RELEASE. Write `.../evidence/qa-gates/test-final.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `ExpectedExitCode:` and an `Output Summary:` carrying the document-level
-      `line-rate`, `lines-valid` and `lines-covered` read from `coverage/coverage.cobertura.xml`, and the
-      total, failed and passed test counts read from the TRX under `coverage/test-results`.
-      Acceptance: the artifact exists, the failed test count is `0`, and all six numeric values are
-      present as numbers. The runner's repository-wide threshold assertion runs after the Cobertura
+      `line-rate`, `lines-valid` and `lines-covered` read from `coverage/coverage.cobertura.xml`, the
+      total, failed and passed test counts read from the TRX under `coverage/test-results`, and a
+      `Failing Test Names:` field listing every failed test by name, recorded as the literal `NONE` when
+      the failed count is zero. The literal `Failing Test Names:` is quoted here in prose because it is
+      absent from the tree until this task runs.
+      Acceptance: the artifact exists; all six numeric values are present as numbers; the
+      `Output Summary:` carries a `Failing Test Names:` field listing every failed test by name; and that
+      list is a subset of the two failures recorded at `[P0-T8]`, namely
+      `ConfigureBreadcrumbDropDown_WorkerThread_ThrowsBoundaryDiagnostic` and
+      `InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic`. Any third name, or any name
+      outside those two, blocks and restarts the loop from step 1. Those two were failing on this tree
+      before any change from this plan was applied, as `[P0-T8]`'s artifact records under its
+      `## Baseline Test Failures (recorded, not repaired)` heading. They are declared at
+      `QuickFiler.Test/Viewers/ItemViewerBreadcrumbThreadAffinityTests.cs` lines 204 and 237, a file no
+      task in this plan writes to and which `[P6-T1]`'s pathspec does not name, so they survive this work
+      unrepaired and requiring zero failures here would make this task unsatisfiable rather than
+      strict. AC18's phrase
+      "no failures" is therefore read against the baseline-failure set recorded at `[P0-T8]`, and
+      `[P6-T23]` checks AC18 off on that reading. `spec.md` is not amended for this: amending AC18 in
+      place risks changing the line count and every `spec.md` line number this plan cites.
+      The subset formulation rather than an equality on the count is deliberate: if the intermittent
+      pair happens to pass, the task must not block for that reason either.
+      The runner's repository-wide threshold assertion runs after the Cobertura
       document has been written, so a non-zero exit caused by that assertion is recorded against a
-      matching `ExpectedExitCode:` and does not block; a failed test count above zero does block, and the
-      loop restarts from step 1.
+      matching `ExpectedExitCode:` and does not block.
 - [ ] [P5-T8] Post-format file-size audit. Repeat the `[P4-T12]` command after the final format pass and
       append the result to `.../evidence/other/file-size-audit.2026-09-13T18-22.md` under a
       `Post-Format Line Counts:` heading.
@@ -1940,6 +2135,15 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       judgment rests solely on `NEW_MODULE_LINE_PERCENT` and on `[P5-T9]`. Comparing a raw
       document-level `line-rate` against a post-processed one would compare two different
       denominators.
+      The artifact additionally records `BASELINE MEASURED ON A DIFFERENT BASE` with the baseline
+      artifact's `Timestamp:` value, which is `2026-09-13T23-15`, and the merge commit `f02cee3fe`,
+      stating that `[P0-T8]` was captured before `origin/main` at `a49c9729e` was merged into this branch
+      and that the two document-level rates therefore measure different code bases as well as different
+      denominators. The baseline is not re-captured: it already records
+      `Cobertura Document State: RAW-COLLECTOR-OUTPUT`, so the no-regression judgment already rests on
+      `NEW_MODULE_LINE_PERCENT` and `[P5-T9]` rather than on the rate comparison. The literal
+      `BASELINE MEASURED ON A DIFFERENT BASE` is quoted here in prose because it is absent from the tree
+      until this task runs.
 
 ### Phase 6 — Open Risk, Manual Gates, Commit, and Acceptance Check-Off
 
@@ -2002,11 +2206,26 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       could not report an uncommitted change to any of them. The two exclusions are the two path
       classes the inherited-path rule places outside every scope assertion in this plan. An anchored
       `git diff --name-only` enumerates tracked committed changes only, so a path this plan created is
-      invisible to it until it is committed, and `[P6-T1]` has committed it. Write
+      invisible to it until it is committed, and `[P6-T1]` has committed it. AC14 at `spec.md` line 536
+      names "the merge base with `main`"; this task anchors on `origin/main` instead, and the artifact
+      records that substitution, because in a worktree-per-item run the local `main` ref is stale — it
+      stands at `03d2ece20` while `origin/main` stands at `a49c9729e`, and `a49c9729e` is already merged
+      into this branch at `f02cee3fe`, so `origin/main...HEAD` is the merge-base diff AC14 describes,
+      whereas anchoring on the stale local ref would additionally list every change `origin/main` gained
+      since `03d2ece20`. The AC
+      text is not amended: `spec.md` line 536 is the first line of a seven-line criterion spanning lines
+      536-542, every `[P6-T#]` check-off addresses `spec.md` by line number, and a re-wrap at line 536
+      would move the five criteria that follow it — `spec.md` lines 543, 545, 547, 550 and 554, cited by
+      `[P6-T20]`, `[P6-T21]`, `[P6-T22]`, `[P6-T23]` and `[P6-T24]` — to correct one word.
+      Write
       `.../evidence/other/scope-boundary-diff.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:` and an `Output Summary:` reproducing the full diff list and the full porcelain
-      output verbatim, empty output recorded as the literal `NONE`.
-      Acceptance: `git rev-parse --verify origin/main` exits 0; the porcelain span returns no output; and
+      output verbatim, empty output recorded as the literal `NONE`, and the sentence
+      `ANCHOR: origin/main, substituted for the stale local main ref`, which is quoted here in prose
+      because it is absent from the tree until this task runs.
+      Acceptance: `git rev-parse --verify origin/main` exits 0; the artifact records the sentence
+      `ANCHOR: origin/main, substituted for the stale local main ref`; the porcelain span returns no
+      output; and
       the diff list contains none of `SVGControl/SvgAssemblyResolver.cs`, `SVGControl/SvgRenderer.cs`,
       `SVGControl/SvgAssemblyProbe.cs`, `TestSupport/TestAssemblyResolver.cs`,
       `QuickFiler.Test/SetupAssemblyInitializer.cs`, `UtilitiesCS.Test/TestAssemblyInitializer.cs`,
@@ -2051,8 +2270,20 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       Acceptance: `spec.md` line 547 begins with `- [x] `.
 - [ ] [P6-T23] Mark the acceptance criterion at `spec.md` line 550 as complete, as in `[P6-T6]`.
       Acceptance: `spec.md` line 550 begins with `- [x] `.
-- [ ] [P6-T24] Mark the acceptance criterion at `spec.md` line 554 as complete, as in `[P6-T6]`.
-      Acceptance: `spec.md` line 554 begins with `- [x] `.
+- [ ] [P6-T24] Conditionally mark the acceptance criterion at `spec.md` line 554. Read the `RESULT:`
+      field of `.../evidence/other/manual-live-outlook-gate.2026-09-13T18-22.md`. When that value is
+      `DEEDLE LOADED AND DATA MODEL POPULATED`, change line 554's leading `- [ ] ` to `- [x] `, changing
+      no other character. When it is `FAILED` or `PENDING-MAINTAINER`, leave line 554 as `- [ ] ` and
+      append to that artifact a `Check-Off Withheld:` field carrying the observed `RESULT:` value and the
+      sentence `AC19 is not checked off because the human gate is not discharged.`
+      Acceptance: exactly one of the two branches is taken and is evidenced. Either `spec.md` line 554
+      begins with the six characters `- [x] ` and the artifact's `RESULT:` is
+      `DEEDLE LOADED AND DATA MODEL POPULATED`; or `spec.md` line 554 begins with `- [ ] ` and the
+      artifact carries a `Check-Off Withheld:` field. Any other combination blocks. The literal
+      `Check-Off Withheld:` is quoted here in prose because it is absent from the tree until this task
+      runs. `spec.md` lines 554-556 state that this is a human gate and that an unrecorded result does
+      not discharge it, so an unconditional check-off would make the plan's own artifact assert
+      something false about a gate no executor can perform.
 - [ ] [P6-T25] Mirror the issue update locally. Write
       `.../evidence/issue-updates/issue-879.2026-09-13T18-22.md` with `Timestamp:`, the exact text
       intended for the issue — a summary of the remedy, the evidence paths for the negative control and
@@ -2091,21 +2322,26 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 ## Task Counts
 
 Counted mechanically over lines matching either task prefix pattern, `- [ ] [P#-T#]` or `- [x] [P#-T#]`,
-and re-derived after the Revision R2 delta rather than carried forward:
+and re-derived after the Revision R3 delta rather than carried forward:
 
 - Phase 0: 16 tasks, all 16 complete
 - Phase 1: 7 tasks, 4 complete — `[P1-T5]`, `[P1-T6]` and `[P1-T7]` are new in Revision R2
-- Phase 2: 12 tasks, 6 complete — `[P2-T1]`, `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and `[P2-T12]` were
-  unchecked by Revision R2 and `[P2-T11]` was already unchecked
+- Phase 2: 12 tasks, 5 complete — the five complete are `[P2-T2]`, `[P2-T4]`, `[P2-T7]`, `[P2-T8]` and
+  `[P2-T9]`. `[P2-T1]`, `[P2-T5]`, `[P2-T6]`, `[P2-T10]` and `[P2-T12]` were unchecked by Revision R2,
+  `[P2-T11]` was already unchecked, and `[P2-T3]` was unchecked by Revision R3 because that revision
+  adds an eleventh test method to a file the version 1.0 execution had already completed
 - Phase 3: 5 tasks, 0 complete
 - Phase 4: 12 tasks, 0 complete
 - Phase 5: 10 tasks, 0 complete
 - Phase 6: 27 tasks, 0 complete
-- Total: 89 tasks, 26 complete
+- Total: 89 tasks, 25 complete
 
-Revision R2 added three tasks and removed none, so the total moved from 86 to 89. No task was renumbered:
-the three new tasks were appended to the end of Phase 1, which leaves every `[P2-T#]` through `[P6-T#]`
-identifier that this plan and its evidence artifacts already cite unchanged.
+Revision R2 added three tasks and removed none, so the total moved from 86 to 89. Revision R3 added no
+task and removed none, so the total is unchanged at 89; it unchecked exactly one task, `[P2-T3]`, which
+moved the complete count from 26 to 25. No task was renumbered in either revision: Revision R2's three
+new tasks were appended to the end of Phase 1, which leaves every `[P2-T#]` through `[P6-T#]` identifier
+that this plan and its evidence artifacts already cite unchanged, and Revision R3 edited task bodies
+only.
 
 ## Acceptance-Criteria Traceability
 
@@ -2131,6 +2367,18 @@ identifier that this plan and its evidence artifacts already cite unchanged.
 | AC18 | 550 | P5-T2 to P5-T7 | P5-T5, P5-T6, P5-T7 | P5-T5, P5-T6, P5-T7 |
 | AC19 | 554 | P6-T4 | P6-T4 | P6-T4 |
 
+AC19 is the only conditionally discharged criterion in this table. `[P6-T24]` checks it off only when
+`.../evidence/other/manual-live-outlook-gate.2026-09-13T18-22.md` records
+`RESULT: DEEDLE LOADED AND DATA MODEL POPULATED`. When that artifact records `FAILED` or
+`PENDING-MAINTAINER`, `[P6-T24]` takes its withholding branch and the acceptance-criteria status summary
+reported at plan completion must list AC19 as REMAINING, naming the observed `RESULT:` value as the
+reason. Reporting AC19 as delivered on the strength of a `PENDING-MAINTAINER` result would assert
+something false about a gate no executor can perform.
+
+AC18 is discharged on the reading `[P5-T7]` states: "no failures" is read against the two baseline
+failures recorded at `[P0-T8]`, which are outside this plan's authorised write set. `[P6-T23]` checks
+AC18 off on that reading, and the status summary reports it as delivered with that qualification named.
+
 ## Planner Notes
 
 - **Revision R2 spec amendment recorded.** The planner rewrote acceptance criterion AC10 at `spec.md`
@@ -2148,6 +2396,19 @@ identifier that this plan and its evidence artifacts already cite unchanged.
   `evidence/coverage/`, which is not a canonical evidence kind. The planner changed that single directory
   reference to `evidence/qa-gates/`, changed nothing else in the criterion's text, added no criterion and
   removed none. No other non-canonical evidence directory appears in `spec.md`.
+- **Revision R3 amends no acceptance criterion and moves no `spec.md` line.** Revision R3 edits
+  `plan.2026-09-13T18-22.md` only. `spec.md` is not written by this revision, so every acceptance-criterion
+  line number the plan cites — 473, 477, 481, 484, 491, 495, 499, 504, 509, 515, 521, 528, 534, 536, 543,
+  545, 547, 550 and 554 — is unchanged, and that was verified by re-reading `spec.md` lines 468-556 after
+  the revision's edits rather than inferred from the absence of a write. Two candidate `spec.md`
+  amendments were considered and both were declined: re-wording AC14 at line 536 from `main` to
+  `origin/main`, declined in favour of recording the anchor substitution in `[P6-T5]`; and extending AC4's
+  enumerated list at lines 484-490 to name the eleventh test, declined because an additional test method
+  beyond the enumeration does not falsify AC4.
+- **One inbound figure corrected.** The Revision R3 delta described AC4 at `spec.md` lines 484-490 as a
+  six-line block. It is seven lines: 484 through 490 inclusive, with AC5 beginning at line 491. The
+  constraint the delta drew from that figure — preserve the block's line count if it is amended — is
+  unaffected, and the question is moot because AC4 is not amended.
 - **Validator status.** The `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool is not present
   in this planner session's tool surface, so the validator gate was NOT RUN by the planner. It must be run
   before the plan is treated as approved.
