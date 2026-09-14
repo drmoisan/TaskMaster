@@ -50,6 +50,7 @@
 - [Piped command's `$?` is the LAST segment](piped-command-exit-code-is-the-last-segment.md) — suspect the measurement before overwriting a memory it contradicts
 
 ## Plans, preflight, delegation
+- [Your brief silently overrides your own recorded deviation](delegation-brief-silently-overrides-recorded-deviation.md) — the delegate obeys; verify the commit FILE LIST, not the summary
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) · [converges on verbatim delta text](preflight-converges-on-verbatim-delta-text.md) · [may exceed the 2-round target](preflight-rounds-exceed-target-legitimately.md)
 - [Preflight sibling-invalidation cascade](preflight-sibling-invalidation-cascade.md) · [sweep ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) · [defect-trend scope confound](preflight-defect-trend-scope-confound.md)
 - [Absence from a failure list isn't a pass](absence-from-failure-list-is-not-a-pass-gate.md) — pair with a discovery-count control
@@ -83,6 +84,8 @@
 - [Post-processed Cobertura = zero exit, NOT a test result](cobertura-postprocessing-is-a-zero-exit-proxy-not-a-test-result.md) — no .trx exists; re-run the gate
 - [[ExcludeFromCodeCoverage] is INVISIBLE, not 0%](excludefromcodecoverage-invisible-to-coverage-gates.md) — per-file hits-row gates unsatisfiable; METHOD-level leaks
 - [vstest emits TWO .coverage files per run](vstest-emits-two-coverage-files-per-run.md) — need a disambiguation rule
+- [Coverage runner throws BEFORE post-processing](coverage-runner-throws-before-postprocessing.md) — line 236 beats line 341, so a failing test leaves raw XML; and evidence-dir .cobertura.xml is NOT gitignored
+- [Class helper's property names differ from the package helper's](cobertura-class-helper-property-names-differ-from-package.md) — no rate property, inverted count names; makes a plan's acceptance unsatisfiable as written
 
 ## C# toolchain and tests
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) · [analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) · [direct-csproj build facts](csharp-direct-csproj-build-facts.md)

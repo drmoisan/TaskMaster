@@ -347,6 +347,8 @@
     <Compile Include="Controllers\QfcRemainingQueueAdmission.cs" />
     <Compile Include="Controllers\QfcQueue.cs" />
     <Compile Include="Controllers\QfcQueue.Enqueue.cs" />
+    <Compile Include="Controllers\QfcQueue.Tlp.cs" />
+    <Compile Include="Controllers\QfcQueue.UiIdle.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\ConversationResolver.Loading.cs" />
@@ -366,6 +368,7 @@
     <Compile Include="Interfaces\IItemControler.cs" />
     <Compile Include="Interfaces\IKbdAction.cs" />
     <Compile Include="Interfaces\IQfcCollectionController.cs" />
+    <Compile Include="Interfaces\IUiIdleDispatcher.cs" />
     <Compile Include="Interfaces\IQfcDatamodel.cs" />
     <Compile Include="Interfaces\IQfcExplorerController.cs" />
     <Compile Include="Interfaces\IQfcFormController.cs" />
