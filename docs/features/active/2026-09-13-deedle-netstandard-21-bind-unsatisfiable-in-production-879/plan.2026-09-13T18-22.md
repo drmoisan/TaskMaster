@@ -1529,12 +1529,20 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       a second sentence states that one further test drives the subscribed handler through the real CLR
       binder in order to cover the production entry point. The rewritten comment must not contain any
       token on `[P4-T9]`'s banned list, whose sweep is textual and covers comments.
-      Acceptance: the file exists and contains at least eleven occurrences of `[TestMethod]`. The
-      tree currently carries exactly ten, which is what makes this count discriminating rather than
-      already satisfied. Additionally, `Select-String -SimpleMatch -CaseSensitive` on that file returns
-      exactly 0 hits for `reaches the GAC`. That literal is present in the tree now at line 14, which is
-      what makes its zero-hit assertion discriminating rather than vacuous, and it is a single-line
-      fragment that no CSharpier pass reflows.
+      Acceptance: the file exists and contains at least eleven occurrences of `[TestMethod]`.
+      Additionally, `Select-String -SimpleMatch -CaseSensitive` on that file returns exactly 0 hits for
+      `reaches the GAC`, which is a single-line fragment that no CSharpier pass reflows.
+
+      Both conditions are stated as standing guards rather than as new measurements, because this task
+      has executed and its own product already satisfies them, so no reader mistakes them for evidence
+      that this task ran. The discriminating readings that justified them were taken before execution:
+      the file then carried exactly ten `[TestMethod]` occurrences, which is the figure the body of this
+      task records above, and it then carried `reaches the GAC` at line 14. The post-execution readings,
+      taken against the tree at `fce5994c6`, are eleven `[TestMethod]` occurrences and 0 hits for
+      `reaches the GAC` in a file of 383 lines. The pre-execution figures are retained in the body above
+      as the record of why each condition was authored and are not restated here as current
+      measurements; the guards themselves are retained so that a later edit to this file cannot regress
+      them.
 - [x] [P2-T4] Register the new unit-test file. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` into the `ItemGroup` in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
@@ -1942,6 +1950,23 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 - [ ] [P2-T11] [expect-fail] LOCK-ACQUIRE, then run the harness class alone and capture the TRX, then
       LOCK-RELEASE.
 
+      First, remove every TRX already in the results directory and record the emptied count:
+
+      ```
+      pwsh -NoProfile -Command '
+      $d = "TestResults/p2-expect-fail"
+      foreach ($f in @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue)) { Remove-Item -LiteralPath $f.FullName -Force }
+      Write-Output ("PRERUN_TRX_COUNT=" + @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue).Count)
+      '
+      ```
+
+      The removal is a per-file `Remove-Item` over the enumerated `.trx` matches and deliberately not a
+      recursive delete of the directory, so nothing other than the files that reader selects can be
+      removed. `-ErrorAction SilentlyContinue` on both enumerations makes the span succeed and still emit
+      `PRERUN_TRX_COUNT=0` when the directory is absent.
+
+      Then run the harness class:
+
       ```
       pwsh -NoProfile -Command '
       $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
@@ -1984,22 +2009,27 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       '
       ```
 
-      **Why the TRX name is pinned rather than selected.** `TestResults/p2-expect-fail` already contains
-      `DanMoisan_MEGALODON4_2026-09-13_23_35_52_net481.trx`, written by the superseded version 1.0 run —
-      the run that recorded the vacuous `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` and
-      that carries no `DEEDLE_RECORD_CONVERSION_OUTCOME=` line at all. `Get-ChildItem` returns its
-      results in name-ascending order rather than in write-time order, and a TRX written on 2026-09-14
-      sorts after a name beginning `DanMoisan_MEGALODON4_2026-09-13`, so an unpinned
-      `-Filter "*.trx"` followed by `[0]` selects the superseded file. Both of this task's acceptance
-      conditions would then read the old run and fail while the fix was in fact present, which is a
-      false negative indistinguishable from a genuine one, and `[P2-T12]` would re-confirm against the
-      wrong run. The literal `p2-expect-fail.trx` is quoted here in prose because it is absent from the
-      tree until this task runs.
+      **Why the TRX name is pinned, and why the directory is emptied first.** `TestResults/p2-expect-fail`
+      currently holds two superseded TRX files. The first is
+      `DanMoisan_MEGALODON4_2026-09-13_23_35_52_net481.trx`, written by the version 1.0 run, which
+      recorded the vacuous `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` and carries no
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=` line. `Get-ChildItem` returns results in name-ascending rather
+      than write-time order, so an unpinned `-Filter "*.trx"` followed by `[0]` would select it. The
+      second is `p2-expect-fail.trx` itself, written by the Revision R2 re-run on 2026-09-14, recording
+      `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` and
+      `DEEDLE_RECORD_CONVERSION_OUTCOME=INVOKED-NO-EXCEPTION` and no
+      `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory` result. Pinning the name does not
+      discriminate against that second file: `TRX_MATCH_COUNT=1` reads `1` whether this run wrote a fresh
+      TRX or wrote none, and whether `LogFileName=` overwrites has not been observed in this worktree,
+      because the Revision R2 run created that file rather than overwriting one. The `.trx` files are
+      therefore removed before the run, so `TRX_MATCH_COUNT=1` afterwards can only count a file this run
+      wrote. The literal `p2-expect-fail.trx` is quoted here in prose because it is removed before this
+      task's run writes it.
 
       Write `.../evidence/regression-testing/expect-fail-run.2026-09-13T18-22.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1` and an `Output Summary:` reproducing every
-      `OUTCOME=` line verbatim, the `TRX_MATCH_COUNT=` line, and the single
-      `DEEDLE_RECORD_CONVERSION_OUTCOME=` line.
+      `OUTCOME=` line verbatim, the `PRERUN_TRX_COUNT=` line emitted by the first span, the
+      `TRX_MATCH_COUNT=` line, and the single `DEEDLE_RECORD_CONVERSION_OUTCOME=` line.
 
       **This is a Revision R5 re-run and it overwrites the artifact at that path.** `[P1-T5]` must
       already have copied the superseded version 1.0 artifact to
@@ -2010,7 +2040,9 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       current content of the plan-named path and is overwritten here; the observation it carries is
       reproduced in `## R6.1` and in the Revision R2 measurement table there, so no measurement is lost.
 
-      Acceptance: the artifact records `TRX_MATCH_COUNT=1`,
+      Acceptance: the artifact records `PRERUN_TRX_COUNT=0`, taken before the run, which is what makes
+      the `TRX_MATCH_COUNT=1` below a measurement of this run rather than of a residue; the artifact
+      records `TRX_MATCH_COUNT=1`,
       `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed`,
       `AfterInstall_BothNetstandardVersionsBind OUTCOME=Failed`,
       `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Failed`, and exactly one
@@ -2119,6 +2151,31 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       Acceptance: the console log contains at least one line matching `^\s+0 Error\(s\)$`.
 - [ ] [P4-T2] LOCK-ACQUIRE, run the `UtilitiesCS.Test` ladder unit tests alone, LOCK-RELEASE.
 
+      First, remove every TRX already in the results directory and record the emptied count:
+
+      ```
+      pwsh -NoProfile -Command '
+      $d = "TestResults/p4-ladder"
+      foreach ($f in @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue)) { Remove-Item -LiteralPath $f.FullName -Force }
+      Write-Output ("PRERUN_TRX_COUNT=" + @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue).Count)
+      '
+      ```
+
+      `TestResults/p4-ladder` does not exist in the tree as it stands, so on a first execution this span
+      enumerates nothing and emits `PRERUN_TRX_COUNT=0` — `-ErrorAction SilentlyContinue` on both
+      enumerations is what makes an absent directory a zero count rather than an error. The span is
+      nonetheless required, because the state that matters is the one this task is in on a RE-execution,
+      when the directory holds this task's own earlier TRX under the pinned name. Pinning the name does
+      not discriminate against that file: `TRX_MATCH_COUNT=1` reads `1` whether this run wrote a fresh
+      TRX or wrote none, so a run that failed to emit for any reason — testhost crash, build-lock
+      timeout, discovery failure — would leave the reader replaying the earlier run's outcomes as though
+      they were this run's. That is exactly the exposure `[P2-T11]` was found to carry after its own
+      re-run. Removing first makes `TRX_MATCH_COUNT=1` a count of a file this run wrote. The removal is a
+      per-file `Remove-Item` over the enumerated `.trx` matches and deliberately not a recursive delete of
+      the directory.
+
+      Then run the ladder tests:
+
       ```
       pwsh -NoProfile -Command '
       $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
@@ -2138,12 +2195,38 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       prohibited here for the reason `[P2-T11]` records: `Get-ChildItem` orders by name, not by write
       time, so a re-run leaves the task reading whichever TRX name sorts first. Write
       `.../evidence/regression-testing/pass-after-ladder.2026-09-13T18-22.md` with the four required
-      fields plus the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line. The literal
+      fields plus the `PRERUN_TRX_COUNT=` line emitted by the first span, the `TRX_MATCH_COUNT=` line and
+      every `OUTCOME=` line. The literal
       `p4-ladder.trx` is quoted here in prose because it is absent from the tree until this task runs.
-      Acceptance: `EXIT_CODE: 0`, the artifact records `TRX_MATCH_COUNT=1`, the TRX `ResultSummary`
+      Acceptance: `EXIT_CODE: 0`, the artifact records `PRERUN_TRX_COUNT=0`, taken before the run, which
+      is what makes the `TRX_MATCH_COUNT=1` below a measurement of this run rather than of a residue; the
+      artifact records `TRX_MATCH_COUNT=1`, the TRX `ResultSummary`
       `outcome` is `Completed`, the `Counters` `failed` value is `0`, and the `passed` value is at
       least 11.
-- [ ] [P4-T3] LOCK-ACQUIRE, run the child-domain harness class alone, LOCK-RELEASE. Same command shape as
+- [ ] [P4-T3] LOCK-ACQUIRE, run the child-domain harness class alone, LOCK-RELEASE.
+
+      First, remove every TRX already in the results directory and record the emptied count:
+
+      ```
+      pwsh -NoProfile -Command '
+      $d = "TestResults/p4-harness"
+      foreach ($f in @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue)) { Remove-Item -LiteralPath $f.FullName -Force }
+      Write-Output ("PRERUN_TRX_COUNT=" + @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue).Count)
+      '
+      ```
+
+      `TestResults/p4-harness` does not exist in the tree as it stands, so on a first execution this span
+      enumerates nothing and emits `PRERUN_TRX_COUNT=0`; `-ErrorAction SilentlyContinue` on both
+      enumerations is what makes an absent directory a zero count rather than an error. The span is
+      required for the re-execution state, in which the directory holds this task's own earlier TRX under
+      the pinned name and `TRX_MATCH_COUNT=1` reads `1` whether this run wrote a fresh TRX or wrote none.
+      The consequence here is larger than in `[P4-T2]`: `[P4-T4]`, `[P4-T5]` and `[P4-T6]` all read this
+      task's artifact or this same TRX, so a silently replayed earlier run would propagate into four
+      acceptance conditions. Removing first makes `TRX_MATCH_COUNT=1` a count of a file this run wrote.
+      The removal is a per-file `Remove-Item` over the enumerated `.trx` matches and deliberately not a
+      recursive delete of the directory.
+
+      Then run the harness class. Same command shape as
       `[P2-T11]`, which means the same `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll` assembly operand,
       the same `/InIsolation`, the same `/TestCaseFilter:"FullyQualifiedName~TaskMaster.Test.Bootstrap"`,
       and the same `/Settings:scripts/vscode/TaskMaster.cli.runsettings` operand and not the
@@ -2157,9 +2240,12 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       the same `TRX_MATCH_COUNT=` emission before `[0]` is taken. A `-Filter "*.trx"` selection is
       prohibited here for the reason `[P2-T11]` records. Write
       `.../evidence/regression-testing/pass-after-harness.2026-09-13T18-22.md` with the four required
-      fields plus the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line. The literal `p4-harness.trx`
+      fields plus the `PRERUN_TRX_COUNT=` line emitted by the first span, the `TRX_MATCH_COUNT=` line and
+      every `OUTCOME=` line. The literal `p4-harness.trx`
       is quoted here in prose because it is absent from the tree until this task runs.
-      Acceptance: `EXIT_CODE: 0`, the artifact records `TRX_MATCH_COUNT=1`, the `Counters` `failed`
+      Acceptance: `EXIT_CODE: 0`, the artifact records `PRERUN_TRX_COUNT=0`, taken before the run, which
+      is what makes the `TRX_MATCH_COUNT=1` below a measurement of this run rather than of a residue; the
+      artifact records `TRX_MATCH_COUNT=1`, the `Counters` `failed`
       value is `0`, and the artifact records `OUTCOME=Passed` for all nine method names listed in
       `[P2-T6]`, which includes the Revision R5 addition
       `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory`. Nine rather than eight: a run reporting
@@ -2211,11 +2297,32 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       additionally requires that the `[P4-T3]` artifact records
       `ChildDomain_IsRootedAtTheQuickFilerTestOutputDirectory OUTCOME=Passed`; without it the post-fix
       reading is not comparable with the pre-fix one.
-- [ ] [P4-T7] LOCK-ACQUIRE, run the `AddInEagerInstallShapeTests` class alone with
+- [ ] [P4-T7] LOCK-ACQUIRE, run the `AddInEagerInstallShapeTests` class alone, LOCK-RELEASE.
+
+      First, remove every TRX already in the results directory and record the emptied count:
+
+      ```
+      pwsh -NoProfile -Command '
+      $d = "TestResults/p4-shape"
+      foreach ($f in @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue)) { Remove-Item -LiteralPath $f.FullName -Force }
+      Write-Output ("PRERUN_TRX_COUNT=" + @(Get-ChildItem -LiteralPath $d -Filter "*.trx" -Recurse -ErrorAction SilentlyContinue).Count)
+      '
+      ```
+
+      `TestResults/p4-shape` does not exist in the tree as it stands, so on a first execution this span
+      enumerates nothing and emits `PRERUN_TRX_COUNT=0`; `-ErrorAction SilentlyContinue` on both
+      enumerations is what makes an absent directory a zero count rather than an error. The span is
+      required for the re-execution state, in which the directory holds this task's own earlier TRX under
+      the pinned name and `TRX_MATCH_COUNT=1` reads `1` whether this run wrote a fresh TRX or wrote none.
+      Removing first makes `TRX_MATCH_COUNT=1` a count of a file this run wrote. The removal is a per-file
+      `Remove-Item` over the enumerated `.trx` matches and deliberately not a recursive delete of the
+      directory.
+
+      Then run the class with
       `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, and not the repository-root
       `TaskMaster.runsettings`, with
-      `/ResultsDirectory:TestResults/p4-shape` and `/TestCaseFilter:"FullyQualifiedName~AddInEagerInstallShapeTests"`,
-      LOCK-RELEASE. Same command shape as `[P2-T11]`, which means the same assembly operand
+      `/ResultsDirectory:TestResults/p4-shape` and `/TestCaseFilter:"FullyQualifiedName~AddInEagerInstallShapeTests"`.
+      Same command shape as `[P2-T11]`, which means the same assembly operand
       `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll`, the same `/InIsolation`, and
       `"/Logger:trx;LogFileName=p4-shape.trx"` with `/ResultsDirectory:TestResults/p4-shape`. The `;`
       must stay inside the double quotes, for the reason `[P2-T11]` states. Read the TRX with the same
@@ -2225,8 +2332,11 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       the artifact. The literal `p4-shape.trx` is quoted here in prose because it is absent from the
       tree until this task runs.
       Write `.../evidence/regression-testing/pass-after-shape.2026-09-13T18-22.md` with the
-      four required fields plus the `TRX_MATCH_COUNT=` line and every `OUTCOME=` line.
-      Acceptance: `EXIT_CODE: 0`, the artifact records `TRX_MATCH_COUNT=1`, and the artifact records
+      four required fields plus the `PRERUN_TRX_COUNT=` line emitted by the first span, the
+      `TRX_MATCH_COUNT=` line and every `OUTCOME=` line.
+      Acceptance: `EXIT_CODE: 0`, the artifact records `PRERUN_TRX_COUNT=0`, taken before the run, which
+      is what makes the `TRX_MATCH_COUNT=1` below a measurement of this run rather than of a residue; the
+      artifact records `TRX_MATCH_COUNT=1`, and the artifact records
       `ThisAddIn_HasExplicitStaticConstructor OUTCOME=Passed` and
       `AppConfig_DeclaresNetstandardRedirect OUTCOME=Passed`.
 - [ ] [P4-T8] Static shape checks for the criteria a test cannot carry. Command:
@@ -2839,7 +2949,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
 ## Task Counts
 
 Counted mechanically over lines matching either task prefix pattern, `- [ ] [P#-T#]` or `- [x] [P#-T#]`,
-and re-derived after the Revision R5 delta rather than carried forward:
+and re-derived after the Revision R6 delta rather than carried forward:
 
 - Phase 0: 16 tasks, all 16 complete
 - Phase 1: 7 tasks, 5 complete — the five complete are `[P1-T1]` through `[P1-T5]`. `[P1-T6]` and
@@ -2867,6 +2977,10 @@ subsequently completed `[P1-T6]`, `[P1-T7]`, `[P2-T1]`, `[P2-T3]`, `[P2-T5]`, `[
 `[P2-T12]`, which is how 25 became 34, and that state was re-counted mechanically in this pass rather than
 carried forward. The per-phase figures above were likewise re-counted mechanically after the Revision R5
 edits: Phase 0 16, Phase 1 7, Phase 2 12, Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, which sum to 91.
+
+Revision R6 adds no task, removes none, and checks or unchecks none. The per-phase figures above were
+re-counted mechanically after the Revision R6 edits and are unchanged: Phase 0 16, Phase 1 7, Phase 2 12,
+Phase 3 5, Phase 4 12, Phase 5 12, Phase 6 27, summing to 91, of which 28 are complete.
 
 ## Acceptance-Criteria Traceability
 
@@ -2921,6 +3035,21 @@ named.
 
 ## Planner Notes
 
+- **Revision R6 recorded: TRX residue removal, and no criterion or task change.** Revision R6 amends no
+  acceptance-criterion text, writes no `spec.md` edit, adds and removes no task, and changes no task's
+  checklist state. It makes three changes. First, `[P2-T11]` gains a pre-run span that removes the `.trx`
+  files in `TestResults/p2-expect-fail` and emits `PRERUN_TRX_COUNT=`, because that directory holds two
+  superseded TRX files and the second of them carries the pinned name `p2-expect-fail.trx`, against which
+  the `TRX_MATCH_COUNT=1` guard added in Revision R3 does not discriminate. Second, `[P4-T2]`, `[P4-T3]`
+  and `[P4-T7]` gain the same span against their own results directories; those directories are absent
+  from the tree today, so the span is a guard against the re-execution state rather than a correction of
+  an observed residue. `[P4-T6]` needs no span of its own: it reads the TRX that `[P4-T3]` emptied and
+  rewrote earlier in the same phase. Third, `[P2-T3]`'s acceptance conditions are relabelled as standing
+  guards, matching the label `[P2-T5]` and `[P2-T6]` already carry, and the pre-execution figure quoted
+  in that acceptance is replaced by a post-execution reading: the file now carries eleven `[TestMethod]`
+  occurrences and zero hits for `reaches the GAC`. `[P2-T3]` is checked and does not re-run, so no gate
+  changes; the body's pre-execution figure of ten is retained as the record of why the condition was
+  authored.
 - **Revision R2 spec amendment recorded; its AC10 text is SUPERSEDED by Revision R5.** The planner
   rewrote acceptance criterion AC10 at `spec.md` lines 515-520 in place, in exactly six lines, so every
   acceptance-criterion line number this plan cites is unchanged. The text it replaced asserted that "a
