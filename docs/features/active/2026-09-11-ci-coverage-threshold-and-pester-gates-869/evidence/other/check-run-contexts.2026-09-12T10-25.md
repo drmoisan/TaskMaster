@@ -2,7 +2,7 @@
 
 Timestamp: 2026-09-14T20-46
 
-Status: PENDING LIVE RUN
+Status: CAPTURED FROM A LIVE RUN
 
 ## The command prescribed by the workflow README
 
@@ -65,3 +65,56 @@ The five existing contexts are expected to continue reporting under unchanged na
 ## Consequence for the acceptance criteria
 
 Acceptance criterion AC-23 requires the actual context name to be captured from a live run and recorded. That capture has not been made. AC-23 is therefore **left unchecked**, with this artifact as the recorded reason, per the authorized branch of this task and of P9-T27. The criterion line in the specification is left byte-identical.
+
+
+## Live capture (AC-23 discharged)
+
+Timestamp: 2026-09-14T19-40
+
+The bootstrap condition described above has cleared: pull request 897 is open against `main` for
+this branch, all six of its check runs have completed, and the head SHA is therefore resolvable
+with check runs attached. The prescribed query was re-run by the coordinator, unmodified, against
+that head.
+
+Head SHA queried: `df4c247df90176e17bf0ac5e247290113d06ba32`
+
+Command: `gh api repos/drmoisan/TaskMaster/commits/df4c247df90176e17bf0ac5e247290113d06ba32/check-runs --jq '.check_runs[].name'`
+EXIT_CODE: 0
+Returned list of names:
+
+```
+build-nullable / Build with nullable warnings treated as errors
+mstest-coverage / Run MSTest suite with coverage
+actionlint / actionlint
+format-check / Verify formatting
+build-analyzers / Build with analyzers and code style enforcement
+pester / Run Pester suite with coverage
+```
+
+Corroborating query: `gh api repos/drmoisan/TaskMaster/commits/df4c247df90176e17bf0ac5e247290113d06ba32/check-runs --jq '.total_count'`
+Output: `6`
+
+## Outcome for the prediction
+
+The predicted string `pester / Run Pester suite with coverage` **IS PRESENT** in the returned list.
+The prediction was derived mechanically from the `<caller job id> / <callee job name>` convention
+the workflow README states, and the live capture confirms it. It is no longer labelled predicted.
+
+Exactly ONE context was added. The five pre-existing contexts — `actionlint / actionlint`,
+`format-check / Verify formatting`, `build-analyzers / Build with analyzers and code style
+enforcement`, `build-nullable / Build with nullable warnings treated as errors`, and
+`mstest-coverage / Run MSTest suite with coverage` — all report under unchanged names, confirming
+that placing the C# threshold assertion inside the existing `mstest-coverage` callee added no
+context of its own.
+
+The context strings above were taken from the output of the prescribed `gh api` query and were not
+hand-written, and were not transcribed from `gh pr checks`, which is a different command producing
+a differently-derived list.
+
+## Consequence for the acceptance criteria
+
+AC-23 is now **satisfied and checked off**. It was never unsatisfiable: it required only that a
+pull-request run exist, which is a bootstrap condition rather than a structural impossibility, and
+it was discharged the moment that condition cleared. This is deliberately distinguished from the
+criteria elsewhere in this run that were disclosed rather than discharged — AC16 on item 742, AC19
+on item 879, and AC22 on item 871 — each of which could not be satisfied at all.
