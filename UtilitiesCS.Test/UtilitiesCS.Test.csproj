@@ -513,6 +513,7 @@
     <Compile Include="Threading\ProgressViewer_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />
     <Compile Include="Threading\UiThreadInitContract_Tests.cs" />
+    <Compile Include="Threading\UiThreadApartmentMeasurement_Tests.cs" />
     <Compile Include="Threading\WpfUiDispatcherTests.cs" />
     <Compile Include="Threading\CurrentStoreContextTests.cs" />
     <Compile Include="Threading\LockupStallDeciderTests.cs" />
