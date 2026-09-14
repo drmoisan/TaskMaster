@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
@@ -232,7 +233,10 @@ namespace QuickFiler.Controllers
                         strNotifications
                         + grp.ItemController.ItemNumber
                         + "  "
-                        + grp.ItemController.Mail.SentOn.ToString("MM/dd/yyyy")
+                        + grp.ItemController.Mail.SentOn.ToString(
+                            "MM/dd/yyyy",
+                            CultureInfo.InvariantCulture
+                        )
                         + "  "
                         + grp.ItemController.Mail.Subject
                         + Environment.NewLine;
@@ -1293,7 +1297,7 @@ namespace QuickFiler.Controllers
                 var c = _itemGroups[itemIndex].ItemController;
                 var msg =
                     $"Cannot expand item with index {itemIndex} because UI is not active.\n"
-                    + $"Controller for message \"{c.ItemHelper.Subject} sent on {c.ItemHelper.SentDate.ToString("MM/dd/yyyy")} at {c.ItemHelper.SentDate.ToString("HH:mm")} "
+                    + $"Controller for message \"{c.ItemHelper.Subject} sent on {c.ItemHelper.SentDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)} at {c.ItemHelper.SentDate.ToString("HH:mm", CultureInfo.InvariantCulture)} "
                     + $"by {c.ItemHelper.SenderName} has a value of {c.IsActiveUI} for {nameof(c.IsActiveUI)}";
                 throw new InvalidOperationException(msg);
             }
@@ -2299,7 +2303,7 @@ namespace QuickFiler.Controllers
                 var dataLine =
                     $"{dataLineBeg} {xComma(qf.ItemHelper.Subject)},QuickFiled,{durationText},{durationMinutesText},";
                 dataLine +=
-                    $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy")},{qf.ItemHelper.SentDate.ToString("HH:mm")}";
+                    $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)},{qf.ItemHelper.SentDate.ToString("HH:mm", CultureInfo.InvariantCulture)}";
 
                 strOutput[k] = dataLine;
             }

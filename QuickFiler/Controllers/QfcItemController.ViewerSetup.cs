@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -473,6 +474,6 @@ namespace QuickFiler.Controllers
         }
 
         internal string GetItemSummary() =>
-            $"Subject: {ItemHelper.Subject} sent on {ItemHelper.SentDate.ToString("MM/dd/yyyy")} at {ItemHelper.SentDate.ToString("HH:mm")} by {ItemHelper.SenderName}";
+            $"Subject: {ItemHelper.Subject} sent on {ItemHelper.SentDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)} at {ItemHelper.SentDate.ToString("HH:mm", CultureInfo.InvariantCulture)} by {ItemHelper.SenderName}";
     }
 }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -604,12 +605,12 @@ namespace QuickFiler.Controllers
 
         public string SentDate
         {
-            get => _itemInfo.SentDate.ToString("MM/dd/yyyy");
+            get => _itemInfo.SentDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
         }
 
         public string SentTime
         {
-            get => _itemInfo.SentDate.ToString("HH:mm");
+            get => _itemInfo.SentDate.ToString("HH:mm", CultureInfo.InvariantCulture);
         }
 
         public string Subject

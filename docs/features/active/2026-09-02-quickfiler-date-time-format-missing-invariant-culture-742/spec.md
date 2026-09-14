@@ -350,7 +350,7 @@ performance impact.
 > "the command returns 0," because `git grep -c` prints no line at all, and exits 1, for a path with zero
 > matches.
 
-- [ ] The interpolated site formerly at line 48 of `QuickFiler/Controllers/QfcHomeController.Metrics.cs`
+- [x] The interpolated site formerly at line 48 of `QuickFiler/Controllers/QfcHomeController.Metrics.cs`
   is rewritten as two explicit two-argument `ToString` calls, each passing `CultureInfo.InvariantCulture`.
   Checked two ways, because an absence claim alone is not a sufficient gate. First: a search of that file
   for the interpolated-specifier token, written with a bracketed character class as `[{]now:` so the
@@ -364,23 +364,23 @@ performance impact.
   here, because CSharpier decides whether the two replacement calls land on one line or two apiece, and a
   predicted figure would be a formatter artifact rather than a property of the change. Both pre-fix
   figures were measured on 2026-09-12 against the unfixed tree.
-- [ ] Lines 125 and 127 of `QuickFiler/Controllers/QfcHomeController.Metrics.cs` each pass
+- [x] Lines 125 and 127 of `QuickFiler/Controllers/QfcHomeController.Metrics.cs` each pass
   `CultureInfo.InvariantCulture` as the second argument to their `ToString` call.
-- [ ] Lines 95, 96, 118, and 119 of `QuickFiler/Controllers/EfcHomeController.Metrics.cs` each pass
+- [x] Lines 95, 96, 118, and 119 of `QuickFiler/Controllers/EfcHomeController.Metrics.cs` each pass
   `CultureInfo.InvariantCulture` as the second argument to their `ToString` call. As a discovery-count
   control, the count of lines in that file containing `CultureInfo.InvariantCulture` rises from exactly 2
   on the unfixed tree (the pre-existing numeric-field sites) to a strictly greater number after the fix;
   this pre-fix figure of 2 was measured on 2026-09-12 against the unfixed tree.
-- [ ] Line 465 of `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` has both of its `ToString`
+- [x] Line 465 of `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` has both of its `ToString`
   calls passing `CultureInfo.InvariantCulture` as the second argument, and the file gains a
   `using System.Globalization;` directive (exactly one occurrence).
-- [ ] Lines 235, 1296, and 2302 of `QuickFiler/Controllers/QfcCollectionController.cs` have all five of
+- [x] Lines 235, 1296, and 2302 of `QuickFiler/Controllers/QfcCollectionController.cs` have all five of
   their `ToString` calls passing `CultureInfo.InvariantCulture` as the second argument, and the file
   gains a `using System.Globalization;` directive (exactly one occurrence).
-- [ ] Lines 607 and 612 of `QuickFiler/Controllers/EfcItemController.cs` each pass
+- [x] Lines 607 and 612 of `QuickFiler/Controllers/EfcItemController.cs` each pass
   `CultureInfo.InvariantCulture` as the second argument to their `ToString` call, and the file gains a
   `using System.Globalization;` directive (exactly one occurrence).
-- [ ] A line-count search using the regular expression written with bracketed character classes as
+- [x] A line-count search using the regular expression written with bracketed character classes as
   `[.]ToString[(]@\?"[^"]*[:/.\-][^"]*"[)]`, restricted to the five production files listed above, returns
   exactly 2 matching lines after the fix, both of them in
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs`. The residual 2 are the commented-out predecessor
@@ -398,44 +398,44 @@ performance impact.
   this repository whatever the executor does, which would make this criterion unfalsifiable. Both
   spellings were run against the unfixed tree on 2026-09-12: the escaped form printed the 4/4/1/3/2
   per-file distribution and exited 0, and the unescaped form printed no line and exited 1.
-- [ ] In `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, the test method
+- [x] In `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, the test method
   `WriteMetricsAsync_UsesInjectedClock_ForDateAndTimeStamps` and the test method
   `QuickFileMetrics_WRITE_UsesInjectedClock_ForDataLine` both build their expected date/time substring
   using `CultureInfo.InvariantCulture` rather than an uncultured `.ToString(format)` call, and both tests
   pass.
-- [ ] The new file `QuickFiler.Test/Controllers/QuickFilerInvariantCultureIssue742Tests.cs` exists and
+- [x] The new file `QuickFiler.Test/Controllers/QuickFilerInvariantCultureIssue742Tests.cs` exists and
   contains exactly five test methods, one exercising each of the five production files named in this
   issue, each following the try/finally culture-swap pattern with an explicit sentinel `DateSeparator`
   and `TimeSeparator` (not a named culture's separators) and asserting that production output contains
   `/` and `:`; all five tests pass.
-- [ ] `QuickFiler.Test/QuickFiler.Test.csproj` gains exactly one new `Compile Include` entry naming the
+- [x] `QuickFiler.Test/QuickFiler.Test.csproj` gains exactly one new `Compile Include` entry naming the
   new test file. Checked as a pair of counts rather than by eye: a line-count search of that file for
   `QuickFilerInvariantCultureIssue742Tests` returns exactly 1 after the fix and prints no line, exiting 1,
   before the fix, and a line-count search for `Compile Include` in that file returns exactly one more
   after the fix than it did before the fix. The new entry sits inside the single existing `ItemGroup`
   element that opens at line 57 of that file, which is the element holding every existing `Compile`
   entry for the Controllers folder.
-- [ ] No new test-results file carrying the trx extension, and no new Cobertura coverage XML file,
+- [x] No new test-results file carrying the trx extension, and no new Cobertura coverage XML file,
   appears as a tracked evidence artifact in the repository as a result of this change. Per the maintainer
   decision on issue #671, effective
   2026-09-11, only Markdown evidence summaries are committed; the numeric pass/fail counts and coverage
   figures produced by the toolchain run are transcribed into Markdown artifacts under the feature
   folder's evidence directory, and the raw tool output is discarded rather than committed.
-- [ ] A Markdown baseline evidence artifact exists under the feature folder's evidence directory, kind
+- [x] A Markdown baseline evidence artifact exists under the feature folder's evidence directory, kind
   baseline, recording the pre-fix discovery-count figures this document's acceptance criteria depend on
   (the 14/4/1/3/2 per-file counts for the `[.]ToString[(]` sweep, the single `[{]now:` count, and the 4/2
   `CultureInfo.InvariantCulture` counts), and that artifact was written before any Write Set source file
   was modified.
-- [ ] `dotnet tool run csharpier format .` followed by `dotnet tool run csharpier check .` both complete
+- [x] `dotnet tool run csharpier format .` followed by `dotnet tool run csharpier check .` both complete
   with no remaining diff.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   completes with zero analyzer errors.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
   completes with zero errors.
 - [ ] `vstest.console.exe QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`, run against the built
   QuickFiler.Test test assembly, reports zero failures for QuickFiler.Test, including the two rewritten tests and the
   five new tests. Outlook was closed, not killed, before the preceding rebuild steps.
-- [ ] Within the QuickFiler and QuickFiler.Test source trees, the change touches exactly the eight paths
+- [x] Within the QuickFiler and QuickFiler.Test source trees, the change touches exactly the eight paths
   listed in the Write Set section below and no other file. This is scoped to those two trees on purpose:
   the same change also adds Markdown evidence artifacts and updates planning documents inside this
   feature folder, and those additions are expected rather than a scope violation, so a repository-wide
