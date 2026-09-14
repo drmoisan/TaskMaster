@@ -11,8 +11,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | max_concurrency | 3 |
 | current_cohort | 0 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-14T00-31 |
-| next_step | HOLD_UNTIL_OPERATOR_CONFIRMS_ACCOUNT_2_RESET_THEN_QUEUE_ITEM_1_742_PLAN_REVISION |
+| last_updated | 2026-09-14T01-16 |
+| next_step | REVISE_742_PLAN_MECHANICAL_THEN_872_MERGE_MAIN_AND_GATES |
 
 ## Items
 
@@ -23,7 +23,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 742 | `docs/features/active/2026-09-02-quickfiler-date-time-format-missing-invariant-culture-742` | 1 | C2 | sonnet | blocked | worktree_created |  |  |
 | 743 | `docs/features/active/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam-743` | 0 | C4 | fable | merged | merged | 888 | b63eaa4630d1 |
 | 792 | `docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792` | 2 | C4 | fable | scheduled | not_started |  |  |
-| 816 | `docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816` | 1 | C3 | opus | in_flight | pr_open | 890 |  |
+| 816 | `docs/features/active/2026-09-08-uithread-iscompleted-branch2-residual-and-ac5-apartment-measurement-816` | 1 | C3 | opus | merged | merged | 890 | 1e32500de4cb |
 | 838 | `docs/features/active/2026-09-09-gettableinviewasync-returns-null-on-timeout-838` | 0 | C3 | opus | merged | worktree_removed | 875 | 5cc7dcd6330b |
 | 839 | `docs/features/active/2026-09-09-createcancellationtoken-has-no-production-caller-839` | 0 | C3 | opus | merged | worktree_removed | 876 | e4349a62c0fe |
 | 869 | `docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869` | 1 | C3 | opus | blocked | worktree_created |  |  |
@@ -42,7 +42,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 742 | 2026-09-13T00-27 | 2026-09-13T22-50 | 2026-09-13T22-50 |  |  |
 | 743 | 2026-09-13T00-27 | 2026-09-13T00-39 | 2026-09-13T00-39 | 2026-09-13T21-37 |  |
 | 792 | 2026-09-13T00-27 |  |  |  |  |
-| 816 | 2026-09-13T00-27 | 2026-09-13T22-50 | 2026-09-13T22-50 |  |  |
+| 816 | 2026-09-13T00-27 | 2026-09-13T22-50 | 2026-09-13T22-50 | 2026-09-14T01-15 |  |
 | 838 | 2026-09-13T00-27 | 2026-09-13T00-39 | 2026-09-13T00-39 | 2026-09-13T04-34 | 2026-09-13T04-36 |
 | 839 | 2026-09-13T00-27 | 2026-09-13T02-20 | 2026-09-13T02-20 | 2026-09-13T06-57 | 2026-09-13T06-58 |
 | 869 | 2026-09-13T00-27 | 2026-09-13T15-51 | 2026-09-13T15-51 |  |  |
