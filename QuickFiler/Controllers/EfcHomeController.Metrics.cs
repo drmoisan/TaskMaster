@@ -92,8 +92,8 @@ namespace QuickFiler
                 return Array.Empty<string>();
             }
 
-            var curDateText = currentDateTime.ToString("MM/dd/yyyy");
-            var curTimeText = currentDateTime.ToString("HH:mm");
+            var curDateText = currentDateTime.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+            var curTimeText = currentDateTime.ToString("HH:mm", CultureInfo.InvariantCulture);
             var dataLineBeg = curDateText + "," + curTimeText + ",";
 
             var duration = elapsedSeconds;
@@ -115,8 +115,8 @@ namespace QuickFiler
                     + $",SingleSorted,{durationText},{durationMinutesText},"
                     + $"{QfcCollectionController.xComma(itemInfo.ToRecipientsName)},"
                     + $"{QfcCollectionController.xComma(itemInfo.SenderName)},Email,{folderText},"
-                    + $"{itemInfo.SentDate.ToString("MM/dd/yyyy")},"
-                    + $"{itemInfo.SentDate.ToString("HH:mm:ss")}"
+                    + $"{itemInfo.SentDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)},"
+                    + $"{itemInfo.SentDate.ToString("HH:mm:ss", CultureInfo.InvariantCulture)}"
                 )
                 .ToArray();
         }

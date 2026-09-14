@@ -1,9 +1,5 @@
 # Orchestrator Memory Index
 
-## Resuming a dead run
-- [Recover a dead agent worktree via shared git](recovering-a-dead-agent-worktree-via-shared-git.md) — its committed work is already in your object store; `git -C` into it is refused but `hash-object` reads its uncommitted files
-- [Blast-radius audit must cover the PLAN too](blast-radius-audit-must-cover-the-plan-too.md) — spec-only audit missed 5 stray paths; a BACKSLASH path is dropped by the extractor
-
 ## Lifecycle, promotion, checkpoint
 - [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) · [Small-path = minor-audit](small-path-minor-audit-selection.md) — 1-3 prod files = small path
 - [potential_to_issue creates the issue](potential-to-issue-creates-github-issue.md) · [needs an absolute path](potential-to-issue-needs-absolute-path.md) · [maps sections by heading](potential-to-issue-keeps-only-summary-section.md)
@@ -19,7 +15,7 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) · [Resumed child shares your worktree](resumed-child-orchestrator-shares-worktree.md)
 - [MCP tools available to orchestrator](mcp-tools-available-to-orchestrator.md) — run them yourself if a worker can't
 - [Run the real hook, not MCP](run-orchestration-hook-gates-locally.md) — the MCP validator disagrees on the bug route
-- [Preflight-cleared plan can still contradict a spec AC clause](preflight-cleared-plan-can-still-conflict-with-a-spec-acceptance-clause.md) — read each AC's "not a pass" sentence against the claiming task's decision rule before execution (#743 AC1 no-expiry)
+- [Measure your hook exposure, don't assume it](parallel-child-hook-exposure-measured-not-assumed.md) — a non-isolated child committed + delegated with NO shared-file sync; prd-feature gates only atomic-planner
 
 ## PR authoring and CI gate
 - [pr-author is a skill, not an agent](pr-author-hook-blocks-gh-in-this-repo.md) · [exact checkpoint schema](pr-author-hook-exact-checkpoint-schema.md) — agents must be a LIST; `relativeFile` required
@@ -46,11 +42,11 @@
 - [Epic child: never anchor a plan on origin/main](epic-child-plan-must-not-anchor-on-origin-main.md) — the merge base sits behind every merged sibling
 - [Three-dot diff degenerates on an ancestor base](three-dot-diff-degenerates-on-ancestor-base.md) — bills sibling merges to your footprint
 - [Merging main invalidates the plan's base anchor](merging-main-invalidates-plan-base-anchor.md) — re-anchor to the merge commit
+- [A merge retargets a delete-by-line-number citation](line-number-deletion-citation-shifts-under-merge.md) — the "count falls by one" gate passes on the wrong line too
 - [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) · [Verify reducibility before accepting an exemption count](feedback_verify_reducibility_before_accepting_exemption_count.md)
 - [Piped command's `$?` is the LAST segment](piped-command-exit-code-is-the-last-segment.md) — suspect the measurement before overwriting a memory it contradicts
 
 ## Plans, preflight, delegation
-- [Your brief silently overrides your own recorded deviation](delegation-brief-silently-overrides-recorded-deviation.md) — the delegate obeys; verify the commit FILE LIST, not the summary
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) · [converges on verbatim delta text](preflight-converges-on-verbatim-delta-text.md) · [may exceed the 2-round target](preflight-rounds-exceed-target-legitimately.md)
 - [Preflight sibling-invalidation cascade](preflight-sibling-invalidation-cascade.md) · [sweep ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) · [defect-trend scope confound](preflight-defect-trend-scope-confound.md)
 - [Absence from a failure list isn't a pass](absence-from-failure-list-is-not-a-pass-gate.md) — pair with a discovery-count control
@@ -84,8 +80,7 @@
 - [Post-processed Cobertura = zero exit, NOT a test result](cobertura-postprocessing-is-a-zero-exit-proxy-not-a-test-result.md) — no .trx exists; re-run the gate
 - [[ExcludeFromCodeCoverage] is INVISIBLE, not 0%](excludefromcodecoverage-invisible-to-coverage-gates.md) — per-file hits-row gates unsatisfiable; METHOD-level leaks
 - [vstest emits TWO .coverage files per run](vstest-emits-two-coverage-files-per-run.md) — need a disambiguation rule
-- [Coverage runner throws BEFORE post-processing](coverage-runner-throws-before-postprocessing.md) — line 236 beats line 341, so a failing test leaves raw XML; and evidence-dir .cobertura.xml is NOT gitignored
-- [Class helper's property names differ from the package helper's](cobertura-class-helper-property-names-differ-from-package.md) — no rate property, inverted count names; makes a plan's acceptance unsatisfiable as written
+- [Coverage runner has NO runsettings override](coverage-runner-has-no-runsettings-override.md) — the Deedle/parallelism fix works on direct vstest spans but NOT on runner-invoking tasks; count the split
 
 ## C# toolchain and tests
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) · [analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) · [direct-csproj build facts](csharp-direct-csproj-build-facts.md)

@@ -497,7 +497,6 @@
     <Compile Include="Threading\ProgressTracker_Tests.cs" />
     <Compile Include="Threading\ProgressTracker_ReportAndViewerTests.cs" />
     <Compile Include="Threading\ProgressTrackerPane_Tests.cs" />
-    <Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />
     <Compile Include="Threading\TaskPriority_Tests.cs" />
     <Compile Include="Threading\ThreadSafeFunctions_Tests.cs" />
     <Compile Include="Threading\ThreadSafeSingleShotGuard_Tests.cs" />
@@ -514,6 +513,7 @@
     <Compile Include="Threading\ProgressViewer_Tests.cs" />
     <Compile Include="Threading\UiThread_Tests.cs" />
     <Compile Include="Threading\UiThreadInitContract_Tests.cs" />
+    <Compile Include="Threading\UiThreadApartmentMeasurement_Tests.cs" />
     <Compile Include="Threading\WpfUiDispatcherTests.cs" />
     <Compile Include="Threading\CurrentStoreContextTests.cs" />
     <Compile Include="Threading\LockupStallDeciderTests.cs" />
