@@ -395,7 +395,7 @@ checks have already passed. No throughput or latency target applies and none is 
 
 ## Acceptance Criteria
 
-- [ ] **AC1 — The 176-179 exit is hardened and nothing else in the accessor changes.** After the
+- [x] **AC1 — The 176-179 exit is hardened and nothing else in the accessor changes.** After the
       change, `SynchronizationContextAwaiter.IsCompleted` in `UtilitiesCS/Threading/UiThread.cs`
       still has exactly five exits in the same source order — the count and its two independent
       derivations are in the `## Numeric Derivation Evidence` section of the research of record, and
@@ -405,7 +405,7 @@ checks have already passed. No throughput or latency target applies and none is 
       PASS requires a diff of that file confined to the `_uiSyncContext` condition and its comment.
       FAIL if the diff alters the ambient-identity exit, the null-ambient exit, the thread-id guard,
       the dispatcher exit, or `UiThread.Init`.
-- [ ] **AC2 — The recycled-id negative regression test is red before and green after.** A test in
+- [x] **AC2 — The recycled-id negative regression test is red before and green after.** A test in
       `UtilitiesCS.Test/Threading/UiThreadApartmentMeasurement_Tests.cs` installs the captured UI
       context, installs a captured dispatcher owned by a different thread, installs the captured
       thread id as the executing dedicated thread's own managed id, sets a non-null ambient context
@@ -414,20 +414,20 @@ checks have already passed. No throughput or latency target applies and none is 
       reported Failed against the unmodified predicate and Passed against the modified one, with the
       command and exit code for each run. FAIL if either recorded outcome is absent, if the
       fail-before outcome is Passed, or if the test is skipped or not discovered.
-- [ ] **AC3 — The null-dispatcher fail-closed negative test passes.** A second test in the same new
+- [x] **AC3 — The null-dispatcher fail-closed negative test passes.** A second test in the same new
       file asserts the predicate is false when the captured UI context is installed, the captured
       thread id matches the executing thread, no captured UI dispatcher is installed, and the
       executing thread has no dispatcher of its own. It is recorded Passed in the pass-after
       projection. FAIL if the implementation satisfies the added conjunct by a null-to-null
       reference match, which this test detects.
-- [ ] **AC4 — The positive twin passes both before and after.** A test named for the
+- [x] **AC4 — The positive twin passes both before and after.** A test named for the
       dispatcher-owning-caller case, added inside `SynchronizationContextAwaiter_Tests` in
       `UtilitiesCS.Test/Threading/UiThread_Tests.cs`, asserts the predicate is true when evaluated
       on the thread that owns the captured dispatcher with the captured UI context installed and a
       different non-null ambient context set. The same projection records it Passed against both the
       unmodified and the modified predicate. FAIL if either outcome is not Passed, because that
       would mean the change altered behaviour on the leg declared out of scope.
-- [ ] **AC5 — The weak retry assertion is tightened and discriminates.** In
+- [x] **AC5 — The weak retry assertion is tightened and discriminates.** In
       `UtilitiesCS.Test/Threading/UiThreadInitContract_Tests.cs`, the assertion at line 318 of the
       pre-change file gains `.WithMessage(FakeUiCaptureSource.CaptureFailureMessage)`, and the same
       test gains `Thread.CurrentThread.GetApartmentState().Should().Be(ApartmentState.STA);` as its
@@ -439,7 +439,7 @@ checks have already passed. No throughput or latency target applies and none is 
       the constraint distinguishes the two `InvalidOperationException` sources. FAIL if the message
       constraint is absent, if the apartment assertion is absent, or if the projection does not
       record the message comparison.
-- [ ] **AC6 — The runtime apartment measurement is taken and settles clause (i) of issue #809's
+- [x] **AC6 — The runtime apartment measurement is taken and settles clause (i) of issue #809's
       AC5.** A test in `UtilitiesCS.Test/Threading/UiThreadApartmentMeasurement_Tests.cs` runs on a
       dedicated thread whose apartment was set to MTA explicitly, reads
       `Thread.CurrentThread.GetApartmentState()` on that thread inside the delegate, constructs
@@ -453,14 +453,14 @@ checks have already passed. No throughput or latency target applies and none is 
       than MTA, because the probe then measured nothing and the run is void; FAIL if the apartment
       is asserted from a settings file, from the `Parallelize` attribute, or from documented
       `[STATestClass]` behaviour instead of being read on the executing thread.
-- [ ] **AC7 — The measurement leaves nothing behind and needs no host.** The measurement test
+- [x] **AC7 — The measurement leaves nothing behind and needs no host.** The measurement test
       disposes the form it constructs, creates no dispatcher and starts no message loop, joins the
       thread it creates before returning, and requires no live Outlook process. PASS requires the
       structural guard `ExecutingAssembly_ContainsNoFormDerivedType` to be recorded Passed in the
       same run, proving no Form-derived type was compiled into the test assembly, and the run to
       complete with no orphaned thread and no hang dump. FAIL if the run leaves a visible window, a
       live form, an un-shut dispatcher, or a non-background thread alive.
-- [ ] **AC8 — Both issue #782 findings are recorded, and neither changes production.** A Markdown
+- [x] **AC8 — Both issue #782 findings are recorded, and neither changes production.** A Markdown
       artifact under this feature folder's evidence/other directory records finding 4A, that the
       retry-after-failed-initialize behaviour is already present in production at lines 47-59 of
       `UtilitiesCS/Threading/UiThread.cs` where the flag is set after `Initialize()` returns inside
@@ -471,7 +471,7 @@ checks have already passed. No throughput or latency target applies and none is 
       supporting line ranges and requires the AC1 diff to show `UiThread.Init` unchanged. FAIL if
       the artifact presents the issue #782 status as a single finding or asserts a production
       residual that the research of record contradicts.
-- [ ] **AC9 — Clause (ii) of issue #809's AC5 is discharged or explicitly left outstanding.** A
+- [x] **AC9 — Clause (ii) of issue #809's AC5 is discharged or explicitly left outstanding.** A
       Markdown projection under this feature folder's evidence/regression-testing directory records
       a full-suite run over the explicitly named test assemblies, repeated at least three times,
       with the per-repetition outcome of
@@ -484,7 +484,7 @@ checks have already passed. No throughput or latency target applies and none is 
       none of the code the failing test exercises. FAIL if fewer than three repetitions are
       recorded, if the per-repetition outcome of that test is omitted, or if a failure is recorded
       with no attribution.
-- [ ] **AC10 — Coverage of the hardened exit and the repository floor.** A Markdown projection under
+- [x] **AC10 — Coverage of the hardened exit and the repository floor.** A Markdown projection under
       this feature folder's evidence/qa-gates directory records line coverage for
       `UtilitiesCS/Threading/UiThread.cs` at or above the 80% floor in CLAUDE.md, records the
       executable lines of the hardened `_uiSyncContext` exit as covered — identified by their
@@ -495,7 +495,7 @@ checks have already passed. No throughput or latency target applies and none is 
       together with coverage of the hardened exit. FAIL if the projection omits the per-file figure,
       if the figure is below 80%, or if any executable line of the hardened exit is recorded
       uncovered.
-- [ ] **AC11 — Issue #809's AC5 is checked off only on a complete discharge.** The checkbox at line
+- [x] **AC11 — Issue #809's AC5 is checked off only on a complete discharge.** The checkbox at line
       464 of
       `docs/features/active/2026-09-07-uithread-init-contract-residuals-784-787-788-809/spec.md`
       changes from `- [ ]` to `- [x]` if and only if AC6 and AC9 are both PASS. Its criterion text
@@ -512,7 +512,7 @@ checks have already passed. No throughput or latency target applies and none is 
       if the box is checked while either criterion is short, if the criterion text is edited, if a
       partial discharge is committed without the outstanding-clause note, or if the artifact named
       by that criterion is absent from the folder the criterion names.
-- [ ] **AC12 — The new file is registered and its tests actually ran.**
+- [x] **AC12 — The new file is registered and its tests actually ran.**
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` gains a `<Compile Include>` item for
       `UtilitiesCS.Test/Threading/UiThreadApartmentMeasurement_Tests.cs`, inserted between the
       existing UiThreadInitContract_Tests item and the WpfUiDispatcherTests item, both of which are
@@ -520,14 +520,14 @@ checks have already passed. No throughput or latency target applies and none is 
       new tests by name among the executed tests, which is the only check that proves the file
       compiled into the assembly rather than silently producing nothing. FAIL if the tests are
       absent from the executed list, even if the item appears in the project file.
-- [ ] **AC13 — File-size limit respected.** Each C# source file this delivery touches remains at or
+- [x] **AC13 — File-size limit respected.** Each C# source file this delivery touches remains at or
       below the 500-line limit in CLAUDE.md. A projection records the post-change line count of
       `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs`,
       `UtilitiesCS.Test/Threading/UiThreadInitContract_Tests.cs` and
       `UtilitiesCS.Test/Threading/UiThreadApartmentMeasurement_Tests.cs`. The pre-change counts are
       293, 458 and 460 for the first three, so the headroom is 207, 42 and 40 lines respectively.
       FAIL if any recorded count exceeds 500.
-- [ ] **AC14 — Full four-step toolchain passes in one final pass.** All four CLAUDE.md commands
+- [x] **AC14 — Full four-step toolchain passes in one final pass.** All four CLAUDE.md commands
       run in order in a single clean pass: `dotnet tool run csharpier format .` verified by
       `dotnet tool run csharpier check .`;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`;

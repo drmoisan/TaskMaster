@@ -71,3 +71,20 @@ The case where a caller is genuinely on the captured UI thread inside a WPF disp
 out of scope. On that leg the predicate returns true today and must continue to return true, because
 the dispatcher exit of the same predicate already reports true in that state. Ordering assertions at
 the production await sites are also out of scope and remain an open residual from issue #809.
+
+## What was delivered
+
+Non-normative, as is the rest of this document; it carries no acceptance criteria.
+
+The delivery landed. The falsifiable pair a reviewer can point at is the recycled-thread-id test
+`IsCompleted_WhenTheCapturedUiContextMatchesButTheExecutingThreadOwnsNoDispatcher_ReturnsFalse`,
+recorded **Failed** against the unmodified predicate with the message
+`Expected observed to be False, but found True.` and recorded **Passed** against the hardened one.
+The invariance control beside it is
+`IsCompleted_OnTheThreadThatOwnsTheCapturedDispatcherWithTheCapturedUiContext_ReturnsTrue`, recorded
+**Passed** in both states, which is what shows the genuine-UI-thread leg was left alone.
+
+The apartment value observed on the executing thread was **MTA**, read by a
+`Thread.CurrentThread.GetApartmentState()` call inside the delegate rather than inferred from any
+settings file or attribute, and the accompanying record line was
+`MTA_INITIALIZE_OUTCOME: COMPLETED`.

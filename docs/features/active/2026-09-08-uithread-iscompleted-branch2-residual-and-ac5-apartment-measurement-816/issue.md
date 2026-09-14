@@ -99,4 +99,25 @@ thread-pool thread whose managed id equals the owner's. See
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch
+
+## Delivery Outcome
+
+The hardened exit is the captured-UI-context exit of
+`UtilitiesCS.UiThread.SynchronizationContextAwaiter.IsCompleted`, which now returns `true` only when
+the captured context is the persistent UI context, a non-null captured UI dispatcher exists, and
+that dispatcher is reference-equal to the WPF dispatcher of the executing thread; no other exit of
+the accessor changed and the accessor still has exactly five exits in the same source order. Three
+tests were added in the new file
+`UtilitiesCS.Test/Threading/UiThreadApartmentMeasurement_Tests.cs` —
+`IsCompleted_WhenTheCapturedUiContextMatchesButTheExecutingThreadOwnsNoDispatcher_ReturnsFalse`,
+`IsCompleted_WhenNoUiDispatcherWasCapturedAndTheExecutingThreadHasNone_ReturnsFalse` and
+`SyncContextFormShow_OnAThreadMeasuredAsMta_RecordsTheOutcome` — alongside the positive twin
+`IsCompleted_OnTheThreadThatOwnsTheCapturedDispatcherWithTheCapturedUiContext_ReturnsTrue` added to
+the existing awaiter test class; the two negative tests were recorded Failed against the unmodified
+predicate and Passed against the hardened one, and the positive twin Passed against both. The
+runtime apartment measurement read a guard value of **MTA** on the executing thread and recorded the
+settling token **`MTA_INITIALIZE_OUTCOME: COMPLETED`**, meaning constructing and showing the
+production capture form on an MTA thread did not throw on this host. With that measurement and a
+three-repetition full-suite record in which the non-deterministic dictionary-extension test Passed
+every time, both clauses of issue 809's AC5 are discharged and its checkbox is now checked.
