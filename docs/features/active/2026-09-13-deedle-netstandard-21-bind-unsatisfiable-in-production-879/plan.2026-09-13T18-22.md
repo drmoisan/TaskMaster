@@ -106,11 +106,14 @@ Documents and evidence:
 
 Conditional, only if the Phase 0 build-output premise check fails and the recorded substitution is taken:
 
-14. `ToDoModel.Test/Bootstrap/ChildDomainBindProbe.cs`,
-    `ToDoModel.Test/Bootstrap/NetstandardBindChildDomainTests.cs` and
-    `ToDoModel.Test/ToDoModel.Test.csproj` replace items 7, 8 and 10. Item 9
+14. `ToDoModel.Test/Bootstrap/ChildDomainBindProbe.cs` and
+    `ToDoModel.Test/Bootstrap/NetstandardBindChildDomainTests.cs` replace items 7 and 8, and
+    `ToDoModel.Test/ToDoModel.Test.csproj` joins the write set carrying those two new
+    `Compile Include` items. Item 10 (`TaskMaster.Test/TaskMaster.Test.csproj`) is NOT replaced: it
+    stays in the write set and gains one `Compile Include` item rather than three, because item 9
     (`TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs`) is NOT moved and stays in
-    `TaskMaster.Test`: `ToDoModel.Test/ToDoModel.Test.csproj` carries ProjectReferences to
+    `TaskMaster.Test`. The reason item 9 stays is that
+    `ToDoModel.Test/ToDoModel.Test.csproj` carries ProjectReferences to
     `ToDoModel` (line 310) and `UtilitiesCS` (line 314) only and does not reference `TaskMaster`, so
     `typeof(ThisAddIn)` would not compile there, and `TaskMaster.dll.config` is not in that project's
     build output. Under this substitution the child domains' `ConfigurationFile` is
@@ -146,7 +149,10 @@ handler does not propagate into a child domain, so the PR #880 resolver linked i
    name `SVGControl`. `SvgRenderer`'s type initializer cannot have run if its assembly is not loaded, so
    this is a complete proof that no SVG rendering occurred.
 2. `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall` — inside the child domain, the `AppDomain`
-   assembly-resolution event has an empty invocation list before the installer under test runs.
+   assembly-resolution event has an empty invocation list before the installer under test runs, and a
+   non-empty one after it. The second reading is the positive control on the counting mechanism:
+   without it, a reflected field that is null in every state reports an empty list unconditionally and
+   the first reading proves nothing.
 3. `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect` — the configuration file supplied to both
    child domains declares no `netstandard` `dependentAssembly` entry, so a positive result is
    attributable to the installer and not to the `TaskMaster/app.config` hardening.
@@ -302,8 +308,10 @@ gate task; `[P5-T1]` re-gates it before the final loop.
   are permitted.
 - Therefore: never prefix a command with `cd`; never chain `grep`, `sed`, `cat`, `head`, `tail`, `ls` or
   `find` onto another command. Every pwsh payload in this plan is written with newline-separated
-  statements rather than `;` for that reason, and avoids `|` by using `@(...)` indexing and the `.Where`
-  method instead of pipelines.
+  statements rather than `;` for that reason. A `|` that appears inside a single-quoted
+  `pwsh -NoProfile -Command '...'` payload is part of one Bash segment and is permitted; `[P0-T4]`'s
+  manifest read contains one. A `|` between two commands is not permitted, and this plan contains none.
+  Where a pipeline is avoidable the payloads use `@(...)` indexing and the `.Where` method instead.
 - Express file inspection as a `pwsh` one-liner or as a Read/Grep tool step.
 - `git commit` with zero pathspec operands is denied. Every commit task in this plan appends
   `-- <explicit paths>`.
@@ -319,9 +327,10 @@ rewrites `csproj` HintPaths.
 - `/t:Rebuild`, never `/t:Build`. MSBuild's up-to-date check does not invalidate on a command-line `/p:`
   change, so a warm `/t:Build` returns exit 0 with `CoreCompile` skipped on every project and the gate
   cannot fail.
-- Do **not** add `/p:Nullable=enable`. No project carries a `Nullable` element, there is no
-  `Directory.Build.props`, and forcing it conscripts every file that has never adopted the pragma. The
-  nullable command below is character-for-character CI's.
+- Do **not** add `/p:Nullable=enable`. No project carries a `Nullable` element, and the
+  repository's `Directory.Build.props` sets `RxUseUnsupportedPackagesConfig` only and carries no
+  `Nullable` element either, so the property is a solution-wide opt-in that conscripts every file
+  that has never adopted the pragma. The nullable command below is character-for-character CI's.
 - A successful `msbuild` run prints the word `error` dozens of times in unrelated contexts. No acceptance
   condition in this plan asserts on a bare `error` substring count. The success signal asserted is the
   anchored summary line whose pattern is `^\s+0 Error\(s\)$`, which does not also match `10 Error(s)`.
@@ -357,7 +366,19 @@ separate cleanly and only one of them is closed by AppDomain isolation:
   domain, and it raises `CannotUnloadAppDomainException` when a thread cannot be aborted in time. Run
   concurrently with sibling classes on a machine under load, that is a failure mode of the harness that
   has nothing to do with the bind under test, and the harness's positive and negative domain pair is
-  the only load-bearing evidence this plan produces. A single attribute removes it.
+  the only load-bearing evidence this plan produces. The attribute reduces that exposure rather than
+  removing it: under `Workers=0` with `Scope=ClassLevel` a `[DoNotParallelize]` class is not run in a
+  phase disjoint from the parallel bucket, so sibling classes can still execute alongside it. What the
+  attribute is worth is therefore bounded by how many sibling classes each run discovers, and that was
+  measured per run rather than assumed. `[P4-T7]` filters on
+  `FullyQualifiedName~AddInEagerInstallShapeTests`, which discovers that one class, so that run carries
+  no exposure from either direction. `[P2-T11]` and `[P4-T3]` filter on
+  `FullyQualifiedName~TaskMaster.Test.Bootstrap`, which also discovers
+  `AddInEagerInstallShapeTests` because `[P2-T8]` declares it in that namespace, so exactly one sibling
+  class can execute alongside the harness in those two runs and the attribute narrows that single
+  window. The attribute is also in force for the full-suite run at `[P5-T7]`, where the sibling set is
+  every test class in the solution and the window is narrowed without being closed. `[P0-T8]` runs
+  before the harness file exists, so no exposure arises there.
 
 The pinning is made checkable by `[P2-T6]`'s acceptance condition, which requires the literal
 `[DoNotParallelize]` to appear exactly once in
@@ -387,7 +408,7 @@ because it is absent from the tree until `[P2-T6]` runs.
       `.../evidence/baseline/outlook-closed-gate.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:` and `Output Summary:` recording the observed count.
       Acceptance: the recorded count is `0` and the artifact exists.
-- [ ] [P0-T4] LOCK-ACQUIRE, bootstrap the toolchain in three steps beginning with scripts/vscode/Install-RepoDotNetSdk.ps1, then LOCK-RELEASE. This
+- [ ] [P0-T4] LOCK-ACQUIRE, bootstrap the toolchain in four steps beginning with scripts/vscode/Install-RepoDotNetSdk.ps1, then LOCK-RELEASE. This
       worktree is fresh: `.dotnet-sdk` and `packages/` are both absent, `global.json` pins SDK
       `8.0.205` with `paths` `.dotnet-sdk` and `$host$`, and every `dotnet` invocation fails with the
       `global.json` `errorMessage` until the repo-local SDK is installed. Steps, in this order:
@@ -557,7 +578,9 @@ because it is absent from the tree until `[P2-T6]` runs.
       `[P0-T10]` artifact records `TaskMaster.Test/bin/Debug/Deedle.dll EXISTS=True` and
       `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll.config EXISTS=True`; otherwise
       `HOST=ToDoModel.Test`, and the artifact additionally carries an `Amendment:` section reproducing
-      write-set item 14 of this plan verbatim and stating that items 7, 8 and 10 are replaced.
+      write-set item 14 of this plan verbatim and stating that items 7 and 8 are replaced, that
+      `ToDoModel.Test/ToDoModel.Test.csproj` joins the write set, and that item 10 stays in the write
+      set and gains one `Compile Include` item rather than three.
       Independently of the host decision, the artifact carries a `Deployed Add-In Config:` field whose
       value is the `TaskMaster.Test/bin/Debug/TaskMaster.dll.config EXISTS=` line copied verbatim from
       the `[P0-T10]` artifact. If that line reads `EXISTS=False`, the executor reports blocked before
@@ -570,13 +593,38 @@ because it is absent from the tree until `[P2-T6]` runs.
       `HOST=ToDoModel.Test` the `Amendment:` section is present. When the value is
       `HOST=ToDoModel.Test` the `Amendment:` section must additionally state, in its
       own line, `AddInEagerInstallShapeTests REMAINS IN TaskMaster.Test` and
-      `CHILD DOMAIN CONFIGURATION FILE = ToDoModel.Test.dll.config`, and `[P2-T6]` and `[P2-T9]` are
-      read with those two substitutions applied.
+      `CHILD DOMAIN CONFIGURATION FILE = ToDoModel.Test.dll.config`, and every subsequent task that
+      names a path beginning `TaskMaster.Test/Bootstrap/` is read with `ToDoModel.Test/Bootstrap/`
+      substituted for that prefix, except
+      `TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs`, which is not moved. The tasks
+      affected are exactly `[P2-T5]`, `[P2-T6]`, `[P2-T7]`, `[P2-T9]`, `[P4-T9]`, `[P4-T12]`,
+      `[P5-T2]`, `[P5-T8]` and `[P6-T1]`. In `[P2-T9]` and `[P6-T1]` the owning project file for the
+      two moved harness files becomes `ToDoModel.Test/ToDoModel.Test.csproj` while
+      `AddInEagerInstallShapeTests.cs` stays registered in `TaskMaster.Test/TaskMaster.Test.csproj`,
+      and in `[P5-T2]` the write-set paths in items 1 to 10 are read with write-set item 14 applied,
+      which substitutes two of them and adds `ToDoModel.Test/ToDoModel.Test.csproj`, so the permitted
+      set has eleven members rather than ten. The
+      `Amendment:` section reproduces this list of nine task IDs verbatim, so the substitution is
+      recorded once and no later task is left naming a path that does not exist.
+
+      That list is exhaustive for the path-prefix rule and for nothing else. Two further substitutions
+      follow from the same decision without being path-prefix substitutions, and the `Amendment:`
+      section reproduces them alongside the nine task IDs. First, the vstest assembly operand
+      `TaskMaster.Test/bin/Debug/TaskMaster.Test.dll` in `[P2-T11]`, and in `[P4-T3]` which takes its
+      command shape from `[P2-T11]`, is read as `ToDoModel.Test/bin/Debug/ToDoModel.Test.dll`; the
+      namespace `TaskMaster.Test.Bootstrap` that `[P2-T5]` and `[P2-T6]` declare is deliberately NOT
+      substituted, so the `/TestCaseFilter:"FullyQualifiedName~TaskMaster.Test.Bootstrap"` operand
+      still discovers the two moved classes in the substituted assembly. Second, the child-domain
+      configuration file named in `[P2-T6]`, including the literal its acceptance condition searches
+      for, is read as `ToDoModel.Test.dll.config`, which is the value write-set item 14 and the
+      `CHILD DOMAIN CONFIGURATION FILE` line above already fix. `[P4-T7]` is in neither list: it
+      filters on `FullyQualifiedName~AddInEagerInstallShapeTests`, and that class stays in
+      `TaskMaster.Test` under this substitution.
 - [ ] [P0-T15] Record the baseline scope-boundary state. Command:
 
       ```
       git rev-parse --verify origin/main
-      git status --porcelain --untracked-files=all -- UtilitiesCS TaskMaster UtilitiesCS.Test TaskMaster.Test docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879
+      git status --porcelain --untracked-files=all -- . ":(exclude).claude" ":(exclude)docs/features"
       git diff --name-only origin/main...HEAD
       ```
 
@@ -585,9 +633,15 @@ because it is absent from the tree until `[P2-T6]` runs.
       companion the name-listing diff needs, and the two mechanisms are complementary because each
       alone is wrong in one state: the anchored diff enumerates tracked committed changes only and is
       blind to a file this plan has created but not yet committed, and porcelain status goes empty once
-      the change is committed. At Phase 0 nothing has been created yet, so both are expected to be
-      empty here and the pair establishes the starting state against which `[P6-T5]` compares. Append
-      both outputs to `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md`, the diff under a
+      the change is committed. This task runs after `[P0-T1]` through `[P0-T14]`, which have already
+      written baseline artifacts under this feature folder and have already marked their own entries in
+      this plan file, so a span that included `docs/features` would list every one of them. The span
+      therefore carries the same two exclusions `[P6-T5]` carries, which is what makes the two outputs
+      comparable. The merge-base diff is separately expected to be non-empty here: the branch already
+      carries the committed documentation that introduced `issue.md`, `spec.md`,
+      `research/2026-09-13T19-05-deedle-netstandard-bind-research.md` and this plan file, so those four
+      paths are the expected Phase 0 diff content and are recorded rather than treated as a defect.
+      Append both outputs to `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md`, the diff under a
       `Baseline Merge-Base Diff:` heading and the porcelain output under a
       `Baseline Porcelain Status:` heading, each empty output recorded as the literal `NONE`.
 
@@ -612,8 +666,14 @@ because it is absent from the tree until `[P2-T6]` runs.
       `Baseline Comparators:` heading.
       Acceptance: `git rev-parse --verify origin/main` exits 0; both the `Baseline Merge-Base Diff:`
       and the `Baseline Porcelain Status:` headings exist with the raw output beneath them, empty
-      output recorded as the literal `NONE`; the `Baseline Porcelain Status:` output names no path
-      other than this feature folder's `plan.2026-09-13T18-22.md` and `spec.md`; and
+      output recorded as the literal `NONE`; the `Baseline Porcelain Status:` output is the literal
+      `NONE`, or names only paths that are members of items 1 to 10 of `## Authorised Write Set`, and
+      any other path blocks because it would mean the bootstrap or a baseline build wrote into the
+      tracked tree; the `Baseline Merge-Base Diff:` output names only paths beginning
+      `docs/features/active/2026-09-13-deedle-netstandard-21-bind-unsatisfiable-in-production-879/`,
+      and a path outside that prefix blocks, except that a path beginning `.claude/` is an inherited
+      path under the inherited-path rule in `## Authorised Write Set` and is recorded rather than
+      blocking; and
       `BASELINE_FSHARP_REDIRECT_LINES` is recorded as an integer greater than 0. A value of 0 blocks,
       because it would mean the search mechanism found nothing at baseline and no later comparison
       against it would prove anything.
@@ -706,8 +766,17 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `[ThreadStatic]` re-entrance guard; and an `internal sealed class AssemblyBindingLadder` whose
       constructor takes five injectable delegates — get-loaded-assemblies, load-by-display-name,
       load-from-path, file-exists, and get-runtime-directory — with production defaults supplied by
-      `AssemblyBindingFallback`. **In this task every ladder rung returns `null` and `Install()` has an
-      empty body.** The file carries `#nullable enable` and XML documentation on the public surface. No
+      `AssemblyBindingFallback`. **In this task every ladder rung returns `null`, so the ladder resolves
+      nothing, and `Install()` subscribes the handler to `AppDomain.CurrentDomain.AssemblyResolve`
+      through the `Interlocked.Exchange` guard and does nothing else.** It is the ladder, not the
+      subscription, that is behaviour-empty in this phase. The subscription belongs here rather than in
+      Phase 3 because `[P2-T6]`'s positive control on `CountAssemblyResolveHandlers()` reads the
+      invocation list after `InstallProductionFallback()` in the `[P2-T11]` run, and an `Install()` with
+      an empty body would report an empty list there and make `[P2-T12]` unsatisfiable. The fail-before
+      property is unaffected: a subscribed handler whose every rung returns `null` resolves no
+      `netstandard` identity, so `AfterInstall_BothNetstandardVersionsBind` and
+      `AfterInstall_DeedleTypeInitializerSucceeds` still fail at runtime in `[P2-T11]`. The file carries
+      `#nullable enable` and XML documentation on the public surface. No
       WinForms type, no Outlook Interop type, no log4net reference.
       Acceptance: the file exists, `Select-String -SimpleMatch` on it returns at least one hit each for
       `public static void Install()`, `internal static Assembly Resolve(`,
@@ -796,6 +865,14 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       `NegativeControl_WithoutInstall_Netstandard21Throws` and
       `NegativeControl_Netstandard20Observation_IsRecorded` run in the installer-free domain.
 
+      `AfterInstall_BothNetstandardVersionsBind` and `AfterInstall_DeedleTypeInitializerSucceeds` run in
+      the POSITIVE domain, and each calls `InstallProductionFallback()` before the observation it makes,
+      in that order. `ChildDomain_ConfigurationFileDeclaresNoNetstandardRedirect` runs in the POSITIVE
+      domain and its position relative to `InstallProductionFallback()` is deliberately unconstrained,
+      because it reads the configuration file supplied at domain creation and the installer neither
+      reads nor writes that file. Every one of the eight methods therefore has a stated domain, and
+      every method whose result can depend on the installer has a stated order relative to it.
+
       `ChildDomain_HasNoSvgControlAssemblyLoaded` additionally records
       `CountLoadedAssembliesNamed("UtilitiesCS")` as a positive control on the counting mechanism and
       asserts it is greater than 0. The control is sound because `InstallProductionFallback()` cannot
@@ -803,6 +880,19 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       be non-zero. The same helper therefore returns a non-zero count in the positive domain and 0 in
       `NegativeControl_HasNoUtilitiesCsAssemblyLoaded`, which is what makes the zero an observation
       rather than an artefact of a helper that always returns 0.
+
+      `ChildDomain_HasNoAssemblyResolveHandlerBeforeInstall` carries the same shape of positive control
+      on its own counting mechanism. It reads `CountAssemblyResolveHandlers()` before
+      `InstallProductionFallback()` and asserts the value is 0, then calls `InstallProductionFallback()`
+      and reads `CountAssemblyResolveHandlers()` a second time and asserts the value is greater than 0.
+      Without the second read the zero is not an observation: a reflected field whose value is null in
+      every state returns 0 unconditionally, and the fail-loud rule recorded at `[P0-T13]` covers only
+      the case where the field lookup itself returns null, not the case where the lookup succeeds and
+      the value never becomes non-null. The first reading would then pass in a domain where a handler
+      had in fact been installed. This second reading is why `[P2-T1]`'s behaviour-empty seam subscribes
+      the handler: the reading is taken in the `[P2-T11]` run as well as the `[P4-T3]` run, and an
+      `Install()` with an empty body would report an empty invocation list there and make `[P2-T12]`
+      unsatisfiable.
 
       The class carries `[DoNotParallelize]`, for the reason given under
       `## Run Environment Constraints`: the runsettings in force set `<Scope>ClassLevel</Scope>`, so
@@ -820,8 +910,9 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       and `AppDomain.Unload`, contains `TaskMaster.Test.dll.config`, and returns zero hits for
       `TaskMaster.dll.config`. The file additionally contains the literal `[DoNotParallelize]` exactly
       once, the literal `CountLoadedAssembliesNamed("SVGControl")` exactly
-      once and the literal `CountLoadedAssembliesNamed("UtilitiesCS")` exactly twice. Those three
-      literals are quoted here in prose because they are absent from the tree until this task runs.
+      once, the literal `CountLoadedAssembliesNamed("UtilitiesCS")` exactly twice, and the literal
+      `CountAssemblyResolveHandlers()` exactly twice. Those four literals are quoted here in prose
+      because they are absent from the tree until this task runs.
 - [ ] [P2-T7] Add the in-file isolation warning required by the spec's negative-control criterion, worded
       unambiguously. Immediately above `NegativeControl_WithoutInstall_Netstandard21Throws` in
       `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs`, add a comment stating that if the
@@ -951,7 +1042,11 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 - [ ] [P3-T2] Implement `Install()` in the same file so that it subscribes the handler to
       `AppDomain.CurrentDomain.AssemblyResolve` exactly once per AppDomain, guarded by
       `Interlocked.Exchange` on the private counter, and so that it never throws: an exception escaping it
-      becomes a `TypeInitializationException` on `ThisAddIn` and would take the whole add-in down.
+      becomes a `TypeInitializationException` on `ThisAddIn` and would take the whole add-in down. The
+      subscription and the `Interlocked.Exchange` guard are already present from `[P2-T1]`, which is
+      what makes `[P2-T6]`'s handler-count control observable in the `[P2-T11]` run; this task's
+      obligation is that `Install()` attaches exactly one handler however many times it is called and
+      never throws, which is measured by the two named tests rather than by inspection.
       Acceptance: the idempotence test and the never-throws test in
       `UtilitiesCS.Test.Bootstrap.AssemblyBindingFallbackTests` pass in `[P4-T2]`.
 - [ ] [P3-T3] Add the eager installation point. In `TaskMaster/ThisAddIn.cs`, inside
@@ -1302,7 +1397,7 @@ Each attempt overwrites its own artifact; the committed artifact is the final, c
       means the file was not instrumented and the figure would be unmeasurable, which is not a pass.
 - [ ] [P5-T10] Coverage delta and no-regression record. Write
       `.../evidence/qa-gates/coverage-delta.2026-09-13T18-22.md` with `Timestamp:`, `Command:`,
-      `EXIT_CODE:` and an `Output Summary:` carrying four labelled figures: `BASELINE_LINE_RATE` and
+      `EXIT_CODE:` and an `Output Summary:` carrying five labelled figures: `BASELINE_LINE_RATE` and
       `BASELINE_LINES_VALID` copied from `.../evidence/baseline/test-coverage-baseline.2026-09-13T18-22.md`;
       `POST_CHANGE_LINE_RATE` and `POST_CHANGE_LINES_VALID` copied from
       `.../evidence/qa-gates/test-final.2026-09-13T18-22.md`; and `NEW_MODULE_LINE_PERCENT` copied from
