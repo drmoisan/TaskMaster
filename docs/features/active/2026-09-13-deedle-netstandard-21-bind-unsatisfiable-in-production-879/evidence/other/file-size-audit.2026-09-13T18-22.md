@@ -93,3 +93,28 @@ it left `NetstandardBindChildDomainTests.cs` unchanged at 466, that file not hav
 rewritten by the formatter. The largest post-format file is therefore
 `NetstandardBindChildDomainTests.cs` at 466 lines with 34 lines of headroom. No hand-formatting
 was applied against CSharpier output at any point.
+
+## Revision R7 Seven-Path Pre-Format Line Counts:
+
+Timestamp: 2026-09-14T12-45
+EXIT_CODE: 0
+
+```
+UtilitiesCS/Bootstrap/AssemblyBindingFallback.cs LINES=455
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs LINES=383
+UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs LINES=284
+TaskMaster.Test/Bootstrap/ChildDomainBindProbe.cs LINES=364
+TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs LINES=466
+TaskMaster.Test/Bootstrap/AddInEagerInstallShapeTests.cs LINES=123
+TaskMaster/ThisAddIn.cs LINES=318
+```
+
+Every one of the seven `LINES=` values is at most 500, so no file needs splitting and no
+write-set amendment beyond the one `[P4-T15]` already recorded is required. The seventh path,
+the new `AssemblyBindingFallbackEdgeCaseTests.cs`, enters the audit at 284 lines with 216 lines
+of headroom. The pinned sibling `AssemblyBindingFallbackTests.cs` still reads 383, unchanged
+from its earlier recorded count, which confirms Revision R7 did not write to it.
+
+The largest file remains `TaskMaster.Test/Bootstrap/NetstandardBindChildDomainTests.cs` at 466
+lines with 34 lines of headroom. These are pre-format counts; `[P5-T8]` re-takes the same
+seven-path command after the Phase 5 format step.

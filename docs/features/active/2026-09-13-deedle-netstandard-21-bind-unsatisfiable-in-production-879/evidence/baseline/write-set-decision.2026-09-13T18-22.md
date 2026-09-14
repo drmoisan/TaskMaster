@@ -104,3 +104,30 @@ BASELINE_NETSTANDARD_DLL_IN_PROJECTS=0
 found real content at baseline and a later comparison against it is meaningful. The Phase 4
 sweep must observe the same value of 15 for the `FSharp.Core` redirect and the same value of
 0 for a deployed `netstandard.dll` project item.
+
+## Revision R7 Write-Set Amendment:
+
+Timestamp: 2026-09-14T10-08
+
+R7 WRITE-SET AMENDMENT: sibling test file added, existing test file untouched
+
+1. `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs` is added as item 14 of
+   `## Authorised Write Set`. It is a new file authored by `[P4-T13]` and is the only source
+   file Revision R7 creates.
+
+2. `UtilitiesCS.Test/UtilitiesCS.Test.csproj` now carries two `Compile Include` items added by
+   this plan rather than one: the `[P2-T4]` registration of
+   `Bootstrap\AssemblyBindingFallbackTests.cs` at line 190, and the `[P4-T14]` registration of
+   `Bootstrap\AssemblyBindingFallbackEdgeCaseTests.cs` at line 191. No other change was made
+   to that project file by any Revision R7 task.
+
+3. `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs` is NOT written by any Revision
+   R7 task. Its `[P2-T3]` standing guards are intact: the file was neither edited nor
+   reformatted by `[P4-T13]`, `[P4-T14]` or `[P4-T15]`, and it stands at 383 lines with eleven
+   `[TestMethod]` members.
+
+4. Reason for the split. The existing file is 383 lines against the repository's 500-line
+   ceiling. Ten further tests written in that file's style, each carrying a documentation
+   comment and Arrange-Act-Assert structure, would land it within a CSharpier reflow of that
+   ceiling. A sibling file keeps both files well inside the limit and leaves the pinned file
+   untouched.

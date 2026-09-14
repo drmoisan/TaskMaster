@@ -2707,7 +2707,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       post-format rather than this six-path one. The remedy clause above — split into a second file, record
       a write-set amendment, register the new file in the owning `csproj` — is the mechanism Revision R7
       applies at `[P4-T13]`, `[P4-T14]` and `[P4-T15]`, before an overflow rather than after one.
-- [ ] [P4-T13] Create `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`. This is a NEW
+- [x] [P4-T13] Create `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs`. This is a NEW
       file and a SIBLING of `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackTests.cs`. **Do not write,
       reformat or otherwise touch that sibling file in this task or in any other Revision R7 task**: it is
       pinned by two standing guards in `[P2-T3]`, it is 383 lines against a 500-line ceiling, and it is
@@ -2831,7 +2831,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       is absent from the tree until this task runs and is quoted here in prose for that reason; the file
       itself does not exist yet, which is what makes every count above a measurement of this task's product
       rather than a condition already satisfied.
-- [ ] [P4-T14] Register the new unit-test file, and gate the `.csproj` boundary mechanically. Insert
+- [x] [P4-T14] Register the new unit-test file, and gate the `.csproj` boundary mechanically. Insert
       `<Compile Include="Bootstrap\AssemblyBindingFallbackEdgeCaseTests.cs" />` into the `ItemGroup` in
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` that already contains
       `<Compile Include="Bootstrap\AssemblyBindingFallbackTests.cs" />` at line 190. This project uses
@@ -2896,7 +2896,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       re-measure. `NEW_COMPILE_ITEM` reads 0 in the tree as it stands and
       `FSHARP_CORE_NETSTANDARD20_HINTPATH` reads 1 at line 598, both re-derived in this pass, which is what
       makes the first assertion discriminating and the third a real guard rather than a restatement.
-- [ ] [P4-T15] Record the write-set amendment, as `[P4-T12]`'s own remedy clause requires. Append to
+- [x] [P4-T15] Record the write-set amendment, as `[P4-T12]`'s own remedy clause requires. Append to
       `.../evidence/baseline/write-set-decision.2026-09-13T18-22.md` a section headed
       `Revision R7 Write-Set Amendment:` recording: that
       `UtilitiesCS.Test/Bootstrap/AssemblyBindingFallbackEdgeCaseTests.cs` is added as item 14 of
@@ -2911,7 +2911,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       artifact contains the line
       `R7 WRITE-SET AMENDMENT: sibling test file added, existing test file untouched` exactly once. That
       literal is absent from the tree until this task runs and is quoted here in prose for that reason.
-- [ ] [P4-T16] LOCK-ACQUIRE, rebuild the solution so the new test file is compiled, LOCK-RELEASE. Identical
+- [x] [P4-T16] LOCK-ACQUIRE, rebuild the solution so the new test file is compiled, LOCK-RELEASE. Identical
       to `[P2-T10]`'s msbuild span in every respect except the console-log path, which is
       `TestResults/r7-build/r7-build-console.txt`. That path is under the git-ignored `TestResults/` scratch
       tree — the `[Tt]est[Rr]esult*/` pattern at `.gitignore` line 39 — deliberately, so this task adds no
@@ -2952,7 +2952,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       Acceptance: `R7_BUILD_LOG_DIR_PRESENT=True`, `EXIT_CODE: 0`, `ZERO_ERRORS_LINES` greater than 0,
       `SKIPPED_CORECOMPILE=0`, and `CONTROL_BUILD_OUTPUT` greater than 0. A compile failure here is a defect
       in the new test file: fix it and re-run this task before proceeding to `[P4-T17]`.
-- [ ] [P4-T17] LOCK-ACQUIRE, re-take the ladder unit-test measurement now that the new tests exist,
+- [x] [P4-T17] LOCK-ACQUIRE, re-take the ladder unit-test measurement now that the new tests exist,
       LOCK-RELEASE. This task supersedes `[P4-T2]` as the ladder suite's measurement of record; `## R7.6`
       records why `[P4-T2]` is not re-executed in place.
 
@@ -3007,7 +3007,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
       as a floor rather than an equality so that a later task adding a further test does not make this
       condition unsatisfiable. It is discriminating against the pre-Revision-R7 assembly, which carries
       eleven.
-- [ ] [P4-T18] Re-take the determinism sweep and the file-size audit over the path lists that include the
+- [x] [P4-T18] Re-take the determinism sweep and the file-size audit over the path lists that include the
       new test file. Two commands, run in this order:
 
       ```
