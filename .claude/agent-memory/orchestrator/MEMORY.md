@@ -1,5 +1,9 @@
 # Orchestrator Memory Index
 
+## Resuming a dead run
+- [Recover a dead agent worktree via shared git](recovering-a-dead-agent-worktree-via-shared-git.md) — its committed work is already in your object store; `git -C` into it is refused but `hash-object` reads its uncommitted files
+- [Blast-radius audit must cover the PLAN too](blast-radius-audit-must-cover-the-plan-too.md) — spec-only audit missed 5 stray paths; a BACKSLASH path is dropped by the extractor
+
 ## Lifecycle, promotion, checkpoint
 - [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) · [Small-path = minor-audit](small-path-minor-audit-selection.md) — 1-3 prod files = small path
 - [potential_to_issue creates the issue](potential-to-issue-creates-github-issue.md) · [needs an absolute path](potential-to-issue-needs-absolute-path.md) · [maps sections by heading](potential-to-issue-keeps-only-summary-section.md)
@@ -15,6 +19,7 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) · [Resumed child shares your worktree](resumed-child-orchestrator-shares-worktree.md)
 - [MCP tools available to orchestrator](mcp-tools-available-to-orchestrator.md) — run them yourself if a worker can't
 - [Run the real hook, not MCP](run-orchestration-hook-gates-locally.md) — the MCP validator disagrees on the bug route
+- [Preflight-cleared plan can still contradict a spec AC clause](preflight-cleared-plan-can-still-conflict-with-a-spec-acceptance-clause.md) — read each AC's "not a pass" sentence against the claiming task's decision rule before execution (#743 AC1 no-expiry)
 
 ## PR authoring and CI gate
 - [pr-author is a skill, not an agent](pr-author-hook-blocks-gh-in-this-repo.md) · [exact checkpoint schema](pr-author-hook-exact-checkpoint-schema.md) — agents must be a LIST; `relativeFile` required
@@ -45,6 +50,7 @@
 - [Piped command's `$?` is the LAST segment](piped-command-exit-code-is-the-last-segment.md) — suspect the measurement before overwriting a memory it contradicts
 
 ## Plans, preflight, delegation
+- [Your brief silently overrides your own recorded deviation](delegation-brief-silently-overrides-recorded-deviation.md) — the delegate obeys; verify the commit FILE LIST, not the summary
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) · [converges on verbatim delta text](preflight-converges-on-verbatim-delta-text.md) · [may exceed the 2-round target](preflight-rounds-exceed-target-legitimately.md)
 - [Preflight sibling-invalidation cascade](preflight-sibling-invalidation-cascade.md) · [sweep ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) · [defect-trend scope confound](preflight-defect-trend-scope-confound.md)
 - [Absence from a failure list isn't a pass](absence-from-failure-list-is-not-a-pass-gate.md) — pair with a discovery-count control
@@ -65,6 +71,8 @@
 - [A session may have NO Agent tool](orchestrator-session-may-lack-agent-tool.md) — block, never implement the plan yourself
 - [PowerShell batch budget caps plan helper scripts](powershell-batch-budget-caps-plan-helper-scripts.md) · [tracked + carries stale paths](powershell-batch-budget-is-tracked-and-carries-stale-paths.md) — put throwaway helpers in the session scratchpad
 - [Get-PlanPaths truncates spaced paths](get-planpaths-truncates-paths-containing-spaces.md)
+- [pwsh starts in the SESSION worktree, not yours](pwsh-starts-in-session-worktree-not-yours.md) — sibling has its own .sln; unqualified msbuild builds the wrong checkout, green and meaningless
+- [Applying a delta is itself a defect source](delta-application-is-itself-a-defect-source.md) — 16/7/2/0 on #877; budget a scoped round to review your OWN application
 
 ## Coverage
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) · [lines-covered is nondeterministic](coverage-lines-covered-is-nondeterministic.md) · [#457 coverage moved UP](project_457_coverage_moved_up_not_down.md)
@@ -76,6 +84,8 @@
 - [Post-processed Cobertura = zero exit, NOT a test result](cobertura-postprocessing-is-a-zero-exit-proxy-not-a-test-result.md) — no .trx exists; re-run the gate
 - [[ExcludeFromCodeCoverage] is INVISIBLE, not 0%](excludefromcodecoverage-invisible-to-coverage-gates.md) — per-file hits-row gates unsatisfiable; METHOD-level leaks
 - [vstest emits TWO .coverage files per run](vstest-emits-two-coverage-files-per-run.md) — need a disambiguation rule
+- [Coverage runner throws BEFORE post-processing](coverage-runner-throws-before-postprocessing.md) — line 236 beats line 341, so a failing test leaves raw XML; and evidence-dir .cobertura.xml is NOT gitignored
+- [Class helper's property names differ from the package helper's](cobertura-class-helper-property-names-differ-from-package.md) — no rate property, inverted count names; makes a plan's acceptance unsatisfiable as written
 
 ## C# toolchain and tests
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) · [analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) · [direct-csproj build facts](csharp-direct-csproj-build-facts.md)
@@ -96,7 +106,7 @@
 - [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) · [Promotion hook matches commit-message text](promotion-hook-matches-commit-message-text.md)
 - [validate-bash blocks --force-with-lease too](validate-bash-blocks-force-with-lease-too.md) — delete-and-repush instead
 - [Agent-worktree hooks resolve to agent cwd](agent-worktree-hooks-resolve-to-agent-cwd.md) · [Child-orchestrator PR hook reads SESSION ROOT](child-orchestrator-pr-hook-reads-session-root.md) · [Pre-impl gate reads a SIBLING's checkpoint](preimplementation-gate-reads-sibling-checkpoint.md)
-- [feature-folder-order hook is work-mode-blind](feature-folder-order-hook-is-workmode-blind.md) · [PRD_FEATURE_BLOCKED false positive](prd-feature-hook-parses-prompt-paths.md) · [picks the LONGEST active path](prd-feature-hook-picks-longest-active-path.md) · [blocks reused prep-worktree topology](prd-feature-hook-blocks-reused-prep-worktree-topology.md)
+- [feature-folder-order hook is work-mode-blind](feature-folder-order-hook-is-workmode-blind.md) · [PRD_FEATURE_BLOCKED false positive](prd-feature-hook-parses-prompt-paths.md) · [picks the LONGEST active path](prd-feature-hook-picks-longest-active-path.md) · [blocks reused prep-worktree topology](prd-feature-hook-blocks-reused-prep-worktree-topology.md) · [deny string blames the marker, not the cwd](prd-feature-deny-string-blames-the-marker-not-the-cwd.md)
 - [Hard-lock MCP needs an absolute target](mcp-hardlock-and-review-mirror-quirks.md) · [check-ignore false negative on a directory glob](check-ignore-false-negative-on-directory-glob.md)
 - [Edit tool CRLF-ifies LF markdown](edit-tool-crlf-ifies-lf-markdown.md) · [feature-review + `git -C` hangs forever](feature-review-git-c-form-hangs-unattended.md) — ban Bash there, paste the diff
 

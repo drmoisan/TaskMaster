@@ -37,6 +37,18 @@ a mandatory loop iteration. #648's `[P2-T1]` executed twice for exactly this rea
 `LoopIterations: 2`. Any plan with a Phase 2 loop ceiling must budget the restart even when it creates
 no new file.
 
+**A one-line CRLF rewrite right after Write avoids the restart, and it is cheaper than a pre-emptive
+format run (2026-09-13, #877).** `.editorconfig` sets `end_of_line = crlf` under `[*.{cs,vb}]` (line 669,
+section opening at line 619), which is the setting CSharpier honours. After Writing the new
+`TestSupport/TestAssemblyResolver.cs` and the two edited `.cs` files, one `pwsh` command normalized all
+of them — `$t = [System.IO.File]::ReadAllText($p); $t = $t -replace "``r``n","``n"; $t = $t -replace "``n","``r``n";
+[System.IO.File]::WriteAllText($p, $t, (New-Object System.Text.UTF8Encoding($false)))` with an ABSOLUTE
+`$p`, because .NET IO APIs in pwsh resolve relative paths against the process cwd, not the PowerShell
+location. The result: `format .` reported `Formatted 1627 files` and the post-command porcelain over the
+write set printed ZERO lines, `check .` exited 0 with zero `Was not formatted` lines, and the Phase 2
+loop completed in ONE pass with no restart. Prefer this over a pre-emptive `csharpier format` when the
+formatter is gated behind a build lock or when the plan authorizes the format command at one task only.
+
 **A SHA-256 pair DOES discriminate where porcelain does not.** The bullet above is right that
 `git status --porcelain` is byte-identical across a repairing format run. #648's `[P2-T1]` recorded
 `SHA256Before`/`SHA256After` instead and the pair separated the two executions cleanly: unequal on the
