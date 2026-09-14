@@ -77,6 +77,9 @@
     <Compile Include="TestHelpers\UiThreadDispatcherScope.cs" />
     <Compile Include="TestHelpers\UiThreadStateScope.cs" />
     <Compile Include="TestAssemblyInitializer.cs" />
+    <Compile Include="..\TestSupport\TestAssemblyResolver.cs">
+      <Link>TestSupport\TestAssemblyResolver.cs</Link>
+    </Compile>
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Dialogs\ActionButtonTests.cs" />
     <Compile Include="Dialogs\MyBoxModelessTests.cs" />
@@ -547,6 +550,7 @@
     <Compile Include="OutlookObjects\Table\OlTableExtensions_Tests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsEtlClockTests.cs" />
     <Compile Include="OutlookObjects\Table\GetTableInViewAsyncClockTests.cs" />
+    <Compile Include="OutlookObjects\Table\GetTableInViewAsyncFailureContractTests.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensionsTimeoutDiagnosticsTests.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable_Tests.cs" />
     <Compile Include="ReusableTypeClasses\NewSmartSerializable\ConfigController_Tests.cs" />

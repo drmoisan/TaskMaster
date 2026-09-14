@@ -196,5 +196,17 @@ namespace QuickFiler
 #pragma warning restore CS0108
 
         void RemoveControlsColsRightOf(Control furthestRight);
+
+        /// <summary>
+        /// Additive intent member added for issue #743 so the control-group resolution member can
+        /// be driven through the interface: enumerates every descendant control of the viewer.
+        /// </summary>
+        System.Collections.Generic.IEnumerable<Control> DescendantControls();
+
+        /// <summary>
+        /// Additive intent member added for issue #743 so the control-group resolution member can
+        /// be driven through the interface: the item-number label whose position tip is built first.
+        /// </summary>
+        Label ItemNumberLabel { get; }
     }
 }
