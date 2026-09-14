@@ -115,6 +115,7 @@
 - [Epic manifest's ALL CLEAR table is not evidence](epic-manifest-all-clear-table-is-not-evidence.md) — grep the child folder; 1 round found 7 blocking defects incl. an inverted derivation
 - [Epic-child rebase shared-memory conflict](epic-child-rebase-shared-memory-conflict.md) · [agent-memory merge conflicts](epic-child-agent-memory-merge-conflicts.md) · [Parallel children conflict on the memory index](parallel-epic-children-conflict-on-agent-memory-index.md)
 - [Child cwd is the session root](preparation-child-cwd-is-session-root-not-item-worktree.md) — mirror the WHOLE folder; execution mode too
+- [Parallel-item preparation is structurally impossible](parallel-item-preparation-is-structurally-impossible.md) — planner, prd-feature AND git add all blocked together; probe the hook, not the file
 - [Resume brief's "already in your worktree" can be false](resume-brief-worktree-contents-premise-can-be-false.md) — Glob first; repair with `merge --ff-only`, which creates no branch
 - [Unplanned epic-child worktree mechanics](unplanned-epic-child-worktree-mechanics.md) · [Parallel preparation children share one worktree](parallel-preparation-children-shared-worktree.md)
 - [Parallel epic children name collisions](parallel-epic-children-name-collisions.md) · [generic-constraint cascades across children](epic-generic-constraint-cascades-multiple-children.md) · [Absolute-zero gate on a sibling-owned assembly](absolute-zero-gate-on-sibling-owned-assembly.md)
