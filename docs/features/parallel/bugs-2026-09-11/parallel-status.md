@@ -11,8 +11,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | max_concurrency | 3 |
 | current_cohort | 0 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-14T00-27 |
-| next_step | HOLD_FOR_QUOTA_RESET_816_PR_890_CI_RUNNING_THEN_ROUTE_THREE_PLAN_REVISIONS |
+| last_updated | 2026-09-14T00-31 |
+| next_step | HOLD_UNTIL_OPERATOR_CONFIRMS_ACCOUNT_2_RESET_THEN_QUEUE_ITEM_1_742_PLAN_REVISION |
 
 ## Items
 
