@@ -33,3 +33,22 @@ No product code and no C# source are touched. No file is excluded from coverage 
 ## How success is recognised
 
 The pull request's own run shows the new Pester check alongside the existing checks, and both coverage gates pass on their measured figures rather than vacuously. A deliberately introduced regression on each side turns the corresponding job red, captured as evidence in the feature folder. The measured PowerShell figure is identical across two consecutive clean runs, which is the observable proof that the seam defect is fixed. The maintainer then applies the ruleset edit using the context name captured from the live run.
+
+## The two gates as delivered, from the maintainer's point of view
+
+Two gates are now enforced on every pull request, and between them they enforce **three figures**.
+
+**Gate one, the MSTest coverage job.** It reports under the unchanged context `mstest-coverage / Run MSTest suite with coverage`. It runs the same route as the local tooling, produces the post-processed first-party Cobertura projection, and then asserts two floors against that projection's document root:
+
+- **80** for C# line coverage, enforced by `Assert-CoberturaLineCoverageThreshold`. Measured at 85.87 percent on the delivered tree.
+- **75** for C# branch coverage, enforced by the new `Assert-CoberturaBranchCoverageThreshold`. Measured at 80.04 percent on the delivered tree.
+
+The branch assertion additionally refuses a document that reports no valid branches, so a projection with nothing to measure fails rather than passing. A non-zero exit from the script propagates to the job through the step's exit-code guard, and the coverage document is uploaded with `if-no-files-found: error`, so an absent document fails the job too.
+
+**Gate two, the Pester job.** It reports under the new context predicted as `pester / Run Pester suite with coverage`, which is the one context the maintainer must add to the `main` ruleset. It runs the Pester suite over the developer tooling with coverage scoped to `scripts/vscode`, prints the measured figures, and then asserts one floor:
+
+- **80** for PowerShell line coverage, read from the JaCoCo `LINE` counter. Measured at 83.93 percent on the delivered tree, which is 34 covered lines above the floor.
+
+It exits non-zero on any test failure as well, through an explicit exit placed after the figures print, so a red run always records the numbers. No PowerShell branch figure is asserted, printed or computed anywhere, because Pester measures none.
+
+The three enforced figures are therefore **80 for C# line, 75 for C# branch, and 80 for PowerShell line**. All three are fixed by the #563 maintainer decision and none was lowered by this delivery. New code added by the delivery reaches 98.36 percent line coverage against the separate 90 percent new-code floor.

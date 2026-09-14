@@ -50,6 +50,20 @@ These are measurements, not projections. They are also **stale**: the artifact i
 
 Projection on the prior basis, shown as an estimate for sizing only: 80 percent of 681 lines requires ceil(0.80 x 681) = 545 covered lines. The recommended seam route loses the 53 lines that the accidental execution currently supplies in the sync script while retaining the 36 in the build script under mocks, giving 482 covered, so the uplift requirement is approximately +63 lines. Under a test-only seam the requirement rises to approximately +99 lines against a smaller pool, which is the route that halts.
 
+**2026-09-12 re-measurement (the measured basis this delivery is scoped against).** Phase 0 re-measured before any uplift work was scoped, per decision D7. The figures below are read from the report-level LINE counter of the JaCoCo document the Phase 0 run wrote, and are recorded in the evidence artifacts `evidence/baseline/jacoco-line-counter-shape.2026-09-12T10-25.md` and `evidence/baseline/powershell-line-delta.2026-09-12T10-25.md`.
+
+| Counter | Covered | Missed | Total | Percent |
+| --- | --- | --- | --- | --- |
+| LINE (2026-09-12 re-measurement) | 662 | 177 | 839 | 78.90 |
+
+The denominator moved from 681 to 839 because the prior basis predates three scripts now in `scripts/vscode`: `Invoke-MSTestWithCoverage.FirstParty.ps1`, `Invoke-MSTest.TrxSummary.ps1` and `Invoke-MSTestWithCoverage.Projection.ps1`. The directory now holds 14 production PowerShell scripts rather than the 12 the research record enumerated.
+
+**Required delta.** Evaluated against that fresh measurement using the formula in decision D7, `N = ceil(0.80 * T) - C`: ceil(0.80 x 839) = 672, and 672 - 662 gives **N = 10** covered lines.
+
+**HALT verdict: CLEARED.** The post-uplift measurement recorded in `evidence/qa-gates/powershell-coverage-postuplift.2026-09-12T10-25.md` reads 731 covered of 871, which is **83.93 percent**, above the 80 floor by 34 covered lines. The measured gain in covered lines was 69 against the required 10. The verdict and the three prohibitions it restates are recorded in `evidence/qa-gates/halt-decision.2026-09-12T10-25.md`, and the tracked-fixture contingency was consequently recorded `Decision: NOT REQUIRED` in `evidence/other/fixture-contingency.2026-09-12T10-25.md`.
+
+The 2026-09-03 table above remains, labelled as the prior basis. No figure in it is used in the delta computation.
+
 Actual behaviour today: a coverage regression on `main` cannot fail CI, and a regression in the PowerShell coverage arithmetic or closure filter merges green.
 
 ## Scope & Non-Goals
@@ -69,7 +83,7 @@ Out of scope / non-goals:
 - Adding a PSScriptAnalyzer or PoshQC gate to CI. Not run anywhere today; recorded as a follow-up candidate.
 - Adding a PowerShell branch-coverage assertion. See decision D4 below.
 - Editing the repository coverage settings file named coverage.config. It already excludes the third-party modules that would otherwise break instrumentation and needs no change.
-- Adding the new assertion to the helpers script named Invoke-MSTestWithCoverage.Helpers.ps1. That file sits at 470 of its 500-line ceiling; its existing dot-source of the threshold part already resolves the new function for every caller.
+- Adding the new assertion to the helpers script named Invoke-MSTestWithCoverage.Helpers.ps1. That file sits at 471 of its 500-line ceiling; its existing dot-source of the threshold part already resolves the new function for every caller.
 - Editing the three rules files under the .claude rules directory (general-unit-test.md, quality-tiers.md, powershell.md). They are push-down-owned from an upstream repository and are overwritten with no templating.
 - Editing the `main` branch ruleset. That is a repository-settings change performed by the maintainer out of band; see the manual follow-up section.
 
@@ -238,37 +252,37 @@ Toolchain: format, lint, type-check, test, in that order, restarting from the be
 
 ## Acceptance Criteria
 
-- [ ] (#561) `.github/workflows/_mstest-coverage.yml` produces a Cobertura document in CI by running `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, and the step's non-zero exit code fails the job.
-- [ ] (#561) The C# line floor of 80 percent is asserted in CI against the post-processed first-party projection, by the existing line assertion reaching execution on every run.
-- [ ] (#561) `Assert-CoberturaBranchCoverageThreshold` exists in `scripts/vscode/Invoke-MSTestWithCoverage.Threshold.ps1`, reads the document-root branch rate, and enforces the 75 percent floor.
-- [ ] (#561) `scripts/vscode/Invoke-MSTestWithCoverage.ps1` calls the branch assertion immediately after the existing line assertion, at the same site and on the same post-processed string; a test pins the invocation order and the argument.
-- [ ] (#561) The branch assertion fails closed with a distinct terminating message for each of: below floor, missing attribute, non-numeric value, value outside the interval from 0 to 1 inclusive, and zero valid branches. Each case has a test.
-- [ ] (#561) A deliberately introduced C# coverage regression turns the MSTest coverage job red, demonstrated and captured as evidence under the feature folder's evidence directory.
-- [ ] (#561) Withholding the gate's input does not produce a green run: an absent coverage document fails the job through `if-no-files-found: error` on the upload step, and a zero-branch projection fails through the zero-branch guard.
-- [ ] (#562) `.github/workflows/_pester.yml` exists as a reusable callee following the established callee convention: `windows-latest`, per-job timeout, `permissions: contents: read`, both `workflow_call` and `workflow_dispatch`, and no `concurrency` block of its own.
-- [ ] (#562) `.github/workflows/ci.yml` calls the new callee, with the job key and job name matching the convention the other callers use.
-- [ ] (#562) The Pester job runs the test tree under tests/scripts/vscode with code coverage scoped to scripts/vscode, writes its JaCoCo document to an explicit path rather than relying on the Pester default, and uploads it with `if-no-files-found: error`.
-- [ ] (#562) The Pester job asserts the JaCoCo `LINE` figure aggregated over scripts/vscode at 80 percent or above and exits non-zero below it, after printing the measured figure.
-- [ ] (#562) The Pester job exits non-zero on any test failure, through an explicit exit placed after the count-emitting statements rather than through the configuration's exit option.
-- [ ] (#562) `scripts/vscode/Invoke-VSBuild.ps1` carries an invocation guard, an extracted `Invoke-VSBuildMain` function, and the named wrapper seams `Get-MSBuildPath`, `Invoke-SyncPackageReferences` and `Invoke-MSBuildExe`, and `tests/scripts/vscode/Invoke-VSBuild.Tests.ps1` drives the main function with those seams mocked.
-- [ ] (#562) A regression test asserts that dot-sourcing `scripts/vscode/Invoke-VSBuild.ps1` launches no external process and executes no sibling script; the test fails on the pre-fix tree.
-- [ ] (#562) The measured coverage of the package-reference sync script is the same on two consecutive clean runs, demonstrating the measurement is deterministic.
-- [ ] (#562) `scripts/vscode/Invoke-Restore.ps1` receives the same invocation guard and main extraction, and `tests/scripts/vscode/Invoke-Restore.Tests.ps1` drives it under mocks.
-- [ ] (#869) Phase 0 re-measures the scripts/vscode coverage basis before any uplift work is scoped, and the required delta is recorded as `N = ceil(0.80 * T) - C` evaluated against that fresh measurement, with the 2026-09-03 figures cited only as the prior basis.
-- [ ] (#869) The final scripts/vscode JaCoCo `LINE` figure is at or above 80 percent, measured on a clean runner and captured as evidence under the feature folder's evidence directory.
-- [ ] (#869) If the floor is not reached after the planned uplift work and the tracked-fixture contingency, the item halts and reports. It does not lower any floor, does not exclude any production file from measurement, and does not merge the Pester job without its threshold assertion.
-- [ ] (#869) The delivery adds no coverage exclusion matching any production source path, in the repository coverage settings, in the Pester configuration, or by any attribute. The coverage exclusion policy in the general unit test rules treats such an entry as a blocking finding.
-- [ ] (#869) No PowerShell branch-coverage assertion, threshold, or reported branch figure is introduced anywhere in the delivery.
-- [ ] (#869) The delivery introduces the new required check-run context predicted as `pester / Run Pester suite with coverage` and introduces no other new context; the existing required contexts continue to report under unchanged names, because the C# assertion changes no job name. The issue's expectation of an additional context for the C# threshold is recorded as superseded, with the reason.
+- [x] (#561) `.github/workflows/_mstest-coverage.yml` produces a Cobertura document in CI by running `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, and the step's non-zero exit code fails the job.
+- [x] (#561) The C# line floor of 80 percent is asserted in CI against the post-processed first-party projection, by the existing line assertion reaching execution on every run.
+- [x] (#561) `Assert-CoberturaBranchCoverageThreshold` exists in `scripts/vscode/Invoke-MSTestWithCoverage.Threshold.ps1`, reads the document-root branch rate, and enforces the 75 percent floor.
+- [x] (#561) `scripts/vscode/Invoke-MSTestWithCoverage.ps1` calls the branch assertion immediately after the existing line assertion, at the same site and on the same post-processed string; a test pins the invocation order and the argument.
+- [x] (#561) The branch assertion fails closed with a distinct terminating message for each of: below floor, missing attribute, non-numeric value, value outside the interval from 0 to 1 inclusive, and zero valid branches. Each case has a test.
+- [x] (#561) A deliberately introduced C# coverage regression turns the MSTest coverage job red, demonstrated and captured as evidence under the feature folder's evidence directory.
+- [x] (#561) Withholding the gate's input does not produce a green run: an absent coverage document fails the job through `if-no-files-found: error` on the upload step, and a zero-branch projection fails through the zero-branch guard.
+- [x] (#562) `.github/workflows/_pester.yml` exists as a reusable callee following the established callee convention: `windows-latest`, per-job timeout, `permissions: contents: read`, both `workflow_call` and `workflow_dispatch`, and no `concurrency` block of its own.
+- [x] (#562) `.github/workflows/ci.yml` calls the new callee, with the job key and job name matching the convention the other callers use.
+- [x] (#562) The Pester job runs the test tree under tests/scripts/vscode with code coverage scoped to scripts/vscode, writes its JaCoCo document to an explicit path rather than relying on the Pester default, and uploads it with `if-no-files-found: error`.
+- [x] (#562) The Pester job asserts the JaCoCo `LINE` figure aggregated over scripts/vscode at 80 percent or above and exits non-zero below it, after printing the measured figure.
+- [x] (#562) The Pester job exits non-zero on any test failure, through an explicit exit placed after the count-emitting statements rather than through the configuration's exit option.
+- [x] (#562) `scripts/vscode/Invoke-VSBuild.ps1` carries an invocation guard, an extracted `Invoke-VSBuildMain` function, and the named wrapper seams `Get-MSBuildPath`, `Invoke-SyncPackageReferences` and `Invoke-MSBuildExe`, and `tests/scripts/vscode/Invoke-VSBuild.Tests.ps1` drives the main function with those seams mocked.
+- [x] (#562) A regression test asserts that dot-sourcing `scripts/vscode/Invoke-VSBuild.ps1` launches no external process and executes no sibling script; the test fails on the pre-fix tree.
+- [x] (#562) The measured coverage of the package-reference sync script is the same on two consecutive clean runs, demonstrating the measurement is deterministic.
+- [x] (#562) `scripts/vscode/Invoke-Restore.ps1` receives the same invocation guard and main extraction, and `tests/scripts/vscode/Invoke-Restore.Tests.ps1` drives it under mocks.
+- [x] (#869) Phase 0 re-measures the scripts/vscode coverage basis before any uplift work is scoped, and the required delta is recorded as `N = ceil(0.80 * T) - C` evaluated against that fresh measurement, with the 2026-09-03 figures cited only as the prior basis.
+- [x] (#869) The final scripts/vscode JaCoCo `LINE` figure is at or above 80 percent, measured on a clean runner and captured as evidence under the feature folder's evidence directory.
+- [x] (#869) If the floor is not reached after the planned uplift work and the tracked-fixture contingency, the item halts and reports. It does not lower any floor, does not exclude any production file from measurement, and does not merge the Pester job without its threshold assertion.
+- [x] (#869) The delivery adds no coverage exclusion matching any production source path, in the repository coverage settings, in the Pester configuration, or by any attribute. The coverage exclusion policy in the general unit test rules treats such an entry as a blocking finding.
+- [x] (#869) No PowerShell branch-coverage assertion, threshold, or reported branch figure is introduced anywhere in the delivery.
+- [x] (#869) The delivery introduces the new required check-run context predicted as `pester / Run Pester suite with coverage` and introduces no other new context; the existing required contexts continue to report under unchanged names, because the C# assertion changes no job name. The issue's expectation of an additional context for the C# threshold is recorded as superseded, with the reason.
 - [ ] (#869) The actual context name is captured from a live run against the pull request head SHA using the check-runs query the workflow README prescribes, and recorded in the evidence directory; it is labelled predicted until that capture confirms it.
-- [ ] (#869) `.github/workflows/README.md` is updated: the MSTest callee's table row, the claim that its vstest invocation was moved and not edited, the pinned tool versions, the new Pester row, and the verbatim required-context list.
-- [ ] (#869) The runsettings-driven MSTest class-level parallelization arriving in CI is recorded as an accepted behaviour change, and the trx logger loss is remedied by repointing the upload step at the Cobertura document.
-- [ ] (#869) The threshold divergence is recorded in this specification as a documented, maintainer-ratified exception under #563, with citations, and no rules file under the .claude rules directory is edited.
-- [ ] (#869) The production PowerShell work is delivered in batches that respect the per-batch production-file cap, with a full toolchain pass per batch.
-- [ ] (#869) New PowerShell code added by this delivery reaches at least 90 percent line coverage, per the new-code floor.
-- [ ] (#869) No test creates or reads a temporary file, performs network or archive I/O, or sleeps. If a tracked fixture is used, it is asserted byte-identical before and after the suite runs.
-- [ ] (#869) actionlint passes on every changed workflow file, and the full toolchain passes in a single final pass.
-- [ ] (#869) No file exceeds 500 lines after the change.
+- [x] (#869) `.github/workflows/README.md` is updated: the MSTest callee's table row, the claim that its vstest invocation was moved and not edited, the pinned tool versions, the new Pester row, and the verbatim required-context list.
+- [x] (#869) The runsettings-driven MSTest class-level parallelization arriving in CI is recorded as an accepted behaviour change, and the trx logger loss is remedied by repointing the upload step at the Cobertura document.
+- [x] (#869) The threshold divergence is recorded in this specification as a documented, maintainer-ratified exception under #563, with citations, and no rules file under the .claude rules directory is edited.
+- [x] (#869) The production PowerShell work is delivered in batches that respect the per-batch production-file cap, with a full toolchain pass per batch.
+- [x] (#869) New PowerShell code added by this delivery reaches at least 90 percent line coverage, per the new-code floor.
+- [x] (#869) No test creates or reads a temporary file, performs network or archive I/O, or sleeps. If a tracked fixture is used, it is asserted byte-identical before and after the suite runs.
+- [x] (#869) actionlint passes on every changed workflow file, and the full toolchain passes in a single final pass.
+- [x] (#869) No file exceeds 500 lines after the change.
 
 ## Manual follow-up (maintainer, out of band)
 

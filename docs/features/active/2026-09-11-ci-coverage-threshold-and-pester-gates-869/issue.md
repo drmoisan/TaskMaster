@@ -71,6 +71,22 @@ High: the quality gates the policy documents describe are not enforced on merge.
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch
 
 Closes #561 and #562 on merge.
+
+## Delivered Outcome
+
+- The C# gate now runs `scripts/vscode/Invoke-MSTestWithCoverage.ps1` inside `_mstest-coverage.yml`, so the Cobertura document exists in CI, and asserts 80% line through the existing `Assert-CoberturaLineCoverageThreshold` and 75% branch through the new `Assert-CoberturaBranchCoverageThreshold`. The upload step now publishes `coverage/coverage.cobertura.xml` with `if-no-files-found: error`.
+- A new reusable callee `.github/workflows/_pester.yml` runs Pester over `tests/scripts/vscode` with JaCoCo coverage scoped to `scripts/vscode` and asserts the `LINE` figure at 80%. `ci.yml` calls it under the job key `pester`.
+- `Invoke-VSBuild.ps1` and `Invoke-Restore.ps1` now carry invocation guards with their bodies extracted into `Invoke-VSBuildMain` and `Invoke-RestoreMain` behind named wrapper seams, so a test run no longer invokes `vswhere.exe` or executes `Sync-PackageReferences.ps1` against the real repository root.
+- `scripts/vscode` LINE coverage moved from a measured 78.90% to 83.93%, above the 80 floor.
+- The coverage of `Sync-PackageReferences.ps1` is now identical on two consecutive clean runs, which is the determinism regression the item reports as non-deterministic at 53/84 versus 71/84.
+
+### Superseded: the new required check-run context count
+
+This item's Expected Behavior section anticipates **two** new check-run contexts. That figure is **superseded**: the delivery adds exactly **one**.
+
+The reason is that the C# threshold assertion was placed inside the existing `_mstest-coverage.yml` callee rather than in a callee of its own. A check-run context name takes the form `<caller job id> / <callee job name>`, so an assertion added inside an existing callee changes no name: the existing context `mstest-coverage / Run MSTest suite with coverage` continues to report under its current name and needs no ruleset edit. A separate callee would have produced a second context, but the pipeline has zero `needs:` edges and the callees share no artifacts, so it would have duplicated the full restore, build and instrumented test run for no additional signal. That route was rejected as settled decision D1 of the specification.
+
+The single new context is predicted as `pester / Run Pester suite with coverage`. It is **predicted, not confirmed**: the workflow README forbids hand-writing these strings and requires capturing them from a live run against the pull request head SHA. No run exists yet, so the capture is recorded as `Status: PENDING LIVE RUN` in `evidence/other/check-run-contexts.2026-09-12T10-25.md` together with the exact command to run once the run completes. The maintainer's ruleset edit should use the captured value verbatim, and should add that one context only.

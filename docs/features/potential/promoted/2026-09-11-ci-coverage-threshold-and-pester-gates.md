@@ -8,7 +8,18 @@
 
 - Issue: #869
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/869
-- Last Updated: 2026-09-12
+- Last Updated: 2026-09-14
+
+## Delivery Outcome
+
+Delivered under issue **#869**.
+
+Plan: `docs/features/active/2026-09-11-ci-coverage-threshold-and-pester-gates-869/plan.2026-09-12T10-25.md`
+
+Both gates are wired and enforcing. The MSTest coverage callee now runs `scripts/vscode/Invoke-MSTestWithCoverage.ps1` and asserts 80 percent C# line coverage and 75 percent C# branch coverage against the post-processed first-party projection, measured at 85.87 and 80.04 percent respectively on the delivered tree. A new reusable callee `.github/workflows/_pester.yml`, called from `ci.yml` under the job key `pester`, asserts 80 percent PowerShell line coverage over `scripts/vscode`, measured at 83.93 percent after the uplift work moved it up from 78.90 percent. The seam defect in `scripts/vscode/Invoke-VSBuild.ps1` is fixed and the measurement is now identical across two consecutive clean runs.
+
+The delivery adds exactly one new required check-run context, predicted as `pester / Run Pester suite with coverage`, not the two the original capture anticipated. The remaining maintainer action is the `main` ruleset edit, performed out of band using the context name captured from a live run.
+
 ## Summary
 
 CI collects C# coverage but enforces no threshold (#561), and runs no Pester at all, so the production PowerShell under `scripts/vscode/` has zero CI coverage (#562). Both gates are wired in one delivery against the thresholds the maintainer settled on 2026-09-11 under #563: 80% line and 75% branch for C#, 80% line for PowerShell. PowerShell coverage measures 78.3% today, so this item also raises `scripts/vscode` coverage above 80 rather than lowering the floor.
