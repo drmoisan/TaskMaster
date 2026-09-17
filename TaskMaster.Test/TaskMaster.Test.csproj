@@ -324,6 +324,8 @@
     <Compile Include="Bootstrap\ChildDomainBindProbe.cs" />
     <Compile Include="Bootstrap\NetstandardBindChildDomainTests.cs" />
     <Compile Include="Bootstrap\AddInEagerInstallShapeTests.cs" />
+    <Compile Include="Bootstrap\FSharpCoreHintPathAlignmentTests.cs" />
+    <Compile Include="Bootstrap\FSharpCoreDeployedIdentityTests.cs" />
     <Compile Include="Ribbon\EngineReadinessGateTests.cs" />
     <Compile Include="Ribbon\EngineToggleCatalogTests.cs" />
     <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.cs" />
