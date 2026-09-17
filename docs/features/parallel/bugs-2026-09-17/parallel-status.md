@@ -11,8 +11,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | `max_concurrency` | 2 |
 | `current_cohort` | 0 |
 | `recolor_generation` | 0 |
-| `last_updated` | 2026-09-17T02-03 |
-| `next_step` | SEED_ITEM_900_EXECUTION_SESSION_AND_LAUNCH |
+| `last_updated` | 2026-09-17T02-04 |
+| `next_step` | ITEM_900_IN_FLIGHT_AWAITING_CHILD_DONE |
 
 Effective concurrency for this run is 1 by operator directive, not 2. Both items
 carry command tasks and both run msbuild and vstest, so they are serialized. See the
@@ -23,14 +23,14 @@ carry command tasks and both run msbuild and vstest, so they are serialized. See
 | issue_num | feature_folder | cohort | state | merge_status | pr_url | merge_commit_sha |
 | --- | --- | --- | --- | --- | --- | --- |
 | 895 | `docs/features/active/2026-09-14-fsharp-core-hintpath-netstandard21-skew-895` | 0 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/901 | 66b65a4626095ade5a01643aee4a43c90cc58cbf |
-| 900 | `docs/features/active/breadcrumb-thread-affinity-tests-assume-taskrun-distinct-thread-900` | 0 | scheduled | not_started | - | - |
+| 900 | `docs/features/active/breadcrumb-thread-affinity-tests-assume-taskrun-distinct-thread-900` | 0 | in_flight | worktree_created | - | - |
 
 ### Item lifecycle timestamps
 
 | issue_num | worktree_created_at | pr_opened_at | ci_green_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- |
 | 895 | 2026-09-17T01-07 | 2026-09-17T01-54 | 2026-09-17T02-02 | 2026-09-17T02-02 | 2026-09-17T02-03 |
-| 900 | - | - | - | - | - |
+| 900 | 2026-09-17T02-04 | - | - | - | - |
 
 ### Item branches and worktrees
 
