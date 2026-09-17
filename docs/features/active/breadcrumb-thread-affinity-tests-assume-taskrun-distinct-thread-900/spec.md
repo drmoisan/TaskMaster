@@ -270,31 +270,31 @@ call. No measurable effect on suite runtime.
 - Manual validation steps: none required.
 
 ## Acceptance Criteria
-- [ ] AC1. `InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic` and
+- [x] AC1. `InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic` and
   `ConfigureBreadcrumbDropDown_WorkerThread_ThrowsBoundaryDiagnostic` in
   `QuickFiler.Test/Viewers/ItemViewerBreadcrumbThreadAffinityTests.cs` no longer obtain their worker thread
   from `Task.Run(...).GetAwaiter().GetResult()`; they use a dedicated `System.Threading.Thread` the test
   creates and joins.
-- [ ] AC2. Each rewritten test explicitly establishes the distinct-thread precondition
+- [x] AC2. Each rewritten test explicitly establishes the distinct-thread precondition
   (`scope.Viewer.UiDispatcher.CheckAccess()` is `false` on the dedicated thread) before asserting the
   boundary diagnostic, so the boundary assertion cannot pass vacuously.
-- [ ] AC3. Each rewritten test asserts the captured exception is exactly `InvalidOperationException`
+- [x] AC3. Each rewritten test asserts the captured exception is exactly `InvalidOperationException`
   (excluding `ObjectDisposedException`), with a message containing the guarded operation's name
   (`"InitializeBreadcrumbPipeline"` / `"ConfigureBreadcrumbDropDown"` respectively), preserving the AC3
   contract ratified for issue #781.
 - [x] AC4. A `fail-before-exception.<timestamp>.md` dossier is recorded under
   `<FEATURE>/evidence/regression-testing/`, documenting why a deterministic failing run of the *original*
   two tests is not achievable, with the wait-inlining mechanism chain as the alternative proof.
-- [ ] AC5. A deterministic guard-disabled failing run of the two *replacement* tests (via a temporary,
+- [x] AC5. A deterministic guard-disabled failing run of the two *replacement* tests (via a temporary,
   fully reverted `ClearViewerDispatcher(scope.Viewer)` insertion, no production edit) is captured as
   evidence under `<FEATURE>/evidence/regression-testing/`, proving the new assertions are not vacuous; the
   temporary insertion is confirmed removed (clean `git diff`) before the final pass-after run.
-- [ ] AC6. Both rewritten tests pass under `scripts/vscode/TaskMaster.cli.runsettings` (`Workers=0`,
+- [x] AC6. Both rewritten tests pass under `scripts/vscode/TaskMaster.cli.runsettings` (`Workers=0`,
   `Scope=ClassLevel`) — i.e. under full parallel execution, not serially — with no change to that
   runsettings file.
-- [ ] AC7. No sibling test in `ItemViewerBreadcrumbThreadAffinityTests.cs` regresses (all 7
+- [x] AC7. No sibling test in `ItemViewerBreadcrumbThreadAffinityTests.cs` regresses (all 7
   `[TestMethod]`s in the file pass), and no production file is modified in the final committed diff.
-- [ ] AC8. Full C# toolchain pass completed in order (CSharpier format → .NET analyzers/EnforceCodeStyleInBuild
+- [x] AC8. Full C# toolchain pass completed in order (CSharpier format → .NET analyzers/EnforceCodeStyleInBuild
   rebuild → nullable/TreatWarningsAsErrors rebuild → vstest with the CLI runsettings), restarting from step
   1 on any failure or file change, with numeric coverage recorded and confirmed not regressed.
 
