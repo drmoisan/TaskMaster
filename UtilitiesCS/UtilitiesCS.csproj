@@ -968,7 +968,6 @@
       <DependentUpon>ProgressMultiStepViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="NewtonsoftHelpers\AppGlobalsConverter.cs" />
-    <Compile Include="Threading\ProgressTrackerAsync.cs" />
     <Compile Include="Threading\ProgressTrackerPane.cs" />
     <Compile Include="Threading\ProgressViewer.cs">
       <SubType>Form</SubType>
@@ -992,6 +991,7 @@
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapEntry.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.cs" />
     <Compile Include="EmailIntelligence\SubjectMap\SubjectMapSco.Orchestration.cs" />
+    <Compile Include="Bootstrap\AssemblyBindingFallback.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\DfDeedle.cs" />
     <Compile Include="Extensions\DfDeedle.FrameUtilities.cs" />
@@ -1066,6 +1066,7 @@
     <Compile Include="OutlookObjects\Table\OlTableExtensions.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions.RowTransforms.cs" />
     <Compile Include="OutlookObjects\Table\OlTableExtensions.TableAccess.cs" />
+    <Compile Include="OutlookObjects\Table\OlTableExtensions.TableAccess.Failures.cs" />
     <Compile Include="OutlookObjects\Table\OlToDoTable.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItem.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemExtensions.cs" />

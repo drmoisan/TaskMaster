@@ -44,6 +44,37 @@ Describe 'Invoke-VsTestExe splatting seam (Invoke-MSTest.ps1)' {
     }
 }
 
+Describe 'Get-VsTestConsolePath seam (Invoke-MSTest.ps1)' {
+    BeforeAll {
+        # An in-process stand-in whose parameters bind the seam's own argument list. It is not a
+        # mock of the seam: the seam body runs and calls this function through the call operator,
+        # so the seam's own statements are executed rather than replaced. Defined inside the setup
+        # block, never at file scope, because each It runs in a child scope of the containing
+        # block. No external process is launched.
+        function Invoke-MSTestVsWhereStandIn {
+            param(
+                [switch]$latest,
+                [string]$products,
+                [string]$find
+            )
+
+            # The -latest switch is bound by the seam's own argument list and is read here so it
+            # is not reported as a declared-but-unused parameter.
+            $null = $latest
+            "C:\stand-in\$products\$find"
+        }
+    }
+
+    It 'resolves the vstest console path through the vswhere seam' {
+        # The seam is exercised against an in-process command rather than a real vswhere.exe, so
+        # the argument contract is asserted with no external process and no filesystem access.
+        # The returned value proves the products selector and the find expression both arrived.
+        $resolved = Get-VsTestConsolePath -VsWherePath 'Invoke-MSTestVsWhereStandIn'
+
+        $resolved | Should -Be 'C:\stand-in\*\Common7\IDE\Extensions\TestPlatform\vstest.console.exe'
+    }
+}
+
 Describe 'Invoke-MSTestMain' {
     # Invoke-MSTest.ps1's entry-point body was extracted into Invoke-MSTestMain so the guards,
     # messages, and ordering below are reachable from Pester. Every external dependency is
@@ -112,7 +143,9 @@ Describe 'Invoke-MSTestMain' {
             'C:\repo\A.Test\bin\Debug\A.Test.dll',
             "/Settings:$($script:expectedRunSettings)",
             '/InIsolation',
-            '/TestCaseFilter:TestCategory!=LiveOutlook'
+            '/TestCaseFilter:TestCategory!=LiveOutlook',
+            '/ResultsDirectory:C:\repo\coverage\test-results',
+            '/Logger:trx;LogFileName=mstest-run.trx'
         )
     }
 

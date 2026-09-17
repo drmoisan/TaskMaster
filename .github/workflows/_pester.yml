@@ -1,0 +1,80 @@
+name: pester
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pester:
+    name: Run Pester suite with coverage
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          # Pinned so a runner image bump cannot change the gate silently. The image also ships
+          # the legacy Pester 3.4.0 with Windows PowerShell, which has no New-PesterConfiguration
+          # and no JaCoCo coverage output format, so the version is pinned on both the install and
+          # the import rather than resolved by module name.
+          Install-Module Pester -RequiredVersion 5.6.1 -Force -SkipPublisherCheck -Scope CurrentUser
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run Pester suite with coverage
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          Import-Module Pester -RequiredVersion 5.6.1
+
+          $configuration = New-PesterConfiguration
+          $configuration.Run.Path = 'tests/scripts/vscode'
+          $configuration.Run.PassThru = $true
+          $configuration.Output.Verbosity = 'Detailed'
+          $configuration.CodeCoverage.Enabled = $true
+          $configuration.CodeCoverage.Path = 'scripts/vscode'
+          $configuration.CodeCoverage.OutputFormat = 'JaCoCo'
+          $configuration.CodeCoverage.OutputPath = 'coverage/pester-coverage.xml'
+
+          $result = Invoke-Pester -Configuration $configuration
+
+          "PESTER Passed=$($result.PassedCount) Failed=$($result.FailedCount) Skipped=$($result.SkippedCount) Total=$($result.TotalCount)"
+
+          [xml]$jacoco = Get-Content 'coverage/pester-coverage.xml' -Raw
+          # Selected by XPath rather than by dotted property access. A JaCoCo document declares
+          # <!DOCTYPE report ...>, so $jacoco.report resolves to a two-element array holding the
+          # document-type node and the document element, and member access across that array
+          # throws under Set-StrictMode -Version Latest. The XPath form names the report element's
+          # own counter children unambiguously and reads the same report-level LINE counter.
+          $lineCounter = @($jacoco.SelectNodes('/report/counter')) | Where-Object { $_.type -eq 'LINE' }
+          $coveredLines = [int]$lineCounter.covered
+          $totalLines = $coveredLines + [int]$lineCounter.missed
+          $linePercent = if ($totalLines -gt 0) { 100 * $coveredLines / $totalLines } else { 0 }
+
+          "COVERAGE LinePercent=$($linePercent.ToString('0.00')) Covered=$coveredLines Total=$totalLines"
+          "COVERAGE CommandPercentInformational=$($result.CodeCoverage.CoveragePercent)"
+
+          # The explicit exit is placed after the count-emitting and figure-emitting statements
+          # above, because the configuration's own exit option would terminate before the
+          # figures print, and because a pwsh step exits zero unless the script calls exit.
+          if ($result.FailedCount -gt 0) { exit 1 }
+          if ($linePercent -lt 80) { exit 1 }
+          exit 0
+
+      - name: Upload coverage document
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pester-coverage
+          path: coverage/pester-coverage.xml
+          if-no-files-found: error

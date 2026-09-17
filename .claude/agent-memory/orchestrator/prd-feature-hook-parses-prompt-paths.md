@@ -33,6 +33,27 @@ Do not respond to this error by running the promotion or prd-feature step again:
 would duplicate work already committed. Verify the folder on disk first
 (see [[small-path-minor-audit-selection]] for the mode-to-document mapping).
 
+## In a parallel item, this hook makes atomic-planner UNREACHABLE (verified 2026-09-13, items 839 and 743)
+
+`Find-PrdFeatureFolderFromPrompt` truncates any `docs/features/active/...` token in the prompt to the
+four-segment folder (absolute or relative spelling alike), and `Get-PrdFeatureIssueContent` (line
+107) then does `Test-Path "$FeatureFolder/issue.md"` with no cwd override, so the read resolves
+against the hook process cwd, the session root. A parallel item's feature folder exists only on its
+branch in its own worktree, so the marker reads as "unreadable" and the delegation is denied while
+`- Work Mode:` sits correct at line 12 of the item worktree's `issue.md`. With ZERO prompt candidates
+the line-369 fallback reads the SESSION-ROOT checkpoint's `feature-folder`, a sibling's, and would
+admit the delegation on the sibling's documents: an engineered false green, refuse it. Shimming the
+folder into the session root and `isolation: "worktree"` are both out (the hook fires in the parent
+process; the directive forbids session-root writes).
+
+Consequence confirmed on 743: a parallel item cannot run its REMEDIATION loop at all, because cycle
+N's `remediation-plan.md` must come from `atomic-planner`, so any review with `blocking_count > 0`
+ends the item blocked however small the fix (743's were a one-token path substitution and an
+evidence-wording amendment). Author `remediation-inputs.md` fully anyway, commit and push it, record
+`blocked_reason: delegation_launch_failed` with the mechanism, and hand the planner step to the
+coordinator. Fix upstream in drm-copilot; `.claude` files here are push-down-owned.
+
 Related: [[agent-worktree-hooks-resolve-to-agent-cwd]],
-[[model-routing-hook-reads-canonical-path-only]] — both are cases of a hook resolving a
+[[model-routing-hook-reads-canonical-path-only]],
+[[preimplementation-gate-reads-sibling-checkpoint]] — all cases of a hook resolving a
 path differently from how the calling agent meant it.

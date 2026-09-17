@@ -174,6 +174,12 @@ namespace QuickFiler
 
         #region Field to Property for Interface
 
+        // #743 additive intent members: let ResolveControlGroupsAsync be driven through
+        // IItemViewer without a concrete viewer.
+        public IEnumerable<Control> DescendantControls() => this.GetAllChildren();
+
+        public Label ItemNumberLabel => LblItemNumber;
+
         public System.Windows.Forms.Label LblItemNumber
         {
             get => _lblItemNumber;

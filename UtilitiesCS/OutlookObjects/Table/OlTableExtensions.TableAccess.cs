@@ -33,6 +33,21 @@ namespace UtilitiesCS
         // when no clock is supplied. Do not introduce a CancelAfter call on the source the provider
         // creates: on pre-.NET 8 runtimes, and net481 is one, CancelAfter(TimeSpan) does not
         // terminate the original delay timer.
+        /// <summary>
+        /// Returns the table of the active explorer's current view, retrying a timed-out
+        /// acquisition up to the retry ceiling. The result is never null: the method reports every
+        /// failure as an exception instead.
+        /// </summary>
+        /// <exception cref="TimeoutException">
+        /// The acquisition deadline was exhausted on every attempt, including the retry ceiling.
+        /// </exception>
+        /// <exception cref="OperationCanceledException">
+        /// The caller's token was cancelled. Cancellation is reported as cancellation and is never
+        /// relabelled as a timeout.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// The explorer's current view is not a table view.
+        /// </exception>
         public static async Task<Outlook.Table> GetTableInViewAsync(
             this Explorer activeExplorer,
             CancellationToken token,
@@ -85,11 +100,11 @@ namespace UtilitiesCS
                     $"retryCount={counter}; elapsedMs={acquisitionStopwatch.ElapsedMilliseconds}"
                 );
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException e)
             {
                 if (token.IsCancellationRequested)
                 {
-                    table = null;
+                    throw;
                 }
                 else
                 {
@@ -106,11 +121,11 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        table = null;
+                        throw AcquisitionTimeout(counter, timeoutMs, e);
                     }
                 }
             }
-            catch (TimeoutException)
+            catch (TimeoutException e)
             {
                 logger.Warn($"{nameof(GetTableInViewAsync)} timed out on try {counter}");
                 if (counter < 2)
@@ -129,13 +144,19 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    table = null;
+                    throw AcquisitionTimeout(counter, timeoutMs, e);
                 }
             }
 
-            // GetTableInViewAsync's public contract is non-null (callers dereference the result);
-            // the null-on-cancellation/timeout path is a pre-existing latent condition.
-            return table!;
+            // A null local here means the shared helper absorbed its own retry budget and returned
+            // its default value rather than raising, so the failure has to be reported here.
+            if (table is null)
+            {
+                token.ThrowIfCancellationRequested();
+                throw AcquisitionTimeout(counter, timeoutMs);
+            }
+
+            return table;
         }
 
         public static async Task<object?> TryGetTableAsync(

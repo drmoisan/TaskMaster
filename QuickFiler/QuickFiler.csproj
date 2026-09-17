@@ -49,7 +49,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Core, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.1\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=3.4.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.3.4.0\lib\net462\log4net.dll</HintPath>
@@ -347,6 +347,8 @@
     <Compile Include="Controllers\QfcRemainingQueueAdmission.cs" />
     <Compile Include="Controllers\QfcQueue.cs" />
     <Compile Include="Controllers\QfcQueue.Enqueue.cs" />
+    <Compile Include="Controllers\QfcQueue.Tlp.cs" />
+    <Compile Include="Controllers\QfcQueue.UiIdle.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\ConversationResolver.Loading.cs" />
@@ -366,6 +368,7 @@
     <Compile Include="Interfaces\IItemControler.cs" />
     <Compile Include="Interfaces\IKbdAction.cs" />
     <Compile Include="Interfaces\IQfcCollectionController.cs" />
+    <Compile Include="Interfaces\IUiIdleDispatcher.cs" />
     <Compile Include="Interfaces\IQfcDatamodel.cs" />
     <Compile Include="Interfaces\IQfcExplorerController.cs" />
     <Compile Include="Interfaces\IQfcFormController.cs" />

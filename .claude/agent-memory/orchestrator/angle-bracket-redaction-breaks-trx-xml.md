@@ -15,7 +15,8 @@ re-parse afterwards to prove well-formedness, and diff the `Counters` attributes
 only identity fields.
 
 **Trap 2 — vstest LOWERCASES the storage path.** `codeBase=` keeps the original casing but `storage=`
-is lowercased, so `grep 'DanMoisan'` returns clean while `grep -i danmoisan` finds 19 files. Always
+is lowercased, so a case-sensitive fixed-string search for the account token as originally cased
+returns clean while a case-insensitive search for that same token finds 19 files. Always
 sweep case-insensitively, and sweep for the machine/domain token separately — `runUser` carries
 `<machine>\<account>` even after `computerName` has been redacted.
 

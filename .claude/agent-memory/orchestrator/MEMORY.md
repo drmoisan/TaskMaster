@@ -15,6 +15,7 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) · [Resumed child shares your worktree](resumed-child-orchestrator-shares-worktree.md)
 - [MCP tools available to orchestrator](mcp-tools-available-to-orchestrator.md) — run them yourself if a worker can't
 - [Run the real hook, not MCP](run-orchestration-hook-gates-locally.md) — the MCP validator disagrees on the bug route
+- [Measure your hook exposure, don't assume it](parallel-child-hook-exposure-measured-not-assumed.md) — a non-isolated child committed + delegated with NO shared-file sync; prd-feature gates only atomic-planner
 
 ## PR authoring and CI gate
 - [pr-author is a skill, not an agent](pr-author-hook-blocks-gh-in-this-repo.md) · [exact checkpoint schema](pr-author-hook-exact-checkpoint-schema.md) — agents must be a LIST; `relativeFile` required
@@ -41,6 +42,7 @@
 - [Epic child: never anchor a plan on origin/main](epic-child-plan-must-not-anchor-on-origin-main.md) — the merge base sits behind every merged sibling
 - [Three-dot diff degenerates on an ancestor base](three-dot-diff-degenerates-on-ancestor-base.md) — bills sibling merges to your footprint
 - [Merging main invalidates the plan's base anchor](merging-main-invalidates-plan-base-anchor.md) — re-anchor to the merge commit
+- [A merge retargets a delete-by-line-number citation](line-number-deletion-citation-shifts-under-merge.md) — the "count falls by one" gate passes on the wrong line too
 - [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) · [Verify reducibility before accepting an exemption count](feedback_verify_reducibility_before_accepting_exemption_count.md)
 - [Piped command's `$?` is the LAST segment](piped-command-exit-code-is-the-last-segment.md) — suspect the measurement before overwriting a memory it contradicts
 
@@ -65,6 +67,8 @@
 - [A session may have NO Agent tool](orchestrator-session-may-lack-agent-tool.md) — block, never implement the plan yourself
 - [PowerShell batch budget caps plan helper scripts](powershell-batch-budget-caps-plan-helper-scripts.md) · [tracked + carries stale paths](powershell-batch-budget-is-tracked-and-carries-stale-paths.md) — put throwaway helpers in the session scratchpad
 - [Get-PlanPaths truncates spaced paths](get-planpaths-truncates-paths-containing-spaces.md)
+- [pwsh starts in the SESSION worktree, not yours](pwsh-starts-in-session-worktree-not-yours.md) — sibling has its own .sln; unqualified msbuild builds the wrong checkout, green and meaningless
+- [Applying a delta is itself a defect source](delta-application-is-itself-a-defect-source.md) — 16/7/2/0 on #877; budget a scoped round to review your OWN application
 
 ## Coverage
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) · [lines-covered is nondeterministic](coverage-lines-covered-is-nondeterministic.md) · [#457 coverage moved UP](project_457_coverage_moved_up_not_down.md)
@@ -76,6 +80,7 @@
 - [Post-processed Cobertura = zero exit, NOT a test result](cobertura-postprocessing-is-a-zero-exit-proxy-not-a-test-result.md) — no .trx exists; re-run the gate
 - [[ExcludeFromCodeCoverage] is INVISIBLE, not 0%](excludefromcodecoverage-invisible-to-coverage-gates.md) — per-file hits-row gates unsatisfiable; METHOD-level leaks
 - [vstest emits TWO .coverage files per run](vstest-emits-two-coverage-files-per-run.md) — need a disambiguation rule
+- [Coverage runner has NO runsettings override](coverage-runner-has-no-runsettings-override.md) — the Deedle/parallelism fix works on direct vstest spans but NOT on runner-invoking tasks; count the split
 
 ## C# toolchain and tests
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) · [analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) · [direct-csproj build facts](csharp-direct-csproj-build-facts.md)
@@ -96,7 +101,7 @@
 - [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) · [Promotion hook matches commit-message text](promotion-hook-matches-commit-message-text.md)
 - [validate-bash blocks --force-with-lease too](validate-bash-blocks-force-with-lease-too.md) — delete-and-repush instead
 - [Agent-worktree hooks resolve to agent cwd](agent-worktree-hooks-resolve-to-agent-cwd.md) · [Child-orchestrator PR hook reads SESSION ROOT](child-orchestrator-pr-hook-reads-session-root.md) · [Pre-impl gate reads a SIBLING's checkpoint](preimplementation-gate-reads-sibling-checkpoint.md)
-- [feature-folder-order hook is work-mode-blind](feature-folder-order-hook-is-workmode-blind.md) · [PRD_FEATURE_BLOCKED false positive](prd-feature-hook-parses-prompt-paths.md) · [picks the LONGEST active path](prd-feature-hook-picks-longest-active-path.md) · [blocks reused prep-worktree topology](prd-feature-hook-blocks-reused-prep-worktree-topology.md)
+- [feature-folder-order hook is work-mode-blind](feature-folder-order-hook-is-workmode-blind.md) · [PRD_FEATURE_BLOCKED false positive](prd-feature-hook-parses-prompt-paths.md) · [picks the LONGEST active path](prd-feature-hook-picks-longest-active-path.md) · [blocks reused prep-worktree topology](prd-feature-hook-blocks-reused-prep-worktree-topology.md) · [deny string blames the marker, not the cwd](prd-feature-deny-string-blames-the-marker-not-the-cwd.md)
 - [Hard-lock MCP needs an absolute target](mcp-hardlock-and-review-mirror-quirks.md) · [check-ignore false negative on a directory glob](check-ignore-false-negative-on-directory-glob.md)
 - [Edit tool CRLF-ifies LF markdown](edit-tool-crlf-ifies-lf-markdown.md) · [feature-review + `git -C` hangs forever](feature-review-git-c-form-hangs-unattended.md) — ban Bash there, paste the diff
 

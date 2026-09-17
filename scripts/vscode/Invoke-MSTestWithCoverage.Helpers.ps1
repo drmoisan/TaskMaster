@@ -3,6 +3,7 @@ Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.PackageRate.ps1')
 . (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.Threshold.ps1')
 . (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.FirstParty.ps1')
+. (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.Projection.ps1')
 
 function Get-KoverageProjectAllowlist {
     [CmdletBinding()]

@@ -88,15 +88,13 @@ namespace QuickFiler.Controllers
             _qfcCollectionController = qfcCollectionController;
 
             await Task.Run(() =>
-                items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x)))
+                items.ForEach(item => MoveMonitor.HookItem(item, async (x) => await RemoveItem(x)))
             );
 
             Interlocked.Increment(ref _jobsRunning);
             //logger.Debug($"{nameof(EnqueueAsync)} called and jobsRunning increased to {_jobsRunning}");
 
-            var tlp = await UiIdleCallAsync(() =>
-                _tlpTemplate.Clone(name: "BackgroundTableLayout")
-            );
+            var tlp = await UiIdleCallAsync(() => BackgroundTlpFactory(_tlpTemplate));
 
             //ActivateTlpTemplate(tlp);
 
@@ -174,7 +172,9 @@ namespace QuickFiler.Controllers
             var itemTasks = Enumerable
                 .Range(start, items.Count)
                 .ToAsyncEnumerable()
-                .SelectAwait(async i => (i: i, grp: await AddAsync(tlp, items[i - start], i)))
+                .SelectAwait(async i =>
+                    (i: i, grp: await ItemGroupFactory(tlp, items[i - start], i))
+                )
                 .SelectAwait(async x =>
                 {
                     x.grp.CarriedFolderHandler = ResolveCarriedHandler(preScored, x.grp.MailItem);
