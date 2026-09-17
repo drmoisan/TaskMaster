@@ -1,137 +1,134 @@
 # Task Researcher Memory Index
 
-- [pump-timeout-743](project_pump_timeout_743.md) — #743/#592/#511: the dispatcher-gate lead is stale (#493 deleted both symbols); 9 of 19 pump tests never take the gate; committed TRX timestamps are a measurement instrument; no expiry artifact exists in-repo (2026-09-12)
-- [qfc-breadcrumb-bridge-router-495](project_qfc_breadcrumb_bridge_router_495.md) — #495/F12: open #440 will rewrite this file's arrow-key semantics; the WRONG router class's emitted branch-rate matches the right answer to 6 digits (2026-08-08)
-- [breadcrumb-messenger-hub-495](project_breadcrumb_messenger_hub_495.md) — #495/F12: a Component finalizer can make a branch outcome GC-dependent (fake coverage); 3 types in one .cs emit ONE Cobertura class element; brief's "Lines" is coverable not physical (2026-08-08)
-- [qfc-upgrade-lifetime-495](project_qfc_upgrade_lifetime_495.md) — #495/F12: Cobertura `<class name>` can name a SECONDARY type in the file; multi-line ternary arms both report hits=1; pick the discriminating ordering for latch tests (2026-08-08)
-- [push-down-claude-dir-149](project_push_down_claude_dir.md) — Issue #149: pushDownClaudeDir command research completed 2026-04-16
-- [qfc-item-controller-227-r2-denial](project_qfc_item_controller_227_r2_denial.md) — Issue #227: maintainer denied blanket exemption boundary (2026-07-01); precedent for per-member barrier analysis before any future coverage exemption
-- [feedback-exemption-audit-check-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — when re-auditing exemption boundaries, grep for already-proven test techniques and check sibling-method consistency before accepting IRREDUCIBLE (issue #227 cycle-2 re-audit, 2026-07-02)
-- [qfc227-headless-itemviewer-and-tlpcellsnapshot](project_qfc227_headless_itemviewer_and_tlpcellsnapshot.md) — Issue #227: headless ItemViewer construction confirmed safe (ProgressPane precedent); TlpCellSnapShot retrofit scoped; revised target 24 -> 19 (2026-07-02)
-- [qfc-high-confidence-dual-pipeline](project_qfc_high_confidence_dual_pipeline.md) — QFC now has THREE high-confidence pipelines; #233 dequeue-time gate is LIVE, #169/#171 dormant; admission never scores (updated 2026-08-06)
-- [qfc424-high-confidence-startup-stall](project_qfc424_high_confidence_startup_stall.md) — #424: gate scores serially w/o deadline/progress (stall ~ ItemsPerIteration/p); async-void BackgroundWorker makes IsBusy lie; parallel COM scoring rejected (STA) (2026-08-06)
-- [qfc254-darkmode-stale-labels](project_qfc254_darkmode_stale_labels.md) — #254: sender/subject labels themed only in MailRead()-guarded branch of SetQfcTheme; COM probe throw + fire-and-forget async leaves some rows stale (2026-07-07)
-- [onedrive-timeout-test-determinism-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask.cs Func<T1,TResult> overload catches TimeoutException not TaskCanceledException (unlike siblings); DI-seam fix recommended over production catch-clause change (2026-07-07)
-- [store-runtime-reenable-263](project_store_runtime_reenable_263.md) — #263: no per-store post-startup hookup seam exists anywhere; AppOlObjects.cs already over 500-line ceiling; F1.Reenable calls F3, not reverse (2026-07-07)
-- [store-lockup-resilience-f4-research](project_store_lockup_resilience_f4_research.md) — F4 #264: AsyncLocal rejected for cross-thread attribution (use static volatile field); MyBox has no modeless path; ThreadMonitor dormant/untested (2026-07-07)
-- [qfc254-residual-after-comexception-fix](project_qfc254_residual_after_comexception_fix.md) — #254 residual investigation (superseded for #269 by the git-proven Light-theme fore/back swap; kept as historical): COMException-only catch narrower than probe surface; WebView2-not-ready silent skip noted (2026-07-07)
-- [stores-enum-stall-292](project_stores_enum_stall_292.md) — #292: blank-attribution stall at Stores enumeration; latent watchdog-thread crash via DisableSessionOnly-on-null-model; RED tests via existing Stores proxy seams; ThreadMonitor now LIVE (2026-07-09)
-- [qfc254-ambient-inheritance-mechanism](project_qfc254_ambient_inheritance_mechanism.md) — #254/#269 investigation snapshot (SUPERSEDED: the real #269 cause was a Light-theme fore/back swap from the #236 refactor, not a dark-mode abort); WinForms ambient inheritance behavior is still accurate (2026-07-07)
-- [winforms-testability-epic-298](project_winforms_testability_epic_298.md) — Epic #295 coordination: #298 depends on #297; FlagTasks ctor pinned by QuickFiler seam; #298 inverts #197 exemptions; behavioral viewer interfaces (2026-07-09)
-- [tagcontroller-refactor-293](project_tagcontroller_refactor_293.md) — #293/epic #295: ITagViewer/IForm gaps, Tags orphan files, IUserPrompt+DrawFocus seams, PrefixItem NotImplemented, live-form test migration (2026-07-09)
-- [swordfish-removal-epic-306](project_swordfish_removal_epic_306.md) — #306 F1 dictionary lineage: legacy flat JSON (no $type) round-trips via ScoDictionaryNew default path; avoid globals converter; scoping vs F2/F3/F5 (2026-07-10)
-- [legacy-scodictionary-removal-315](project_legacy_scodictionary_removal_315.md) — #315: DELETE SCODictionary_Tests(+Additional), RETARGET 3 SmartSerializable* test files, IScoDictionary interface safe to keep for F5 (2026-07-11)
-- [lock-recursion-coverage-317](project_lock_recursion_coverage_317.md) — #317: deleted LockRecursionTests.cs is a restoration (F2-authored clean-base coverage F5 knowingly removed per WI-4), not new authoring; no git/shell tool this session (2026-07-11)
-- [qfc-folder-tree-percentage-325](project_qfc_folder_tree_percentage_325.md) — #325 (epic child 9003): only 1 live viewer (ItemViewer) despite 9 dead CboFolders variants; owner-draw ComboBox + host-neutral TreeNode<T> seams; consumes 9001 probability contract (2026-07-15)
-- [qfc-breadcrumb-webview2-351](project_qfc_breadcrumb_webview2_351.md) — #351 (epic 9103): 9101 provider ABSENT (code to assumed contract); JS<->.NET bridge greenfield (no WebMessageReceived anywhere); Theme.Rendering TODO = top percentage hypothesis (2026-07-16)
-- [dependabot-net481-340](project_dependabot_net481_340.md) — #340: no packages.config package currently dropped net481; transitive-bump restraint is already Dependabot's NuGet default (cite security-updates docs, not a new config primitive); use semver-major ignore not fabricated version ceilings (2026-07-16)
-- [folder-hierarchy-provider-350](project_folder_hierarchy_provider_350.md) — #350/epic 9101: reuse existing snapshot infra (IOutlookFolderTreeService.GetChildren + ParentKey walk), add IFolderHierarchyProvider facade + pure GetAncestorChain, no new COM seam; defer deleting BuildFromRows/Build to 9102/9103 (2026-07-16)
-- [efcviewer-breadcrumb-webview2-349](project_efcviewer_breadcrumb_webview2_349.md) — #349 (epic child 9102): EfcViewer3 dead; no JS<->.NET bridge precedent in repo; percent defect = unscaled ColumnHeader widths at high-DPI design scale (2026-07-16)
-- [svgcontrol-test-unwired-418](project_svgcontrol_test_unwired_418.md) — #418 (STALE: SVGControl.Test now IN .sln as of 2026-08-14); historical package-pin + ExCSS/Fizzler redirect topology
-- [ci-parallel-split-553](project_ci_parallel_split_553.md) — #553: 4 independent jobs w/ tailored setup beat build-once artifact sharing; single-PUT ruleset 18572843 swap fail-closed; called-workflow check names are "caller / callee" (2026-08-14)
-- [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — #230: WinFormsPumpHost design decided; CreateAsync factory-seam gap; InitializeWebViewAsync stays exempt; 19 -> 11 max (2026-08-07)
-- [qfc438-search-focus-steal](project_qfc438_search_focus_steal.md) — #438: TWO focus-steal mechanisms (open _focusPending + close _focusAnchor via per-keystroke Clear); CancelSelector emits no SelectionChanged -> stale _selectedFolder (2026-08-08)
-- [ribbon-engine-readiness-503](project_ribbon_engine_readiness_503.md) — #503: whole TaskMaster Ribbon layer is coverage-excluded; net481 blocks default interface members; 5 orphan onAction callbacks in RibbonExplorer.xml (2026-08-08)
-- [cobertura-closure-exemption-457](project_cobertura_closure_exemption_457.md) — #457: exempt members emit NO `<method>` element (absence = exemption signal); async `d__` state machines are the trap; filter must run pre-merge (2026-08-10)
-- [ribbon-toggle-state-guards-505](project_ribbon_toggle_state_guards_505.md) — #505/#506/#518: toggle(config) vs command(InboxEngines) guard asymmetry; catalog<->XML set-equality tests; MessageBox in notify sink blocks viewer-level tests (2026-08-08)
-- [coverage-threshold-reconciliation-494](project_coverage_threshold_reconciliation_494.md) — #494: 85/75 is foreign-import leakage reintroduced after #178 rejected it; the only numeric coverage gate is evadable by withholding its input; repo-wide coverage has a +/-15pt run-to-run spread (2026-08-10)
-- [cobertura-root-attrs-raw-vs-postprocessed](project_cobertura_root_attrs_raw_vs_postprocessed.md) — #441/#478: raw dotnet-coverage root totals are class-level-only; the Koverage post-processor overwrites them with a doubled both-axes sum — never compare the two (2026-08-10)
-- [double-count-moves-counts-not-rates-815](project_cobertura_double_count_moves_counts_not_rates_815.md) — #815: `.//line` doubles the four counters but moves the percentage 0.00-0.46pp, so it can't explain a 2.35pt swing; site is plan prose only, zero hits under scripts/ (2026-09-08)
-- [breadcrumb-navigation-defects-439-440-498-499](project_breadcrumb_navigation_defects_439_440_498_499.md) — fixing the #439 lineage REGRESSES the percentage join + filing target; #440 contradicts landed #400 AC-9; Efc/Qfc use different html documents (2026-08-24)
-- [issue-440-already-landed-via-498](project_issue_440_already_landed_via_498.md) — #440 shipped inside #498 and is on main; only a leaf-anchored gate in Qfc LeftArrow remains; Efc/Qfc do NOT share BreadcrumbRow; the two coverage-r2 branches would revert it (2026-08-29)
-- [qfc-item-controller-defects-484](project_qfc_item_controller_defects_484.md) — #484 (closes #480/#481/#483/#484/#485): all 5 promoted-potential "Suspected Fix" sections were wrong; verify callers + interface decls + coverage-exempt enclosure first (2026-08-24)
-- [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — #512/#492/#509/#522: AGENTS.md/.agents/.github-instructions are externally owned (generator absent); Invoke-VSBuild.ps1 is an unenumerated executable carrier; ~1.2s vs ~17s = vacuity tell (2026-08-10)
-- [webview2-host-initializer-defects-476](project_webview2_host_initializer_defects_476.md) — #476/#458/#477: EfcViewerQueue is NOT a recycle pool (#458 latent); real WebView2 controls ARE built in QuickFiler tests; CaptureProductionDispatcher captures nothing from the control (2026-08-24)
-- [uithread-dispatcher-restore-scope-493](project_uithread_dispatcher_restore_scope_493.md) — #493: never share ONE semaphore between a brief helper and a long fixture swap (2-lock split); editorconfig analyzer catch-all makes IDisposable returns safe; CI runs QuickFiler.Test serially, runsettings do not (2026-08-24)
-- [qfc-efc-metrics-442](project_qfc_efc_metrics_442.md) — #442/#443/#451: QFC MoveAndIterate stopwatch race unfixable in owned files; legacy csproj blocks any new .cs; metrics CSV has zero in-repo readers (2026-08-24)
-- [qfc-collection-defects-468](project_qfc_collection_defects_468.md) — #468: MovedMails already pushed by EmailFiler (param redundant); no log4net ref in QuickFiler.Test; ConcurrentDictionary order blocks a deterministic pre-fix test (2026-08-24)
-- [qfc-collection-controller-defects-468](project_qfc_collection_controller_defects_468.md) — #468 family: #474 doc's "unrelated interfaces" claim is FALSE (IQfcFormController derives from IFilerFormController); #469-4 undo is NOT broken; #474-2 fix needs a non-owned file (2026-08-24)
-- [efc614-store-root-stem-leak](project_efc614_store_root_stem_leak.md) — #614: verbatim ToArchiveRelativePath + unvalidated DestinationOlStem; #609 fix is FolderPredictor-only by design; FolderConverterTests.cs:329 codifies a bug (2026-08-26)
-- [qfc677-webview2-focus-hold-outlook-keyboard](project_qfc677_webview2_focus_hold_outlook_keyboard.md) — #677: Outlook keyboard death = WebView2 focus hold (WV2Feedback #951) + unconditional FinishClose _focusAnchor steal, NOT a repo hook; fix = focus-permission predicate + deactivate parking (2026-08-28)
-- [qfc680-menu-mode-keyboard-capture](project_qfc680_menu_mode_keyboard_capture.md) — #680: ModalMenuFilter retargets keys on non-focusing ToolStripDropDown show; AutoClose=false pre-Show is the only public opt-out; #438 HV-1 residual, not fixable via #677 MayTakeFocus (2026-08-28)
-- [issue-469-already-fixed-residual-is-629](project_issue_469_already_fixed_residual_is_629.md) — #469's 4 defects verified fixed on main; only residual is param removal = existing #629; `Initialized<T>` never memoizes; defect 1/2 numbering inverted (2026-08-29)
-- [reflective-caller-closure-635](project_reflective_caller_closure_635.md) — #635/#468: removal was THIRTEEN members (`_templateTlp` omitted from AC-16); `GetField(` never searched (172 hits) yet is the only reaching mechanism; QuickFiler is ComVisible(false) (2026-08-29)
-- [qfc-keyboard-action-defects-444](project_qfc_keyboard_action_defects_444.md) — #444/#472/#482 research (2026-08-24): #468 removes WireUpKeyboardHandler so #444's duplicate registration is already gone; #482's filed trigger is unreachable; the real trigger is Right/Down/Right
-- [selectrow-two-families-637](project_selectrow_two_families_637.md) — #637: TWO unrelated SelectRow families (bare grep over-counts ~10x); blanket TryMakeArchiveRelative rejects relative/Trash rows; ButtonOK_Click does NOT rethrow (2026-08-29)
-- [unobserved-task-fault-670](project_unobserved_task_fault_670.md) — #670: ViewerSetup.cs is 499/500 so the named fix target can't hold the fix; IItemViewer.UiDispatcher is a raw WPF Dispatcher (nested Task<Task>); #464 already ratified the sink+guard shape (2026-08-31)
-- [filerqueue-consumer-unsound-633](project_filerqueue_consumer_unsound_633.md) — #633: FilerQueue.Consumer has an orphaned-item race (unusable as a quiesce); QFC BackGroundMove/MoveAndIterate tests are vacuous; UiThread.Dispatcher null in tests (2026-08-31)
-- [qfc678-predictor-carry](project_qfc678_predictor_carry.md) — #678: named producer (QfcHighConfidencePreFilter) is DORMANT, live one is the #233 dequeue gate; PreScored never read; TWO re-score legs; sync LoadFolderHandler never inits (2026-08-31)
-- [storewrapper-dialog-287-state-inversion](project_storewrapper_dialog_287_state_inversion.md) — #287: issue inverts the states — StoresUnavailable is transient, ModelUnavailable is the permanent one; enum alone can't express it; 2 copy sites (2026-08-31)
-- [analyzer-severity-ceiling-and-runsettings-split](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 is the ONLY rule above suggestion; no .globalconfig; Invoke-MSTest.ps1 docstring names the wrong runsettings (2026-08-31)
-- [issue-656-bypass-path-does-not-exist](project_issue_656_bypass_path_does_not_exist.md) — #656 premise FALSE: no bypassing reopen path exists; SR-4's "no IsOpen under _sync" already violated at :112; both nominated owner files at the 500-line cap (2026-08-31)
-- [qfc663-alt-chord-no-altf](project_qfc663_alt_chord_no_altf.md) — #663: QfcFormViewer has NO menus/mnemonics of its own; only Alt+M (from hosted ItemViewer) is swallowed, Alt+F is EFC-only; #464 deferred the shared predicate for file-ownership reasons only (2026-09-01)
-- [ribbon-engine-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — #735: RibbonExplorer.xml IS CSharpier-formatted; 84 distinct callback names (5 dead, 8 in comments); ManagerAsyncLazy test-constructible; 459-line test file forces partial split (2026-09-02)
-- [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — #662: AC2's decl regex contradicts AC5's aliasing remedy; the "must agree" assertion does NOT catch the widening (only the BeFalse line does); `/Tests:` and `/TestCaseFilter:` are mutually exclusive (2026-08-31)
-- [efc736-archiveroot-boundary-sink](project_efc736_archiveroot_boundary_sink.md) — #736: finding 6's cause is FALSE (#699 authoritative); keyboard path logs silently, no crash; 6 sink sites not 4; modal default sink would hang a live test (2026-09-02)
-- [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — #731: sharing EmailMoveMonitor DROPS move actions; `volatile` = CS0420 build break; TWO dead ctor params; Cleanup() is UI-thread so no Task.Wait (2026-09-02)
-- [qfc791-deadline-and-cancel-teardown](project_qfc791_deadline_and_cancel_teardown.md) — #791: #424 AC:231/239 + #608 AC:184 ratified the empty-at-deadline result being superseded; item cap alone can't bound the pre-UI wait; gate ctor lookup fails closed (2026-09-06)
-- [qfc810-teardown-dropdown-residuals](project_qfc810_teardown_dropdown_residuals.md) — #810: method-group at park-focus blocks an optional param (CS0123); QfcHomeController.cs + BreadcrumbDropDownHost.cs both 496/500; dead accessor is in QfcItemController not the host (2026-09-07)
-- [console-out-and-rs0030-promotion-826](project_console_out_and_rs0030_promotion_826.md) — #826: Directory.Build.props DOES exist (CLAUDE.md stale); no GenerateDocumentationFile so IDE0005 never fires — CS0169/CS0414 is the real deletion hazard; TimeoutAfter is repo-local (2026-09-08)
+## Reference / cross-cutting
+- [no-absolute-host-paths](../_shared_no_absolute_host_paths.md) — never embed account/host paths in artifacts; control TRX names
+- [committed-cobertura-baselines](reference_committed_cobertura_baselines.md) — per-line coverage exists in docs/features/*/evidence; class line-rate denominator differs
+- [net481-timeprovider-available](reference_net481_timeprovider_available.md) — TimeProvider/FakeTimeProvider work on net481; reject "net8+ only"
+- [github-issue-search-without-gh](reference_github_issue_search_without_gh.md) — WebFetch github issues?q=... when no gh; mark [V-web]
+- [exemption-audit-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — grep proven test techniques + sibling consistency before accepting IRREDUCIBLE
 
-## Artifact hygiene
-- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
-- [terminal-hook-barrier-751](project_terminal_hook_barrier_751.md) — #751: notify runs AFTER the terminal TrySet on another thread; ReleaseAsync is a no-op and there is no queue to pump; `run.Terminal` is the existing barrier 6 siblings use; both test files ~490/500 lines (2026-09-03)
-- [folder-settings-persistence-797](project_folder_settings_persistence_797.md) - #797: live path is SmartSerializable<T> not ...Base; null-return pinned by LCPPN fail-soft so AC1 belongs at the caller; ThisAddIn_Shutdown is never raised; a test asserts the AC8 bug (2026-09-06)
-- [qfc823-review-residuals](project_qfc823_review_residuals.md) - #823: R3 null-tolerance doc is FALSE (`?.` guards the receiver, not the args); the R2 owed follow-up already exists as #813; per-store retry must stay an instance field or the :200 test fails (2026-09-08)
-- [ilglobals-static-publication-824](project_ilglobals_static_publication_824.md) - #824: identity-stability (BeSameAs) is the only order-independent RED gate; UtilitiesCS has NO NetAnalyzers so CA2211 can never fire (2026-09-08)
-- [teardown-guard-enumeration-821](project_teardown_guard_enumeration_821.md) - #821: the 4th sharer is really the 4th Cancel() SITE (9 holders); the unconditional enabler is SetCancellationTokenSource not the CancelSource setter; only 1 extra unguarded site (2026-09-08)
-- [etl-deadline-followups-825](project_etl_deadline_followups_825.md) - #825: read the shipped .xml of a package to verify an API without a decompiler; the timeoutSourceFactory seam is unreachable from DfDeedle; ten tests is really four/one (2026-09-08)
-- [qfc-explorer-controller-435](project_qfc_explorer_controller_435.md) — #435/epic #136 F6: zero irreducible remainder; QuickFiler DOES have DynamicProxyGenAssembly2 IVT (in QfcHighConfidencePreFilter.cs, not AssemblyInfo.cs) so internal interfaces ARE mockable; Outlook.Views unproven (2026-08-07)
-- [qfc-form-controller-coverage-435](project_qfc_form_controller_coverage_435.md) — #435/epic #136 F6 EventHandlers/Actions: UndoConsumer `|| exit` busy-spins forever; seam test string-matches Actions.cs signatures. RECONSTRUCTED after overwrite — re-verify (2026-08-07)
-- [qfc-form-controller-setup-disposal-435](project_qfc_form_controller_setup_disposal_435.md) — #435/epic #136 F6: no new seams needed for QfcFormController.cs/.SetupDisposal.cs; Cleanup() is idempotent (no double-dispose defect); 827-line test file split deferred to F16 (2026-08-07)
-- [quickfiler-duplicate-iqfcformcontroller-435](project_quickfiler_duplicate_iqfcformcontroller_435.md) — #435/epic #136 F6: `QuickFiler.Interfaces.IQfcFormController` is compiled DEAD code (0 implementers/0 compiled consumers); resolution turns on compilation-unit vs namespace-body `using` placement (2026-08-07)
+## Build, CI, coverage tooling
+- [fsharp-core-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — #895: 15 output dirs (3 deterministic-2.1); Sync-PackageReferences ranks ns2.1>2.0; ToDoModel.Test packages.config gap (2026-09-16)
+- [ci-parallel-split-553](project_ci_parallel_split_553.md) — #553: 4 tailored jobs beat build-once; ruleset swap fail-closed; check names "caller / callee"
+- [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — #512: AGENTS.md/.agents externally owned; Invoke-VSBuild.ps1 unenumerated carrier; ~1.2s vs ~17s = vacuity
+- [coverage-threshold-reconciliation-494](project_coverage_threshold_reconciliation_494.md) — #494: 85/75/tiers is foreign leakage; gate evadable by withholding input; +/-15pt spread
+- [cobertura-root-attrs-raw-vs-postprocessed](project_cobertura_root_attrs_raw_vs_postprocessed.md) — raw root totals class-only; post-processor doubles both axes; never compare
+- [double-count-815](project_cobertura_double_count_moves_counts_not_rates_815.md) — #815: `.//line` doubles counters but moves % <=0.46pp; can't explain 2.35pt swing
+- [cobertura-closure-exemption-457](project_cobertura_closure_exemption_457.md) — #457: exempt members emit NO `<method>`; async `d__` machines are the trap; filter pre-merge
+- [analyzer-severity-ceiling](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 only rule above suggestion; no .globalconfig; Invoke-MSTest docstring wrong runsettings
+- [console-out-rs0030-826](project_console_out_and_rs0030_promotion_826.md) — #826: Directory.Build.props EXISTS; no GenerateDocumentationFile so IDE0005 never fires
+- [dependabot-net481-340](project_dependabot_net481_340.md) — #340: transitive restraint is Dependabot default; use semver-major ignore, not version ceilings
+- [svgcontrol-test-unwired-418](project_svgcontrol_test_unwired_418.md) — #418 STALE (in .sln since 2026-08-14); ExCSS/Fizzler redirect topology historical
+- [cobertura-exemption-branchrate-gotchas](project_cobertura_exemption_and_branchrate_gotchas.md) — method-level exclude doesn't exempt lambdas; branch-rate double-counts
+- [cobertura-perfile-attribution](project_cobertura_perfile_attribution_contract.md) — per-file works for partials but `line-rate` attr inflated; recompute from `<lines>`
+- [cobertura-line-double-count](project_cobertura_line_double_count.md) — lines-valid ~2x (`.//lines/line` hits both rollups); recompute per-file from `<line>`
+- [capstone-f16-measurement](project_quickfiler_capstone_f16_measurement.md) — `<sources>` discriminates raw vs post-processed Cobertura (70.19/85.65 swing)
+- [qfc455-exclude-lambda-leak](project_qfc455_exclude_attribute_lambda_leak.md) — method-level exclude leaks lambdas into denominator; type-level doesn't
+- [webview2-exemption-asymmetry](project_webview2_exemption_and_coverage_asymmetry.md) — #455: class-level exclude suppresses nested lambdas; UT2 grounds miss SDK adapters
+- [partial-type-coverage-exclusion-456](project_partial_type_coverage_exclusion_456.md) — type-level exclusion hides Designer partials; de-exempting big designer RAISES coverage
+- [winforms-designer-coverage](project_winforms_designer_coverage_mechanics.md) — one form construction auto-covers ~99% of Designer; Forms ARE constructed in tests
+- [iqfcdatamodel-contract-436](project_iqfcdatamodel_contract_436.md) — Cobertura emits NO class element for interfaces/enums; indirect consumers hide from grep
+- [interface-only-files-433](project_quickfiler_interface_only_files_433.md) — interface-only .cs absent from Cobertura; net481 bars DIM; IQfcHomeController.cs exists twice
+- [interface-only-bucket](project_quickfiler_per_file_coverage_interface_only_bucket.md) — epic #136: third ledger bucket `interface-only`; report 0/0 as N/A; key on `filename`
+- [percoverage-epic-136](project_quickfiler_percoverage_epic_136.md) — read exact per-file line-rate from committed Cobertura instead of assuming
+- [perfile-viewerqueue-434](project_qfc_perfile_coverage_viewerqueue_434.md) — #424 Cobertura gives baselines w/o running; method-group sites forbid optional params
+- [coverage-ledger-432](project_quickfiler_coverage_ledger_432.md) — #432: 121 files; "33 exemptions" really 40 usages/21 files; 24 suppressed by inheritance
 
-## Additional entries
+## QuickFiler coverage epic #136 children
+- [qfc-explorer-controller-435](project_qfc_explorer_controller_435.md) — zero irreducible; DynamicProxyGenAssembly2 IVT lives in QfcHighConfidencePreFilter.cs
+- [qfc-form-controller-coverage-435](project_qfc_form_controller_coverage_435.md) — UndoConsumer `|| exit` busy-spins; RECONSTRUCTED, re-verify
+- [qfc-form-controller-setup-disposal-435](project_qfc_form_controller_setup_disposal_435.md) — no new seams; Cleanup() idempotent; 827-line test split deferred
+- [duplicate-iqfcformcontroller-435](project_quickfiler_duplicate_iqfcformcontroller_435.md) — QuickFiler.Interfaces.IQfcFormController is dead; hinges on `using` placement
+- [qfc-helper-classes-f4-434](project_qfc_helper_classes_f4_434.md) — EmailMoveMonitor seam exists; #426 cross-child risk; QuickFiler.Test explicit Compile Includes
+- [qfc-theme-cluster-f4-434](project_qfc_theme_cluster_f4_434.md) — theme+layout tests-only; ThemeControlGroup no colour getters; TlpCellStates ~38 refs
+- [qfc-datamodel-coverage-436](project_qfc_datamodel_coverage_436.md) — type-scoped exclude hides 3 partials; remove last
+- [efcdatamodel-coverage-436](project_efcdatamodel_coverage_436.md) — EmailFiler Sort/Open non-virtual so factory seam insufficient; PackageItems(bool) dead
+- [qfc-queueprocessing-436](project_qfc_queueprocessing_436.md) — zero COM deref; 2 latent defects; missing FakeTimeProvider fails silently
+- [qfc-framebuilding-436](project_qfc_framebuilding_436.md) — FrameBuilding is Deedle not WinForms; DfDeedle dialogs behind IVT wall
+- [qfc-breadcrumb-lifecycle-f12-495](project_qfc_breadcrumb_lifecycle_f12_495.md) — multi-type .cs emits ONE class element; `0/2` on `?? throw` = factory threw
+- [qfc-breadcrumb-bridge-router-495](project_qfc_breadcrumb_bridge_router_495.md) — #440 rewrites arrow keys; WRONG router class branch-rate matches to 6 digits
+- [breadcrumb-messenger-hub-495](project_breadcrumb_messenger_hub_495.md) — Component finalizer makes branch GC-dependent; "Lines" is coverable not physical
+- [qfc-upgrade-lifetime-495](project_qfc_upgrade_lifetime_495.md) — `<class name>` can name SECONDARY type; ternary arms both hits=1
+- [qfc-keyboard-coverage-430](project_qfc_keyboard_coverage_430.md) — UtilitiesCS grants no IVT to QuickFiler.Test; headless ItemViewer OK
+- [qfc-keyboard-actions-430](project_qfc_keyboard_actions_430.md) — KaStringAsync has NO async/timer; only CLAUDE.md:303 names KbdActions non-exempt
+- [efc-home-controller-deps-437](project_efc_home_controller_deps_437.md) — deps ~86-93% covered; Production* statics vs ClassLevel hazard
+- [efc-home-controller-coverage-437](project_efc_home_controller_coverage_437.md) — family ~90% seamed; Timing.cs reads NO clock; dual factory lambdas order-dependent
+- [qfc-home-controller-metrics-433](project_qfc_home_controller_metrics_433.md) — BlockingCollection can't throw OCE uncancelled; metrics consumer never runs
+- [qfc-home-controller-iteration-433](project_qfc_home_controller_iteration_433.md) — #424 12s deadline leaked into 2-arg dequeue; Iterate/Iterate2 dead
+- [qfc-home-controller-coverage-433](project_qfc_home_controller_coverage_433.md) — check BOTH halves before splitting; LaunchAsync 0% structurally
+- [qfc-itemviewer-coverage-456](project_qfc_itemviewer_coverage_456.md) — class line-rate corrupt (#441); designer partials branch-capped 75%; STA attrs in MSTest 4.3.3
+- [itemviewer-partial-exemption-coupling](project_itemviewer_partial_exemption_coupling.md) — one attr hides 6 partials + Designer; never retype Designer props
+- [efc-item-controller-452](project_efc_item_controller_452.md) — IItemViewer covers ~70% (1:1 forwards); WpfUiDispatcher ctor internal
+- [qfc-f9-measurement-441](project_qfc_f9_measurement_441_and_designer_inheritance.md) — #441 corrupts per-file line-rate (6dp vs 16dp tell); csharpier needs `format`
+- [efc-form-controller-452](project_efc_form_controller_452.md) — copy IQfcFormViewer:IForm triple; ViewerQueueCore does NOT pool; no STA needed
+- [qfc-item-controller-230-pump-seam](project_qfc_item_controller_230_pump_seam.md) — #230 is sole cause of 4 exemptions; 3 of 19 on DEAD members
+- [qfc-item-controller-f10-453](project_qfc_item_controller_f10_coverage_453.md) — two test files at 497/498 of 500; branch gaps in logger null-conditionals
+- [qfc-f10-init-viewersetup-453](project_excludefromcodecoverage_lambda_leak.md) — 3 of 7 Initialization exemptions on DEAD members; ViewerSetup 56% branch
+- [qfc-conversation-seam-ratified-453](project_qfc_conversation_seam_ratified_453.md) — DoLoadConversationResolverCoreAsync exemption #227-ratified; expr-bodied +1 line
+- [qfc-collection-controller-454](project_qfc_collection_controller_454.md) — #444 defect in DEAD code; 12 unreachable; `async public` defeats greps
+- [quickfiler-test-sta-and-ivt](project_quickfiler_test_sta_and_ivt.md) — QuickFiler grants internals to its test; manual STA infra exists
+- [qfc-breadcrumb-dropdown-f13-455](project_qfc_breadcrumb_dropdown_f13_455.md) — already 91-92% branch; key on `filename`; async `throw;` unreachable brace
+- [qfc455-reentrant-dispose-seam](project_qfc455_reentrant_dispose_seam.md) — disposal-callback reentrancy opens async window; look before adding seams
+- [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — WinFormsPumpHost decided; CreateAsync factory gap; 19 -> 11 max
+- [qfc-item-controller-227-r2-denial](project_qfc_item_controller_227_r2_denial.md) — maintainer denied blanket exemption; per-member barrier analysis required
+- [qfc227-headless-itemviewer](project_qfc227_headless_itemviewer_and_tlpcellsnapshot.md) — headless ItemViewer safe (ProgressPane precedent); target 24 -> 19
 
-- [qfc-helper-classes-f4-434](project_qfc_helper_classes_f4_434.md) — #434/epic #136: EmailMoveMonitor seam already exists; #426 is an unlisted cross-child risk; QuickFiler.Test has zero STA infra + explicit-Compile-Include csproj + stale .bak (2026-08-07)
-- [svgcontrol-test-unwired-418](project_svgcontrol_test_unwired_418.md) — #418: SVGControl.Test absent from the .sln and its pinned test packages missing, so it cannot build; ExCSS 4.2.3-vs-4.3.1 redirect topology; Fizzler redirects inert (2026-08-04)
-- [qfc-datamodel-coverage-436](project_qfc_datamodel_coverage_436.md) — #436/epic #136 F5: [ExcludeFromCodeCoverage] is type-scoped so it hides all 3 QfcDatamodel partials; removal must be sequenced last; no irreducible remainder (2026-08-08)
-- [committed-cobertura-baselines](reference_committed_cobertura_baselines.md) — measured per-line C# coverage already lives in docs/features/*/evidence/*.cobertura.xml; read it instead of inferring, but its class line-rate uses a different denominator than the `<lines>` map
-- [efcdatamodel-coverage-436](project_efcdatamodel_coverage_436.md) — #436 F5 EfcDataModel.cs: EmailFiler's Sort/Open methods are non-virtual so a `Func<EmailFilerConfig,EmailFiler>` factory is insufficient; PackageItems(bool) is dead code (2026-08-08)
-- [qfc-queueprocessing-436](project_qfc_queueprocessing_436.md) — #436 F5 QueueProcessing.cs: zero COM deref so no new seam; 2 latent defects (null@quantity<=0, rejects discarded still-hooked); missing FakeTimeProvider fails silently (2026-08-08)
-- [qfc-framebuilding-436](project_qfc_framebuilding_436.md) — #436 F5 FrameBuilding.cs is Deedle data-frames NOT WinForms (issue.md wrong); DfDeedle modal dialogs are behind an IVT wall QuickFiler.Test can't cross (2026-08-08)
-- [iqfcdatamodel-contract-436](project_iqfcdatamodel_contract_436.md) — Cobertura emits NO class element for any interface or enum (declaration-only files are absent, not 0%); indirect consumers via IQfcHomeController.DataModel hide from a type-name grep (2026-08-08)
-- [qfc-breadcrumb-lifecycle-f12-495](project_qfc_breadcrumb_lifecycle_f12_495.md) — #495 F12: a multi-type .cs emits ONE Cobertura class element; `0/2` on `factory() ?? throw` means the factory THREW; emitted rates reconstruct as class+method union (2026-08-08)
+## QuickFiler / EFC defects and behaviour
+- [pump-timeout-743](project_pump_timeout_743.md) — dispatcher-gate lead stale (#493); 9/19 pump tests skip gate; TRX timestamps as instrument
+- [qfc-high-confidence-dual-pipeline](project_qfc_high_confidence_dual_pipeline.md) — THREE pipelines; #233 dequeue gate LIVE; admission never scores
+- [qfc424-startup-stall](project_qfc424_high_confidence_startup_stall.md) — gate scores serially w/o deadline; async-void worker makes IsBusy lie; STA blocks parallel
+- [qfc254-darkmode-stale-labels](project_qfc254_darkmode_stale_labels.md) — labels themed only in MailRead() branch; COM throw + fire-and-forget leaves rows stale
+- [qfc254-residual](project_qfc254_residual_after_comexception_fix.md) — historical; #269 real cause = Light-theme fore/back swap
+- [qfc254-ambient-inheritance](project_qfc254_ambient_inheritance_mechanism.md) — SUPERSEDED for #269; WinForms ambient inheritance notes still accurate
+- [qfc438-search-focus-steal](project_qfc438_search_focus_steal.md) — TWO focus-steal mechanisms; CancelSelector emits no SelectionChanged
+- [qfc677-webview2-focus-hold](project_qfc677_webview2_focus_hold_outlook_keyboard.md) — Outlook keyboard death = WV2 focus hold + FinishClose steal; not a repo hook
+- [qfc680-menu-mode-capture](project_qfc680_menu_mode_keyboard_capture.md) — ModalMenuFilter retargets keys; AutoClose=false pre-Show only opt-out
+- [qfc663-alt-chord](project_qfc663_alt_chord_no_altf.md) — QfcFormViewer has no mnemonics; only Alt+M swallowed; Alt+F EFC-only
+- [qfc678-predictor-carry](project_qfc678_predictor_carry.md) — named producer DORMANT; live one is #233 gate; PreScored never read
+- [qfc791-deadline-cancel-teardown](project_qfc791_deadline_and_cancel_teardown.md) — empty-at-deadline superseded by ACs; item cap can't bound pre-UI wait
+- [qfc810-teardown-dropdown](project_qfc810_teardown_dropdown_residuals.md) — method-group blocks optional param (CS0123); two files at 496/500
+- [qfc823-review-residuals](project_qfc823_review_residuals.md) — `?.` guards receiver not args; owed follow-up is #813; per-store retry stays instance
+- [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — sharing EmailMoveMonitor DROPS moves; `volatile` = CS0420; Cleanup() is UI-thread
+- [qfc-efc-metrics-442](project_qfc_efc_metrics_442.md) — stopwatch race unfixable in owned files; legacy csproj blocks new .cs; CSV has no readers
+- [qfc-collection-defects-468](project_qfc_collection_defects_468.md) — MovedMails param redundant; no log4net in QuickFiler.Test; ConcurrentDictionary order
+- [qfc-collection-controller-defects-468](project_qfc_collection_controller_defects_468.md) — #474 "unrelated interfaces" FALSE; #469-4 undo not broken
+- [issue-469-already-fixed](project_issue_469_already_fixed_residual_is_629.md) — 4 defects fixed on main; residual = #629; `Initialized<T>` never memoizes
+- [reflective-caller-closure-635](project_reflective_caller_closure_635.md) — removal was 13 members; `GetField(` is the only reaching mechanism (172 hits)
+- [qfc-keyboard-action-defects-444](project_qfc_keyboard_action_defects_444.md) — #468 removes WireUpKeyboardHandler; real #482 trigger is Right/Down/Right
+- [selectrow-two-families-637](project_selectrow_two_families_637.md) — TWO SelectRow families (grep over-counts 10x); ButtonOK_Click does NOT rethrow
+- [unobserved-task-fault-670](project_unobserved_task_fault_670.md) — ViewerSetup.cs 499/500; UiDispatcher is raw WPF Dispatcher; #464 ratified sink+guard
+- [filerqueue-consumer-unsound-633](project_filerqueue_consumer_unsound_633.md) — Consumer orphaned-item race; BackGroundMove tests vacuous; UiThread.Dispatcher null
+- [issue-656-no-bypass-path](project_issue_656_bypass_path_does_not_exist.md) — premise FALSE; SR-4 already violated at :112; owner files at 500 cap
+- [breadcrumb-nav-defects-439-440](project_breadcrumb_navigation_defects_439_440_498_499.md) — fixing #439 REGRESSES percentage join; Efc/Qfc use different html
+- [issue-440-landed-via-498](project_issue_440_already_landed_via_498.md) — #440 on main via #498; Efc/Qfc do NOT share BreadcrumbRow
+- [qfc-item-controller-defects-484](project_qfc_item_controller_defects_484.md) — all 5 "Suspected Fix" sections wrong; verify callers + exempt enclosure first
+- [webview2-host-initializer-476](project_webview2_host_initializer_defects_476.md) — EfcViewerQueue NOT a pool; real WV2 controls built in tests
+- [uithread-dispatcher-restore-493](project_uithread_dispatcher_restore_scope_493.md) — never share ONE semaphore across helper+fixture; CI runs QuickFiler.Test serially
+- [efc614-store-root-stem-leak](project_efc614_store_root_stem_leak.md) — verbatim ToArchiveRelativePath; FolderConverterTests.cs:329 codifies a bug
+- [efc736-archiveroot-sink](project_efc736_archiveroot_boundary_sink.md) — finding 6 cause FALSE (#699); 6 sink sites; modal default sink hangs live test
+- [terminal-hook-barrier-751](project_terminal_hook_barrier_751.md) — notify runs AFTER terminal TrySet; `run.Terminal` is the barrier; test files ~490/500
+- [teardown-guard-enumeration-821](project_teardown_guard_enumeration_821.md) — 4th sharer is 4th Cancel() SITE (9 holders); enabler is SetCancellationTokenSource
+- [etl-deadline-followups-825](project_etl_deadline_followups_825.md) — read package .xml to verify API; timeoutSourceFactory unreachable from DfDeedle
+- [ilglobals-static-publication-824](project_ilglobals_static_publication_824.md) — BeSameAs is only order-independent RED gate; UtilitiesCS has NO NetAnalyzers
+- [folder-settings-persistence-797](project_folder_settings_persistence_797.md) — live path SmartSerializable<T>; ThisAddIn_Shutdown never raised; test asserts AC8 bug
+- [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — AC2 regex contradicts AC5; `/Tests:` and `/TestCaseFilter:` mutually exclusive
+- [qfc-folder-tree-percentage-325](project_qfc_folder_tree_percentage_325.md) — 1 live viewer despite 9 dead CboFolders; host-neutral TreeNode<T> seams
+- [qfc-breadcrumb-webview2-351](project_qfc_breadcrumb_webview2_351.md) — 9101 provider ABSENT; JS<->.NET bridge greenfield
+- [folder-hierarchy-provider-350](project_folder_hierarchy_provider_350.md) — reuse snapshot infra; IFolderHierarchyProvider facade; no new COM seam
+- [efcviewer-breadcrumb-webview2-349](project_efcviewer_breadcrumb_webview2_349.md) — EfcViewer3 dead; percent defect = unscaled ColumnHeader widths at high DPI
 
-
-- [qfc-theme-cluster-f4-434](project_qfc_theme_cluster_f4_434.md) — #434/epic #136 F4: theme+layout cluster is tests-only (seams already exist); ThemeControlGroup has no colour getters; TlpCellStates has ~38 sibling refs (2026-08-07)
-- [qfc-perfile-coverage-viewerqueue-434](project_qfc_perfile_coverage_viewerqueue_434.md) — #434/epic #136: committed #424 Cobertura gives per-file baselines w/o running coverage; method-group call sites forbid optional-param seams; enum-only files emit no class element (2026-08-07)
-- [quickfiler-per-file-coverage-interface-only-bucket](project_quickfiler_per_file_coverage_interface_only_bucket.md) — epic #136: recommend a third ledger bucket `interface-only` (not `ratified-exempt`) + F1 harness must report 0/0 files as N/A and key on `filename` (2026-08-07)
-- [qfc-keyboard-coverage-430](project_qfc_keyboard_coverage_430.md) — #430/epic #136 F3: UtilitiesCS grants no InternalsVisibleTo to QuickFiler.Test (MyBox.DialogInvoker unreachable); headless ItemViewer OK in plain TestClass; 3 viewer files unassigned in epic (2026-08-07)
-- [qfc-keyboard-actions-430](project_qfc_keyboard_actions_430.md) — #430/epic #136 F3: KaStringAsync has NO async/timer (issue.md's fake-timer constraint is wrong); only CLAUDE.md:303 names KbdActions<> non-exempt (2026-08-07)
-- [efc-home-controller-deps-437](project_efc_home_controller_deps_437.md) — #437/epic #136 F8: dep files already ~86-93% covered (class name != file name); F9 consumes nothing from them; Production* statics vs ClassLevel parallelism hazard (2026-08-07)
-- [qfc-home-controller-metrics-433](project_qfc_home_controller_metrics_433.md) — #433/epic #136 F7: BlockingCollection can't throw OCE with an uncancelled token; QFC metrics consumer never runs (dead CompareExchange + unstarted timer); Efc delegate-writer precedent; #424 didn't touch the Metrics partial (2026-08-07)
-- [qfc-home-controller-iteration-433](project_qfc_home_controller_iteration_433.md) — #433 F7: #424's 12s deadline leaked into the 2-arg dequeue, so empty-batch => irreversible CompleteAdding is now unsound; Iterate/Iterate2 dead (2026-08-07)
-- [qfc-home-controller-coverage-433](project_qfc_home_controller_coverage_433.md) — #433/epic #136 F7 main partial: coverage-check BOTH halves before splitting; line 133 live-form is what makes line 136 work; LaunchAsync is 0% structurally; derive hit maps from committed Cobertura (2026-08-07)
-- [quickfiler-interface-only-files-433](project_quickfiler_interface_only_files_433.md) — interface-only .cs emit NO Cobertura class entry (MailItemActionsAdapter = positive control); net481+preview still bars DIM; IQfcHomeController.cs exists twice (one orphan); EfcHomeController throws on 3 IFilerHomeController members (2026-08-07)
-- [efc-home-controller-coverage-437](project_efc_home_controller_coverage_437.md) — #437 (epic #136 F8): family already ~90% covered and fully seamed; Timing.cs reads NO clock; dual default-factory lambdas make coverage order-dependent (2026-08-07)
-- [qfc-itemviewer-coverage-456](project_qfc_itemviewer_coverage_456.md) — #456/epic #136 F14: Cobertura class `line-rate` is corrupt per issue #441 (branch-rate IS sound); designer partials can't be exempted alone and are branch-capped at 75%; STA attrs ship in MSTest 4.3.3 (2026-08-07)
-- [quickfiler-percoverage-epic-136](project_quickfiler_percoverage_epic_136.md) — epic #136: read exact per-file line-rate from committed Cobertura under evidence/qa-gates/ instead of assuming low coverage (2026-08-07)
-- [net481-timeprovider-available](reference_net481_timeprovider_available.md) — TimeProvider/FakeTimeProvider ARE usable on net481 here (Microsoft.Bcl.TimeProvider + TimeProvider.Testing); reject "net8+ only" premises
-- [itemviewer-partial-exemption-coupling](project_itemviewer_partial_exemption_coupling.md) — #456/F14: one attribute at ItemViewer.cs:20 hides all 6 partials + the 6,224-line Designer; ~8 tests already drive a headless ItemViewer; never retype Designer-backed properties (2026-08-07)
-- [github-issue-search-without-gh](reference_github_issue_search_without_gh.md) — no Bash/gh? WebFetch `github.com/drmoisan/TaskMaster/issues?q=is:issue+is:open+<terms>` works; mark results [V-web]
-- [partial-type-coverage-exclusion-456](project_partial_type_coverage_exclusion_456.md) — #456/#136: QfcFormViewer = executed-but-absent proof that type-level exclusion hides Designer partials too (#457: method-level doesn't); Cobertura `<line>` = per physical line, so de-exempting a big designer RAISES repo coverage (2026-08-07)
-
-## Additional entries
-
-- [efc-item-controller-452](project_efc_item_controller_452.md) — #452/epic #136 F9: IItemViewer already covers ~70% of the viewer surface (1:1 forwards); WpfUiDispatcher(Dispatcher) ctor internal to UtilitiesCS; F8 deps stop at EfcFormController (2026-08-07)
-- [qfc-f9-measurement-441-and-designer-inheritance](project_qfc_f9_measurement_441_and_designer_inheritance.md) — #452/epic #136 F9: issue #441 also corrupts per-file `@line-rate` (6dp vs 16dp tell); Designer partial exempt only by type-attribute inheritance; csharpier 1.2.6 needs `format` (2026-08-07)
-- [winforms-designer-coverage-mechanics](project_winforms_designer_coverage_mechanics.md) — #452/F9: class-level exempt hides the Designer half too; one form construction auto-covers ~99% of it; Forms ARE constructed in this repo's tests (2026-08-07)
-- [efc-form-controller-452](project_efc_form_controller_452.md) — #452/F9 EfcFormController: copy the merged IQfcFormViewer:IForm triple; IControl inherits IWin32Window/IDisposable/ISynchronizeInvoke; ViewerQueueCore does NOT pool; #439 = path-namespace mismatch; no STA needed (2026-08-07)
-- [qfc-item-controller-230-pump-seam](project_qfc_item_controller_230_pump_seam.md) — open #230 (WinForms pump seam) is the sole root cause of the 4 remaining QfcItemController exemptions; 3 of the 19 sit on DEAD members — delete, don't test (2026-08-07)
-- [qfc-item-controller-f10-coverage-453](project_qfc_item_controller_f10_coverage_453.md) — #453/F10: QuickFiler.Test.csproj needs explicit Compile Includes; FocusAndThemeTests 497/500 AND FolderHandlingTests 498/500; branch gaps live in logger.Debug null-conditionals (2026-08-07)
-- [cobertura-exemption-and-branchrate-gotchas](project_cobertura_exemption_and_branchrate_gotchas.md) — method-level [ExcludeFromCodeCoverage] does NOT exempt lambdas; branch-rate double-counts (line-rate disputed) (2026-08-07)
-- [qfc-item-controller-f10-init-viewersetup-453](project_excludefromcodecoverage_lambda_leak.md) — #453/F10: 3 of 7 Initialization exemptions are on DEAD members; every exemption comment cites an already-defeated "live ItemViewer" barrier; ViewerSetup fails branch (56%) worse than line (2026-08-07)
-- [qfc-conversation-seam-ratified-453](project_qfc_conversation_seam_ratified_453.md) — F10 #453 cycle-2: DoLoadConversationResolverCoreAsync exemption is #227-ratified, not removable; same bucket covers Navigation.cs seams too; expr-bodied members cost +1 line, not the cross-cutting doc's +8 (2026-08-07)
-- [qfc-collection-controller-454](project_qfc_collection_controller_454.md) — #454/epic #136 F11: #444 defect is in DEAD code; 12 unreachable members; UiThread.Dispatcher null in tests; DynamicProxyGenAssembly2 grant hides in F2-owned QfcHighConfidencePreFilter.cs:11; `async public` defeats greps (2026-08-07)
-- [quickfiler-test-sta-and-ivt](project_quickfiler_test_sta_and_ivt.md) — QuickFiler DOES grant internals to QuickFiler.Test; QuickFiler.Test already has manual STA-thread infra, no MSTest.STAExtensions needed (2026-08-07)
-- [webview2-exemption-and-coverage-asymmetry](project_webview2_exemption_and_coverage_asymmetry.md) — #455/F13: class-level `[ExcludeFromCodeCoverage]` suppresses nested lambdas, method-level does NOT; §UT2's 3 grounds don't cover SDK adapters; WebView2 type constructibility (2026-08-07)
-- [qfc-breadcrumb-dropdown-f13-455](project_qfc_breadcrumb_dropdown_f13_455.md) — #455/epic #136 F13: files already pass the 75% branch floor (91-92%); key the harness on `filename` not `<class name>`; async `throw;` makes a catch's closing brace unreachable (2026-08-07)
-- [qfc455-exclude-attribute-lambda-leak](project_qfc455_exclude_attribute_lambda_leak.md) — method-level [ExcludeFromCodeCoverage] leaks its lambdas into the denominator (type-level does not); #441 inflation = exactly the per-method `<lines>` block (2026-08-07)
-- [qfc455-reentrant-dispose-seam](project_qfc455_reentrant_dispose_seam.md) — #455 F13: an existing disposal-callback reentrancy point opens an otherwise-unreachable async window — look for outward calls made outside the lock before adding a test-only scheduling seam (2026-08-07)
-
-
-- [cobertura-perfile-attribution-contract](project_cobertura_perfile_attribution_contract.md) — per-file attribution works for partial classes, but the `line-rate` ATTRIBUTE is inflated (double-count + bad merge blend) — recompute from class-level `<lines>` only (2026-08-07)
-- [quickfiler-coverage-ledger-432](project_quickfiler_coverage_ledger_432.md) — #432/epic #136 F1: 121 compiled files confirmed; manifest's "33 exemptions" is really 40 usages/21 files; 24 files suppressed via partial-class inheritance (2026-08-07)
-- [cobertura-line-double-count](project_cobertura_line_double_count.md) — repo-wide lines-valid is ~2x actual (`.//lines/line` matches method-level AND class-level rollups); merged class `line-rate` is biased — recompute per-file from `<line>` nodes (2026-08-07)
-- [quickfiler-capstone-f16-measurement](project_quickfiler_capstone_f16_measurement.md) — #136 F16: `<sources>` element discriminates raw vs post-processed Cobertura (explains the 70.19/85.65 swing, epic.md's cause is wrong); F1 sidesteps but does NOT fix #441/#478 (2026-08-08)
+## Other areas
+- [push-down-claude-dir-149](project_push_down_claude_dir.md) — #149 pushDownClaudeDir research (2026-04-16)
+- [onedrive-timeout-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask Func<T1,TResult> catches TimeoutException not TCE; DI seam fix
+- [store-runtime-reenable-263](project_store_runtime_reenable_263.md) — no per-store post-startup seam; AppOlObjects.cs over 500; F1.Reenable calls F3
+- [store-lockup-f4-264](project_store_lockup_resilience_f4_research.md) — AsyncLocal rejected (use static volatile); MyBox no modeless path
+- [stores-enum-stall-292](project_stores_enum_stall_292.md) — blank-attribution stall; watchdog crash on null model; ThreadMonitor now LIVE
+- [storewrapper-dialog-287](project_storewrapper_dialog_287_state_inversion.md) — issue inverts states: StoresUnavailable transient, ModelUnavailable permanent
+- [winforms-testability-epic-298](project_winforms_testability_epic_298.md) — #298 depends on #297; FlagTasks ctor pinned; #298 inverts #197 exemptions
+- [tagcontroller-refactor-293](project_tagcontroller_refactor_293.md) — ITagViewer/IForm gaps; PrefixItem NotImplemented; live-form migration
+- [swordfish-removal-306](project_swordfish_removal_epic_306.md) — legacy flat JSON round-trips via ScoDictionaryNew default; avoid globals converter
+- [legacy-scodictionary-315](project_legacy_scodictionary_removal_315.md) — DELETE SCODictionary_Tests; RETARGET 3 SmartSerializable* files
+- [lock-recursion-317](project_lock_recursion_coverage_317.md) — deleted LockRecursionTests.cs is a restoration, not new authoring
+- [ribbon-engine-readiness-503](project_ribbon_engine_readiness_503.md) — Ribbon layer coverage-excluded; net481 blocks DIM; 5 orphan onAction callbacks
+- [ribbon-toggle-guards-505](project_ribbon_toggle_state_guards_505.md) — toggle vs command guard asymmetry; MessageBox in sink blocks viewer tests
+- [ribbon-engine-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — RibbonExplorer.xml IS CSharpier-formatted; 84 callbacks (5 dead); 459-line test split
