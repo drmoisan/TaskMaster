@@ -536,7 +536,7 @@ Each check-off task flips exactly one criterion in `docs/features/active/2026-09
       Acceptance: the artifact exists; `Checked off (delivered):` equals the count of `spec.md` lines in the range 422-465 beginning `- [x] `; `Total AC items: 5`; the `Record, Not Fix:`, `Follow-Ups`, and `Spec Observed Corrections:` sections exist.
 - [x] [P5-T7] Mirror the issue update locally at `.../evidence/issue-updates/issue-895.2026-09-16T23-27.md` with `Timestamp:`, the exact text intended for issue #895 (the three one-line HintPath edits, the two regression tests with their observed-failing and observed-passing evidence paths, the comment-only remark correction, the AC status block from `[P5-T6]`, and the two follow-ups), and `PostedAs: unknown` (posting is outside this run).
       Acceptance: the artifact exists and carries `Timestamp:`, `PostedAs: unknown`, and the five evidence paths `expect-fail-shape-a`, `expect-fail-shape-b`, `pass-after-shape-a`, `pass-after-shape-b` and `scope-boundary-diff` by filename.
-- [ ] [P5-T8] Commit the acceptance check-offs in `docs/features/active/2026-09-14-fsharp-core-hintpath-netstandard21-skew-895/spec.md`, the Phase 5 evidence and the plan's task check-offs so far. Commands:
+- [x] [P5-T8] Commit the acceptance check-offs in `docs/features/active/2026-09-14-fsharp-core-hintpath-netstandard21-skew-895/spec.md`, the Phase 5 evidence and the plan's task check-offs so far. Commands:
 
       ```
       git add -- docs/features/active/2026-09-14-fsharp-core-hintpath-netstandard21-skew-895
@@ -544,7 +544,7 @@ Each check-off task flips exactly one criterion in `docs/features/active/2026-09
       ```
 
       Acceptance: the commit exits 0, and `git status --porcelain --untracked-files=all -- QuickFiler QuickFiler.Test ToDoModel TaskMaster.Test UtilitiesCS UtilitiesCS.Test ToDoModel.Test docs/features/active/2026-09-14-fsharp-core-hintpath-netstandard21-skew-895` returns at most one line, and if one line is returned its path is `docs/features/active/2026-09-14-fsharp-core-hintpath-netstandard21-skew-895/plan.2026-09-16T23-27.md`.
-- [ ] [P5-T9] Final QA reconciliation and plan closure. Re-read `.../evidence/qa-gates/loop-closure.2026-09-16T23-27.md` and `.../evidence/qa-gates/coverage-delta.2026-09-16T23-27.md` and confirm the four-step toolchain loop (format, analyzers, nullable, tests with coverage) recorded `LOOP: CLEAN PASS` and the coverage branch was named; record `git status --porcelain --untracked-files=all` verbatim as the pre-commit observation whose `EXIT_CODE:` this task carries (the carve-out named in the evidence accounting rule); mark `[P5-T8]` and this task complete in this plan file; then commit the plan file alone:
+- [x] [P5-T9] Final QA reconciliation and plan closure. Re-read `.../evidence/qa-gates/loop-closure.2026-09-16T23-27.md` and `.../evidence/qa-gates/coverage-delta.2026-09-16T23-27.md` and confirm the four-step toolchain loop (format, analyzers, nullable, tests with coverage) recorded `LOOP: CLEAN PASS` and the coverage branch was named; record `git status --porcelain --untracked-files=all` verbatim as the pre-commit observation whose `EXIT_CODE:` this task carries (the carve-out named in the evidence accounting rule); mark `[P5-T8]` and this task complete in this plan file; then commit the plan file alone:
 
       ```
       git add -- docs/features/active/2026-09-14-fsharp-core-hintpath-netstandard21-skew-895/plan.2026-09-16T23-27.md
