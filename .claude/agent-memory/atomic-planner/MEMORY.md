@@ -2,6 +2,7 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#895 R0](project_895_fsharp_core_hintpath_plan_seams.md) — spec's "no 879 folder" false; AC5 token occurs twice; DataRow DisplayName bracket token; Rebuild keeps copied-ref timestamps; Meziantou 3.0.203 nuget bootstrap; runner state from console literals; hook path check hit 8/48 first lines
 - [#816 R1-R3](project_816_iscompleted_branch2_ac5_plan_seams.md) — re-derive recovered figures; `coverage/.gitkeep` tracked; porcelain vacuous (hash instead); HangDumpType=None; green vstest prints no Failed:/Skipped: line; brace has no Cobertura line element; every delta clause needs a baseline count
 - [#826 factory](project_826_factory_outside_try_reachability_seams.md) · [#826 R2-R5](project_826_console_out_banned_symbol_plan_seams.md) — seam outside `try`; `0 Error(s)` substring of `10 Error(s)`; uncompiled control emits nothing
 - [#825 R1-R6](project_825_etl_deadline_mechanics_plan_seams.md) — latch encodes fixed timer order; Csc line names no project; runner excludes test dll; a comment above a cited range shifts it
