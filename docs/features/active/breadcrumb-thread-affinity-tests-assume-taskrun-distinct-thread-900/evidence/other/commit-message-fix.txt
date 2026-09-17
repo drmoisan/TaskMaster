@@ -1,0 +1,31 @@
+test(quickfiler): run breadcrumb thread-affinity worker tests on a dedicated thread (#900)
+
+The two worker-thread tests in ItemViewerBreadcrumbThreadAffinityTests obtained their
+"worker thread" from Task.Run(...).GetAwaiter().GetResult(). Task.Run guarantees only a
+thread-pool thread, never a different one. When the test body is itself running on a pool
+thread, the work item lands on that thread's own local work-stealing queue and the blocking
+wait pops it back off and runs the delegate inline on the very thread that constructed the
+ItemViewer, unless a remote worker steals it first. Dispatcher.CheckAccess compares Thread
+object identity, so in the inlined branch the boundary guard sees its owner and does not
+throw, and the assertion fails. The outcome was decided by a race the test did not control.
+
+Both tests now obtain their worker from a new private static helper,
+RunOnDedicatedWorkerThread, which starts a background Thread the test itself constructs,
+runs the delegate inside a try/catch that records any exception, joins the thread, and
+returns the captured exception. A Thread object the test constructs is never the object that
+constructed the viewer, so the distinct-thread property holds by construction under any
+scheduler.
+
+Each delegate now asserts the guard's exact predicate as a precondition before invoking the
+guarded member, so the boundary assertion cannot pass vacuously. The assertions moved from an
+Action-plus-Throw chain to assertions on the captured exception: not null, exactly
+InvalidOperationException, message contains the guarded operation's name, and not an
+ObjectDisposedException.
+
+The join is untimed. It is a completion wait on one bounded synchronous call on a dedicated
+non-pool thread, not a sleep and not a wall-clock wait, and it never parks a thread-pool slot
+waiting on another thread-pool slot, so it is safe under the Workers=0 class-level parallel
+run. No test was serialised, pinned, retried or given a tolerance, and the CLI runsettings
+file is unchanged.
+
+Test-only change. No production file is modified.

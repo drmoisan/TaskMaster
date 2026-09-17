@@ -282,7 +282,7 @@ call. No measurable effect on suite runtime.
   (excluding `ObjectDisposedException`), with a message containing the guarded operation's name
   (`"InitializeBreadcrumbPipeline"` / `"ConfigureBreadcrumbDropDown"` respectively), preserving the AC3
   contract ratified for issue #781.
-- [ ] AC4. A `fail-before-exception.<timestamp>.md` dossier is recorded under
+- [x] AC4. A `fail-before-exception.<timestamp>.md` dossier is recorded under
   `<FEATURE>/evidence/regression-testing/`, documenting why a deterministic failing run of the *original*
   two tests is not achievable, with the wait-inlining mechanism chain as the alternative proof.
 - [ ] AC5. A deterministic guard-disabled failing run of the two *replacement* tests (via a temporary,
