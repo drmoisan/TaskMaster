@@ -68,6 +68,13 @@ namespace QuickFiler
             ProductionBlockingPriorityScheduler = (action, priority) => action();
         }
 
+        /// <summary>
+        /// Named UI-dispatcher invoke that becomes the blocking priority scheduler default in
+        /// Phase 4, mirroring ItemViewerQueue so the delegate identity is assertable (#792 AC-U3).
+        /// </summary>
+        internal static void InvokeOnUiDispatcher(Action action, DispatcherPriority priority) =>
+            UiThread.Dispatcher.Invoke(action, priority);
+
         private static ViewerQueueCore<EfcViewer> CreateProductionCore()
         {
             return CreateProductionCore(

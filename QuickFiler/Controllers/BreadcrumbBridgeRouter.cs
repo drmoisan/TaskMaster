@@ -328,6 +328,20 @@ namespace QuickFiler.Controllers
             _outboundQueue.OnInitializationCompleted();
         }
 
+        /// <summary>Banner row text shown when initialization fails. Body lands in Phase 4 (#792).</summary>
+        internal const string InitializationFailedBannerText =
+            BreadcrumbRowBuilder.BannerPrefix
+            + " Folder list unavailable: breadcrumb initialization failed";
+
+        /// <summary>Signals that CoreWebView2 initialization failed. Body lands in Phase 4 (#792).</summary>
+        public void NotifyInitializationFailed(Exception failure)
+        {
+            if (failure == null)
+            {
+                throw new ArgumentNullException(nameof(failure));
+            }
+        }
+
         /// <summary>
         /// Routes one inbound bridge payload. Malformed payloads fail fast with the codec's
         /// <see cref="BreadcrumbMessageException"/> (already logged) and leave state unchanged.

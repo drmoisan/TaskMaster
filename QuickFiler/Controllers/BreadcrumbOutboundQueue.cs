@@ -63,5 +63,11 @@ namespace QuickFiler.Controllers
                 _host.PostMessageJson(_pending.Dequeue());
             }
         }
+
+        /// <summary>Discards buffered payloads without posting. Body lands in Phase 4 (#792).</summary>
+        public int DiscardPending()
+        {
+            return 0;
+        }
     }
 }

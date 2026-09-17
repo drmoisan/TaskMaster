@@ -288,12 +288,18 @@
     <Compile Include="Controllers\BayesianPerformanceController.cs" />
     <Compile Include="Controllers\EfcDataModel.cs" />
     <Compile Include="Controllers\EfcDataModel.FilingStem.cs" />
+    <Compile Include="Controllers\EfcDataModel.Carry.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Arrows.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Selection.cs" />
     <Compile Include="Controllers\BreadcrumbOutboundQueue.cs" />
     <Compile Include="Controllers\EfcSelectionGuard.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
+    <Compile Include="Controllers\EfcFormController.Actions.cs" />
+    <Compile Include="Controllers\EfcFormController.Breadcrumb.cs" />
+    <Compile Include="Controllers\EfcFormController.EventHandlers.cs" />
+    <Compile Include="Controllers\EfcFormController.Helpers.cs" />
+    <Compile Include="Controllers\EfcFormController.SetupAndProperties.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcHomeController.Metrics.cs" />
     <Compile Include="Controllers\EfcHomeController.ExecuteMoves.cs" />
@@ -302,6 +308,7 @@
     <Compile Include="Controllers\EfcHomeControllerDependencies.cs" />
     <Compile Include="Controllers\EfcItemController.cs" />
     <Compile Include="Controllers\EfcItemController.WebViewFaultBoundary.cs" />
+    <Compile Include="Controllers\EfcItemController.WebViewEnvironment.cs" />
     <Compile Include="Controllers\FilerQueue.cs" />
     <Compile Include="Controllers\IQfcFormController.cs" />
     <Compile Include="Controllers\IQfcHomeController.cs" />
@@ -313,6 +320,7 @@
     <Compile Include="Controllers\KbdActions.cs" />
     <Compile Include="Controllers\QfcCollectionController.cs" />
     <Compile Include="Controllers\QfcCollectionController.CarrierLoad.cs" />
+    <Compile Include="Controllers\QfcCollectionController.PopOut.cs" />
     <Compile Include="Controllers\EmailSorter.cs" />
     <Compile Include="Controllers\QfcDatamodel.cs" />
     <Compile Include="Controllers\QfcDatamodel.FrameBuilding.cs" />
@@ -424,6 +432,7 @@
     <Compile Include="Viewers\IWebViewCoreInitializer.cs" />
     <Compile Include="Viewers\IBreadcrumbWebHost.cs" />
     <Compile Include="Viewers\WebView2BreadcrumbHost.cs" />
+    <Compile Include="Viewers\WebView2EnvironmentContract.cs" />
     <Compile Include="Viewers\IWebViewMessenger.cs" />
     <Compile Include="Viewers\WebView2CoreInitializer.cs" />
     <Compile Include="Viewers\WebView2Messenger.cs" />
