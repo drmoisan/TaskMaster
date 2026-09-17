@@ -36,6 +36,12 @@ Impact / Severity:
 
 High. The breadcrumb folder selector is the primary folder-selection surface on both Efc entry points, and it is unavailable for the whole session once the failure occurs. A half-initialized WebView2 was also raised as a candidate contributor to the sporadic Outlook keyboard lock tracked under #677; that link remains unconfirmed and is not claimed here.
 
+Adjacent context — issue #726. The Efc item path is already fault-guarded, which is not otherwise visible from this document. EfcItemController.cs:158 routes initialization through `InitializeWebViewGuardedAsync()`, defined at EfcItemController.WebViewFaultBoundary.cs:25-42. That guard catches faults instead of letting a discarded task be silently finalized, which under .NET Framework 4.5+ produced no diagnostic at all. Its sink `WebViewInitializationErrorSink` (EfcItemController.WebViewFaultBoundary.cs:14-15) defaults to `logger.Error` and has no user-visible path.
+
+This is adjacent context only and does not change AC-U4's scope. #726 landed in `EfcItemController`, whereas AC-U4 governs two members of `EfcFormController`, a different type.
+
+One caution, recorded because it has already produced one wrong plan: the doc comment at EfcItemController.WebViewFaultBoundary.cs:8-13 that disclaims a shared contract applies to the error sink property only. It does not apply to `IncognitoArgument`. The doc on `IncognitoArgument` at EfcItemController.cs:168-176 instead reads "Hoisted to a constant so the value has exactly one owner and can be asserted directly", which supports AC-U6's convergence. There is no anti-contract for AC-U6 to reverse. The error-sink disclaimer becomes relevant only if some change unifies error sinks across types, which is not currently in scope.
+
 ## Repro & Evidence
 
 Steps to reproduce (original, intermittent form):
@@ -86,7 +92,7 @@ In scope:
 
 Out of scope / non-goals:
 
-- A full split of `QuickFiler/Controllers/QfcCollectionController.cs` (2329 lines) or of `QuickFiler/Controllers/EfcItemController.cs` (1121 lines). Only the members this change edits move into new compliant partials; the parents' remaining over-ceiling size is pre-existing debt this change neither introduces nor resolves. See AC-U9.
+- A full split of `QuickFiler/Controllers/QfcCollectionController.cs` (2333 lines) or of `QuickFiler/Controllers/EfcItemController.cs` (1122 lines). Only the members this change edits move into new compliant partials; the parents' remaining over-ceiling size is pre-existing debt this change neither introduces nor resolves. See AC-U9.
 - The archive-root read at the breadcrumb bind boundary. Research confirms the read is unguarded but already fail-soft and already user-surfaced through the existing boundary, and its behavior is pinned by an existing test. The QuickFiler twin of that read is tracked separately under issue #813.
 - Any change to the UtilitiesCS folder-search-handler interface or to the folder predictor. See the carry typing decision below.
 - Any claim about, or fix for, the #677 keyboard lock. The link between a half-initialized WebView2 and the keyboard lock is unconfirmed and is not addressed here.
@@ -100,9 +106,11 @@ Explicitly excluded systems, integrations, or datasets: no Outlook Interop surfa
 
 The add-in has exactly three production environment creations, all against the same user-data folder `%LocalAppData%\WindowsFormsWebView2`, but only two supply `--incognito `:
 
-- `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` at line 61 supplies `--incognito `
-- `QuickFiler/Controllers/EfcItemController.cs` at lines 176 and 187-189 supplies `--incognito `
+- `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` at line 62 supplies `--incognito `
+- `QuickFiler/Controllers/EfcItemController.cs` at the constant on line 177 and the construction at lines 188-190 supplies `--incognito `
 - `QuickFiler/Viewers/WebView2BreadcrumbHost.cs` at line 250 supplies no additional browser arguments
+
+(The line 62 citation is load-bearing for AC-U6. Line 61 of QuickFiler/Controllers/QfcItemController.ViewerSetup.cs is a commented-out dead line reading `// CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");`, while the live construction on line 62 uses the C# target-typed form `CoreWebView2EnvironmentOptions options = new("--incognito ");`. A structural-parity gate that searches for the text `new CoreWebView2EnvironmentOptions` therefore matches the dead comment and misses the live construction, and counted per file it reaches all three files and PASSES ON THE UNFIXED TREE on the strength of that dead comment. Any AC-U6 gate must enumerate by type name, must exclude comment text, and must be observed failing on the unfixed tree before it is trusted; the research record carries the full derivation.)
 
 The breadcrumb host is the odd one out and is the only one that fails. The count of three and the identification of the single divergent site are derived twice by independent search strategies in the research record's Numeric Derivation Evidence section, which agree on both membership and count.
 
@@ -152,7 +160,7 @@ Settled scope decisions, recorded here so they are not relitigated:
 1. **Options direction.** All three sites converge on `--incognito `. Two of three already use it and the item-body preview has always used it. A prerequisite verification task will confirm the breadcrumb document does not depend on persisted browsing storage before this is finalized.
 2. **Error-state primitive for AC-U1.** The visible error state is a banner row composed from the existing breadcrumb banner-prefix convention and delivered through the existing router and renderer. Banner rows are already non-selectable. No new WinForms control is added to the viewer, because that would land in a Designer-owned file that is excluded from coverage.
 3. **Carry typing for AC-U3.** The carried object is typed as the folder-search-handler interface. The Efc data model's concrete predictor property is not retyped and the UtilitiesCS interface is not widened. The carry is adopted only when the carried instance is the concrete predictor type, by pattern match, and otherwise the existing construction path runs unchanged. This keeps the change inside the QuickFiler project. UtilitiesCS is not modified by this change.
-4. **File-size obligations.** The 500-line ceiling applies. `QuickFiler/Controllers/EfcFormController.cs` is 1321 lines and is not currently declared partial; it is split into six files, five of them new, each under 500 lines. `QuickFiler/Controllers/EfcDataModel.cs` is 499 lines, one under the ceiling, so the carry work is placed in a new partial. `QuickFiler/Controllers/QfcCollectionController.cs` is 2329 lines and `QuickFiler/Controllers/EfcItemController.cs` is 1121 lines; a full split of either is out of scope for a bug fix, so the edited members move into new compliant partials and the parent files' remaining over-ceiling size is recorded as pre-existing debt this change does not introduce and does not resolve.
+4. **File-size obligations.** The 500-line ceiling applies. `QuickFiler/Controllers/EfcFormController.cs` is 1321 lines and is not currently declared partial; it is split into six files, five of them new, each under 500 lines. `QuickFiler/Controllers/EfcDataModel.cs` is 499 lines, one under the ceiling, so the carry work is placed in a new partial. `QuickFiler/Controllers/QfcCollectionController.cs` is 2333 lines and `QuickFiler/Controllers/EfcItemController.cs` is 1122 lines; a full split of either is out of scope for a bug fix, so the edited members move into new compliant partials and the parent files' remaining over-ceiling size is recorded as pre-existing debt this change does not introduce and does not resolve.
 5. **Non-SDK-style projects.** Adding or removing any .cs file requires editing the owning project file's Compile item list. `QuickFiler/QuickFiler.csproj` and `QuickFiler.Test/QuickFiler.Test.csproj` are both in the write set for that reason. Hand-written partial parts are listed as bare self-closing Compile elements with no metadata; DependentUpon is used only for Designer and resx pairings and must not be added.
 6. **Evidence convention.** Per the maintainer decision on issue 671 of 2026-09-11, commit projections only. No .trx file and no .cobertura.xml file is written into the repository. Numeric coverage and test-result figures are recorded inside the Markdown evidence artifacts under the feature folder's evidence directory, and the raw tool output is discarded.
 7. **AC-U5 is manual.** It is a human-executed live-Outlook verification with a runbook. It is not an automated gate and must not be described as one.
@@ -345,11 +353,13 @@ The list above holds 31 paths. Files deliberately not modified, stated in prose 
 
 ## Known contention
 
-Two sibling items in the same parallel run touch adjacent surface. This section records the overlap; it does not coordinate. The scheduler serializes.
+The overlap recorded here is historical. Two sibling items in the same parallel run touched adjacent surface; both have since merged into main, and this item's branch has already merged current main with zero conflicts. No scheduler serialization is outstanding.
 
-Sibling A adds invariant-culture date and time formatting and edits the QuickFiler collection controller at three format call sites. Those sites are disjoint from the pop-out members this item edits, so there is no line overlap. Both items nonetheless touch that collection-controller file and the QuickFiler project file, and this item adds Compile items to that project file while the sibling also edits it, so a project-file item-group merge is expected.
+Sibling A is issue #742, invariant-culture date and time formatting. It edited the QuickFiler collection controller at three format call sites. Those sites are disjoint from the pop-out members this item edits, so there was no line overlap. Both items nonetheless touch that collection-controller file and the QuickFiler project file, and this item adds Compile items to that project file. The project-file item-group merge anticipated when this section was written has already been resolved; it is not pending.
 
-Sibling B adds a UI-marshalling seam scoped to the item viewer files, which this item does not write. The overlap is conceptual only: both items decide how UI-boundary ownership is proven. This item adopts the owner-thread-identity idiom that sibling ratified rather than inventing a third convention.
+Sibling B is issue #743, the item-viewer UI-marshalling seam. It is scoped to the item viewer files, which this item does not write. The overlap was conceptual only: both items decide how UI-boundary ownership is proven. This item adopts the owner-thread-identity idiom that sibling ratified rather than inventing a third convention. That decision survives the merge and remains binding.
+
+Those two merges are also what moved the collection-controller and Efc item-controller line counts recorded under File-size obligations above.
 
 ## Risks & Mitigations
 
@@ -362,7 +372,7 @@ Technical and operational risks, including the research record's open questions:
 - **Home-controller file headroom.** That file is 447 lines, leaving roughly 53 lines. The carry parameters plus their documentation could exceed the ceiling, forcing an additional partial and an additional Compile item. Mitigation: size the change before committing to the file list; the write set is adjusted if the measurement requires it, and AC-U8 makes the ceiling a blocking criterion rather than an afterthought.
 - **The Efc item controller bypasses the mockable initializer seam.** Its environment creation calls the SDK factory directly, so AC-U6's assertion for that site requires routing it through the seam. Mitigation: the routing change is part of the write set for that file's new partial.
 - **Retry could mask a genuine environment problem.** A bounded, small attempt count with no wall-clock delay keeps the worst case short, and the final failure is surfaced to the user rather than absorbed.
-- **Project-file merge with the sibling item.** Both items edit the same explicit item list. Mitigation: additions are appended adjacent to their neighbours as bare self-closing elements with no metadata, which minimises the conflict surface; a merge on item-group ordering is expected and accepted.
+- **Project-file merge with the sibling item — resolved.** The sibling is issue #742, which edited the same explicit item list; it has merged, and this item's branch has already merged current main with zero conflicts, so the anticipated item-group merge is resolved rather than expected. The authoring convention remains binding for the Compile items this change adds: additions are appended adjacent to their neighbours as bare self-closing elements with no metadata.
 
 Mitigations and rollback: the change carries no feature flag; rollback is a branch revert. The root-cause convergence is a single-value change and can be reverted independently of the retry, router and carry work.
 
@@ -385,6 +395,7 @@ Links:
 
 - Issue: https://github.com/drmoisan/TaskMaster/issues/792
 - Issue record: docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792/issue.md
-- Research record: docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792/research/2026-09-12T10-30-breadcrumb-webview2-init-research.md
+- Research record (current, supersedes the original): docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792/research/2026-09-17T11-20-breadcrumb-webview2-init-research.md
+- Research record (original, superseded): docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792/research/2026-09-12T10-30-breadcrumb-webview2-init-research.md
 - User story: docs/features/active/2026-09-06-breadcrumb-webview2-init-fails-resource-not-in-correct-state-792/user-story.md
 - Related: #678 (carry pattern), #677 (keyboard hook leak, unconfirmed link), #813 (QuickFiler twin of the archive-root read), #458 and #476 (verified already fixed, not contributing)
