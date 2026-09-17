@@ -361,13 +361,17 @@ namespace TaskMaster.Test.Bootstrap
         /// The directory every child domain is rooted at.
         /// </summary>
         /// <remarks>
-        /// It is deliberately not this test assembly's own output directory. The discriminating
-        /// property is which flavour of <c>FSharp.Core</c> the directory deploys: the directory
-        /// named here deploys the flavour that references the unsatisfiable
-        /// <c>netstandard 2.1.0.0</c> identity, whereas this test assembly's own output
-        /// directory deploys a flavour that never requests it, so a probe rooted there reports
-        /// success whether or not a fix is present. The host base directory is this assembly's
-        /// <c>bin\Debug</c>, so three parent steps reach the repository root.
+        /// It is deliberately not this test assembly's own output directory. This directory is
+        /// retained as the historically failing root: before issue 895 aligned every
+        /// <c>FSharp.Core</c> HintPath on the netstandard2.0 flavour, it deployed the flavour
+        /// whose own reference is <c>netstandard 2.1.0.0</c>, while this test assembly's own
+        /// output directory did not, so a probe rooted here could observe the bind failure and a
+        /// probe rooted there could not. After that alignment every deployed copy references
+        /// <c>netstandard 2.0.0.0</c>, so the Deedle invocation no longer requests the
+        /// <c>2.1.0.0</c> identity from any directory, and the discriminating power of this class
+        /// rests with the display-name tests, which bind that identity directly. The host base
+        /// directory is this assembly's <c>bin\Debug</c>, so three parent steps reach the
+        /// repository root.
         /// </remarks>
         private static string ProbeApplicationBase =>
             Path.GetFullPath(
