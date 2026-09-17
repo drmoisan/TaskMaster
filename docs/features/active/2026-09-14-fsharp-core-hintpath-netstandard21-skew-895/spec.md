@@ -419,7 +419,7 @@ observed FAILING on the unfixed tree, with that failing run captured as evidence
 applied; criteria 3 and 4 are containment and non-regression gates whose pass condition is stated
 exactly so it cannot be satisfied vacuously.
 
-- [ ] AC1. Exactly six FSharp.Core HintPath entries exist across all project files in the solution
+- [x] AC1. Exactly six FSharp.Core HintPath entries exist across all project files in the solution
       (enumerated from the repository root, excluding .git, .claude, packages, bin, obj and node_modules
       directories), and every one of the six ends in lib\netstandard2.0\FSharp.Core.dll. Verified by the
       new Shape-A tests `SolutionHasExactlySixFSharpCoreHintPaths` and
@@ -427,7 +427,7 @@ exactly so it cannot be satisfied vacuously.
       observation required: run on the unfixed tree and observe the flavour test FAILING with three of six
       members on netstandard2.1 (QuickFiler line 52, QuickFiler.Test line 259, ToDoModel line 42) while
       the count test passes with six; capture the run under evidence/regression-testing.
-- [ ] AC2. After a whole-solution rebuild with the mandated msbuild /t:Rebuild command whose log contains
+- [x] AC2. After a whole-solution rebuild with the mandated msbuild /t:Rebuild command whose log contains
       no "Skipping target CoreCompile" line, for each of the fifteen enumerated Debug|Any CPU output
       directories (QuickFiler, QuickFiler.Test, ToDoModel, UtilitiesCS, UtilitiesCS.Test, ToDoModel.Test,
       Tags, Tags.Test, VBFunctions.Test, TaskTree, TaskTree.Test, TaskVisualization,
@@ -441,20 +441,20 @@ exactly so it cannot be satisfied vacuously.
       QuickFiler.Test and ToDoModel rows FAILING (any additional failing rows are recorded as observed
       build-order outcomes) while the positive control passes; capture the run under
       evidence/regression-testing.
-- [ ] AC3. The HintPath entries in UtilitiesCS/UtilitiesCS.csproj (line 70),
+- [x] AC3. The HintPath entries in UtilitiesCS/UtilitiesCS.csproj (line 70),
       UtilitiesCS.Test/UtilitiesCS.Test.csproj (line 599) and ToDoModel.Test/ToDoModel.Test.csproj
       (line 96) are byte-identical before and after the fix, and the three edited project files differ
       from origin/main (after a fetch) on exactly one line each, that line being the HintPath value.
       Verified by a git diff against origin/main restricted to those six files: empty for the three
       untouched files, one changed line for each of the three edited files.
-- [ ] AC4. The full C# toolchain passes in a single final pass with zero regressions after the fix, run in
+- [x] AC4. The full C# toolchain passes in a single final pass with zero regressions after the fix, run in
       the order and with the commands quoted in Test Strategy: CSharpier check clean, analyzer rebuild
       with zero errors, nullable rebuild with zero errors, and vstest with coverage under the standard
       Workers=0 / ClassLevel runsettings with every test passing, including the pre-existing
       NetstandardBindChildDomainTests class and its negative control, and with no `[DoNotParallelize]`
       or serialisation added anywhere. Each gate's command, EXIT_CODE and output summary are recorded
       under evidence/qa-gates.
-- [ ] AC5. The `<remarks>` block on `ProbeApplicationBase` in NetstandardBindChildDomainTests.cs no
+- [x] AC5. The `<remarks>` block on `ProbeApplicationBase` in NetstandardBindChildDomainTests.cs no
       longer states that the QuickFiler.Test output directory deploys the flavour referencing the
       unsatisfiable netstandard 2.1.0.0 identity; it describes the post-fix state (all deployed copies
       reference netstandard 2.0.0.0, and the directory is retained as the historically failing root with
