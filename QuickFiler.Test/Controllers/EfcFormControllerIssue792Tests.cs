@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using QuickFiler.Viewers;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -142,6 +145,203 @@ namespace QuickFiler.Controllers.Tests
                         "after 3 attempts",
                         "the report must name the exhausted attempt limit"
                     );
+            }
+        }
+
+        /// <summary>
+        /// Recording seam for <see cref="EfcFormController.BreadcrumbHostInitializer"/>. Every
+        /// invocation is counted and resolves per the scripted outcomes: a scripted exception is
+        /// returned as a faulted task, a null entry completes, and the last entry repeats once the
+        /// script is exhausted. No invocation yields, so no continuation needs a pumped thread.
+        /// </summary>
+        private sealed class ScriptedInitializer
+        {
+            private readonly Exception[] _script;
+
+            internal ScriptedInitializer(params Exception[] script)
+            {
+                _script = script;
+            }
+
+            internal int Invocations { get; private set; }
+
+            internal Task InvokeAsync()
+            {
+                int index = Math.Min(Invocations, _script.Length - 1);
+                Invocations++;
+                Exception outcome = _script[index];
+                return outcome == null ? Task.CompletedTask : Task.FromException(outcome);
+            }
+        }
+
+        private static ScriptedInitializer InstallAlwaysFailingInitializer(
+            EfcFormController controller
+        )
+        {
+            var initializer = new ScriptedInitializer(new InvalidOperationException("boom"));
+            controller.BreadcrumbHostInitializer = initializer.InvokeAsync;
+            return initializer;
+        }
+
+        /// <summary>
+        /// AC-U1: the host initializer is retried up to the attempt limit and the exhausted limit
+        /// is reported to the user exactly once. Before the fix the seam is never consulted (the
+        /// single attempt goes straight to the null host), so the invocation count is zero.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeBreadcrumbHostAsync_RetriesUpToTheAttemptLimitThenReportsOnce()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var initializer = InstallAlwaysFailingInitializer(controller);
+            var captured = new List<string>();
+            using (CaptureUserFaults(captured))
+            {
+                // Act
+                Func<Task> act = () => controller.InitializeBreadcrumbHostAsync();
+
+                // Assert
+                await act.Should().NotThrowAsync("the initializer must contain its own fault");
+                initializer
+                    .Invocations.Should()
+                    .Be(
+                        3,
+                        "the host initializer must be attempted exactly the limit of three times"
+                    );
+                captured
+                    .Should()
+                    .ContainSingle("the exhausted limit must be reported to the user exactly once")
+                    .Which.Should()
+                    .Contain(
+                        "after 3 attempts",
+                        "the report must name the exhausted attempt limit"
+                    );
+            }
+        }
+
+        /// <summary>
+        /// AC-U1: a failure followed by a success stops the loop after the second attempt and
+        /// reports nothing. Before the fix the seam is never consulted, so the count is zero.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeBreadcrumbHostAsync_SucceedsOnALaterAttempt_ReportsNothing()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var initializer = new ScriptedInitializer(new InvalidOperationException("boom"), null);
+            controller.BreadcrumbHostInitializer = initializer.InvokeAsync;
+            var captured = new List<string>();
+            using (CaptureUserFaults(captured))
+            {
+                // Act
+                Func<Task> act = () => controller.InitializeBreadcrumbHostAsync();
+
+                // Assert
+                await act.Should().NotThrowAsync("a successful retry must not surface anything");
+                initializer
+                    .Invocations.Should()
+                    .Be(2, "the loop must stop on the first successful attempt");
+                captured.Should().BeEmpty("a recovered initialization must not be reported");
+            }
+        }
+
+        /// <summary>
+        /// AC-U1: cancellation is not a fault. It stops the loop after the first attempt and is
+        /// neither retried nor reported. Before the fix the seam is never consulted.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeBreadcrumbHostAsync_WhenCanceled_DoesNotRetryOrReport()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var initializer = new ScriptedInitializer(new OperationCanceledException());
+            controller.BreadcrumbHostInitializer = initializer.InvokeAsync;
+            var captured = new List<string>();
+            using (CaptureUserFaults(captured))
+            {
+                // Act
+                Func<Task> act = () => controller.InitializeBreadcrumbHostAsync();
+
+                // Assert
+                await act.Should().NotThrowAsync("cancellation must be absorbed at the boundary");
+                initializer.Invocations.Should().Be(1, "a canceled attempt must not be retried");
+                captured.Should().BeEmpty("cancellation is not a fault and must not be reported");
+            }
+        }
+
+        /// <summary>
+        /// AC-U1 visible error state (D4): on final failure the folder-area label carries the
+        /// failure text. Before the fix nothing writes the label, so its text stays empty.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeBreadcrumbHostAsync_OnFinalFailure_ShowsTheErrorTextInTheFolderAreaLabel()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var viewer = (EfcViewer)FormatterServices.GetUninitializedObject(typeof(EfcViewer));
+            var label = new System.Windows.Forms.Label();
+
+            // Constructing a WinForms control installs WindowsFormsSynchronizationContext on this
+            // thread; clear it so a genuine await in the code under test cannot post its
+            // continuation to a thread that no test host pumps.
+            SynchronizationContext.SetSynchronizationContext(null);
+            SetPrivateField(viewer, "label2", label);
+            SetPrivateField(controller, "_formViewer", viewer);
+            InstallAlwaysFailingInitializer(controller);
+            using (CaptureUserFaults(new List<string>()))
+            {
+                // Act
+                Func<Task> act = () => controller.InitializeBreadcrumbHostAsync();
+
+                // Assert
+                await act.Should().NotThrowAsync("the initializer must contain its own fault");
+                label
+                    .Text.Should()
+                    .Be(
+                        EfcFormController.FolderAreaInitializationFailedText,
+                        "the folder-area label is the visible carrier of the final failure"
+                    );
+            }
+        }
+
+        /// <summary>
+        /// AC-U1/AC-U7: on final failure the router is notified, which navigates the error
+        /// banner and discards the outbound queue. Before the fix the router is never notified.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeBreadcrumbHostAsync_OnFinalFailure_NotifiesTheRouter()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var host = new Mock<IBreadcrumbWebHost>();
+            host.SetupGet(h => h.IsCoreInitialized).Returns(false);
+            var navigated = new List<string>();
+            host.Setup(h => h.NavigateToString(It.IsAny<string>()))
+                .Callback<string>(html => navigated.Add(html));
+            var queue = new BreadcrumbOutboundQueue(host.Object);
+            queue.PostOrQueue("{\"type\":\"render\"}");
+            var router = new BreadcrumbBridgeRouter(
+                new Mock<IFolderHierarchyProvider>().Object,
+                host.Object,
+                new BreadcrumbMessageCodec(),
+                new BreadcrumbHtmlRenderer(),
+                queue
+            );
+            SetPrivateField(controller, "_router", router);
+            InstallAlwaysFailingInitializer(controller);
+            using (CaptureUserFaults(new List<string>()))
+            {
+                // Act
+                Func<Task> act = () => controller.InitializeBreadcrumbHostAsync();
+
+                // Assert
+                await act.Should().NotThrowAsync("the initializer must contain its own fault");
+                navigated
+                    .Should()
+                    .ContainSingle("the router must navigate exactly one document on failure")
+                    .Which.Should()
+                    .Contain("Folder list unavailable", "the navigated document is the banner");
+                queue.PendingCount.Should().Be(0, "the failure must discard the outbound queue");
             }
         }
     }
