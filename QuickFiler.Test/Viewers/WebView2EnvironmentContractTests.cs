@@ -1,8 +1,15 @@
 using System;
 using System.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
+using Moq;
+using QuickFiler.Controllers;
 using QuickFiler.Viewers;
 
 namespace QuickFiler.Test.Viewers
@@ -103,6 +110,83 @@ namespace QuickFiler.Test.Viewers
                     WebView2EnvironmentContract.AdditionalBrowserArguments,
                     "the second instance must carry the shared arguments"
                 );
+        }
+
+        private static void SetPrivateField(object target, string fieldName, object value)
+        {
+            FieldInfo field = target
+                .GetType()
+                .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            field.Should().NotBeNull($"{fieldName} must remain available for this headless seam");
+            field.SetValue(target, value);
+        }
+
+        /// <summary>
+        /// #792 site 3: <c>EfcItemController.InitializeWebViewAsync</c> hands the contract's folder
+        /// and options to the seam; a shared context lets the UI-context await complete inline.
+        /// </summary>
+        [TestMethod]
+        public async Task EfcItemController_InitializeWebViewAsync_PassesTheContractValuesThroughTheSeam()
+        {
+            // Arrange
+            SynchronizationContext previous = SynchronizationContext.Current;
+            var context = new SynchronizationContext();
+            SynchronizationContext.SetSynchronizationContext(context);
+            try
+            {
+                var controller = (EfcItemController)
+                    FormatterServices.GetUninitializedObject(typeof(EfcItemController));
+                var viewer = (ItemViewer)
+                    FormatterServices.GetUninitializedObject(typeof(ItemViewer));
+                SetPrivateField(viewer, "_context", context);
+                SetPrivateField(controller, "_itemViewer", viewer);
+                string capturedFolder = null;
+                CoreWebView2EnvironmentOptions capturedOptions = null;
+                var initializer = new Mock<IWebViewCoreInitializer>();
+                initializer
+                    .Setup(seam =>
+                        seam.CreateEnvironmentAsync(
+                            It.IsAny<string>(),
+                            It.IsAny<CoreWebView2EnvironmentOptions>()
+                        )
+                    )
+                    .Callback<string, CoreWebView2EnvironmentOptions>(
+                        (folder, options) =>
+                        {
+                            capturedFolder = folder;
+                            capturedOptions = options;
+                        }
+                    )
+                    .Returns(Task.FromResult<CoreWebView2Environment>(null));
+                initializer
+                    .Setup(seam =>
+                        seam.EnsureCoreWebView2Async(
+                            It.IsAny<WebView2>(),
+                            It.IsAny<CoreWebView2Environment>()
+                        )
+                    )
+                    .Returns(Task.CompletedTask);
+                controller.WebViewInitializer = initializer.Object;
+
+                // Act
+                await controller.InitializeWebViewAsync();
+
+                // Assert
+                string expectedFolder = WebView2EnvironmentContract.ResolveUserDataFolder();
+                capturedFolder.Should().Be(expectedFolder, "the shared user-data folder");
+                capturedOptions.Should().NotBeNull("site 3 must pass an options object");
+                string expectedArguments = WebView2EnvironmentContract.AdditionalBrowserArguments;
+                string actualArguments = capturedOptions.AdditionalBrowserArguments;
+                actualArguments.Should().Be(expectedArguments, "the shared browser arguments");
+
+                // The uninitialized viewer's control and the mocked environment are both null, so
+                // the exact-argument form pins the one awaited seam call.
+                initializer.Verify(seam => seam.EnsureCoreWebView2Async(null, null), Times.Once);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
         }
     }
 }

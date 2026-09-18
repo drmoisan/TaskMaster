@@ -61,18 +61,71 @@ namespace QuickFiler.Controllers
             _ = InitializeBreadcrumbHostAsync();
         }
 
-        // Fire-and-forget host initialization with an error boundary (the router queues every
-        // outbound payload until CoreWebView2InitializationCompleted fires).
+        // Fire-and-forget host initialization with an error boundary (#792 D3): a fixed number of
+        // attempts on this awaited path, no wall-clock delay, cancellation stops the loop without
+        // being a fault. On final failure the router discards its pending document and outbound
+        // queue explicitly through NotifyInitializationFailed, the folder-area label carries the
+        // visible error state (D4), and the fault is reported once through the boundary sink.
         internal async Task InitializeBreadcrumbHostAsync()
         {
-            try
+            System.Exception lastFailure = null;
+            for (int attempt = 1; attempt <= BreadcrumbInitializationAttemptLimit; attempt++)
             {
-                await _breadcrumbHost.InitializeAsync(_formViewer.UiSyncContext);
+                try
+                {
+                    await InitializeBreadcrumbHostOnceAsync();
+                    return;
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.Debug("Breadcrumb initialization canceled.");
+                    return;
+                }
+                catch (System.Exception ex)
+                {
+                    lastFailure = ex;
+                    logger.Warn(
+                        $"Breadcrumb WebView2 initialization attempt {attempt} of "
+                            + $"{BreadcrumbInitializationAttemptLimit} failed: {ex.Message}",
+                        ex
+                    );
+                }
             }
-            catch (System.Exception ex)
+
+            _router?.NotifyInitializationFailed(lastFailure);
+            ShowFolderAreaError(FolderAreaInitializationFailedText);
+            TryReportBoundaryFault(
+                $"Breadcrumb WebView2 initialization failed after {BreadcrumbInitializationAttemptLimit} attempts: {lastFailure.Message}",
+                lastFailure
+            );
+        }
+
+        // One initialization attempt: the seam when a test installed one, else the production host.
+        private Task InitializeBreadcrumbHostOnceAsync()
+        {
+            Func<Task> initializer = BreadcrumbHostInitializer;
+            return initializer != null
+                ? initializer()
+                : _breadcrumbHost.InitializeAsync(_formViewer.UiSyncContext);
+        }
+
+        // D4: a document navigated into a WebView2 whose core never initialized is not visible, so
+        // the existing folder-area label is the visible carrier of the final failure.
+        private void ShowFolderAreaError(string message)
+        {
+            Label label = _formViewer?.label2;
+            if (label == null)
             {
-                logger.Error($"Breadcrumb WebView2 initialization failed: {ex.Message}", ex);
+                return;
             }
+
+            if (!label.InvokeRequired)
+            {
+                label.Text = message;
+                return;
+            }
+
+            label.BeginInvoke(new MethodInvoker(() => label.Text = message));
         }
 
         // Presentation only. #465 C (RC9) removed the _folderRows write-back: neither assigns

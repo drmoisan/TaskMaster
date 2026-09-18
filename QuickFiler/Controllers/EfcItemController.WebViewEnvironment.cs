@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
@@ -12,8 +11,9 @@ namespace QuickFiler.Controllers
         private IWebViewCoreInitializer _webViewInitializer;
 
         /// <summary>
-        /// Seam over WebView2 environment creation for the EFC item viewer (#792). Not yet
-        /// consumed: <see cref="InitializeWebViewAsync"/> is routed through it in Phase 4.
+        /// Seam over WebView2 environment creation for the EFC item viewer (#792).
+        /// <see cref="InitializeWebViewAsync"/> is routed through it so a test can observe the
+        /// values handed to the SDK without starting a browser process.
         /// </summary>
         internal IWebViewCoreInitializer WebViewInitializer
         {
@@ -26,44 +26,30 @@ namespace QuickFiler.Controllers
         /// so that the item preview keeps no browsing data.
         /// </summary>
         /// <remarks>
-        /// Hoisted to a constant so the value has exactly one owner and can be asserted directly.
-        /// A direct assertion is the only instrument available for it: the enclosing member needs
-        /// the real WebView2 runtime, so it cannot be executed under the unit-test policy.
+        /// The owner of this value is <see cref="WebView2EnvironmentContract"/> (#792); this alias
+        /// exists so the #463 pin
+        /// <c>EfcItemControllerTests.IncognitoArgument_IsAsciiDoubleHyphenIncognitoWithTrailingSpace</c>
+        /// keeps asserting the value the preview actually passes.
         /// </remarks>
-        internal const string IncognitoArgument = "--incognito ";
+        internal const string IncognitoArgument =
+            WebView2EnvironmentContract.AdditionalBrowserArguments;
 
         internal async Task InitializeWebViewAsync()
         {
-            // Create the cache directory
-            string localAppData = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData
-            );
-            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
-
-            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
-            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions(
-                IncognitoArgument
-            );
+            string cacheFolder = WebView2EnvironmentContract.ResolveUserDataFolder();
+            CoreWebView2EnvironmentOptions options = WebView2EnvironmentContract.CreateOptions();
 
             await _itemViewer.UiSyncContext;
-            //logger.Debug($"Ui Thread Id: {Thread.CurrentThread.ManagedThreadId}");
-            // Create the environment manually
-            Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(
-                null,
+
+            // Both seam calls are awaited (no detached continuation) so a failure reaches
+            // InitializeWebViewGuardedAsync instead of being lost off the awaited path (#792).
+            _webViewEnvironment = await WebViewInitializer.CreateEnvironmentAsync(
                 cacheFolder,
                 options
             );
-
-            // Do this so the task is continued on the UI Thread
-            TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
-
-            await task.ContinueWith(
-                t =>
-                {
-                    _webViewEnvironment = task.Result;
-                    _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
-                },
-                ui
+            await WebViewInitializer.EnsureCoreWebView2Async(
+                _itemViewer.L0v2h2_WebView2,
+                _webViewEnvironment
             );
         }
     }

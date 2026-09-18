@@ -52,42 +52,60 @@ namespace QuickFiler.Controllers
         }
 
         /// <summary>
-        /// Reads the folder handler and mail helper carried by a group's item controller. Body
-        /// lands in Phase 4 (#792).
+        /// Reads the folder handler and mail helper carried by a group's item controller (#792 D6).
+        /// Pure: the handler is read through the concrete <see cref="QfcItemController.FolderHandler"/>
+        /// accessor by pattern match, the helper through <see cref="IQfcItemController.ItemHelper"/>;
+        /// a null group or controller yields a null pair.
         /// </summary>
         internal static (
             IFolderSearchHandler FolderHandler,
             MailItemHelper MailHelper
         ) ReadPopOutCarry(QfcItemGroup group)
         {
-            return (null, null);
+            IQfcItemController controller = group?.ItemController;
+            return (
+                controller is QfcItemController concrete ? concrete.FolderHandler : null,
+                controller?.ItemHelper
+            );
         }
 
+        /// <summary>
+        /// Pops the selected group out into its own EFC home controller. The carry is read BEFORE
+        /// the removal call because <c>QfcItemController.Cleanup</c> nulls <c>_folderHandler</c> and
+        /// <c>ItemHelper</c>; the home controller is built through the factory seam (#792 D6).
+        /// </summary>
         public void PopOutControlGroup(int selection)
         {
-            // Get mail item from the group
-            MailItem mailItem = _itemGroups[selection - 1].MailItem;
+            QfcItemGroup group = _itemGroups[selection - 1];
+            MailItem mailItem = group.MailItem;
+            (IFolderSearchHandler handler, MailItemHelper helper) = ReadPopOutCarry(group);
 
             // Remove the group from the form
             RemoveSpecificControlGroup(selection);
 
-            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
-            popOutForm.Run();
+            var form = PopOutHomeControllerFactory(_globals, () => { }, mailItem, handler, helper);
+            form.Run();
         }
 
+        /// <summary>
+        /// Async form of <see cref="PopOutControlGroup"/>. The carry is read BEFORE the removal call
+        /// because <c>QfcItemController.Cleanup</c> nulls <c>_folderHandler</c> and
+        /// <c>ItemHelper</c>; the home controller is built through the factory seam (#792 D6).
+        /// </summary>
         public async Task PopOutControlGroupAsync(int selection)
         {
             Token.ThrowIfCancellationRequested();
 
-            // Get mail item from the group
-            MailItem mailItem = _itemGroups[selection - 1].MailItem;
+            QfcItemGroup group = _itemGroups[selection - 1];
+            MailItem mailItem = group.MailItem;
+            (IFolderSearchHandler handler, MailItemHelper helper) = ReadPopOutCarry(group);
 
             // Remove the group from the form
             await RemoveSpecificControlGroupAsync(selection);
 
-            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
+            var form = PopOutHomeControllerFactory(_globals, () => { }, mailItem, handler, helper);
 
-            await popOutForm.RunAsync();
+            await form.RunAsync();
         }
     }
 }

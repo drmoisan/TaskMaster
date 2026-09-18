@@ -334,12 +334,44 @@ namespace QuickFiler.Controllers
             + " Folder list unavailable: breadcrumb initialization failed";
 
         /// <summary>Signals that CoreWebView2 initialization failed. Body lands in Phase 4 (#792).</summary>
+        /// <remarks>
+        /// Sibling of <see cref="NotifyCoreInitialized"/> for the failure outcome (#792 D5). The
+        /// stashed document is discarded (never replayed by a later initialization), the outbound
+        /// queue is discarded rather than drained (the host cannot post to a core that does not
+        /// exist), the rows become a single banner row, the selection is cleared, and the rendered
+        /// error document is handed to the host, whose pre-initialization guard drops it without
+        /// throwing. One error line records both discard facts.
+        /// </remarks>
+        /// <param name="failure">The final initialization failure. Required.</param>
         public void NotifyInitializationFailed(Exception failure)
         {
             if (failure == null)
             {
                 throw new ArgumentNullException(nameof(failure));
             }
+
+            bool hadPendingDocument = _pendingDocument != null;
+            _pendingDocument = null;
+            int discardedPayloads = _outboundQueue.DiscardPending();
+            _rows = _builder.BuildRows(
+                new[] { InitializationFailedBannerText },
+                _ => null,
+                Array.Empty<FolderScore>()
+            );
+            _selectedRowId = null;
+            if (SelectedFolderPath != null)
+            {
+                SelectedFolderPath = null;
+                SelectedFolderPathChanged?.Invoke(this, null);
+            }
+
+            _host.NavigateToString(_renderer.RenderDocument(_rows, _darkMode, null));
+            log.Error(
+                $"Breadcrumb CoreWebView2 initialization failed: {failure.Message} "
+                    + $"(pending document discarded: {hadPendingDocument}; "
+                    + $"outbound payloads discarded: {discardedPayloads}).",
+                failure
+            );
         }
 
         /// <summary>

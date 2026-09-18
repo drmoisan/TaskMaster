@@ -22,7 +22,7 @@ namespace QuickFiler
         internal static Action<
             Action,
             DispatcherPriority
-        > ProductionBlockingPriorityScheduler { get; set; } = (action, priority) => action();
+        > ProductionBlockingPriorityScheduler { get; set; } = InvokeOnUiDispatcher;
 
         private static ViewerQueueCore<EfcViewer> _core = CreateProductionCore();
 
@@ -65,12 +65,12 @@ namespace QuickFiler
             ProductionSynchronousScheduler = action => action();
             ProductionPriorityScheduler = (action, priority) =>
                 _ = UiThread.Dispatcher.InvokeAsync(action, priority);
-            ProductionBlockingPriorityScheduler = (action, priority) => action();
+            ProductionBlockingPriorityScheduler = InvokeOnUiDispatcher;
         }
 
         /// <summary>
-        /// Named UI-dispatcher invoke that becomes the blocking priority scheduler default in
-        /// Phase 4, mirroring ItemViewerQueue so the delegate identity is assertable (#792 AC-U3).
+        /// Named UI-dispatcher invoke that is the blocking priority scheduler default, mirroring
+        /// ItemViewerQueue so the delegate identity is assertable (#792 AC-U3).
         /// </summary>
         internal static void InvokeOnUiDispatcher(Action action, DispatcherPriority priority) =>
             UiThread.Dispatcher.Invoke(action, priority);
