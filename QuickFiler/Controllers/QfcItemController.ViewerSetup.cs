@@ -52,14 +52,9 @@ namespace QuickFiler.Controllers
 
             Token.ThrowIfCancellationRequested();
 
-            // Create the cache directory
-            string localAppData = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData
-            );
-            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
-
-            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
-            CoreWebView2EnvironmentOptions options = new("--incognito ");
+            // #792: shared user-data folder and browser arguments come from the single contract.
+            string cacheFolder = WebView2EnvironmentContract.ResolveUserDataFolder();
+            CoreWebView2EnvironmentOptions options = WebView2EnvironmentContract.CreateOptions();
 
             // Switch to UI Thread
             await _itemViewer.UiSyncContext;

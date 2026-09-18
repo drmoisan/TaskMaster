@@ -711,33 +711,6 @@ namespace QuickFiler.Controllers
             return itemViewer;
         }
 
-        public void PopOutControlGroup(int selection)
-        {
-            // Get mail item from the group
-            MailItem mailItem = _itemGroups[selection - 1].MailItem;
-
-            // Remove the group from the form
-            RemoveSpecificControlGroup(selection);
-
-            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
-            popOutForm.Run();
-        }
-
-        public async Task PopOutControlGroupAsync(int selection)
-        {
-            Token.ThrowIfCancellationRequested();
-
-            // Get mail item from the group
-            MailItem mailItem = _itemGroups[selection - 1].MailItem;
-
-            // Remove the group from the form
-            await RemoveSpecificControlGroupAsync(selection);
-
-            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
-
-            await popOutForm.RunAsync();
-        }
-
         public void RemoveControls()
         {
             if (_itemGroups is not null)

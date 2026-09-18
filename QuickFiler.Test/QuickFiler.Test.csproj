@@ -57,6 +57,8 @@
   <ItemGroup>
     <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.Part2.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue792Tests.cs" />
+    <Compile Include="Controllers\BreadcrumbOutboundQueueIssue792Tests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterTests.Selection.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue614Tests.cs" />
@@ -123,8 +125,10 @@
     <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />
+    <Compile Include="Controllers\EfcDataModelIssue792CarryTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.Part2.cs" />
+    <Compile Include="Controllers\EfcFormControllerIssue792Tests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesProductionFactoryTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerExecuteMovesTests.cs" />
@@ -165,6 +169,7 @@
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />
     <Compile Include="Controllers\QfcScanProgressBandMapperTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.Part2.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerIssue792PopOutTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerIterationTests.Part2.cs" />
     <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.Part2.cs" />
     <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.Part3.cs" />
@@ -216,6 +221,8 @@
     <Compile Include="Controllers\WebView2CoreInitializerTests.cs" />
     <Compile Include="Viewers\WebView2BreadcrumbHostContractTests.cs" />
     <Compile Include="Viewers\WebView2BreadcrumbHostTests.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHostIssue792Tests.cs" />
+    <Compile Include="Viewers\WebView2EnvironmentContractTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />
@@ -228,6 +235,7 @@
     <Compile Include="Helper Classes\TlpCellSnapShotTests.cs" />
     <Compile Include="Helper Classes\ViewerQueueCoreTests.cs" />
     <Compile Include="Helper Classes\ViewerQueueStaticWrapperTests.cs" />
+    <Compile Include="Helper Classes\EfcViewerQueueIssue792Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QfcViewer_Test.cs" />
     <Compile Include="SetupAssemblyInitializer.cs" />

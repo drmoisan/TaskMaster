@@ -264,6 +264,12 @@ namespace QuickFiler.Controllers
         /// </summary>
         public long TopFolderScore => _folderHandler?.Suggestions?.TopScore() ?? 0;
 
+        /// <summary>
+        /// Read-only accessor over the folder handler for the pop-out carry (#792 AC-U3). Null
+        /// after Cleanup, so callers must read it before the group is removed.
+        /// </summary>
+        internal IFolderSearchHandler FolderHandler => _folderHandler;
+
         public bool SuppressEvents
         {
             get => _suppressEvents;

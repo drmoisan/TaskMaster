@@ -185,41 +185,6 @@ namespace QuickFiler.Controllers
             protected set => _folderHelper = value;
         }
 
-        public async Task InitFolderHandlerAsync(object folderList = null)
-        {
-            if (folderList is null)
-            {
-                if (MailInfo is null)
-                {
-                    FolderHelper = await Task.Run(() => new FolderPredictor(Globals), Token);
-                }
-                else
-                {
-                    FolderHelper = await Task.Run(
-                        async () =>
-                            await new FolderPredictor(
-                                Globals,
-                                MailInfo,
-                                FolderPredictor.InitOptions.FromField
-                            ).InitAsync(MailInfo, FolderPredictor.InitOptions.FromField),
-                        Token
-                    );
-                }
-            }
-            else
-            {
-                FolderHelper = await Task.Run(
-                    async () =>
-                        await new FolderPredictor(
-                            Globals,
-                            folderList,
-                            FolderPredictor.InitOptions.FromArrayOrString
-                        ).InitAsync(folderList, FolderPredictor.InitOptions.FromArrayOrString),
-                    Token
-                );
-            }
-        }
-
         ConversationResolver _conversationResolver;
         public ConversationResolver ConversationResolver
         {
