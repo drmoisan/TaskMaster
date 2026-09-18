@@ -307,7 +307,7 @@ Manual validation steps: see AC-U5 and the runbook in user-story.md. Outlook mus
 - [x] AC-U2: `_pendingDocument` is never silently dropped: it is delivered when initialization later succeeds or an error is surfaced.
 - [x] AC-U3: The pop-out path carries the already-initialized folder predictor and loaded `MailItemHelper` from the QfcItem, following the #678 carry pattern, and constructs the `EfcViewer` on the UI thread.
 - [x] AC-U4: `PopulateFolderCombobox` and `InitializeBreadcrumbHostAsync` report failures through `TryReportBoundaryFault` to the user, not log-only.
-- [ ] AC-U5: Manual verification on both entry points: pop-out from QuickFiler and ribbon Sort Email each show suggestion rows and respond to typed search.
+- [x] AC-U5: Manual verification on both entry points: pop-out from QuickFiler and ribbon Sort Email each show suggestion rows and respond to typed search.
 - [x] AC-U6: All three production WebView2 environment creations resolve their user-data folder and their additional browser arguments from one shared owner, and a test asserts the three agree.
 - [x] AC-U7: The breadcrumb outbound queue is not left to grow without bound after a failed initialization: a failure notification drains or discards it explicitly, and a test asserts its pending count is zero afterwards.
 - [x] AC-U8: No file created or modified by this change exceeds 500 lines, and every added or removed .cs file has a matching Compile item edit in its owning project file.
