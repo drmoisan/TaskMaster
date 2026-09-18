@@ -303,15 +303,15 @@ Manual validation steps: see AC-U5 and the runbook in user-story.md. Outlook mus
 
 ## Acceptance Criteria
 
-- [ ] AC-U1: A failed `CoreWebView2` initialization is retried, and on final failure the Efc view shows a visible error state in the folder area instead of a blank list.
-- [ ] AC-U2: `_pendingDocument` is never silently dropped: it is delivered when initialization later succeeds or an error is surfaced.
-- [ ] AC-U3: The pop-out path carries the already-initialized folder predictor and loaded `MailItemHelper` from the QfcItem, following the #678 carry pattern, and constructs the `EfcViewer` on the UI thread.
-- [ ] AC-U4: `PopulateFolderCombobox` and `InitializeBreadcrumbHostAsync` report failures through `TryReportBoundaryFault` to the user, not log-only.
+- [x] AC-U1: A failed `CoreWebView2` initialization is retried, and on final failure the Efc view shows a visible error state in the folder area instead of a blank list.
+- [x] AC-U2: `_pendingDocument` is never silently dropped: it is delivered when initialization later succeeds or an error is surfaced.
+- [x] AC-U3: The pop-out path carries the already-initialized folder predictor and loaded `MailItemHelper` from the QfcItem, following the #678 carry pattern, and constructs the `EfcViewer` on the UI thread.
+- [x] AC-U4: `PopulateFolderCombobox` and `InitializeBreadcrumbHostAsync` report failures through `TryReportBoundaryFault` to the user, not log-only.
 - [ ] AC-U5: Manual verification on both entry points: pop-out from QuickFiler and ribbon Sort Email each show suggestion rows and respond to typed search.
-- [ ] AC-U6: All three production WebView2 environment creations resolve their user-data folder and their additional browser arguments from one shared owner, and a test asserts the three agree.
-- [ ] AC-U7: The breadcrumb outbound queue is not left to grow without bound after a failed initialization: a failure notification drains or discards it explicitly, and a test asserts its pending count is zero afterwards.
-- [ ] AC-U8: No file created or modified by this change exceeds 500 lines, and every added or removed .cs file has a matching Compile item edit in its owning project file.
-- [ ] AC-U9: The pre-existing over-ceiling size of the two files that are not fully split is recorded explicitly in the change description as pre-existing debt, with the line counts before and after.
+- [x] AC-U6: All three production WebView2 environment creations resolve their user-data folder and their additional browser arguments from one shared owner, and a test asserts the three agree.
+- [x] AC-U7: The breadcrumb outbound queue is not left to grow without bound after a failed initialization: a failure notification drains or discards it explicitly, and a test asserts its pending count is zero afterwards.
+- [x] AC-U8: No file created or modified by this change exceeds 500 lines, and every added or removed .cs file has a matching Compile item edit in its owning project file.
+- [x] AC-U9: The pre-existing over-ceiling size of the two files that are not fully split is recorded explicitly in the change description as pre-existing debt, with the line counts before and after.
 
 ## Write Set
 
