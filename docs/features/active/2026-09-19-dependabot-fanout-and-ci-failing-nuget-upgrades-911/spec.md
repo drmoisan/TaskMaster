@@ -43,10 +43,19 @@ Environment:
   `strict_required_status_checks_policy: true`.
 - `.github/workflows/_pester.yml` **does exist** on `origin/main` and the
   `pester / Run Pester suite with coverage` check ran and passed on pull request #908. It is not one
-  of the checks the ruleset marks required, but it does execute on every pull request. Every
-  criterion below that cites Pester output as its evidence is therefore gated by CI, not merely by a
-  local run. (An earlier statement that no Pester workflow existed was read from a session worktree
-  243 commits behind `origin/main` and was incorrect.)
+  of the checks the ruleset marks required, but it does execute on every pull request. (An earlier
+  statement that no Pester workflow existed was read from a session worktree 243 commits behind
+  `origin/main` and was incorrect.)
+- **However, that job is scoped to one directory and would not execute this change's tests.** It
+  hard-codes `Run.Path = 'tests/scripts/vscode'` (line 41) and
+  `CodeCoverage.Path = 'scripts/vscode'` (line 45). Tests added under `tests/scripts/dependencies/`
+  would never run, and the job would report green while measuring none of the new code — an instance
+  of the exact vacuous-gate failure this specification is written to avoid. Widening both paths is
+  therefore in scope and is a precondition for treating any Pester-evidenced criterion below as
+  CI-gated. Until that widening lands, Pester evidence is local-only.
+- The `pester` job enforces a line-coverage floor of 80 (line 71), while `.claude/rules/` state 85.
+  This specification asserts nothing about that discrepancy; it is recorded so the gap is not
+  mistaken for a property this change establishes.
 
 Impact / Severity: **High**. Dependency upgrades, including security-relevant ones, cannot land.
 Separately, `main` is one cache eviction away from an unbuildable state: the stale
