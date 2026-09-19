@@ -13,67 +13,101 @@
 
 ## Summary
 
-Dependabot opens several pull requests per upgrade cycle and the resulting branches fail the
+Dependabot opens one pull request per configured group each cycle, and those pull requests fail the
 required CI checks, so dependency upgrades are effectively unmergeable without manual repair.
-Dependabot edits `packages.config` but cannot maintain the coupled `.csproj` state that
-`packages.config`-style (non-SDK) projects require, so every bot branch is internally inconsistent
-from the moment it is created.
+
+The cause is **not** that Dependabot fails to maintain `.csproj` state. It maintains it. The cause
+is that while updating one group, Dependabot also rewrites the `<Import>` and `<Error>` package-import
+guards of packages **outside** that group to a version that no `packages.config` in the repository
+declares. Restore honours the manifest, the build honours the project file, and
+`EnsureNuGetPackageBuildImports` fails closed.
 
 ## Environment
 
 - OS/version: Windows 11 Pro 10.0.26200
-- Python version: n/a (.NET Framework 4.8.1 VSTO solution, 17 non-SDK projects)
-- Command/flags used: `.github/dependabot.yml` weekly NuGet schedule; required checks `actionlint`,
-  `format-check`, `build-analyzers`, `build-nullable`, `mstest-coverage`, `pester`
-- Data source or fixture: 17 `packages.config` manifests and their sibling `.csproj` files
+- Python version: n/a (.NET Framework 4.8.1 VSTO solution, 18 non-SDK projects)
+- Command/flags used: `.github/dependabot.yml` weekly NuGet schedule
+- Required checks (repository ruleset 18572843, `strict_required_status_checks_policy: true`), five:
+  `actionlint / actionlint`, `format-check / Verify formatting`,
+  `build-analyzers / Build with analyzers and code style enforcement`,
+  `build-nullable / Build with nullable warnings treated as errors`,
+  `mstest-coverage / Run MSTest suite with coverage`.
+  A sixth check, `pester / Run Pester suite with coverage`, runs but is not required.
+- Data source or fixture: 18 `packages.config` manifests and their sibling `.csproj` and `app.config` files
 
 ## Steps to Reproduce
 
 1. Allow the weekly Dependabot NuGet schedule to run against `main`.
-2. Observe the number of pull requests opened (three are open as of 2026-09-19: #907, #908, #909).
-3. Open any one of them and run the required checks.
-4. Inspect the branch diff: `packages.config` version attributes changed, `.csproj` unchanged.
+2. Observe one pull request per configured group (four groups produced #907, #908, #909).
+3. Open any one of them and inspect the required checks.
+4. Compare, for a package that is **not** in that pull request's group, the version in
+   `packages.config` against the version in the sibling `.csproj` `<Import>` element.
 
 ## Expected Behavior
 
-One consolidated pull request per upgrade cycle, containing a dependency upgrade that is
-internally consistent — manifest versions, `<HintPath>`, `<Analyzer Include>`, package-import
-guards, and binding redirects all moved together — and that passes all six required checks
-without human edits.
+One consolidated pull request per cycle whose manifest, project-file and `app.config` state are
+mutually consistent, and which passes all five required checks without human edits.
 
 ## Actual Behavior
 
-Multiple pull requests per cycle (one per configured group, multiplied by the `directories` glob
-fan-out), each failing CI. Measured history: **14 of 59 Dependabot pull requests have ever been
-merged, and none since 2026-08-21**; every merge that did land carried human commits performing
-the `.csproj` maintenance NuGet would normally perform.
+Measured history: **14 of 59 Dependabot pull requests have ever been merged, and none since
+2026-08-21**; every merge that did land carried human commits repairing the branch.
 
-Four distinct defects contribute:
+Verified on pull request #908 (the `test-frameworks` group) at run 35264873270:
 
-1. `packages.config` is absent from `.csharpierignore`, so CSharpier reflows manifest entries and
-   `format-check` fails on the bot's unformatted edit.
-2. `.csproj` analyzer paths do not move with the manifests. **15 of 17 projects reference
-   `Meziantou.Analyzer.3.0.203` while every manifest pins `3.0.235`** (issue #898). CI is currently
-   green only because the workflow cache prefix fallback carries the old package forward; a cache
-   eviction turns `main` red with no code change (`CS0006`).
-3. Deedle no longer supports this target framework, so it cannot be upgraded at all.
-4. Four groups combined with the directory glob produce duplicate pull requests for the same
-   package across projects.
+- It changed **30 files**: 10 `.csproj`, 10 `app.config`, 10 `packages.config`, across ten project
+  directories in a single pull request.
+- It correctly rewrote `<Import>`, `<Error>`, `<Reference>` and `<HintPath>`, added
+  `<Private>True</Private>` and dropped `processorArchitecture=MSIL` — the signature of NuGet
+  regenerating references rather than patching version strings.
+- **But** in nine project files it also moved `Meziantou.Analyzer` — which belongs to the
+  `analyzers-dev-deps` group, not this one — from `3.0.235` to `3.0.259` in `<Import>` and
+  `<Error>`, while leaving `packages.config` at `3.0.235`.
+
+The resulting three-way divergence inside a single project:
+
+| Location | Version |
+|---|---|
+| `packages.config` | `3.0.235` (unchanged) |
+| `.csproj` `<Import>` / `<Error>` | `3.0.259` (rewritten, out of scope) |
+| `.csproj` `<Analyzer Include>` | `3.0.203` (never rewritten by anything) |
+
+`nuget restore` honoured `packages.config` and fetched `3.0.235`; the restore log lists every
+package it pulled and `Meziantou.Analyzer.3.0.259` is not among them. MSBuild then failed in nine
+projects with:
+
+```
+error : This project references NuGet package(s) that are missing on this computer.
+The missing file is ..\packages\Meziantou.Analyzer.3.0.259\build\Meziantou.Analyzer.props.
+```
+
+The `csc` command line in the same log shows
+`/analyzer:..\packages\Meziantou.Analyzer.3.0.203\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll`,
+confirming the third version is live in the compile.
+
+`format-check` separately rejected **all 20** touched files — 10 `packages.config` **and** 10
+`app.config` — because Dependabot writes them in inline form while CSharpier requires its own
+wrapping.
 
 ## Logs / Screenshots
 
 - [x] Attached minimal logs or snippet
-- Snippet (measured on `origin/main` at 734112ed2, 2026-09-19):
+- Snippet (measured against `origin/main` at 734112ed2 and pull request #908, 2026-09-19):
 
 ```
-grep -rho "Meziantou.Analyzer.[0-9.]*" --include=*.csproj . | sort | uniq -c
-     15 Meziantou.Analyzer.3.0.203      <- stale csproj references
-     65 Meziantou.Analyzer.3.0.235
+gh pr view 908 --json files   -> 10 .csproj, 10 app.config, 10 packages.config
 
-gh pr list --state open --author app/dependabot
-909  Bump the graph-identity-telemetry group with 2 updates
-908  Bump the test-frameworks group with 11 updates
-907  Bump the analyzers-dev-deps group with 1 update
+Meziantou changes in #908:
+  9x  packages.config        version="3.0.235"   (unchanged; reflowed to inline only)
+  9x  csproj Import/Error    3.0.235 -> 3.0.259  (out of this PR's group)
+  0x  csproj Analyzer Include                     (never touched)
+
+restore log, job 105349413710: FluentAssertions.8.11.0, Microsoft.Testing.*.2.4.1,
+MSTest.*.4.4.1, Microsoft.TestPlatform.*.18.10.1 -- no Meziantou.Analyzer.3.0.259
+
+On origin/main today: 15 of 18 projects still carry a stale
+  <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.203\...\Meziantou.Analyzer.dll" />
+while every manifest pins 3.0.235 -- the residue of an earlier merged bot pull request.
 ```
 
 ## Impact / Severity
@@ -84,69 +118,83 @@ gh pr list --state open --author app/dependabot
 - [ ] Low
 
 Dependency upgrades — including security-relevant ones — cannot land. Separately, `main` is one
-cache eviction away from an unbuildable state and analyzers are silently disabled in the 15
-projects carrying the stale path.
+cache eviction away from an unbuildable state, because the stale `<Analyzer Include>` resolves today
+only through the workflow cache `restore-keys:` prefix fallback, and analyzers are silently disabled
+in the 15 affected projects.
 
 ## Suspected Cause / Notes
 
-The root cause is not package incompatibility (Deedle excepted). It is that **Dependabot cannot
-correctly upgrade `packages.config` projects**: it edits manifests and leaves the coupled `.csproj`
-state behind. Local Visual Studio / NuGet upgrades succeed because
-`scripts/vscode/Sync-PackageReferences.ps1` runs before every local build (invoked from
-`scripts/vscode/Invoke-VSBuild.ps1` lines 247-253) and repairs `<HintPath>` values. **That script
-never runs in CI**, so CI builds exactly what was committed. That asymmetry explains the whole
-failure pattern.
+Four distinct defects, in descending order of consequence:
 
-Three adjacent defects make a repaired pipeline fail on its first run and are in scope:
+- **D1 — out-of-scope project-file rewrites.** Dependabot writes `<Import>`/`<Error>` versions for
+  packages outside the pull request's declared group, to a version no manifest declares. This is the
+  direct cause of the build failure. Why it selects that version is an inference (its own restore
+  most likely resolved the floating latest for that package id); the divergence and its consequence
+  are verified.
+- **D2 — `<Analyzer Include>` is never rewritten by anything.** Confirmed in `dependabot-core`'s
+  `MSBuildNuGetProject` handling, which contains no analyzer-item logic, and confirmed empirically:
+  #908 contains zero `<Analyzer Include>` lines. This is issue **#898**. The naive
+  `analyzers\dotnet\cs\<Id>.dll` mapping is wrong for three of the five analyzer families in use —
+  Meziantou uses `dotnet\roslyn5.0\cs`, Roslynator `dotnet\roslyn4.7\cs` (four mangled assemblies),
+  SonarAnalyzer a bare `analyzers\` directory — so a repair must enumerate the restored package on
+  disk rather than compute the path. The repair must also preserve the sibling
+  `<AdditionalFiles ... BannedSymbols.txt>` element, since dropping it silently disables
+  BannedApiAnalyzers.
+- **D3 — formatting.** CSharpier formats both `packages.config` and `app.config`; Dependabot writes
+  both inline. `.csharpierignore` currently excludes neither.
+- **D4 — fan-out.** Four groups produce four pull requests. Grouping already consolidates across
+  directories (#908 spans ten), so a single group yields a single pull request.
 
-- **#898** — 15 `<Analyzer Include>` sites pinned to `Meziantou.Analyzer.3.0.203`.
-- **#902** — `Sync-PackageReferences.ps1` ranks `netstandard2.1` above `netstandard2.0`, which would
-  reintroduce #895 on the next local build. `net481` cannot consume `netstandard2.1` at all.
-- **#903** — `ToDoModel.Test/packages.config` omits packages for which the `.csproj` carries
-  `<HintPath>` entries (confirmed: `FSharp.Core`, `Deedle`).
+Adjacent defects folded in so that a repaired pipeline passes on its first run:
 
-Verified constraints on the NuGet CLI update command (fact-find, 2026-09-17): it is
-non-interactive-capable (requires the non-interactive and overwrite-conflict switches, and requires
-MSBuild, which CI has). It writes `packages.config`, existing `<Reference>`/`<HintPath>`, the
-conditional package `<Import>`, and the package-imports `<Error>` target. It **does not** write
-`<Analyzer Include>` (162 occurrences across all 17 projects; those are added by `install.ps1` via
-EnvDTE, and the update command never runs `install.ps1`) and it does **not** write binding
-redirects (the add-binding-redirects routine is a documented no-op, closed *By Design*). The
-version switch applies only when exactly one package id is supplied.
+- **#898** — the 15 stranded `<Analyzer Include>` sites described above.
+- **#902** — `scripts/vscode/Sync-PackageReferences.ps1` ranks `netstandard2.1` above
+  `netstandard2.0`, which would reintroduce #895 on the next local build. `net481` cannot consume
+  `netstandard2.1` at all. This script is the only one in `scripts/vscode/` with no Pester test file,
+  which is why the defect went undetected. It runs from `Invoke-VSBuild.ps1` lines 250-253 before
+  every local build and **never** in CI.
+- **#903** — `ToDoModel.Test/packages.config` omits packages whose `.csproj` carries `<HintPath>`
+  entries (confirmed: `FSharp.Core`, `Deedle`).
 
-One claim remains contested and must be settled empirically rather than assumed: the documentation
-states the update command adds no `<Reference>` element for a newly-added assembly, while the
-source suggests a full uninstall/install cycle that would. If the pessimistic reading holds, a
-third post-pass is required.
+Execution constraint discovered during analysis: a push made with the default `GITHUB_TOKEN` does
+not re-trigger workflows. An automated repair that pushes with it would leave the required checks red
+on the pre-repair commit, so a self-fixing pull request requires a GitHub App installation token.
 
 ## Proposed Fix / Validation Ideas
 
-Settled design (22 decisions, design-tree session 2026-09-19):
+Dependabot remains the upgrade engine — it already invokes the NuGet CLI update command, so
+reimplementing it would duplicate the work and inherit D1. The capability set settled in the design
+session is delivered as a **repair pass over Dependabot's own pull request** instead of as a
+replacement pipeline.
 
-- [x] **Dependabot detects; NuGet performs the upgrade.** One consolidated pull request,
-      `open-pull-requests-limit: 1`, directory fan-out collapsed, Deedle ignored entirely, the eight
-      existing major-version ignores retained.
-- [x] **A new reusable workflow performs the upgrade** automatically on its own fresh branch and
-      pull request, gated by a framework-compatibility check.
-- [x] **Compatibility is asset-level**: a candidate passes only if it ships an asset `net481` can
-      consume. `netstandard2.1` is excluded outright, not merely ranked last. An incompatible
-      package is skipped with a recorded reason and the remaining upgrades proceed.
-- [x] **One update invocation per package**, each version-pinned to what Dependabot identified,
-      followed by two post-passes for what NuGet provably does not write (`<Analyzer Include>` and
-      binding redirects).
-- [x] **A verifier repairs freely and fails only if the post-fix tree is still inconsistent**,
-      labelling the pull request `deps:autofixed` when a repair outside the two known-weak classes
-      was applied, and recording a "Repairs applied" block in the pull request body.
-- [x] Prerequisites folded into the same change so the verifier's first run is a clean pass:
-      #898, #902, #903, `packages.config` added to `.csharpierignore`, and all 17 manifests
-      normalised to inline form once.
-- [x] Pin the NuGet CLI version (currently floating in all three CI workflows).
-- [x] Unit coverage areas: the compatibility evaluator and the verifier are pure functions over
-      parsed manifest and project state and are unit-testable with Pester without touching the
-      network.
-- [x] Integration scenario to retest: run the upgrade workflow against a deliberately stale
-      manifest and confirm all six required checks pass on the produced branch.
-- [x] Manual verification notes: confirm `main` builds from a cold cache after the #898 correction.
+- [ ] **Detection and consolidation.** Collapse the four groups to one so each cycle yields exactly
+      one pull request; `open-pull-requests-limit: 1`; Deedle ignored entirely; the eight existing
+      major-version ignores retained; the inert `group-by: "dependency-name"` keys removed.
+- [ ] **Repair workflow**, triggered automatically on Dependabot pull requests, performing:
+  - [ ] **Compatibility gate** — asset-level: a candidate passes only if it ships an asset `net481`
+        can consume, with `netstandard2.1` excluded outright rather than merely ranked last. An
+        incompatible package is skipped with a recorded reason and the remaining upgrades proceed.
+  - [ ] **Version reconciliation (D1)** — every `<Import>`, `<Error>`, `<Reference>` and `<HintPath>`
+        is forced to agree with the version its own `packages.config` declares.
+  - [ ] **Analyzer-item repair (D2)** — `<Analyzer Include>` regenerated by enumerating the restored
+        package directory, preserving sibling `<AdditionalFiles>` elements.
+  - [ ] **Binding-redirect repair** — `app.config` redirects reconciled to the resolved assembly
+        versions.
+  - [ ] **Formatting (D3)** — CSharpier run over `packages.config` and `app.config`.
+  - [ ] **Verifier** — repairs freely; fails only if the post-repair tree is still inconsistent.
+  - [ ] **Disclosure** — a "Repairs applied" block added to the pull request body and a
+        `deps:autofixed` label when a repair outside the known-weak classes was applied.
+  - [ ] The repair commit is pushed onto Dependabot's existing branch, preserving the single-pull-request
+        rule, using a GitHub App installation token so the required checks re-run.
+- [ ] **Prerequisites** landed in the same change: #898, #902, #903, `.csharpierignore` coverage for
+      both `packages.config` and `app.config`, all 18 manifests normalised once, and the NuGet CLI
+      version pinned (currently floating in three workflows).
+- [ ] Unit coverage: the compatibility evaluator, the version reconciler and the analyzer-path
+      resolver are pure functions over parsed manifest and project state, unit-testable with Pester
+      without network access.
+- [ ] Integration scenario: replay the #908 divergence as a fixture and assert the repair produces a
+      tree that builds.
+- [ ] Manual verification: confirm `main` builds from a cold cache after the #898 correction.
 
 ## Next Step
 
