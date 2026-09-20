@@ -379,4 +379,51 @@ Describe 'Repair-PackageManifestConsistency' {
             $script:ScopedResult.IsSuccess | Should -BeTrue
         }
     }
+
+    Context 'A run whose only change is a manifest normalisation' {
+        BeforeAll {
+            # A manifest in the wrapped multi-line form CSharpier produces, beside a project
+            # that already agrees with it. The normalisation pass rewrites the manifest to the
+            # inline form the NuGet CLI writes; nothing in the project needs repairing.
+            $script:WrappedManifest = (@'
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package
+    id="Contoso.Widgets"
+    version="1.0.0"
+    targetFramework="net481" />
+</packages>
+'@ -replace "`r?`n", "`r`n") + "`r`n"
+
+            $script:AgreeingProject = @'
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0">
+  <ItemGroup>
+    <Reference Include="Contoso.Widgets, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contoso.Widgets.1.0.0\lib\net472\Contoso.Widgets.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
+'@ -replace "`r?`n", "`r`n"
+
+            $script:NormalisationFixture = Get-RepairFixture -File @{
+                $script:ManifestPath = $script:WrappedManifest
+                $script:ProjectPath  = $script:AgreeingProject
+            } -Identity $script:AssemblyIdentity
+            $argument = $script:NormalisationFixture.Argument
+            $script:NormalisationResult = & $script:EntryPoint @argument
+        }
+
+        It 'R3- reports a non-zero write count for a run whose only change is a normalisation' {
+            # Assert: the two quantities disagree, which is exactly the silent-discard case.
+            # The old push gate read RepairCount and would have seen 0; the new one reads the
+            # write-set count and sees 1.
+            $script:NormalisationResult.RepairCount |
+                Should -Be 0 -Because 'a normalisation produces no per-project repair record'
+            @($script:NormalisationResult.WrittenPath).Count |
+                Should -Be 1 -Because 'the manifest was rewritten, so the write set must not be empty'
+            @($script:NormalisationResult.WrittenPath)[0] |
+                Should -BeExactly $script:ManifestPath -Because 'the single written path is the manifest the normalisation reflowed'
+        }
+    }
 }

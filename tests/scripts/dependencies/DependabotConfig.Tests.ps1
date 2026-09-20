@@ -153,6 +153,30 @@ BeforeAll {
         return $step.ToArray()
     }
 
+    function Get-WorkflowStepBlock {
+        <#
+        .SYNOPSIS
+            Returns one workflow step's lines, from its name line to the next step's name line.
+        #>
+        param(
+            # AllowEmptyString is required: a mandatory [string[]] rejects a blank element, and a workflow file is full of blank lines.
+            [Parameter(Mandatory = $true)][AllowEmptyString()][string[]]$Line,
+            [Parameter(Mandatory = $true)][string]$StepName
+        )
+
+        $block = [System.Collections.Generic.List[string]]::new()
+        $inStep = $false
+        foreach ($text in $Line) {
+            if ($text -match '^\s+-\s+name:\s*(.+?)\s*$') {
+                if ($inStep) { break }
+                if ($Matches[1] -eq $StepName) { $inStep = $true; $block.Add($text); continue }
+            }
+            if ($inStep) { $block.Add($text) }
+        }
+
+        return $block.ToArray()
+    }
+
     # The literal expected set, in file order, as recorded by the P0-T22 census of the
     # merge-base configuration. Declared here so the comparison is against a fixed list
     # rather than against whatever the file happens to contain.
@@ -334,6 +358,88 @@ Describe 'Dependabot configuration consolidation' {
         }
     }
 
+    Context 'Repair workflow gating, disclosure and identity' {
+
+        It 'R3- gates the commit step on the write-set count rather than the repair count' {
+            # Arrange
+            $line = [System.IO.File]::ReadAllLines($script:RepairWorkflowPath)
+            $step = @(Get-WorkflowStepBlock -Line $line -StepName 'Commit and push the repair onto the Dependabot branch')
+            # Act
+            $ifLine = @($step | Where-Object { $_ -match '^\s+if:\s' })
+            # Assert
+            $step.Count | Should -BeGreaterThan 0 -Because 'an empty step block would make every clause below vacuous'
+            $ifLine.Count | Should -Be 1 -Because 'the commit step carries exactly one condition'
+            @($line | Where-Object { $_ -like '*written-count=*' }).Count |
+                Should -BeGreaterThan 0 -Because 'the repair step must publish the write-set count as a step output'
+            $ifLine[0] | Should -BeLike '*written-count*' -Because 'the push gate must read the quantity that moves whenever any file is written'
+            $ifLine[0] | Should -Not -BeLike '*repair-count*' -Because 'RepairCount excludes normalisation and binding-redirect writes, so a run whose only writes fall in those classes would go green and skip the push'
+        }
+
+        It 'R6- guards the disclosure step and replaces a delimited block' {
+            # Arrange
+            $line = [System.IO.File]::ReadAllLines($script:RepairWorkflowPath)
+            $text = [System.IO.File]::ReadAllText($script:RepairWorkflowPath)
+            $step = @(Get-WorkflowStepBlock -Line $line -StepName 'Disclose the repairs on the pull request')
+            # Act
+            $ifLine = @($step | Where-Object { $_ -match '^\s+if:\s' })
+            # Assert
+            $step.Count | Should -BeGreaterThan 0 -Because 'an empty step block would make every clause below vacuous'
+            $ifLine.Count | Should -Be 1 -Because 'the disclosure step must be guarded'
+            $ifLine[0] | Should -BeLike '*written-count*' -Because 'a run that wrote nothing has nothing to disclose'
+            $ifLine[0] | Should -BeLike '*skip-count*' -Because 'AC20 requires the skipped block whenever the run recorded a skip, even with no write'
+            $text | Should -BeLike '*<!-- dependabot-repair:begin -->*' -Because 'the disclosure must be delimited so a later run replaces it instead of appending'
+            $text | Should -BeLike '*<!-- dependabot-repair:end -->*' -Because 'a block needs both delimiters to be replaceable'
+        }
+
+        It 'R7- counts beyond-known-weak repairs with the analyzer exclusion alone' {
+            # Arrange
+            $text = [System.IO.File]::ReadAllText($script:RepairWorkflowPath)
+            # Assert
+            $text.Length | Should -BeGreaterThan 0 -Because 'an empty file would satisfy both containment clauses below vacuously'
+            $text | Should -BeLike "*Where-Object { `$_ -ne 'Analyzer' }*" -Because 'the binding-redirect clause is unreachable under the configured trigger and is removed'
+            $text | Should -BeLike '*not reachable from the workflow_run trigger*' -Because 'the reachability decision must be recorded at the line it explains, so a later author who supplies -CandidateUpgrade is told'
+        }
+
+        It 'R8- derives the commit identity from the token step outputs' {
+            # Arrange: the prohibited address is composed rather than typed, so this test file
+            # is not itself a match for a repository search for the literal.
+            $text = [System.IO.File]::ReadAllText($script:RepairWorkflowPath)
+            $handWritten = 'dependabot-repair' + '[bot]' + '@users.noreply.github.com'
+            # Assert
+            $text.Length | Should -BeGreaterThan 0 -Because 'an empty file would satisfy the absence clause below vacuously'
+            $text | Should -BeLike '*steps.app-token.outputs.app-slug*' -Because 'the app slug must come from the token step rather than a literal'
+            $text | Should -BeLike '*users/*' -Because 'the bot user id is resolved through the users API, the numeric part being the bot user id and not the app id'
+            $text.Contains($handWritten) | Should -BeFalse -Because 'a hand-written noreply address matches no account, so the commit author login would resolve to null and AC18 could not hold'
+        }
+
+        It 'R6- replaces rather than appends a previously disclosed block' {
+            # Arrange: the pattern is the one the workflow itself uses, and the containment
+            # assertion below is what makes this a test of the workflow rather than of a
+            # pattern this test invented. It fails if the two ever diverge by a character.
+            $blockPattern = '(?s)<!-- dependabot-repair:begin -->.*?<!-- dependabot-repair:end -->'
+            $text = [System.IO.File]::ReadAllText($script:RepairWorkflowPath)
+            $text.Contains($blockPattern) |
+                Should -BeTrue -Because 'the workflow must strip prior blocks with exactly this expression'
+
+            # The markers are derived from the pattern the same way the workflow derives them.
+            $marker = $blockPattern.Substring(4) -split '\.\*\?'
+            $leading = 'Bumps Contoso.Widgets from 1.0.0 to 2.0.0.'
+            $existing = $leading + "`n`n" + $marker[0] + "`n## Repairs applied`n- first run`n" + $marker[1]
+
+            # Act: strip any prior block, then append a fresh one, exactly as the step does.
+            $stripped = [regex]::Replace($existing, $blockPattern, '').TrimEnd()
+            $updated = $stripped + "`n`n" + $marker[0] + "`n## Repairs applied`n- second run`n" + $marker[1]
+            # Assert
+            ([regex]::Matches($updated, [regex]::Escape($marker[0]))).Count |
+                Should -Be 1 -Because 'a second run must leave exactly one opening marker, not two'
+            ([regex]::Matches($updated, [regex]::Escape($marker[1]))).Count |
+                Should -Be 1 -Because 'a second run must leave exactly one closing marker, not two'
+            $updated | Should -BeLike "*$leading*" -Because 'the strip must remove only the delimited block, leaving the pull-request body intact'
+            $updated | Should -BeLike '*second run*' -Because 'the fresh block must be present, so the strip did not simply delete everything'
+            $updated | Should -Not -BeLike '*first run*' -Because 'the prior block must be gone rather than accumulated'
+        }
+    }
+
     Context 'Default manifest lister visibility' {
 
         It 'R9c- records the enumerated directory count in the default manifest lister' {
@@ -352,10 +458,8 @@ Describe 'Dependabot configuration consolidation' {
                 if ($line[$j] -eq '}') { $end = $j; break }
             }
             $end | Should -BeGreaterThan $start -Because 'an undelimited block would make both assertions below vacuous'
-
             # Act
             $block = ($line[$start..$end] -join [System.Environment]::NewLine)
-
             # Assert
             $block | Should -BeLike '*Write-Verbose*' -Because 'a shortfall in one-level-deep manifest discovery must be observable in the run log'
             $block | Should -BeLike '*enumerated director*' -Because 'the verbose record must name the enumerated directory count, which is the quantity a shortfall shows up in'
