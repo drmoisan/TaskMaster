@@ -1,0 +1,123 @@
+name: dependabot-repair
+
+# Repairs the manifest and project-file inconsistencies a Dependabot upgrade leaves behind, then
+# pushes the repair onto Dependabot's own branch so the required checks re-run on it.
+#
+# The trigger is workflow_run rather than pull_request: a run triggered directly by a Dependabot
+# pull_request event receives a read-only token and no access to repository secrets, so it cannot
+# push. A workflow_run completion executes in the base-branch context, where the App credential is
+# available. The base-context variant of the pull-request trigger is deliberately not used and its
+# name appears nowhere in this file: it is a security regression for a convenience gain, and GitHub
+# restricts it by default from 2026-11-02.
+#
+# Credential: a GitHub App installation token minted from DEPENDABOT_REPAIR_APP_ID and
+# DEPENDABOT_REPAIR_APP_PRIVATE_KEY. When those secrets are absent the token step fails, the job
+# stops before it can push, and the pull request keeps the behaviour it has today. See
+# .github/workflows/README.md for the degraded mode and the installation runbook.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dependabot-repair-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    name: Repair package manifest consistency
+    runs-on: windows-latest
+    timeout-minutes: 45
+    # The branch-prefix restriction. Dependabot creates every branch under dependabot/, so this is
+    # what keeps the job off every other completed CI run.
+    if: >-
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/') &&
+      github.event.workflow_run.event == 'pull_request'
+
+    env:
+      SOLUTION_PATH: TaskMaster.sln
+      HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+
+    steps:
+      - name: Mint an installation token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.DEPENDABOT_REPAIR_APP_ID }}
+          private-key: ${{ secrets.DEPENDABOT_REPAIR_APP_PRIVATE_KEY }}
+
+      - name: Checkout the Dependabot branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          # Pinned for the same reason as every other workflow here: the tool that rewrites
+          # .csproj and app.config during an upgrade must be a known quantity for a given commit.
+          nuget-version: '7.9.0'
+
+      - name: Restore solution
+        shell: pwsh
+        run: nuget restore $env:SOLUTION_PATH
+
+      - name: Repair package manifest consistency
+        id: repair
+        shell: pwsh
+        run: |
+          $result = & "$env:GITHUB_WORKSPACE\scripts\dependencies\Repair-PackageManifestConsistency.ps1"
+          if (-not $result.IsSuccess) {
+            $result.Failure | ForEach-Object { Write-Error "$($_.ProjectName): $($_.Condition)" }
+            exit 1
+          }
+          $kind = @($result.Verification | ForEach-Object { $_.Report.Repair } |
+              Where-Object { $null -ne $_ } | ForEach-Object { $_.Kind })
+          $beyondKnownWeak = @($kind | Where-Object { $_ -ne 'Analyzer' -and $_ -ne 'BindingRedirect' }).Count
+          $body = Join-Path $env:RUNNER_TEMP 'repairs-report.md'
+          [System.IO.File]::WriteAllText($body, $result.Body)
+          "repair-count=$($result.RepairCount)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "beyond-known-weak=$beyondKnownWeak" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "skip-count=$(@($result.Skipped).Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "report-path=$body" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Commit and push the repair onto the Dependabot branch
+        if: steps.repair.outputs.repair-count != '0'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git config user.name 'dependabot-repair[bot]'
+          git config user.email 'dependabot-repair[bot]@users.noreply.github.com'
+          git add --update -- '*.csproj' '*/packages.config' '*/app.config'
+          git commit -m 'chore(deps): repair manifest and project-file consistency'
+          git push origin "HEAD:$env:HEAD_BRANCH"
+
+      - name: Disclose the repairs on the pull request
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          $number = @(gh pr list --head $env:HEAD_BRANCH --state open --json number --jq '.[].number')
+          if ($number.Count -eq 0) {
+            Write-Warning "No open pull request for branch $env:HEAD_BRANCH; nothing to disclose."
+            exit 0
+          }
+          $existing = gh pr view $number[0] --json body --jq '.body'
+          $report = [System.IO.File]::ReadAllText('${{ steps.repair.outputs.report-path }}')
+          $updated = Join-Path $env:RUNNER_TEMP 'pr-body.md'
+          [System.IO.File]::WriteAllText($updated, ($existing + "`n`n" + $report))
+          gh pr edit $number[0] --body-file $updated
+          if ('${{ steps.repair.outputs.beyond-known-weak }}' -ne '0') {
+            gh pr edit $number[0] --add-label 'deps:autofixed'
+          }

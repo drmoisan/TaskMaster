@@ -109,6 +109,8 @@ BeforeAll {
     }
 
     $script:WorkflowDirectory = Join-Path $script:RepoRoot '.github/workflows'
+    $script:RepairWorkflowPath = Join-Path $script:WorkflowDirectory 'dependabot-repair.yml'
+    $script:WorkflowReadmePath = Join-Path $script:WorkflowDirectory 'README.md'
 
     function Get-SetupNuGetStep {
         <#
@@ -259,6 +261,75 @@ Describe 'Dependabot configuration consolidation' {
                 $declared.NuGetVersion |
                     Should -Match '^\d+\.\d+\.\d+$' -Because "$($declared.File) line $($declared.LineNumber) must declare an exact three-part nuget-version, not a floating selector"
             }
+        }
+    }
+
+    Context 'Repair workflow static validity' {
+
+        It 'AC17- restricts its work to head branches under the Dependabot branch prefix' {
+            # Arrange
+            $line = [System.IO.File]::ReadAllLines($script:RepairWorkflowPath)
+
+            # Act
+            $restriction = @($line | Where-Object {
+                    $_ -match "startsWith\(github\.event\.workflow_run\.head_branch,\s*'dependabot/'\)"
+                })
+
+            # Assert: a positive match on the named expression, so an absent restriction fails
+            # rather than passing for want of anything to find.
+            $line.Count | Should -BeGreaterThan 0 -Because 'the workflow file must be readable for the assertion below to mean anything'
+            $restriction.Count | Should -BeGreaterThan 0 -Because 'the job must not run for a completed CI run on any other branch'
+        }
+
+        It 'AC17- does not use the base-context variant of the pull-request trigger' {
+            # Arrange
+            $text = [System.IO.File]::ReadAllText($script:RepairWorkflowPath)
+
+            # Act
+            $prohibited = ([regex]::Matches($text, 'pull_request' + '_target')).Count
+            $declared = ([regex]::Matches($text, 'workflow_run:')).Count
+
+            # Assert: the positive count is what distinguishes a file declaring the intended
+            # trigger from a file that declares no trigger at all.
+            $declared | Should -BeGreaterThan 0 -Because 'the workflow must declare the workflow_run trigger it was designed around'
+            $prohibited | Should -Be 0 -Because 'the base-context pull-request trigger is rejected on security grounds'
+        }
+
+        It 'AC26- records a NuGet pin in the workflow README equal to every workflow literal' {
+            # Arrange: the README literal, read from the pinned-tool paragraph of the repair
+            # workflow section, and every nuget-version literal the workflow files declare.
+            $readme = [System.IO.File]::ReadAllText($script:WorkflowReadmePath)
+            $documented = @([regex]::Matches($readme, '`(?<value>\d+\.\d+\.\d+)`') |
+                    ForEach-Object { $_.Groups['value'].Value } |
+                        Where-Object { $_ -match '^\d+\.\d+\.\d+$' })
+            $step = @(Get-SetupNuGetStep -Directory $script:WorkflowDirectory)
+
+            # Act
+            $declared = @($step | ForEach-Object { $_.NuGetVersion } | Sort-Object -Unique)
+            $pinned = @($documented | Where-Object { $declared -contains $_ } | Sort-Object -Unique)
+
+            # Assert: the comparison runs over a non-empty set in both directions, so neither an
+            # empty README nor a broken step enumerator can satisfy it vacuously.
+            $step.Count | Should -BeGreaterThan 0 -Because 'an empty workflow set would make the equality below vacuous'
+            $declared.Count | Should -Be 1 -Because 'every workflow step must pin the same NuGet CLI version'
+            $pinned.Count | Should -Be 1 -Because "the README must record the pinned version $($declared -join ', ') that the workflow files declare"
+            foreach ($record in $step) {
+                $record.NuGetVersion |
+                    Should -BeExactly $pinned[0] -Because "$($record.File) line $($record.LineNumber) must declare the version the README records"
+            }
+        }
+
+        It 'AC17- declares the write permissions the repair and the disclosure need' {
+            # Arrange
+            $line = [System.IO.File]::ReadAllLines($script:RepairWorkflowPath)
+
+            # Act
+            $contents = @($line | Where-Object { $_ -match '^\s*contents:\s*write\s*$' })
+            $pullRequests = @($line | Where-Object { $_ -match '^\s*pull-requests:\s*write\s*$' })
+
+            # Assert
+            $contents.Count | Should -BeGreaterThan 0 -Because 'the job pushes a commit onto the Dependabot branch'
+            $pullRequests.Count | Should -BeGreaterThan 0 -Because 'the job edits the pull-request body and its labels'
         }
     }
 }

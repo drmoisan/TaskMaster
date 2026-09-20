@@ -373,7 +373,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       selector, and the greater-than-zero assertion prevents a broken enumerator from passing
       vacuously.
 
-- [ ] **AC5 — Every analyzer item agrees with its manifest (#898).** A verifier invocation over the
+- [x] **AC5 — Every analyzer item agrees with its manifest (#898).** A verifier invocation over the
       working tree reports zero analyzer-item version disagreements **and** reports having examined
       162 `<Analyzer Include>` items across 17 project files. Evidence: the verifier report under
       evidence/qa. The examined-count assertion is the non-vacuity guard: a detector that matched
@@ -412,7 +412,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       consumable asset, it returns an acceptance naming the selected asset folder. Evidence: Pester
       output under evidence/qa.
 
-- [ ] **AC10 — An incompatible package is skipped and the remaining upgrades proceed.** A test in
+- [x] **AC10 — An incompatible package is skipped and the remaining upgrades proceed.** A test in
       `tests/scripts/dependencies/Repair-PackageManifestConsistency.Tests.ps1` drives the entry point
       over an in-memory fixture with two candidate upgrades, one incompatible. It asserts all three
       of: the incompatible package's manifest version is unchanged; the compatible package's manifest
@@ -477,7 +477,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       `newVersion`; and that an `app.config` with no redirect for that assembly is returned
       unchanged. Evidence: Pester output under evidence/qa.
 
-- [ ] **AC15 — The repair pass leaves a formatting-stable tree.** Running the repair entry point a
+- [x] **AC15 — The repair pass leaves a formatting-stable tree.** Running the repair entry point a
       second time over its own output produces an empty `git diff`, and
       `dotnet tool run csharpier check .` reports no findings on the post-repair tree. Evidence: the
       empty diff and the formatter output under evidence/qa. Fails on a non-idempotent normaliser or
@@ -491,7 +491,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       evidence/qa. The failing direction is the criterion that proves the verifier is not a
       pass-through.
 
-- [ ] **AC17 — The repair workflow exists and is statically valid.**
+- [x] **AC17 — The repair workflow exists and is statically valid.**
       `.github/workflows/dependabot-repair.yml` is present, passes `run-actionlint`, declares the
       write permissions it needs, and restricts its work to head branches under the Dependabot
       branch prefix. A Pester assertion in `tests/scripts/dependencies/DependabotConfig.Tests.ps1`
@@ -552,7 +552,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       single final pass, with the analyzer and nullable builds proven non-vacuous by the absence of a
       skipped compile target in their logs. Evidence: the captured logs under evidence/qa.
 
-- [ ] **AC26 — Documentation matches the delivered behaviour.** `.github/workflows/README.md`
+- [x] **AC26 — Documentation matches the delivered behaviour.** `.github/workflows/README.md`
       documents the repair workflow, its trigger, its credential requirement, and the pinned NuGet
       CLI version, and a Pester assertion in `tests/scripts/dependencies/DependabotConfig.Tests.ps1`
       asserts the pinned version literal recorded in the README equals the literal declared in the
