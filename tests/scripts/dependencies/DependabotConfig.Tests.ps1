@@ -461,8 +461,10 @@ Describe 'Dependabot configuration consolidation' {
             # Act
             $block = ($line[$start..$end] -join [System.Environment]::NewLine)
             # Assert
-            $block | Should -BeLike '*Write-Verbose*' -Because 'a shortfall in one-level-deep manifest discovery must be observable in the run log'
-            $block | Should -BeLike '*enumerated director*' -Because 'the verbose record must name the enumerated directory count, which is the quantity a shortfall shows up in'
+            $block | Should -BeLike '*Write-Information*' -Because 'a shortfall in one-level-deep manifest discovery must be observable in the run log'
+            $block | Should -BeLike '*-InformationAction Continue*' -Because 'the workflow step passes no -Verbose and sets no preference, so only an explicit action on the call reaches the run log'
+            $block | Should -Not -BeLike '*Write-Verbose*' -Because 'a verbose record is discarded by the deployed invocation, which is what made the prior remedy inert'
+            $block | Should -BeLike '*enumerated director*' -Because 'the record must name the enumerated directory count, which is the quantity a shortfall shows up in'
         }
     }
 }

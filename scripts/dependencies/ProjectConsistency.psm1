@@ -138,9 +138,17 @@ function Resolve-ReferenceAssemblyVersion {
         [AllowNull()][scriptblock]$IdentityProvider = $null
     )
 
+    # Case-insensitive, and tolerant of whitespace either side of the name, so that this
+    # resolver accepts exactly the Include set Get-RewrittenReferenceVersionLine rewrites: that
+    # function compares the captured name with PowerShell -ne after .Trim(), and -ne is
+    # case-insensitive. Were the two to diverge, an Include differing from the manifest id only
+    # in case would resolve to the empty string here while the rewrite still fired, and the
+    # caller's fallback would put the package version into the Reference with no assembly
+    # evidence behind it. That is finding R5, and no parameter lets a consumer avoid it.
     $declared = ''
     $match = [regex]::Match($ProjectText,
-        'Include="' + [regex]::Escape($PackageId) + ',\s*Version=(?<value>[^,"]+)')
+        'Include="\s*' + [regex]::Escape($PackageId) + '\s*,\s*Version=(?<value>[^,"]+)',
+        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
     if ($match.Success) { $declared = $match.Groups['value'].Value }
     if ($null -eq $IdentityProvider) { return $declared }
 

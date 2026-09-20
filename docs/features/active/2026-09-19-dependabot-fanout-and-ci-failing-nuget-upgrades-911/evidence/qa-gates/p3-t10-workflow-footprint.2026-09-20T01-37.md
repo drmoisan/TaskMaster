@@ -54,16 +54,26 @@ adjusted.** The four edits replace five lines between them and add 55:
 | Edit | Task | Lines deleted | Lines added |
 |---|---|---|---|
 | Write-set output and push gate | [P3-T2] | 1, the old `if:` condition | 9 |
-| Disclosure guard and block replacement | [P3-T4] | 2, the old `$updated` composition and its `WriteAllText` | 20 |
+| Disclosure guard and block replacement | [P3-T4] | 1, the old `WriteAllText` call | 20 |
 | Beyond-known-weak filter | [P3-T6] | 1, the two-clause filter line | 9 |
 | Commit identity | [P3-T7] | 2, the two `git config` literals | 17 |
 | **Total** | | **5** at least | **55** |
 
+*Corrigendum, cycle 2026-09-20T09-42.* The `[P3-T4]` row above originally read "2, the old
+`$updated` composition and its `WriteAllText`", which made the column sum to 6 against the
+measured 5 while the total row reconciled to 5 without noting the disagreement. The review dated
+2026-09-20 established that `$updated = Join-Path $env:RUNNER_TEMP 'pr-body.md'` is unchanged
+context in the diff and only the `WriteAllText` line was deleted. Re-verified here:
+`git diff 794d34f02..HEAD -- .github/workflows/dependabot-repair.yml` emits exactly five `-`
+content lines, one of which is the `WriteAllText` call and none of which is the `$updated`
+composition. The row and the prose below are corrected; the measured totals, the numstat and the
+conclusion are unchanged.
+
 The plan's figure of "at least 6" appears to have counted the two `git config` lines plus the
 four other replaced lines as six distinct deletions. In the delivered edit the disclosure change
-replaces two lines rather than three, because the `$report` read is unchanged and only the
-composition and the write were rewritten. Five deletions is the correct count for the four edits
-as made, and the 55 additions are far above the 12 floor.
+replaces one line rather than two, because the `$report` read and the `$updated` composition are
+both unchanged and only the write was rewritten. Five deletions is the correct count for the four
+edits as made, and the 55 additions are far above the 12 floor.
 
 **All four edits are independently confirmed present** by measurements that do not depend on this
 count: [P3-T2] records the new output and condition lines verbatim with their own anchored

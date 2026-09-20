@@ -450,4 +450,45 @@ Describe 'Project consistency reconciliation and verification' {
             $line | Should -BeLike '*newVersion="2.0.0.0"*'
         }
     }
+
+    Context 'Agreement between the resolve guard and the rewrite guard' {
+
+        It 'R5- preserves the declared version for an Include whose case differs from the manifest identifier' {
+            # Arrange: the Include name and the package identifier differ only in case, which is
+            # the one input class on which the two guards can disagree. The rewriter compares the
+            # captured name with PowerShell -ne, which is case-insensitive, so it rewrites this
+            # Reference. A case-sensitive resolver never sees the declaration, returns the empty
+            # string, and Invoke-VersionReconciliation then substitutes the manifest version --
+            # a Reference version written from the package version with no assembly evidence,
+            # which is finding R5.
+            $project = $script:StaleProject.Replace('Include="Contoso.Widgets,', 'Include="CONTOSO.widgets,')
+
+            # The restored package carries the declared 1.0.2 in an asset folder no .NET
+            # Framework target can consume, so the resolver has no selectable folder to answer
+            # from and must answer from the declaration or not at all. That is what makes the
+            # two outcomes distinguishable rather than coincidentally equal.
+            $identity = { @([pscustomobject]@{ Version = '1.0.2'; AssetFolder = 'netstandard2.1' }) }
+
+            # Act: the two-call sequence ConsistencyVerifier.psm1 and the repair entry point both
+            # use, with the resolver's answer handed to the reconciliation as it stands.
+            $assemblyVersion = Resolve-ReferenceAssemblyVersion -PackageId 'Contoso.Widgets' `
+                -PackageVersion '2.0.0' -ProjectText $project -IdentityProvider $identity
+            $result = Invoke-VersionReconciliation -ProjectText $project -PackageId 'Contoso.Widgets' `
+                -ManifestVersion '2.0.0' -AssemblyVersion $assemblyVersion
+            $referenceLine = @($result.Text -split '\r?\n' | Where-Object { $_ -like '*<Reference Include=*' })[0]
+
+            # The positive control: supplied a version directly, the reconciliation does rewrite
+            # this same Include, so the resolver refusing it is a real divergence between the two
+            # guards and not a case both of them decline.
+            $control = Invoke-VersionReconciliation -ProjectText $project -PackageId 'Contoso.Widgets' `
+                -ManifestVersion '2.0.0' -AssemblyVersion '7.7.7.7'
+            $controlLine = @($control.Text -split '\r?\n' | Where-Object { $_ -like '*<Reference Include=*' })[0]
+
+            # Assert
+            $assemblyVersion | Should -BeExactly '1.0.2' -Because 'the resolver must see every Include the rewriter will rewrite, whatever its case'
+            $referenceLine | Should -BeLike '*Version=1.0.2,*' -Because 'the restored package carries the declared version, so it is confirmed and preserved'
+            $referenceLine | Should -Not -BeLike '*Version=2.0.0,*' -Because 'substituting the manifest version with no assembly evidence is the R5 behaviour'
+            $controlLine | Should -BeLike '*Version=7.7.7.7,*' -Because 'the rewriter matches this Include case-insensitively, so the guards would genuinely disagree'
+        }
+    }
 }

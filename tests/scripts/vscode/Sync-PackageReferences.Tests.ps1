@@ -390,4 +390,52 @@ Describe 'Sync-PackageReferences negative and error paths' {
             $call['WriteText'] | Should -Be 0 -Because 'a clean project must not be written back, which would dirty the tree on every run'
         }
     }
+
+    Context 'Aggregate summary when the run repairs nothing' {
+
+        It 'R2- reports the up-to-date outcome for the whole run when every hint path already resolves' {
+            # Arrange: one manifest whose sibling project needs no repair, driven through the
+            # top-level entry point rather than the per-project one. This is the zero-fix arm of
+            # the aggregate summary. Its non-zero counterpart is already driven by the
+            # end-to-end repair test, which returns a FixedCount of 1; nothing reached this arm.
+            $call = @{ WriteText = 0; WrittenPath = ''; WrittenText = '' }
+            $clean = '<Project><ItemGroup><Reference Include="Contoso.Widgets, Version=2.0.0.0"><HintPath>..\packages\Contoso.Widgets.2.0.0\lib\net481\Contoso.Widgets.dll</HintPath></Reference></ItemGroup></Project>'
+            $manifest = '<?xml version="1.0" encoding="utf-8"?><packages><package id="Contoso.Widgets" version="2.0.0" targetFramework="net481" /></packages>'
+            $seam = @{
+                ListManifestPath = {
+                    param([string]$Root)
+                    if ([string]::IsNullOrEmpty($Root)) { return @() }
+                    return @('C:\fake\Proj\packages.config')
+                }
+                ListProjectPath  = {
+                    param([string]$Directory)
+                    if ([string]::IsNullOrEmpty($Directory)) { return @() }
+                    return @('C:\fake\Proj\Proj.csproj')
+                }
+                TestPath         = { param([string]$Path) $Path.Length -gt 0 }
+                ReadText         = {
+                    param([string]$Path)
+                    if ($Path -like '*packages.config') { return $manifest }
+                    return $clean
+                }.GetNewClosure()
+                WriteText        = {
+                    param([string]$Path, [string]$Text)
+                    $call['WriteText'] = $call['WriteText'] + 1
+                    $call['WrittenPath'] = $Path
+                    $call['WrittenText'] = $Text
+                }.GetNewClosure()
+            }
+
+            # Act: the information stream is captured because the summary line is the only
+            # observable this arm produces; the returned counts alone cannot distinguish it
+            # from a run that examined nothing at all.
+            $summary = Invoke-PackageReferenceSync -SolutionRoot 'C:\fake' -Seam $seam -InformationVariable record
+
+            # Assert
+            $summary.ExaminedCount | Should -Be 1 -Because 'the one manifest the seam offered was examined'
+            $summary.FixedCount | Should -Be 0 -Because 'every hint path already resolved, so the run repaired nothing'
+            $call['WriteText'] | Should -Be 0 -Because 'a clean tree must not be written back, which would dirty it on every run'
+            (@($record | ForEach-Object { [string]$_ }) -join "`n") | Should -BeLike '*All HintPaths are up to date*' -Because 'the run must report the up-to-date outcome rather than finish silently'
+        }
+    }
 }

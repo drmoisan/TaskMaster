@@ -84,10 +84,19 @@ Structural properties that are deliberate and should not be changed casually:
 `dependabot-repair.yml` is not a CI gate and `ci.yml` does not invoke it. It repairs the manifest
 and project-file inconsistencies a Dependabot upgrade leaves behind — a version reconciled in
 `packages.config` but not in the `<Import>`, `<Error>`, `<Reference>`, `<HintPath>` and
-`<Analyzer Include>` elements that depend on it, or in an `app.config` binding redirect — and
-pushes the repair onto Dependabot's own branch so the required checks re-run on the repaired head.
-The repair itself lives in `scripts/dependencies/Repair-PackageManifestConsistency.ps1`; the
-workflow is the wiring that gives it a restored tree, a credential and a branch to push to.
+`<Analyzer Include>` elements that depend on it — and pushes the repair onto Dependabot's own
+branch so the required checks re-run on the repaired head. The repair itself lives in
+`scripts/dependencies/Repair-PackageManifestConsistency.ps1`; the workflow is the wiring that
+gives it a restored tree, a credential and a branch to push to.
+
+**`app.config` binding redirects are not repaired from this trigger.** The repair script does
+carry a binding-redirect reconciliation pass, but the `workflow_run` step invokes the entry point
+with no `-CandidateUpgrade`, so the applied-upgrade set is always empty and that pass never runs.
+An `app.config` redirect left stale by a Dependabot upgrade therefore stays stale, and an operator
+investigating a binding failure after a repaired run should look there first rather than assume
+the workflow covered it. The class becomes reachable only if a future change supplies
+`-CandidateUpgrade` to the invocation in the "Repair package manifest consistency" step; the same
+condition is recorded as a comment on that step and in the AC14 note in the issue #911 spec.
 
 **Trigger.** The workflow triggers on `workflow_run`, on completion of the `CI` workflow, and the
 job runs only when the originating run's head branch is under the `dependabot/` prefix and its

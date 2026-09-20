@@ -94,9 +94,14 @@ $script:DefaultFileLister = {
                 } | ForEach-Object { $_.FullName })
     # Discovery reaches the root and its immediate subdirectories only, so a project nested
     # deeper is skipped. This record does not prevent that; it makes the shortfall observable
-    # in the run log, which is decision D4 for finding R9c. Widening the walk would change
-    # which manifests the production pass discovers and no test covers that change.
-    Write-Verbose ('Manifest discovery: enumerated directories {0}, returned files {1}' -f ($directory.Count + 1), $file.Count)
+    # in the run log, which is decision D4 for finding R9c. The information stream carries it
+    # rather than the verbose stream because the workflow step that runs this script passes no
+    # -Verbose and sets no $VerbosePreference, so a verbose record would be discarded and the
+    # remedy would be inert at the only invocation that matters. -InformationAction Continue is
+    # stated on the call so visibility does not depend on the caller either. Widening the walk
+    # would change which manifests the production pass discovers and no test covers that change.
+    $record = 'Manifest discovery: enumerated directories {0}, returned files {1}'
+    Write-Information ($record -f ($directory.Count + 1), $file.Count) -InformationAction Continue
     return $file
 }
 
