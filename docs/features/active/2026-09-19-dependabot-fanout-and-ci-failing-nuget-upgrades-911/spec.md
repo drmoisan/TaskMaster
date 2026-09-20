@@ -398,7 +398,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       evidence/qa. Fails if the framework is merely demoted, because the "offered only
       netstandard2.1" case then returns a selection.
 
-- [ ] **AC8 — Orphaned hint paths are eliminated and detectable (#903).** The verifier reports zero
+- [x] **AC8 — Orphaned hint paths are eliminated and detectable (#903).** The verifier reports zero
       orphaned `<HintPath>` entries for `ToDoModel.Test/ToDoModel.Test.csproj` after
       `ToDoModel.Test/packages.config` gains the missing manifest entries, and a unit test in
       `tests/scripts/dependencies/ProjectConsistency.Tests.ps1` asserts the same detector reports a
@@ -420,7 +420,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       incompatible package and a non-empty reason. Evidence: Pester output under evidence/qa. A
       fail-fast implementation fails the second assertion.
 
-- [ ] **AC11 — Version reconciliation covers all four dependent element kinds (D1).**
+- [x] **AC11 — Version reconciliation covers all four dependent element kinds (D1).**
       `tests/scripts/dependencies/ProjectConsistency.Tests.ps1` asserts, with one assertion per
       element kind, that given a manifest version and project text in which `<Import>`, `<Error>`,
       `<Reference>` and `<HintPath>` each name a different version, the reconciled text has each of
@@ -428,7 +428,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       Per-kind assertions make a reconciler that handles only two kinds fail rather than pass on an
       aggregate.
 
-- [ ] **AC12 — Analyzer items are repaired by preserving the existing folder segment (D2).**
+- [x] **AC12 — Analyzer items are repaired by preserving the existing folder segment (D2).**
       `tests/scripts/dependencies/AnalyzerItemRepair.Tests.ps1` supplies an injected directory
       listing and asserts the derived path set for each of the four shapes observed in this
       repository: a plain language-folder shape; a Roslyn-qualified shape; a multi-assembly shape
@@ -464,13 +464,13 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       the path from the package id, and for any implementation that orders or maximises over
       Roslyn-qualified folder names.
 
-- [ ] **AC13 — Sibling elements in the analyzer item group survive regeneration.** The same suite
+- [x] **AC13 — Sibling elements in the analyzer item group survive regeneration.** The same suite
       asserts that after regeneration the item group still contains the `<AdditionalFiles>` element
       naming the banned-symbols list and the explanatory comment that precedes the items, and that a
       project fixture with no analyzer item group at all — the SVGControl shape — is returned
       byte-identical with no item group synthesised. Evidence: Pester output under evidence/qa.
 
-- [ ] **AC14 — Binding redirects are reconciled to the resolved assembly version.**
+- [x] **AC14 — Binding redirects are reconciled to the resolved assembly version.**
       `tests/scripts/dependencies/ProjectConsistency.Tests.ps1` asserts that for an `app.config`
       fixture whose redirect names an older assembly version than the one resolved from the manifest,
       the reconciled text names the resolved version in both the upper bound of `oldVersion` and in
@@ -483,7 +483,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       empty diff and the formatter output under evidence/qa. Fails on a non-idempotent normaliser or
       renderer.
 
-- [ ] **AC16 — The verifier repairs freely and fails only on residual inconsistency.**
+- [x] **AC16 — The verifier repairs freely and fails only on residual inconsistency.**
       `tests/scripts/dependencies/ProjectConsistency.Tests.ps1` asserts both directions against the
       entry point: a fixture whose every divergence is repairable returns a success result whose
       report enumerates the repairs performed; a fixture carrying a divergence no repair can resolve
@@ -520,20 +520,20 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       Evidence: the captured pull-request body and label state for both runs, under evidence/qa. The
       absent-label case prevents an implementation that always labels from passing.
 
-- [ ] **AC21 — The #908 three-way divergence is reproduced as a fixture and resolved.**
+- [x] **AC21 — The #908 three-way divergence is reproduced as a fixture and resolved.**
       `tests/scripts/dependencies/ProjectConsistency.Tests.ps1` carries an in-memory fixture in which
       one project's manifest declares 3.0.235, its `<Import>` and `<Error>` name 3.0.259, and its
       `<Analyzer Include>` names 3.0.203. The test asserts the verifier reports a disagreement for
       the guard elements and a disagreement for the analyzer item before repair, and that after
       repair all three locations name 3.0.235. Evidence: Pester output under evidence/qa.
 
-- [ ] **AC22 — The AC21 regression test is observed failing before the fix.** The AC21 test is
+- [x] **AC22 — The AC21 regression test is observed failing before the fix.** The AC21 test is
       executed against the tree before the reconciliation and analyzer-repair modules are wired in,
       and the captured run shows it failing; the same test is then captured passing on the delivered
       tree. Evidence: the failing run under evidence/baseline and the passing run under
       evidence/regression. A test that cannot be shown failing is not admitted.
 
-- [ ] **AC23 — Reference completeness is asserted and demonstrably detectable.** The verifier asserts
+- [x] **AC23 — Reference completeness is asserted and demonstrably detectable.** The verifier asserts
       that for each package in a manifest, a `<Reference>` with a matching `<HintPath>` exists for
       each consumable library asset resolved for that package, and
       `tests/scripts/dependencies/ProjectConsistency.Tests.ps1` asserts the detector reports a
