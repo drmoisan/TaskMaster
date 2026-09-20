@@ -183,3 +183,211 @@ Describe 'Sync-PackageReferences framework selection parity with the shared modu
         }
     }
 }
+
+Describe 'Sync-PackageReferences negative and error paths' {
+
+    Context 'Manifest identifier resolution' {
+
+        It 'R2- returns no identifier when the restore folder matches no manifest package' {
+            # Arrange: the manifest declares one package and the restore folder names a
+            # different one, so no declared identifier prefixes the folder name.
+            $versionMap = @{ 'Contoso.Widgets' = '2.0.0' }
+
+            # Act
+            $identifier = Resolve-ManifestPackageId -FolderName 'Fabrikam.Core.1.0.0' -VersionMap $versionMap
+
+            # Assert
+            $identifier | Should -BeNullOrEmpty -Because 'a restore folder no manifest key prefixes belongs to no declared package'
+        }
+    }
+
+    Context 'Asset folder resolution against an absent library directory' {
+
+        It 'R2- returns no asset folder when the library directory is absent' {
+            # Arrange: every probe reports the path absent, and the enumerator records
+            # whether it was reached at all.
+            $call = @{ ListAssetFolder = 0; LastLibraryDirectory = '' }
+            $seam = @{
+                TestPath        = { param([string]$Path) $Path.Length -lt 0 }
+                ListAssetFolder = {
+                    param([string]$LibraryDirectory)
+                    $call['ListAssetFolder'] = $call['ListAssetFolder'] + 1
+                    $call['LastLibraryDirectory'] = $LibraryDirectory
+                    return @('net481')
+                }.GetNewClosure()
+            }
+
+            # Act
+            $selected = Resolve-PackageAssetFolder -LibraryDirectory 'C:\fake\packages\Contoso.2.0.0\lib' -Seam $seam
+
+            # Assert
+            $selected | Should -BeNullOrEmpty -Because 'an absent library directory offers no asset folder to select'
+            $call['ListAssetFolder'] | Should -Be 0 -Because 'the function must not enumerate a directory it has not confirmed exists'
+        }
+    }
+
+    Context 'Compatibility rejection reaching the issue 902 handler' {
+
+        It 'R2- warns and records no repair when no asset folder the target framework can consume ships the file' {
+            # Arrange: the project is bound to version 1.0.0 of the package and the manifest
+            # declares 2.0.0, so the hint path needs repairing; but 2.0.0 ships only an asset
+            # folder .NET Framework 4.8.1 cannot consume.
+            $projectText = '<Project><ItemGroup><Reference Include="Contoso.Widgets, Version=1.0.0.0"><HintPath>..\packages\Contoso.Widgets.1.0.0\lib\netstandard2.1\Contoso.Widgets.dll</HintPath></Reference></ItemGroup></Project>'
+            $versionMap = @{ 'Contoso.Widgets' = '2.0.0' }
+
+            # Every relative probe reports absent, so neither the current hint path nor the
+            # candidate at the corrected version resolves. Every absolute probe reports
+            # present, so the library directory and the required file inside the single
+            # offered asset folder are both found and the rejection is the compatibility
+            # gate's decision rather than a missing file.
+            $seam = @{
+                TestPath        = { param([string]$Path) -not $Path.Contains('..') }
+                ListAssetFolder = {
+                    param([string]$LibraryDirectory)
+                    if ([string]::IsNullOrEmpty($LibraryDirectory)) { return @() }
+                    return @('netstandard2.1')
+                }
+            }
+
+            # Act
+            $repair = @(Get-HintPathRepair -ProjectText $projectText -ProjectDirectory 'C:\fake\Proj' `
+                    -PackagesDirectory 'C:\fake\packages' -VersionMap $versionMap -Seam $seam `
+                    -WarningVariable rejection -WarningAction SilentlyContinue)
+
+            # Assert
+            $repair.Count | Should -Be 0 -Because 'an unconsumable asset set must yield no repair record rather than a guessed one'
+            @($rejection).Count | Should -BeGreaterThan 0 -Because 'an empty warning set would satisfy the text assertion below vacuously'
+            (@($rejection) -join ' ') | Should -BeLike '*no asset folder the target framework can consume ships it*' -Because 'the rejection must be reported in the run log, not skipped silently'
+        }
+    }
+
+    Context 'Reference version rewriting that must not fire' {
+
+        It 'R2- returns the project text unchanged when no Reference names the assembly' {
+            # Arrange: the assembly name appears in no Include attribute of the text.
+            $projectText = '<Project><ItemGroup><Reference Include="Contoso.Widgets, Version=1.0.0.0" /></ItemGroup></Project>'
+
+            # Act
+            $result = Repair-ProjectReferenceVersion -ProjectText $projectText `
+                -AssemblyName 'Fabrikam.Core' -AssemblyVersion '9.9.9.9'
+
+            # Assert
+            $result | Should -BeExactly $projectText -Because 'an assembly the text never names must not cause any rewrite'
+        }
+
+        It 'R2- returns the project text unchanged when the Reference already names the resolved version' {
+            # Arrange: the Include attribute already declares the four-part version that will
+            # be supplied as the resolved one.
+            $projectText = '<Project><ItemGroup><Reference Include="Contoso.Widgets, Version=2.0.0.0" /></ItemGroup></Project>'
+
+            # Act
+            $result = Repair-ProjectReferenceVersion -ProjectText $projectText `
+                -AssemblyName 'Contoso.Widgets' -AssemblyVersion '2.0.0.0'
+
+            # Assert
+            $result | Should -BeExactly $projectText -Because 'an already-correct version must not be rewritten, so applying the repair twice is a no-op'
+        }
+    }
+
+    Context 'Per-project sync outcomes that produce no write' {
+
+        It 'R2- skips the manifest directory when no project file sits beside it' {
+            # Arrange: the directory holds a manifest and no project file, and the reader
+            # records whether it was reached at all.
+            $call = @{ ReadText = 0; LastPath = '' }
+            $seam = @{
+                ListProjectPath = {
+                    param([string]$Directory)
+                    # The directory under test holds no project file; any other directory
+                    # would, so the empty result is a property of this fixture rather than
+                    # of an enumerator that returns nothing whatever it is asked.
+                    if ($Directory -eq 'C:\fake\Proj') { return @() }
+                    return @('C:\fake\Other\Other.csproj')
+                }
+                ReadText        = {
+                    param([string]$Path)
+                    $call['ReadText'] = $call['ReadText'] + 1
+                    $call['LastPath'] = $Path
+                    return ''
+                }.GetNewClosure()
+            }
+
+            # Act
+            $result = Invoke-ProjectReferenceSync -ManifestPath 'C:\fake\Proj\packages.config' `
+                -PackagesDirectory 'C:\fake\packages' -Seam $seam
+
+            # Assert
+            $result.Skipped | Should -BeTrue -Because 'a directory with no project file is skipped rather than examined'
+            $result.FixedCount | Should -Be 0 -Because 'nothing can be repaired where nothing was read'
+            $call['ReadText'] | Should -Be 0 -Because 'the function must not read a project file it never found'
+        }
+
+        It 'R2- skips the project with a warning when merge conflict markers are present' {
+            # Arrange: the project file carries a seven-character conflict marker.
+            $conflicted = ('<' * 7) + " HEAD`n<Project></Project>"
+            $seam = @{
+                ListProjectPath = {
+                    param([string]$Directory)
+                    if ([string]::IsNullOrEmpty($Directory)) { return @() }
+                    return @('C:\fake\Proj\Proj.csproj')
+                }
+                ReadText        = {
+                    param([string]$Path)
+                    # The conflicted text belongs to the project file. The manifest branch
+                    # exists so the delegate answers by path rather than unconditionally; the
+                    # skip returns before the manifest is ever read.
+                    if ($Path -like '*packages.config') { return '' }
+                    return $conflicted
+                }.GetNewClosure()
+            }
+
+            # Act
+            $result = Invoke-ProjectReferenceSync -ManifestPath 'C:\fake\Proj\packages.config' `
+                -PackagesDirectory 'C:\fake\packages' -Seam $seam `
+                -WarningVariable conflictWarning -WarningAction SilentlyContinue
+
+            # Assert
+            $result.Skipped | Should -BeTrue -Because 'a conflicted project must not be rewritten, which would corrupt an in-progress merge'
+            $result.FixedCount | Should -Be 0 -Because 'a skipped project repairs nothing'
+            @($conflictWarning).Count | Should -BeGreaterThan 0 -Because 'an empty warning set would satisfy the text assertion below vacuously'
+            (@($conflictWarning) -join ' ') | Should -BeLike '*Merge conflict markers detected, skipping*' -Because 'the skip must be reported rather than silent'
+        }
+
+        It 'R2- returns an unskipped result with no fix when no hint path needs repair' {
+            # Arrange: one project file whose every hint path already resolves, so the repair
+            # set is empty and nothing is written.
+            $call = @{ WriteText = 0; WrittenPath = ''; WrittenText = '' }
+            $clean = '<Project><ItemGroup><Reference Include="Contoso.Widgets, Version=2.0.0.0"><HintPath>..\packages\Contoso.Widgets.2.0.0\lib\net481\Contoso.Widgets.dll</HintPath></Reference></ItemGroup></Project>'
+            $manifest = '<?xml version="1.0" encoding="utf-8"?><packages><package id="Contoso.Widgets" version="2.0.0" targetFramework="net481" /></packages>'
+            $seam = @{
+                ListProjectPath = {
+                    param([string]$Directory)
+                    if ([string]::IsNullOrEmpty($Directory)) { return @() }
+                    return @('C:\fake\Proj\Proj.csproj')
+                }
+                TestPath        = { param([string]$Path) $Path.Length -gt 0 }
+                ReadText        = {
+                    param([string]$Path)
+                    if ($Path -like '*packages.config') { return $manifest }
+                    return $clean
+                }.GetNewClosure()
+                WriteText       = {
+                    param([string]$Path, [string]$Text)
+                    $call['WriteText'] = $call['WriteText'] + 1
+                    $call['WrittenPath'] = $Path
+                    $call['WrittenText'] = $Text
+                }.GetNewClosure()
+            }
+
+            # Act
+            $result = Invoke-ProjectReferenceSync -ManifestPath 'C:\fake\Proj\packages.config' `
+                -PackagesDirectory 'C:\fake\packages' -Seam $seam
+
+            # Assert: this is the second of the two zero-fix outcomes, and it is distinguished
+            # from the skipped one by Skipped being false.
+            $result.Skipped | Should -BeFalse -Because 'the project was examined, not skipped'
+            $result.FixedCount | Should -Be 0 -Because 'every hint path already resolved, so nothing needed repairing'
+            $call['WriteText'] | Should -Be 0 -Because 'a clean project must not be written back, which would dirty the tree on every run'
+        }
+    }
+}
