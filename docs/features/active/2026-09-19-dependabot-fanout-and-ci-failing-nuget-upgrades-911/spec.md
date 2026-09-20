@@ -337,7 +337,7 @@ docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-
 the baseline, qa or regression subdirectory as indicated, per the evidence and timestamp
 conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
 
-- [ ] **AC1 — Dependabot configuration is consolidated.** `tests/scripts/dependencies/DependabotConfig.Tests.ps1`
+- [x] **AC1 — Dependabot configuration is consolidated.** `tests/scripts/dependencies/DependabotConfig.Tests.ps1`
       parses `.github/dependabot.yml` and asserts, as separate positive assertions: exactly one
       entry under `groups`; that entry declares `applies-to: version-updates` and a catch-all
       pattern; `open-pull-requests-limit` equals 1; an `ignore` entry for Deedle exists with neither
@@ -364,7 +364,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       evidence/qa. Fails if the normaliser is non-idempotent, or if it examines fewer than 18 files
       (which would mean the discovery glob, not the tree, is clean).
 
-- [ ] **AC4 — The NuGet CLI version is pinned everywhere it is selected.** A Pester assertion in
+- [x] **AC4 — The NuGet CLI version is pinned everywhere it is selected.** A Pester assertion in
       `tests/scripts/dependencies/DependabotConfig.Tests.ps1` enumerates every step in
       `.github/workflows/` that uses the setup-nuget action, asserts the enumerated count is
       greater than zero, and asserts that each such step declares a `nuget-version` that is an exact
@@ -387,7 +387,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       the passing one under evidence/qa. This criterion is deliberately local: the CI cache
       `restore-keys:` prefix fallback prevents CI from reaching the failing state.
 
-- [ ] **AC7 — The incompatible framework is excluded, not ranked (#902).**
+- [x] **AC7 — The incompatible framework is excluded, not ranked (#902).**
       `tests/scripts/dependencies/PackageCompatibility.Tests.ps1` asserts positively that the
       selector returns `net481` when it is present; returns `net48` when `net481` is absent; returns
       `netstandard2.0` when offered `netstandard2.1` and `netstandard2.0` together; and returns no
@@ -405,7 +405,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       non-empty orphan set for an in-memory fixture reproducing the pre-fix pair. Both directions are
       asserted in the same suite. Evidence: Pester output under evidence/qa.
 
-- [ ] **AC9 — The compatibility gate is asset-level.** `tests/scripts/dependencies/PackageCompatibility.Tests.ps1`
+- [x] **AC9 — The compatibility gate is asset-level.** `tests/scripts/dependencies/PackageCompatibility.Tests.ps1`
       asserts the gate decides from the asset folders a candidate package actually ships, not from a
       declared framework attribute: given an asset set containing only frameworks net481 cannot
       consume, the gate returns a rejection carrying a reason string; given a set containing a
