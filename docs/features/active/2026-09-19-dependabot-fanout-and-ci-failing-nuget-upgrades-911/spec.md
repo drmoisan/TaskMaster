@@ -476,6 +476,11 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       the reconciled text names the resolved version in both the upper bound of `oldVersion` and in
       `newVersion`; and that an `app.config` with no redirect for that assembly is returned
       unchanged. Evidence: Pester output under evidence/qa.
+      The class is exercised by unit assertion only and is not reachable from the `workflow_run`
+      trigger: the workflow invokes the repair entry point with no `-CandidateUpgrade`, so the
+      applied-upgrade set is always empty and the `app.config` reconciliation pass does not execute
+      in the configured trigger path. Making it reachable is out of scope for issue #911 and is
+      recorded in the code review dated 2026-09-20.
 
 - [x] **AC15 — The repair pass leaves a formatting-stable tree.** Running the repair entry point a
       second time over its own output produces an empty `git diff`, and
