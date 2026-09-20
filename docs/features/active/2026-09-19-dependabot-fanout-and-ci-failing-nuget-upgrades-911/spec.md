@@ -348,7 +348,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       re-qualified, if a second group is added, or if a `group-by` key is reintroduced anywhere in
       the file.
 
-- [ ] **AC2 — Config manifests are outside the formatting gate, proven positively.** `.csharpierignore`
+- [x] **AC2 — Config manifests are outside the formatting gate, proven positively.** `.csharpierignore`
       contains patterns matching `packages.config` and `app.config`. Verification runs
       `dotnet tool run csharpier check .` against a worktree in which one named `packages.config`
       and one named `app.config` have been transiently rewritten in single-line inline form **and** a
@@ -357,7 +357,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       after capture. Evidence: the captured command output under evidence/qa. The control proves the
       check was live; without it, a silent no-op run would read as a pass.
 
-- [ ] **AC3 — All 18 manifests are normalised, and normalisation is idempotent.** After the one-time
+- [x] **AC3 — All 18 manifests are normalised, and normalisation is idempotent.** After the one-time
       normalisation, running the normaliser in `scripts/dependencies/PackageGraph.psm1` over the
       working tree produces an empty `git diff`, and the normaliser reports having examined 18
       `packages.config` files. Evidence: the reported examined-file count and the empty diff, under
@@ -379,7 +379,7 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       evidence/qa. The examined-count assertion is the non-vacuity guard: a detector that matched
       nothing would report zero disagreements and zero examined, and would fail this criterion.
 
-- [ ] **AC6 — The cold-cache failure is observed before the fix and absent after.** Locally, on the
+- [x] **AC6 — The cold-cache failure is observed before the fix and absent after.** Locally, on the
       merge-base tree with the solution `packages` directory deleted and restore re-run, the
       analyzer build command from CLAUDE.md fails with an error naming the
       Meziantou.Analyzer.3.0.203 analyzer assembly. On the fixed tree, the same procedure from the
@@ -575,6 +575,11 @@ Configuration and workflows:
 - `.github/workflows/_mstest-coverage.yml`
 - `.github/workflows/README.md`
 - `.csharpierignore`
+- `.github/workflows/_pester.yml` — the CI Pester job is hard-scoped to a single discovery path and
+  a single coverage path, measured at P0-T23 as `Run.Path = 'tests/scripts/vscode'` on line 41 and
+  `CodeCoverage.Path = 'scripts/vscode'` on line 45, so without widening both to two-member arrays
+  the suite this change creates under the dependencies tree never executes in CI and the check
+  reports green while measuring nothing of what was added.
 
 Production PowerShell:
 
@@ -584,6 +589,10 @@ Production PowerShell:
 - `scripts/dependencies/ProjectConsistency.psm1`
 - `scripts/dependencies/Repair-PackageManifestConsistency.ps1`
 - `scripts/vscode/Sync-PackageReferences.ps1`
+- `scripts/dependencies/ConsistencyVerifier.psm1` — the consistency module is split unconditionally
+  so that reconciliation and detection do not share one file: this module carries detection, the
+  examined counts, the repairs report and the failure-result type, which keeps both halves inside
+  the 500-line file ceiling that the combined module would otherwise breach.
 
 Tests:
 
@@ -594,6 +603,9 @@ Tests:
 - `tests/scripts/dependencies/Repair-PackageManifestConsistency.Tests.ps1`
 - `tests/scripts/dependencies/DependabotConfig.Tests.ps1`
 - `tests/scripts/vscode/Sync-PackageReferences.Tests.ps1`
+- `tests/scripts/dependencies/ConsistencyVerifier.Tests.ps1` — the module-level suite for the
+  verifier half of the split, carrying its own cases including the absent-from-manifest reported
+  class, while the criterion-bearing cases stay in the reconciliation suite the criteria name.
 
 Project files carrying a stranded analyzer item (#898):
 
