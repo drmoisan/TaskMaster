@@ -77,6 +77,22 @@ BeforeAll {
 </packages>
 '@
 
+    # Every folder segment agrees with the manifest, but the Reference Include declares an
+    # assembly version the package version does not track. The two are different quantities:
+    # an assembly version is not required to follow its package version, and
+    # Find-VersionDisagreement states in its own description that a Reference is outside the
+    # detector for exactly that reason. This is the shape the R5 case drives.
+    $script:UntrackedReferenceVersionProject = @'
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0">
+  <ItemGroup>
+    <Reference Include="Contoso.Widgets, Version=4.5.6.7, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contoso.Widgets.2.0.0\lib\net472\Contoso.Widgets.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
+'@
+
     # The delegate signature is the caller's contract, so both parameters are declared even
     # where a fixture consults only one of them.
     $script:AssetProvider = {
@@ -270,6 +286,27 @@ Describe 'ConsistencyVerifier detection surfaces' {
                 Should -Contain 'altcover.8.6.45'
             $result.IsSuccess | Should -BeTrue -Because 'the class is reported rather than fatal, and no exception is hard-coded for the package'
             @($result.Failure).Count | Should -Be 0
+        }
+    }
+
+    Context 'Reference assembly version the package version does not track' {
+
+        It 'R5- preserves a Reference assembly version the package version does not track' {
+            # Arrange: the Include declares Version=4.5.6.7 while the manifest declares the
+            # package at 2.0.0. The folder segments already agree, so the only element the
+            # reconciliation could touch is the Reference line.
+            $project = $script:UntrackedReferenceVersionProject
+
+            # Act: the exported entry point, called exactly as a consumer can call it. It
+            # exposes no parameter through which a caller could supply a resolved assembly
+            # version, so this is the only reachable behaviour.
+            $result = Invoke-ProjectConsistencyRepair -ProjectName 'Contoso.Test' -ProjectText $project -ManifestText $script:Manifest
+
+            # Assert: the declared assembly version survives, and no Reference element was
+            # recorded as repaired.
+            $result.ProjectText | Should -BeLike '*Version=4.5.6.7*' -Because 'an assembly version is not required to track its package version, so the entry point must preserve it'
+            @($result.Report.Repair | Where-Object { $_.Kind -eq 'Reference' }).Count |
+                Should -Be 0 -Because 'a Reference rewrite here would be a change the caller could neither ask for nor avoid'
         }
     }
 }

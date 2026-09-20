@@ -86,12 +86,18 @@ $script:IdentityCache = @{}
 $script:DefaultFileLister = {
     $directory = @(Get-ChildItem -LiteralPath $script:Root -Directory |
             Where-Object { $script:PrunedDirectory -notcontains $_.Name })
-    return @(@($directory) + @(Get-Item -LiteralPath $script:Root) |
+    $file = @(@($directory) + @(Get-Item -LiteralPath $script:Root) |
             ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -File } |
                 Where-Object {
                     $_.Name -eq 'packages.config' -or $_.Name -eq 'app.config' -or
                     $_.Extension -eq $script:ProjectExtension
                 } | ForEach-Object { $_.FullName })
+    # Discovery reaches the root and its immediate subdirectories only, so a project nested
+    # deeper is skipped. This record does not prevent that; it makes the shortfall observable
+    # in the run log, which is decision D4 for finding R9c. Widening the walk would change
+    # which manifests the production pass discovers and no test covers that change.
+    Write-Verbose ('Manifest discovery: enumerated directories {0}, returned files {1}' -f ($directory.Count + 1), $file.Count)
+    return $file
 }
 
 $script:DefaultAssetFolder = {
@@ -138,42 +144,6 @@ $script:RestoreTail = {
     $at = $normalised.IndexOf($script:PackageMarker, [System.StringComparison]::OrdinalIgnoreCase)
     if ($at -lt 0) { return '' }
     return $normalised.Substring($at + $script:PackageMarker.Length).ToLowerInvariant()
-}
-
-function Resolve-ReferenceAssemblyVersion {
-    <#
-    .SYNOPSIS
-        Resolves the assembly version a Reference for one package should declare. A declared
-        version the restored package carries somewhere is confirmed and preserved; a version
-        the package carries nowhere is rewritten to the one in the selected asset folder.
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory = $true)][ValidateNotNullOrEmpty()][string]$PackageId,
-        [Parameter(Mandatory = $true)][ValidateNotNullOrEmpty()][string]$PackageVersion,
-        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$ProjectText,
-        [AllowNull()][scriptblock]$IdentityProvider = $null
-    )
-
-    $declared = ''
-    $match = [regex]::Match($ProjectText,
-        'Include="' + [regex]::Escape($PackageId) + ',\s*Version=(?<value>[^,"]+)')
-    if ($match.Success) { $declared = $match.Groups['value'].Value }
-    if ($null -eq $IdentityProvider) { return $declared }
-
-    $identity = @(& $IdentityProvider $PackageId $PackageVersion | Where-Object { $null -ne $_ })
-    if ($identity.Count -eq 0) { return $declared }
-    if (-not [string]::IsNullOrEmpty($declared) -and
-        @($identity | ForEach-Object { $_.Version }) -contains $declared) {
-        return $declared
-    }
-
-    $folder = Select-CompatibleAssetFolder -AssetFolder @($identity | ForEach-Object { $_.AssetFolder })
-    if ([string]::IsNullOrEmpty($folder)) { return $declared }
-    $selected = @($identity | Where-Object { $_.AssetFolder.ToLowerInvariant() -eq $folder })
-    if ($selected.Count -eq 0) { return $declared }
-    return [string]$selected[0].Version
 }
 
 function Invoke-CandidateUpgrade {
@@ -317,6 +287,8 @@ function Get-ProjectVerification {
             $identifier = $identity.Id
             $version = $identity.Version
             $lister = { & $ListingProvider $identifier $version }.GetNewClosure()
+            # Called without -PreservedSegment, so the result is a verification membership set: every consumable analyzer assembly in every Roslyn folder the package ships, consumed only by the -contains test below and never written to a project file.
+            # A caller wanting a writable path supplies -PreservedSegment, which confines the result to the folder the item already names.
             $ListingCache[$key] = @(Get-AnalyzerAssemblyPath -PackageId $identity.Id `
                     -PackageVersion $identity.Version -DirectoryLister $lister |
                     ForEach-Object { & $script:RestoreTail $_ })

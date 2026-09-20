@@ -111,6 +111,7 @@ BeforeAll {
     $script:WorkflowDirectory = Join-Path $script:RepoRoot '.github/workflows'
     $script:RepairWorkflowPath = Join-Path $script:WorkflowDirectory 'dependabot-repair.yml'
     $script:WorkflowReadmePath = Join-Path $script:WorkflowDirectory 'README.md'
+    $script:CompositionRootPath = Join-Path $script:RepoRoot 'scripts/dependencies/Repair-PackageManifestConsistency.ps1'
 
     function Get-SetupNuGetStep {
         <#
@@ -330,6 +331,34 @@ Describe 'Dependabot configuration consolidation' {
             # Assert
             $contents.Count | Should -BeGreaterThan 0 -Because 'the job pushes a commit onto the Dependabot branch'
             $pullRequests.Count | Should -BeGreaterThan 0 -Because 'the job edits the pull-request body and its labels'
+        }
+    }
+
+    Context 'Default manifest lister visibility' {
+
+        It 'R9c- records the enumerated directory count in the default manifest lister' {
+            # Arrange: read the composition root and isolate the default lister block, which
+            # runs from its assignment line to the first closing brace in column one. This is
+            # a text assertion over production source and is described as such: it observes
+            # what the file says, not what a run of it does.
+            $line = [System.IO.File]::ReadAllLines($script:CompositionRootPath)
+            $start = -1
+            for ($i = 0; $i -lt $line.Count; $i++) {
+                if ($line[$i] -match '^\$script:DefaultFileLister\s*=\s*\{') { $start = $i; break }
+            }
+            $start | Should -BeGreaterThan -1 -Because 'an unfound block would make both assertions below vacuous'
+            $end = -1
+            for ($j = $start + 1; $j -lt $line.Count; $j++) {
+                if ($line[$j] -eq '}') { $end = $j; break }
+            }
+            $end | Should -BeGreaterThan $start -Because 'an undelimited block would make both assertions below vacuous'
+
+            # Act
+            $block = ($line[$start..$end] -join [System.Environment]::NewLine)
+
+            # Assert
+            $block | Should -BeLike '*Write-Verbose*' -Because 'a shortfall in one-level-deep manifest discovery must be observable in the run log'
+            $block | Should -BeLike '*enumerated director*' -Because 'the verbose record must name the enumerated directory count, which is the quantity a shortfall shows up in'
         }
     }
 }

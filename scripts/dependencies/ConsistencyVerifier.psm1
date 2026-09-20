@@ -389,6 +389,10 @@ function Invoke-ProjectConsistencyRepair {
         either a success result whose report enumerates the repairs performed or a failure
         result naming the condition and project. Analyzer-item regeneration runs only where
         a disagreement is detected for that package in that project.
+        The folder-segment kinds are reconciled to the manifest version, but this function
+        preserves the declared Reference assembly version, because an assembly version need not
+        track its package version and this function holds no assembly evidence. A consumer needing
+        evidence-based reference resolution uses the composition root Repair-PackageManifestConsistency.ps1.
     .PARAMETER ProjectName
         The project being repaired, used in the report and in any failure result.
     .PARAMETER ProjectText
@@ -437,8 +441,10 @@ function Invoke-ProjectConsistencyRepair {
             foreach ($item in @($repaired.MissingSegmentRecord)) { $missingSegment.Add($item) }
             $examinedAnalyzerItem += $repaired.ExaminedItemCount
         }
+        # No assembly evidence here, so the resolver returns the version the project already declares and the Reference line is written back unchanged; omitting the argument would rewrite it to the package version.
+        $assemblyVersion = Resolve-ReferenceAssemblyVersion -PackageId $entry.Id -PackageVersion $entry.Version -ProjectText $text
         $reconciled = Invoke-VersionReconciliation -ProjectText $text -PackageId $entry.Id `
-            -ManifestVersion $entry.Version
+            -ManifestVersion $entry.Version -AssemblyVersion $assemblyVersion
         $text = $reconciled.Text
         foreach ($item in @($reconciled.Repair)) { $repair.Add($item) }
     }

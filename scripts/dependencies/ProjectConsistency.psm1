@@ -23,6 +23,7 @@
     or non-native line endings is reassembled byte-for-byte outside the substituted spans.
 
     Exported functions:
+      - Resolve-ReferenceAssemblyVersion
       - Invoke-VersionReconciliation
       - Invoke-BindingRedirectReconciliation
 #>
@@ -37,6 +38,10 @@ Set-StrictMode -Version Latest
 # copies of the one substitution whose correctness gate rule 15 turns on.
 Import-Module (Join-Path $PSScriptRoot 'PackageGraph.psm1')
 Import-Module (Join-Path $PSScriptRoot 'AnalyzerItemRepair.psm1')
+# PackageCompatibility supplies Select-CompatibleAssetFolder, which
+# Resolve-ReferenceAssemblyVersion calls to pick the asset folder whose assembly version
+# a Reference should declare. That module imports nothing, so no cycle is created.
+Import-Module (Join-Path $PSScriptRoot 'PackageCompatibility.psm1')
 
 $script:LineSplitPattern = '(\r?\n)'
 $script:ReconciledKind = @('Import', 'Error', 'Reference', 'HintPath')
@@ -115,6 +120,42 @@ function Get-RewrittenReferenceVersionLine {
     }
 
     return [regex]::Replace($Line, $pattern, $evaluator)
+}
+
+function Resolve-ReferenceAssemblyVersion {
+    <#
+    .SYNOPSIS
+        Resolves the assembly version a Reference for one package should declare. A declared
+        version the restored package carries somewhere is confirmed and preserved; a version
+        the package carries nowhere is rewritten to the one in the selected asset folder.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][ValidateNotNullOrEmpty()][string]$PackageId,
+        [Parameter(Mandatory = $true)][ValidateNotNullOrEmpty()][string]$PackageVersion,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$ProjectText,
+        [AllowNull()][scriptblock]$IdentityProvider = $null
+    )
+
+    $declared = ''
+    $match = [regex]::Match($ProjectText,
+        'Include="' + [regex]::Escape($PackageId) + ',\s*Version=(?<value>[^,"]+)')
+    if ($match.Success) { $declared = $match.Groups['value'].Value }
+    if ($null -eq $IdentityProvider) { return $declared }
+
+    $identity = @(& $IdentityProvider $PackageId $PackageVersion | Where-Object { $null -ne $_ })
+    if ($identity.Count -eq 0) { return $declared }
+    if (-not [string]::IsNullOrEmpty($declared) -and
+        @($identity | ForEach-Object { $_.Version }) -contains $declared) {
+        return $declared
+    }
+
+    $folder = Select-CompatibleAssetFolder -AssetFolder @($identity | ForEach-Object { $_.AssetFolder })
+    if ([string]::IsNullOrEmpty($folder)) { return $declared }
+    $selected = @($identity | Where-Object { $_.AssetFolder.ToLowerInvariant() -eq $folder })
+    if ($selected.Count -eq 0) { return $declared }
+    return [string]$selected[0].Version
 }
 
 function Invoke-VersionReconciliation {
@@ -326,6 +367,7 @@ function Invoke-BindingRedirectReconciliation {
 }
 
 Export-ModuleMember -Function @(
+    'Resolve-ReferenceAssemblyVersion',
     'Invoke-VersionReconciliation',
     'Invoke-BindingRedirectReconciliation'
 )
