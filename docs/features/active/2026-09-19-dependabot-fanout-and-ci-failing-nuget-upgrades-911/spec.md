@@ -541,13 +541,13 @@ conventions skill (.claude/skills/evidence-and-timestamp-conventions/SKILL.md).
       output under evidence/qa. This check exists to falsify the assumption that the NuGet CLI adds
       references for newly introduced assemblies; if it cannot be made to fail, it tests nothing.
 
-- [ ] **AC24 — PowerShell toolchain and coverage.** The PowerShell toolchain passes in order
+- [x] **AC24 — PowerShell toolchain and coverage.** The PowerShell toolchain passes in order
       (format, analyze, test) with no findings, and line coverage for each new module under
       `scripts/dependencies/` is at least 90 percent, with no coverage regression on changed lines in
       `scripts/vscode/Sync-PackageReferences.ps1`. Evidence: the formatter, analyzer and Pester
       coverage reports under evidence/qa.
 
-- [ ] **AC25 — C# toolchain passes on the delivered tree.** The four CLAUDE.md commands run in order
+- [x] **AC25 — C# toolchain passes on the delivered tree.** The four CLAUDE.md commands run in order
       — formatter check, analyzer build, nullable build, test run with coverage — and all pass in a
       single final pass, with the analyzer and nullable builds proven non-vacuous by the absence of a
       skipped compile target in their logs. Evidence: the captured logs under evidence/qa.

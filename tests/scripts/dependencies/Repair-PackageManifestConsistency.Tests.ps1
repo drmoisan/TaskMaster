@@ -83,7 +83,7 @@ BeforeAll {
     $script:ProjectPath = 'X:\fixture\App\App.csproj'
     $script:AppConfigPath = 'X:\fixture\App\app.config'
 
-    function New-RepairFixture {
+    function Get-RepairFixture {
         <#
         .SYNOPSIS
             Builds an in-memory file store and the delegate set the entry point consumes.
@@ -97,6 +97,14 @@ BeforeAll {
 
         $store = @{}
         foreach ($key in $File.Keys) { $store[$key] = $File[$key] }
+
+        # The three maps are read into locals so the closures below capture the locals.
+        # PSReviewUnusedParameter cannot see a parameter referenced only inside a nested
+        # scriptblock, so a body-level read is what keeps the analyzer clean here.
+        $assetMap = $Asset
+        $identityMap = $Identity
+        $listingMap = $Listing
+
         return @{
             Store    = $store
             Argument = @{
@@ -104,14 +112,14 @@ BeforeAll {
                 DirectoryLister          = { @($store.Keys) }.GetNewClosure()
                 TextReader               = { param($Path) [string]$store[$Path] }.GetNewClosure()
                 TextWriter               = { param($Path, $Text) $store[$Path] = $Text }.GetNewClosure()
-                AssetFolderProvider      = { param($Id, $Version) @($Asset[($Id + '|' + $Version)]) }.GetNewClosure()
-                AssemblyIdentityProvider = { param($Id, $Version) @($Identity[($Id + '|' + $Version)]) }.GetNewClosure()
-                AnalyzerListingProvider  = { param($Id, $Version) @($Listing[($Id + '|' + $Version)]) }.GetNewClosure()
+                AssetFolderProvider      = { param($Id, $Version) @($assetMap[($Id + '|' + $Version)]) }.GetNewClosure()
+                AssemblyIdentityProvider = { param($Id, $Version) @($identityMap[($Id + '|' + $Version)]) }.GetNewClosure()
+                AnalyzerListingProvider  = { param($Id, $Version) @($listingMap[($Id + '|' + $Version)]) }.GetNewClosure()
             }
         }
     }
 
-    function New-StandardFixture {
+    function Get-StandardFixture {
         <#
         .SYNOPSIS
             Builds the two-package fixture: one project, its manifest and its application
@@ -119,7 +127,7 @@ BeforeAll {
         #>
         param([string]$Project = $script:ProjectText)
 
-        return New-RepairFixture -File @{
+        return Get-RepairFixture -File @{
             $script:ManifestPath  = $script:ManifestText
             $script:ProjectPath   = $Project
             $script:AppConfigPath = $script:AppConfigText
@@ -131,7 +139,7 @@ Describe 'Repair-PackageManifestConsistency' {
 
     Context 'Two candidate upgrades, one of them incompatible' {
         BeforeAll {
-            $script:Fixture = New-StandardFixture
+            $script:Fixture = Get-StandardFixture
             $argument = $script:Fixture.Argument
             $script:Result = & $script:EntryPoint @argument `
                 -CandidateUpgrade @{ 'Contoso.Widgets' = '2.0.0'; 'Fabrikam.Core' = '2.0.0' }
@@ -223,7 +231,7 @@ Describe 'Repair-PackageManifestConsistency' {
 
     Context 'A tree that already agrees with its manifests' {
         BeforeAll {
-            $script:Agreeing = New-StandardFixture
+            $script:Agreeing = Get-StandardFixture
             $argument = $script:Agreeing.Argument
             $script:AgreeingResult = & $script:EntryPoint @argument
         }
@@ -259,7 +267,7 @@ Describe 'Repair-PackageManifestConsistency' {
 
     Context 'A run asked what it would change' {
         It 'writes nothing and leaves the store byte-identical' {
-            $fixture = New-StandardFixture
+            $fixture = Get-StandardFixture
             $before = $fixture.Store[$script:ProjectPath]
             $argument = $fixture.Argument
             $result = & $script:EntryPoint @argument `
@@ -275,7 +283,7 @@ Describe 'Repair-PackageManifestConsistency' {
             $script:MovedListing = @{
                 'Contoso.Widgets|2.0.0' = @('analyzers\dotnet\roslyn4.7\cs\Contoso.Widgets.dll')
             }
-            $script:Moved = New-RepairFixture -File @{
+            $script:Moved = Get-RepairFixture -File @{
                 $script:ManifestPath = $script:ManifestText
                 $script:ProjectPath  = $script:ProjectText
             } -Asset $script:AssetFolder -Identity $script:AssemblyIdentity -Listing $script:MovedListing
@@ -301,7 +309,7 @@ Describe 'Repair-PackageManifestConsistency' {
 
     Context 'A manifest with no project file beside it' {
         It 'repairs the manifest alone and reports no project' {
-            $fixture = New-RepairFixture -File @{ $script:ManifestPath = $script:ManifestText } `
+            $fixture = Get-RepairFixture -File @{ $script:ManifestPath = $script:ManifestText } `
                 -Asset $script:AssetFolder
             $argument = $fixture.Argument
             $result = & $script:EntryPoint @argument `
@@ -325,7 +333,7 @@ Describe 'Repair-PackageManifestConsistency' {
   </ItemGroup>
 </Project>
 '@ -replace "`r?`n", "`r`n"
-            $script:Unmanifested = New-RepairFixture -File @{
+            $script:Unmanifested = Get-RepairFixture -File @{
                 $script:ManifestPath = $script:ManifestText
                 $script:ProjectPath  = $script:UnmanifestedProject
             } -Identity $script:AssemblyIdentity
