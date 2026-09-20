@@ -4,9 +4,9 @@ Timestamp: 2026-09-19T12-26
 
 Command:
 ```
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911";
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>";
   & ".\scripts\vscode\Install-RepoDotNetSdk.ps1"'
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911";
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>";
   dotnet --version; dotnet --list-sdks'
 ```
 
@@ -22,7 +22,7 @@ EXIT_CODE: 0
 Installer:
 ```
 Repo-local .NET SDK 8.0.205 is already installed at
-C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\.dotnet-sdk.
+<execution-worktree-root>\.dotnet-sdk.
 ```
 The script terminated without error (`$?` = `True`). It reported the SDK already present, so this
 run confirmed provisioning rather than performing a download.
@@ -47,7 +47,7 @@ run confirmed provisioning rather than performing a download.
 
 `dotnet --list-sdks` (exit 0):
 ```
-8.0.205 [C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\.dotnet-sdk\sdk]
+8.0.205 [<execution-worktree-root>\.dotnet-sdk\sdk]
 10.0.401 [C:\Program Files\dotnet\sdk]
 ```
 
@@ -62,7 +62,7 @@ the recorded measurement because it is what every later task in this plan will e
 
 - `dotnet --version` prints the version `global.json` pins: pinned `8.0.205`, printed `8.0.205`. PASS.
 - `dotnet --list-sdks` includes a path ending `.dotnet-sdk\sdk`: the first entry is
-  `C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\.dotnet-sdk\sdk`. PASS.
+  `<execution-worktree-root>\.dotnet-sdk\sdk`. PASS.
 
 **Failing-condition reachability.** The failing condition is `dotnet --version` printing the
 `global.json` `errorMessage` ("The repo-local .NET SDK is missing…") instead of a version. It is
@@ -71,6 +71,6 @@ fresh worktree reaches exactly that state until the installer has run. This work
 before Phase 0 began and therefore reports the already-installed path.
 
 Output Summary: Repo-local .NET SDK 8.0.205 present at
-`C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\.dotnet-sdk`; `dotnet --version` prints
+`<execution-worktree-root>\.dotnet-sdk`; `dotnet --version` prints
 `8.0.205`, matching the `global.json` pin; `dotnet --list-sdks` lists that SDK at a path ending
 `.dotnet-sdk\sdk`. Both acceptance clauses hold, exit 0 on both commands.

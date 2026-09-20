@@ -4,7 +4,7 @@ Timestamp: 2026-09-19T12-18
 
 Command:
 ```
-git -C "C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911" fetch origin main
+git -C "<execution-worktree-root>" fetch origin main
 git -C <W> rev-parse origin/main
 git -C <W> rev-parse main
 git -C <W> rev-parse HEAD

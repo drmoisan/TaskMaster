@@ -7,7 +7,7 @@ reachable from the environment the check runs in.
 
 Timestamp: 2026-09-19T11:40:00Z
 
-Worktree: `C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911`
+Worktree: `<execution-worktree-root>`
 Branch: `bug/dependabot-fanout-and-ci-failing-nuget-upgrades-911`, cut from `origin/main` at `734112ed2`
 Condition: clean worktree, **cold package restore** (no CI cache, no pre-existing `packages/` tree)
 

@@ -5,7 +5,7 @@ Timestamp: 2026-09-20T09-44
 Command: CMD-MSTEST-COVERAGE.
 
 ```
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911"; & "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\scripts\vscode\Invoke-MSTestWithCoverage.ps1" -SearchRoot .'
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>"; & "<execution-worktree-root>\scripts\vscode\Invoke-MSTestWithCoverage.ps1" -SearchRoot .'
 ```
 
 Absolute script path with `Set-Location`, per gate rule 16. `-SearchRoot .` is mandatory: the

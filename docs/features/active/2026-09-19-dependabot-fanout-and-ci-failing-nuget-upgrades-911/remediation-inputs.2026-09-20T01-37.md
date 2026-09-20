@@ -95,7 +95,7 @@ reports a non-zero write count.
 **Invariant to restore:** no committed artifact discloses a filesystem path containing the account
 name.
 
-74 occurrences of `C:\Users\DanMoisan` across 27 markdown files under the feature folder. Sanitisation
+74 occurrences of `<user-home>` across 27 markdown files under the feature folder. Sanitisation
 was applied inconsistently: `evidence/qa-gates/p4-t5-actionlint` already uses
 `<execution-worktree-root>`, while `evidence/baseline/p0-t5-sdk-bootstrap`,
 `evidence/baseline/p0-t8-dotnet-coverage` and 25 others do not.

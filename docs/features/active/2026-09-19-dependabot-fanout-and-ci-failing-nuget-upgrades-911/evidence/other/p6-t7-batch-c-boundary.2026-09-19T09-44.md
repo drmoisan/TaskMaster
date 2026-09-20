@@ -76,9 +76,9 @@ prohibition.
   "prodCap": 3,
   "testCap": 3,
   "prodFiles": [
-    "<temp>/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/.../scratchpad/run-vstest.ps1",
-    "<temp>/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/.../scratchpad/postrebase_verify.ps1",
-    "<temp>/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/.../scratchpad/run-toolchain-442.ps1"
+    "<temp>/<user-home>-repos-TaskMaster-wt-2026-08-23T22-51/.../scratchpad/run-vstest.ps1",
+    "<temp>/<user-home>-repos-TaskMaster-wt-2026-08-23T22-51/.../scratchpad/postrebase_verify.ps1",
+    "<temp>/<user-home>-repos-TaskMaster-wt-2026-08-23T22-51/.../scratchpad/run-toolchain-442.ps1"
   ],
   "testFiles": []
 }

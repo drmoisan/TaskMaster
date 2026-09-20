@@ -12,7 +12,7 @@ Command:
 
 ```
 mcp__drm-copilot__run_poshqc_format
-  workspace_root = C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911
+  workspace_root = <execution-worktree-root>
   scan_folders   = ["scripts/dependencies","scripts/vscode","tests/scripts/dependencies","tests/scripts/vscode"]
 ```
 

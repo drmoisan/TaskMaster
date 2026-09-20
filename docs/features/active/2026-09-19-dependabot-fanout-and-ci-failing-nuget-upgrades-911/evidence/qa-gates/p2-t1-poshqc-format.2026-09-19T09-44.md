@@ -4,7 +4,7 @@ Timestamp: 2026-09-19T14-46
 
 Command: MCP tool `mcp__drm-copilot__run_poshqc_format`, invoked three times.
 
-`workspace_root`: `C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911`
+`workspace_root`: `<execution-worktree-root>`
 
 Exact `scan_folders` argument value, supplied explicitly on both invocations:
 

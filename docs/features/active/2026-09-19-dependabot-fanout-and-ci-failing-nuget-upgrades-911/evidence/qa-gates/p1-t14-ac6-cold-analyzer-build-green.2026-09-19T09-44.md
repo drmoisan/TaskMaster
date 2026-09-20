@@ -4,8 +4,8 @@ Timestamp: 2026-09-19T14-34
 
 Command:
 ```
-pwsh -NoProfile -Command '[System.IO.Directory]::Delete("C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\packages", $true)'
-pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911"; & "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\scripts\vscode\Invoke-Restore.ps1"'
+pwsh -NoProfile -Command '[System.IO.Directory]::Delete("<execution-worktree-root>\packages", $true)'
+pwsh -NoProfile -Command 'Set-Location -LiteralPath "<execution-worktree-root>"; & "<execution-worktree-root>\scripts\vscode\Invoke-Restore.ps1"'
 pwsh -NoProfile -Command 'Get-Process outlook -ErrorAction SilentlyContinue | Measure-Object | Select-Object -ExpandProperty Count'
 CMD-MSBUILD-ANALYZERS, invoked as:
   & "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true "/flp:LogFile=coverage\analyzers.msbuild.log;Verbosity=normal"
@@ -33,7 +33,7 @@ and the deletion was asserted rather than assumed.
 | Package directories present | — | — | **172** |
 
 The restore reported `Installed: 172 package(s) to packages.config projects`, exit 0, against
-`C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\TaskMaster.sln`. The 172-directory count is
+`<execution-worktree-root>\TaskMaster.sln`. The 172-directory count is
 the non-vacuity guard on the two folder assertions: a restore that installed nothing would also
 leave `Meziantou.Analyzer.3.0.203` absent and satisfy the negative clause on its own.
 
@@ -47,7 +47,7 @@ effect of the P1-T11 manifest entries: before #903 was corrected, the two `<Hint
 The first restore attempt used
 `pwsh -NoProfile -WorkingDirectory "<execution-worktree>" -File ".\scripts\vscode\Invoke-Restore.ps1"`
 and **restored the wrong checkout**: the log line read
-`Done Building Project "C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\TaskMaster.sln"`.
+`Done Building Project "<session-worktree-root>\TaskMaster.sln"`.
 The relative `-File` argument resolves against the session worktree rather than against
 `-WorkingDirectory`, and `Invoke-Restore.ps1` derives its repository root from `$PSScriptRoot`
 (line 84), so the script that ran was the session worktree's copy and it restored the session

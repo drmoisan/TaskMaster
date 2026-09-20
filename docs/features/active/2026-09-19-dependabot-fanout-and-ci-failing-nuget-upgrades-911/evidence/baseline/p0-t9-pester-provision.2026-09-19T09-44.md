@@ -44,7 +44,7 @@ exercised directly:
 
 ```
 IMPORTED_VERSION=5.6.1
-IMPORTED_PATH=C:\Users\DanMoisan\OneDrive\Documents\PowerShell\Modules\Pester\5.6.1\Pester.psm1
+IMPORTED_PATH=<user-home>\OneDrive\Documents\PowerShell\Modules\Pester\5.6.1\Pester.psm1
 NEW_PESTER_CONFIGURATION_OK=True
 Invoke-Pester resolves to module version 5.6.1
 ```

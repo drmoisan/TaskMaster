@@ -4,7 +4,7 @@ Timestamp: 2026-09-19T12-30
 
 Command:
 ```
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911";
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>";
   $before = @(Get-ChildItem -Path ".\packages" -Directory).Count; "PACKAGE_DIRS_BEFORE=$before";
   & ".\scripts\vscode\Invoke-Restore.ps1";
   $after = @(Get-ChildItem -Path ".\packages" -Directory).Count; "PACKAGE_DIRS_AFTER=$after"'

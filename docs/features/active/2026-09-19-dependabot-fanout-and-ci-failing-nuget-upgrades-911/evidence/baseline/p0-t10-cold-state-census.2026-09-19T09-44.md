@@ -4,7 +4,7 @@ Timestamp: 2026-09-19T12-36
 
 Command:
 ```
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911";
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>";
   Test-Path -LiteralPath ".\packages\Meziantou.Analyzer.3.0.235" -PathType Container;
   Test-Path -LiteralPath ".\packages\Meziantou.Analyzer.3.0.203" -PathType Container;
   Get-ChildItem -Path ".\packages" -Directory -Filter "Meziantou.Analyzer.*" |

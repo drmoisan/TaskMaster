@@ -101,7 +101,7 @@ This is the single most consequential finding in this research. It means:
 with the directory glob." That is not what happens.
 
 `[OBS-LOCAL]` The four live Dependabot branches, read from
-`C:\Users\DanMoisan\repos\TaskMaster\.git\info\refs` lines 161-164, are:
+`<repo-root>\.git\info\refs` lines 161-164, are:
 
 ```
 dependabot/nuget/QuickFiler.Test/analyzers-dev-deps/Meziantou.Analyzer-9e457076d6
@@ -974,7 +974,7 @@ fixed with one shared TFM-ranking function, not two.
   (`*.csproj`, `*.vbproj`, `*.props`, `*.targets`), excluding prose in Markdown/txt documentation
   and evidence artefacts.
 - **Exhaustive Search Scope:** the entire working tree
-  `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15`, unfiltered by path, with
+  `<session-worktree-root>`, unfiltered by path, with
   `head_limit: 0` so no result was truncated. Both records cover all three attribute forms, not
   only `Include`.
 - **Inclusion Rules:** any occurrence of an `Analyzer` item element inside a file that MSBuild
@@ -1329,15 +1329,15 @@ ruleset.
 
 | Path | Relevance |
 |---|---|
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\.github\dependabot.yml` | R3 — replace per § 5.3 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\.github\workflows\ci.yml` | R1 — triggers and check-name derivation |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\.github\workflows\_build-analyzers.yml` | R5 — `nuget-version: latest` at line 33 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\.github\workflows\_build-nullable.yml` | R5 — `nuget-version: latest` at line 33 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\.github\workflows\_mstest-coverage.yml` | R5 — `nuget-version: latest` at line 33 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\.csharpierignore` | § 2.2b — no `packages.config` / `app.config` entry |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\scripts\vscode\Sync-PackageReferences.ps1` | § 2.3 — `netstandard2.1` at line 18 (#902); `\lib\`-anchored regex at line 58 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\UtilitiesCS\UtilitiesCS.csproj` | § 6.2 — all four analyzer path shapes, lines 1305-1318 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\UtilitiesCS\packages.config` | § 2.2b — CSharpier-reflowed manifest entry, lines 17-22 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\SVGControl.Test\app.config` | § 2.2b — CSharpier-reflowed `assemblyIdentity`, lines 6-10 |
-| `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\ToDoModel.Test\ToDoModel.Test.csproj` | § 2.2d — orphaned Deedle/FSharp.Core HintPaths, lines 92-96 (#903) |
-| `C:\Users\DanMoisan\repos\TaskMaster\.git\info\refs` | § 1.3 — Dependabot branch names, lines 161-175 |
+| `<session-worktree-root>\.github\dependabot.yml` | R3 — replace per § 5.3 |
+| `<session-worktree-root>\.github\workflows\ci.yml` | R1 — triggers and check-name derivation |
+| `<session-worktree-root>\.github\workflows\_build-analyzers.yml` | R5 — `nuget-version: latest` at line 33 |
+| `<session-worktree-root>\.github\workflows\_build-nullable.yml` | R5 — `nuget-version: latest` at line 33 |
+| `<session-worktree-root>\.github\workflows\_mstest-coverage.yml` | R5 — `nuget-version: latest` at line 33 |
+| `<session-worktree-root>\.csharpierignore` | § 2.2b — no `packages.config` / `app.config` entry |
+| `<session-worktree-root>\scripts\vscode\Sync-PackageReferences.ps1` | § 2.3 — `netstandard2.1` at line 18 (#902); `\lib\`-anchored regex at line 58 |
+| `<session-worktree-root>\UtilitiesCS\UtilitiesCS.csproj` | § 6.2 — all four analyzer path shapes, lines 1305-1318 |
+| `<session-worktree-root>\UtilitiesCS\packages.config` | § 2.2b — CSharpier-reflowed manifest entry, lines 17-22 |
+| `<session-worktree-root>\SVGControl.Test\app.config` | § 2.2b — CSharpier-reflowed `assemblyIdentity`, lines 6-10 |
+| `<session-worktree-root>\ToDoModel.Test\ToDoModel.Test.csproj` | § 2.2d — orphaned Deedle/FSharp.Core HintPaths, lines 92-96 (#903) |
+| `<repo-root>\.git\info\refs` | § 1.3 — Dependabot branch names, lines 161-175 |

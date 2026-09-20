@@ -6,7 +6,7 @@ Command:
 ```
 git grep -n -e "Run.Path" -e "CodeCoverage.Path" -e "Invoke-Pester" -e "linePercent -lt 80" -- ".github/workflows/_pester.yml"
 git grep -c -F "Invoke-Pester" -- ".github/workflows/_pester.yml"
-pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911"; & "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\scripts\dev-tools\run-actionlint.ps1"'
+pwsh -NoProfile -Command 'Set-Location -LiteralPath "<execution-worktree-root>"; & "<execution-worktree-root>\scripts\dev-tools\run-actionlint.ps1"'
 git diff --numstat 734112ed25bba293cb074e71fee2286bc3b72fae -- ".github/workflows/_pester.yml"
 git status --porcelain --untracked-files=all -- ".github/workflows/_pester.yml"
 ```
@@ -49,7 +49,7 @@ line, so no non-vacuity observation can be read from its output. **The count bel
 independent filesystem enumeration, not actionlint output.**
 
 ```
-pwsh -NoProfile -Command 'Get-ChildItem -LiteralPath "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\.github\workflows" -File | Where-Object { $_.Extension -in ".yml",".yaml" }'
+pwsh -NoProfile -Command 'Get-ChildItem -LiteralPath "<execution-worktree-root>\.github\workflows" -File | Where-Object { $_.Extension -in ".yml",".yaml" }'
 WORKFLOW_FILE_COUNT=8
   _actionlint.yml
   _build-analyzers.yml
@@ -71,7 +71,7 @@ edits rather than an unrelated population.
 
 The run was invoked with an **absolute** script path and an explicit `Set-Location` to the
 execution worktree, and the resolved working directory was printed and recorded as
-`C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911`. Both are required rather than cosmetic,
+`<execution-worktree-root>`. Both are required rather than cosmetic,
 and the first was established by a measured failure in this run rather than by assumption.
 
 `pwsh -NoProfile -WorkingDirectory <execution-worktree> -File ".\scripts\..."` was tried first and
@@ -79,7 +79,7 @@ and the first was established by a measured failure in this run rather than by a
 `-WorkingDirectory`**. The effect was observed directly at P1-T14, where the same invocation shape
 launched `scripts\vscode\Invoke-Restore.ps1` from the session worktree and the script — which
 derives its repository root from `$PSScriptRoot` — restored
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\TaskMaster.sln` instead of the execution
+`<session-worktree-root>\TaskMaster.sln` instead of the execution
 worktree's solution. `run-actionlint.ps1` derives its binary path the same way, so the earlier
 actionlint invocation was re-run in the corrected form before this artifact was finalised. The
 result was identical, exit 0 with no output, but the earlier form is not sound evidence and is not

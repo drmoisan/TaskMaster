@@ -41,11 +41,11 @@ Derivation, from `Get-PowerShellBatchBudgetSessionId` (hook lines 111-174) and
 worktree containing the hook script that executes. `.claude/settings.json:144` registers the hook as
 `pwsh -NoProfile -File .claude/hooks/enforce-powershell-batch-budget.ps1` — a **relative** path,
 resolved against the hook process's working directory, which is the Claude Code project directory
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15` (the session worktree), not the execution
+`<session-worktree-root>` (the session worktree), not the execution
 worktree. The resolved absolute state-file path is therefore
 
 ```
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\.claude\state\powershell-batch-budget.4b68295b-3901-4320-add3-cde634c30dae.json
+<session-worktree-root>\.claude\state\powershell-batch-budget.4b68295b-3901-4320-add3-cde634c30dae.json
 ```
 
 The file name is certain. The directory is inferred from the relative hook registration rather than
@@ -75,7 +75,7 @@ git** (`git ls-files` lists it; `git check-ignore` exits 1), and carries `prodFi
 3. It is not the file this session uses: the session-id segment is the GUID above, not `default`.
 
 It would also be harmless if it were. Its three entries are
-`C:/Users/DANMOI~1/AppData/Local/Temp/claude/…/scratchpad/run-vstest.ps1`,
+`<user-home>/AppData/Local/Temp/claude/…/scratchpad/run-vstest.ps1`,
 `…/postrebase_verify.ps1` and `…/run-toolchain-442.ps1`, all under the system temp tree.
 `ConvertTo-PowerShellBatchBudgetState` (lines 218-225) drops every persisted entry failing
 `Test-PowerShellBatchBudgetPathInRoot` against the current root, and all three fail it, so they
@@ -104,7 +104,7 @@ containment test at lines 82-92 admits a relative path unconditionally but requi
 to be equal to, or prefixed by, the root.
 
 Every PowerShell file this plan creates lives under the **execution** worktree
-`C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911`, and the `Write` tool supplies an absolute
+`<execution-worktree-root>`, and the `Write` tool supplies an absolute
 path. If `$Root` is the session worktree as derived above, every one of those writes is out-of-root,
 is discarded, consumes no slot, and causes no state file to be created at all.
 
@@ -126,7 +126,7 @@ directory after that write, the out-of-root discard is confirmed.
 Output Summary: State file the hook will use is
 `.claude/state/powershell-batch-budget.4b68295b-3901-4320-add3-cde634c30dae.json`, resolved from
 `$env:CLAUDE_SESSION_ID`, most probably under the session worktree
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15`. It does not exist in either candidate
+`<session-worktree-root>`. It does not exist in either candidate
 directory, so starting counts are production **0** of 3 and test **0** of 3. The hook records the
 absolute supplied `file_path` with backslashes normalised to forward slashes, so later boundary
 assertions must compare suffixes. The tracked `powershell-batch-budget.default.json` is a different

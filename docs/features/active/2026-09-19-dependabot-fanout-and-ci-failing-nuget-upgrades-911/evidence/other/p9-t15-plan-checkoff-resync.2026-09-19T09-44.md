@@ -6,8 +6,8 @@ Timestamp: 2026-09-20T09-44
 
 | Role | Path |
 |---|---|
-| Check-off state of record | `C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\docs\features\active\2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911\plan.2026-09-19T09-44.md` |
-| Session copy | `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15\docs\features\active\2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911\plan.2026-09-19T09-44.md` |
+| Check-off state of record | `<execution-worktree-root>\docs\features\active\2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911\plan.2026-09-19T09-44.md` |
+| Session copy | `<session-worktree-root>\docs\features\active\2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911\plan.2026-09-19T09-44.md` |
 
 Both files were read and both exist.
 

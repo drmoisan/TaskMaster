@@ -4,7 +4,7 @@ Timestamp: 2026-09-19T12-28
 
 Command:
 ```
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911";
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>";
   dotnet tool restore'
 ```
 

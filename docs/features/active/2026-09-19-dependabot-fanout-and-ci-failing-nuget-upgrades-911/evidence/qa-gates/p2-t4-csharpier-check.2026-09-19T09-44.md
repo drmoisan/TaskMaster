@@ -8,7 +8,7 @@ Command: CMD-CSHARPIER-CHECK.
 dotnet tool run csharpier check .
 ```
 
-Run from the execution worktree `C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911`. Invoked
+Run from the execution worktree `<execution-worktree-root>`. Invoked
 through `dotnet tool run` so the manifest-pinned 1.2.6 is used, never a global install.
 
 EXIT_CODE: 0

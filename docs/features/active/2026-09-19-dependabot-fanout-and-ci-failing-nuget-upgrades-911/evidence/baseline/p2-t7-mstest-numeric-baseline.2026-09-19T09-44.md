@@ -91,8 +91,8 @@ The runner printed both path lines, so both copies are mandatory and both were m
 The exact stdout lines that named them:
 
 ```
-Coverage projection: C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\coverage\coverage.cobertura.jacoco.xml
-Test-result summary: C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911\coverage\test-results\mstest-coverage-run.summary.txt
+Coverage projection: <execution-worktree-root>\coverage\coverage.cobertura.jacoco.xml
+Test-result summary: <execution-worktree-root>\coverage\test-results\mstest-coverage-run.summary.txt
 ```
 
 **TEST-RESULT-SUMMARY: produced.** The `Test-result summary was not written:` warning did not

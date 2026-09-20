@@ -5,7 +5,7 @@ Timestamp: 2026-09-20T09-44
 Command:
 
 ```
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911"; foreach ($f in $paths) { (Get-Content -LiteralPath $f).Count }'
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>"; foreach ($f in $paths) { (Get-Content -LiteralPath $f).Count }'
 ```
 
 EXIT_CODE: 0

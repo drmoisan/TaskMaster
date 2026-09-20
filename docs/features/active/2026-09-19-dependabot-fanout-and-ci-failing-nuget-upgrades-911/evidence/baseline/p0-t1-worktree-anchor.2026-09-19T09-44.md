@@ -4,10 +4,10 @@ Timestamp: 2026-09-19T12-13
 
 Command:
 ```
-git -C "C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911" rev-parse --show-toplevel
-git -C "C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911" rev-parse --abbrev-ref HEAD
-git -C "C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911" rev-parse HEAD
-git -C "C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911" status --porcelain --untracked-files=all
+git -C "<execution-worktree-root>" rev-parse --show-toplevel
+git -C "<execution-worktree-root>" rev-parse --abbrev-ref HEAD
+git -C "<execution-worktree-root>" rev-parse HEAD
+git -C "<execution-worktree-root>" status --porcelain --untracked-files=all
 ```
 
 EXIT_CODE: 0
@@ -16,7 +16,7 @@ EXIT_CODE: 0
 
 | Item | Value |
 |---|---|
-| `git rev-parse --show-toplevel` | `C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911` |
+| `git rev-parse --show-toplevel` | `<execution-worktree-root>` |
 | `git rev-parse --abbrev-ref HEAD` | `bug/dependabot-fanout-and-ci-failing-nuget-upgrades-911` |
 | `git rev-parse HEAD` | `8b0afe2c48060804ded103db62a4c3e5eceef8f9` |
 | HEAD commit date | `2026-09-19T12:08:38-04:00` |
@@ -37,11 +37,11 @@ EXIT_CODE: 0
 
 The failing condition is that the resolved toplevel names a different checkout. It is reachable: the
 executor's ambient working directory for this session is
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15`, a different worktree of the same
+`<session-worktree-root>`, a different worktree of the same
 repository holding a different branch. Every command in this plan is therefore issued with an
 explicit `git -C <absolute execution worktree path>` rather than relying on the ambient directory.
 
 Output Summary: Execution worktree resolved to
-`C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911` on branch
+`<execution-worktree-root>` on branch
 `bug/dependabot-fanout-and-ci-failing-nuget-upgrades-911` at HEAD
 `8b0afe2c48060804ded103db62a4c3e5eceef8f9`, working tree clean. All three acceptance clauses hold.

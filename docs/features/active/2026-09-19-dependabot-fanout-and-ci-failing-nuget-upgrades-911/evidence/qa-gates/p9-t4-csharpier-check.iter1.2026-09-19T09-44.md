@@ -5,7 +5,7 @@ Timestamp: 2026-09-20T09-44
 Command: CMD-CSHARPIER-CHECK.
 
 ```
-pwsh -NoProfile -Command 'Set-Location "C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911"; dotnet tool run csharpier check .'
+pwsh -NoProfile -Command 'Set-Location "<execution-worktree-root>"; dotnet tool run csharpier check .'
 ```
 
 Invoked through `dotnet tool run` so the manifest-pinned CSharpier 1.2.6 is used rather than any

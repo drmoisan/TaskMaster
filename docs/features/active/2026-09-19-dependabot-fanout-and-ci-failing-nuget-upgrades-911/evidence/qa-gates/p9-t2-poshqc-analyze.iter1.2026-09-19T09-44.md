@@ -3,7 +3,7 @@
 Timestamp: 2026-09-20T09-44
 
 Command: CMD-POSHQC-ANALYZE — MCP tool `mcp__drm-copilot__run_poshqc_analyze`, `workspace_root`
-passed as `C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911`.
+passed as `<execution-worktree-root>`.
 
 Exact `scan_folders` argument value passed:
 
@@ -18,7 +18,7 @@ MCP payload, verbatim:
 ```
 ok: false
 tool: run_poshqc_analyze
-workspace_root: C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911
+workspace_root: <execution-worktree-root>
 summary: Command exited with code 1.
 stderr_excerpt: Exception: PSScriptAnalyzer reported 18 issue(s).
 ```

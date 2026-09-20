@@ -10,7 +10,7 @@ then `.claude/rules/general-unit-test.md`, then `.claude/rules/powershell.md`, t
 
 Command:
 ```
-git -C "C:/Users/DanMoisan/repos/TaskMaster-wt/dependabot-911" hash-object <the seven files>
+git -C "<execution-worktree-root>" hash-object <the seven files>
 wc -l CLAUDE.md .claude/rules/general-code-change.md .claude/rules/general-unit-test.md \
       .claude/rules/powershell.md .claude/rules/csharp.md .claude/rules/quality-tiers.md \
       .claude/rules/tonality.md
@@ -31,13 +31,13 @@ EXIT_CODE: 0
 | 7 | `.claude/rules/tonality.md` | 80 | `d971f5be28aa02722e216e7fe6b92aec04c40a52` |
 
 Total 972 lines. Every file was read in full from the execution worktree
-`C:\Users\DanMoisan\repos\TaskMaster-wt\dependabot-911`, not from the session worktree.
+`<execution-worktree-root>`, not from the session worktree.
 
 ## Why the read was taken against the execution worktree
 
 The blob SHA-1 of `CLAUDE.md` differs between the two worktrees: `0c650735e…` in the execution
 worktree against `67f75c93d…` in the session worktree
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-12T10-15`. The other six files are byte-identical
+`<session-worktree-root>`. The other six files are byte-identical
 across the two. The session copy of `CLAUDE.md` is therefore not a valid substitute and the
 execution-worktree copy is the governing text for this run.
 

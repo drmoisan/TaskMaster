@@ -124,9 +124,9 @@ Exactly two of the 82 are PowerShell files, and they are the two enumerated abov
   "prodCap": 3,
   "testCap": 3,
   "prodFiles": [
-    "<TEMP>/claude/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/<session>/scratchpad/run-vstest.ps1",
-    "<TEMP>/claude/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/<session>/scratchpad/postrebase_verify.ps1",
-    "<TEMP>/claude/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/<session>/scratchpad/run-toolchain-442.ps1"
+    "<TEMP>/claude/<user-home>-repos-TaskMaster-wt-2026-08-23T22-51/<session>/scratchpad/run-vstest.ps1",
+    "<TEMP>/claude/<user-home>-repos-TaskMaster-wt-2026-08-23T22-51/<session>/scratchpad/postrebase_verify.ps1",
+    "<TEMP>/claude/<user-home>-repos-TaskMaster-wt-2026-08-23T22-51/<session>/scratchpad/run-toolchain-442.ps1"
   ],
   "testFiles": []
 }
