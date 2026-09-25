@@ -79,6 +79,62 @@ Structural properties that are deliberate and should not be changed casually:
   `--version` output carries a build-metadata suffix that is not part of package
   identity and does not resolve when passed to `--version`; do not pin it.
 
+## Dependabot repair workflow
+
+`dependabot-repair.yml` is not a CI gate and `ci.yml` does not invoke it. It repairs the manifest
+and project-file inconsistencies a Dependabot upgrade leaves behind — a version reconciled in
+`packages.config` but not in the `<Import>`, `<Error>`, `<Reference>`, `<HintPath>` and
+`<Analyzer Include>` elements that depend on it — and pushes the repair onto Dependabot's own
+branch so the required checks re-run on the repaired head. The repair itself lives in
+`scripts/dependencies/Repair-PackageManifestConsistency.ps1`; the workflow is the wiring that
+gives it a restored tree, a credential and a branch to push to.
+
+**`app.config` binding redirects are not repaired from this trigger.** The repair script does
+carry a binding-redirect reconciliation pass, but the `workflow_run` step invokes the entry point
+with no `-CandidateUpgrade`, so the applied-upgrade set is always empty and that pass never runs.
+An `app.config` redirect left stale by a Dependabot upgrade therefore stays stale, and an operator
+investigating a binding failure after a repaired run should look there first rather than assume
+the workflow covered it. The class becomes reachable only if a future change supplies
+`-CandidateUpgrade` to the invocation in the "Repair package manifest consistency" step; the same
+condition is recorded as a comment on that step and in the AC14 note in the issue #911 spec.
+
+**Trigger.** The workflow triggers on `workflow_run`, on completion of the `CI` workflow, and the
+job runs only when the originating run's head branch is under the `dependabot/` prefix and its
+event was `pull_request`. The trigger is `workflow_run` rather than a direct `pull_request` trigger
+because a run triggered directly by a Dependabot `pull_request` event receives a read-only token and
+no access to repository secrets, so it cannot push. A `workflow_run` completion executes in the
+base-branch context, where the credential is available. The base-context variant of the
+pull-request trigger is deliberately not used: it is a security regression for a convenience gain,
+and GitHub restricts it by default from 2026-11-02.
+
+**Credential.** The workflow mints a GitHub App installation token with
+`actions/create-github-app-token@v3` from two repository secrets:
+
+| Secret | Holds |
+| --- | --- |
+| `DEPENDABOT_REPAIR_APP_ID` | the numeric App identifier |
+| `DEPENDABOT_REPAIR_APP_PRIVATE_KEY` | the App's PEM private key |
+
+A repository admin provisions both by hand. The procedure — creating the App, granting it contents
+and pull-requests write, installing it on this repository and storing the two secrets — is in
+`docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911/runbooks/github-app-installation-token.runbook.md`.
+
+**Degraded mode when the credential is absent.** Until both secrets exist, the token step fails and
+the job stops before it can push, so every Dependabot pull request keeps exactly the behaviour it
+has today and nothing regresses. The credential matters for what happens after a repair is pushed:
+a push made with the default Actions token produces a `pull_request` `synchronize` run that parks
+awaiting a human approval click, because a workflow run cannot trigger another workflow run when it
+is authenticated with the default token. The App identity is what makes the re-run start on its own.
+The degraded mode is therefore a recurring manual approval click on every upgrade pull request
+rather than a failure.
+
+**Pinned tool version.** The workflow pins the NuGet CLI to `7.9.0`, the same literal the three
+build and test gates pin, so the tool that rewrites `.csproj` and `app.config` during a restore is a
+known quantity for a given commit. A Pester assertion in
+`tests/scripts/dependencies/DependabotConfig.Tests.ps1` compares the literal recorded in this
+section against the literal every workflow declares, so bumping the pin in one place only fails the
+suite.
+
 ## Per-stage workflow_dispatch procedure
 
 Every callee declares `workflow_dispatch` in addition to `workflow_call`, so any

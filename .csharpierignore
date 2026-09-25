@@ -12,3 +12,7 @@
 *.csproj
 *.props
 *.targets
+# The repository adopts the inline form the NuGet CLI writes these manifests in, so the formatter no longer owns them.
+**/packages.config
+# The repository adopts the inline form the NuGet CLI writes these binding-redirect files in, so the formatter no longer owns them.
+**/app.config
