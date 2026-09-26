@@ -5,40 +5,18 @@ updates:
       - "/*"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    # One pull request at a time. Four groups at a limit of 10 produced the fan-out
+    # issue #911 reports: every weekly run opened several pull requests, each of which
+    # had to clear the full CI matrix independently (see research section 2).
+    open-pull-requests-limit: 1
     groups:
-      analyzers-dev-deps:
+      # A single catch-all group. The four topic groups this replaces each carried an
+      # inert per-dependency partition key that is not a Dependabot grouping option and
+      # had no effect, so the grouping they appeared to express was never applied.
+      all-nuget-updates:
+        applies-to: version-updates
         patterns:
-          - "Meziantou.Analyzer"
-          - "SonarAnalyzer.CSharp"
-          - "Roslynator.Analyzers"
-          - "AsyncFixer"
-          - "Microsoft.CodeAnalysis.BannedApiAnalyzers"
-        group-by: "dependency-name"
-      test-frameworks:
-        patterns:
-          - "MSTest.*"
-          - "Moq"
-          - "FluentAssertions"
-          - "Castle.Core"
-          - "Microsoft.Testing.*"
-          - "Microsoft.TestPlatform.*"
-        group-by: "dependency-name"
-      microsoft-extensions-and-bcl:
-        patterns:
-          - "Microsoft.Extensions.*"
-          - "Microsoft.Bcl.*"
-          - "System.*"
-        group-by: "dependency-name"
-      graph-identity-telemetry:
-        patterns:
-          - "Microsoft.Graph*"
-          - "Microsoft.Identity.*"
-          - "Microsoft.IdentityModel.*"
-          - "Azure.*"
-          - "OpenTelemetry*"
-          - "Microsoft.ApplicationInsights"
-        group-by: "dependency-name"
+          - "*"
     ignore:
       # Major-version bumps for Microsoft's .NET-runtime-aligned package families are
       # the only observed point at which supported TFMs (net462/netstandard2.0) have
@@ -60,3 +38,8 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "Microsoft.ML*"
         update-types: ["version-update:semver-major"]
+      # Deedle is ignored outright, at every update type. Its published packages target
+      # netstandard2.1 and later only, which .NET Framework 4.8.1 cannot consume at any
+      # version, so every Deedle pull request this repository has received has been
+      # unmergeable by construction.
+      - dependency-name: "Deedle"
