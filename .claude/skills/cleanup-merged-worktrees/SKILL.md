@@ -178,6 +178,12 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    defer to that skill for it rather than restating any value from it here. For `<N>`,
    use the GitHub issue number the run executes under when the run has one. When the run
    has none, `<N>` is an arbitrary run-scoped identifier chosen by the pr-author agent.
+   The delegation prompt MUST carry a `branch: <name>` label naming the consolidation branch,
+   and the canonical issue number line when the run has an issue number.
+   `enforce-model-routing-receipt.ps1` identifies the item from those two lines and denies a
+   gated delegation it cannot identify. A cleanup run with no issue number is therefore
+   identified by the branch label alone, which is why the label is required and the issue line
+   is not.
    It is not a pull-request number, and the only requirement on it is that the body-file
    path, the receipt's `number` field, and the body bytes all agree. This skill never
    authors or creates the PR itself.
@@ -519,6 +525,12 @@ and is prohibited by this skill, which is the term the residual rests on.
   only a distinct, individually confirmed manual action outside that automated path for
   `NOT_MERGED`/`HAS_UNIQUE_RESIDUALS` — never a change to the classification ladder
   itself, and never for `PROTECTED_CURRENT`.
+- Never delete the base branch `main` and never remove a worktree checked out on it.
+  `compute_protected` protects `main` by name in every checkout topology, so it
+  classifies `PROTECTED_CURRENT` even when no protected worktree has it checked out, and
+  `delete_candidate` refuses a deletion request for it with
+  `ACTION|delete|main|BLOCKED-PROTECTED-BASE` before any re-verification, worktree
+  removal, or branch deletion runs.
 - Never use commit-message text matching as a classification input, and never
   auto-resolve cherry-pick conflicts.
 - Never delete an origin branch, or run plain filesystem removal on an orphaned

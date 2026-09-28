@@ -76,3 +76,18 @@ writes and the `gh pr create` / `gh pr edit --body-file` handoff.
 - Do not treat PR numbers as issues.
 - Auto-close bullets must use exactly `- Closes #NNN` format, sourced only from "Issues to autoclose" or "Author-asserted autoclose issues."
 - If GitHub validation is unavailable/unverified, do not emit `Closes`; use the fallback `None` bullet.
+
+## Required `--head` on `gh pr create` (issue #687)
+
+Every `gh pr create` command this agent issues MUST carry an explicit
+`--head <branch>` naming the branch the pull request is opened from.
+
+This is what makes the call's target derivable. `enforce-pr-author-skill.ps1` resolves the
+worktree the call pertains to from the command text, and validates the orchestrator checkpoint
+belonging to that worktree. Without `--head`, `gh pr create` infers its head branch from the
+current checkout and the command carries no signal at all, so the gate denies with
+`TARGET_WORKTREE_NOT_DERIVABLE` rather than validating against whichever checkpoint occupies the
+session root, which in a parallel or epic topology belongs to a different item.
+
+Pass `--head` even when the branch is the current one: the gate resolves it to the session root
+and behaves exactly as before, and the command stays correct if it is ever replayed elsewhere.

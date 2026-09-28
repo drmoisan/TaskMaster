@@ -71,6 +71,7 @@ $script:GENERATED_AGENT_FAMILIES = @(
     'task-researcher',
     'prd-feature',
     'pr-author',
+    'commit-steward',
     'python-typed-engineer',
     'powershell-typed-engineer',
     'csharp-typed-engineer',

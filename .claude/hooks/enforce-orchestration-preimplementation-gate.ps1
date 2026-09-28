@@ -19,6 +19,10 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 # proof the issue #539 exemption is behaviourally unchanged.
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1')
 
+# Epic-scope command and path legs (issue #663, decision D2), plus the two per-mode read
+# seams relocated from this file to keep it inside the 500-line cap.
+. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1')
+
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
@@ -261,33 +265,6 @@ function Get-CheckpointContent {
     return Get-Content -Raw -LiteralPath $script:CheckpointPath
 }
 
-# The two per-mode read seams (issue #554). Each takes its path from the fixed mode
-# table and never from a delegation's own text; an absent file returns an empty
-# string, which the readiness predicate then treats as a deny.
-function Get-EpicCheckpointContent {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode 'epic'
-    if (-not (Test-Path -LiteralPath $path)) {
-        return ''
-    }
-    return Get-Content -Raw -LiteralPath $path
-}
-
-function Get-ParallelCheckpointContent {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode 'parallel'
-    if (-not (Test-Path -LiteralPath $path)) {
-        return ''
-    }
-    return Get-Content -Raw -LiteralPath $path
-}
-
 function Get-OrchestrationPreimplementationGateAllowDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -377,6 +354,7 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     # default wording they have today.
     $mode = $script:OrchestrationDelegationDefaultMode
     $prompt = ''
+    $command = ''
     $filePath = Get-StringProperty -Value $toolInput -Name 'file_path'
     if ($filePath) {
         $normalized = ([string]$filePath) -replace '\\', '/'
@@ -404,6 +382,15 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (-not (Test-OrchestrationDelegationDeclaredCheckpointPath -Prompt $prompt -Mode $mode)) {
         return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
             Get-OrchestrationModeDenyReason -Mode $mode -Failure 'declared-checkpoint-path')
+    }
+
+    # The command and path legs consult the epic checkpoint first (issue #663). A call that
+    # is not epic scope yields $null and continues to the unchanged single-feature path.
+    if ($filePath -or $command) {
+        $epicDecision = Get-OrchestrationEpicScopeDecision -Command $command -FilePath $filePath
+        if ($null -ne $epicDecision) {
+            return $epicDecision
+        }
     }
 
     if ($mode -eq 'epic' -or $mode -eq 'parallel') {
