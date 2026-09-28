@@ -38,11 +38,11 @@ jobs:
           Import-Module Pester -RequiredVersion 5.6.1
 
           $configuration = New-PesterConfiguration
-          $configuration.Run.Path = 'tests/scripts/vscode'
+          $configuration.Run.Path = @('tests/scripts/dependencies', 'tests/scripts/vscode')
           $configuration.Run.PassThru = $true
           $configuration.Output.Verbosity = 'Detailed'
           $configuration.CodeCoverage.Enabled = $true
-          $configuration.CodeCoverage.Path = 'scripts/vscode'
+          $configuration.CodeCoverage.Path = @('scripts/dependencies', 'scripts/vscode')
           $configuration.CodeCoverage.OutputFormat = 'JaCoCo'
           $configuration.CodeCoverage.OutputPath = 'coverage/pester-coverage.xml'
 

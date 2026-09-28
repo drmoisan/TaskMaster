@@ -1,0 +1,173 @@
+name: dependabot-repair
+
+# Repairs the manifest and project-file inconsistencies a Dependabot upgrade leaves behind, then
+# pushes the repair onto Dependabot's own branch so the required checks re-run on it.
+#
+# The trigger is workflow_run rather than pull_request: a run triggered directly by a Dependabot
+# pull_request event receives a read-only token and no access to repository secrets, so it cannot
+# push. A workflow_run completion executes in the base-branch context, where the App credential is
+# available. The base-context variant of the pull-request trigger is deliberately not used and its
+# name appears nowhere in this file: it is a security regression for a convenience gain, and GitHub
+# restricts it by default from 2026-11-02.
+#
+# Credential: a GitHub App installation token minted from DEPENDABOT_REPAIR_APP_ID and
+# DEPENDABOT_REPAIR_APP_PRIVATE_KEY. When those secrets are absent the token step fails, the job
+# stops before it can push, and the pull request keeps the behaviour it has today. See
+# .github/workflows/README.md for the degraded mode and the installation runbook.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dependabot-repair-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    name: Repair package manifest consistency
+    runs-on: windows-latest
+    timeout-minutes: 45
+    # The branch-prefix restriction. Dependabot creates every branch under dependabot/, so this is
+    # what keeps the job off every other completed CI run.
+    if: >-
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/') &&
+      github.event.workflow_run.event == 'pull_request'
+
+    env:
+      SOLUTION_PATH: TaskMaster.sln
+      HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+
+    steps:
+      - name: Mint an installation token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.DEPENDABOT_REPAIR_APP_ID }}
+          private-key: ${{ secrets.DEPENDABOT_REPAIR_APP_PRIVATE_KEY }}
+
+      - name: Checkout the Dependabot branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          # Pinned for the same reason as every other workflow here: the tool that rewrites
+          # .csproj and app.config during an upgrade must be a known quantity for a given commit.
+          nuget-version: '7.9.0'
+
+      - name: Restore solution
+        shell: pwsh
+        run: nuget restore $env:SOLUTION_PATH
+
+      - name: Repair package manifest consistency
+        id: repair
+        shell: pwsh
+        run: |
+          $result = & "$env:GITHUB_WORKSPACE\scripts\dependencies\Repair-PackageManifestConsistency.ps1"
+          if (-not $result.IsSuccess) {
+            $result.Failure | ForEach-Object { Write-Error "$($_.ProjectName): $($_.Condition)" }
+            exit 1
+          }
+          $kind = @($result.Verification | ForEach-Object { $_.Report.Repair } |
+              Where-Object { $null -ne $_ } | ForEach-Object { $_.Kind })
+          # The binding-redirect class is not reachable from the workflow_run trigger: this step
+          # invokes the repair entry point with no -CandidateUpgrade, so the applied-upgrade set
+          # is always empty, the app.config reconciliation pass never runs, and the call site
+          # keeps only the reconciled .Text and discards the Kind = 'BindingRedirect' record.
+          # No record of that kind can reach this filter, so the clause excluding it is removed.
+          # The decision is recorded in the AC14 note in spec.md and in the code review dated
+          # 2026-09-20. If a later change supplies -CandidateUpgrade, the removed clause becomes
+          # load-bearing again and must be restored.
+          $beyondKnownWeak = @($kind | Where-Object { $_ -ne 'Analyzer' }).Count
+          $body = Join-Path $env:RUNNER_TEMP 'repairs-report.md'
+          [System.IO.File]::WriteAllText($body, $result.Body)
+          "repair-count=$($result.RepairCount)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          # RepairCount counts per-project repair records only. Manifest normalisation and
+          # binding-redirect reconciliation write files without producing one, so a run whose
+          # only writes fall in those classes reports zero, skips the push, and discards the
+          # repair while reporting "No repairs were applied." WrittenPath already carries
+          # every written path, so the push gate reads that instead. repair-count stays
+          # published because the disclosure body and the beyond-known-weak label read repair
+          # records rather than the write set.
+          "written-count=$(@($result.WrittenPath).Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "beyond-known-weak=$beyondKnownWeak" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "skip-count=$(@($result.Skipped).Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "report-path=$body" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Commit and push the repair onto the Dependabot branch
+        if: steps.repair.outputs.written-count != '0'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          # The commit identity is derived at run time, not written as a literal. GitHub
+          # resolves commits/<sha>.author.login by matching the commit author email to an
+          # account, and a GitHub App bot's noreply address is
+          # <bot-user-id>+<slug>[bot]@users.noreply.github.com where the numeric part is the
+          # BOT USER'S id, not the app id. Neither value is knowable when this file is
+          # authored, and a hand-written address matches no account, resolves author.login to
+          # null, and makes AC18 unsatisfiable. Both reads are guarded so a wrong assumption
+          # fails this step with a named error instead of producing a silent bad identity.
+          $slug = '${{ steps.app-token.outputs.app-slug }}'
+          if ([string]::IsNullOrWhiteSpace($slug)) {
+            throw 'dependabot-repair: the token step published no app-slug output, so the commit identity cannot be derived. See issue 914.'
+          }
+          $botLogin = $slug + '[bot]'
+          $botUserId = gh api "/users/$([uri]::EscapeDataString($botLogin))" --jq .id
+          if ([string]::IsNullOrWhiteSpace($botUserId)) {
+            throw "dependabot-repair: the users API returned no id for $botLogin, so the commit identity cannot be derived. See issue 914."
+          }
+          git config user.name $botLogin
+          git config user.email "$botUserId+$botLogin@users.noreply.github.com"
+          git add --update -- '*.csproj' '*/packages.config' '*/app.config'
+          git commit -m 'chore(deps): repair manifest and project-file consistency'
+          git push origin "HEAD:$env:HEAD_BRANCH"
+
+      - name: Disclose the repairs on the pull request
+        # A run that neither wrote nor skipped anything has nothing to disclose, and the
+        # unguarded step appended a "No repairs were applied." block on every completed CI
+        # run on the branch. skip-count is named as well as written-count because AC20
+        # requires the skipped block whenever the run recorded a skip, and a run that skipped
+        # an incompatible package without writing anything must still disclose.
+        if: steps.repair.outputs.written-count != '0' || steps.repair.outputs.skip-count != '0'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          $number = @(gh pr list --head $env:HEAD_BRANCH --state open --json number --jq '.[].number')
+          if ($number.Count -eq 0) {
+            Write-Warning "No open pull request for branch $env:HEAD_BRANCH; nothing to disclose."
+            exit 0
+          }
+          $existing = gh pr view $number[0] --json body --jq '.body'
+          $report = [System.IO.File]::ReadAllText('${{ steps.repair.outputs.report-path }}')
+          # Replace rather than append. The repair push triggers a new CI run whose completion
+          # re-fires this workflow, so an appending edit grows the body without bound over the
+          # life of the pull request. Stripping any prior delimited block first makes the edit
+          # idempotent: one block, however many times the workflow runs.
+          $blockPattern = '(?s)<!-- dependabot-repair:begin -->.*?<!-- dependabot-repair:end -->'
+          # The two markers are derived from the strip pattern rather than written a second
+          # time, so the block this step emits and the block it strips cannot drift apart.
+          # Substring(4) drops the (?s) option prefix; the split is on the .*? between them.
+          $marker = $blockPattern.Substring(4) -split '\.\*\?'
+          $stripped = [regex]::Replace($existing, $blockPattern, '').TrimEnd()
+          $block = $marker[0] + "`n" + $report + "`n" + $marker[1]
+          $updated = Join-Path $env:RUNNER_TEMP 'pr-body.md'
+          [System.IO.File]::WriteAllText($updated, ($stripped + "`n`n" + $block))
+          gh pr edit $number[0] --body-file $updated
+          if ('${{ steps.repair.outputs.beyond-known-weak }}' -ne '0') {
+            gh pr edit $number[0] --add-label 'deps:autofixed'
+          }

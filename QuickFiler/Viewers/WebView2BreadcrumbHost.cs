@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,10 +13,10 @@ namespace QuickFiler.Viewers
     /// <summary>
     /// Adapter implementing <see cref="IBreadcrumbWebHost"/> over the Designer-owned
     /// <see cref="WebView2"/> control (#349). Initialization awaits the form's UI
-    /// SynchronizationContext BEFORE EnsureCoreWebView2Async, and uses the shared
-    /// %LocalAppData%\WindowsFormsWebView2 cache folder through the existing
-    /// <see cref="IWebViewCoreInitializer"/> seam. Waiting is event-driven
-    /// (CoreWebView2InitializationCompleted) — no polling, no delays. Every SDK touch outside the
+    /// SynchronizationContext BEFORE EnsureCoreWebView2Async, and resolves the shared user-data
+    /// folder and browser arguments from <see cref="WebView2EnvironmentContract"/> (#792) before
+    /// handing them to the existing <see cref="IWebViewCoreInitializer"/> seam. Waiting is
+    /// event-driven (CoreWebView2InitializationCompleted) — no polling, no delays. Every SDK touch outside the
     /// SDK's own event callbacks is marshalled through one <see cref="BreadcrumbUiDispatcher"/>
     /// callback, and exactly one host owns a given control at a time.
     /// </summary>
@@ -152,18 +151,36 @@ namespace QuickFiler.Viewers
         /// fire-and-forget, so this member returns before the forward executes; order between
         /// successive calls is preserved by the single post queue. Before <c>InitializeAsync</c> has
         /// installed a dispatcher there is none to marshal through, and the callback executes inline
-        /// on the calling thread exactly as it did before this change.
+        /// on the calling thread exactly as it did before this change. The <c>CoreWebView2</c> read,
+        /// the null guard and the log-and-drop run inside the same callback as the forward (#792):
+        /// a document handed over before the core exists is dropped rather than forwarded to a
+        /// control that would throw.
         /// </remarks>
         public void NavigateToString(string html)
         {
+            // One unit of work, so the read and the forward cannot be split across two dispatch hops.
+            void NavigateCore()
+            {
+                CoreWebView2? core = _control.CoreWebView2;
+                if (core == null)
+                {
+                    log.Error(
+                        "NavigateToString called before CoreWebView2 initialization; document dropped."
+                    );
+                    return;
+                }
+
+                ForwardNavigateToString(html);
+            }
+
             BreadcrumbUiDispatcher? dispatcher = _dispatcher;
             if (dispatcher == null)
             {
-                ForwardNavigateToString(html);
+                NavigateCore();
                 return;
             }
 
-            _ = dispatcher.Dispatch(() => ForwardNavigateToString(html));
+            _ = dispatcher.Dispatch(NavigateCore);
         }
 
         /// <summary>The unavoidable SDK call behind <see cref="NavigateToString"/>.</summary>
@@ -243,11 +260,8 @@ namespace QuickFiler.Viewers
                 throw new ArgumentNullException(nameof(uiSyncContext));
             }
 
-            string cacheFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "WindowsFormsWebView2"
-            );
-            var options = new CoreWebView2EnvironmentOptions();
+            string cacheFolder = WebView2EnvironmentContract.ResolveUserDataFolder();
+            CoreWebView2EnvironmentOptions options = WebView2EnvironmentContract.CreateOptions();
 
             // Capture variant V1: build the UI marshalling boundary from the context the caller
             // already supplies, so the constructor gains no new throwing precondition. Assign only

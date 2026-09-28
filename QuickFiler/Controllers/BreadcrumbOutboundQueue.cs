@@ -63,5 +63,18 @@ namespace QuickFiler.Controllers
                 _host.PostMessageJson(_pending.Dequeue());
             }
         }
+
+        /// <summary>
+        /// Discards every buffered payload without posting and returns how many were dropped. Used
+        /// when CoreWebView2 initialization has finally failed: a never-initialized host has no core
+        /// to post to, so draining would only forward into the log-and-drop path (#792 AC-U7).
+        /// </summary>
+        /// <returns>The number of payloads that were pending before the discard.</returns>
+        public int DiscardPending()
+        {
+            int discarded = _pending.Count;
+            _pending.Clear();
+            return discarded;
+        }
     }
 }

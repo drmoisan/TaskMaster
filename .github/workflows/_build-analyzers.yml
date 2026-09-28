@@ -30,7 +30,8 @@ jobs:
       - name: Setup NuGet
         uses: nuget/setup-nuget@v2
         with:
-          nuget-version: latest
+          # Pinned: the tool that rewrites .csproj and app.config during an upgrade must be a known quantity for a given commit, and 7.9.0 is what the floating selector resolved to, so this freezes current behaviour rather than changing it.
+          nuget-version: '7.9.0'
 
       - name: Cache NuGet packages
         uses: actions/cache@v4

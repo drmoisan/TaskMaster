@@ -27,3 +27,4 @@
 
 - [Ratified exemption boundaries](reference_ratified_exemption_boundaries.md) — check docs/features/archive/ for a maintainer-decision artifact before planning any [ExcludeFromCodeCoverage] removal; never promise N -> 0
 - [ExcludeFromCodeCoverage lambda propagation](reference_exclude_from_code_coverage_lambda_propagation.md) — method-level leaks nested lambdas into the denominator, class-level does not; a partial-class attribute exempts the whole type
+- [Repo-walking count tests must exclude .claude](reference_repo_walking_tests_exclude_claude_worktrees.md) — nested agent worktrees hold full csproj copies; put the .git/.claude/packages/bin/obj exclusion list in the AC text, pair count with content assertion

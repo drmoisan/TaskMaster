@@ -9,11 +9,13 @@ tools:
   - Glob
   - "Write(docs/features/epics/**)"
   - "Edit(docs/features/epics/**)"
+  - "Write(docs/features/potential/**)"
   - "Write(artifacts/orchestration/**)"
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
   - "Bash(gh *)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
+  - "mcp__drm-copilot__potential_to_issue"
 skills:
   - policy-compliance-order
   - epic-plan
@@ -102,10 +104,11 @@ the prepared epic, per the template in the `epic-plan` skill.
 ## Checkpoint Persistence
 
 Update `artifacts/orchestration/epic-planner-state.json` after every completed step with:
-`objective`, `epic_feature_folder`, `epic_manifest_path`, `integration_branch`,
+`objective`, `epic_feature_folder`, `epic_manifest_path`, `integration_branch`, `epic_issue_num`,
 `epic_worthiness` (`{verdict, rationale}`), `features[]` (per-feature `issue_num`,
 `feature_folder`, `depends_on`, `wave`, `complexity_band`, `preparation_status`, `plan_path`,
 `preflight_status`), `kickoff_prompt_path`, `completed_steps`, `next_step`, and `last_updated`.
+`epic_issue_num` is the epic-level issue `epic-planner` promotes at planning time through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic` (issue #663; see `## Epic-Level Issue Promotion` in the `epic-plan` skill).
 
 ## Completion Requirements
 

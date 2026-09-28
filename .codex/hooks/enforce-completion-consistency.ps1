@@ -5,8 +5,8 @@
     evidence.
 
 .DESCRIPTION
-    Invoked by the Claude Code PreToolUse hook on Write or Edit operations. The
-    hook activates only when the target file_path normalizes to
+    Invoked by the Codex PreToolUse hook on apply_patch operations. The hook
+    reads one JSON object from stdin and activates only when the target path normalizes to
     artifacts/orchestration/orchestrator-state.json.
 
     A written checkpoint asserts completion when any of the following hold:
@@ -23,9 +23,11 @@
         variables.feature-folder);
       - a ci_gate object with conclusion == "success" and a non-empty head_sha.
 
-    The block reason names the specific missing evidence so the caller can
-    remediate. When completion is not asserted, the write is allowed
-    (backward compatibility).
+    When completion evidence is missing the hook emits a PreToolUse JSON
+    response with hookSpecificOutput.permissionDecision='deny' and a reason that
+    names the specific missing evidence so the caller can remediate. When
+    completion is not asserted, the write is allowed via
+    hookSpecificOutput.permissionDecision='allow' (backward compatibility).
 
     Edit tool calls supply only old_string/new_string (a partial patch) and
     cannot be reliably validated without the full target file content, so they
@@ -39,6 +41,21 @@
 [CmdletBinding()]
 param()
 
+# Reuse the adjacent hook's shared checkpoint policy logic. This dot-source is by
+# design, not a copy-paste defect, so the hook is not renamed.
+. (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1')
+
+# Shared Codex PreToolUse transport. Dot-sourced explicitly rather than relying on
+# the transitive load above, so this hook's transport does not depend on its
+# neighbour's internals. Every transport error it raises names this hook, because
+# the shared parser is called with -HookName 'enforce-completion-consistency'.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+
+# Dot-source the shared validation helpers. Guarded so a missing file produces a
+# clear error and so dot-sourcing this hook in tests loads the helpers too.
+$script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1'
+. $script:CompletionHelpersPath
+
 function ConvertFrom-CheckpointJson {
     <#
     .SYNOPSIS
@@ -51,6 +68,29 @@ function ConvertFrom-CheckpointJson {
     )
 
     return $Json | ConvertFrom-Json -ErrorAction Stop
+}
+
+function Get-CheckpointFileContent {
+    <#
+    .SYNOPSIS
+        Reads the on-disk checkpoint content for the read-then-validate Edit path.
+    .DESCRIPTION
+        Returns the full file text when the path resolves to a file on disk, or
+        $null when the file does not exist. Tests inject a CheckpointReader
+        scriptblock instead of mocking this function so no temporary files are
+        required.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Path
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return $null
+    }
+    return Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
 }
 
 function Test-IsCheckpointPath {
@@ -149,7 +189,13 @@ function Get-MissingCompletionEvidence {
     param(
         [Parameter(Mandatory)]
         [AllowNull()]
-        $Payload
+        $Payload,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $FolderExistsCheck = { param($p) Test-Path -LiteralPath $p -PathType Container },
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $RoutingMatrixReader
     )
 
     $missing = @()
@@ -158,16 +204,17 @@ function Get-MissingCompletionEvidence {
     if (-not $issueNum -and $null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'variables')) {
         $issueNum = Get-CheckpointStringValue -Payload $Payload.variables -Name 'issue-num'
     }
-    if (-not $issueNum) {
-        $missing += 'issue-num'
+    if (-not (Test-IsValidIssueNum -Value $issueNum)) {
+        # Name the offending value so sentinel/placeholder inputs are explicit.
+        $missing += "issue-num value '$issueNum' is not a valid issue number (must be digits-only)"
     }
 
     $featureFolder = Get-CheckpointStringValue -Payload $Payload -Name 'feature-folder'
     if (-not $featureFolder -and $null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'variables')) {
         $featureFolder = Get-CheckpointStringValue -Payload $Payload.variables -Name 'feature-folder'
     }
-    if (-not $featureFolder) {
-        $missing += 'feature-folder'
+    if (-not (Test-IsValidFeatureFolder -Value $featureFolder -FolderExistsCheck $FolderExistsCheck)) {
+        $missing += "feature-folder value '$featureFolder' is not a valid feature folder (must be under docs/features/active/ and exist)"
     }
 
     $ciGate = $null
@@ -188,7 +235,14 @@ function Get-MissingCompletionEvidence {
         }
     }
 
-    if ($issueNum -eq '232') {
+    # PR-gate evidence is required only when the checkpoint's selected route
+    # opts into it via requires_pr_gate in the routing matrix. This replaces the
+    # former issue-number special-casing with route-driven enforcement.
+    $prGateArgs = @{ Payload = $Payload }
+    if ($PSBoundParameters.ContainsKey('RoutingMatrixReader') -and $null -ne $RoutingMatrixReader) {
+        $prGateArgs['RoutingMatrixReader'] = $RoutingMatrixReader
+    }
+    if (Test-RouteRequiresPrGate @prGateArgs) {
         $prGate = $null
         if ($null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'pr_gate')) {
             $prGate = $Payload.pr_gate
@@ -213,72 +267,146 @@ function Get-MissingCompletionEvidence {
     return [string[]]$missing
 }
 
+function Resolve-EditedCheckpointContent {
+    <#
+    .SYNOPSIS
+        Returns the patched checkpoint content for an Edit-tool call, or $null
+        when the patch cannot be applied against the on-disk checkpoint.
+    .DESCRIPTION
+        Implements the read-then-validate Edit path. When the tool input carries
+        an old_string (an Edit patch), the on-disk checkpoint is read through the
+        injectable CheckpointReader seam and the old_string -> new_string
+        replacement is applied in memory (no on-disk mutation). Returns $null
+        when there is no old_string, the on-disk file does not exist, or the
+        old_string is not present in the on-disk content, signalling the caller
+        to allow (defer).
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowNull()]
+        $ToolInput,
+
+        [Parameter(Mandatory)]
+        [scriptblock] $CheckpointReader
+    )
+
+    $oldString = $null
+    if ($null -ne $ToolInput -and ($ToolInput.PSObject.Properties.Name -contains 'old_string')) {
+        $oldString = [string]$ToolInput.old_string
+    }
+    if ([string]::IsNullOrEmpty($oldString)) {
+        return $null
+    }
+
+    $newString = ''
+    if ($ToolInput.PSObject.Properties.Name -contains 'new_string') {
+        $newString = [string]$ToolInput.new_string
+    }
+
+    $onDisk = & $CheckpointReader 'artifacts/orchestration/orchestrator-state.json'
+    if ([string]::IsNullOrEmpty([string]$onDisk)) {
+        # The on-disk checkpoint does not exist (or is empty); cannot patch.
+        return $null
+    }
+
+    $onDiskText = [string]$onDisk
+    if (-not $onDiskText.Contains($oldString)) {
+        # The old_string is not present, so the patch does not apply here.
+        return $null
+    }
+
+    # Apply the patch in memory using a literal (non-regex) replacement.
+    return $onDiskText.Replace($oldString, $newString)
+}
+
 function Invoke-CompletionConsistencyDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision based on
+        Parses mapped Codex tool_input JSON and returns an allow-or-deny decision based on
         completion-evidence consistency.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
-        [string] $ToolInputRaw
+        [string] $ToolInputRaw,
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $FolderExistsCheck = { param($p) Test-Path -LiteralPath $p -PathType Container },
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $CheckpointReader = { param($Path) Get-CheckpointFileContent -Path $Path },
+
+        [Parameter(Mandatory = $false)]
+        [scriptblock] $RoutingMatrixReader
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     }
     catch {
-        throw "enforce-completion-consistency hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
+        throw "enforce-completion-consistency received malformed mapped tool_input JSON: $_"
     }
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $normalized = $filePath -replace '\\', '/'
     if (-not (Test-IsCheckpointPath -NormalizedPath $normalized)) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    # Write tool: validate the content payload. Edit tool: partial new_string is
-    # not reliable without the full target file content, so allow.
+    # Write tool: validate the content payload directly. Edit tool: no content is
+    # supplied, so read the on-disk checkpoint through the injectable seam and
+    # apply the old_string -> new_string patch in memory (read-then-validate).
     $content = $toolInput.content
     if (-not $content) {
-        return [ordered]@{ decision = 'allow' }
+        $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader
+        if (-not $content) {
+            return [ordered]@{ hookSpecificOutput = [ordered]@{
+                    hookEventName = 'PreToolUse'; permissionDecision = 'deny'
+                    permissionDecisionReason = 'COMPLETION_CONSISTENCY_BLOCKED: the canonical checkpoint cannot be deleted, emptied, or replaced through an unresolved patch.'
+                } }
+        }
     }
 
     try {
         $payload = ConvertFrom-CheckpointJson -Json $content
     }
     catch {
-        # The content itself is not valid JSON. Let downstream tools surface the
-        # error rather than blocking with a misleading reason here.
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{
+                hookEventName = 'PreToolUse'; permissionDecision = 'deny'
+                permissionDecisionReason = 'COMPLETION_CONSISTENCY_BLOCKED: the canonical checkpoint must remain valid JSON.'
+            } }
     }
 
     if (-not (Test-CompletionAsserted -Payload $payload)) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $missing = Get-MissingCompletionEvidence -Payload $payload
+    $missingArgs = @{ Payload = $payload; FolderExistsCheck = $FolderExistsCheck }
+    if ($PSBoundParameters.ContainsKey('RoutingMatrixReader') -and $null -ne $RoutingMatrixReader) {
+        $missingArgs['RoutingMatrixReader'] = $RoutingMatrixReader
+    }
+    $missing = Get-MissingCompletionEvidence @missingArgs
     if ($missing.Count -eq 0) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $issueContext = ''
-    if ((Get-CheckpointStringValue -Payload $payload -Name 'issue-num') -eq '232') {
-        $issueContext = ' Issue #232 requires pr_gate evidence and current-head ci_gate evidence.'
-    }
-
+    $reason = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
     return [ordered]@{
-        decision = 'block'
-        reason   = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', ').$issueContext A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha. Supply the missing evidence or remove the completion assertion."
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $reason
+        }
     }
 }
 
@@ -288,13 +416,23 @@ if ($MyInvocation.InvocationName -eq '.') {
 }
 
 try {
-    $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+    # -HookName makes every transport error name this hook rather than the
+    # neighbour it dot-sources. Update reconstruction is scoped to the governed
+    # checkpoint path for the same reason as in enforce-checkpoint-monotonic.
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-completion-consistency'
+    $mappedInputs = @(
+        ConvertTo-CodexFileEditInput -Payload $payload -ResolveUpdateContent -GovernedPath $script:GovernedCheckpointPath
+    )
+    foreach ($toolInput in $mappedInputs) {
+        $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
+        $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $toolInputRaw
+        if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+            exit 0
+        }
+    }
+    exit 0
+} catch {
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-catch {
-    Write-Error $_
-    exit 1
-}
-
-$decision | ConvertTo-Json -Compress | Write-Output
-
-exit 0

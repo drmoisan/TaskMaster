@@ -66,6 +66,10 @@ At manifest-authoring time child issues do not exist yet, so `issue_num` values 
 placeholders and back-filled from each child's promotion receipt as preparation completes. The
 manifest is committed in final, resolved form before the kickoff artifact is written.
 
+## Epic-Level Issue Promotion
+
+Issue #663. Before the first preparation-mode child delegation, `epic-planner` promotes one epic-level GitHub issue for the epic itself. It authors a potential entry under `docs/features/potential/` describing the epic and promotes it through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic`; `gh issue create` is not used. It records the resulting number as `epic_issue_num` in the epic planning checkpoint (`artifacts/orchestration/epic-planner-state.json`) and in the kickoff prompt artifact, and `epic-orchestrator` copies it into the epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` at its first checkpoint write. The integration-to-`main` pull request uses `epic_issue_num` as its canonical issue number.
+
 ## Complexity Assessment
 
 Assess each child feature's complexity band (`C1`-`C4`) using the `model_policy` scale and

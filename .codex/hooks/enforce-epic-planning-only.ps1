@@ -83,9 +83,6 @@ function Get-EpicPlanningRegisteredMcpTool {
 }
 
 $script:EpicPlanningRepositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$script:AllowedPreparationSemanticMcpTools = @(Get-EpicPlanningRegisteredMcpTool `
-        -RegistryPath (Join-Path $script:EpicPlanningRepositoryRoot 'config/orchestration-handoff-registry.json') `
-        -SemanticIds $script:PreparationSemanticMcpIds)
 
 function Get-EpicPlanningDenyDecision {
     [CmdletBinding()]
@@ -209,7 +206,8 @@ function Invoke-EpicPlanningOnlyDecision {
         [AllowNull()][AllowEmptyString()][string] $CheckpointRaw,
         [AllowNull()][AllowEmptyString()][string] $EpicExecutionContext,
         [AllowNull()][string[]] $StagedPaths,
-        [AllowNull()][AllowEmptyString()][string] $CurrentBranch
+        [AllowNull()][AllowEmptyString()][string] $CurrentBranch,
+        [string] $RegistryPath = (Join-Path $script:EpicPlanningRepositoryRoot 'config/orchestration-handoff-registry.json')
     )
 
     $payload = ConvertFrom-EpicPlanningJson -Raw $PayloadRaw -Name 'PreToolUse input'
@@ -269,8 +267,20 @@ function Invoke-EpicPlanningOnlyDecision {
         return Get-EpicPlanningDenyDecision -Reason 'the Bash command is outside the preparation read, branch, commit, push, or validator allowlist.'
     }
 
+    # Lifecycle tools are decided first and never need the registry. Only a
+    # registry-dependent mcp__ call reads it, so a destination without the
+    # registry keeps every other decision and fails closed for semantic MCP.
     $allowedRepositoryMcp = $script:AllowedPreparationMcpTools -contains $toolName
-    $allowedSemanticMcp = $script:AllowedPreparationSemanticMcpTools -contains $toolName
+    $allowedSemanticMcp = $false
+    if (-not $allowedRepositoryMcp -and $toolName -like 'mcp__*') {
+        if (-not (Test-Path -LiteralPath $RegistryPath -PathType Leaf)) {
+            return Get-EpicPlanningDenyDecision -Reason "semantic MCP registry '$RegistryPath' does not exist; registry-dependent MCP tool '$toolName' is denied in preparation mode."
+        }
+        $registeredSemanticMcp = @(Get-EpicPlanningRegisteredMcpTool `
+                -RegistryPath $RegistryPath `
+                -SemanticIds $script:PreparationSemanticMcpIds)
+        $allowedSemanticMcp = $registeredSemanticMcp -contains $toolName
+    }
     if ($allowedRepositoryMcp -or $allowedSemanticMcp) {
         if ($attestedPreparation) {
             $workspaceRoot = [string]$payload.tool_input.workspace_root

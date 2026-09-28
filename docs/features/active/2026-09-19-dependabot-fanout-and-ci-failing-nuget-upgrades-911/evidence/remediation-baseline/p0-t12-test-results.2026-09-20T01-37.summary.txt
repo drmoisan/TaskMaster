@@ -1,0 +1,5 @@
+Test run outcome: Completed
+Total 7343, executed 7343, passed 7343, failed 0.
+Skipped 0, derived as total minus executed rather than reported by the test platform.
+Figures reported verbatim by the test platform: error 0, timeout 0, aborted 0, notExecuted 0, inconclusive 0.
+Failed tests: none

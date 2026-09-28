@@ -1,6 +1,7 @@
 name = "csharp-typed-engineer"
 description = "Converted subagent"
-variant = "legacy"
+model = "gpt-5.6-terra"
+model_reasoning_effort = "high"
 developer_instructions = '''
 Canonical migration source: .github/agents/csharp-typed-engineer.agent.md
 Read the canonical source agent file first and follow it exactly.

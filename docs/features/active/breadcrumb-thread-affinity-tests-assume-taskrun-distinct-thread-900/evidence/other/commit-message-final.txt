@@ -1,0 +1,25 @@
+docs(900): evidence, acceptance check-off and plan state for the thread-affinity test fix
+
+Adds the remaining execution evidence for issue #900 and records the acceptance state.
+
+Artifact kinds included:
+
+- regression-testing: the fail-before exception dossier, the pre-edit and post-edit token
+  censuses, the scoped formatter record, the post-fix build, the pre-mutation pair run, the
+  fix-commit record, the two mutation runs and their two revert proofs, the post-revert
+  rebuild, and the two pass-after runs.
+- qa-gates: the final toolchain loop over formatter, formatter check, analyzer rebuild,
+  nullable rebuild, repository-wide test and coverage run, coverage delta, file-size and
+  census audit, loop closure, scope boundary, and the host-identifier sweep.
+- other: the Phase 0 commit record, the two commit message files, the record of the loop
+  iteration that failed on environmental file contention, the follow-up handoff record, and
+  this closure record.
+- issue-updates: the mirror of the text intended for the issue.
+- baseline: the Phase 0 policy-read record, mode preconditions, worktree context, channel
+  probe, toolchain bootstrap, package restore, formatter baseline, analyzer baseline,
+  nullable baseline, scoped baseline run, and repository-wide baseline coverage.
+
+Acceptance criteria: 8 of 8 checked off in spec.md.
+
+No production file is modified. The only source path changed by this branch is
+QuickFiler.Test/Viewers/ItemViewerBreadcrumbThreadAffinityTests.cs.

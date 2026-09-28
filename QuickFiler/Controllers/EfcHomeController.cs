@@ -47,15 +47,26 @@ namespace QuickFiler
         public EfcHomeController(
             IApplicationGlobals globals,
             System.Action parentCleanup,
-            MailItem mail = null
+            MailItem mail = null,
+            IFolderSearchHandler carriedFolderHandler = null,
+            MailItemHelper carriedMailHelper = null
         )
-            : this(globals, parentCleanup, CreateDefaultDependencies(), mail) { }
+            : this(
+                globals,
+                parentCleanup,
+                CreateDefaultDependencies(),
+                mail,
+                carriedFolderHandler,
+                carriedMailHelper
+            ) { }
 
         internal EfcHomeController(
             IApplicationGlobals globals,
             System.Action parentCleanup,
             EfcHomeControllerDependencies dependencies,
-            MailItem mail = null
+            MailItem mail = null,
+            IFolderSearchHandler carriedFolderHandler = null,
+            MailItemHelper carriedMailHelper = null
         )
         {
             dependencies.ThrowIfNull();
@@ -69,6 +80,12 @@ namespace QuickFiler
                 this.TokenSource,
                 this.Token
             );
+
+            // #792 AC-U3: deposit the pop-out carry before the form controller is built, because
+            // FormControllerWithDataFactory calls Initialize(), which fires PopulateFolderCombobox
+            // and therefore InitFolderHandlerAsync, the consumer of the carry.
+            DataModel.CarriedFolderHandler = carriedFolderHandler;
+            DataModel.CarriedMailHelper = carriedMailHelper;
 
             if (DataModel.Mail is not null)
             {

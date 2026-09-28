@@ -200,6 +200,21 @@ namespace QuickFiler.Test.Viewers
         /// A genuine cross-thread call must still fail fast with a diagnostic naming the operation,
         /// and must not be an <see cref="ObjectDisposedException"/>.
         /// </summary>
+        /// <remarks>
+        /// Issue #900: the worker is a dedicated thread created by <c>RunOnDedicatedWorkerThread</c>,
+        /// never a <c>Task.Run</c> work item. A work item queued from a thread-pool thread lands on
+        /// that thread's local queue, and a blocking wait on it can run the delegate inline on the
+        /// constructing thread, in which case <c>Dispatcher.CheckAccess()</c> is true and the guard
+        /// never throws. A thread object this test constructs is never the object that constructed
+        /// the viewer, so the precondition asserted inside the delegate holds by construction under
+        /// any scheduler, including the <c>Workers=0</c> class-level parallel run. The helper's
+        /// untimed <c>Thread.Join()</c> is a completion wait for one synchronous call on a dedicated
+        /// non-pool thread; unlike the previous blocking <c>GetResult()</c> shape it never parks a
+        /// thread-pool slot waiting on another thread-pool slot, so it adds no starvation risk under
+        /// parallel execution. <c>BeOfType</c> is an exact-type check, so the derived
+        /// <see cref="ObjectDisposedException"/> is excluded by it as well as by the explicit
+        /// <c>NotBeOfType</c> that documents the intent.
+        /// </remarks>
         [TestMethod]
         public void InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic()
         {
@@ -210,21 +225,28 @@ namespace QuickFiler.Test.Viewers
                 var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
 
                 // Act
-                Action act = () =>
-                    Task.Run(() =>
-                            scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations)
-                        )
-                        .GetAwaiter()
-                        .GetResult();
+                Exception captured = RunOnDedicatedWorkerThread(() =>
+                {
+                    bool isOwnerThread = scope.Viewer.UiDispatcher.CheckAccess();
+                    isOwnerThread
+                        .Should()
+                        .BeFalse(
+                            "the dedicated worker thread must not be the thread that constructed "
+                                + "the viewer, or the boundary assertion would pass vacuously"
+                        );
+                    scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
+                });
 
                 // Assert
-                act.Should()
-                    .Throw<InvalidOperationException>(
-                        "a worker thread is not the thread that constructed the viewer"
-                    )
-                    .Where(error => error.Message.Contains("InitializeBreadcrumbPipeline"))
-                    .Which.Should()
-                    .NotBeOfType<ObjectDisposedException>();
+                captured
+                    .Should()
+                    .NotBeNull(
+                        "a worker thread is not the thread that constructed the viewer, so the "
+                            + "guard must throw rather than admit the call"
+                    );
+                captured.Should().BeOfType<InvalidOperationException>();
+                captured.Message.Should().Contain("InitializeBreadcrumbPipeline");
+                captured.Should().NotBeOfType<ObjectDisposedException>();
             }
         }
 
@@ -233,6 +255,16 @@ namespace QuickFiler.Test.Viewers
         /// overload, whose guard is its first statement and therefore throws before any argument
         /// check or control access.
         /// </summary>
+        /// <remarks>
+        /// Issue #900: the worker is a dedicated thread created by <c>RunOnDedicatedWorkerThread</c>
+        /// rather than a <c>Task.Run</c> work item, for the reason given on
+        /// <c>InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic</c>: a pool work
+        /// item can be inlined onto the constructing thread, and a thread this test creates cannot.
+        /// The precondition inside the delegate proves the call is off the owning thread before the
+        /// guarded member runs. The helper's untimed <c>Thread.Join()</c> waits for one synchronous
+        /// call on a non-pool thread and parks no thread-pool slot, so it is safe under the
+        /// <c>Workers=0</c> class-level parallel run.
+        /// </remarks>
         [TestMethod]
         public void ConfigureBreadcrumbDropDown_WorkerThread_ThrowsBoundaryDiagnostic()
         {
@@ -242,25 +274,32 @@ namespace QuickFiler.Test.Viewers
                 var host = new InertDropDownHost();
 
                 // Act
-                Action act = () =>
-                    Task.Run(() =>
-                            scope.Viewer.ConfigureBreadcrumbDropDown(
-                                host,
-                                () => new Rectangle(0, 0, 10, 10),
-                                () => new Rectangle(0, 0, 1920, 1040)
-                            )
-                        )
-                        .GetAwaiter()
-                        .GetResult();
+                Exception captured = RunOnDedicatedWorkerThread(() =>
+                {
+                    bool isOwnerThread = scope.Viewer.UiDispatcher.CheckAccess();
+                    isOwnerThread
+                        .Should()
+                        .BeFalse(
+                            "the dedicated worker thread must not be the thread that constructed "
+                                + "the viewer, or the boundary assertion would pass vacuously"
+                        );
+                    scope.Viewer.ConfigureBreadcrumbDropDown(
+                        host,
+                        () => new Rectangle(0, 0, 10, 10),
+                        () => new Rectangle(0, 0, 1920, 1040)
+                    );
+                });
 
                 // Assert
-                act.Should()
-                    .Throw<InvalidOperationException>(
-                        "a worker thread is not the thread that constructed the viewer"
-                    )
-                    .Where(error => error.Message.Contains("ConfigureBreadcrumbDropDown"))
-                    .Which.Should()
-                    .NotBeOfType<ObjectDisposedException>();
+                captured
+                    .Should()
+                    .NotBeNull(
+                        "a worker thread is not the thread that constructed the viewer, so the "
+                            + "guard must throw rather than admit the call"
+                    );
+                captured.Should().BeOfType<InvalidOperationException>();
+                captured.Message.Should().Contain("ConfigureBreadcrumbDropDown");
+                captured.Should().NotBeOfType<ObjectDisposedException>();
             }
         }
 
@@ -329,6 +368,38 @@ namespace QuickFiler.Test.Viewers
                 .Should()
                 .NotBeNull("ItemViewer must still declare the private _uiDispatcher field");
             field.SetValue(viewer, null);
+        }
+
+        /// <summary>
+        /// Runs <paramref name="action"/> on a dedicated background thread, joins it, and returns
+        /// the exception it threw, or <see langword="null"/> when it completed normally.
+        /// </summary>
+        /// <remarks>
+        /// Issue #900: a <c>Task.Run</c> work item is not guaranteed to run on a thread other than
+        /// the caller's, so it cannot stand in for a different thread in a thread-identity test. A
+        /// thread this method constructs is distinct from every live thread by construction. The
+        /// untimed <c>Join()</c> is a completion wait on one bounded synchronous call, not a sleep or
+        /// a wall-clock wait, and the waiting thread and the waited-for thread are never both
+        /// thread-pool workers, so the wait cannot starve the pool under parallel execution.
+        /// </remarks>
+        private static Exception RunOnDedicatedWorkerThread(Action action)
+        {
+            Exception captured = null;
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception error)
+                {
+                    captured = error;
+                }
+            });
+            thread.IsBackground = true;
+            thread.Start();
+            thread.Join();
+            return captured;
         }
 
         /// <summary>A drop-down host that records nothing and does nothing.</summary>
