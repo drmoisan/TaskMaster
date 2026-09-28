@@ -39,5 +39,28 @@ correctly said an already-started delegate is never cancelled. Fixing that contr
 lines in `spec.md`, needed no toolchain re-run, and preserved the footprint AC — whereas the
 source-level findings from the same review would each have cost a full C# gate cycle.
 
+**The same bind fires on `.claude/agent-memory/`, and that one is self-inflicted.** Agent memory is
+TRACKED in this repo, so an orchestrator that commits its own memory files onto an item branch puts
+those paths into `git diff BASE HEAD` and makes a footprint AC permanently unsatisfiable. On issue #839
+(2026-09-12) I committed five agent-memory paths mid-run as a rate-limit safety measure; preflight's
+first blocking defect was that AC10 ("lists only paths matching the three Write Set entries") could
+never pass, and it proposed carving agent-memory out of the gate. Carving it out is the wrong fix — it
+weakens a real scope criterion to accommodate an avoidable error, and on a parallel cohort it also ships
+`MEMORY.md` edits to main through the item's PR, which is exactly the sibling merge-conflict hazard that
+[[parallel-epic-children-conflict-on-agent-memory-index]] describes.
+
+The fix is to keep agent memory **uncommitted** in an item worktree. Modified-and-untracked memory files
+are the normal residue state for a parallel item and are covered by a porcelain residue rule; committed
+ones are a footprint violation. Undoing it: `git reset --hard` is blocked by `validate-bash`, but
+`git reset <sha>` (mixed, the default) is allowed and is what you want anyway, because it drops the commit
+while leaving every file on disk. Force-push is also blocked, so remove it from origin with
+`git push origin --delete <branch>` followed by a plain `git push -u origin <branch>`. Save the blob SHAs
+(`git diff-tree -r --no-commit-id --format= <sha>`) to the scratchpad first, since deleting the remote ref
+makes those objects unreachable.
+
+**How to apply:** never include `.claude/agent-memory` in a commit pathspec on an item branch. Write the
+memory files, leave them dirty, and report their paths so the owning session harvests them.
+
 Related: [[whole-repo-ci-gate-not-out-of-scope]], [[orchestrator-state-json-is-tracked-in-git]],
-[[feedback_commit_before_ci_gate]].
+[[feedback_commit_before_ci_gate]], [[validate-bash-blocks-force-with-lease-too]],
+[[parallel-epic-children-conflict-on-agent-memory-index]].

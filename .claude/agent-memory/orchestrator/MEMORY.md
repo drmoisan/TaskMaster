@@ -228,3 +228,14 @@
 - [Preflight finds forward-referencing acceptances](preflight-forward-referencing-acceptances.md) — budget 3 preflight rounds; name "no acceptance may reference state a later task establishes" explicitly; MCP validator passes right through it
 - [Preflight catches what the plan validator cannot](preflight-catches-what-the-plan-validator-cannot.md) — MCP validator passed 3x on a plan with 8 blocking execution defects; budget 2-3 preflight cycles above ~100 tasks, and check the six recurring defect classes
 - [Cobertura line-rate attribute is wrong](cobertura-line-rate-attribute-is-wrong.md) — #441 + #478 both corrupt it; recompute from deduplicated class-level `<line>` nodes. Per-file attribution DOES survive partial splits; #424's raw-vs-post-processed baseline is a like-for-like trap
+- [Bash filter refuses the word "parallel" in a git pathspec](bash-filter-refuses-the-word-parallel-in-a-git-pathspec.md) — unrunnable, not vacuous; also: `| wc -l` IS allowed
+- [Preparation commit ordering creates FALSE preflight defects](preparation-commit-ordering-creates-false-preflight-defects.md) — "files are uncommitted" is transient; commit and re-run, never make Phase 0 commit
+- [git grep is a different ENGINE than the Grep tool](git-grep-is-a-different-engine-than-the-grep-tool.md) — BRE `?` is literal; blind to untracked; made 5 gates unfalsifiable
+- [Invoke-MSTestWithCoverage: three traps](invoke-mstest-with-coverage-three-traps.md) — Join-Path rooting, SearchRoot scans the repo, throws without dotnet-coverage
+- [Inventory gate flags inherited content](inventory-clause-omits-pre-phase0-inherited-content.md)
+- [Main advancing does NOT move the merge base](main-advancing-does-not-move-the-merge-base.md)
+- [require_model_routing is EXISTENCE-ONLY](mcp-orchestrator-state-validator-is-existence-only-for-routing.md)
+- [Per-file gate excludes sibling test file](per-file-coverage-gate-excludes-sibling-test-file.md)
+- [A bad switch may be INLINE, not upstream](plan-defect-may-be-inline-not-upstream.md)
+- [Run the failing class ALONE before blaming parallelism](run-the-failing-class-alone-before-blaming-parallelism.md)
+- [Build-lock: COORDINATOR-HOLD, waiter kill](shared-build-lock-coordinator-hold-and-waiter-kill.md)

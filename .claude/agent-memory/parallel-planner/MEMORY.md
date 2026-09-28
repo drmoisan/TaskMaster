@@ -12,3 +12,6 @@
 - [Default to open mode; expect mid-flight knob changes](feedback_default_to_open_mode_for_parallel_runs.md) — operator wants /parallel-add to stay available; a max_concurrency raise can be honoured immediately
 - [Never backtick exclusion paths in delegation prompts](feedback_never_backtick_exclusion_paths_in_delegation_prompts.md) — children echo them into plans, the extractor reads them as write claims, and V1/V2 cannot see it
 - [Unchanged ref does not prove a dead child](feedback_unchanged_ref_does_not_prove_a_dead_child.md) — after an interruption, check liveness separately before relaunching; always require fast-forward-only pushes
+- [Never emit fable_policy: disabled](feedback_never_emit_fable_policy_disabled.md) — clamps fable to opus; use preferred
+- [coverage/** and .claude/** pollute derived radii](project_coverage_and_claude_paths_pollute_derived_radii.md)
+- [Checkout collision set is larger than status suggests](reference_checkout_collision_set_is_larger_than_status_suggests.md)

@@ -36,3 +36,34 @@ shape as [[suggestion-severity-diagnostics-invisible-to-msbuild]] and
 [[absence-from-failure-list-is-not-a-pass-gate]].
 
 Related: [[msbuild-analyzer-gate-vacuous-without-rebuild]], [[csharp-analyzer-packages-config-quirks]].
+
+## The same trap produces FALSE preflight findings, and two reviewers can contradict each other on it
+
+Verified 2026-09-12 on the #872 preparation run. A preflight round reported as BLOCKING that the
+UtilitiesCS test assembly carries two method-level `[Ignore]` attributes, at
+`UtilitiesCS.Test/InputBox_Test.cs:11` and `UtilitiesCS.Test/YesNoToAll_Test.cs:10`, and concluded
+that four acceptance conditions demanding a zero skipped count were unsatisfiable. It proposed a
+long delta rewriting a decision record and three tasks.
+
+**Both citations were literally true and the conclusion was false.** `UtilitiesCS.Test.csproj` names
+only `Dialogs\InputBox_Test.cs`, `Dialogs\YesNoToAll_Test.cs` and `Dialogs\YesNoToAll_Tests.cs`; there
+is no Compile item for either root-level file, and the `Dialogs\` copies carry no `[Ignore]`. The
+compiled population contains no ignored test, so the conditions were satisfiable as written.
+
+Two things make this worth recording beyond the analyzer case above:
+
+- **The duplicate-file shape is the tell.** A root-level `Foo_Test.cs` and a `Dialogs/Foo_Test.cs`
+  with the same class name cannot both be compiled — that would be CS0101. When a search returns two
+  paths whose basenames match, exactly one is usually live. Check which before reasoning from either.
+- **An earlier round had already got it right.** Round 2 stated the files carried no Compile item;
+  round 3 asserted the opposite as a blocking finding. Neither reviewer's confidence distinguished
+  them. When consecutive reviewers contradict each other on a compile-membership fact, the
+  orchestrator must settle it directly — two greps, one for the attribute and one for the Compile
+  item — rather than deferring to the later or the more detailed report. Accepting the later report
+  here would have rewritten three tasks and a decision record to accommodate a condition that does
+  not exist.
+
+Record the resolution in the plan itself (a decision-record sentence naming the uncompiled files in
+prose and the "verify by Compile item, not by finding the file" rule), because the next reviewer will
+find the same two files by the same search. See [[subagent-self-reported-correction-can-be-false]]
+and [[my-own-negative-claims-need-a-scoped-search]].

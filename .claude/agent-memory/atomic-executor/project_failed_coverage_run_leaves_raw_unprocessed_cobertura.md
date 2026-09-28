@@ -14,6 +14,11 @@ collector output:
   `QuickFiler\Viewers\Foo.cs` form finds nothing.
 - The root `coverage` node carries no `lines-covered` / `lines-valid`; those are set only at
   `Invoke-MSTestWithCoverage.Helpers.ps1:442-445`.
+- One source file maps to SEVERAL `class` nodes (one per compiled/compiler-generated class);
+  post-processing merges them to ONE per filename. So the class-element count is a cheap tell for
+  which document you are holding: re-deriving a per-file baseline after a previously-failed run
+  changed `ClassElements` 6 -> 1 on `Threading/ProgressPackage.cs` (2026-09-13, item 872) while
+  `TotalLines`/`CoveredLines` stayed 52/52. Only the count moves; the ratio does not.
 - The root `line-rate` is the ALL-MODULES rate, not the first-party allowlist rate. Measured
   gap: issue #608's failed run recorded `line-rate="0.7017"` / `lines-valid="81570"`, against
   ~0.853 / ~64k on processed runs of comparable trees. Reading the raw number as a coverage

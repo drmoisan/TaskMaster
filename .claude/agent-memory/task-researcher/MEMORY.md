@@ -266,3 +266,6 @@
 - [ribbon-engine-readiness-503](project_ribbon_engine_readiness_503.md) — Ribbon layer coverage-excluded; net481 blocks DIM; 5 orphan onAction callbacks
 - [ribbon-toggle-guards-505](project_ribbon_toggle_state_guards_505.md) — toggle vs command guard asymmetry; MessageBox in sink blocks viewer tests
 - [ribbon-engine-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — RibbonExplorer.xml IS CSharpier-formatted; 84 callbacks (5 dead); 459-line test split
+- [gettableinviewasync-null-contract-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts; OCE is not TCE
+- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — #602: PQ setting no var substitution; rg-vs-git deltas; basename gotcha
+- [Measure the item worktree, not the session worktree](feedback_measure_item_worktree_not_session_worktree.md)

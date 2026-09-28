@@ -36,5 +36,33 @@ is about. Self-matching is the default, not the exception.
   error into committed plan text. See [[subagent-self-reported-correction-can-be-false]] for the
   converse case — verify either way, but do not treat pushback as non-compliance.
 
+## A relayed delta can create a BLOCKING defect, not just an inert one (verified 2026-09-13, #879)
+
+The #815 case above produced gates that could not pass. The #879 case is worse and is the one to
+expect: **two of the nine round-2 defects were created by the round-1 delta I relayed**, and both
+were blocking.
+
+- The round-1 delta added a porcelain companion to `[P0-T15]` (a correct G8b fix) whose pathspec
+  included the feature folder, and an acceptance demanding the output name only `plan.md` and
+  `spec.md`. By the time that task runs, the fourteen tasks before it have written a dozen untracked
+  evidence artifacts into that folder and checked off their own plan lines. The gate could not pass.
+  The companion was right; its **scope** and its acceptance were authored without asking what the
+  tree looks like at that task's position.
+- The same delta's `HOST=ToDoModel.Test` amendment scoped the path substitution to two task IDs.
+  Nine tasks name `TaskMaster.Test/Bootstrap/...` by literal path. On the fallback branch seven of
+  them read or stage a path that does not exist.
+
+**How to apply.** When a delta changes a path SCOPE or adds a CONTINGENCY branch, the check is not
+"is this command correct" — it is "at this task's position in the plan, what does this command
+actually emit, and does every OTHER task that names the same paths get the same treatment". Two
+concrete forms:
+
+- For any span whose output is asserted, walk the earlier tasks and list what they will have created
+  by then. Evidence artifacts and plan check-offs are the usual surprise.
+- For any conditional substitution, grep the plan for the literal prefix being substituted and list
+  every task ID that names it. Scope the amendment to that full list, not to the tasks that happened
+  to be under discussion.
+
 Related: [[preflight-catches-vacuous-gates]], [[my-own-negative-claims-need-a-scoped-search]],
-[[apply-every-part-of-a-multipart-delta]].
+[[apply-every-part-of-a-multipart-delta]], [[preflight-sibling-invalidation-cascade]],
+[[preflight-rounds-exceed-target-legitimately]].

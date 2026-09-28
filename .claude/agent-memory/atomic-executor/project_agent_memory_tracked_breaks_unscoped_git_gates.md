@@ -51,6 +51,16 @@ between the plan's baseline observation and preflight round 2. Require a **stand
 ("every path under `.claude/agent-memory/` is out of scope for every gate, whenever it appeared"),
 not a point-in-time snapshot.
 
+**A standing porcelain allowance is ALSO not sufficient once the memory files are COMMITTED.** On
+issue #839 the agent worktree arrived with four inherited commits above the merge base, one of them
+`chore(memory): ...`, so `git diff --name-only <merge-base> HEAD` listed five `.claude/agent-memory/**`
+paths permanently while `git status --porcelain --untracked-files=all` printed nothing at all
+(measured at preflight). A plan that keys its residue set off the Phase 0 *porcelain* snapshot
+therefore builds an EMPTY residue set and its anchored name-listing footprint gate is unsatisfiable
+from the first task onward. Capture BOTH snapshots in Phase 0 — the anchored
+`git diff --name-only <base> HEAD` set and the porcelain set — and write the standing allowance
+against the union.
+
 Related: [[project_preflight_selfderived_gate_thresholds_are_blind]],
 [[project_418_plan_rationale_clauses_are_evidence]],
 [[project_preflight_ac_checkoff_and_tooloutput_paths]].
