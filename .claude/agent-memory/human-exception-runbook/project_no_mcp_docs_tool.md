@@ -5,8 +5,10 @@ metadata:
   type: project
 ---
 
-Re-verified 2026-09-06 (previously 2026-08-28, 2026-08-08, 2026-08-04; first recorded 2026-07-06): no `mcp__*`
-documentation-retrieval tool wired as a dependency in TaskMaster. The `human-exception-runbook` skill's sourcing rule is MCP-first, then
+Re-verified 2026-09-19 (previously 2026-09-06, 2026-08-28, 2026-08-08, 2026-08-04; first recorded 2026-07-06): no `mcp__*`
+documentation-retrieval tool wired as a dependency in TaskMaster. The `mcp__drm-copilot__*` tools registered in
+`.claude/settings.json` are all repo-operations tools (poshqc, PR context, promotion lifecycle, artifact validation,
+prompt resolution) — none retrieves vendor documentation. The `human-exception-runbook` skill's sourcing rule is MCP-first, then
 web-second (`.claude/skills/human-exception-runbook/SKILL.md`), but the "MCP-first" clause is
 currently aspirational: there is no MCP tool that can be queried for third-party UI documentation
 (e.g., GitHub web UI, Entra admin center). `WebFetch` is the only available sourcing mechanism for
@@ -24,3 +26,5 @@ sessions — this is a snapshot of repo state as of 2026-08-28, not a permanent 
 
 Microsoft Learn pages fetched via `WebFetch` expose an `updated_at` field in their front matter, which
 satisfies the skill's dated-capture requirement directly; record both `updated_at` and the retrieval date.
+GitHub Docs pages (docs.github.com) do NOT expose a last-updated date through `WebFetch`, so for GitHub UI
+steps record the retrieval date as the capture date and label it "captured <date>" rather than `updated_at`.

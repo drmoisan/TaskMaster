@@ -275,6 +275,41 @@ namespace UtilitiesCS.Test.Threading
         }
 
         [TestMethod]
+        public void IsCompleted_OnTheThreadThatOwnsTheCapturedDispatcherWithTheCapturedUiContext_ReturnsTrue()
+        {
+            // Arrange: the invariance control for issue #816. A caller genuinely standing on the
+            // thread that owns the captured dispatcher must still complete inline.
+            using (UiThreadStateScope.Enter())
+            using (var host = new StaDispatcherHost())
+            {
+                var capturedContext = new SynchronizationContext();
+                UiThreadStateScope.SetDispatcher(host.Dispatcher);
+                UiThreadStateScope.SetUiSyncContext(capturedContext);
+
+                // Act
+                bool result = host.Dispatcher.Invoke(() =>
+                {
+                    UiThreadStateScope.SetUiThreadId(Thread.CurrentThread.ManagedThreadId);
+                    SynchronizationContext captured = SynchronizationContext.Current;
+                    SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                    try
+                    {
+                        return new UiThread.SynchronizationContextAwaiter(
+                            capturedContext
+                        ).IsCompleted;
+                    }
+                    finally
+                    {
+                        SynchronizationContext.SetSynchronizationContext(captured);
+                    }
+                });
+
+                // Assert
+                result.Should().BeTrue();
+            }
+        }
+
+        [TestMethod]
         public void IsCompleted_OnDefaultAwaiterOnAContextFreeThread_ReturnsTrue()
         {
             // Arrange: the default instance has a null captured context, and this thread has none.

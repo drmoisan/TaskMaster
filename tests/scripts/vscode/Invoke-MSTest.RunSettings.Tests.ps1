@@ -379,7 +379,7 @@ Describe 'Invoke-MSTestWithCoverageMain' {
         # lines-covered and lines-valid attributes and one package whose per-package figures sum to
         # them, because the reconciliation assertion reads exactly those two root attributes.
         Mock Get-Content -ParameterFilter { $LiteralPath -eq $script:coverageTrxPath } -MockWith { $script:coverageTrxFixture }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>' }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" branch-rate="0.8" lines-covered="4" lines-valid="5" branches-valid="10"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>' }
         Mock Set-Content {}
     }
 
@@ -413,9 +413,9 @@ Describe 'Invoke-MSTestWithCoverageMain' {
     It 'passes the generated Cobertura result to the threshold evaluator before completing successfully' {
         $script:evaluatedCoberturaXml = $null
         Mock Assert-CoberturaLineCoverageThreshold { param([string]$CoberturaXml) $script:evaluatedCoberturaXml = $CoberturaXml }
-        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>' }
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.8" branch-rate="0.8" lines-covered="4" lines-valid="5" branches-valid="10"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>' }
         Invoke-MSTestWithCoverageMain -ScriptRoot $script:scriptDir
-        $script:evaluatedCoberturaXml | Should -Be '<coverage line-rate="0.8" lines-covered="4" lines-valid="5"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>'
+        $script:evaluatedCoberturaXml | Should -Be '<coverage line-rate="0.8" branch-rate="0.8" lines-covered="4" lines-valid="5" branches-valid="10"><packages><package name="Alpha.Core"><classes><class name="Alpha.Core.Widget" filename="Alpha.Core\Widget.cs"><lines><line number="10" hits="1" /><line number="11" hits="2" /><line number="12" hits="3" /><line number="13" hits="4" /><line number="14" hits="0" /></lines></class></classes></package></packages></coverage>'
     }
 
     It 'fails when the search root cannot be found' {

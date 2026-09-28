@@ -1,10 +1,10 @@
 # GitHub Actions Workflows
 
-This directory holds the CI orchestrator and the five callee reusable workflows
+This directory holds the CI orchestrator and the six callee reusable workflows
 it invokes. The split was introduced by issue #553 to replace a single
 sequential `quality-gates` job, whose measured wall clock was 444s, with
 independent gate jobs that GitHub Actions schedules concurrently and that report
-as separate status checks.
+as separate status checks. Issue #869 added the sixth callee, `_pester.yml`.
 
 ## Pipeline overview
 
@@ -14,12 +14,13 @@ references each gate with `uses:`. It contains no inline `steps:`.
 
 | File | Runner | Gate | Timeout |
 | --- | --- | --- | --- |
-| `ci.yml` | n/a (orchestrator) | Invokes the five callees below | n/a |
+| `ci.yml` | n/a (orchestrator) | Invokes the six callees below | n/a |
 | `_actionlint.yml` | `ubuntu-latest` | Downloads actionlint 1.7.7 and lints every workflow file | 10 min |
 | `_format-check.yml` | `windows-latest` | `dotnet csharpier check .` | 10 min |
 | `_build-analyzers.yml` | `windows-latest` | `msbuild /t:Build` with `EnableNETAnalyzers` and `EnforceCodeStyleInBuild` | 30 min |
 | `_build-nullable.yml` | `windows-latest` | `msbuild /t:Rebuild` with `TreatWarningsAsErrors` | 30 min |
-| `_mstest-coverage.yml` | `windows-latest` | Plain `msbuild /t:Build`, then `vstest.console.exe` with `/EnableCodeCoverage`; uploads the `test-results` artifact | 30 min |
+| `_mstest-coverage.yml` | `windows-latest` | Plain `msbuild /t:Build`, then `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, which runs the suite under `dotnet-coverage`, post-processes the result into a first-party Cobertura projection, and asserts 80% line and 75% branch against it; uploads the Cobertura document as the `test-results` artifact | 30 min |
+| `_pester.yml` | `windows-latest` | Pester over `tests/scripts/vscode` with JaCoCo coverage scoped to `scripts/vscode`; asserts the `LINE` figure at 80% and exits non-zero on any test failure; uploads the JaCoCo document as the `pester-coverage` artifact | 10 min |
 
 Structural properties that are deliberate and should not be changed casually:
 
@@ -42,12 +43,97 @@ Structural properties that are deliberate and should not be changed casually:
   `nuget restore`. Each job installs only what its gate consumes. If a gate ever
   fails because a trimmed setup step was in fact required, restore that specific
   step to that specific callee rather than restoring full setup everywhere.
-- **Gate commands are byte-identical to their pre-split forms.** The two msbuild
-  invocations (including the `/t:Rebuild` rationale comment and both
-  `$LASTEXITCODE` guards), the csharpier invocation, and the vstest invocation
-  (including the test-assembly discovery filter and the zero-assembly `throw`)
-  were moved, not edited. Treat any change to those blocks as a change to the
-  gate's pass criterion.
+- **Gate commands were byte-identical to their pre-split forms, with one
+  deliberate exception.** The two msbuild invocations (including the
+  `/t:Rebuild` rationale comment and both `$LASTEXITCODE` guards) and the
+  csharpier invocation are unchanged from the pre-split forms. The vstest
+  invocation in `_mstest-coverage.yml` is **not**: issue #869 replaced it
+  outright with an invocation of `scripts/vscode/Invoke-MSTestWithCoverage.ps1`,
+  so that CI runs the same route as the local tooling and so that the Cobertura
+  document the coverage thresholds are asserted against exists in CI. That
+  replacement **changed the gate's pass criterion**: the job now also fails when
+  first-party line coverage is below 80% or first-party branch coverage is below
+  75%, and it fails when the coverage document is absent or carries no valid
+  branches. Two consequences arrived with it and were accepted deliberately:
+  the runsettings file the script passes declares class-level test scope with
+  one worker per core, which CI did not previously apply; and the `/Logger:trx`
+  argument is no longer passed, which is why the upload step now publishes
+  `coverage/coverage.cobertura.xml` with `if-no-files-found: error` instead of
+  globbing for trx files with `if-no-files-found: warn`. Treat any further
+  change to those blocks as a change to the gate's pass criterion.
+
+- **Pinned tool versions.** Two external tools are pinned in the workflow files
+  so a runner image bump cannot change a gate silently. Bumping either is a
+  reviewable change to both the workflow and this table.
+
+  | Tool | Pinned version | Pinned in |
+  | --- | --- | --- |
+  | `dotnet-coverage` | `18.10.0` | `_mstest-coverage.yml`, install step |
+  | Pester | `5.6.1` | `_pester.yml`, install step and import step |
+
+  The Pester pin is load-bearing beyond drift control: `windows-latest` also
+  ships the legacy Pester 3.4.0 with Windows PowerShell, which provides neither
+  `New-PesterConfiguration` nor the JaCoCo coverage output format the gate
+  depends on, so the version is pinned on the import as well as the install.
+  The `dotnet-coverage` pin is the NuGet package version. The tool's own
+  `--version` output carries a build-metadata suffix that is not part of package
+  identity and does not resolve when passed to `--version`; do not pin it.
+
+## Dependabot repair workflow
+
+`dependabot-repair.yml` is not a CI gate and `ci.yml` does not invoke it. It repairs the manifest
+and project-file inconsistencies a Dependabot upgrade leaves behind — a version reconciled in
+`packages.config` but not in the `<Import>`, `<Error>`, `<Reference>`, `<HintPath>` and
+`<Analyzer Include>` elements that depend on it — and pushes the repair onto Dependabot's own
+branch so the required checks re-run on the repaired head. The repair itself lives in
+`scripts/dependencies/Repair-PackageManifestConsistency.ps1`; the workflow is the wiring that
+gives it a restored tree, a credential and a branch to push to.
+
+**`app.config` binding redirects are not repaired from this trigger.** The repair script does
+carry a binding-redirect reconciliation pass, but the `workflow_run` step invokes the entry point
+with no `-CandidateUpgrade`, so the applied-upgrade set is always empty and that pass never runs.
+An `app.config` redirect left stale by a Dependabot upgrade therefore stays stale, and an operator
+investigating a binding failure after a repaired run should look there first rather than assume
+the workflow covered it. The class becomes reachable only if a future change supplies
+`-CandidateUpgrade` to the invocation in the "Repair package manifest consistency" step; the same
+condition is recorded as a comment on that step and in the AC14 note in the issue #911 spec.
+
+**Trigger.** The workflow triggers on `workflow_run`, on completion of the `CI` workflow, and the
+job runs only when the originating run's head branch is under the `dependabot/` prefix and its
+event was `pull_request`. The trigger is `workflow_run` rather than a direct `pull_request` trigger
+because a run triggered directly by a Dependabot `pull_request` event receives a read-only token and
+no access to repository secrets, so it cannot push. A `workflow_run` completion executes in the
+base-branch context, where the credential is available. The base-context variant of the
+pull-request trigger is deliberately not used: it is a security regression for a convenience gain,
+and GitHub restricts it by default from 2026-11-02.
+
+**Credential.** The workflow mints a GitHub App installation token with
+`actions/create-github-app-token@v3` from two repository secrets:
+
+| Secret | Holds |
+| --- | --- |
+| `DEPENDABOT_REPAIR_APP_ID` | the numeric App identifier |
+| `DEPENDABOT_REPAIR_APP_PRIVATE_KEY` | the App's PEM private key |
+
+A repository admin provisions both by hand. The procedure — creating the App, granting it contents
+and pull-requests write, installing it on this repository and storing the two secrets — is in
+`docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911/runbooks/github-app-installation-token.runbook.md`.
+
+**Degraded mode when the credential is absent.** Until both secrets exist, the token step fails and
+the job stops before it can push, so every Dependabot pull request keeps exactly the behaviour it
+has today and nothing regresses. The credential matters for what happens after a repair is pushed:
+a push made with the default Actions token produces a `pull_request` `synchronize` run that parks
+awaiting a human approval click, because a workflow run cannot trigger another workflow run when it
+is authenticated with the default token. The App identity is what makes the re-run start on its own.
+The degraded mode is therefore a recurring manual approval click on every upgrade pull request
+rather than a failure.
+
+**Pinned tool version.** The workflow pins the NuGet CLI to `7.9.0`, the same literal the three
+build and test gates pin, so the tool that rewrites `.csproj` and `app.config` during a restore is a
+known quantity for a given commit. A Pester assertion in
+`tests/scripts/dependencies/DependabotConfig.Tests.ps1` compares the literal recorded in this
+section against the literal every workflow declares, so bumping the pin in one place only fails the
+suite.
 
 ## Per-stage workflow_dispatch procedure
 
@@ -85,7 +171,7 @@ Two caveats:
 
 The required context names take the form `<caller job id> / <callee job name>` —
 the job id used in `ci.yml`, then the `name:` of the job inside the callee. The
-five contexts this pipeline reports are, verbatim:
+six contexts this pipeline reports are, verbatim:
 
 ```
 actionlint / actionlint
@@ -93,7 +179,16 @@ format-check / Verify formatting
 build-analyzers / Build with analyzers and code style enforcement
 build-nullable / Build with nullable warnings treated as errors
 mstest-coverage / Run MSTest suite with coverage
+pester / Run Pester suite with coverage
 ```
+
+The sixth entry is the one context issue #869 adds. It is **predicted** until a
+live run against the pull request head SHA confirms it with the check-runs query
+in step 2 of the next section; the first five are unchanged and continue to
+report under their existing names. Issue #869 changes no job name, so its C#
+threshold assertion adds no context of its own: the issue text's expectation of
+two new contexts is superseded, and only `pester / Run Pester suite with
+coverage` needs adding to the ruleset.
 
 Do not hand-write these strings when editing branch protection; capture them from
 a live run as described in the next section.

@@ -194,7 +194,7 @@ These are the required tools for C# code in this repo:
    - Always invoke through `dotnet tool run` so the manifest-pinned version is used. Do not invoke a globally installed `csharpier`: a different global version produces diffs that disagree with `.github/workflows/_format-check.yml`, which runs the pinned version after `dotnet tool restore`.
 
 2. **Linting / Static Analysis — .NET analyzers**
-   - C# code must pass Roslyn/.NET analyzer diagnostics configured by `.editorconfig`, `.globalconfig`, and project properties.
+   - C# code must pass Roslyn/.NET analyzer diagnostics configured by `.editorconfig` and project properties.
    - Enforce analyzer diagnostics in build using `EnableNETAnalyzers` and `EnforceCodeStyleInBuild`.
    - Prefer fixing diagnostics over suppressing them.
    - Approved commands (PowerShell):
@@ -270,7 +270,7 @@ Use methods/local functions when implementing narrow, deterministic behavior or 
 
 ### C#7. Dependencies and Analyzer Configuration (C#)
 
-- Prefer built-in .NET SDK analyzers and configuration through `.editorconfig` / `.globalconfig`.
+- Prefer built-in .NET SDK analyzers and configuration through `.editorconfig`.
 - Use project-level properties (`EnableNETAnalyzers`, `AnalysisLevel`, `AnalysisMode`, `EnforceCodeStyleInBuild`) rather than ad-hoc per-command behavior where possible.
 - Avoid adding external dependencies unless unavoidable and approved by the project direction.
 - If suppression is unavoidable, keep it as narrow as possible and document the rationale in-code.
@@ -300,7 +300,9 @@ Every new or modified unit test must adhere to these guidelines.
 - **Comprehensive Coverage (within reason)**
   - Aim to exercise critical paths and important edge conditions.
   - Configure coverage tooling to exclude test files (e.g., `tests/`), so metrics reflect the application code, not the tests themselves.
-  - Repository-wide line coverage must remain `>= 80%`.
+  - C# line coverage must remain `>= 80%`, and C# branch coverage must remain `>= 75%`.
+  - PowerShell line coverage must remain `>= 80%`; Pester does not measure branch coverage, so no PowerShell branch coverage floor is stated.
+  - These coverage figures were settled by the project maintainer on 2026-09-11 (issue #563).
   - **COM/VSTO/WinForms coverage exemption (testable denominator).** The 80% floor applies to the **testable denominator** — production-only first-party code, after excluding:
     - (a) VSTO add-in lifecycle classes (entry points, ribbon event handlers, COM utility registration) that cannot be unit-tested without a live Outlook process;
     - (b) WinForms form-derived classes and Designer-generated code;
@@ -387,7 +389,7 @@ For C# work, use these concrete commands for the general policy toolchain loop:
 1. `dotnet tool run csharpier format .` (verify with `dotnet tool run csharpier check .`)
 2. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 3. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
-4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage /ResultsDirectory:coverage\test-results /Logger:trx;LogFileName=mstest-run.trx`
+4. Run the `test: MSTest with Coverage (Koverage)` VS Code task (or invoke `Invoke-MSTestWithCoverage.ps1` under `scripts/vscode` directly), which wraps an inner `vstest.console.exe` invocation inside an outer `dotnet-coverage` collect process; the built-in Code Coverage data collector is deliberately withheld from the inner vstest invocation because it conflicts with the outer `dotnet-coverage` instrumentation.
 
 The loop behavior (restart rules, must-pass requirements, and audit expectations) is defined by the General Code Change Policy above.
 
@@ -405,7 +407,7 @@ The loop behavior (restart rules, must-pass requirements, and audit expectations
 1. **Format**: `dotnet tool run csharpier format .` (verify: `dotnet tool run csharpier check .`; always via `dotnet tool run`, never a global install)
 2. **Analyze**: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 3. **Type-check**: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
-4. **Test**: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage /ResultsDirectory:coverage\test-results /Logger:trx;LogFileName=mstest-run.trx`
+4. **Test**: Run the `test: MSTest with Coverage (Koverage)` VS Code task (or invoke `Invoke-MSTestWithCoverage.ps1` under `scripts/vscode` directly), which wraps an inner `vstest.console.exe` invocation inside an outer `dotnet-coverage` collect process; the built-in Code Coverage data collector is deliberately withheld from the inner vstest invocation because it conflicts with the outer `dotnet-coverage` instrumentation.
 
 If any step fails, fix and restart from step 1.
 
@@ -421,7 +423,7 @@ A raw coverage collector document and a raw test-platform document are both proh
 
 This rule lives in this file rather than in the evidence-and-timestamp conventions document or the atomic-plan contract. Both of those are push-down owned from an upstream repository and an edit to either is reverted on the next push-down, whereas this file is owned here and is loaded into every agent session.
 
-The two test-console toolchain steps above pass the results directory and the trx log file name explicitly for the same reason. Left to the console, the test-result document is written under a derived machine-and-timestamp name that no later step can predict or read, so no summary can be produced from it.
+The coverage route named in the two step 4 toolchain entries above passes the results directory and the trx log file name explicitly to its inner vstest invocation for the same reason: `Invoke-MSTestWithCoverage.ps1` supplies the fixed values `coverage\test-results` and `mstest-coverage-run.trx` and declares no command-line parameter for either, so the VS Code task that wraps it cannot override them. Left to the console, the test-result document is written under a derived machine-and-timestamp name that no later step can predict or read, so no summary can be produced from it.
 
 ## Key Skills Reference
 

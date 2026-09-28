@@ -1,14 +1,12 @@
-# Converted hook
-# Review the generated hook behavior before enabling it.
 
 <#
 .SYNOPSIS
-    Pre-tool-use hook for Claude Code that blocks forbidden patterns in Python unit tests.
+    Pre-tool-use hook for Codex that blocks forbidden patterns in Python unit tests.
 
 .DESCRIPTION
-    This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
+    This script is invoked by the Codex PreToolUse hook before any Write or Edit
     operation on a file path matching tests/**/*.py. It reads the tool input from the
-    CLAUDE_TOOL_INPUT environment variable (JSON with 'file_path' and a content field:
+    Codex tool_input environment variable (JSON with 'file_path' and a content field:
     'content' for Write, 'new_string' for Edit) and rejects the operation when the
     proposed content introduces forbidden runtime dependencies.
 
@@ -21,7 +19,7 @@
       - real database drivers (psycopg2, pymysql, sqlite3.connect on real files)
 
     If the content contains any forbidden pattern, the script writes a JSON response
-    to stdout with 'decision': 'block' and exits with code 0 to let Claude Code surface
+    to stdout with 'decision': 'block' and exits with code 0 to let Codex surface
     the reason.
 
 .NOTES
@@ -32,6 +30,10 @@
 [CmdletBinding()]
 param()
 
+# Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
+# mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+
 function Get-PythonTestPurityBlockDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -41,8 +43,11 @@ function Get-PythonTestPurityBlockDecision {
     )
 
     [ordered]@{
-        decision = 'block'
-        reason   = $Reason
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
     }
 }
 
@@ -66,22 +71,22 @@ function Invoke-PythonTestPurityDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        return Get-PythonTestPurityBlockDecision -Reason 'Python unit test purity hook received malformed JSON in CLAUDE_TOOL_INPUT.'
+        return Get-PythonTestPurityBlockDecision -Reason 'Python unit test purity hook received malformed JSON in Codex tool_input.'
     }
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     if (-not (Test-PythonTestFilePath -FilePath $filePath)) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $content = $null
@@ -92,7 +97,7 @@ function Invoke-PythonTestPurityDecision {
     }
 
     if (-not $content) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $forbiddenPatterns = @(
@@ -128,7 +133,7 @@ function Invoke-PythonTestPurityDecision {
     }
 
     if ($violations.Count -eq 0) {
-        return [ordered]@{ decision = 'allow' }
+        return $null
     }
 
     $uniqueViolations = $violations | Select-Object -Unique
@@ -141,9 +146,21 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$decision = Invoke-PythonTestPurityDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-if ($decision.decision -eq 'block') {
-    $decision | ConvertTo-Json -Compress | Write-Output
+try {
+    # Transport and mapping come from the shared module. A well-formed payload
+    # that maps to no file edit produces an empty record set, so the loop body
+    # never runs and the hook allows silently.
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'check-python-test-purity'
+    foreach ($toolInput in @(ConvertTo-CodexFileEditInput -Payload $payload)) {
+        $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
+        $decision = Invoke-PythonTestPurityDecision -ToolInputRaw $toolInputRaw
+        if ($null -ne $decision -and $decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+            exit 0
+        }
+    }
+    exit 0
+} catch {
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-
-exit 0

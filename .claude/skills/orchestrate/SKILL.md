@@ -33,6 +33,7 @@ On every invocation, the main session must:
 1. Read `artifacts/orchestration/orchestrator-state.json` to check for existing state.
 2. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
 3. If no checkpoint exists or the objective is new, begin the orchestration lifecycle from the start.
+4. **Checkpoint hygiene (issue #673).** When the checkpoint at `artifacts/orchestration/orchestrator-state.json` records an `issue-num` other than the item this invocation is about, move it to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json` before writing a new checkpoint, rather than overwriting it or leaving it in place. Apply the same move when this session hands an item whose checkpoint it holds to another session or worktree. A checkpoint left at a session root is read by gates that resolve against that root, so a foreign one there is state a gate can answer from.
 
 ## Prepared-State Portable Handoff Intake
 
@@ -255,9 +256,11 @@ A bounded loop consisting of five steps. The loop variable `remediation_pass` st
 
 The canonical issue number is derived once from the active feature folder name: extract the trailing integer from the folder base name (e.g., `2026-04-26-push-down-claude-customizations-162` yields `162`). Record as `issue_num` in the checkpoint.
 
-Every delegation prompt to `atomic-planner`, `atomic-executor`, and `feature-review` must include the line:
+Every delegation prompt to a receipt-gated subagent type — `atomic-planner`, `atomic-executor`, `feature-review`, `task-researcher`, `prd-feature`, and `pr-author` — must include the line:
 
 > `Canonical issue number for this feature is <issue_num>. All artifact content, file paths, and cross-references must use this number.`
+
+Each such prompt also carries a `branch: <name>` label naming the branch checked out in the item's worktree, written as the first `branch:` occurrence in the prompt. Before promotion assigns an issue number, the branch label alone is required. Two gates, `enforce-model-routing-receipt.ps1` and `enforce-prd-feature-before-planner.ps1`, identify the item from these two lines: they deny a gated delegation they cannot identify rather than checking it against whichever checkpoint occupies the calling session's root, and they never use a feature-folder path to choose the worktree, because a merged feature folder exists in every checkout branched from main.
 
 If a subagent artifact references a different issue number, the orchestrator rejects it, requests correction, and records the discrepancy under `artifact_errors` in the checkpoint.
 

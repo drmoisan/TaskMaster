@@ -32,6 +32,8 @@ namespace QuickFiler.Controllers.Tests
     {
         private const int GateTimeoutMs = 60000;
 
+        public TestContext TestContext { get; set; }
+
         /// <summary>
         /// R1 — the exact issue #230 clobber precondition. While a transaction holds a live
         /// dispatcher, the ensure helper must observe a non-null field and install nothing, so the
@@ -347,6 +349,47 @@ namespace QuickFiler.Controllers.Tests
             finally
             {
                 QfcItemControllerTestSupport.ShutdownDispatcher(liveA);
+            }
+        }
+
+        /// <summary>
+        /// Issue #743 AC1 balance assertion over the fixture's gate counters. While this test holds
+        /// the sole permit, every predecessor transaction that was released contributed equally to
+        /// the acquisition and release counters, so the difference is 1 if and only if no predecessor
+        /// leaked. The assertion is order-independent and uses no sleep, delay, stopwatch or
+        /// wall-clock read. The three counter values are written to the test output so the run's
+        /// TRX carries them.
+        /// </summary>
+        [TestMethod]
+        [Timeout(GateTimeoutMs)]
+        public async Task TransactionGate_WhileThisTestHoldsATransaction_HasExactlyOneUnreleasedAcquisition()
+        {
+            // Arrange
+            UiThreadDispatcherTransaction transaction = await UiThreadDispatcherFixture
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
+            try
+            {
+                // Act
+                int acquisitions = UiThreadDispatcherFixture.TransactionAcquisitions;
+                int releases = UiThreadDispatcherFixture.TransactionReleases;
+                int contended = UiThreadDispatcherFixture.ContendedAcquisitions;
+
+                // Assert
+                (acquisitions - releases)
+                    .Should()
+                    .Be(
+                        1,
+                        because: "this test holds the only permit, so exactly one acquisition may be "
+                            + "unreleased; a larger difference means a predecessor leaked its transaction"
+                    );
+                TestContext.WriteLine(
+                    $"GATECOUNTERS acquisitions={acquisitions} releases={releases} contended={contended}"
+                );
+            }
+            finally
+            {
+                transaction.Dispose();
             }
         }
     }

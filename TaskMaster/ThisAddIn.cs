@@ -18,6 +18,17 @@ namespace TaskMaster
     [ExcludeFromCodeCoverage]
     public partial class ThisAddIn
     {
+        /// <summary>
+        /// Installs the host-neutral assembly-binding fallback before any other member of
+        /// this type runs. Declaring the static constructor explicitly clears
+        /// <c>beforefieldinit</c>, which makes the ordering precise rather than "at or
+        /// before first use".
+        /// </summary>
+        static ThisAddIn()
+        {
+            UtilitiesCS.Bootstrap.AssemblyBindingFallback.Install();
+        }
+
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
             logger.Debug("ThisAddIn_Startup() fired");

@@ -43,3 +43,15 @@ it as a reason to fingerprint shared state before acting, not as a licence to go
 conflict is detectable at preflight for free — hash the plan, count the evidence dir, sample twice.
 Do that BEFORE the first check-off. Once you have written even one artifact you have joined the race
 and the clean stop is no longer available.
+
+## Third occurrence — #792 Phase 2 relaunch, 2026-09-17
+
+The caller relaunched an executor for [P2-T13]..[P2-T15] stating "nothing is running; I checked the
+process table". The predecessor was alive: it wrote its T14 artifact, committed T15 and checked off
+both tasks within three minutes of the relaunch, while the relaunched executor's own T14 run was in
+progress. Lessons: (1) a caller's "no live process" claim is not evidence — an agent turn does not
+show up as a distinguishable `msbuild`/`vstest` process between tool calls; (2) re-read the plan's
+check-off state and `git rev-parse HEAD` immediately before EVERY artifact write, not only at
+preflight; (3) if your Write clobbers a sibling's already-committed artifact, `git checkout HEAD --
+<that one file>` restores it without touching anything else, and put your own observations in a
+separate `evidence/other/` artifact rather than re-editing theirs.

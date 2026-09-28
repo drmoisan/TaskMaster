@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
@@ -232,7 +233,10 @@ namespace QuickFiler.Controllers
                         strNotifications
                         + grp.ItemController.ItemNumber
                         + "  "
-                        + grp.ItemController.Mail.SentOn.ToString("MM/dd/yyyy")
+                        + grp.ItemController.Mail.SentOn.ToString(
+                            "MM/dd/yyyy",
+                            CultureInfo.InvariantCulture
+                        )
                         + "  "
                         + grp.ItemController.Mail.Subject
                         + Environment.NewLine;
@@ -705,33 +709,6 @@ namespace QuickFiler.Controllers
 
             LoadItemToTlp(itemViewer, indexNumber, template, blGroupConversation, columnNumber);
             return itemViewer;
-        }
-
-        public void PopOutControlGroup(int selection)
-        {
-            // Get mail item from the group
-            MailItem mailItem = _itemGroups[selection - 1].MailItem;
-
-            // Remove the group from the form
-            RemoveSpecificControlGroup(selection);
-
-            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
-            popOutForm.Run();
-        }
-
-        public async Task PopOutControlGroupAsync(int selection)
-        {
-            Token.ThrowIfCancellationRequested();
-
-            // Get mail item from the group
-            MailItem mailItem = _itemGroups[selection - 1].MailItem;
-
-            // Remove the group from the form
-            await RemoveSpecificControlGroupAsync(selection);
-
-            var popOutForm = new EfcHomeController(_globals, () => { }, mailItem);
-
-            await popOutForm.RunAsync();
         }
 
         public void RemoveControls()
@@ -1293,7 +1270,7 @@ namespace QuickFiler.Controllers
                 var c = _itemGroups[itemIndex].ItemController;
                 var msg =
                     $"Cannot expand item with index {itemIndex} because UI is not active.\n"
-                    + $"Controller for message \"{c.ItemHelper.Subject} sent on {c.ItemHelper.SentDate.ToString("MM/dd/yyyy")} at {c.ItemHelper.SentDate.ToString("HH:mm")} "
+                    + $"Controller for message \"{c.ItemHelper.Subject} sent on {c.ItemHelper.SentDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)} at {c.ItemHelper.SentDate.ToString("HH:mm", CultureInfo.InvariantCulture)} "
                     + $"by {c.ItemHelper.SenderName} has a value of {c.IsActiveUI} for {nameof(c.IsActiveUI)}";
                 throw new InvalidOperationException(msg);
             }
@@ -2299,7 +2276,7 @@ namespace QuickFiler.Controllers
                 var dataLine =
                     $"{dataLineBeg} {xComma(qf.ItemHelper.Subject)},QuickFiled,{durationText},{durationMinutesText},";
                 dataLine +=
-                    $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy")},{qf.ItemHelper.SentDate.ToString("HH:mm")}";
+                    $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)},{qf.ItemHelper.SentDate.ToString("HH:mm", CultureInfo.InvariantCulture)}";
 
                 strOutput[k] = dataLine;
             }

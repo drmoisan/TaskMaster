@@ -172,8 +172,21 @@ namespace UtilitiesCS
                     {
                         return false;
                     }
-                    // The persistent UI context captured at Init() time.
-                    if (ReferenceEquals(_context, _uiSyncContext))
+                    // The persistent UI context captured at Init() time. A reference match alone is
+                    // not sufficient: the managed thread id above is reused by the CLR after a
+                    // thread dies, so this exit also demands a second, independent proof that the
+                    // caller stands on the captured UI thread. The null test is load-bearing, not
+                    // redundant: without it a null captured dispatcher would match the null lookup
+                    // on a thread that owns none, and the exit would return true on the very shape
+                    // this guard exists to reject.
+                    if (
+                        ReferenceEquals(_context, _uiSyncContext)
+                        && _dispatcher is not null
+                        && ReferenceEquals(
+                            System.Windows.Threading.Dispatcher.FromThread(Thread.CurrentThread),
+                            _dispatcher
+                        )
+                    )
                     {
                         return true;
                     }

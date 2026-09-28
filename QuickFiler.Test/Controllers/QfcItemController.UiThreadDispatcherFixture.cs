@@ -34,6 +34,25 @@ namespace QuickFiler.Controllers.Tests
         private static readonly FieldInfo DispatcherField = ResolveDispatcherField();
         private static Dispatcher _parkedDispatcher = null;
 
+        // Issue #743 AC1 observable: three monotonic counters over TransactionGate. A contended
+        // acquisition is one that observed CurrentCount == 0 immediately before waiting. In a serial
+        // run no live holder can exist when a test begins its transaction, so a non-zero contended
+        // count there can only come from a leaked or late-released transaction.
+        private static int _transactionAcquisitions = 0;
+        private static int _transactionReleases = 0;
+        private static int _contendedAcquisitions = 0;
+
+        /// <summary>Monotonic count of completed <c>TransactionGate</c> acquisitions.</summary>
+        internal static int TransactionAcquisitions => Volatile.Read(ref _transactionAcquisitions);
+
+        /// <summary>Monotonic count of <c>TransactionGate</c> releases.</summary>
+        internal static int TransactionReleases => Volatile.Read(ref _transactionReleases);
+
+        /// <summary>
+        /// Monotonic count of acquisitions that found the permit held immediately before waiting.
+        /// </summary>
+        internal static int ContendedAcquisitions => Volatile.Read(ref _contendedAcquisitions);
+
         /// <summary>
         /// Reads the current value of the static under <c>FieldLock</c>. Test observation only.
         /// </summary>
@@ -87,6 +106,7 @@ namespace QuickFiler.Controllers.Tests
         /// </summary>
         internal static void ReleaseTransactionGate()
         {
+            Interlocked.Increment(ref _transactionReleases);
             TransactionGate.Release();
         }
 
@@ -121,7 +141,13 @@ namespace QuickFiler.Controllers.Tests
         /// </summary>
         internal static async Task<UiThreadDispatcherTransaction> BeginTransactionAsync()
         {
+            if (TransactionGate.CurrentCount == 0)
+            {
+                Interlocked.Increment(ref _contendedAcquisitions);
+            }
+
             await TransactionGate.WaitAsync().ConfigureAwait(false);
+            Interlocked.Increment(ref _transactionAcquisitions);
             return new UiThreadDispatcherTransaction();
         }
 

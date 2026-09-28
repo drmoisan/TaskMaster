@@ -1,11 +1,11 @@
+
 <#
 .SYNOPSIS
     Pre-tool-use hook that blocks Bash promotion-script bypass attempts.
 
 .DESCRIPTION
-    This script is invoked by the Claude Code PreToolUse hook before any Bash
-    command runs. It reads the tool input from the CLAUDE_TOOL_INPUT environment
-    variable, inspects the attempted command text, and blocks direct promotion
+    This script is invoked by the Codex PreToolUse hook before a shell command runs.
+    It reads one Codex JSON object from stdin, inspects tool_input.command, and blocks direct promotion
     script execution that would bypass the repository's MCP-only promotion path.
 
     Forbidden command tokens (legacy promotion-script bypass):
@@ -28,6 +28,12 @@
 #>
 [CmdletBinding()]
 param()
+
+# Shared command-line parser (issue #545). Every forbidden-token scan and both `gh`
+# expressions below run against each segment's clause-ordered scan text, and the
+# structural matcher reaches the relocating `gh` spellings adjacency cannot.
+. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 
 $script:PromotionMcpOnlyBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct Bash promotion-script execution is not allowed in agent sessions. Use the drm-copilot MCP promotion tools instead.'
 
@@ -70,7 +76,7 @@ function Get-PromotionBypassReason {
         Returns the gh-CLI issue creation reason when a forbidden gh pattern is matched.
         Returns $null when the command is allowed.
     .PARAMETER CommandText
-        The Bash command text extracted from CLAUDE_TOOL_INPUT.
+        The shell command text extracted from the Codex tool_input object.
     .OUTPUTS
         System.String or $null.
     #>
@@ -88,15 +94,34 @@ function Get-PromotionBypassReason {
         'new_active_feature_folder'
     )
 
-    foreach ($token in $forbiddenTokens) {
-        if ($CommandText.IndexOf($token, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
-            return (Get-PromotionMcpOnlyBlockedReason)
+    # Issue #545: the scan text of a segment is its raw text only when the segment is
+    # wrapper-led, carries a live substitution, or could not be balanced; otherwise
+    # quoted spans and attached heredoc bodies are masked. A promotion tool name that
+    # appears only as a JSON receipt value is therefore a mention, not an invocation.
+    $segments = @(Read-CommandLineSegment -CommandText $CommandText)
+
+    foreach ($segment in $segments) {
+        foreach ($token in $forbiddenTokens) {
+            if ($segment.ScanText.IndexOf($token, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                return (Get-PromotionMcpOnlyBlockedReason)
+            }
         }
     }
 
     # `gh issue create` and `gh issue new` are direct bypasses of the MCP
     # promotion path. Tolerate any flags after the subcommand.
-    if ($CommandText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
+    foreach ($segment in $segments) {
+        if ($segment.ScanText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
+            return (Get-PromotionMcpOnlyGhIssueBlockedReason)
+        }
+    }
+
+    # The adjacency-requiring expression above cannot see a relocating spelling, in
+    # which a `gh` global option such as --repo or -R sits between the command word
+    # and its subcommand (D10). The structural matcher absorbs those options and
+    # reads the subcommand path positionally, so both spellings classify.
+    if ((Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('issue', 'create')) -or
+        (Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('issue', 'new'))) {
         return (Get-PromotionMcpOnlyGhIssueBlockedReason)
     }
 
@@ -104,10 +129,12 @@ function Get-PromotionBypassReason {
     # explicit POST method is supplied. `gh api` defaults to GET, so we only
     # block when -X POST or --method POST is present, to avoid false positives
     # on issue read operations. Use a single regex with lookaheads against the
-    # whole command string.
+    # scan text of one segment.
     $ghApiIssuesPostPattern = '(?i)(?=.*\bgh\s+api\b)(?=.*repos/[^/\s]+/[^/\s]+/issues(?:\b|/[^/\s]*$))(?=.*(?:-X\s+POST|--method\s+POST))'
-    if ($CommandText -match $ghApiIssuesPostPattern) {
-        return (Get-PromotionMcpOnlyGhIssueBlockedReason)
+    foreach ($segment in $segments) {
+        if ($segment.ScanText -match $ghApiIssuesPostPattern) {
+            return (Get-PromotionMcpOnlyGhIssueBlockedReason)
+        }
     }
 
     return $null
@@ -118,7 +145,7 @@ function Test-PromotionBypassToken {
     .SYNOPSIS
         Return $true when a Bash command contains a forbidden promotion bypass pattern.
     .PARAMETER CommandText
-        The Bash command text extracted from CLAUDE_TOOL_INPUT.
+        The shell command text extracted from the Codex tool_input object.
     .OUTPUTS
         System.Boolean
     #>
@@ -153,17 +180,39 @@ function Get-PromotionMcpOnlyBlockDecision {
     }
 
     return [ordered]@{
-        decision = 'block'
-        reason   = $Reason
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
+    }
+}
+
+function Get-PromotionMcpOnlyAllowDecision {
+    <#
+    .SYNOPSIS
+        Construct the structured allow decision for a permitted Bash command.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param()
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName      = 'PreToolUse'
+            permissionDecision = 'allow'
+        }
     }
 }
 
 function Invoke-PromotionMcpOnlyDecision {
     <#
     .SYNOPSIS
-        Parse CLAUDE_TOOL_INPUT and return an allow-or-block decision.
+        Parse the mapped Codex tool_input JSON and return an allow-or-deny decision.
     .PARAMETER ToolInputRaw
-        The raw JSON tool payload supplied by Claude Code.
+        The mapped tool_input JSON supplied by Codex.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     .NOTES
@@ -177,18 +226,18 @@ function Invoke-PromotionMcpOnlyDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-PromotionMcpOnlyAllowDecision
     }
 
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        throw "enforce-promotion-mcp-only hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
+        throw "enforce-promotion-mcp-only received malformed mapped tool_input JSON: $_"
     }
 
     $commandText = $toolInput.command
     if (-not $commandText) {
-        return [ordered]@{ decision = 'allow' }
+        return Get-PromotionMcpOnlyAllowDecision
     }
 
     $reason = Get-PromotionBypassReason -CommandText $commandText
@@ -196,7 +245,28 @@ function Invoke-PromotionMcpOnlyDecision {
         return Get-PromotionMcpOnlyBlockDecision -Reason $reason
     }
 
-    return [ordered]@{ decision = 'allow' }
+    return Get-PromotionMcpOnlyAllowDecision
+}
+
+function ConvertFrom-CodexPromotionHookPayload {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string] $PayloadRaw)
+
+    if ([string]::IsNullOrWhiteSpace($PayloadRaw)) {
+        throw 'enforce-promotion-mcp-only hook input is empty.'
+    }
+    try {
+        $payload = $PayloadRaw | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        throw "enforce-promotion-mcp-only hook input is malformed JSON: $_"
+    }
+    if ($payload.PSObject.Properties.Name -notcontains 'tool_input' -or $null -eq $payload.tool_input) {
+        throw 'enforce-promotion-mcp-only hook input is missing tool_input.'
+    }
+    if ([string]$payload.hook_event_name -ne 'PreToolUse' -or [string]$payload.tool_name -ne 'Bash') {
+        throw 'enforce-promotion-mcp-only requires a PreToolUse Bash payload.'
+    }
+    return $payload
 }
 
 # Allow dot-sourcing in tests without executing the entrypoint.
@@ -205,12 +275,14 @@ if ($MyInvocation.InvocationName -eq '.') {
 }
 
 try {
-    $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+    $payload = ConvertFrom-CodexPromotionHookPayload -PayloadRaw ([Console]::In.ReadToEnd())
+    $toolInputRaw = $payload.tool_input | ConvertTo-Json -Compress -Depth 20
+    $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $toolInputRaw
+    if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+        $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+    }
+    exit 0
 } catch {
-    Write-Error $_
-    exit 1
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-
-$decision | ConvertTo-Json -Compress | Write-Output
-
-exit 0

@@ -225,7 +225,7 @@ namespace UtilitiesCS
                 SynchronizationContext.SetSynchronizationContext(
                     new WindowsFormsSynchronizationContext()
                 );
-            var tokenSource = new CancellationTokenSource();
+            using var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
             var progress = new ProgressTracker(tokenSource).Initialize();
 

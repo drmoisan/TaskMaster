@@ -239,8 +239,15 @@ namespace QuickFiler.Controllers.Tests
             var fake = FixedClock();
             controller.TimeProvider = fake;
             var expectedLocal = fake.GetLocalNow().LocalDateTime;
+            // Issue #742: the oracle must name the invariant culture explicitly. An uncultured
+            // ToString(format) here resolves the "/" and ":" placeholders against the operator's
+            // locale, exactly as the pre-fix production code did, so the two would agree under any
+            // culture and the assertion could not detect the defect it is meant to pin.
             var expectedDataLineBeg =
-                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("HH:mm") + ",";
+                expectedLocal.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                + ","
+                + expectedLocal.ToString("HH:mm", CultureInfo.InvariantCulture)
+                + ",";
 
             // Act
             await controller.WriteMetricsAsync("metrics.csv");
@@ -274,8 +281,13 @@ namespace QuickFiler.Controllers.Tests
             var fake = FixedClock();
             controller.TimeProvider = fake;
             var expectedLocal = fake.GetLocalNow().LocalDateTime;
+            // Issue #742: see the note in the sibling test above. The oracle names the invariant
+            // culture so it cannot silently track a culture-dependent production rendering.
             var expectedDataLineBeg =
-                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("HH:mm") + ",";
+                expectedLocal.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                + ","
+                + expectedLocal.ToString("HH:mm", CultureInfo.InvariantCulture)
+                + ",";
 
             // Act
             controller.QuickFileMetrics_WRITE("metrics.csv");

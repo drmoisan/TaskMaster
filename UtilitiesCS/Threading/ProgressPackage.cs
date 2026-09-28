@@ -10,7 +10,7 @@ using UtilitiesCS.HelperClasses;
 
 namespace UtilitiesCS.Threading
 {
-    public class ProgressPackage
+    public class ProgressPackage : IDisposable
     {
         public ProgressPackage() { }
 
@@ -23,6 +23,7 @@ namespace UtilitiesCS.Threading
         )
         {
             _cancelSource = cancelSource ?? new CancellationTokenSource();
+            _ownsCancelSource = cancelSource is null;
             _cancel = cancel == default ? _cancelSource.Token : cancel;
             _progressTracker =
                 progressTracker ?? new ProgressTracker(_cancelSource, screen).Initialize();
@@ -38,12 +39,19 @@ namespace UtilitiesCS.Threading
         )
         {
             _cancelSource = cancelSource ?? new CancellationTokenSource();
+            _ownsCancelSource = cancelSource is null;
             _cancel = cancel == default ? _cancelSource.Token : cancel;
             _progressTrackerPane = progressTrackerPane ?? new ProgressTrackerPane(_cancelSource);
             _stopWatch = stopWatch ?? await Task.Run(() => new SegmentStopWatch().Start());
             return this;
         }
 
+        /// <summary>
+        /// Issue #872. The cancellation token source in the returned tuple is transferred to the
+        /// caller, and the caller owns its release. The package this factory constructs is discarded
+        /// once the tuple is taken, so nothing else can release that source; disposing it here would
+        /// release the very source the factory is contractually returning.
+        /// </summary>
         public static async Task<(
             CancellationTokenSource? CancelSource,
             CancellationToken Cancel,
@@ -62,6 +70,12 @@ namespace UtilitiesCS.Threading
             return package.ToTuple();
         }
 
+        /// <summary>
+        /// Issue #872. The cancellation token source in the returned tuple is transferred to the
+        /// caller, and the caller owns its release. The package this factory constructs is discarded
+        /// once the tuple is taken, so nothing else can release that source; disposing it here would
+        /// release the very source the factory is contractually returning.
+        /// </summary>
         public static async Task<(
             CancellationTokenSource? CancelSource,
             CancellationToken Cancel,
@@ -85,6 +99,13 @@ namespace UtilitiesCS.Threading
             get => _cancelSource;
             set => _cancelSource = value;
         }
+
+        // Issue #872. True only when this package constructed the held cancellation token source, so
+        // that Dispose releases a source the package owns and never one the caller lent it. The flag
+        // is deliberately not touched by the CancelSource setter: SpawnChild copies the parent's
+        // source through that setter, and a setter that claimed ownership would make every child
+        // claim its parent's source.
+        private bool _ownsCancelSource;
 
         private CancellationToken _cancel;
         public CancellationToken Cancel
@@ -145,6 +166,22 @@ namespace UtilitiesCS.Threading
         ) ToTuplePane()
         {
             return (CancelSource, Cancel, ProgressTrackerPane, StopWatch);
+        }
+
+        /// <summary>
+        /// Releases the cancellation token source only when this package constructed it. A
+        /// caller-supplied source, and a source a spawned child received through the property
+        /// setter, belong to their owner and are left usable. The held reference is deliberately
+        /// not cleared, so the public getter's observable behaviour for existing callers is
+        /// unchanged.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_ownsCancelSource)
+            {
+                _cancelSource?.Dispose();
+                _ownsCancelSource = false;
+            }
         }
     }
 }

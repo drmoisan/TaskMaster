@@ -45,7 +45,11 @@ namespace QuickFiler.Controllers
             //var curDateText = DateTime.Now.ToString("MM/dd/yyyy");
             //var curTimeText = DateTime.Now.ToString("hh:mm");
             //dataLineBeg = curDateText + "," + curTimeText + ",";
-            dataLineBeg = $"{now:MM/dd/yyyy},{now:HH:mm},";
+            dataLineBeg =
+                now.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                + ","
+                + now.ToString("HH:mm", CultureInfo.InvariantCulture)
+                + ",";
 
             if (!Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
             {
@@ -122,9 +126,9 @@ namespace QuickFiler.Controllers
 
             // Create a line of comma seperated valued to store data
             var now = TimeProvider.GetLocalNow().LocalDateTime;
-            curDateText = now.ToString("MM/dd/yyyy");
+            curDateText = now.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
 
-            curTimeText = now.ToString("HH:mm");
+            curTimeText = now.ToString("HH:mm", CultureInfo.InvariantCulture);
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
 

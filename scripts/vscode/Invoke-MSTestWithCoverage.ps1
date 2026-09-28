@@ -384,6 +384,7 @@ function Invoke-MSTestWithCoverageMain {
     Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
 
     Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
+    Assert-CoberturaBranchCoverageThreshold -CoberturaXml $processedXmlContent
     Write-Output (Get-CoberturaFirstPartyCoverageReport -CoberturaXml $processedXmlContent)
 
     # The projection is built from the post-processed content, never from the raw collector

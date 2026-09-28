@@ -37,6 +37,23 @@ reason: eleven earlier Phase 5 artifacts were also still uncommitted.
   it as untracked. This makes the residual genuinely empty at capture time and keeps the unverifiable
   final step out of the acceptance clause. The remaining gap — nothing executes a check after the
   second commit — is the irreducible fixpoint and is acceptable.
+- Third validated planner fix (issue #871 plan, P7-T25, executed 2026-09-13 with no tension at all):
+  word the terminal gate as "the porcelain output contains **no line naming a path under the three
+  canonical evidence directories**" rather than as a clean tree or an exact dirty-path set. The plan
+  file is not an evidence path, so the commit task's own check-off cannot break the gate, and the gate
+  still proves the substantive thing it is there to prove — that every artifact written after the
+  previous phase commit got committed. Flip the checkbox after the capture, then make a separate
+  one-line housekeeping commit for it; the tree then ends genuinely empty. This is the cleanest of the
+  three fixes because the acceptance is satisfiable *as written* at the moment it is evaluated.
 - Scope every terminal `git status` by pathspec. `.claude/agent-memory/**` is tracked and other agents
   write to it, so an unscoped clean-tree gate is unsatisfiable for reasons unrelated to the feature.
   See [[project_agent_memory_tracked_breaks_unscoped_git_gates]].
+- The trap is not only terminal. Any task placed AFTER an intermediate commit whose acceptance
+  ENUMERATES the admitted porcelain lines has the same defect, and it is easier to miss there because
+  the task is not about committing. Found at issue #839 preflight round 2: `[P3-T13]`'s footprint gate
+  ran after the `[P3-T12]` commit and admitted only "this task's own artifact, a path under the
+  evidence tree written after P3-T12, or a member of the D10 residue set" — the plan file carrying the
+  `[P3-T12]` check-off matches none of the three, so the gate fails on every correct run. When auditing
+  an enumerated-porcelain acceptance, count the plan file itself as a guaranteed member of the set from
+  the first check-off onward, and admit it for PORCELAIN only: it is a Write Set path that must stay in
+  the anchored diff / committed footprint.

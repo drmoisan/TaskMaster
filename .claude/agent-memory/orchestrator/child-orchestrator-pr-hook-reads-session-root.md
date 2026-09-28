@@ -72,6 +72,27 @@ lines exactly while the item checkpoint returned `HasErrors=False`.
 Use only the **exported** entry point. `Get-OrchestratorStatePrCreationReadinessError` is not exported;
 calling it leaves the error variable `$null`, which renders as a PASS-looking line and is a false green.
 
+**Exact signature, confirmed 2026-09-13 on parallel item #871.** `Invoke-OrchestratorStatePreflight` takes
+`-CheckpointPath` and `-Invoker` only. There is no `-RequirePrCreationReady` switch — passing one fails with
+`A parameter cannot be found that matches parameter name`. The function applies PR-creation readiness
+unconditionally, so `-CheckpointPath` alone reproduces the hook's text. That run confirmed the diagnostic
+works exactly as described: the item checkpoint returned `HasErrors=False` with empty `ErrorText`, while the
+session-root checkpoint reproduced all five denial lines character-for-character.
+
+**The #733 counter-case recurred on #871, same shape.** Run `bugs-2026-09-11`, three items live. The
+session-root occupant was item #872's checkpoint (`bug/minor-audit-trio-gate-cts-tracker-872`) reading
+`step7_status=blocked`, `step8_status=pending`, `blocked_reason=validator_failed`, plus two
+`complexity_assessments` both carrying `floor C3` against a computed `C1`. Every one of the five denial lines
+traced to #872 and contradicted #871, whose own checkpoint was ready. Those statuses mark a **live,
+mid-execution** sibling, so the swap-and-restore remedy was unavailable for the same reason it was on #733,
+and the #871 run brief independently forbade writing into the session worktree. Disposition: record the
+blocked state, leave the branch pushed and clean with the body and receipt already authored, and hand
+pull-request creation to the coordinator, which runs in the session root and satisfies the gate natively.
+
+Treat that as the default disposition rather than a last resort. Two of the three recorded outcomes on this
+gate are now "hand it to the parent"; the swap-and-restore dance applies only when the occupant is provably
+STALE, and checking that precondition is cheaper than discovering mid-swap that it is not.
+
 `enforce-pr-author-skill.ps1` has no parallel/epic branch at all — no run-checkpoint lookup, no
 `Parallel mode: true` marker, no derivation of the item worktree from `--body-file`. It is the sibling that
 `enforce-model-routing-receipt.ps1` already received and this one did not. Fix it upstream in drm-copilot;
@@ -116,6 +137,27 @@ blocks then a pass:
    `artifacts/pr_body_796.receipt.json`, which existed in that same item worktree beside the body it had just
    accepted.
 3. Mirroring body and receipt into the session-root `artifacts/` → PR created.
+
+**Item 872, 2026-09-13, run `bugs-2026-09-11`: both halves of the gate were unsound in the same call, and
+the directive forbade the mirroring remedy.** Spawned NON-isolated, so env "Working directory" was the
+session worktree while the item lived in `bugs-2026-09-11-item-872`. A single `gh pr create` with a
+relative `--body-file artifacts/pr_body_872.md` returned `PR_AUTHOR_RECEIPT_MISSING` naming
+`artifacts/pr_body_872.receipt.json`, which existed beside the body in the item worktree; a two-tree
+`Test-Path` confirmed both artifacts present in the item worktree and both absent from the session root.
+
+Two conclusions, and the first is the one worth carrying:
+
+- Reaching a *receipt* error is positive evidence that the checkpoint half already PASSED, because the
+  hook's own header (line 24) states the `--require-pr-creation-ready` preflight runs "before receipt
+  verification runs". The session-root checkpoint held a different item's state, so the gate admitted this
+  item on a sibling's evidence — the #736 false green again, and confirmable from the deny string alone
+  without the exported-preflight diagnostic. Read the deny string as a two-part verdict: which check
+  blocked you also tells you every earlier check silently passed, and on a shared session root "passed" may
+  mean "passed on someone else's file".
+- The mirroring remedy was unavailable: the operator directive forbade writing anything into the session
+  worktree, as in the #733 counter-case. Correct action is #733's — record the block, report the exact deny
+  string, hand PR creation to the coordinator that runs in the session root and satisfies the gate
+  natively. Do not mirror, and do not touch the shared checkpoint.
 
 So `Set-Location` relocates `gh`'s own path resolution but not the hook's: the hook is a separate process
 whose cwd stays the session root regardless. The body check follows `gh`; the receipt check follows the hook.

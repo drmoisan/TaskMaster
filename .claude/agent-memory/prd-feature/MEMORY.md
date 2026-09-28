@@ -1,7 +1,7 @@
 - [push-down command pattern](project_push_down_pattern.md) — 10-file change map for adding a new push-down command; reference impl is pushDownCodexAndAgentsCustomizations
 - [Promotion scaffold metadata defects](project_promotion_scaffold_metadata_defects.md) — fix Status folder path and Last Updated date in scaffolded issue.md before filling docs
 - [Test disposition: grep for run-time-only bindings](feedback_test_disposition_overload_pins.md) — before marking a test file "unchanged", grep for Setup/Verify of retired overloads AND GetField reflection on renamed private fields
-- [AC gates: verify satisfiability + fresh reads](feedback_ac_gates_verify_satisfiability.md) — check baselines before repo-wide floors; grep asserted tokens on disk for exact casing; scope zero-hit gates to named files; re-read spec before tallies
+- [AC gates: verify satisfiability + fresh reads](feedback_ac_gates_verify_satisfiability.md) — check baselines before repo-wide floors; put ZERO digits in AC checkbox lines (validator fires on any standalone integer); no "every file in the Write Set" line-ceiling gate; grep asserted tokens on disk for exact casing; scope zero-hit gates to named files; re-read spec before tallies
 - [Inherited AC from an upstream sibling](feedback_inherited_ac_from_upstream_sibling.md) — when an upstream epic sibling's diff already satisfies a promoted AC, write it inherited-and-verified (confirm the site is ABSENT), don't drop or restate it as this feature's own work
 - [full-bug means spec.md is the only AC source](feedback_full_bug_spec_only.md) — no user-story.md by default (Expected Outputs header vs AC-tracking skill); two exceptions (epic-prep route, cross-reference instruction) handled by making it checkbox-free narrative with a banner
 - [Backticked paths ARE the change footprint](feedback_backticked_paths_are_the_change_footprint.md) — a harvester reads backticked paths from spec.md/plan; backtick every in-scope file, leave out-of-scope citations unbackticked; strictest form is a `## Write Set`-only section
@@ -27,3 +27,9 @@
 
 - [Ratified exemption boundaries](reference_ratified_exemption_boundaries.md) — check docs/features/archive/ for a maintainer-decision artifact before planning any [ExcludeFromCodeCoverage] removal; never promise N -> 0
 - [ExcludeFromCodeCoverage lambda propagation](reference_exclude_from_code_coverage_lambda_propagation.md) — method-level leaks nested lambdas into the denominator, class-level does not; a partial-class attribute exempts the whole type
+- [Repo-walking count tests must exclude .claude](reference_repo_walking_tests_exclude_claude_worktrees.md) — nested agent worktrees hold full csproj copies; put the .git/.claude/packages/bin/obj exclusion list in the AC text, pair count with content assertion
+- [Numeric AC without full derivation: phrase as exclusion](feedback_numeric_ac_without_full_derivation_phrase_as_exclusion.md) — caller wants "exactly one remains" but the research derivation block covers another family; write "no file other than the named one", keep counts informational, say why
+- [500-line ceiling counts TOTAL lines](feature_line_ceiling_counts_total_lines.md)
+- [Negative control must isolate the code fix](feedback_negative_control_must_isolate_the_code_fix.md)
+- [Outcome AC when the mechanism is unverified](feedback_outcome_ac_when_mechanism_unverified.md)
+- [Issue 671: projections-only evidence](project_671_projections_only_evidence.md) — no new raw TRX/coverage XML in the repo (effective 2026-09-12); name fixed-filename Markdown projections in full feature-relative backticked paths, never bare `evidence/...`
