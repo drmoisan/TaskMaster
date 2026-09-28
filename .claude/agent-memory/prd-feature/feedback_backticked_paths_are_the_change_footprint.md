@@ -53,6 +53,14 @@ sibling file under a space-free path, that is the reason; record it in the spec'
 do not "restore" the research artifact's original placement. Same mechanism makes the mandated
 CLAUDE.md msbuild command strings safe to quote.
 
+**Evidence paths are the second permitted backtick site (seen on #839, 2026-09-12).** When the caller
+mandates that evidence artifact paths be backticked in full, they are allowed outside the Write Set
+because they fall under the feature-folder `**` glob that is itself a Write Set line; say so in the
+top blockquote. Never backtick a bare repo-root `evidence/...` path (a sibling produced 44 bogus
+blast-radius entries that way). Also unbacktick msbuild switch tokens such as the
+TreatWarningsAsErrors property: a slash-bearing whitespace-free token is harvestable. See
+[[671-projections-only-evidence]].
+
 **The seeded spec template is itself a source of false write claims (seen on #798, 2026-09-07).**
 The promotion scaffold copies `issue.md` prose into Context / Repro & Evidence, and that prose
 arrives with backticks already around paths that are *not* write claims: the debug-log path under

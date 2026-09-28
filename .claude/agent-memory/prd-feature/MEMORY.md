@@ -32,3 +32,4 @@
 - [500-line ceiling counts TOTAL lines](feature_line_ceiling_counts_total_lines.md)
 - [Negative control must isolate the code fix](feedback_negative_control_must_isolate_the_code_fix.md)
 - [Outcome AC when the mechanism is unverified](feedback_outcome_ac_when_mechanism_unverified.md)
+- [Issue 671: projections-only evidence](project_671_projections_only_evidence.md) — no new raw TRX/coverage XML in the repo (effective 2026-09-12); name fixed-filename Markdown projections in full feature-relative backticked paths, never bare `evidence/...`
