@@ -46,3 +46,4 @@
 - [Barrier hook resolves the LONGEST active-path token](feedback_barrier_hook_resolves_the_longest_active_path_token.md) - the plan path wins over the folder path, and one trailing comma defeats the .md strip and denies an eligible launch; the deny quotes a FILE name, so the defect is the prompt not the checkpoint
 - [Diff the status-doc header against the checkpoint](feedback_diff_the_status_doc_header_against_the_checkpoint.md) - the generated projection had already drifted on current_cohort; a close-scoped edit would have carried the stale value forward
 - [Never prefix a command with cd](feedback_never_prefix_commands_with_cd.md) - a leading cd breaks the Bash git allowlist prefix match, so every auto-approved call becomes an approval prompt; use git -C and path operands, and never put a per-call cd in a child prompt
+- [Verify a removal's stated premise before recording it](feedback_verify_a_removals_stated_premise_before_recording_it.md)

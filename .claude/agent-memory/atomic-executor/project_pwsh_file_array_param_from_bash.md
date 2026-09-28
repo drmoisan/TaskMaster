@@ -21,6 +21,8 @@ ONE `-TokenFile` parameter and write the pairs to a tab-separated scratchpad fil
 [[preflight-gate-literal-extract-from-plan-not-retype]]: the same TSV can be produced by parsing the
 plan's backtick spans rather than re-typing them.
 
+**Refinement (2026-09-17, #792 Phase 1):** splitting the single bound string works (`$names = @($Tokens -split '[, ]' | Where-Object { $_ })`), but ONLY into a fresh variable. Assigning the split array back to the `[string]`-typed parameter variable (`$Tokens = @(...)`) re-coerces it to one string joined with `$OFS` (a space), so the loop searches for `A B` and again reports a silent zero. Two verification runs were wasted on this before the positive control (the same search against a file known to contain the token) exposed it. Always pair a zero-hit gate with a positive control.
+
 Count occurrences with `$txt.IndexOf($t, $i, [System.StringComparison]::Ordinal)` in a loop, not
 with `grep`, so the count is an ordinal occurrence count immune to shell quoting and to
 [[tool-layer-collapses-double-backslash-in-file-content]].

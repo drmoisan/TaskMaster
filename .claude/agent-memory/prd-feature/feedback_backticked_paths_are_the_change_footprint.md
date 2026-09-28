@@ -45,6 +45,14 @@ block as the sole exception and classifying each span as a runtime value or a C#
 than a repository path. Do not paraphrase the criteria to dodge the sweep, and do not strip their
 backticks. Expect the audit grep to return exactly (Write Set paths + AC lines containing spans).
 
+**A path containing a space is silently dropped from the footprint (seen on #871, 2026-09-12).** The
+harvester only takes *whitespace-free* backticked tokens, so any file under a folder whose name has a
+space — in TaskMaster that is `QuickFiler/Helper Classes/` and `QuickFiler.Test/Helper Classes/` —
+cannot be declared at all. When a caller's Write Set relocates a new type out of such a folder into a
+sibling file under a space-free path, that is the reason; record it in the spec's design section and
+do not "restore" the research artifact's original placement. Same mechanism makes the mandated
+CLAUDE.md msbuild command strings safe to quote.
+
 **The seeded spec template is itself a source of false write claims (seen on #798, 2026-09-07).**
 The promotion scaffold copies `issue.md` prose into Context / Repro & Evidence, and that prose
 arrives with backticks already around paths that are *not* write claims: the debug-log path under

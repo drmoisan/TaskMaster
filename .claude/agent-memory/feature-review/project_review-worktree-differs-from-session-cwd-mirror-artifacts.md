@@ -24,7 +24,14 @@ though the artifacts exist where the caller asked for them.
 docs/features/active/../../../../<review-worktree-name>/docs/features/active/<feature>/policy-audit.<ts>.md
 ```
 
-Four `..` from `<root>/docs/features/active` lands on the shared parent. Verified on the #638 review
+Four `..` from `<root>/docs/features/active` lands on the PARENT of `<root>` (3 climb out of
+`docs/features/active`, the 4th leaves the root), which is the shared parent only when both worktrees are
+direct siblings. **Count the depth every time (#895, 2026-09-17):** with the session cwd at
+`repos/TaskMaster-wt/<ts>` and the review worktree at `repos/TaskMaster/.claude/worktrees/<wt>`, four
+`..` lands on `TaskMaster-wt/` and the hook reports "no file exists"; FIVE `..` is required to reach
+`repos/`, i.e. `docs/features/active/../../../../../TaskMaster/.claude/worktrees/<wt>/docs/features/active/<feature>/policy-audit.<ts>.md`.
+That five-level form returned Ok=True from the session cwd and (expectedly) Ok=False from the worktree
+cwd, so it is session-cwd-specific; the hook runs in the session cwd. Verified on the #638 review
 (2026-08-29): the same string returned Ok=True from BOTH the session cwd and the review worktree, so
 one advertisement covers either hook cwd. Use this when the caller forbids writing into its sibling's
 tree (a mirror under `docs/features/active/` there is tracked territory and a sibling's `git add -A`

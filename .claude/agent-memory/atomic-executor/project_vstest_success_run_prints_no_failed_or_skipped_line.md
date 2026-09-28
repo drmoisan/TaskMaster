@@ -62,6 +62,14 @@ skip: console prints `Failed: 1` and no `Skipped:` line at all — the two aggre
 independent per-counter, so an `[expect-fail]` task whose run has a non-zero failure count CAN read
 `Failed:` from the console.
 
+Per-test lines (relevant when a gate asserts a named test passed). At
+`/logger:console;verbosity=normal` the console prints `  Passed <MethodName> [N ms]` and
+`  Failed <MethodName> [N ms]` — the **method name only**, with no namespace or class prefix, even
+though `/TestCaseFilter:FullyQualifiedName=` takes the fully qualified name. Confirmed 2026-09-12 from
+several committed run transcripts under `docs/features/active/**/evidence/` (440, 285, 468, 817). So a
+regex of the form `^\s*Passed\s+<MethodName>\b` is satisfiable, and one anchored on the fully
+qualified name is not.
+
 Two operational facts from the same runs:
 - The default TRX filename is `<account>_<machine>_<timestamp>_net<tfm>.trx`, and vstest also prints
   a `Results File: <absolute host path>\<that name>` console line on green AND red runs. Both
