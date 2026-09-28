@@ -1,0 +1,472 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://drm-copilot.dev/schemas/orchestration-handoff/2.0.0/schema.json",
+  "title": "Portable prepared orchestration handoff",
+  "description": "Provider-neutral identity, provenance, lifecycle, plan, capability, scheduler, and history contract for a prepared orchestration handoff.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schema_version", "kind", "handoff_id", "identity", "binding", "source", "destination", "plan", "lifecycle", "capabilities", "scheduler_context", "handoff_history"],
+  "properties": {
+    "$schema": {
+      "const": "https://drm-copilot.dev/schemas/orchestration-handoff/2.0.0/schema.json"
+    },
+    "schema_version": {
+      "$ref": "#/$defs/schemaVersion"
+    },
+    "kind": {
+      "const": "portable_orchestration_handoff"
+    },
+    "handoff_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+    },
+    "identity": {
+      "$ref": "#/$defs/identity"
+    },
+    "binding": {
+      "$ref": "#/$defs/binding"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "destination": {
+      "$ref": "#/$defs/destination"
+    },
+    "plan": {
+      "$ref": "#/$defs/plan"
+    },
+    "lifecycle": {
+      "$ref": "#/$defs/lifecycle"
+    },
+    "capabilities": {
+      "$ref": "#/$defs/capabilities"
+    },
+    "scheduler_context": {
+      "$ref": "#/$defs/schedulerContext"
+    },
+    "handoff_history": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/historyEntry"
+      }
+    }
+  },
+  "$defs": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^2\\.[0-9]+\\.[0-9]+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "gitSha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["claude", "codex"]
+    },
+    "repositoryRelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective_id", "issue_number", "feature_folder", "work_mode"],
+      "properties": {
+        "objective_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issue_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "feature_folder": {
+          "$ref": "#/$defs/repositoryRelativePath"
+        },
+        "work_mode": {
+          "type": "string",
+          "enum": ["minor-audit", "full-feature", "full-bug"]
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id", "workspace_root", "branch", "source_head_sha", "allowed_head_relationship"],
+      "properties": {
+        "repository_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspace_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_head_sha": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "allowed_head_relationship": {
+          "type": "string",
+          "enum": ["equal", "equal_or_descendant"]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "checkpoint", "expression"],
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/provider"
+        },
+        "checkpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "archive_path"],
+          "properties": {
+            "path": {
+              "$ref": "#/$defs/repositoryRelativePath"
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "archive_path": {
+              "type": "string",
+              "pattern": "^artifacts/orchestration/handoffs/sources/sha256/[a-f0-9]{64}\\.json$"
+            }
+          }
+        },
+        "expression": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_id", "schema_version", "historical_receipts"],
+          "properties": {
+            "schema_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "schema_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "historical_receipts": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mode", "references"],
+              "properties": {
+                "mode": {
+                  "const": "opaque"
+                },
+                "references": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["path", "sha256"],
+                    "properties": {
+                      "path": {
+                        "$ref": "#/$defs/repositoryRelativePath"
+                      },
+                      "sha256": {
+                        "$ref": "#/$defs/sha256"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "destination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "checkpoint_path"],
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/provider"
+        },
+        "checkpoint_path": {
+          "const": "artifacts/orchestration/orchestrator-state.json"
+        }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "contract_version"],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/repositoryRelativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "contract_version": {
+          "type": "string",
+          "pattern": "^atomic-plan-v[0-9]+$"
+        }
+      }
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "intake",
+        "promotion",
+        "research",
+        "feature_documents",
+        "atomic_planning",
+        "preflight",
+        "atomic_execution",
+        "qa",
+        "feature_review",
+        "pr_creation",
+        "ci_verification",
+        "completion"
+      ]
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logical_complexity",
+        "route_intent",
+        "completed_phases",
+        "next_transition",
+        "replay_policy"
+      ],
+      "properties": {
+        "logical_complexity": {
+          "type": "string",
+          "enum": [
+            "C1",
+            "C2",
+            "C3",
+            "C4"
+          ]
+        },
+        "route_intent": {
+          "type": "string",
+          "enum": [
+            "prepared_to_ordinary_execution",
+            "prepared_child_to_ordinary_execution"
+          ]
+        },
+        "completed_phases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/phase"
+          }
+        },
+        "next_transition": {
+          "$ref": "#/$defs/phase"
+        },
+        "replay_policy": {
+          "const": "forbid_completed_phases"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vocabularies",
+        "required"
+      ],
+      "properties": {
+        "vocabularies": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "schedulerContext": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "ordinary"
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/scheduledChildContext"
+        }
+      ]
+    },
+    "scheduledChildContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "run_id",
+        "item_id",
+        "kickoff_or_manifest_path",
+        "kickoff_or_manifest_sha256",
+        "parent_checkpoint_path",
+        "parent_checkpoint_sha256",
+        "cohort_or_wave",
+        "scheduler_owner",
+        "child_execution_owner",
+        "return_contract"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "parallel",
+            "epic"
+          ]
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kickoff_or_manifest_path": {
+          "$ref": "#/$defs/repositoryRelativePath"
+        },
+        "kickoff_or_manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "parent_checkpoint_path": {
+          "$ref": "#/$defs/repositoryRelativePath"
+        },
+        "parent_checkpoint_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "cohort_or_wave": {
+          "type": [
+            "string",
+            "integer"
+          ]
+        },
+        "scheduler_owner": {
+          "type": "string",
+          "enum": [
+            "parallel_orchestrator",
+            "epic_orchestrator"
+          ]
+        },
+        "child_execution_owner": {
+          "const": "ordinary_orchestrator"
+        },
+        "return_contract": {
+          "const": "portable_child_result-v1"
+        }
+      }
+    },
+    "historyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "from_provider",
+        "to_provider",
+        "source_checkpoint_sha256",
+        "envelope_sha256",
+        "requested_at",
+        "previous_entry_sha256",
+        "entry_sha256",
+        "status",
+        "adapter_id",
+        "adapter_version"
+      ],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "from_provider": {
+          "$ref": "#/$defs/provider"
+        },
+        "to_provider": {
+          "$ref": "#/$defs/provider"
+        },
+        "source_checkpoint_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "envelope_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "target_checkpoint_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "requested_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "previous_entry_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "entry_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "requested",
+            "validated",
+            "materialized",
+            "blocked",
+            "returned"
+          ]
+        },
+        "adapter_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adapter_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failure_code": {
+          "type": "string",
+          "pattern": "^HANDOFF_[A-Z0-9_]+$"
+        }
+      }
+    }
+  }
+}

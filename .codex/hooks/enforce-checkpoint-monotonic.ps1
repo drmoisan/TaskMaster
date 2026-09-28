@@ -1,10 +1,11 @@
+
 <#
 .SYNOPSIS
     Pre-tool-use hook that blocks Write operations on the orchestrator checkpoint
     file when completed_steps appear out of declared canonical order.
 
 .DESCRIPTION
-    Invoked by the Claude Code PreToolUse hook on Write or Edit operations. The
+    Invoked by the Codex PreToolUse hook on Write or Edit operations. The
     hook activates only when the target file_path is
     artifacts/orchestration/orchestrator-state.json.
 
@@ -27,9 +28,11 @@
 
     Entries that do not match any canonical prefix are treated as informational
     and ignored. If any pair (i, j) with i < j has a higher canonical index at
-    position i than at position j, the script blocks with a reason listing the
-    offending pair. A non-empty rollback_history array suppresses this check
-    because rollbacks legitimately reorder steps.
+    position i than at position j, the script denies via a PreToolUse JSON
+    response with hookSpecificOutput.permissionDecision='deny' and a reason
+    listing the offending pair. A non-empty rollback_history array suppresses
+    this check because rollbacks legitimately reorder steps. All allow paths
+    emit hookSpecificOutput.permissionDecision='allow'.
 
     Edit tool calls supply only old_string/new_string (a partial patch) and
     cannot be reliably validated without the full target file content, so they
@@ -40,6 +43,15 @@
 #>
 [CmdletBinding()]
 param()
+
+# Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
+# mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
+. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+
+# The only path this hook governs. On-disk reconstruction of an apply_patch
+# Update is requested for this path alone, so a patch that merely happens to
+# touch other files can never fail the hook.
+$script:GovernedCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
 $script:CanonicalStepPrefixes = @(
     'S0_startup_checks',
@@ -195,7 +207,7 @@ function Test-IsCheckpointPath {
 function Invoke-CheckpointMonotonicDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses Codex tool_input and returns an allow-or-block decision.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -204,44 +216,49 @@ function Invoke-CheckpointMonotonicDecision {
     )
 
     if (-not $ToolInputRaw) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     try {
         $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
     }
     catch {
-        throw "enforce-checkpoint-monotonic hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
+        throw "enforce-checkpoint-monotonic hook received malformed JSON in Codex tool_input: $_"
     }
 
     $filePath = $toolInput.file_path
     if (-not $filePath) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $normalized = $filePath -replace '\\', '/'
     if (-not (Test-IsCheckpointPath -NormalizedPath $normalized)) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    # Write tool: validate the content payload. Edit tool: partial new_string is
-    # not reliable without the full target file content, so allow.
+    # The adapter supplies complete post-patch content for every recognized
+    # operation. Empty content therefore represents deletion and must fail
+    # closed for the canonical checkpoint.
     $content = $toolInput.content
     if (-not $content) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{
+                hookEventName = 'PreToolUse'; permissionDecision = 'deny'
+                permissionDecisionReason = 'CHECKPOINT_ORDER_BLOCKED: the canonical checkpoint cannot be deleted or replaced with empty content.'
+            } }
     }
 
     try {
         $payload = ConvertFrom-CheckpointJson -Json $content
     }
     catch {
-        # The content itself is not valid JSON. Let downstream tools surface the
-        # error rather than blocking with a misleading reason here.
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{
+                hookEventName = 'PreToolUse'; permissionDecision = 'deny'
+                permissionDecisionReason = 'CHECKPOINT_ORDER_BLOCKED: the canonical checkpoint must remain valid JSON.'
+            } }
     }
 
     if (-not $payload.PSObject.Properties.Name -contains 'completed_steps') {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $steps = @()
@@ -256,14 +273,17 @@ function Invoke-CheckpointMonotonicDecision {
         $rollbackHistory = $payload.rollback_history
     }
     if ($rollbackHistory -and @($rollbackHistory).Count -gt 0) {
-        return [ordered]@{ decision = 'allow' }
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $pair = if ($steps.Count -ge 2) { Get-OutOfOrderPair -CompletedSteps $steps } else { $null }
     if ($null -ne $pair) {
         return [ordered]@{
-            decision = 'block'
-            reason   = "CHECKPOINT_ORDER_BLOCKED: completed_steps lists '$($pair.EarlierEntry)' at position $($pair.EarlierPos) before '$($pair.LaterEntry)' at position $($pair.LaterPos), but the canonical orchestrator workflow requires the later step to follow the earlier one. Reorder completed_steps or, if a rollback occurred, record it in rollback_history."
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = "CHECKPOINT_ORDER_BLOCKED: completed_steps lists '$($pair.EarlierEntry)' at position $($pair.EarlierPos) before '$($pair.LaterEntry)' at position $($pair.LaterPos), but the canonical orchestrator workflow requires the later step to follow the earlier one. Reorder completed_steps or, if a rollback occurred, record it in rollback_history."
+            }
         }
     }
 
@@ -277,12 +297,15 @@ function Invoke-CheckpointMonotonicDecision {
             $missing += 'S4_atomic_planning'
         }
         return [ordered]@{
-            decision = 'block'
-            reason   = "CHECKPOINT_ORDER_BLOCKED: completed_steps lists '$($missingPrerequisite.Step)' before required prerequisite step(s): $($missing -join ', '). Record promotion and planning completion before implementation, review, PR, CI, or DONE steps."
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = "CHECKPOINT_ORDER_BLOCKED: completed_steps lists '$($missingPrerequisite.Step)' before required prerequisite step(s): $($missing -join ', '). Record promotion and planning completion before implementation, review, PR, CI, or DONE steps."
+            }
         }
     }
 
-    return [ordered]@{ decision = 'allow' }
+    return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.
@@ -291,13 +314,26 @@ if ($MyInvocation.InvocationName -eq '.') {
 }
 
 try {
-    $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+    # Transport and mapping come from the shared module. Update reconstruction is
+    # requested for the governed checkpoint path only: an Update touching any
+    # other file yields no record and therefore allows, instead of failing the
+    # whole invocation because an unrelated source could not be read. A governed
+    # reconstruction failure yields empty content, which routes into the existing
+    # fail-closed deny below rather than exit 2.
+    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-checkpoint-monotonic'
+    $mappedInputs = @(
+        ConvertTo-CodexFileEditInput -Payload $payload -ResolveUpdateContent -GovernedPath $script:GovernedCheckpointPath
+    )
+    foreach ($toolInput in $mappedInputs) {
+        $toolInputRaw = $toolInput | ConvertTo-Json -Compress -Depth 20
+        $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $toolInputRaw
+        if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+            exit 0
+        }
+    }
+    exit 0
+} catch {
+    [Console]::Error.WriteLine([string]$_)
+    exit 2
 }
-catch {
-    Write-Error $_
-    exit 1
-}
-
-$decision | ConvertTo-Json -Compress | Write-Output
-
-exit 0

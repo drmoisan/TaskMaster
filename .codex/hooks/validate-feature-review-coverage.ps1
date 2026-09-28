@@ -1,6 +1,3 @@
-# Converted hook
-# Review the generated hook behavior before enabling it.
-
 <#
 .SYNOPSIS
     SubagentStop hook that validates feature-review coverage verdicts against the branch diff.
@@ -33,8 +30,10 @@
         PowerShell  artifacts/pester/powershell-coverage.xml    (JaCoCo XML)
         CSharp      artifacts/csharp/coverage.xml               (JaCoCo XML)
 
-    On a validation failure the script writes a block decision to stdout and exits 1.
-    Read-only: inspects artifacts on disk and never modifies state.
+    Reads one Codex SubagentStop payload from stdin. On validation failure, the hook
+    requests one continuation with decision=block and exit 0. If stop_hook_active is
+    already true, it emits continue=false to avoid a continuation loop. Malformed input
+    fails closed with exit 2 and the reason on stderr.
 
 .NOTES
     Compatible with PowerShell 7+.
@@ -45,15 +44,7 @@ param()
 $ErrorActionPreference = 'Stop'
 
 function Get-RepoRoot {
-    $start = (Get-Location).Path
-    $current = $start
-    while ($true) {
-        if (Test-Path (Join-Path $current '.claude')) { return $current }
-        $parent = Split-Path $current -Parent
-        if (-not $parent -or $parent -eq $current) { break }
-        $current = $parent
-    }
-    return $start
+    return Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 }
 
 function Get-LatestPolicyAudit {
@@ -214,17 +205,51 @@ function Test-LanguageCoverageRow {
     return @{ Ok = $true; Reason = $null }
 }
 
-function Write-BlockDecision {
-    param([string]$Reason)
+function Get-FeatureReviewCoverageContinuation {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)][string] $Reason,
+        [Parameter(Mandatory)][bool] $StopHookActive
+    )
 
-    $payload = [ordered]@{
+    if ($StopHookActive) {
+        return [ordered]@{
+            continue      = $false
+            stopReason    = $Reason
+            systemMessage = $Reason
+        }
+    }
+    return [ordered]@{
         decision = 'block'
         reason   = $Reason
-    } | ConvertTo-Json -Compress
-    Write-Output $payload
+    }
+}
+
+if ($MyInvocation.InvocationName -eq '.') {
+    return
 }
 
 try {
+    $payloadRaw = [Console]::In.ReadToEnd()
+    if ([string]::IsNullOrWhiteSpace($payloadRaw)) {
+        throw 'validate-feature-review-coverage hook input is empty.'
+    }
+    try {
+        $payload = $payloadRaw | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        throw "validate-feature-review-coverage hook input is malformed JSON: $_"
+    }
+    if ($payload.PSObject.Properties.Name -notcontains 'stop_hook_active' -or
+        $payload.stop_hook_active -isnot [bool]) {
+        throw 'validate-feature-review-coverage hook input requires boolean stop_hook_active.'
+    }
+    if ([string]$payload.hook_event_name -ne 'SubagentStop' -or
+        @('feature-review', 'feature-reviewer') -notcontains [string]$payload.agent_type) {
+        throw 'validate-feature-review-coverage requires a feature-review SubagentStop payload.'
+    }
+    $stopHookActive = [bool]$payload.stop_hook_active
+
     $repoRoot = Get-RepoRoot
     $audit = Get-LatestPolicyAudit -RepoRoot $repoRoot
     if (-not $audit) {
@@ -253,13 +278,23 @@ try {
         $header = "Feature-review coverage validation failed against branch diff."
         $body   = "  - " + ($failures -join "`n  - ")
         $footer = "Audit file: $($audit.FullName)`nFix the policy-audit to carry an explicit PASS or FAIL verdict per language with changed files, and reflect repo-wide coverage below 80% as FAIL."
-        Write-BlockDecision -Reason ("{0}`n{1}`n{2}" -f $header, $body, $footer)
-        exit 1
+        $reason = "{0}`n{1}`n{2}" -f $header, $body, $footer
+        Get-FeatureReviewCoverageContinuation -Reason $reason -StopHookActive $stopHookActive |
+            ConvertTo-Json -Compress -Depth 5 |
+                Write-Output
+        exit 0
     }
 
     exit 0
 }
 catch {
-    Write-BlockDecision -Reason ("Feature-review coverage validator error: {0}" -f $_.Exception.Message)
-    exit 1
+    $reason = "Feature-review coverage validator error: $($_.Exception.Message)"
+    if ($null -ne $stopHookActive -and $stopHookActive) {
+        Get-FeatureReviewCoverageContinuation -Reason $reason -StopHookActive $true |
+            ConvertTo-Json -Compress -Depth 5 |
+                Write-Output
+        exit 0
+    }
+    [Console]::Error.WriteLine($reason)
+    exit 2
 }
