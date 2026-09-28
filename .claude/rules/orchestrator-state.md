@@ -122,6 +122,30 @@ The rest of the completion gate is unchanged. An epic whose feature is not merge
 
 Enforcement is validator logic plus this prose, never an imported JSON Schema. The activation scope lives in `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py`, and the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts` reproduces it with byte-identical error strings. No schema file is authored, imported, or read for it.
 
+## Standalone-Merge-Authorization Scope and Backward Compatibility
+
+These invariants apply only when a checkpoint contains a top-level `standalone_merge_authorizations` array. The key may appear in any of the three checkpoints the epic merge gate reads: `artifacts/orchestration/orchestrator-state.json`, `artifacts/orchestration/epic-orchestrator-state.json`, and `artifacts/orchestration/parallel-orchestrator-state.json`. A checkpoint with no such key (the existing checkpoint shape) is unaffected: it validates exactly as before and produces no new errors. The invariants are additive and key-gated. No JSON Schema file is authored, imported, or read for the block (see the Foreign Schema Warning above); the enforcing surface is the `PreToolUse` merge gate (issue #670).
+
+Each entry records one authorized standalone merge with the shape `{ pr_number, pr_url, issue_num, branch_name, authorized_by, authorized_at, session_id, basis, run_slug? }`. The gate consults the array only for a `gh pr merge --merge` command that names an explicit pull request number, and only after its per-feature, epic, and parallel allow conditions have all declined.
+
+Honest disclosure: the standalone-merge authorization record is a policy-level, auditable declaration and is
+not a cryptographic or security control.
+`authorized_by` is a declaration that the gate does not verify, because the runtime exposes no attested agent identity at Bash `PreToolUse` time. The record is not tamper-proof: any actor able to write `artifacts/orchestration/*.json` inside the authorizing session can write one. The `session_id` cross-check binds a record to the session that wrote it, so a stale record from a previous run or a record copied between runs authorizes nothing; it does not stop same-session forgery. This is a documented accepted trade, not an unexamined gap.
+
+## Invariants (standalone_merge_authorizations array)
+
+1. **PR-specific block.** The value of `standalone_merge_authorizations` must be a non-empty array whose every entry is an object with a `pr_number` that is a JSON integer greater than zero. Any other shape (a boolean or other blanket flag, a string, an object, an empty array, a non-object entry, or a `pr_number` that is absent, `null`, zero, negative, fractional, a string, or an array) is rejected with `STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`.
+2. **Binding by `pr_number`.** The gate selects the entry whose `pr_number` equals the pull request number extracted from the command. When records exist but none matches, the gate denies with `STANDALONE_MERGE_AUTHORIZATION_PR_MISMATCH`; when no checkpoint carries the key, it denies with `STANDALONE_MERGE_AUTHORIZATION_ABSENT`.
+3. **`pr_url`.** Non-empty, and it must end with `/pull/` followed by the entry's own `pr_number` and nothing else.
+4. **`issue_num`.** A JSON integer greater than zero.
+5. **`branch_name`.** A non-empty string. It is never compared against the live branch or the working directory.
+6. **`authorized_by`.** A non-empty string; presence only.
+7. **`authorized_at`.** A date-time string that parses with the invariant culture, assuming and adjusting to UTC. No clock is read.
+8. **`basis` and `run_slug`.** `basis` is at least 20 characters after trimming. `run_slug` is optional; when present it is a non-empty string.
+9. **`session_id`.** A non-empty string equal, by ordinal comparison, to the `session_id` of the live hook envelope. An envelope without a `session_id` fails closed.
+
+Field checks 3 through 9 run in the fixed order `pr_url`, `issue_num`, `branch_name`, `authorized_by`, `authorized_at`, `basis`, `run_slug`, `session_id`; the first failure wins and the gate denies with `STANDALONE_MERGE_AUTHORIZATION_MALFORMED` naming that field.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated invariant when a `remediation_loop` is present, using the existing validator message style (literal, checkpoint-context prefixed). The validator returns a list of error strings and does not mutate its input.
@@ -130,3 +154,6 @@ Enforcement is validator logic plus this prose, never an imported JSON Schema. T
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated `model_routing_receipts` invariant when a `model_routing_receipts` key is present, delegating to `scripts/dev_tools/_orchestrator_state_model_routing.py`, which recomputes the resolved model via `resolve_delegation_model`. The check does not import or read any schema file.
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated `require_model_routing` invariant only when the caller passes `require_model_routing=True`, delegating to `scripts/dev_tools/_orchestrator_state_model_routing_gate.py`, which reuses the complexity and model-routing per-entry validators. When the flag is not passed the gate does not run, so existing calls are byte-identical.
 - The validator is consumed by the MCP tool `validate_orchestration_artifacts`; backward compatibility for existing step-based checkpoints is preserved.
+- The standalone-merge authorization invariants are enforced by the `PreToolUse` merge gate (`.claude/hooks/enforce-epic-merge-gate.ps1` with its dot-sourced helpers file, and `.codex/hooks/enforce-epic-merge-gate.ps1`) at merge time. The Python checkpoint validator
+  does not currently validate standalone_merge_authorizations
+  entries; adding that check is recorded as follow-up FU-3.

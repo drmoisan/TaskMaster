@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "lifecycle_ids": [
+    "intake",
+    "promotion",
+    "research",
+    "feature_documents",
+    "atomic_planning",
+    "preflight",
+    "atomic_execution",
+    "qa",
+    "feature_review",
+    "pr_creation",
+    "ci_verification",
+    "completion"
+  ],
+  "semantic_tools": {
+    "drm-copilot.validate_orchestration_artifacts": {
+      "operation": "validate_orchestration_artifacts",
+      "transport_aliases": [
+        "mcp__drm-copilot__validate_orchestration_artifacts",
+        "mcp__drm_copilot__validate_orchestration_artifacts"
+      ],
+      "mutating": false
+    },
+    "drm-copilot.resolve_orchestration_topology": {
+      "operation": "resolve_orchestration_topology",
+      "transport_aliases": [
+        "mcp__drm-copilot__resolve_orchestration_topology",
+        "mcp__drm_copilot__resolve_orchestration_topology"
+      ],
+      "mutating": false
+    },
+    "drm-copilot.resolve_provider_routing": {
+      "operation": "resolve_provider_routing",
+      "transport_aliases": [
+        "mcp__drm-copilot__resolve_provider_routing",
+        "mcp__drm_copilot__resolve_provider_routing"
+      ],
+      "mutating": false
+    },
+    "drm-copilot.transition_prepared_orchestration": {
+      "operation": "transition_prepared_orchestration",
+      "transport_aliases": [
+        "mcp__drm-copilot__transition_prepared_orchestration",
+        "mcp__drm_copilot__transition_prepared_orchestration"
+      ],
+      "mutating": true
+    }
+  },
+  "provider_adapters": {
+    "claude": {
+      "checkpoint_expression": "claude.orchestrator-state",
+      "source_validator": "claude-source-v1",
+      "destination_projector": "portable-to-claude-v1",
+      "routing_policy": "model_policy"
+    },
+    "codex": {
+      "checkpoint_expression": "codex.orchestrator-state",
+      "source_validator": "codex-source-v1",
+      "destination_projector": "portable-to-codex-v1",
+      "routing_policy": "codex_model_policy",
+      "topology_policy": "codex_topology_policy"
+    }
+  },
+  "transitions": {
+    "migrate_legacy": {
+      "from": ["legacy_v1"],
+      "to": "preparation_complete",
+      "required_capabilities": ["handoff-schema:2", "plan-contract:atomic-plan-v1"]
+    },
+    "prepared_to_atomic_execution": {
+      "from": ["preparation_complete"],
+      "to": "validated",
+      "required_capabilities": [
+        "handoff-schema:2",
+        "transition:prepared_to_atomic_execution",
+        "workspace-explicit-validation"
+      ]
+    },
+    "materialize_destination": {
+      "from": ["validated"],
+      "to": "materialized",
+      "required_capabilities": [
+        "atomic-checkpoint-materialization",
+        "semantic-tool:drm-copilot.transition_prepared_orchestration"
+      ]
+    },
+    "atomic_execution": {
+      "from": ["materialized"],
+      "to": "atomic_execution",
+      "required_capabilities": ["workspace-explicit-routing"]
+    },
+    "return_to_scheduler": {
+      "from": ["atomic_execution", "qa", "feature_review", "completion"],
+      "to": "scheduler_result",
+      "required_capabilities": ["scheduler-return:portable_child_result-v1"]
+    }
+  },
+  "capabilities": {
+    "supported_vocabularies": ["portable-orchestration-handoff-core-v1"],
+    "supported": [
+      "handoff-schema:2",
+      "transition:prepared_to_atomic_execution",
+      "plan-contract:atomic-plan-v1",
+      "semantic-tool:drm-copilot.validate_orchestration_artifacts",
+      "semantic-tool:drm-copilot.resolve_orchestration_topology",
+      "semantic-tool:drm-copilot.resolve_provider_routing",
+      "semantic-tool:drm-copilot.transition_prepared_orchestration",
+      "workspace-explicit-validation",
+      "workspace-explicit-routing",
+      "atomic-checkpoint-materialization",
+      "scheduler-context:ordinary",
+      "scheduler-context:parallel-child",
+      "scheduler-context:epic-child",
+      "scheduler-return:portable_child_result-v1"
+    ]
+  },
+  "failure_precedence": [
+    "HANDOFF_UNSUPPORTED_VERSION",
+    "HANDOFF_SOURCE_HASH_MISMATCH",
+    "HANDOFF_HISTORY_INVALID",
+    "HANDOFF_REPOSITORY_MISMATCH",
+    "HANDOFF_WORKSPACE_MISMATCH",
+    "HANDOFF_ISSUE_FEATURE_MISMATCH",
+    "HANDOFF_BRANCH_LINEAGE_MISMATCH",
+    "HANDOFF_PLAN_PATH_INVALID",
+    "HANDOFF_PLAN_HASH_MISMATCH",
+    "HANDOFF_SCHEDULER_BINDING_MISMATCH",
+    "HANDOFF_TRANSITION_NOT_ALLOWED",
+    "HANDOFF_CAPABILITY_UNAVAILABLE",
+    "HANDOFF_VALIDATOR_UNAVAILABLE",
+    "HANDOFF_TOPOLOGY_RESOLVER_UNAVAILABLE",
+    "HANDOFF_PROVIDER_ROUTING_UNAVAILABLE",
+    "HANDOFF_DIRTY_WORKTREE"
+  ]
+}

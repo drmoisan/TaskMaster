@@ -20,19 +20,24 @@ function Get-PrAuthorCheckpointContent {
         Read the raw JSON text of the per-feature orchestrator checkpoint. Tests mock this
         function (read seam) for the epic-mode base-branch override check.
     .DESCRIPTION
-        Returns the raw text content of artifacts/orchestration/orchestrator-state.json, or
-        $null when the file is absent. This is the injectable boundary for checkpoint content
-        used by Test-EpicBaseBranchOverride; no test writes the checkpoint file to disk.
+        Returns the raw text content of the checkpoint at the supplied path, or $null when the
+        file is absent. This is the injectable boundary for checkpoint content used by
+        Test-EpicBaseBranchOverride; no test writes the checkpoint file to disk.
+
+        The path is mandatory and carries no default (issue #673). A relative default was the
+        second of this feature's three bindings: it made check 6 read whichever checkpoint
+        occupied the process directory even when target resolution had already selected a
+        different worktree, so the epic verdict could come from an unrelated item.
     .PARAMETER CheckpointPath
-        The relative path to the per-feature orchestrator checkpoint.
+        The absolute path of the checkpoint belonging to the resolved worktree.
     .OUTPUTS
         System.String or $null
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
-        [Parameter(Mandatory = $false)]
-        [string] $CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
+        [Parameter(Mandatory)]
+        [string] $CheckpointPath
     )
 
     if (-not (Test-Path -LiteralPath $CheckpointPath)) {
@@ -57,6 +62,13 @@ function Test-EpicBaseBranchOverride {
         unchanged.
     .PARAMETER CommandText
         The Bash command text under evaluation.
+    .PARAMETER CheckpointPath
+        The absolute checkpoint path identity resolution selected, passed straight through to
+        the read seam so this check and the orchestrator-state preflight read one file.
+    .PARAMETER EpicScope
+        Optional. The epic-scope result gate 1 resolved (issue #663). When it reports epic
+        scope, the integration pull request must pass --base main and the per-feature
+        checkpoint seam is not read; $null keeps the per-feature epic_mode rule unchanged.
     .OUTPUTS
         System.String or $null
     #>
@@ -64,7 +76,13 @@ function Test-EpicBaseBranchOverride {
     [OutputType([string])]
     param(
         [Parameter(Mandatory)]
-        [string] $CommandText
+        [string] $CommandText,
+
+        [Parameter(Mandatory)]
+        [string] $CheckpointPath,
+
+        [AllowNull()]
+        [object] $EpicScope
     )
 
     # The epic-mode base-branch override only constrains gh pr create; gh pr edit does not
@@ -75,7 +93,18 @@ function Test-EpicBaseBranchOverride {
         return $null
     }
 
-    $checkpointRaw = Get-PrAuthorCheckpointContent
+    # Epic scope (issue #663): the epic's own integration pull request targets main. The
+    # scope object comes from gate 1, so the epic checkpoint is not read a second time and
+    # the per-feature checkpoint is not consulted.
+    if ($null -ne $EpicScope -and $EpicScope.IsEpicScope) {
+        $epicBaseValue = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create') -FlagName '--base'
+        if ($null -eq $epicBaseValue -or $epicBaseValue -cne 'main') {
+            return "EPIC_BASE_BRANCH_MISMATCH: this epic-scope gh pr create was evaluated against $($EpicScope.CheckpointPath); the integration pull request must pass --base main."
+        }
+        return $null
+    }
+
+    $checkpointRaw = Get-PrAuthorCheckpointContent -CheckpointPath $CheckpointPath
     if ([string]::IsNullOrWhiteSpace($checkpointRaw)) {
         return $null
     }

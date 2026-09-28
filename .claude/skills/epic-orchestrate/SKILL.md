@@ -170,6 +170,13 @@ frontmatter default — `opus` for these workers — which suppresses a `fable` 
 MUST NOT hard-code `model=opus` in a way that overrides the resolved routing model, mirroring
 step 5 of `## Model Selection` in `.claude/skills/orchestrate/SKILL.md`.
 
+Every such spawn of `Agent(pr-author)` also carries the canonical issue number line and a
+`branch: <name>` label naming the branch checked out in the worktree the pull request is opened
+from, per `## Issue Number Consistency` in `.claude/skills/orchestrate/SKILL.md`.
+`enforce-model-routing-receipt.ps1` identifies the item from those two lines and denies a gated
+delegation it cannot identify, so a spawn that omits both is refused rather than validated against
+whichever checkpoint occupies the calling session's root.
+
 `route` is never an input to model selection; `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
 inherits the parent model and ignores a model override, so model selection applies to agent
@@ -281,7 +288,9 @@ checkpoint JSON remains the durable, machine-authoritative source.
 `epic_feature_folder`, `epic_manifest_path` (which points at
 `docs/features/epics/<epic-slug>/epic.md`), `epic_status_doc_path`, `integration_branch`,
 `completed_steps`, `next_step`, `last_updated`, `current_wave`, `waves[]`, `features[]`,
-`epic_merge_pr`, and the three receipt arrays (`delegation_receipts[]`, `skill_receipts[]`,
+`epic_merge_pr`, `epic_issue_num` (the epic-level issue `epic-planner` promoted),
+`model_routing_receipts[]` (the routing receipt for each delegation `epic-orchestrator` itself
+spawns), and the three receipt arrays (`delegation_receipts[]`, `skill_receipts[]`,
 `mcp_call_receipts[]`). The
 `merge_status` enum is: `not_started`, `worktree_created`, `pr_open`, `ci_green`,
 `merge_conflict`, `blocked_conflict_loop_limit`, `merged`, `worktree_removed`. The optional
@@ -297,6 +306,10 @@ Validate the checkpoint through the
 `artifact_type: "epic-orchestrator-state"`, supplying the `require_complete` argument on
 that same call at the completion gate. The validation is implemented in
 `scripts/dev_tools/validate_epic_orchestrator_state.py`.
+
+**Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
+
+**Integration-PR checkpoint shape (issue #663).** The integration-to-`main` pull request and its `Agent(pr-author)` delegation are gated against `artifacts/orchestration/epic-orchestrator-state.json`, and no per-feature checkpoint is written for them. Before `epic-orchestrator` opens that pull request, the epic checkpoint carries `route_id: "epic"`, `integration_branch`, `epic_issue_num`, and a `features[]` array in which every entry's `merge_status` is `merged` or `worktree_removed`. Before the `Agent(pr-author)` delegation, `epic-orchestrator` records the `pr-author` routing receipt in that file's `model_routing_receipts[]`. The pr-author gate, the epic base-branch check, the model-routing gate, and the preimplementation gate treat a call as epic scope when its branch signal (or, for a staging command or file edit, the worktree HEAD) equals `integration_branch`; the pull request base must then be `main`.
 
 ## Completion Requirements
 

@@ -46,7 +46,9 @@ param()
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 $script:PrContextArtifactPath = 'artifacts/pr_context.summary.txt'
-$script:OrchestratorStateCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
+# Null until the resolution step assigns the absolute path of the resolved worktree's
+# checkpoint (issue #673); a relative default here was the process-directory binding.
+$script:OrchestratorStateCheckpointPath = $null
 
 Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force
 

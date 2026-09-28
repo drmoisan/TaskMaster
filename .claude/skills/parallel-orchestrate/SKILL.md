@@ -234,6 +234,8 @@ There is no final integration pull request and no fan-in path: the epic surface'
 integration-branch lifecycle has no counterpart on this surface, and its absence is structural
 rather than an omission.
 
+**Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first item delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
+
 ## Parallel-Mode Kickoff Parameter
 
 When `parallel-orchestrator` delegates an item to `Agent(orchestrator)`, the delegation prompt
@@ -326,12 +328,43 @@ Procedure, per item:
 
 **Merge-gate authorization.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide
 `PreToolUse` Bash-matcher hook that denies any `gh pr merge --merge` unless a checkpoint satisfies
-one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate now authorizes
-a parallel per-item merge when the parallel-orchestrator checkpoint has `route_id == "parallel"`,
-the target item's `merge_status == "ci_green"`, and, when a PR number is named, it matches the
-item's `pr_number`. Step 3 above is therefore permitted for a legitimate parallel merge; a missing,
-unreadable, or invalid parallel checkpoint, a target item whose `merge_status` is not `ci_green`, or
-a PR number that matches no item still fails closed with `EPIC_MERGE_GATE_BLOCKED`.
+one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate has
+four allow conditions
+which it evaluates in this order: a per-feature checkpoint with `epic_mode == true` and
+`step9_status == "passed"`; an epic checkpoint whose `epic_merge_pr.ci_gate.conclusion` is
+`success` with a matching `pr_number`; the parallel condition described next; and a standalone
+merge authorization record, described after it. The parallel condition authorizes a per-item merge
+when the parallel-orchestrator checkpoint has `route_id == "parallel"`, the target item's
+`merge_status == "ci_green"`, and, when a PR number is named, it matches the item's `pr_number`.
+Step 3 above is therefore permitted for a legitimate parallel merge; a missing, unreadable, or
+invalid parallel checkpoint, a target item whose `merge_status` is not `ci_green`, or a PR number
+that matches no item still fails closed with `EPIC_MERGE_GATE_BLOCKED`.
+
+The standalone condition (issue #670) is the only route for merging a pull request that is not a
+parallel item, such as a standalone fix that unblocks the run. It is evaluated last and never
+overrides the other three. Writer procedure for the coordinating session:
+
+1. Write the record into a top-level `standalone_merge_authorizations` array in the
+   parallel-orchestrator checkpoint (`artifacts/orchestration/parallel-orchestrator-state.json`);
+   the gate also reads the key from the per-feature and epic checkpoints.
+2. Write one entry per authorized pull request, with these fields: `pr_number` (JSON integer),
+   `pr_url` (ending in `/pull/<pr_number>`), `issue_num` (JSON integer), `branch_name`,
+   `authorized_by`, `authorized_at` (ISO 8601 date-time), `session_id`, `basis` (at least 20
+   characters), and optionally `run_slug`.
+3. Set `session_id` to the session id of the coordinating session that will run the merge
+   command. The gate compares it with the live hook envelope and denies on any difference, so a
+   record written by another session or a previous run authorizes nothing.
+4. Name the pull request explicitly in the merge command (`gh pr merge <PR> --merge`); a bare
+   command never satisfies the standalone condition.
+
+A blanket flag is actively rejected: a `standalone_merge_authorizations` value that names no
+specific pull request (for example `true`) denies with
+`STANDALONE_MERGE_AUTHORIZATION_NOT_PR_SPECIFIC`. Other denials carry
+`STANDALONE_MERGE_AUTHORIZATION_ABSENT`, `STANDALONE_MERGE_AUTHORIZATION_PR_MISMATCH`, or
+`STANDALONE_MERGE_AUTHORIZATION_MALFORMED` (naming the failing field) after the
+`EPIC_MERGE_GATE_BLOCKED` token. The record is a policy-level, auditable declaration, not a
+security control; see the Standalone-Merge-Authorization section of
+`.claude/rules/orchestrator-state.md` for the full field rules and the disclosure.
 
 Branch protection on `main` affects only the pacing of step 3, not its ownership: if `main`
 requires branches to be up to date, an automated `gh pr update-branch` plus re-green cycle is

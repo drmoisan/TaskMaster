@@ -134,7 +134,7 @@ full schema enforced by `validate_epic_orchestrator_state_text`, implemented in
 `epic_feature_folder`,
 `epic_manifest_path`, `epic_status_doc_path`, `integration_branch`, `completed_steps`, `next_step`,
 `last_updated`, `current_wave`, `waves[]`, `features[]` (including `merge_status` and the four
-lifecycle timestamps), `epic_merge_pr`, and the three receipt arrays
+lifecycle timestamps), `epic_merge_pr`, `epic_issue_num`, `model_routing_receipts[]` (including the `pr-author` receipt recorded before the integration-to-`main` pull request, issue #663), and the three receipt arrays
 (`delegation_receipts[]`, `skill_receipts[]`, `mcp_call_receipts[]`) populated with the `epic`
 route's required names from `config/orchestration-routing.json`.
 
