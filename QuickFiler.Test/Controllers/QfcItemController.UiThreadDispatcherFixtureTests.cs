@@ -392,5 +392,66 @@ namespace QuickFiler.Controllers.Tests
                 transaction.Dispose();
             }
         }
+
+        /// <summary>
+        /// Issue #882 — a bounded acquisition that cannot obtain the permit fails promptly by name
+        /// instead of waiting without bound. While this test holds the sole permit, a zero-bound probe
+        /// through the internal overload must throw <c>TimeoutException</c> carrying the token
+        /// TRANSACTIONGATE_ACQUIRE_TIMEOUT, must not be counted as an acquisition, and must not
+        /// release the permit it never obtained. A zero bound returns immediately by contract, so the
+        /// test consumes no wall-clock time on any path; the gate's continued usability is asserted
+        /// only through the production entry point, which waits rather than fails under contention.
+        /// </summary>
+        [TestMethod]
+        [Timeout(GateTimeoutMs)]
+        public async Task BeginTransactionAsync_ZeroBoundWhileThisTestHoldsThePermit_ThrowsTimeoutExceptionAndReleasesNothing()
+        {
+            // Arrange
+            UiThreadDispatcherTransaction transaction = await UiThreadDispatcherFixture
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
+            try
+            {
+                int contendedBefore = UiThreadDispatcherFixture.ContendedAcquisitions;
+
+                // Act
+                Func<Task> probe = () => UiThreadDispatcherFixture.BeginTransactionAsync(TimeSpan.Zero);
+
+                // Assert
+                await probe
+                    .Should()
+                    .ThrowAsync<TimeoutException>(
+                        because: "a zero bound cannot obtain the permit this test already holds"
+                    )
+                    .WithMessage("*TRANSACTIONGATE_ACQUIRE_TIMEOUT*");
+                (
+                    UiThreadDispatcherFixture.TransactionAcquisitions
+                    - UiThreadDispatcherFixture.TransactionReleases
+                )
+                    .Should()
+                    .Be(1, because: "the failed probe must not be counted as an acquisition");
+                UiThreadDispatcherFixture
+                    .ContendedAcquisitions.Should()
+                    .BeGreaterThanOrEqualTo(
+                        contendedBefore + 1,
+                        because: "the probe observed a held permit, and other classes can only add to the counter"
+                    );
+                Action dispose = () => transaction.Dispose();
+                dispose
+                    .Should()
+                    .NotThrow<SemaphoreFullException>(
+                        because: "the failed probe released nothing, so the holder's own release is the first"
+                    );
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
+
+            UiThreadDispatcherTransaction roundTrip = await UiThreadDispatcherFixture
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
+            roundTrip.Dispose();
+        }
     }
 }
