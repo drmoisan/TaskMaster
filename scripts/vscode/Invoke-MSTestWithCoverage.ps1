@@ -308,8 +308,8 @@ function Invoke-MSTestWithCoverageMain {
     # non-fatal warning branch below, so no summary would ever be written.
     . (Join-Path $ScriptRoot 'Invoke-MSTest.TrxSummary.ps1')
 
-    # The scope predicate is dot-sourced here rather than through the helpers chain, because an
-    # added line in the helpers file would widen this change beyond its three production files.
+    # The scope part file is dot-sourced here rather than through the helpers chain because this
+    # entry point is its only consumer: it calls the gate once, after post-processing.
     . (Join-Path $ScriptRoot 'Invoke-MSTestWithCoverage.Scope.ps1')
 
     if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
@@ -401,17 +401,12 @@ function Invoke-MSTestWithCoverageMain {
     $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
     Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
 
-    # Skipped on a scoped run: both assertions compare a document-level rate taken across every
-    # instrumented assembly against floors set for the whole solution, so a single-assembly run
-    # fails them on a healthy tree (issue #928). The unscoped arm is unchanged.
-    if (Test-CoverageRunIsScoped -RepoRoot $repoRoot -ResolvedSearchRoot $resolvedSearchRoot) {
-        Write-Warning ("Coverage threshold assertions skipped: the run is scoped to search root " +
-            "'$resolvedSearchRoot' rather than the repository root '$repoRoot'.")
-    }
-    else {
-        Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
-        Assert-CoberturaBranchCoverageThreshold -CoberturaXml $processedXmlContent
-    }
+    # The scoped-run gate lives in the path-loaded Scope part file rather than here, so that every
+    # test file credits its lines under breakpoint coverage and this entry point stays thin wiring.
+    Assert-CoberturaCoverageThresholdForRun `
+        -CoberturaXml $processedXmlContent `
+        -RepoRoot $repoRoot `
+        -ResolvedSearchRoot $resolvedSearchRoot
     Write-Output (Get-CoberturaFirstPartyCoverageReport -CoberturaXml $processedXmlContent)
 
     # The projection is built from the post-processed content, never from the raw collector

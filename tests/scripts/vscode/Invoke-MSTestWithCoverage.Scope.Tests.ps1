@@ -128,6 +128,80 @@ Describe 'Test-CoverageRunIsScoped' {
         Test-CoverageRunIsScoped -RepoRoot $script:fixtureRoot -ResolvedSearchRoot $searchRoot |
             Should -BeTrue
     }
+
+    It 'throws when the repository root is an empty string' {
+        # CR-2 control. An empty repository root is rejected by parameter binding and validation.
+        { Test-CoverageRunIsScoped -RepoRoot '' -ResolvedSearchRoot $script:fixtureRoot } |
+            Should -Throw -ExpectedMessage "*parameter 'RepoRoot'*"
+    }
+
+    It 'throws when the resolved search root is an empty string' {
+        # CR-2 control. An empty search root is rejected by parameter binding and validation.
+        { Test-CoverageRunIsScoped -RepoRoot $script:fixtureRoot -ResolvedSearchRoot '' } |
+            Should -Throw -ExpectedMessage "*parameter 'ResolvedSearchRoot'*"
+    }
+
+    It 'throws when the repository root is a relative path' {
+        # CR-2. A relative input would resolve against the process working directory, so it fails fast.
+        { Test-CoverageRunIsScoped -RepoRoot 'repo' -ResolvedSearchRoot $script:fixtureRoot } |
+            Should -Throw -ExpectedMessage 'RepoRoot must be an absolute path: repo'
+    }
+
+    It 'throws when the resolved search root is a relative path' {
+        # CR-2. A relative search root fails fast for the same reason.
+        { Test-CoverageRunIsScoped -RepoRoot $script:fixtureRoot -ResolvedSearchRoot 'QuickFiler.Test' } |
+            Should -Throw -ExpectedMessage 'ResolvedSearchRoot must be an absolute path: QuickFiler.Test'
+    }
+}
+
+Describe 'Assert-CoberturaCoverageThresholdForRun' {
+    BeforeEach {
+        # The warning stream is the scoped arm's only side effect, so it is the only mock.
+        Mock Write-Warning {}
+    }
+
+    It 'does not throw on a scoped run whose document is below both floors' {
+        # AC1. The scoped arm returns before either floor is asserted.
+        {
+            Assert-CoberturaCoverageThresholdForRun `
+                -CoberturaXml $script:belowBothFloorsXml `
+                -RepoRoot $script:fixtureRoot `
+                -ResolvedSearchRoot ($script:fixtureRoot + '\QuickFiler.Test')
+        } | Should -Not -Throw
+    }
+
+    It 'writes exactly one warning naming the scoped search root' {
+        # AC1. The skip is announced once, and the announcement names the search root.
+        Assert-CoberturaCoverageThresholdForRun `
+            -CoberturaXml $script:belowBothFloorsXml `
+            -RepoRoot $script:fixtureRoot `
+            -ResolvedSearchRoot ($script:fixtureRoot + '\QuickFiler.Test')
+
+        Should -Invoke Write-Warning -Times 1 -Exactly
+        Should -Invoke Write-Warning -Times 1 -Exactly -ParameterFilter {
+            $Message -like 'Coverage threshold assertions skipped*' -and $Message -like '*QuickFiler.Test*'
+        }
+    }
+
+    It 'throws the line threshold message on an unscoped run below the line floor' {
+        # AC3. The unscoped arm keeps enforcing the line floor.
+        {
+            Assert-CoberturaCoverageThresholdForRun `
+                -CoberturaXml $script:belowBothFloorsXml `
+                -RepoRoot $script:fixtureRoot `
+                -ResolvedSearchRoot $script:fixtureRoot
+        } | Should -Throw -ExpectedMessage 'Cobertura line coverage 40% is below the required 80% threshold.'
+    }
+
+    It 'throws the branch threshold message on an unscoped run at the line floor and below the branch floor' {
+        # AC3. The unscoped arm keeps enforcing the branch floor once the line floor is met.
+        {
+            Assert-CoberturaCoverageThresholdForRun `
+                -CoberturaXml $script:branchBelowFloorXml `
+                -RepoRoot $script:fixtureRoot `
+                -ResolvedSearchRoot $script:fixtureRoot
+        } | Should -Throw -ExpectedMessage 'Cobertura branch coverage 50% is below the required 75% threshold.'
+    }
 }
 
 Describe 'Invoke-MSTestWithCoverageMain threshold gating by search root' {
