@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickFiler.Viewers;
@@ -85,6 +86,47 @@ namespace UtilitiesCS.Test.Threading
                             new SynchronizationContext()
                         );
                         var awaiter = new UiThread.SynchronizationContextAwaiter(capturedContext);
+                        observed = awaiter.IsCompleted;
+                    }
+                );
+
+                // Assert
+                thrown.Should().BeNull();
+                observed.Should().BeFalse();
+            }
+        }
+
+        /// <summary>
+        /// Issue #889: the dispatcher exit. The captured-context exit is not taken, because the
+        /// awaiter context is a dispatcher context that is not the captured UI context. No UI
+        /// dispatcher was captured and the executing thread owns none, so a bare reference
+        /// comparison would match null against null and return true. The awaiter context wraps a
+        /// dispatcher owned by a separate STA host thread; the dispatcher-taking constructor only
+        /// stores it, whereas the parameterless constructor would create a dispatcher on the test
+        /// worker thread and never shut it down.
+        /// </summary>
+        [TestMethod]
+        public void IsCompleted_WhenTheAwaiterContextIsAForeignDispatcherContextAndNoUiDispatcherWasCaptured_ReturnsFalse()
+        {
+            // Arrange
+            using (UiThreadStateScope.Enter())
+            using (var foreignHost = new SharedStaDispatcherHost())
+            {
+                var awaiterContext = new DispatcherSynchronizationContext(foreignHost.Dispatcher);
+                UiThreadStateScope.SetDispatcher(null);
+                UiThreadStateScope.SetUiSyncContext(new SynchronizationContext());
+                bool observed = true;
+
+                // Act
+                Exception thrown = ApartmentThreadRunner.RunOnThread(
+                    ApartmentState.MTA,
+                    () =>
+                    {
+                        UiThreadStateScope.SetUiThreadId(Thread.CurrentThread.ManagedThreadId);
+                        SynchronizationContext.SetSynchronizationContext(
+                            new SynchronizationContext()
+                        );
+                        var awaiter = new UiThread.SynchronizationContextAwaiter(awaiterContext);
                         observed = awaiter.IsCompleted;
                     }
                 );
