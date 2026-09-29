@@ -795,6 +795,16 @@ Feature-folder scopes (redaction and removal; files affected, of which raw docum
 
 Not in the Write Set, deliberately (plain prose): anything under the push-down-owned governance directory .claude (companion upstream issue 932), the two MCP configuration files .mcp.json and .codex/config.toml, TaskMaster.sln, every csproj, packages.config and app.config, every production (non-test) C# file, and the active feature folders of the other five items of parallel run bugs-2026-09-28.
 
+## Correction-Round Dispositions (orchestrator record, 2026-09-29)
+
+- Preflight round 9 (over revision 1.12): F1 (P6-T25 must require the PRE-CLEANUP `UTF16-PROFILE-FILES=1`), F2 (P4-T8 write wording), F3 (P4-T7 rationale reference) and F4 (spec.md Assumptions bullet) were approved by the run coordinator and applied in round 10 as revision 1.13. F4 was applied as the coordinator worded it; the acceptance-criterion count stays 20.
+- Preflight round 10 (over revision 1.13, commit 43ef029c5): `PREFLIGHT: ALL CLEAR`, `CONVERGENCE: NO FURTHER ROUNDS EXPECTED`. Four non-blocking observations, dispositions:
+  - O1 (P4-T3 still says the census "runs read-only"; within the root cause, optional wording): not applied. The statement is true of the repository, no gate depends on it, and applying it would require a further confirming round for a wording change.
+  - O2 (P4-T8 colon placement after the F2 wording; within the root cause, optional wording): not applied, for the same reason.
+  - O3 (P1-T13 sentence naming 7e6ecbd0e as the only descendant of the anchor; three plan-only commits now follow it): outside the root cause; no delta. The range figures still hold because the three commits touch only this feature folder, and C7 asserts no expected HEAD.
+  - O4 (the Pester and analyzer gates P3-T17, P6-T2 and P6-T3 name figures that the PoshQC MCP tools may not print): outside the root cause; not a plan edit. Routed to the run coordinator under the local PowerShell gate directive; execution proceeds and stops at the first gate criterion PoshQC cannot produce.
+- No further correction round was run under the standing authority.
+
 ## Planner Self-Review Record (Rounds 0 to 10)
 
 SELF-REVIEW: RE-DERIVED THIS PASS
