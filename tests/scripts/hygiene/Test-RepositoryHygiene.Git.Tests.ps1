@@ -24,6 +24,14 @@ Describe 'Get-TrackedFileRecord' {
         $records[2].Path | Should -Be 'README.md'
         @($records | Where-Object { $_.IsBinaryInIndex }).Count | Should -Be 0 -Because 'no record is binary in the index'
         Should -Invoke Invoke-GitExe -Times 1 -Exactly -ParameterFilter { ($GitArgs -join ' ') -eq 'ls-files --eol -z' }
+
+        # A record without the tab that separates the attributes from the path fails fast.
+        Mock Invoke-GitExe {
+            param([string[]]$GitArgs)
+            $null = $GitArgs
+            "i/lf    w/lf    attr/text=auto         docs/no-separator.md`0"
+        }
+        { Get-TrackedFileRecord } | Should -Throw -ExpectedMessage '*Malformed git ls-files --eol record*'
     }
 
     It 'flags an index-binary record' {
