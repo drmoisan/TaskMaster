@@ -7,7 +7,7 @@ EXIT_CODE: 1
 ExpectedExitCode: 1
 MCP_RESULT_OK_FLAG: false
 
-MCP payload (transcribed, workspace_root replaced):
+MCP payload (transcribed, workspace_root replaced by <repo-root>):
 - ok: false
 - tool: run_poshqc_test
 - workspace_root: <repo-root>

@@ -6,7 +6,7 @@ Command: mcp__drm-copilot__run_poshqc_test with workspace_root = <repo-root> and
 EXIT_CODE: 0
 MCP_RESULT_OK_FLAG: true
 
-MCP payload (transcribed, workspace_root replaced):
+MCP payload (transcribed, workspace_root replaced by <repo-root>):
 - ok: true
 - tool: run_poshqc_test
 - workspace_root: <repo-root>
