@@ -1,6 +1,6 @@
 # Baseline Census ([P0-T14])
 
-Timestamp: 2026-09-29T09-08
+Timestamp: 2026-09-29T08-57
 Command: CMD-CENSUS (pwsh -NoProfile -Command 'foreach ($p in "UtilitiesCS/Threading/UiThread.cs", ... ) { "LINES $p=..." }; "STALE_487=..."; ...; "RUNSETTINGS_HASH=..."', verbatim from the plan Command Reference)
 Command: CMD-REF-SOURCE (git grep -n -I -F over six patterns, excluding docs, .claude and artifacts)
 Command: CMD-REF-REPO (git grep -n -I -F over six patterns, repository-wide, classified by first path component)

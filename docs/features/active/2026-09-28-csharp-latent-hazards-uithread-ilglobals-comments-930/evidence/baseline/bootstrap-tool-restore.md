@@ -1,6 +1,6 @@
 # Bootstrap: manifest tool restore ([P0-T5])
 
-Timestamp: 2026-09-29T08-53
+Timestamp: 2026-09-29T08-52
 Command: pwsh -NoProfile -Command 'dotnet tool restore; "TOOL_RESTORE_EXIT=$LASTEXITCODE"; dotnet tool list --local; dotnet tool run csharpier check --help | Out-Null; "CSHARPIER_HELP_EXIT=$LASTEXITCODE"'
 EXIT_CODE: 0
 Output Summary:

@@ -1,6 +1,6 @@
 # Bootstrap: NuGet restore ([P0-T6])
 
-Timestamp: 2026-09-29T08-54
+Timestamp: 2026-09-29T08-53
 Command: pwsh -NoProfile -Command 'pwsh -NoProfile -File scripts/vscode/Invoke-Restore.ps1; "RESTORE_EXIT=$LASTEXITCODE"; "PACKAGE_DIRS=$(@(Get-ChildItem -Directory -LiteralPath packages).Count)"' (script path passed as its absolute worktree path, REPO-ROOT/scripts/vscode/Invoke-Restore.ps1)
 EXIT_CODE: 0
 Output Summary:

@@ -1,6 +1,6 @@
 # Bootstrap: dotnet-coverage global tool ([P0-T7])
 
-Timestamp: 2026-09-29T08-55
+Timestamp: 2026-09-29T08-53
 Command: (1) pwsh -NoProfile -Command 'if (-not (Get-Command dotnet-coverage -ErrorAction SilentlyContinue)) { dotnet tool install --global dotnet-coverage }; "INSTALL_STEP_DONE=True"'
 Command: (2, separate invocation; its exit is the EXIT_CODE row) pwsh -NoProfile -Command '"DOTNET_COVERAGE_RESOLVED=$([bool](Get-Command dotnet-coverage -ErrorAction SilentlyContinue))"; dotnet-coverage --version'
 EXIT_CODE: 0

@@ -1,6 +1,6 @@
 # Bootstrap: repository .NET SDK ([P0-T4])
 
-Timestamp: 2026-09-29T08-53
+Timestamp: 2026-09-29T08-52
 Command: pwsh -NoProfile -Command 'if (-not (Test-Path -LiteralPath .dotnet-sdk/sdk/8.0.205)) { & ./scripts/vscode/Install-RepoDotNetSdk.ps1 }; "SDK_MARKER=$(Test-Path -LiteralPath .dotnet-sdk/sdk/8.0.205)"; dotnet --version'
 EXIT_CODE: 0
 Output Summary:
