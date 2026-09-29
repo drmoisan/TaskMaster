@@ -415,7 +415,8 @@ namespace QuickFiler.Controllers.Tests
                 int contendedBefore = UiThreadDispatcherFixture.ContendedAcquisitions;
 
                 // Act
-                Func<Task> probe = () => UiThreadDispatcherFixture.BeginTransactionAsync(TimeSpan.Zero);
+                Func<Task> probe = () =>
+                    UiThreadDispatcherFixture.BeginTransactionAsync(TimeSpan.Zero);
 
                 // Assert
                 await probe

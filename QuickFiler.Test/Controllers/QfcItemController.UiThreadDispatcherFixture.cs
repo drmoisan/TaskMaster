@@ -154,7 +154,9 @@ namespace QuickFiler.Controllers.Tests
         /// </summary>
         internal static Task<UiThreadDispatcherTransaction> BeginTransactionAsync()
         {
-            return BeginTransactionAsync(TimeSpan.FromMilliseconds(TransactionGateAcquireTimeoutMs));
+            return BeginTransactionAsync(
+                TimeSpan.FromMilliseconds(TransactionGateAcquireTimeoutMs)
+            );
         }
 
         /// <summary>
@@ -164,7 +166,9 @@ namespace QuickFiler.Controllers.Tests
         /// acquisitions or releases counter, so there is no release to omit; the contended pre-check
         /// stays before the wait because a failed probe did observe a held permit.
         /// </summary>
-        internal static async Task<UiThreadDispatcherTransaction> BeginTransactionAsync(TimeSpan bound)
+        internal static async Task<UiThreadDispatcherTransaction> BeginTransactionAsync(
+            TimeSpan bound
+        )
         {
             if (TransactionGate.CurrentCount == 0)
             {
