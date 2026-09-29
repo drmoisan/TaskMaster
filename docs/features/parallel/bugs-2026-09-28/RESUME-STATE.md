@@ -1,5 +1,9 @@
 # Resume State: bugs-2026-09-28
 
+SUPERSEDED 2026-09-29T03:55Z: the hold ended, all six items reached PREFLIGHT: ALL CLEAR, and the run
+is planned. The authoritative artifacts are parallel.md and parallel-kickoff.md in this folder. The
+content below is kept only as the record of the state at the hold.
+
 Written by parallel-planner at 2026-09-29T01:20Z under the coordinator's commit-and-hold order
 (forecast: all accounts exhausted about 01:40Z, no usable account until about 02:20Z). This file is
 the durable copy of the planner checkpoint, which lives in the gitignored
