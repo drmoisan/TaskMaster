@@ -38,24 +38,12 @@ jobs:
         with:
           path: packages
           key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.config') }}
-            # The bare-prefix fallback below is safe against stale package
-            # versions: `nuget restore` (next step) always runs unconditionally
-            # and is idempotent per package for packages.config-style restores —
-            # each package is materialized under a version-qualified directory
-            # (packages/{id}.{version}/, matching every HintPath in this repo's
-            # .csproj files). A fallback cache populated under an older
-            # packages.config hash can therefore only ever contribute either
-            # (a) version-folders that still match the current packages.config
-            # (a legitimate, desired reuse) or (b) inert orphaned version-
-            # folders for packages no longer referenced by any HintPath. Either
-            # way, `nuget restore` fetches exactly the delta implied by the
-            # current packages.config from the network before the build step
-            # runs, so a fallback hit can never cause the build to compile
-            # against a package version other than the one packages.config
-            # names. See docs/features/active/2026-09-02-ci-build-infra-debt-730/
-            # research/ for the full analysis (issue #730).
-          restore-keys: |
-            nuget-${{ runner.os }}-
+            # No restore-keys fallback (issue #936). A fallback cache restored under an
+            # older packages.config hash carries superseded packages/{id}.{version}/
+            # folders, and those folders satisfy stale project-file paths (for example an
+            # <Analyzer Include> left on an old version by a Dependabot bump). That hid a
+            # clean-restore compile failure (CS0006) from every required check. An exact-key
+            # miss now restores from scratch, so CI builds only what the manifests declare.
 
       - name: Restore solution
         shell: pwsh
