@@ -47,7 +47,7 @@ Derived on 2026-09-28 from the Expected Behavior section above, because the prom
 - [x] AC4 (#863): The `ILGlobals.Cache` assertion in `UtilitiesCS.Test/NewtonsoftHelpers/SDILReader/ILGlobals_Tests.cs` is updated or removed consistently with AC3, and the ILGlobals test class passes.
 - [x] AC5 (#862): The XML doc comments in `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.Search.cs` and `QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.Search.cs` state no numeric line count for their primary partial-class file, while still explaining why the partial part exists.
 - [x] AC6: The full C# toolchain passes in one clean pass in CLAUDE.md order (CSharpier check, analyzer Rebuild, TreatWarningsAsErrors Rebuild, MSTest with coverage), with test execution in the existing parallel regime: no new `DoNotParallelize` attribute, no worker-count reduction, and no retry. Every changed production line that remains executable is covered, and coverage does not regress.
-- [ ] AC7: Committed evidence follows the CLAUDE.md "Committed Test Evidence Format" section (projections and summaries only, no raw trx or raw coverage collector document), and no committed file contains an absolute host path, the developer account name, or the host name.
+- [x] AC7: Committed evidence follows the CLAUDE.md "Committed Test Evidence Format" section (projections and summaries only, no raw trx or raw coverage collector document), and no committed file contains an absolute host path, the developer account name, or the host name.
 
 ## Actual Behavior
 As described in the Summary. All three were verified still present on 2026-09-28.

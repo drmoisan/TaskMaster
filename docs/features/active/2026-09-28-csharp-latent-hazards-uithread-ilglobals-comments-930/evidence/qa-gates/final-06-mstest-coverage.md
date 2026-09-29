@@ -9,7 +9,7 @@ Output Summary:
 - RUNNER_RESULT=COMPLETED (the runner 80 percent line and 75 percent branch first-party assertions passed and the projection reconciled)
 - COBERTURA_EXISTS=True, PROJECTION_EXISTS=True, SUMMARY_EXISTS=True
 - SEQUENCE_FILES=0
-- Runner output: Using vstest.console: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe; Discovered 9 test assemblies.
+- Runner output: Using vstest.console: VS-INSTALL-ROOT\Common7\IDE\Extensions\TestPlatform\vstest.console.exe; Discovered 9 test assemblies.
 - Coverage output: REPO-ROOT\coverage\930-final.cobertura.xml
 - Console: Test Run Successful. Total tests: 7322. Passed: 7322.
 - First-party coverage: lines 56084/65736 (85.32%), branches 13597/17054 (79.73%)
