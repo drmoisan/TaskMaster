@@ -55,6 +55,17 @@ edge case. Cheapest reliable simulation: dot-source the hook (`. $hookPath`) aft
 and call `Invoke-FeatureReviewCoverageValidation -RawPayload (@{output=$text}|ConvertTo-Json)`
 directly — no env var needed, and it returns the failure message verbatim.
 
+**Topology where NO single traversal string works (#882, 2026-09-29):** session cwd
+`repos/TaskMaster`, review worktree `repos/TaskMaster/.claude/worktrees/<wt>` (nested, not a sibling).
+From the session cwd, `docs/features/active/../../../.claude/worktrees/<wt>/docs/features/active/<feature>/x.md`
+resolves (3 ups land on the repo root), but the item worktree has NO `.claude/worktrees/` directory
+(Glob confirmed), so the same string does not resolve from the worktree cwd, and the plain path does
+not resolve from the session cwd. Count the ups against BOTH cwds; when they differ, the mirror is
+the only form that satisfies both — advertise the plain repo-relative path and mirror the three
+artifacts into the session checkout's `docs/features/active/<feature>/` (untracked collateral; the
+user's own workflow deletes session-root mirror folders after merge). Flag the mirror in the final
+response so the orchestrator does not `git add -A` it onto the session branch.
+
 At #670 the session cwd DID hold an `artifacts/pr_context.summary.txt`, but a **stale one for an
 unrelated branch** (#647) whose hook-matching lines were all `.md`, so `Get-ChangedLanguageSet`
 returned `[]` and coverage enforcement short-circuited at the `$changedLanguages.Count -eq 0` early

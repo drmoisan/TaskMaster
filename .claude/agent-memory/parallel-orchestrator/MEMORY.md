@@ -1,7 +1,7 @@
 # Parallel Orchestrator Memory Index
 
 - [Parallel run execution playbook](project_parallel_run_execution_playbook.md) — kickoff lives on the plan-home branch; bare `python` IS on PATH; the mutation engine lives only in drm-copilot; close keys on `in_flight` alone
-- [Pre-implementation gate scope](project_preimplementation_gate_scope.md) — parallel runs need no synthetic orchestrator-state.json; .json/.js writes blocked everywhere, .md allowed; git commit needs a pathspec operand
+- [Pre-implementation gate scope](project_preimplementation_gate_scope.md) — Agent leg reads the parallel checkpoint, but Edit/git legs need a 4-key session-root orchestrator-state.json SEEDED BEFORE LAUNCH; git commit needs a pathspec
 - [Free item branches by detaching](feedback_free_item_branches_by_detaching.md) — stale planner worktrees hold the item branches; detach HEAD, never `git worktree remove` (both removal gates fail closed)
 - [Issue merge/removal commands bare](feedback_issue_merge_and_removal_commands_bare.md) — the merge gate reads the first digit run in the whole command, so a `cd` path with digits becomes the PR number; also unlock a finished child's worktree before removing
 - [Defer the /parallel-add checkpoint write](feedback_defer_the_checkpoint_write_until_admission.md) — a `proposed` item is unrepresentable (invariants 9 + 13); recompute after prep — the verdict flips BOTH ways, and a deferred recolor moves unstarted items and may put the candidate FIRST

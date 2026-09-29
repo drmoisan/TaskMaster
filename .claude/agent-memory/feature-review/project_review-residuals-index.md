@@ -92,3 +92,33 @@ not the full record.
   `TimeOutTask.cs` 966 lines and `OlTableExtensions_Tests.cs` ~1822 lines both still over the 500 cap
   (only the former has a recorded follow-up); `spec.md` says 968 lines / 43-line reduction where the
   measured values are 966 / 45 (`issue.md` and `file-size-accounting.md` are correct).
+- **#882** (TransactionGate bounded acquisition, parallel run bugs-2026-09-28): 12/12 AC PASS, 0 blocking,
+  no-Bash review. Test-only C# change (both files in QuickFiler.Test), so the only coverage figure is a
+  QuickFiler.Test-scoped first-party observation (24.42/23.20, plan D1) — written as an honest FAIL row,
+  non-blocking, no remediation-inputs; the +12 covered-line delta was cross-package run noise (UtilitiesCS
+  +15 / QuickFiler -3, identical denominators). Moves worth reusing: (a) the counter-balance test passing
+  in the SAME process as a new failed-probe test is live proof the acquisitions increment sits after the
+  wait; (b) verify overload-introduction safety by grepping for a method-group use (`= Type.Method;`),
+  not only for call sites; (c) FluentAssertions generic `NotThrow<T>()` only fails on T — a spec-mandated
+  shape, so Informational only. Residuals: planner-owned P4-T22 comma-operator payload collapse
+  (executor corrected in-band), P4-T24 HEAD-listing clause unsatisfiable after mid-plan commits, and the
+  caller's inventory omitted two pre-existing `.claude/agent-memory/orchestrator` paths on the diff.
+- **#930** (UiThread dispatcher-exit null guard + ILGlobals dead statics + doc-comment counts, parallel
+  run bugs-2026-09-28, no-Bash minor-audit): 6/7 AC PASS, AC7 PARTIAL and UNCHECKED, 0 blocking, 1
+  non-blocking. First-party 85.31/79.71 -> 85.32/79.73 (same-session, D3 four shell-icon classes excluded
+  identically). The only finding: two evidence lines carried `C:\Program Files\...\vstest.console.exe`
+  ("Using vstest.console:" runner output transcribed verbatim), which the plan's sanitize gate (account,
+  host, root, `<drive>:\Users\`) cannot match — see [[sweep-drive-letter-paths-not-just-identity-patterns]].
+  Also: Phase 0 `Timestamp:` values were estimates later replaced by file mtimes (disclosed, no figure
+  affected; Informational); `<Analyzer Include>` HintPath skew (Meziantou 3.0.235 vs packages.config
+  3.0.290; MSTest.Analyzers 4.4.0 vs 4.4.1) is on origin/main and breaks a cold analyzer Rebuild with
+  CS0006 until the older packages are nuget-installed; `quality-tiers.yml` still absent at repo root; the
+  session-cwd `pr_context.summary.txt` was a stale `.md`-only pair (documentationandmemories) so the hook's
+  language checks were disarmed there, and the three artifacts had to be mirrored into the session cwd
+  again. Unused `using System.Collections.Generic;` left in ILGlobals.cs after the Dictionary field
+  deletion (Informational).
+- **#928** (scoped coverage-runner threshold skip, parallel run bugs-2026-09-28, no-Bash minor-audit): cycle 1
+  1 blocking (AC6: entry-point changed line uncredited by breakpoint coverage), cycle-1 exit PASS 7/7 AC,
+  0 blocking after relocating the gate into the path-loaded part file (details in
+  [[928-review-residuals]] and [[pester-breakpoint-coverage-binds-to-first-parsefile-copy]]). Residuals P-1
+  to P-4 owed by the orchestrator (P-4: the bundled PoshQC coverage document never covers `scripts/`).
