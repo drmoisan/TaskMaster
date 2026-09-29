@@ -115,7 +115,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             );
             var excludedGwso = CreateStore(
                 "Google Workspace",
-                @"C:\Users\Dan\Google\Google Workspace Sync\sync.ost",
+                @"C:\Fixtures\testuser\Google\Google Workspace Sync\sync.ost",
                 "gwso@example.com"
             );
 

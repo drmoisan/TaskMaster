@@ -1,6 +1,6 @@
 # P2-T3 Raw-document removal and ignore rules (AC7, AC8)
 
-Timestamp: 2026-09-29T19-45
+Timestamp: 2026-09-29T19-42
 Command: GATE5A, GATE5B, GATE5C (Gate command reference); git check-ignore -q docs/features/x/a.trx; git check-ignore -q docs/features/x/b.cobertura.xml; the P2-T3 projection and run-log payload
 EXIT_CODE: 0
 Output Summary:

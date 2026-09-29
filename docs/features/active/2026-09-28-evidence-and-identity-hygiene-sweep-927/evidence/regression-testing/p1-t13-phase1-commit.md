@@ -1,6 +1,6 @@
 # P1-T13 Phase 1 commit
 
-Timestamp: 2026-09-29T19-36
+Timestamp: 2026-09-29T19-35
 Command: git add -- scripts/hygiene tests/scripts/hygiene .github/workflows/_pester.yml docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927; git commit -m "feat(927): add the repository hygiene guard, its Pester suite and the Pester callee arrays" -m "Co-Authored-By: Claude Opus 5.5 noreply@anthropic.com (trailer written with the bracketed address form the orchestrator directed)"; git show --name-only --format= HEAD; the P1-T13 range check payload; git status --porcelain
 EXIT_CODE: 0
 Output Summary:
