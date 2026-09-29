@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using FluentAssertions;
@@ -260,11 +261,55 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers.SDILReader
             result.Should().Be(typeName);
         }
 
+        /// <summary>
+        /// Issue #863 regression gate. ILGlobals must expose no public mutable static: every public
+        /// static field must be init-only. On the unfixed tree two public writable fields exist, so
+        /// this test fails there and passes once both are removed.
+        /// </summary>
         [TestMethod]
-        public void Cache_IsInitialized()
+        public void PublicStaticFields_AreAllInitOnly()
         {
+            // Arrange & Act
+            FieldInfo[] fields = typeof(ILGlobals).GetFields(
+                BindingFlags.Public | BindingFlags.Static
+            );
+
             // Assert
-            ILGlobals.Cache.Should().NotBeNull();
+            fields.Should().NotBeEmpty("the two opcode tables are public static fields");
+            fields
+                .Should()
+                .OnlyContain(
+                    field => field.IsInitOnly,
+                    "a public static field that is not readonly is a process-wide mutable "
+                        + "publication point with no reader in production code"
+                );
+        }
+
+        /// <summary>
+        /// Issue #863 surface pin. The public static field surface of ILGlobals is exactly the two
+        /// opcode tables, so a later addition of another public static field fails here by name.
+        /// </summary>
+        [TestMethod]
+        public void PublicStaticFields_AreExactlyTheTwoOpCodeTables()
+        {
+            // Arrange & Act
+            string[] names = typeof(ILGlobals)
+                .GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Select(field => field.Name)
+                .ToArray();
+
+            // Assert
+            names
+                .Should()
+                .BeEquivalentTo(
+                    new[]
+                    {
+                        nameof(ILGlobals.singleByteOpCodes),
+                        nameof(ILGlobals.multiByteOpCodes),
+                    },
+                    "issue #863 removed the two writable fields and no other public static field "
+                        + "is expected"
+                );
         }
     }
 }

@@ -7,7 +7,7 @@ namespace QuickFiler.Viewers
     /// Issue #438: the non-focusing drop-down path used by the folder-search presentation.
     /// <para>
     /// Held on a second partial-class part so
-    /// <c>BreadcrumbItemViewerLifecycleCoordinator.cs</c> (481 lines) stays clear of the
+    /// <c>BreadcrumbItemViewerLifecycleCoordinator.cs</c> stays clear of the
     /// repository's 500-line ceiling.
     /// </para>
     /// </summary>
