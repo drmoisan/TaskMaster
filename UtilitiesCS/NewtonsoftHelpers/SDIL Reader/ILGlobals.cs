@@ -110,8 +110,6 @@ namespace SDILReader
 
     public static class ILGlobals
     {
-        public static Dictionary<int, object> Cache = new Dictionary<int, object>();
-
         /// <summary>
         /// Multi-byte (0xFE-prefixed) opcode table, indexed by the low byte of the opcode value.
         /// Published once by the static constructor of <see cref="ILGlobals"/>, fully populated,
@@ -128,7 +126,6 @@ namespace SDILReader
         /// prevent element mutation, so callers must treat the contents as read-only.
         /// </summary>
         public static readonly OpCode[] singleByteOpCodes;
-        public static Module[]? modules = null;
 
         /// <summary>
         /// Builds both opcode tables in locals and publishes each one exactly once, after the
