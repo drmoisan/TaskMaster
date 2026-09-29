@@ -96,6 +96,7 @@
     <Compile Include="Viewers\ItemViewerSearchDismissalContractTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbThreadAffinityTests.cs" />
+    <Compile Include="Viewers\ItemViewerBreadcrumbThreadAffinityTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="Viewers\WebView2EnvironmentContractTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
+    <Compile Include="TestSupport\DedicatedWorkerThread.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Helper Classes\ConversationResolverTests.cs" />

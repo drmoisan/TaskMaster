@@ -9,6 +9,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
 using Moq;
+using QuickFiler.Test.TestSupport;
 using QuickFiler.Viewers;
 
 namespace QuickFiler.Test.Viewers
@@ -49,14 +50,38 @@ namespace QuickFiler.Test.Viewers
                 .NotThrow();
         }
 
+        /// <summary>
+        /// An owner-only dispatcher (null context) reached from a thread that is not its owner
+        /// must report a marshalling failure and must not run the action.
+        /// </summary>
+        /// <remarks>
+        /// Issue #931: the worker is a dedicated thread created by
+        /// <c>DedicatedWorkerThread.Run</c>, never a <c>Task.Run</c> work item. A blocking wait on
+        /// a pool work item queued from a pool thread can run the delegate inline on the owner
+        /// thread, in which case the owner-thread-id branch of <c>IsCurrentBoundary()</c> admits
+        /// the call, the action runs, and the test fails spuriously. The delegate asserts it is
+        /// off the owner thread before it dispatches. The rejection path reports and returns a
+        /// completed task synchronously, so no task wait is needed.
+        /// </remarks>
         [TestMethod]
         public void Dispatcher_OwnerOnlyWorker_ReportsWithoutRunningAction()
         {
             var errors = new List<Exception>();
+            int ownerThreadId = Environment.CurrentManagedThreadId;
             BreadcrumbUiDispatcher dispatcher = CreateOwnerOnlyDispatcher(errors.Add);
             int executions = 0;
-            Task dispatch = Task.Run(() => dispatcher.Dispatch(() => executions++));
-            dispatch.GetAwaiter().GetResult();
+            Exception captured = DedicatedWorkerThread.Run(() =>
+            {
+                Environment
+                    .CurrentManagedThreadId.Should()
+                    .NotBe(
+                        ownerThreadId,
+                        "the dedicated worker thread must not be the owner thread the dispatcher "
+                            + "was built for, or the rejection path would never be reached"
+                    );
+                dispatcher.Dispatch(() => executions++);
+            });
+            captured.Should().BeNull();
             executions.Should().Be(0);
             errors.Should().ContainSingle().Which.Message.Should().Contain("cannot marshal");
         }
