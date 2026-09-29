@@ -9,7 +9,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 0
 - recolor_generation: 0
-- last_updated: 2026-09-29T10-26
+- last_updated: 2026-09-29T10-32
 - next_step: await_cohort_0_children; await_operator_decision_powershell_budget_for_927
 
 ## Items
@@ -20,7 +20,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 927 | docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927 | 0 | in_flight | worktree_created |  |  |
 | 928 | docs/features/active/2026-09-28-coverage-runner-scoped-threshold-and-format-928 | 0 | in_flight | worktree_created |  |  |
 | 929 | docs/features/active/2026-09-28-package-manifest-consistency-residuals-929 | 1 | scheduled | not_started |  |  |
-| 930 | docs/features/active/2026-09-28-csharp-latent-hazards-uithread-ilglobals-comments-930 | 0 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/935 |  |
+| 930 | docs/features/active/2026-09-28-csharp-latent-hazards-uithread-ilglobals-comments-930 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/935 | dcce3c8169f7ec528e4b706bba66931017d60794 |
 | 931 | docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931 | 0 | in_flight | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
@@ -31,7 +31,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 927 | 2026-09-29T08-46 | 2026-09-29T08-47 |  |  |
 | 928 | 2026-09-29T08-46 | 2026-09-29T08-47 |  |  |
 | 929 | 2026-09-29T08-46 |  |  |  |
-| 930 | 2026-09-29T08-46 | 2026-09-29T08-47 |  |  |
+| 930 | 2026-09-29T08-46 | 2026-09-29T08-47 | 2026-09-29T10-31 |  |
 | 931 | 2026-09-29T08-46 | 2026-09-29T08-47 |  |  |
 
 ## Cohorts
