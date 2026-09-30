@@ -333,3 +333,70 @@ METHOD-LINE CompletePrime 382 hits=1
 ```
 
 P3-T8 acceptance on pass 2: branch (a) (exit 0, both floors met, FAILED-SET empty); SEQUENCE_FILES: 0; TRX_PRESENT: True; the Output Summary holds 14 lines; the summary block reports failed 0; COORD-CLASS-NODES: 1; the three METHOD rows are in the Output Summary; the projection contains the TaskMaster package with LINE and BRANCH counters. All clauses hold. The raw documents coverage\final-944.cobertura.xml (post-processed in place) and coverage\final-944.trx remain on disk under the git-ignored coverage directory and are not committed.
+
+## COMPARISON:
+
+P3-T10, Timestamp: 2026-09-30T15-14. Sources: evidence/baseline/coverage-baseline.md (P0-T18) and the PASS-2: section of this artifact (reader rule: pass 2 ran, so its values are read in place of pass 1). Command: CMD-CHANGED-LINES (git diff -U0 ANCHOR-SHA b305903e275b8abf58e8e65831c189f517568fe4 -- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs, hits read from coverage\final-944.cobertura.xml of pass 2). EXIT_CODE: 0.
+
+- COORD-LINES-BASELINE: covered=143 valid=143
+- COORD-LINES-FINAL: covered=157 valid=157
+- COORD-UNCOVERED-BASELINE: 0
+- COORD-UNCOVERED-FINAL: 0
+- COORD-BRANCHES-BASELINE: covered=37 valid=38
+- COORD-BRANCHES-FINAL: covered=37 valid=38
+- METHOD-BASELINE: METHOD StartPrimeIfNeeded span=263-280 elements=13 covered=13 uncovered=0 rate=100
+- METHOD-FINAL: METHOD StartPrimeIfNeeded span=264-289 elements=17 covered=17 uncovered=0 rate=100
+- METHOD-BASELINE: METHOD StartObservedPrime span=292-305 elements=9 covered=9 uncovered=0 rate=100
+- METHOD-FINAL: METHOD StartObservedPrime span=303-327 elements=19 covered=19 uncovered=0 rate=100
+- METHOD-BASELINE: METHOD CompletePrime span=344-360 elements=10 covered=10 uncovered=0 rate=100
+- METHOD-FINAL: METHOD CompletePrime span=366-382 elements=10 covered=10 uncovered=0 rate=100
+- FIRST-PARTY-BASELINE: First-party coverage: lines 56078/65736 (85.31%), branches 13594/17054 (79.71%)
+- FIRST-PARTY-FINAL: First-party coverage: lines 56098/65750 (85.32%), branches 13597/17054 (79.73%)
+- ROOT-BASELINE: ROOT line-rate=0.853079 branch-rate=0.797115 lines-covered=56078 lines-valid=65736 branches-covered=13594 branches-valid=17054
+- ROOT-FINAL: ROOT line-rate=0.853202 branch-rate=0.797291 lines-covered=56098 lines-valid=65750 branches-covered=13597 branches-valid=17054
+- DENOMINATOR-BRANCH: COMPARABLE (root lines-valid 65736 and 65750 differ by 14, which is at most 1 percent of 65736 (657.36); the final root line-rate 0.853202 is at least the baseline 0.853079 minus 0.005 = 0.848079, so the rate clause holds)
+
+CMD-CHANGED-LINES output (verbatim):
+
+```
+COORD-CLASS-NODES: 1
+CHANGED-LINE-COUNT: 34
+CHANGED-LINE 59 no line element
+CHANGED-LINE 60 no line element
+CHANGED-LINE 73 no line element
+CHANGED-LINE 74 no line element
+CHANGED-LINE 75 no line element
+CHANGED-LINE 76 no line element
+CHANGED-LINE 279 no line element
+CHANGED-LINE 280 no line element
+CHANGED-LINE 281 no line element
+CHANGED-LINE 282 no line element
+CHANGED-LINE 283 hits=1
+CHANGED-LINE 284 hits=1
+CHANGED-LINE 285 hits=1
+CHANGED-LINE 286 hits=1
+CHANGED-LINE 287 hits=1
+CHANGED-LINE 298 no line element
+CHANGED-LINE 299 no line element
+CHANGED-LINE 300 no line element
+CHANGED-LINE 301 no line element
+CHANGED-LINE 303 no line element
+CHANGED-LINE 306 no line element
+CHANGED-LINE 307 no line element
+CHANGED-LINE 310 hits=1
+CHANGED-LINE 312 hits=1
+CHANGED-LINE 313 hits=1
+CHANGED-LINE 314 hits=1
+CHANGED-LINE 315 hits=1
+CHANGED-LINE 316 hits=1
+CHANGED-LINE 317 hits=1
+CHANGED-LINE 318 hits=1
+CHANGED-LINE 319 hits=1
+CHANGED-LINE 320 hits=1
+CHANGED-LINE 321 hits=1
+CHANGED-LINE 322 hits=1
+CHANGED-LINES-WITH-ELEMENT: 17
+CHANGED-LINES-UNCOVERED: 0
+```
+
+Acceptance: METHOD StartPrimeIfNeeded final rate=100 (at least 90.00); METHOD StartObservedPrime final rate=100 (at least 90.00) and final elements=19 strictly greater than baseline elements=9; METHOD CompletePrime final elements=10 equals baseline 10 and final uncovered=0 is at most baseline 0; CHANGED-LINES-UNCOVERED: 0 and CHANGED-LINES-WITH-ELEMENT: 17 (at least 4); COORD-LINES-FINAL covered 157 at least baseline 143; COORD-UNCOVERED-FINAL 0 at most baseline 0; COORD-BRANCHES-FINAL covered 37 at least baseline 37; exactly one DENOMINATOR-BRANCH value (COMPARABLE) is recorded and its rate clause holds. Every P3-T10 clause holds. The prospective P0-T18 statement is borne out: COORD-LINES valid rose from 143 to 157, and the CompletePrime row is unchanged apart from its line offsets. Substitution: output lines printed by string concatenation; values unchanged.
