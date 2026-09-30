@@ -8,9 +8,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - mode: open
 - max_concurrency: 6
 - current_cohort: 1
-- recolor_generation: 0
-- last_updated: 2026-09-30T08-22
-- next_step: await cohort 1 children (929, 940, 942); 941 to launch only after its admission appears in the checkpoint
+- recolor_generation: 2
+- last_updated: 2026-09-30T09-12
+- next_step: 944 running; 929 running; 940 awaiting coordinator AC8 ruling; 945 held on 940 merge; 941 awaiting admission
 
 ## Items
 
@@ -24,6 +24,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 931 | docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/939 | ddbab26a0149bf2ca5d0256e60686ad79e74d90c |
 | 942 | docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/946 | b305903e275b8abf58e8e65831c189f517568fe4 |
 | 940 | docs/features/active/2026-09-29-filesystem-wrapper-tests-open-repository-solution-file-940 | 1 | in_flight | worktree_created |  |  |
+| 945 | docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945 | 2 | scheduled | not_started |  |  |
+| 944 | docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944 | 2 | in_flight | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -37,6 +39,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 931 | 2026-09-29T08-46 | 2026-09-29T08-47 | 2026-09-29T20-45 |  |
 | 942 | 2026-09-30T00-52 | 2026-09-30T07-05 | 2026-09-30T08-21 |  |
 | 940 | 2026-09-30T01-30 | 2026-09-30T07-05 |  |  |
+| 945 | 2026-09-30T08-49 |  |  |  |
+| 944 | 2026-09-30T09-08 | 2026-09-30T09-12 |  |  |
 
 ## Cohorts
 
@@ -44,6 +48,12 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | --- | --- | --- |
 | 0 | 0 | 882, 927, 928, 930, 931 |
 | 1 | 0 | 929, 940, 942 |
+| 0 | 1 | 882, 927, 928, 930, 931 |
+| 1 | 1 | 929, 940, 942 |
+| 2 | 1 | 945 |
+| 0 | 2 | 882, 927, 928, 930, 931 |
+| 1 | 2 | 929, 940, 942 |
+| 2 | 2 | 944, 945 |
 
 ## Conflict Edges
 
@@ -51,6 +61,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | --- | --- | --- | --- |
 | 927 | 929 | path_overlap | path_overlap:.github/workflows/README.md |
 | 931 | 940 | path_overlap | path_overlap:docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931/** ~ docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931/evidence/qa-gates/p4-t13-follow-up-handoff.2026-09-29T09-46.md |
+| 940 | 945 | path_overlap | path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_Tests.cs |
+| 927 | 944 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 942 | 944 | path_overlap | path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs; path_overlap:TaskMaster.Test/TaskMaster.Test.csproj; path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs; path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs |
 
 ## Mutations
 
@@ -58,6 +71,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | --- | --- | --- | --- | --- | --- | --- |
 | add | 942 | 2026-09-30T00-52 |  | scheduled |  | 0 |
 | add | 940 | 2026-09-30T01-30 |  | scheduled |  | 0 |
+| add | 945 | 2026-09-30T08-49 |  | scheduled |  | 1 |
+| add | 944 | 2026-09-30T09-08 |  | scheduled |  | 2 |
 
 ## Drift Events
 
