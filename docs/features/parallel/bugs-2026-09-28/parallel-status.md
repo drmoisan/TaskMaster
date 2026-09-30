@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 1
 - recolor_generation: 2
-- last_updated: 2026-09-30T11-38
-- next_step: 940 applying AC8 ruling then P2-T7 onward; 944 approved restart P3-T1..P3-T8; 945 held on 940 merge; 941 not admitted
+- last_updated: 2026-09-30T11-43
+- next_step: 940 running under AC8 ruling; 945 held on 940 merge; 941 not admitted
 
 ## Items
 
@@ -25,7 +25,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 942 | docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/946 | b305903e275b8abf58e8e65831c189f517568fe4 |
 | 940 | docs/features/active/2026-09-29-filesystem-wrapper-tests-open-repository-solution-file-940 | 1 | in_flight | worktree_created |  |  |
 | 945 | docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945 | 2 | scheduled | not_started |  |  |
-| 944 | docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944 | 2 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/954 |  |
+| 944 | docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/954 | 829ad415db99bf13b70a7766fe85dfa0d521f706 |
 
 ## Item Lifecycle Timestamps
 
@@ -40,7 +40,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 942 | 2026-09-30T00-52 | 2026-09-30T07-05 | 2026-09-30T08-21 |  |
 | 940 | 2026-09-30T01-30 | 2026-09-30T07-05 |  |  |
 | 945 | 2026-09-30T08-49 |  |  |  |
-| 944 | 2026-09-30T09-08 | 2026-09-30T09-12 |  |  |
+| 944 | 2026-09-30T09-08 | 2026-09-30T09-12 | 2026-09-30T11-43 |  |
 
 ## Cohorts
 
