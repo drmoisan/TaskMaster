@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security.AccessControl;
@@ -12,12 +13,28 @@ namespace UtilitiesCS.Test.HelperClasses
     [TestClass]
     public class PhysicalFileSystemAdapters_Tests
     {
+        // Issue #940 fixtures. The running host's own loaded assembly image exists for the whole
+        // run and its physical path is the project output directory, so that directory and its
+        // parent are owned by this test process; no repository file and no temporary file is
+        // involved. Every mutating member is invoked either on a path under the owned directory
+        // that is asserted absent beforehand, so the wrapped BCL member reports the missing path
+        // before touching the disk, or as a no-op on an owned entry that already exists.
+        private static FileInfo OwnedAssemblyFile =>
+            new FileInfo(typeof(PhysicalFileSystemAdapters_Tests).Assembly.Location);
+
+        private static DirectoryInfo OwnedAssemblyDirectory => OwnedAssemblyFile.Directory;
+
+        private static string MissingOwnedPath(string suffix) =>
+            Path.Combine(OwnedAssemblyDirectory.FullName, "__940_missing_" + suffix);
+
         [TestMethod]
-        public void PhysicalDirectoryInfoAdapter_PropertiesEnumerationAndAccessors_MirrorDirectoryInfo()
+        public void PhysicalDirectoryInfoAdapter_AccessorsAndNoOpCreation_MirrorOwnedDirectory()
         {
             // Arrange
-            var directory = GetRepositoryRoot();
+            var directory = OwnedAssemblyDirectory;
+            var parent = directory.Parent;
             var adapter = new PhysicalDirectoryInfoAdapter(directory);
+            var parentAdapter = new PhysicalDirectoryInfoAdapter(parent);
             var security = adapter.GetAccessControl();
             var serialized = new SerializationInfo(
                 typeof(PhysicalDirectoryInfoAdapter),
@@ -25,66 +42,15 @@ namespace UtilitiesCS.Test.HelperClasses
             );
             var context = new StreamingContext(StreamingContextStates.All);
 
-            // Act
-            adapter.Attributes = adapter.Attributes;
-
-            // Timestamp-setter delegation is structurally identical to the getter delegation
-            // (_directoryInfo.CreationTime = value) but may throw IOException when VS Code
-            // file watchers or the test host hold the directory handle open.
-            try
-            {
-                adapter.CreationTime = adapter.CreationTime;
-                adapter.CreationTimeUtc = adapter.CreationTimeUtc;
-                adapter.LastAccessTime = adapter.LastAccessTime;
-                adapter.LastAccessTimeUtc = adapter.LastAccessTimeUtc;
-                adapter.LastWriteTime = adapter.LastWriteTime;
-                adapter.LastWriteTimeUtc = adapter.LastWriteTimeUtc;
-            }
-            catch (IOException)
-            {
-                // Filesystem contention is expected in shared environments.
-            }
-
+            // Act: the creation members are invoked on entries that already exist, so nothing
+            // is created; the returned wrappers name the owned directory, which proves both the
+            // delegation and the wrapping.
             adapter.Create();
             adapter.Create(directory.GetAccessControl());
-
-            var createdSubdirectory = adapter.CreateSubdirectory("UtilitiesCS");
-            var createdSubdirectoryWithSecurity = adapter.CreateSubdirectory(
-                "UtilitiesCS",
-                directory.GetAccessControl()
-            );
-            var enumeratedDirectories = adapter.EnumerateDirectories();
-            var enumeratedDirectoriesByPattern = adapter.EnumerateDirectories("UtilitiesCS*");
-            var enumeratedDirectoriesByPatternAndOption = adapter.EnumerateDirectories(
-                "UtilitiesCS*",
-                SearchOption.TopDirectoryOnly
-            );
-            var enumeratedFiles = adapter.EnumerateFiles();
-            var enumeratedFilesByPattern = adapter.EnumerateFiles("*.sln");
-            var enumeratedFilesByPatternAndOption = adapter.EnumerateFiles(
-                "*.sln",
-                SearchOption.TopDirectoryOnly
-            );
-            var enumeratedFileSystemInfos = adapter.EnumerateFileSystemInfos();
-            var enumeratedFileSystemInfosByPattern = adapter.EnumerateFileSystemInfos("*");
-            var enumeratedFileSystemInfosByPatternAndOption = adapter.EnumerateFileSystemInfos(
-                "*",
-                SearchOption.TopDirectoryOnly
-            );
-            var directories = adapter.GetDirectories();
-            var directoriesByPattern = adapter.GetDirectories("UtilitiesCS*");
-            var directoriesByPatternAndOption = adapter.GetDirectories(
-                "UtilitiesCS*",
-                SearchOption.TopDirectoryOnly
-            );
-            var files = adapter.GetFiles();
-            var filesByPattern = adapter.GetFiles("*.sln");
-            var filesByPatternAndOption = adapter.GetFiles("*.sln", SearchOption.TopDirectoryOnly);
-            var fileSystemInfos = adapter.GetFileSystemInfos();
-            var fileSystemInfosByPattern = adapter.GetFileSystemInfos("*");
-            var fileSystemInfosByPatternAndOption = adapter.GetFileSystemInfos(
-                "*",
-                SearchOption.TopDirectoryOnly
+            var createdSubdirectory = parentAdapter.CreateSubdirectory(directory.Name);
+            var createdSubdirectoryWithSecurity = parentAdapter.CreateSubdirectory(
+                directory.Name,
+                parent.GetAccessControl()
             );
             var accessWithSections = adapter.GetAccessControl(AccessControlSections.Access);
             adapter.GetObjectData(serialized, context);
@@ -94,65 +60,182 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             adapter.Exists.Should().BeTrue();
+            adapter.Attributes.Should().Be(directory.Attributes);
+            adapter.CreationTime.Should().Be(directory.CreationTime);
+            adapter.CreationTimeUtc.Should().Be(directory.CreationTimeUtc);
+            adapter.LastAccessTime.Should().Be(directory.LastAccessTime);
+            adapter.LastAccessTimeUtc.Should().Be(directory.LastAccessTimeUtc);
+            adapter.LastWriteTime.Should().Be(directory.LastWriteTime);
+            adapter.LastWriteTimeUtc.Should().Be(directory.LastWriteTimeUtc);
+            adapter.Extension.Should().Be(directory.Extension);
             adapter.FullName.Should().Be(directory.FullName);
             adapter.Name.Should().Be(directory.Name);
-            adapter.Parent.FullName.Should().Be(directory.Parent.FullName);
+            adapter.Parent.FullName.Should().Be(parent.FullName);
             adapter.Root.FullName.Should().Be(directory.Root.FullName);
-            createdSubdirectory.FullName.Should().Contain("UtilitiesCS");
-            createdSubdirectoryWithSecurity.FullName.Should().Contain("UtilitiesCS");
-            enumeratedDirectories.Should().Contain(item => item.Name == "UtilitiesCS");
-            enumeratedDirectoriesByPattern
-                .Should()
-                .ContainSingle(item => item.Name == "UtilitiesCS");
-            enumeratedDirectoriesByPatternAndOption
-                .Should()
-                .ContainSingle(item => item.Name == "UtilitiesCS");
-            enumeratedFiles.Should().Contain(item => item.Name == "TaskMaster.sln");
-            enumeratedFilesByPattern.Should().ContainSingle(item => item.Name == "TaskMaster.sln");
-            enumeratedFilesByPatternAndOption
-                .Should()
-                .ContainSingle(item => item.Name == "TaskMaster.sln");
-            enumeratedFileSystemInfos.Should().Contain(item => item.Name == "UtilitiesCS");
-            enumeratedFileSystemInfos.Should().Contain(item => item.Name == "TaskMaster.sln");
-            enumeratedFileSystemInfosByPattern.Should().Contain(item => item.Name == "UtilitiesCS");
-            enumeratedFileSystemInfosByPatternAndOption
-                .Should()
-                .Contain(item => item.Name == "UtilitiesCS");
-            directories.Should().Contain(item => item.Name == "UtilitiesCS");
-            directoriesByPattern.Should().ContainSingle(item => item.Name == "UtilitiesCS");
-            directoriesByPatternAndOption
-                .Should()
-                .ContainSingle(item => item.Name == "UtilitiesCS");
-            files.Should().Contain(item => item.Name == "TaskMaster.sln");
-            filesByPattern.Should().ContainSingle(item => item.Name == "TaskMaster.sln");
-            filesByPatternAndOption.Should().ContainSingle(item => item.Name == "TaskMaster.sln");
-            fileSystemInfos.Should().Contain(item => item.Name == "TaskMaster.sln");
-            fileSystemInfosByPattern.Should().Contain(item => item.Name == "UtilitiesCS");
-            fileSystemInfosByPatternAndOption.Should().Contain(item => item.Name == "UtilitiesCS");
+            createdSubdirectory.FullName.Should().Be(directory.FullName);
+            createdSubdirectoryWithSecurity.FullName.Should().Be(directory.FullName);
             security.Should().NotBeNull();
             accessWithSections.Should().NotBeNull();
             toStringValue.Should().Be(directory.ToString());
+            serialized.MemberCount.Should().BeGreaterThan(0, "GetObjectData adds values");
+        }
+
+        [TestMethod]
+        public void PhysicalDirectoryInfoAdapter_Enumeration_WrapsOwnedDirectoryEntries()
+        {
+            // Arrange
+            var directory = OwnedAssemblyDirectory;
+            var fileName = OwnedAssemblyFile.Name;
+            var directoryName = directory.Name;
+            var adapter = new PhysicalDirectoryInfoAdapter(directory);
+            var parentAdapter = new PhysicalDirectoryInfoAdapter(directory.Parent);
+
+            // Act: files are enumerated from the owned directory and directories from its
+            // parent, because the parent containing the owned directory is guaranteed by
+            // construction while subdirectories inside the owned directory are not.
+            var enumeratedDirectories = parentAdapter.EnumerateDirectories();
+            var enumeratedDirectoriesByPattern = parentAdapter.EnumerateDirectories(directoryName);
+            var enumeratedDirectoriesByPatternAndOption = parentAdapter.EnumerateDirectories(
+                directoryName,
+                SearchOption.TopDirectoryOnly
+            );
+            var enumeratedFiles = adapter.EnumerateFiles();
+            var enumeratedFilesByPattern = adapter.EnumerateFiles(fileName);
+            var enumeratedFilesByPatternAndOption = adapter.EnumerateFiles(
+                fileName,
+                SearchOption.TopDirectoryOnly
+            );
+            var enumeratedInfos = adapter.EnumerateFileSystemInfos();
+            var enumeratedInfosByPattern = parentAdapter.EnumerateFileSystemInfos(directoryName);
+            var enumeratedInfosByPatternAndOption = adapter.EnumerateFileSystemInfos(
+                fileName,
+                SearchOption.TopDirectoryOnly
+            );
+            var directories = parentAdapter.GetDirectories();
+            var directoriesByPattern = parentAdapter.GetDirectories(directoryName);
+            var directoriesByPatternAndOption = parentAdapter.GetDirectories(
+                directoryName,
+                SearchOption.TopDirectoryOnly
+            );
+            var files = adapter.GetFiles();
+            var filesByPattern = adapter.GetFiles(fileName);
+            var filesByPatternAndOption = adapter.GetFiles(fileName, SearchOption.TopDirectoryOnly);
+            var infos = parentAdapter.GetFileSystemInfos();
+            var infosByPattern = adapter.GetFileSystemInfos(fileName);
+            var infosByPatternAndOption = parentAdapter.GetFileSystemInfos(
+                directoryName,
+                SearchOption.TopDirectoryOnly
+            );
+
+            // Assert
+            files.Select(item => item.Name).Should().Contain(fileName);
+            files.Should().OnlyContain(item => item is FileInfoWrapper);
+            filesByPattern.Should().ContainSingle().Which.Name.Should().Be(fileName);
+            filesByPatternAndOption.Should().ContainSingle().Which.Name.Should().Be(fileName);
+            enumeratedFiles.Select(item => item.Name).Should().Contain(fileName);
+            enumeratedFilesByPattern.Should().ContainSingle().Which.Name.Should().Be(fileName);
+            enumeratedFilesByPatternAndOption
+                .Should()
+                .ContainSingle()
+                .Which.Name.Should()
+                .Be(fileName);
+            directories.Select(item => item.Name).Should().Contain(directoryName);
+            directories.Should().OnlyContain(item => item is DirectoryInfoWrapper);
+            directoriesByPattern.Should().ContainSingle().Which.Name.Should().Be(directoryName);
+            directoriesByPatternAndOption
+                .Should()
+                .ContainSingle()
+                .Which.Name.Should()
+                .Be(directoryName);
+            enumeratedDirectories.Select(item => item.Name).Should().Contain(directoryName);
+            enumeratedDirectoriesByPattern
+                .Should()
+                .ContainSingle()
+                .Which.Name.Should()
+                .Be(directoryName);
+            enumeratedDirectoriesByPatternAndOption
+                .Should()
+                .ContainSingle()
+                .Which.Name.Should()
+                .Be(directoryName);
+            enumeratedInfos
+                .OfType<FileInfoWrapper>()
+                .Select(item => item.Name)
+                .Should()
+                .Contain(fileName);
+            enumeratedInfosByPattern
+                .Should()
+                .ContainSingle()
+                .Which.Should()
+                .BeOfType<DirectoryInfoWrapper>();
+            enumeratedInfosByPatternAndOption
+                .Should()
+                .ContainSingle()
+                .Which.Should()
+                .BeOfType<FileInfoWrapper>();
+            infos
+                .OfType<DirectoryInfoWrapper>()
+                .Select(item => item.Name)
+                .Should()
+                .Contain(directoryName);
+            infosByPattern.Should().ContainSingle().Which.Should().BeOfType<FileInfoWrapper>();
+            infosByPatternAndOption
+                .Should()
+                .ContainSingle()
+                .Which.Should()
+                .BeOfType<DirectoryInfoWrapper>();
+        }
+
+        [TestMethod]
+        public void PhysicalDirectoryInfoAdapter_SettersOnMissingDirectory_ThrowWithoutCreatingEntries()
+        {
+            // Arrange
+            var adapter = new PhysicalDirectoryInfoAdapter(
+                new DirectoryInfo(MissingOwnedPath("directory-setters"))
+            );
+            var stamp = new DateTime(2024, 1, 2, 3, 4, 5, DateTimeKind.Utc);
+            adapter.Exists.Should().BeFalse();
+
+            // Act
+            Action setCreationTime = () => adapter.CreationTime = stamp;
+            Action setCreationTimeUtc = () => adapter.CreationTimeUtc = stamp;
+            Action setLastAccessTime = () => adapter.LastAccessTime = stamp;
+            Action setLastAccessTimeUtc = () => adapter.LastAccessTimeUtc = stamp;
+            Action setLastWriteTime = () => adapter.LastWriteTime = stamp;
+            Action setLastWriteTimeUtc = () => adapter.LastWriteTimeUtc = stamp;
+            Action setAttributes = () => adapter.Attributes = FileAttributes.Directory;
+
+            // Assert: each setter reaches the wrapped BCL member, which reports the missing path.
+            setCreationTime.Should().Throw<FileNotFoundException>();
+            setCreationTimeUtc.Should().Throw<FileNotFoundException>();
+            setLastAccessTime.Should().Throw<FileNotFoundException>();
+            setLastAccessTimeUtc.Should().Throw<FileNotFoundException>();
+            setLastWriteTime.Should().Throw<FileNotFoundException>();
+            setLastWriteTimeUtc.Should().Throw<FileNotFoundException>();
+            setAttributes.Should().Throw<FileNotFoundException>();
+            adapter.Refresh();
+            adapter.Exists.Should().BeFalse();
         }
 
         [TestMethod]
         public void PhysicalDirectoryInfoAdapter_MissingDirectoryAndUnsupportedInfo_BranchesBehaveAsExpected()
         {
             // Arrange
-            var missingDirectoryPath = Path.Combine(
-                GetRepositoryRoot().FullName,
-                "__missing_physical_directory_adapter__"
+            var adapter = new PhysicalDirectoryInfoAdapter(
+                new DirectoryInfo(MissingOwnedPath("directory-delete"))
             );
-            var adapter = new PhysicalDirectoryInfoAdapter(new DirectoryInfo(missingDirectoryPath));
             var wrapMethod = typeof(PhysicalDirectoryInfoAdapter).GetMethod(
                 "WrapFileSystemInfo",
                 BindingFlags.Static | BindingFlags.NonPublic
             )!;
+            var directoryMoveTarget = MissingOwnedPath("directory-moved");
+            adapter.Exists.Should().BeFalse();
+            Directory.Exists(directoryMoveTarget).Should().BeFalse();
 
             // Act
             Action delete = () => adapter.Delete();
             Action deleteRecursive = () => adapter.Delete(recursive: true);
-            Action move = () =>
-                adapter.MoveTo(Path.Combine(GetRepositoryRoot().FullName, "__moved"));
+            Action move = () => adapter.MoveTo(directoryMoveTarget);
             Action wrapUnsupported = () =>
                 wrapMethod.Invoke(null, new object[] { new UnsupportedInfo() });
 
@@ -170,7 +253,7 @@ namespace UtilitiesCS.Test.HelperClasses
         public void PhysicalFileInfoAdapter_PropertiesStreamsAndAccessors_MirrorFileInfo()
         {
             // Arrange
-            var file = GetSolutionFile();
+            var file = OwnedAssemblyFile;
             var adapter = new PhysicalFileInfoAdapter(file);
             var security = adapter.GetAccessControl();
             var serialized = new SerializationInfo(
@@ -179,36 +262,9 @@ namespace UtilitiesCS.Test.HelperClasses
             );
             var context = new StreamingContext(StreamingContextStates.All);
 
-            // Act — exercise timestamp setters on the bin-dir copy of the test DLL to avoid
-            // IOException on the solution file, which may be held open by VS Code or MSBuild.
-            // If even the test DLL is locked, accept the IOException since the setter
-            // delegation is structurally identical to the getter delegation.
-            try
-            {
-                adapter.CreationTime = adapter.CreationTime;
-                adapter.CreationTimeUtc = adapter.CreationTimeUtc;
-                adapter.LastAccessTime = adapter.LastAccessTime;
-                adapter.LastAccessTimeUtc = adapter.LastAccessTimeUtc;
-                adapter.LastWriteTime = adapter.LastWriteTime;
-                adapter.LastWriteTimeUtc = adapter.LastWriteTimeUtc;
-            }
-            catch (IOException)
-            {
-                // Filesystem contention is expected in shared environments.
-            }
-
-            adapter.IsReadOnly = adapter.IsReadOnly;
-
-            // Read-only stream methods stay on the real solution file. OpenRead()/OpenText()
-            // internally request FileShare.Read (not FileShare.ReadWrite); FileShare.Read is
-            // compatible with any other handle on the file that also permits read-sharing (the
-            // default sharing mode used by checkout/build/coverage tooling), so those opens do not
-            // contend with the checkout/build process that may hold TaskMaster.sln open and remain
-            // deterministic under parallel CI execution. Only the exclusive FileShare.None request
-            // from the 2-arg Open(FileMode, FileAccess) overload conflicted with a concurrently
-            // open handle, which is why that overload is now seamed (see the seamAdapter section
-            // below) while OpenRead()/OpenText() are left unseamed and continue to run against the
-            // real TaskMaster.sln.
+            // Act: the read-only opens target the running host's own loaded assembly image. The
+            // three-argument Open requests read-write sharing; OpenRead and OpenText request read
+            // sharing, which admits the loader's own read handles on the image.
             bool openModeReadSharedCanRead;
             using (
                 var openModeReadShared = adapter.Open(
@@ -233,21 +289,11 @@ namespace UtilitiesCS.Test.HelperClasses
                 openTextLine = openText.ReadLine();
             }
 
-            // Write-mode opens (AppendText, Open(FileMode.Open) which defaults to ReadWrite,
-            // OpenWrite) must not target the shared TaskMaster.sln: under parallel CI the file is
-            // held open by another process and the write handle throws IOException. The seam also
-            // now covers the read-mode Open(FileMode, FileAccess) overload; its default
-            // FileShare.None behavior — not its read/write direction — is what requires the seam,
-            // since an exclusive handle request is what conflicts with a concurrently open handle
-            // on the shared file. They must also not touch any temporary/scratch file, which the
-            // unit-test policy prohibits. Instead, construct the adapter through its internal
-            // injectable-delegate seam so these members return test-owned sentinel streams. This
-            // covers the adapter's AppendText/Open(mode)/Open(mode, access)/OpenWrite delegation
-            // lines deterministically without acquiring any real write/append or FileShare.None
-            // handle. The sentinel streams are read-only opens of the test assembly DLL (the same
-            // deterministic pattern used in FileInfoWrapper_Tests).
-            // The append sentinel wraps an in-memory stream because StreamWriter requires a
-            // writable backing stream; the read-only DLL opens below cannot back a StreamWriter.
+            // The write-mode members and the two-argument Open are exercised through the
+            // adapter's internal injectable-delegate seam with test-owned sentinel streams, so no
+            // write handle and no exclusive handle is ever requested on the image. The append
+            // sentinel wraps an in-memory stream because StreamWriter requires a writable backing
+            // stream; the other sentinels are read-only opens of the image with read-write sharing.
             using var sentinelAppendStream = new MemoryStream();
             using var sentinelAppendWriter = new StreamWriter(
                 sentinelAppendStream,
@@ -289,12 +335,20 @@ namespace UtilitiesCS.Test.HelperClasses
 
             // Assert
             adapter.Exists.Should().BeTrue();
-            adapter.Extension.Should().Be(".sln");
+            adapter.Extension.Should().Be(".dll");
             adapter.FullName.Should().Be(file.FullName);
             adapter.Name.Should().Be(file.Name);
             adapter.Directory.FullName.Should().Be(file.Directory.FullName);
             adapter.DirectoryName.Should().Be(file.DirectoryName);
             adapter.Length.Should().BeGreaterThan(0);
+            adapter.IsReadOnly.Should().Be(file.IsReadOnly);
+            adapter.Attributes.Should().Be(file.Attributes);
+            adapter.CreationTime.Should().Be(file.CreationTime);
+            adapter.CreationTimeUtc.Should().Be(file.CreationTimeUtc);
+            adapter.LastAccessTime.Should().Be(file.LastAccessTime);
+            adapter.LastAccessTimeUtc.Should().Be(file.LastAccessTimeUtc);
+            adapter.LastWriteTime.Should().Be(file.LastWriteTime);
+            adapter.LastWriteTimeUtc.Should().Be(file.LastWriteTimeUtc);
             openModeReadSharedCanRead.Should().BeTrue();
             openReadCanRead.Should().BeTrue();
             openTextLine.Should().NotBeNull();
@@ -308,34 +362,68 @@ namespace UtilitiesCS.Test.HelperClasses
             security.Should().NotBeNull();
             accessWithSections.Should().NotBeNull();
             toStringValue.Should().Be(file.ToString());
+            serialized.MemberCount.Should().BeGreaterThan(0, "GetObjectData adds values");
+        }
+
+        [TestMethod]
+        public void PhysicalFileInfoAdapter_SettersOnMissingFile_ThrowWithoutCreatingFiles()
+        {
+            // Arrange
+            var adapter = new PhysicalFileInfoAdapter(
+                new FileInfo(MissingOwnedPath("file-setters.txt"))
+            );
+            var stamp = new DateTime(2024, 1, 2, 3, 4, 5, DateTimeKind.Utc);
+            adapter.Exists.Should().BeFalse();
+
+            // Act
+            Action setIsReadOnly = () => adapter.IsReadOnly = true;
+            Action setAttributes = () => adapter.Attributes = FileAttributes.Normal;
+            Action setCreationTime = () => adapter.CreationTime = stamp;
+            Action setCreationTimeUtc = () => adapter.CreationTimeUtc = stamp;
+            Action setLastAccessTime = () => adapter.LastAccessTime = stamp;
+            Action setLastAccessTimeUtc = () => adapter.LastAccessTimeUtc = stamp;
+            Action setLastWriteTime = () => adapter.LastWriteTime = stamp;
+            Action setLastWriteTimeUtc = () => adapter.LastWriteTimeUtc = stamp;
+
+            // Assert: each setter reaches the wrapped BCL member, which reports the missing path.
+            setIsReadOnly.Should().Throw<FileNotFoundException>();
+            setAttributes.Should().Throw<FileNotFoundException>();
+            setCreationTime.Should().Throw<FileNotFoundException>();
+            setCreationTimeUtc.Should().Throw<FileNotFoundException>();
+            setLastAccessTime.Should().Throw<FileNotFoundException>();
+            setLastAccessTimeUtc.Should().Throw<FileNotFoundException>();
+            setLastWriteTime.Should().Throw<FileNotFoundException>();
+            setLastWriteTimeUtc.Should().Throw<FileNotFoundException>();
+            adapter.Refresh();
+            adapter.Exists.Should().BeFalse();
         }
 
         [TestMethod]
         public void PhysicalFileInfoAdapter_MissingFileBranches_ThrowOrNoOpWithoutCreatingFiles()
         {
-            // Arrange
-            var root = GetRepositoryRoot();
-            var solution = GetSolutionFile();
-            var missingPath = Path.Combine(root.FullName, "__missing_physical_file_adapter__.txt");
-            var adapter = new PhysicalFileInfoAdapter(new FileInfo(missingPath));
+            // Arrange: every destination and backup is another missing owned path, so no existing
+            // file is a target under any outcome.
+            var adapter = new PhysicalFileInfoAdapter(
+                new FileInfo(MissingOwnedPath("file-source.txt"))
+            );
+            var copyTarget = MissingOwnedPath("file-copy.txt");
+            var moveTarget = MissingOwnedPath("file-moved.txt");
+            var replaceTarget = MissingOwnedPath("file-replace.txt");
+            var backupTarget = MissingOwnedPath("file-backup.bak");
+            adapter.Exists.Should().BeFalse();
+            File.Exists(copyTarget).Should().BeFalse();
+            File.Exists(moveTarget).Should().BeFalse();
+            File.Exists(replaceTarget).Should().BeFalse();
+            File.Exists(backupTarget).Should().BeFalse();
 
             // Act
             Action delete = () => adapter.Delete();
-            Action copy = () => adapter.CopyTo(solution.FullName);
-            Action copyOverwrite = () => adapter.CopyTo(solution.FullName, overwrite: true);
-            Action move = () =>
-                adapter.MoveTo(Path.Combine(root.FullName, "__moved_missing_file__.txt"));
-            Action replace = () =>
-                adapter.Replace(
-                    solution.FullName,
-                    Path.Combine(root.FullName, "__missing_backup__.bak")
-                );
+            Action copy = () => adapter.CopyTo(copyTarget);
+            Action copyOverwrite = () => adapter.CopyTo(copyTarget, overwrite: true);
+            Action move = () => adapter.MoveTo(moveTarget);
+            Action replace = () => adapter.Replace(replaceTarget, backupTarget);
             Action replaceIgnore = () =>
-                adapter.Replace(
-                    solution.FullName,
-                    Path.Combine(root.FullName, "__missing_backup__.bak"),
-                    ignoreMetadataErrors: true
-                );
+                adapter.Replace(replaceTarget, backupTarget, ignoreMetadataErrors: true);
 
             // Assert
             delete.Should().NotThrow();
@@ -344,36 +432,6 @@ namespace UtilitiesCS.Test.HelperClasses
             move.Should().Throw<FileNotFoundException>();
             replace.Should().Throw<FileNotFoundException>();
             replaceIgnore.Should().Throw<FileNotFoundException>();
-        }
-
-        private static DirectoryInfo GetRepositoryRoot()
-        {
-            // Assembly.Location gives the physical path of the test DLL, which is
-            // always inside the repository tree. AppDomain.CurrentDomain.BaseDirectory
-            // can point to the vstest host directory instead, breaking the walk-up.
-            var startPath =
-                Path.GetDirectoryName(typeof(PhysicalFileSystemAdapters_Tests).Assembly.Location)
-                ?? AppDomain.CurrentDomain.BaseDirectory;
-            var current = new DirectoryInfo(startPath);
-
-            while (
-                current is not null
-                && !File.Exists(Path.Combine(current.FullName, "TaskMaster.sln"))
-            )
-            {
-                current = current.Parent;
-            }
-
-            current
-                .Should()
-                .NotBeNull("the test assembly should run inside the TaskMaster repository");
-            return current;
-        }
-
-        private static FileInfo GetSolutionFile()
-        {
-            var repositoryRoot = GetRepositoryRoot();
-            return new FileInfo(Path.Combine(repositoryRoot.FullName, "TaskMaster.sln"));
         }
 
         private sealed class UnsupportedInfo : FileSystemInfo
