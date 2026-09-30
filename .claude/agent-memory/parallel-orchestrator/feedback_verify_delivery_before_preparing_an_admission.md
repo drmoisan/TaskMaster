@@ -242,6 +242,17 @@ only the guard site answers half the question.
 Also verify the halt claim rather than relaying it: a child's "already delivered" summary is a
 claim, not evidence. Confirm ancestry and read the guard sites yourself before rejecting.
 
+**Preparing a follow-up whose promoted record lives only on the SESSION branch (confirmed 2026-09-30,
+`/parallel-add 940`).** A follow-up promoted by the coordinator is committed on the session branch,
+not on `main`, and the issue already exists. Delegate with `isolation: "worktree"` (this also keeps
+the child's `orchestrator-state.json` out of the session root, which in-flight items' gates read),
+and tell the child to: cut the item branch with `git switch -c <branch> origin/main` (the isolated
+worktree starts on the session HEAD, which carries unrelated commits); restore the record with
+`git checkout <session-branch> -- <promoted-path>`; and skip issue promotion. It worked cleanly, and
+`new_active_feature_folder` wrote into the child worktree rather than into the session tree. Because the
+plan cited a sibling item's evidence file, it produced a real `path_overlap` edge to that merged
+sibling. That edge constrains placement only.
+
 **An ALL-false-positive bare-number grep is a real outcome — open every hit before concluding
 anything from the count.** The three-digit issue numbers on this repository collide constantly with
 abbreviated SHAs and with test counts. On `/parallel-add 663` the grep returned three commits and
