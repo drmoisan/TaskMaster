@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 1
 - recolor_generation: 2
-- last_updated: 2026-09-30T12-04
-- next_step: 940 running under AC8 ruling; 945 held on 940 merge; 941 not admitted
+- last_updated: 2026-09-30T12-07
+- next_step: 945 running; 941 not admitted (coordinator to re-run /parallel-add 941)
 
 ## Items
 
@@ -23,8 +23,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 930 | docs/features/active/2026-09-28-csharp-latent-hazards-uithread-ilglobals-comments-930 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/935 | dcce3c8169f7ec528e4b706bba66931017d60794 |
 | 931 | docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/939 | ddbab26a0149bf2ca5d0256e60686ad79e74d90c |
 | 942 | docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/946 | b305903e275b8abf58e8e65831c189f517568fe4 |
-| 940 | docs/features/active/2026-09-29-filesystem-wrapper-tests-open-repository-solution-file-940 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/955 |  |
-| 945 | docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945 | 2 | scheduled | not_started |  |  |
+| 940 | docs/features/active/2026-09-29-filesystem-wrapper-tests-open-repository-solution-file-940 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/955 | 039cf779110df3313b3324299d019cabfccce980 |
+| 945 | docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945 | 2 | in_flight | worktree_created |  |  |
 | 944 | docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/954 | 829ad415db99bf13b70a7766fe85dfa0d521f706 |
 
 ## Item Lifecycle Timestamps
@@ -38,8 +38,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 930 | 2026-09-29T08-46 | 2026-09-29T08-47 | 2026-09-29T10-31 |  |
 | 931 | 2026-09-29T08-46 | 2026-09-29T08-47 | 2026-09-29T20-45 |  |
 | 942 | 2026-09-30T00-52 | 2026-09-30T07-05 | 2026-09-30T08-21 |  |
-| 940 | 2026-09-30T01-30 | 2026-09-30T07-05 |  |  |
-| 945 | 2026-09-30T08-49 |  |  |  |
+| 940 | 2026-09-30T01-30 | 2026-09-30T07-05 | 2026-09-30T12-06 |  |
+| 945 | 2026-09-30T08-49 | 2026-09-30T12-07 |  |  |
 | 944 | 2026-09-30T09-08 | 2026-09-30T09-12 | 2026-09-30T11-43 |  |
 
 ## Cohorts
