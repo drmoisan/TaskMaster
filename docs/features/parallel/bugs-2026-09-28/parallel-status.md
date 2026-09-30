@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 1
 - recolor_generation: 2
-- last_updated: 2026-09-30T09-12
-- next_step: 944 running; 929 running; 940 awaiting coordinator AC8 ruling; 945 held on 940 merge; 941 awaiting admission
+- last_updated: 2026-09-30T10-27
+- next_step: 944 awaiting coordinator ruling on the P3-T8 re-run rule; 940 awaiting AC8 ruling; 929 running; 945 held on 940; 941 awaiting admission
 
 ## Items
 
@@ -19,7 +19,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 882 | docs/features/active/2026-09-13-quickfiler-transactiongate-permit-leak-unexcluded-882 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/934 | cca27280eef64b563be200445e434850de88bdc2 |
 | 927 | docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/943 | 231e1c0b55105aeb626bf5a6e8d0266a567cacad |
 | 928 | docs/features/active/2026-09-28-coverage-runner-scoped-threshold-and-format-928 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/938 | c4ff0e2be0bc9c51acc43dacd2cc5954a448676c |
-| 929 | docs/features/active/2026-09-28-package-manifest-consistency-residuals-929 | 1 | in_flight | worktree_created |  |  |
+| 929 | docs/features/active/2026-09-28-package-manifest-consistency-residuals-929 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/949 |  |
 | 930 | docs/features/active/2026-09-28-csharp-latent-hazards-uithread-ilglobals-comments-930 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/935 | dcce3c8169f7ec528e4b706bba66931017d60794 |
 | 931 | docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/939 | ddbab26a0149bf2ca5d0256e60686ad79e74d90c |
 | 942 | docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/946 | b305903e275b8abf58e8e65831c189f517568fe4 |
