@@ -113,7 +113,7 @@ and GitHub restricts it by default from 2026-11-02.
 
 | Secret | Holds |
 | --- | --- |
-| `DEPENDABOT_REPAIR_APP_ID` | the numeric App identifier |
+| `DEPENDABOT_REPAIR_APP_ID` | the App's Client ID, passed to the token action's `client-id` input (the numeric App ID is not stored) |
 | `DEPENDABOT_REPAIR_APP_PRIVATE_KEY` | the App's PEM private key |
 
 A repository admin provisions both by hand. The procedure — creating the App, granting it contents
