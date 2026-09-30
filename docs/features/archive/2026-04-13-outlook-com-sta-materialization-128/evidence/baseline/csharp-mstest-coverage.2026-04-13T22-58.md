@@ -9,4 +9,4 @@ Output Summary:
 - Skipped: 2
 - Total time: 48.1339 Seconds
 - Overall line coverage: 78.1782% (line-rate=0.781782; 158120/202256 lines)
-- Coverage artifact path: C:\Users\DanMoisan\repos\TaskMaster\coverage\outlook-com-sta-materialization-128-baseline.cobertura.xml
+- Coverage artifact path: <repo-root>\coverage\outlook-com-sta-materialization-128-baseline.cobertura.xml

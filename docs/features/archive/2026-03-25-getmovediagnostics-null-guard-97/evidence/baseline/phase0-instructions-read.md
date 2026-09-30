@@ -11,11 +11,11 @@ Policy Order:
 
 ## Files Read
 
-1. `c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md` — full read; all sections including General Code Change Policy, C# Code Change Policy, General Unit Test Policy, C# Unit Test Policy, and Tone Policy
-2. `c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\general-code-change-policy\SKILL.md` — full read; confirms general code-change rules, bugfix workflow (regression test first, then minimal fix), design principles, toolchain loop
-3. `c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\general-unit-test-policy\SKILL.md` — full read; confirms UT1-UT5 policies: independence, isolation, determinism, no external deps, no temp files
-4. `c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\csharp-code-change-policy\SKILL.md` — full read; confirms csharpier for formatting, msbuild with analyzers, msbuild with nullable, vstest for testing; no dotnet format
-5. `c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\csharp-unit-test-policy\SKILL.md` — full read; confirms MSTest framework, Moq for mocking, FluentAssertions for assertions
+1. `<repo-root>\CLAUDE.md` — full read; all sections including General Code Change Policy, C# Code Change Policy, General Unit Test Policy, C# Unit Test Policy, and Tone Policy
+2. `<repo-root>\.claude\skills\general-code-change-policy\SKILL.md` — full read; confirms general code-change rules, bugfix workflow (regression test first, then minimal fix), design principles, toolchain loop
+3. `<repo-root>\.claude\skills\general-unit-test-policy\SKILL.md` — full read; confirms UT1-UT5 policies: independence, isolation, determinism, no external deps, no temp files
+4. `<repo-root>\.claude\skills\csharp-code-change-policy\SKILL.md` — full read; confirms csharpier for formatting, msbuild with analyzers, msbuild with nullable, vstest for testing; no dotnet format
+5. `<repo-root>\.claude\skills\csharp-unit-test-policy\SKILL.md` — full read; confirms MSTest framework, Moq for mocking, FluentAssertions for assertions
 
 ## Summary
 

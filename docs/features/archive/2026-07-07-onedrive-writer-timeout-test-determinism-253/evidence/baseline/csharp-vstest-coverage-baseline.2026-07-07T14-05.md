@@ -21,7 +21,7 @@ A follow-up scoped run with `/TestCaseFilter:"FullyQualifiedName~OneDriveDownloa
 
 ## Coverage headline
 
-The `.coverage` binary produced at `TestResults/<guid>/DanMoisan_MEGALODON4_2026-07-07.12_35_51.coverage` was converted to Cobertura XML via `dotnet-coverage merge -f cobertura` (the VS-bundled `CodeCoverage.exe analyze` tool is deprecated and does not offer an equivalent text-summary command in this VS 18 install) for numeric extraction:
+The `.coverage` binary produced at `TestResults/<guid>/<user>_<host>_2026-07-07.12_35_51.coverage` was converted to Cobertura XML via `dotnet-coverage merge -f cobertura` (the VS-bundled `CodeCoverage.exe analyze` tool is deprecated and does not offer an equivalent text-summary command in this VS 18 install) for numeric extraction:
 
 - Repository-wide (all modules loaded by the full `UtilitiesCS.Test` run, including test-only and third-party dependency assemblies such as `Mono.Reflection`) `line-rate`: **60.23%** (`lines-covered=96579`, `lines-valid=160363`).
 - `UtilitiesCS` package (production assembly under test) `line-rate`: **87.98%**.

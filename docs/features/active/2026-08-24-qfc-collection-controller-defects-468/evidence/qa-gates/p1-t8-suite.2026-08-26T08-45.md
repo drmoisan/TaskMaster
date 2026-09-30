@@ -156,7 +156,7 @@ unverifiable.
    identical command through `pwsh -NoProfile -Command` succeeded. This matches the delegation
    directive's rule that C# tooling is invoked through `pwsh`, never the Bash tool.
 
-2. **`sed` cannot perform the TRX path substitution under MSYS.** A `sed 's#C:\\Users\\...#...#g'`
+2. **`sed` cannot perform the TRX path substitution under MSYS.** A `sed 's#<user-profile>#...#g'`
    pass silently matched nothing — verified on a minimal fixture, where both the doubled-backslash
    and single-backslash forms left the input unchanged — because MSYS rewrites an argument that
    looks like a Windows path before `sed` ever parses the expression. The substitution is therefore

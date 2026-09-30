@@ -4,7 +4,7 @@ Timestamp: 2026-07-27T06:50:36-04:00
 
 ## Resolved Target and Before State
 
-- Resolved target: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-final.2026-07-27T06-33.cobertura.xml.effective-coverage.config`
+- Resolved target: `<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-final.2026-07-27T06-33.cobertura.xml.effective-coverage.config`
 - Target SHA-256 before removal: `69509401502CFFF110C4EA8A72663E2A6A562C9DBCBA78D2E6E5BC682AF422F1`
 - Required target SHA-256 matched: `True`
 - Old canonical P9-T45 Cobertura absent before removal: `True`

@@ -90,7 +90,7 @@ Coverage-artifact provenance note (procedural, non-blocking): the canonical repo
 trimmed repo-wide JaCoCo file at this path would be parsed against a 85% hard floor by the coverage
 hook and could misrepresent the measured figure. C# line coverage and C# branch coverage are instead
 verified from the per-feature Cobertura evidence captured during execution (report
-`DanMoisan_MEGALODON4_2026-07-18.08_13_41.cobertura.xml`), which is the required evidence-verification
+`<user>_<host>_2026-07-18.08_13_41.cobertura.xml`), which is the required evidence-verification
 model. The numeric figures above are the authoritative C# coverage result and the verdict is PASS.
 
 ### 1.3 C# Code Change Policy

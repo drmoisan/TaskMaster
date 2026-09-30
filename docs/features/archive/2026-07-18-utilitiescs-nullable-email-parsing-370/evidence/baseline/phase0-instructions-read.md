@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and standards)
 
 Files read (full contents reviewed):
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3211bcc5c56f78c6\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3211bcc5c56f78c6\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3211bcc5c56f78c6\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3211bcc5c56f78c6\.claude\rules\csharp.md
+- <repo-root>\.claude\worktrees\agent-a3211bcc5c56f78c6\CLAUDE.md
+- <repo-root>\.claude\worktrees\agent-a3211bcc5c56f78c6\.claude\rules\general-code-change.md
+- <repo-root>\.claude\worktrees\agent-a3211bcc5c56f78c6\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\worktrees\agent-a3211bcc5c56f78c6\.claude\rules\csharp.md
 
 Note: this feature's plan (`plan.2026-07-18T22-05.md`, Open Questions) flags an unresolved
 rules-vs-convention conflict: `.claude/rules/csharp.md` documents the type-check step as

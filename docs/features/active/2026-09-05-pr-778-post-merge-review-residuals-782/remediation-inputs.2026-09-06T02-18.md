@@ -101,10 +101,10 @@ already carved out to #787 and #788. Do not remediate in this branch.
 
 ```text
 docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/plan.2026-09-05T15-47.md:42
-**Worktree root.** All other paths are relative to `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`.
+**Worktree root.** All other paths are relative to `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`.
 
 docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/research/research.2026-09-05T16-10.md:6
-- Research root (worktree): `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`
+- Research root (worktree): `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`
 ```
 
 **This finding corrects a cycle-1 error by this reviewer.** `policy-audit.2026-09-05T23-48.md` row 2.11

@@ -1,5 +1,5 @@
 Timestamp: 2026-04-13T22-58
-Reviewed File: c:\Users\DanMoisan\repos\TaskMaster\change-plan.md
+Reviewed File: <repo-root>\change-plan.md
 Review Result: reviewed
 Summary:
 - change-plan.md was reviewed before Phase 0 execution.

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T15-07Z
 
-Command: `cd "C:/Users/DanMoisan/repos/TaskMaster-wt/2026-07-21T10-25" && grep -rn "\.Dispatch(\|IsCurrentBoundary\|_ownerThreadId\|CaptureCurrent()\|CreateForCurrentThreadTests()\|CaptureCurrentOrTests()\|new BreadcrumbUiDispatcher(\|new BreadcrumbBridgeCoordinator(" --include=*.cs QuickFiler QuickFiler.Test`
+Command: `cd "<user-profile>/repos/TaskMaster-wt/2026-07-21T10-25" && grep -rn "\.Dispatch(\|IsCurrentBoundary\|_ownerThreadId\|CaptureCurrent()\|CreateForCurrentThreadTests()\|CaptureCurrentOrTests()\|new BreadcrumbUiDispatcher(\|new BreadcrumbBridgeCoordinator(" --include=*.cs QuickFiler QuickFiler.Test`
 
 EXIT_CODE: 0
 

@@ -3,7 +3,7 @@
 - Timestamp: 2026-09-05T16-10
 - Issue: #782
 - Feature folder: `docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/`
-- Research root (worktree): `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`
+- Research root (worktree): `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`
 - Method: Read / Grep / Glob only. No shell, no `git`, no build, no test execution.
   Every claim below is anchored to a file path and a current line number or a quoted identifier.
   Claims that could not be established by static reading are labelled UNVERIFIED with a reason.

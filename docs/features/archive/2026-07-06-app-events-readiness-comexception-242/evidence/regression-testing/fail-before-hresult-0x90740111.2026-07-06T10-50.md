@@ -21,7 +21,7 @@ A total of 1 test files matched the specified pattern.
      at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 267
    at FluentAssertions.Primitives.BooleanAssertions`1.BeTrue(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/BooleanAssertions.cs:line 82
-   at TaskMaster.Test.AppGlobals.HookReadinessCoordinatorTests.IsTransientError_WhenHResult90740111_ReturnsTrueAndEFailReturnsFalse() in C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\AppGlobals\HookReadinessCoordinatorTests.cs:line 124
+   at TaskMaster.Test.AppGlobals.HookReadinessCoordinatorTests.IsTransientError_WhenHResult90740111_ReturnsTrueAndEFailReturnsFalse() in <user-profile>\repos\TaskMaster-wt-2026-07-06-10-36\TaskMaster.Test\AppGlobals\HookReadinessCoordinatorTests.cs:line 124
 
 Total tests: 2
      Passed: 1

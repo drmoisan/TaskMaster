@@ -21,6 +21,6 @@ Required regression tests in PASSED set:
 
 Coverage file path:
 
-`C:\Users\DanMoisan\repos\TaskMaster\TestResults\71f14317-8e41-43ee-90a7-ae4c1b6a7ac5\DanMoisan_MEGALODON4_2026-03-25.11_10_39.coverage`
+`<repo-root>\TestResults\71f14317-8e41-43ee-90a7-ae4c1b6a7ac5\<user>_<host>_2026-03-25.11_10_39.coverage`
 
 The required solution rebuild completed successfully immediately before this test run, so the final QA gate executed against the current compiled `QuickFiler.Test.dll` output.

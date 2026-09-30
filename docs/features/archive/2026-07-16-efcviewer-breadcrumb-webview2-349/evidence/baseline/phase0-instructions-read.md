@@ -3,7 +3,7 @@
 Timestamp: 2026-07-18T08-41
 Policy Order: CLAUDE.md -> .claude/rules/general-code-change.md -> .claude/rules/general-unit-test.md -> .claude/rules/csharp.md (per policy-compliance-order skill)
 
-Files read (from the current worktree `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7071cb39df527237`):
+Files read (from the current worktree `<repo-root>\.claude\worktrees\agent-a7071cb39df527237`):
 
 1. `CLAUDE.md` (sha256 ed6ca760280cb5d2ed07d6771a7a0042487f920739f4517bf61d01234b8653e8)
 2. `.claude/rules/general-code-change.md` (sha256 f2b8683b12d10dd2add50e9bd30fbb5a3657231f676fdbf024165dcf4ea21889)

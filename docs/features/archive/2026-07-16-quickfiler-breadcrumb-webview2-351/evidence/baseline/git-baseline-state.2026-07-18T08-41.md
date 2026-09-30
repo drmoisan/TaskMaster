@@ -3,9 +3,9 @@
 Timestamp: 2026-07-18T08-41
 
 Workspace root note: the plan header cites the planning-time workspace root
-`C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a1d165d3cb6c7c026`, which no longer
+`<repo-root>/.claude/worktrees/agent-a1d165d3cb6c7c026`, which no longer
 exists. Per the binding orchestrator override, the actual execution workspace root is
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad8430e58353ba09b`; all commands
+`<repo-root>\.claude\worktrees\agent-ad8430e58353ba09b`; all commands
 below were run there.
 
 Command: git branch --show-current && git rev-parse HEAD && git status --porcelain

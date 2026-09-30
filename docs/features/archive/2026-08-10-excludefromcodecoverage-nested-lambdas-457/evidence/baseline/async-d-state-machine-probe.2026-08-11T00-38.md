@@ -31,7 +31,7 @@ is the declaration the attribute applies to — and admit the pair when that dec
 Measurement-integrity note: a first attempt reported `ATTRIBUTED_ASYNC_MEMBER_COUNT: 0`. The cause was
 a self-defeating exclusion filter, `$_.FullName -notmatch '\\\.claude\\worktrees\\'`, applied to the
 FULL path. The executing worktree is itself
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`, so that predicate
+`<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`, so that predicate
 excluded every file in the repository. This is exactly the failure mode the plan warns about in
 `[P0-T11]` ("A `\.claude\` substring test over the full path is unsatisfiable when the executing
 worktree is itself under `.claude\worktrees\`"). The filter was corrected to test the root-relative
@@ -100,7 +100,7 @@ SearchResult:
 The positive match, verbatim:
 
 ```
-name="QuickFiler.Controllers.QfcItemController.&lt;ToggleExpansionAsync&gt;d__203" filename="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-04T18-38\Q…
+name="QuickFiler.Controllers.QfcItemController.&lt;ToggleExpansionAsync&gt;d__203" filename="<user-profile>\repos\TaskMaster-wt\2026-08-04T18-38\Q…
 ```
 
 `ToggleExpansionAsync` is one of the 62 attributed async members enumerated in step 1. A single

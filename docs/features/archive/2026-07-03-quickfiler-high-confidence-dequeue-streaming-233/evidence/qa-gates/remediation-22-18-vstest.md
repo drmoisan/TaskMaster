@@ -10,4 +10,4 @@ Output Summary:
 - Total tests: 387.
 - Passed: 387.
 - Total time: 6.6409 Seconds.
-- Coverage attachment: docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\remediation-22-18-vstest-results\47ec19b7-3e35-4085-a8fe-013c03b0613c\DanMoisan_MEGALODON4_2026-07-04.10_39_40.coverage
+- Coverage attachment: docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\remediation-22-18-vstest-results\47ec19b7-3e35-4085-a8fe-013c03b0613c\<user>_<host>_2026-07-04.10_39_40.coverage

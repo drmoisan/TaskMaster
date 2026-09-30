@@ -2,15 +2,15 @@
 
 - **Timestamp:** 2026-03-26T16:52 UTC
 - **Branch:** `bug/quickfiler-gui-not-expanding-96-clean`
-- **Worktree:** `c:\Users\DanMoisan\repos\TaskMaster-issue96-clean`
-- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-issue96-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
+- **Worktree:** `<user-profile>\repos\TaskMaster-issue96-clean`
+- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location '<user-profile>\repos\TaskMaster-issue96-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
 - **EXIT_CODE:** 0
 - **Output Summary:**
   - Total tests: 2873
   - Passed: 2871
   - Skipped: 2
   - Failed: 0
-  - Coverage artifact: `c:\Users\DanMoisan\repos\TaskMaster-issue96-clean\coverage\coverage.cobertura.xml`
+  - Coverage artifact: `<user-profile>\repos\TaskMaster-issue96-clean\coverage\coverage.cobertura.xml`
 
 ## QuickFiler Scope Coverage
 

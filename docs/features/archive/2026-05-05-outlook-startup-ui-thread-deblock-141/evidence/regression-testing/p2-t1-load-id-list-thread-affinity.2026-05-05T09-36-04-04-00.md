@@ -14,6 +14,6 @@ Relevant Stack Frames:
 - TaskMaster.AppToDoObjects.<LoadIdListAsync>b__39_0()
 - TaskMaster.AppToDoObjects.<LoadIdListAsync>d__39.MoveNext()
 Evidence Source Logs:
-- c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_fo2JFkD0IbHLQxS35h1Kjwc2__vscode-1777946811082\content.txt
-- c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_VTphHmFfJplw6cmaFltDHjhk__vscode-1777946811084\content.txt
-- c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_Up5cBOwOH1GchC4dpYoUEWlB__vscode-1777946811087\content.txt
+- <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_fo2JFkD0IbHLQxS35h1Kjwc2__vscode-1777946811082\content.txt
+- <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_VTphHmFfJplw6cmaFltDHjhk__vscode-1777946811084\content.txt
+- <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_Up5cBOwOH1GchC4dpYoUEWlB__vscode-1777946811087\content.txt

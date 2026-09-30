@@ -24,12 +24,12 @@
 
 ### Phase 0 — Baseline Capture
 
-- [x] [P0-T1] Read `c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md` in full (policy-reading order position 1).
-- [x] [P0-T2] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-code-change.md` in full (position 2).
-- [x] [P0-T3] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-unit-test.md` in full (position 3).
-- [x] [P0-T4] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\python.md` in full (position 4, Python-specific).
-- [x] [P0-T5] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\python-suppressions.md` in full (position 4, Python-specific).
-- [x] [P0-T6] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\self-explanatory-code-commenting.md` in full (position 4, commenting/docstring convention required by both blocking findings).
+- [x] [P0-T1] Read `<repo-root>\CLAUDE.md` in full (policy-reading order position 1).
+- [x] [P0-T2] Read `<repo-root>\.claude\rules\general-code-change.md` in full (position 2).
+- [x] [P0-T3] Read `<repo-root>\.claude\rules\general-unit-test.md` in full (position 3).
+- [x] [P0-T4] Read `<repo-root>\.claude\rules\python.md` in full (position 4, Python-specific).
+- [x] [P0-T5] Read `<repo-root>\.claude\rules\python-suppressions.md` in full (position 4, Python-specific).
+- [x] [P0-T6] Read `<repo-root>\.claude\rules\self-explanatory-code-commenting.md` in full (position 4, commenting/docstring convention required by both blocking findings).
 - [x] [P0-T7] Read `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/remediation-inputs.2026-07-18T14-45.md` in full (primary remediation-scope context).
 - [x] [P0-T8] Read `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/scripts/fix_binding_redirects.py` in full (current pre-remediation state, 77 lines).
 - [x] [P0-T9] Write `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/evidence/remediation-baseline/phase0-instructions-read.<timestamp>.md` containing `Timestamp:`, a `Policy Order:` list (the six files from P0-T1–P0-T6 in the order read, plus the two context files from P0-T7–P0-T8), and confirmation all eight were read in full before any implementation task began. Acceptance: file exists at this exact path with all required fields present.

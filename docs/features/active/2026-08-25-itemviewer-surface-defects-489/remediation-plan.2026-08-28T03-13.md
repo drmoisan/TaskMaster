@@ -21,7 +21,7 @@ plus documentation (`FEATURE/spec.md`) and evidence artifacts. **No new source p
 
 ## Execution conventions (binding on every task below)
 
-1. **Worktree**: all paths are relative to `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a172c4246de7346f4`. Nothing is written outside it.
+1. **Worktree**: all paths are relative to `<repo-root>/.claude/worktrees/agent-a172c4246de7346f4`. Nothing is written outside it.
 2. **Solution builds only, spaced platform**: every msbuild task below builds `TaskMaster.sln` with `"/p:Platform=Any CPU"` (spaced). If any executor deviation ever requires a single-`.csproj` build, it must use `/p:Platform=AnyCPU` (no space): the spaced spelling on a single project fails at `Microsoft.Common.CurrentVersion.targets(843,5)` with an unset output path and **compiles nothing**, which has produced vacuous gates five times in this feature.
 3. **`/t:Rebuild`, never `/t:Build`**, and every build task proves non-vacuity: its `/v:normal` file log contains **zero** occurrences of the literal `Skipping target "CoreCompile"`.
 4. **Never add `/p:Nullable=enable`** to any msbuild invocation.

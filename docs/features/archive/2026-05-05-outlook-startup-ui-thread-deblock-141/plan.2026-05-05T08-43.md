@@ -10,7 +10,7 @@
 - **Work Mode:** `full-bug`
 - **Requirements Sources:** `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/issue.md`, `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/spec.md`
 - **Supporting Context:** `artifacts/research/20260504-outlook-startup-ui-thread-deblock-research.md`, `artifacts/orchestration/orchestrator-state.json`
-- **Plan Path:** `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\plan.2026-05-05T08-43.md`
+- **Plan Path:** `<repo-root>\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\plan.2026-05-05T08-43.md`
 
 ## Overview
 
@@ -54,7 +54,7 @@ Deliver a minimal C# bug fix that keeps Outlook COM access on the main STA/UI th
 - [x] [P0-T2] Review `change-plan.md` against issue `#141` and write `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/other/change-plan-review.*.md`.
 	- Acceptance: The artifact exists under `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/other/` and records `Timestamp:`, `Reviewed File: change-plan.md`, `Conflict Check: none` or an exact conflicting section, and `Bug Scope Preserved: true`.
 - [x] [P0-T3] Capture the full-bug input snapshot in `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/other/full-bug-inputs.*.md`.
-	- Acceptance: The artifact exists and records `Timestamp:`, `Work Mode: full-bug`, `Exact Plan Path: c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\plan.2026-05-05T08-43.md`, the exact `issue.md` and `spec.md` paths, the exact supporting-context paths, `Branch: bug/outlook-startup-ui-thread-deblock-141`, `SearchScope: docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/`, `SearchPatterns: user-story.md`, `SearchResult: none` or the exact matching path, and `Scope Guardrails:` with the same five constraints listed in `## Scope Guardrails`.
+	- Acceptance: The artifact exists and records `Timestamp:`, `Work Mode: full-bug`, `Exact Plan Path: <repo-root>\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\plan.2026-05-05T08-43.md`, the exact `issue.md` and `spec.md` paths, the exact supporting-context paths, `Branch: bug/outlook-startup-ui-thread-deblock-141`, `SearchScope: docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/`, `SearchPatterns: user-story.md`, `SearchResult: none` or the exact matching path, and `Scope Guardrails:` with the same five constraints listed in `## Scope Guardrails`.
 - [x] [P0-T4] Run `dotnet tool run csharpier format .` from the repository root and write `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-format.*.md`.
 	- Acceptance: The artifact exists and contains `Timestamp:`, `Command: dotnet tool run csharpier format .`, `EXIT_CODE:`, and `Output Summary:`.
 - [x] [P0-T5] Run `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU' -EnableNETAnalyzers -EnforceCodeStyleInBuild` from the repository root and write `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/baseline/csharp-analyzers-build.*.md`.

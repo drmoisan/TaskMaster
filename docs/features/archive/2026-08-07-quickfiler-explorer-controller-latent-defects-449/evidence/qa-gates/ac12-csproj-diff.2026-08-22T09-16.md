@@ -1,7 +1,7 @@
 # AC-12 — Shared-Surface Project-File Diff (Issue #449, [P7-T14])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 Merge-base SHA (from [P0-T7]): `c551eabab0aa0a6b1a284252811a2e1de819634e`
 HEAD: `05156a3adca741bb3cdfa4d92da836f87814e600`
 

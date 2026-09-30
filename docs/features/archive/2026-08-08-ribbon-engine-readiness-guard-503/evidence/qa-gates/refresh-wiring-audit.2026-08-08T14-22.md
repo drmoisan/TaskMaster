@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-22
 
-Commands (run from `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55`):
+Commands (run from `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55`):
 ```
 sed -n '/internal void InvalidateEngineCommands/,/^        }/p' TaskMaster/Ribbon/RibbonViewer.EngineCommands.cs
 sed -n '74,86p' TaskMaster/ThisAddIn.cs

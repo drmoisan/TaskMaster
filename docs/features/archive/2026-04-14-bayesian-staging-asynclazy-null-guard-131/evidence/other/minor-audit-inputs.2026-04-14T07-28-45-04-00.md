@@ -13,9 +13,9 @@ Acceptance Criteria (verbatim):
 - [ ] Regression tests cover both the staging deserialization boundary and the safe null-or-empty guard behavior.
 
 Plan Path:
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
 
-SearchScope: c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\
+SearchScope: <repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\
 SearchPatterns: spec.md, user-story.md, research.md
 SearchResult: none
 

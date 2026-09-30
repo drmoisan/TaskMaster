@@ -111,7 +111,7 @@ This is a character-for-character match (modulo the `$env:SOLUTION_PATH` -> `Tas
 
 ## 5. `.claude/rules/csharp.md` — confirm no citation to ci.yml or any workflow file
 
-Search patterns run against `.claude/rules/csharp.md` (full path: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a2e056cf0bbd1ce8b\.claude\rules\csharp.md`):
+Search patterns run against `.claude/rules/csharp.md` (full path: `<repo-root>\.claude\worktrees\agent-a2e056cf0bbd1ce8b\.claude\rules\csharp.md`):
 
 | Pattern | Result |
 |---|---|
@@ -123,7 +123,7 @@ All three searches returned zero matches. `.claude/rules/csharp.md` does not cit
 
 ## 6. CLAUDE.md — confirm exactly the three known citation sites (no others)
 
-Search pattern: `ci\.yml` against `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a2e056cf0bbd1ce8b\CLAUDE.md`.
+Search pattern: `ci\.yml` against `<repo-root>\.claude\worktrees\agent-a2e056cf0bbd1ce8b\CLAUDE.md`.
 
 Result (content mode, with line numbers):
 - Line 194: `.github/workflows/ci.yml` (CSharpier parity claim)

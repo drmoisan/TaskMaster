@@ -9,7 +9,7 @@
 - **Work Mode:** full-bug (spec.md required and present; user-story.md absent by design; enforces
   spec-driven expectations and the full QA loop per `atomic-plan-contract`)
 - **Feature folder (`<FEATURE>`):** `docs/features/active/2026-07-15-quickfiler-inline-image-cid-fix-326`
-- **Workspace root:** `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a1e77dc4a849cd790`
+- **Workspace root:** `<repo-root>/.claude/worktrees/agent-a1e77dc4a849cd790`
   (all commands below are run from this root unless otherwise noted; `<TS>` placeholders MUST be
   substituted with the real ISO-8601 timestamp (`yyyy-MM-ddTHH-mm`) at the moment each artifact is
   written, per `evidence-and-timestamp-conventions`).
@@ -49,7 +49,7 @@ out of scope (spec.md §Scope & Non-Goals).
 ### Phase 0 — Baseline Capture & Policy Read
 
 - [x] [P0-T1] Read `CLAUDE.md` in full (policy reading order position 1) at
-      `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a1e77dc4a849cd790/CLAUDE.md`.
+      `<repo-root>/.claude/worktrees/agent-a1e77dc4a849cd790/CLAUDE.md`.
       Acceptance: file read in this execution session; its Policy Compliance Order section is quoted
       verbatim in the Phase 0 evidence artifact produced by P0-T5.
 - [x] [P0-T2] Read `.claude/rules/general-code-change.md` (policy reading order position 2).

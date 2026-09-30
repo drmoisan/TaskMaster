@@ -6,7 +6,7 @@ Command: `ls -la artifacts/csharp/coverage.xml`
 
 EXIT_CODE: 2 (ls: no such file)
 
-SearchScope: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\artifacts\csharp\
+SearchScope: <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\artifacts\csharp\
 SearchPatterns: coverage.xml
 SearchResult: none — the directory artifacts/csharp/ exists but is empty; no coverage.xml is present.
 

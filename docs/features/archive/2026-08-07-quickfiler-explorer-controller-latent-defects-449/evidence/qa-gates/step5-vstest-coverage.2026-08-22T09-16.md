@@ -1,7 +1,7 @@
 # Final QC Step 5 — Tests with Coverage (Issue #449, [P7-T6], [P7-T15])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command (repeats [P0-T12] verbatim, including the WORKTREE-relative `\.claude\` exclusion and
 `/InIsolation`):

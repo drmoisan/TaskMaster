@@ -1,6 +1,6 @@
 # Research: `QuickFiler/Controllers/EfcFormController.cs` (F9 / issue #452, epic #136)
 
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a721e5b2426cc0b97`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a721e5b2426cc0b97`
 - Target file: `QuickFiler/Controllers/EfcFormController.cs` — **1,086 lines**, `internal class EfcFormController : IFilerFormController`, `[ExcludeFromCodeCoverage]` at line 27 (verified).
 - Research date: 2026-08-07.
 - Scope of this artifact: this one production file. `EfcItemController.cs`, `EfcViewer.cs`, and `EfcViewer.Designer.cs` are covered by sibling artifacts, except where this file's seam plan changes their contracts (called out explicitly).

@@ -7,7 +7,7 @@ Command:
 ```
 # (1) MCP call — NON-PROBATIVE
 mcp__drm-copilot__run_poshqc_test
-    workspace_root = 'C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a'
+    workspace_root = '<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a'
     scan_folders   = ['scripts/vscode', 'tests/scripts/vscode']
 
 # (2) direct Pester capture — the actual verdict
@@ -29,7 +29,7 @@ $r = Invoke-Pester -Configuration $c
 EXIT_CODE: 0 (`PESTER_EXIT_CODE` from the direct run)
 
 MCP payload (recorded verbatim, **non-probative**): `ok`: `true`; `summary`:
-`Ran bundled PoshQC test against 'C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a' with 2 selected scan folder(s).`
+`Ran bundled PoshQC test against '<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a' with 2 selected scan folder(s).`
 
 Output Summary:
 

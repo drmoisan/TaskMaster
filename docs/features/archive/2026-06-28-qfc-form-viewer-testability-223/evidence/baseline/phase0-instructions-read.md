@@ -9,12 +9,12 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and standards)
 
 Files read (policy):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\ci-workflows.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\tonality.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\ci-workflows.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\tonality.md
 
 Files read (authoritative inputs):
 - docs/features/active/2026-06-28-qfc-form-viewer-testability-223/spec.md

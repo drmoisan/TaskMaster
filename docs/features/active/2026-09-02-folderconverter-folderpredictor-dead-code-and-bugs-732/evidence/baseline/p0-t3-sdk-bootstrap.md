@@ -10,7 +10,7 @@ EXIT_CODE: 0
 
 Output Summary:
 Installed repo-local .NET SDK 8.0.205 to
-C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aa274c17b2c682ab3\.dotnet-sdk
+<repo-root>\.claude\worktrees\agent-aa274c17b2c682ab3\.dotnet-sdk
 (worktree had no pre-existing .dotnet-sdk directory). `dotnet --version` against that
 repo-local executable resolves to `8.0.205`, matching global.json's pinned SDK version,
 with no global.json missing-SDK error.

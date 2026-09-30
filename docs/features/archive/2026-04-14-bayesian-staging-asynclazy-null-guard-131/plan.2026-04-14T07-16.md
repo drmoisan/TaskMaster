@@ -8,8 +8,8 @@ DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED
 - **Status:** Completed
 - **Version:** 2.0
 - **Work Mode:** `minor-audit`
-- **Requirements Source:** `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\issue.md`
-- **Plan Path:** `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
+- **Requirements Source:** `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\issue.md`
+- **Plan Path:** `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
 - **Plan Path Continuity:** Updated in place after the earlier async-lazy diagnosis was disproven for this crash.
 - **Scope Guardrails:** Keep the fix on the small path. Limit production edits to `UtilitiesCS\EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs` and test edits to `UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs`.
 - **Small-Path Budget:** `Production File Count: 1`; `Test File Count: 1`.

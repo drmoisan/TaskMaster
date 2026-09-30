@@ -2,7 +2,7 @@
 
 Timestamp: 2026-03-26T16:22
 
-Command: git -C c:\Users\DanMoisan\repos\TaskMaster-residual-clean cherry-pick 0c9a045
+Command: git -C <user-profile>\repos\TaskMaster-residual-clean cherry-pick 0c9a045
 
 EXIT_CODE: 0
 

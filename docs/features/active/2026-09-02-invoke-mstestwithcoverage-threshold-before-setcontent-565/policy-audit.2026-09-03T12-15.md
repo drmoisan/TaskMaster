@@ -2,7 +2,7 @@
 
 - Timestamp: 2026-09-03T12-15
 - Reviewer: feature-review agent (parallel mode, issue_num 565)
-- Worktree: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a7d0dc0826acbf47e`
+- Worktree: `<repo-root>/.claude/worktrees/agent-a7d0dc0826acbf47e`
 - Branch: `bug/invoke-mstestwithcoverage-threshold-before-setcontent-565`
 - Branch head: `e165f7ba` (verified via `git log --oneline -1`)
 - Reconciliation merge commit onto origin/main: `dc5e8c0f` (verified via `git log --oneline dc5e8c0f -1`)
@@ -91,7 +91,7 @@ non-canonical evidence path. **Verdict: PASS.**
 
 ## Absolute Host Path Check
 
-`Grep -pattern "C:\\Users|DanMoisan|C:/Users"` across the full feature folder returns no matches.
+`Grep -pattern "C:\\Users|<user>|C:/Users"` across the full feature folder returns no matches.
 Evidence artifacts consistently use `<abs>`, `<item-worktree-root>`, and relative repo paths in
 place of literal host paths. **Verdict: PASS.**
 

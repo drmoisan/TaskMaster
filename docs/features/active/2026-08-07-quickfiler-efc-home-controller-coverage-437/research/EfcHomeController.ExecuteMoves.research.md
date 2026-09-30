@@ -1,7 +1,7 @@
 # Research — `QuickFiler/Controllers/EfcHomeController.ExecuteMoves.cs`
 
 - **Feature:** `2026-08-07-quickfiler-efc-home-controller-coverage-437` (epic child F8, issue #437, parent epic #136)
-- **Production file:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeController.ExecuteMoves.cs`
+- **Production file:** `<repo-root>\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeController.ExecuteMoves.cs`
 - **Size:** 144 lines (limit 500 — compliant, see § 10)
 - **`[ExcludeFromCodeCoverage]`:** absent. The file is already inside the coverage denominator.
 - **Research date:** 2026-08-07
@@ -61,7 +61,7 @@ operation in it is already behind an injectable delegate.
 ## 3. Member-by-member inventory
 
 Existing tests live in
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler.Test\Controllers\`.
+`<repo-root>\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler.Test\Controllers\`.
 Abbreviations: `ExecMovesTests` = `EfcHomeControllerExecuteMovesTests`, `HomeTests` =
 `EfcHomeControllerTests`.
 

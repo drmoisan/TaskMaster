@@ -1,6 +1,6 @@
 Timestamp: 2026-09-03T12-11
 
-Command: git -C C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6cd1c774527c71c3 diff --name-only HEAD~1..HEAD (re-cited from P3-T3)
+Command: git -C <repo-root>/.claude/worktrees/agent-a6cd1c774527c71c3 diff --name-only HEAD~1..HEAD (re-cited from P3-T3)
 
 EXIT_CODE: 0
 

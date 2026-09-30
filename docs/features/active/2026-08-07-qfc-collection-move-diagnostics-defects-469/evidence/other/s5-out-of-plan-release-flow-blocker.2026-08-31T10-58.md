@@ -17,14 +17,14 @@ Observed processes:
     "ParentProcessId": 26328,
     "Name": "pwsh.exe",
     "CreationDate": "2026-08-31T10:55:22.98518-04:00",
-    "CommandLine": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoProfile -Command pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:\\Users\\DanMoisan\\repos\\drm-copilot\\scripts\\dev-tools\\Invoke-FullReleaseFlow.ps1 -ConfirmToken yes"
+    "CommandLine": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoProfile -Command pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File <user-profile>\\repos\\drm-copilot\\scripts\\dev-tools\\Invoke-FullReleaseFlow.ps1 -ConfirmToken yes"
   },
   {
     "ProcessId": 131380,
     "ParentProcessId": 119248,
     "Name": "pwsh.exe",
     "CreationDate": "2026-08-31T10:55:23.413529-04:00",
-    "CommandLine": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:\\Users\\DanMoisan\\repos\\drm-copilot\\scripts\\dev-tools\\Invoke-FullReleaseFlow.ps1 -ConfirmToken yes"
+    "CommandLine": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoLogo -NoProfile -ExecutionPolicy Bypass -File <user-profile>\\repos\\drm-copilot\\scripts\\dev-tools\\Invoke-FullReleaseFlow.ps1 -ConfirmToken yes"
   }
 ]
 ```

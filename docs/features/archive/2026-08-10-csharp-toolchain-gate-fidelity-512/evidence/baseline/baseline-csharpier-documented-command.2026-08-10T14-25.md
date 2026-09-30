@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-10T14-25
 Branch: bug/csharp-toolchain-gate-fidelity-512 (from origin/epic/build-ci-coverage-gate-fidelity-integration @ edf3d34c)
-Worktree: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af19fe9c37ece6a65
+Worktree: <repo-root>\.claude\worktrees\agent-af19fe9c37ece6a65
 
 ## Bootstrap performed first
 

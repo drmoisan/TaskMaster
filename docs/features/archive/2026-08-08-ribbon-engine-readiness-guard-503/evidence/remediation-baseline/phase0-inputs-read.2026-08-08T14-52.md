@@ -7,12 +7,12 @@ EXIT_CODE: 0
 
 ## Files read (six absolute paths)
 
-1. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\remediation-inputs.2026-08-08T14-26.md`
-2. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
-3. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\plan.2026-08-08T11-59.md`
-4. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\code-review.2026-08-08T14-15.md`
-5. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\policy-audit.2026-08-08T14-15.md`
-6. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\feature-audit.2026-08-08T14-15.md`
+1. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\remediation-inputs.2026-08-08T14-26.md`
+2. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
+3. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\plan.2026-08-08T11-59.md`
+4. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\code-review.2026-08-08T14-15.md`
+5. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\policy-audit.2026-08-08T14-15.md`
+6. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\feature-audit.2026-08-08T14-15.md`
 
 ## Resolved work mode and acceptance-criteria source
 

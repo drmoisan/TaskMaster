@@ -26,7 +26,7 @@ Output Summary:
 
 ## Coverage Headline (numeric)
 
-- Coverage artifact: `.coverage` at `trx-full/f6b0d8f7-3887-4017-80dc-9358746bfc82/DanMoisan_MEGALODON4_2026-06-08.22_10_28.coverage`, converted to cobertura via `dotnet-coverage merge ... --output-format cobertura` -> `baseline-coverage.cobertura.xml`.
+- Coverage artifact: `.coverage` at `trx-full/f6b0d8f7-3887-4017-80dc-9358746bfc82/<user>_<host>_2026-06-08.22_10_28.coverage`, converted to cobertura via `dotnet-coverage merge ... --output-format cobertura` -> `baseline-coverage.cobertura.xml`.
 - Raw merged cobertura aggregate: `line-rate=0.5904483566441676` (59.04%), `lines-covered=101824`, `lines-valid=172452`, `branch-rate=1`.
 - NOTE: This raw aggregate denominator (172,452 valid lines) includes test assemblies and instrumented vendored/third-party code, which deflates the headline below the first-party application-code figure that the >=80% policy targets. The aggregate is recorded here as the literal repo-wide measured value for the no-regression delta comparison in P5-T5; the post-change run (P5-T4) is measured identically so the comparison is apples-to-apples.
 - No-regression baseline pass set: 4053 passing tests (the post-change suite must not drop below this once the three in-scope target tests are converted from FAIL to PASS, i.e., expected post-change >= 4056 passing, holding the 8 out-of-scope flaky-timer tests as the only permitted non-passes).

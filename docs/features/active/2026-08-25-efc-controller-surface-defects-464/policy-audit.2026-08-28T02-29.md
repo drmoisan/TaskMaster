@@ -116,7 +116,7 @@ No remediation-inputs artifact is produced: there is no code defect to remediate
 - **Evidence locations: PASS.** Every evidence file in the diff lives under `docs/features/active/efc-controller-surface-defects-464/evidence/<kind>/`. `git diff --name-only` contains zero paths under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`. No `validate_evidence_locations.py` exists in this repository (checked); the equivalent scan was performed directly with the diff path list.
 - **No retained scripts: PASS.** The evidence tree contains 87 `.md` and 22 `.trx` files and nothing else — zero `.ps1`/`.py`/`.pl`/`.sh`/`.xml`.
 - **No raw coverage XML committed: PASS** (see §7.1 for the flip side of that fact).
-- **TRX sanitization: PASS.** Across all 22 committed TRX files: `computerName="<host>"`, `runUser="<host>\<user>"`, and `codeBase`/`storage` paths rendered as `<repo-root>\...`. No account name, machine name, or `C:\Users\...` path appears anywhere in the evidence tree (grep-verified over the full tree).
+- **TRX sanitization: PASS.** Across all 22 committed TRX files: `computerName="<host>"`, `runUser="<host>\<user>"`, and `codeBase`/`storage` paths rendered as `<repo-root>\...`. No account name, machine name, or `<user-profile>` path appears anywhere in the evidence tree (grep-verified over the full tree).
 - **EVIDENCE_LOCATION_OVERRIDE_REJECTED:** none — no caller instruction supplied a non-canonical evidence path.
 
 ## 9. Findings Register

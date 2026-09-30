@@ -1,7 +1,7 @@
 # Phase 9 Formatter-Scope Plan Preflight
 
 - Timestamp: `2026-07-23T11:54:41Z`
-- Command: `mcp__drm_copilot__resolve_atomic_plan_prompt(target=docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md); delegate atomic-executor with DIRECTIVE: PREFLIGHT VALIDATION ONLY; mcp__drm_copilot__validate_orchestration_artifacts(artifact_type=plan, artifact_path=docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md, workspace_root=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25)`
+- Command: `mcp__drm_copilot__resolve_atomic_plan_prompt(target=docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md); delegate atomic-executor with DIRECTIVE: PREFLIGHT VALIDATION ONLY; mcp__drm_copilot__validate_orchestration_artifacts(artifact_type=plan, artifact_path=docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md, workspace_root=<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25)`
 - EXIT_CODE: `0`
 - Output Summary: `PREFLIGHT: ALL CLEAR; canonical plan validation ok=true; plan_sha256=EA1C4101C7B5D41AEA88EE4F8290FE0BED907711BF08D9FD3E9B61E5066043D4; head=a1fbb5b0ce7c058dd44debdf1510282050928687; first_unchecked=P8-T20`
 

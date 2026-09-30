@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P1-T2]
-Command: Source inspection of `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs` lines 176-216, plus `git diff -- TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs` to confirm the change is confined to one method
+Command: Source inspection of `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs` lines 176-216, plus `git diff -- TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs` to confirm the change is confined to one method
 EXIT_CODE: 0
 
 This artifact records the **source-inspection** half of the F1 proof. The **executable** half — a recorded failing run against a deliberately mutated embedded resource — is P1-T7 (`f1-fail-proof.2026-08-08T14-52.md`), with restoration at P1-T8 and the pass-after state at P1-T10. Source inspection alone is not accepted as the proof; it is the argument the executable proof then confirms.

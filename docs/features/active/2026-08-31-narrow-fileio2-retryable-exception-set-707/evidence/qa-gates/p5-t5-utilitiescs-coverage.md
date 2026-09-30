@@ -6,7 +6,7 @@ KNOWN_ENVIRONMENT_DEFECT: issue #752 (same substitution as evidence/baseline/p0-
 Command (substituted): resolved $vstest via vswhere, located the freshly rebuilt UtilitiesCS.Test.dll (workspace-root-prefix checked), then:
 dotnet-coverage collect "<vstest>" "<dll>" /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook "/Logger:trx;LogFileName=p5-t5.trx" /ResultsDirectory:"coverage\testresults\p5-t5" --output "coverage\coverage.cobertura.xml" --output-format cobertura
 
-DISCOVERED_ASSEMBLY: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cd2e1147794981e\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (begins with the workspace root)
+DISCOVERED_ASSEMBLY: <repo-root>\.claude\worktrees\agent-a1cd2e1147794981e\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (begins with the workspace root)
 EXIT_CODE: 1 (vstest reports non-zero because of the 17 pre-existing Deedle/F# failures, not a tooling error)
 
 TOTAL_TESTS: 4786

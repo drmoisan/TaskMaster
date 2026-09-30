@@ -3,7 +3,7 @@ Captured: 2026-05-27T11:32 (local)
 
 [P1-T1] Locked scope statement:
 - The only production/config file edited by this plan is:
-    c:\Users\DanMoisan\repos\TaskMaster\.gitignore
+    <repo-root>\.gitignore
 - No .claude/ files are edited by this plan. Committing the now-tracked .claude/
   content is performed later by the orchestrator pre-review `git add -A` step,
   not by this plan.

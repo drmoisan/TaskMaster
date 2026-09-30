@@ -5,7 +5,7 @@
 - **Scope of this artifact:** measurement machinery, coverage-harness contract, csproj edit mechanics,
   ledger obligations, evidence paths, toolchain commands. Code-level seam analysis for the four F9
   files is covered by sibling research artifacts and is **not** duplicated here.
-- **Worktree:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a721e5b2426cc0b97`
+- **Worktree:** `<repo-root>\.claude\worktrees\agent-a721e5b2426cc0b97`
 - **Branch at time of research:** `TaskMaster-wt-2026-08-07T20-23` (clean, head `74be1964`)
 - **Timestamp:** 2026-08-07T23-10
 
@@ -416,7 +416,7 @@ build-integration picture.)
 
 ## 5. `QuickFiler.csproj` edit mechanics
 
-File: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a721e5b2426cc0b97\QuickFiler\QuickFiler.csproj`.
+File: `<repo-root>\.claude\worktrees\agent-a721e5b2426cc0b97\QuickFiler\QuickFiler.csproj`.
 Legacy non-SDK project, **no globbing** — every source file is an explicit `<Compile Include>`
 (`epic.md:594-600`).
 
@@ -708,7 +708,7 @@ The project is in the solution at `TaskMaster.sln:25`.
 Debug|Any CPU output path (absolute, this worktree):
 
 ```
-C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a721e5b2426cc0b97\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
+<repo-root>\.claude\worktrees\agent-a721e5b2426cc0b97\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
 ```
 
 Repo-relative: `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`.

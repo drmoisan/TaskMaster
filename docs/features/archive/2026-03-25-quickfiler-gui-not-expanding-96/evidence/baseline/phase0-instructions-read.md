@@ -50,6 +50,6 @@ Policy Order:
 - Treat issue.md as sole AC source (minor-audit mode).
 - Use origin/development as comparison base.
 - Keep main workspace on feature/utilities-coverage-part-three-87.
-- Run clean-branch operations in sibling worktree c:\Users\DanMoisan\repos\TaskMaster-issue96-clean.
+- Run clean-branch operations in sibling worktree <user-profile>\repos\TaskMaster-issue96-clean.
 - Replay only commits bd8fc03 and 3b472b2.
 - Limit clean-branch diff to QuickFiler/**, QuickFiler.Test/**, docs/features/active/2026-03-25-quickfiler-gui-not-expanding-96/**.

@@ -6,7 +6,7 @@
 - Target production file: `QuickFiler/Controllers/EfcDataModel.cs` (397 lines, no `[ExcludeFromCodeCoverage]`)
 - Upstream dependency: F1 (`coverage-ledger.md` + per-file coverage harness). Neither exists on disk yet; this
   artifact is written to consume that contract, not to substitute for it.
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a923053598cf4ccea`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a923053598cf4ccea`
 
 ## 0. Method and confidence
 

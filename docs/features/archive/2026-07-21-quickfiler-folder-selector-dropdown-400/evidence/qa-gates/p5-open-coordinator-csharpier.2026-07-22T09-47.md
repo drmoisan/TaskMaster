@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T09:47:18.4677296Z
 
-Command: `$files=@(<the resolved J1 three-production/two-test tuple>); @($files) | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `$files=@(<the resolved J1 three-production/two-test tuple>); @($files) | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 EXIT_CODE: `0` on both passes
 

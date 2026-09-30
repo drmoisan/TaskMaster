@@ -1,7 +1,7 @@
 # Baseline Toolchain Step 4 — Nullable / Type Check Build (Issue #449, [P0-T11])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command:
 ```

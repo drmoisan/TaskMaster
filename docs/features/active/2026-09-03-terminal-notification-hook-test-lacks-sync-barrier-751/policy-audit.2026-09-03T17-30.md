@@ -2,7 +2,7 @@
 
 - Artifact timestamp: 2026-09-03T17-30
 - Reviewer: feature-review agent
-- Worktree audited: `C:/Users/DanMoisan/repos/TaskMaster-wt/prep-751`
+- Worktree audited: `<user-profile>/repos/TaskMaster-wt/prep-751`
 - Branch: `bug/terminal-notification-hook-test-lacks-sync-barrier-751`
 - Head commit: `d2fbc327` (2026-09-03T14:49:35-04:00)
 - Base ref supplied by caller: `f8414ee9`
@@ -201,7 +201,7 @@ Non-blocking findings: **7**.
 - **NB-6 (command shape).** The format step ran `dotnet tool run csharpier format <two files>` rather than `CLAUDE.md`'s `format .`. Immaterial: the verification step ran `csharpier check .` repository-wide at exit 0, and this reviewer re-ran the scoped check at exit 0.
 - **NB-7 (design coupling).** `Volatile.Read(ref sut.InvokedTerminalHookCount)` takes a `ref` to another type's internal instance field. It compiles only while that member remains a field; converting it to a property would break the assertion at compile time. This is consistent with the fixture's existing `_loadCount` pattern and is a deliberate trade against introducing a new accessor, but it is a coupling a future maintainer should know about.
 
-Operational note (not a finding against the delivery): `.claude/hooks/validate-feature-review-coverage.ps1` resolves the advertised artifact paths and `artifacts/pr_context.summary.txt` with **relative** paths, against its own process working directory. The three artifacts of this review exist only under `C:/Users/DanMoisan/repos/TaskMaster-wt/prep-751`. If the hook executes with the shared session worktree as its working directory, it will not find them, because that worktree's copy of this feature folder contains only `issue.md`, `plan.2026-09-03T11-48.md`, `spec.md`, and the research record. Per the delegating instruction, no mirror was created and no `.git/info/exclude` was edited; the need is reported instead. In that same session worktree the changed-language set derived from `artifacts/pr_context.summary.txt` is empty (all ten parsed rows are `.md`), so the hook's coverage checks would be skipped there in any case.
+Operational note (not a finding against the delivery): `.claude/hooks/validate-feature-review-coverage.ps1` resolves the advertised artifact paths and `artifacts/pr_context.summary.txt` with **relative** paths, against its own process working directory. The three artifacts of this review exist only under `<user-profile>/repos/TaskMaster-wt/prep-751`. If the hook executes with the shared session worktree as its working directory, it will not find them, because that worktree's copy of this feature folder contains only `issue.md`, `plan.2026-09-03T11-48.md`, `spec.md`, and the research record. Per the delegating instruction, no mirror was created and no `.git/info/exclude` was edited; the need is reported instead. In that same session worktree the changed-language set derived from `artifacts/pr_context.summary.txt` is empty (all ten parsed rows are `.md`), so the hook's coverage checks would be skipped there in any case.
 
 ## 9. Summary of Changes
 

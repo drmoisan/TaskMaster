@@ -7,7 +7,7 @@ Timestamp: 2026-08-04T15-02
 
 Command: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
 
-Working directory: repository root (`c:\Users\DanMoisan\source\repos\drmoisan\TaskMaster`)
+Working directory: repository root (`<user-profile>\source\repos\drmoisan\TaskMaster`)
 
 Coverage artifact read: `coverage/coverage.cobertura.xml`
 

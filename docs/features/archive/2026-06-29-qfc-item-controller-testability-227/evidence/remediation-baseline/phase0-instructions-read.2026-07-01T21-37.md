@@ -9,12 +9,12 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and standards)
 
 Files read (policy):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-29-09-38\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\tonality.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\ci-workflows.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-29-09-38\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\tonality.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-29-09-38\.claude\rules\ci-workflows.md
 
 Files read (authoritative inputs per plan §Authoritative Inputs):
 - docs/features/active/2026-06-29-qfc-item-controller-testability-227/remediation-plan.2026-07-01T00-30.md (plan of record)

@@ -4,7 +4,7 @@ Timestamp: 2026-08-10T14-20
 
 - **Feature:** `2026-08-10-cobertura-coverage-arithmetic-441`
 - **Issues:** #441 (descendant-axis double count), #478 (blended merge denominator)
-- **Worktree root:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a953f53c75b721348`
+- **Worktree root:** `<repo-root>\.claude\worktrees\agent-a953f53c75b721348`
 - **Scope:** PowerShell only. Toolchain per `.claude/rules/powershell.md:13-20` (PoshQC format -> PSScriptAnalyzer analyze -> Pester test, via MCP).
 
 ## 0. Method and tool limitations (read first)
@@ -655,7 +655,7 @@ so it carries the generator's own correct root attributes as ground truth.
 # Run from the worktree root.
 # Pre-change: check out the unmodified Helpers.ps1. Post-change: after the fix.
 pwsh -NoProfile -Command @'
-$root = "C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a953f53c75b721348"
+$root = "<repo-root>\.claude\worktrees\agent-a953f53c75b721348"
 . (Join-Path $root "scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1")
 $raw = Get-Content -LiteralPath (Join-Path $root "docs\features\active\2026-08-06-quickfiler-high-confidence-queue-init-stall-424\evidence\baseline\coverage-baseline.cobertura.xml") -Raw -Encoding UTF8
 [xml]$doc = $raw
@@ -724,7 +724,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass `
 **Caveat 1 — the `\.claude\` exclusion is NOT implemented in the script.**
 `scripts/vscode/Invoke-MSTestWithCoverage.ps1:296-302` filters only `\bin\<Configuration>\`, `\obj\`,
 and `\ref\`. There is no `\.claude\` guard. Running with `-SearchRoot .` from the **main** checkout
-(`C:\Users\DanMoisan\repos\TaskMaster`) therefore descends into `.claude\worktrees\agent-*\**` and
+(`<repo-root>`) therefore descends into `.claude\worktrees\agent-*\**` and
 picks up stale sibling-worktree assemblies, producing bogus `AssemblyInitialize` signature failures
 (documented in `.claude/agent-memory/atomic-planner/reference_invoke_mstest_with_coverage_script.md:12`).
 In **this** worktree the hazard is currently inert — `Glob .claude/worktrees/**/*.md` returns nothing,

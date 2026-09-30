@@ -12,8 +12,8 @@ Resolved Coverage Output:
 Conversion Output:
 ```text
 dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.9]
-Including file C:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\remediation-baseline\r4-baseline-vstest.coverage.
-Merged into file C:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\remediation-baseline\r4-baseline-vstest.cobertura.xml.
+Including file <repo-root>\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\remediation-baseline\r4-baseline-vstest.coverage.
+Merged into file <repo-root>\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\remediation-baseline\r4-baseline-vstest.cobertura.xml.
 ```
 
 Numeric Baseline Coverage:

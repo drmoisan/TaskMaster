@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T13-08
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' check .; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; & '<user-profile>\.dotnet\tools\csharpier.exe' check .; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
 ```
 
 EXIT_CODE: 0

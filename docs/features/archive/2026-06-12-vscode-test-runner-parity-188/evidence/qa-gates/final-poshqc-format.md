@@ -2,7 +2,7 @@
 
 Timestamp: 2026-06-12T18-30
 
-Command: mcp__drm-copilot__run_poshqc_format (workspace_root=c:\Users\DanMoisan\repos\TaskMaster, scan_folders=["scripts/vscode", "tests/scripts/vscode"])
+Command: mcp__drm-copilot__run_poshqc_format (workspace_root=<repo-root>, scan_folders=["scripts/vscode", "tests/scripts/vscode"])
 
 EXIT_CODE: 0
 

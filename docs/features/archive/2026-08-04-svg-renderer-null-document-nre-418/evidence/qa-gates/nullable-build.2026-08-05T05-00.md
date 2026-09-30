@@ -14,7 +14,7 @@ fallback was needed:
 
 ```
 Command: ls -la "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe"
-Output:  -rwxr-xr-x 1 DanMoisan 197121 378712 Jul 17 13:09 .../MSBuild.exe
+Output:  -rwxr-xr-x 1 <user> 197121 378712 Jul 17 13:09 .../MSBuild.exe
 ```
 
 **Outlook not running.** Checked because `/t:Rebuild` deletes output files and a live Outlook process
@@ -101,8 +101,8 @@ Complete verbatim output:
 
 ```
 
-  SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll
-  SVGControl.Test -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\bin\Debug\SVGControl.Test.dll
+  SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll
+  SVGControl.Test -> <repo-root>\SVGControl.Test\bin\Debug\SVGControl.Test.dll
 ```
 
 ### Per-code per-file diagnostic table
@@ -149,7 +149,7 @@ Complete verbatim output:
 
 ```
 
-  SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll
+  SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll
 ```
 
 ### Per-code per-file diagnostic table

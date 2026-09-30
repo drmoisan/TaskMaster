@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T15-07Z
 
-Command: `cd "C:/Users/DanMoisan/repos/TaskMaster-wt/2026-07-21T10-25" && grep -n "DETERMINATION: B" docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/p5-uidispatch-rootcause-diagnosis.2026-07-22T15-07.md`
+Command: `cd "<user-profile>/repos/TaskMaster-wt/2026-07-21T10-25" && grep -n "DETERMINATION: B" docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/p5-uidispatch-rootcause-diagnosis.2026-07-22T15-07.md`
 
 EXIT_CODE: 0
 

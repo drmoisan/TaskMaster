@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P3-T10]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git diff --numstat 003c5715055d7d1933db68a742531332756e30b2 -- TaskMaster/AppGlobals/AppItemEngines.cs UtilitiesCS/Interfaces/IGlobals/IAppItemEngines.cs TaskMaster/AppGlobals/ApplicationGlobals.cs"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git diff --numstat 003c5715055d7d1933db68a742531332756e30b2 -- TaskMaster/AppGlobals/AppItemEngines.cs UtilitiesCS/Interfaces/IGlobals/IAppItemEngines.cs TaskMaster/AppGlobals/ApplicationGlobals.cs"`
 EXIT_CODE: 0
 
 ## Why this form of the command

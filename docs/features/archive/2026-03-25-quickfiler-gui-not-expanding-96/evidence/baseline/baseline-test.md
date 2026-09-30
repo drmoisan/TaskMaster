@@ -11,7 +11,7 @@ VSTest version 18.4.0 (x64)
 
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
-No test matches the given testcase filter `FullyQualifiedName~QfcItemController_KeyboardRegistration` in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
+No test matches the given testcase filter `FullyQualifiedName~QfcItemController_KeyboardRegistration` in <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
 ```
 
 **Expected baseline state confirmed:** `QfcItemController_KeyboardRegistration` tests do not yet exist

@@ -49,7 +49,7 @@ See policy-audit.md's Coverage Verification section. Repo-scoped (whole-instrume
 
 ### Finding 3 — Informational only: local account/host identifiers in evidence artifacts
 
-Several `.md` evidence files (`p1-t4`, `p2-t4`, `p2-t5`, `p5-t8`, others) quote vstest's default TRX filename, which embeds the local Windows account name and hostname (`DanMoisan_MEGALODON4_...`), and the committed Cobertura XML files' `filename=` attributes embed the full local absolute worktree path (`C:\Users\DanMoisan\repos\TaskMaster\...`). This is the default, unconfigured output of `vstest.console.exe`/`dotnet-coverage` in this environment, not an authoring choice, and no repository policy explicitly prohibits it. Not scored as a defect; noted for awareness only, consistent with general artifact-hygiene practice of avoiding embedded local identifiers in committed files where practical.
+Several `.md` evidence files (`p1-t4`, `p2-t4`, `p2-t5`, `p5-t8`, others) quote vstest's default TRX filename, which embeds the local Windows account name and hostname (`<user>_<host>_...`), and the committed Cobertura XML files' `filename=` attributes embed the full local absolute worktree path (`<repo-root>\...`). This is the default, unconfigured output of `vstest.console.exe`/`dotnet-coverage` in this environment, not an authoring choice, and no repository policy explicitly prohibits it. Not scored as a defect; noted for awareness only, consistent with general artifact-hygiene practice of avoiding embedded local identifiers in committed files where practical.
 
 ## Summary
 

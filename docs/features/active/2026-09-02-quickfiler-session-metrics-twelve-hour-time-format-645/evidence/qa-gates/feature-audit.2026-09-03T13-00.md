@@ -46,9 +46,9 @@ file, 4,014 total) in two committed Cobertura evidence files — does not corres
 10 formal acceptance criteria above (it is an evidence-hygiene defect, not a feature-delivery
 defect). It was independently re-verified as resolved in this reaudit:
 
-1. **Leak removal:** `git grep -c "DanMoisan"` against both files at current HEAD returns 0 matches
+1. **Leak removal:** `git grep -c "<user>"` against both files at current HEAD returns 0 matches
    for each (exit code 1, no output), independently corroborated by a Grep-tool case-insensitive
-   scan and a PowerShell regex sweep for both `DanMoisan` and `C:\Users` patterns. See
+   scan and a PowerShell regex sweep for both `<user>` and `C:\Users` patterns. See
    `policy-audit.2026-09-03T13-00.md` § "Independent Verification 1" for full detail.
 2. **Well-formedness:** both files re-parse as valid XML with root element `coverage`; attribute
    count (`filename="` occurrences, 3,147 per file) is unchanged before/after, confirming a

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T11:07:16Z
 
-Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleCoverageTests.cs').Path; $tool='C:\Users\DanMoisan\.dotnet\tools\csharpier.exe'; & $tool format $file --log-level Information; $first=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; $firstLines=(Get-Content -LiteralPath $file).Count; & $tool format $file --log-level Information; $second=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; $secondLines=(Get-Content -LiteralPath $file).Count; & $tool check $file --log-level Information`
+Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleCoverageTests.cs').Path; $tool='<user-profile>\.dotnet\tools\csharpier.exe'; & $tool format $file --log-level Information; $first=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; $firstLines=(Get-Content -LiteralPath $file).Count; & $tool format $file --log-level Information; $second=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; $secondLines=(Get-Content -LiteralPath $file).Count; & $tool check $file --log-level Information`
 
 EXIT_CODE: 0
 

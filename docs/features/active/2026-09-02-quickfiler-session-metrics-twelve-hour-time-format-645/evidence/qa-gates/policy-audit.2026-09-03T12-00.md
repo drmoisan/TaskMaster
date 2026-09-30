@@ -184,13 +184,13 @@ and
 filename="...">` attribute. Verified by direct count:
 
 ```
-git grep -c "DanMoisan" <both files>
+git grep -c "<user>" <both files>
   .../evidence/baseline/coverage-baseline.cobertura.xml:2007
   .../evidence/qa-gates/coverage-final.cobertura.xml:2007
 ```
 
 Each file carries 2,007 occurrences of the literal path
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a6cd1c774527c71c3\...` (4,014
+`<repo-root>\.claude\worktrees\agent-a6cd1c774527c71c3\...` (4,014
 occurrences total across the two files), introduced in commits `9cc37d01` (baseline) and `6c1ac1f1`
 (final). This is a host-identifying data leak: it discloses the operator's Windows account name and
 local directory layout in a file intended to be merged into shared repository history. Notably,

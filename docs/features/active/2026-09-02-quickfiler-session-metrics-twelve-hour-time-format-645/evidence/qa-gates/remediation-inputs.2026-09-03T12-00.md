@@ -13,9 +13,9 @@
   (added in commit `6c1ac1f1`)
 
 **Defect:** Every `<class filename="...">` attribute in both files embeds the literal absolute
-path `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a6cd1c774527c71c3\...`, disclosing
+path `<repo-root>\.claude\worktrees\agent-a6cd1c774527c71c3\...`, disclosing
 the operator's Windows account name and local worktree layout. Confirmed count: 2,007 occurrences
-per file (`git grep -c "DanMoisan" <file>`), 4,014 total. This class of defect has recurred across
+per file (`git grep -c "<user>" <file>`), 4,014 total. This class of defect has recurred across
 multiple prior feature reviews in this repository (host path / TRX identifier leaks) and is treated
 as a required-remediation finding, not an advisory note.
 
@@ -26,7 +26,7 @@ account name and directory layout into shared git history.
 **Required remediation (does not touch the production or test files):**
 1. Regenerate or redact both Cobertura files so no `filename=` attribute contains an absolute
    host path. Preferred approach: substitute the absolute worktree-root prefix
-   (`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a6cd1c774527c71c3\`) with a
+   (`<repo-root>\.claude\worktrees\agent-a6cd1c774527c71c3\`) with a
    repository-relative marker, applied case-insensitively across the whole file, in binary/raw mode
    so backslash-vs-forward-slash variants are both caught.
 2. After substitution, verify each rewritten file still parses as well-formed XML (a textual
@@ -43,7 +43,7 @@ account name and directory layout into shared git history.
 
 **Verification the reviewer performed (for the remediator's reference):**
 ```
-git grep -c "DanMoisan" \
+git grep -c "<user>" \
   docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/evidence/baseline/coverage-baseline.cobertura.xml \
   docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/evidence/qa-gates/coverage-final.cobertura.xml
 ```

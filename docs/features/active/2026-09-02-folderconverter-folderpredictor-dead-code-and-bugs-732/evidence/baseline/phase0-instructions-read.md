@@ -9,7 +9,7 @@ Policy Order:
 4. .claude/rules/csharp.md
 
 Confirmation (each file read in full, in the item worktree
-C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-aa274c17b2c682ab3):
+<repo-root>/.claude/worktrees/agent-aa274c17b2c682ab3):
 
 - CLAUDE.md: read in full (448 lines) — Policy Compliance Order, General Code Change Policy
   (including Bugfix Workflow), General Unit Test Policy, C# Code Change Policy, C# Unit Test

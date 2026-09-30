@@ -8,7 +8,7 @@
 - **Last Updated:** 2026-07-16T21-53
 - **Status:** Draft — pending atomic-executor preflight (`DIRECTIVE: PREFLIGHT VALIDATION ONLY`)
 - **Requirements sources:** `<FEATURE>/issue.md`, `<FEATURE>/spec.md` (FR-1..FR-7, AC-1..AC-13), `<FEATURE>/user-story.md` (US-1..US-8), `<FEATURE>/research/2026-07-16T22-30-quickfiler-breadcrumb-webview2-research.md`, `docs/features/epics/folder-tree-breadcrumb-redesign/epic.md`
-- **Workspace root:** `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a1d165d3cb6c7c026` (all relative paths below resolve against this root)
+- **Workspace root:** `<repo-root>/.claude/worktrees/agent-a1d165d3cb6c7c026` (all relative paths below resolve against this root)
 
 ## Required References (policy compliance order)
 
@@ -65,7 +65,7 @@ The JaCoCo coverage XML at `artifacts/csharp/coverage.xml` (Phase 7) is a non-ev
   - Acceptance: `docs/features/active/2026-07-16-quickfiler-breadcrumb-webview2-351/evidence/baseline/phase0-instructions-read.md` exists containing `Timestamp:`, `Policy Order:`, and the explicit list of files read.
 - [x] [P0-T2] Read the requirements sources — `docs/features/active/2026-07-16-quickfiler-breadcrumb-webview2-351/issue.md`, `spec.md`, `user-story.md`, `research/2026-07-16T22-30-quickfiler-breadcrumb-webview2-research.md`, and `docs/features/epics/folder-tree-breadcrumb-redesign/epic.md` — and record the context-read evidence.
   - Acceptance: `docs/features/active/2026-07-16-quickfiler-breadcrumb-webview2-351/evidence/baseline/phase0-context-read.<TS>.md` exists with `Timestamp:` and the explicit list of documents read, confirming Work Mode `full-feature` and the FR-1..FR-7 / AC-1..AC-13 inventory.
-- [x] [P0-T3] Record the git baseline state (current branch, HEAD SHA, `git status` cleanliness) for the workspace root `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a1d165d3cb6c7c026`.
+- [x] [P0-T3] Record the git baseline state (current branch, HEAD SHA, `git status` cleanliness) for the workspace root `<repo-root>/.claude/worktrees/agent-a1d165d3cb6c7c026`.
   - Acceptance: `docs/features/active/2026-07-16-quickfiler-breadcrumb-webview2-351/evidence/baseline/git-baseline-state.<TS>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (branch, SHA, clean/dirty).
 - [x] [P0-T4] Run the baseline formatting check `dotnet tool run csharpier check .` from the repo root and record the command-step artifact under `docs/features/active/2026-07-16-quickfiler-breadcrumb-webview2-351/evidence/baseline/`.
   - Acceptance: `evidence/baseline/baseline-csharpier-check.<TS>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` (pass/fail and any pre-existing unformatted-file count). Baseline capture does not mutate files.

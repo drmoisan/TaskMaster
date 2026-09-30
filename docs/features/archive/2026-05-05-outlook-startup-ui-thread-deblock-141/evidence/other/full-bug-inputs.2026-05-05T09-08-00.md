@@ -2,13 +2,13 @@
 
 Timestamp: 2026-05-05T09:08:00-04:00
 Work Mode: full-bug
-Exact Plan Path: c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\plan.2026-05-05T08-43.md
+Exact Plan Path: <repo-root>\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\plan.2026-05-05T08-43.md
 Requirements Sources:
-- c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\issue.md
-- c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\spec.md
+- <repo-root>\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\issue.md
+- <repo-root>\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\spec.md
 Supporting Context:
-- c:\Users\DanMoisan\repos\TaskMaster\artifacts\research\20260504-outlook-startup-ui-thread-deblock-research.md
-- c:\Users\DanMoisan\repos\TaskMaster\artifacts\orchestration\orchestrator-state.json
+- <repo-root>\artifacts\research\20260504-outlook-startup-ui-thread-deblock-research.md
+- <repo-root>\artifacts\orchestration\orchestrator-state.json
 Branch: bug/outlook-startup-ui-thread-deblock-141
 SearchScope: docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/
 SearchPatterns: user-story.md

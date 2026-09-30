@@ -1,5 +1,5 @@
 Timestamp: 2026-05-06T22-23-08-04:00
-Command: mcp_drmcopilotext_run_poshqc_format {"workspace_root":"c:\\Users\\DanMoisan\\repos\\TaskMaster","scan_folders":["scripts/vscode"]}
+Command: mcp_drmcopilotext_run_poshqc_format {"workspace_root":"<repo-root>","scan_folders":["scripts/vscode"]}
 EXIT_CODE: 0
 Scoped Folder: scripts/vscode
 Changed Scripts: scripts/vscode/Invoke-MSTest.ps1, scripts/vscode/Invoke-VSBuild.ps1, scripts/vscode/TestProcessCleanup.ps1

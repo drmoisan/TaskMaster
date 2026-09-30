@@ -3,14 +3,14 @@
 Timestamp: 2026-08-11T01-36
 Iteration: **1**
 Command: `mcp__drm-copilot__run_poshqc_format` with
-`workspace_root = C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a` and
+`workspace_root = <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a` and
 `scan_folders = ["scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1", "scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Tests.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"]`
 EXIT_CODE: MCP `ok:true` (the format surface emits no process exit code)
 
 MCP Result (verbatim):
 
 ```json
-{"ok":true,"tool":"run_poshqc_format","workspace_root":"C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC format against 'C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 4 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_format","workspace_root":"<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC format against '<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 4 selected scan folder(s)."}
 ```
 
 `tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Unit.Tests.ps1` is correctly absent

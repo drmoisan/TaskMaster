@@ -8,7 +8,7 @@ status: research complete, no source changed
 # Issue #491 — `QuickFiler.Test.Form1` live-form removal — research
 
 All line numbers below were re-derived directly from the worktree at
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a32345a9498cf124e` on 2026-08-21. No
+`<repo-root>\.claude\worktrees\agent-a32345a9498cf124e` on 2026-08-21. No
 source file was edited to produce this document.
 
 ## Verdict

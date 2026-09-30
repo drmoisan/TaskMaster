@@ -13,16 +13,16 @@ Policy Order:
 8. .claude/skills/acceptance-criteria-tracking/SKILL.md (AC check-off protocol)
 
 Files Read:
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\atomic-plan-contract\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\policy-compliance-order\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\acceptance-criteria-tracking\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\docs\features\active\2026-06-28-non-deterministic-createasync-task-wait-tests-219\issue.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\docs\features\active\2026-06-28-non-deterministic-createasync-task-wait-tests-219\plan.2026-06-28T19-42.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\atomic-plan-contract\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\policy-compliance-order\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\.claude\skills\acceptance-criteria-tracking\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\docs\features\active\2026-06-28-non-deterministic-createasync-task-wait-tests-219\issue.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\docs\features\active\2026-06-28-non-deterministic-createasync-task-wait-tests-219\plan.2026-06-28T19-42.md
 
 Output Summary: All required policy files plus the feature issue.md and plan were read in the
 mandatory order. Work Mode is minor-audit; AC source is issue.md (## Acceptance Criteria,

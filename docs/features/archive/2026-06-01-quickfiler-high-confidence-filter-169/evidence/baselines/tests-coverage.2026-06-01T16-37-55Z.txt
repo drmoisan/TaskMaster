@@ -1,6 +1,6 @@
 Command: vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Test\bin\Debug\QuickFiler.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /EnableCodeCoverage
 vstest.console.exe path: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
-Working directory: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+Working directory: <user-profile>\repos\TaskMaster-wt-2026-06-01-08-21
 Timestamp (UTC): 2026-06-01T16-37-55Z
 
 == Test results ==
@@ -10,7 +10,7 @@ Run 2 (re-run, same assemblies): Total 3965, Passed 3965, Failed 0.
 Pre-existing-condition note: The 8 failures in run 1 were non-deterministic (flaky) and did not reproduce on the immediate re-run, which passed 3965/3965. This matches the repository's recent test-isolation work (commits 384858b8, b160037a) addressing concurrent-subscriber/timer flakiness. These flaky failures are a PRE-EXISTING condition unrelated to issue #169. The stable, deterministic baseline outcome is 3965 passing tests.
 
 == Coverage baseline (from run 1 .coverage, converted via dotnet-coverage merge -f xml) ==
-Coverage file: TestResults/95e8ed8c-b7e8-428f-a65a-b754a379e63d/DanMoisan_MEGALODON4_2026-06-01.12_42_15.coverage
+Coverage file: TestResults/95e8ed8c-b7e8-428f-a65a-b754a379e63d/<user>_<host>_2026-06-01.12_42_15.coverage
 
 Per in-scope production module (line coverage):
 - UtilitiesCS.dll: 85.39% (covered 34927, partial 883, not covered 5094)

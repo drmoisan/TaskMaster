@@ -3,9 +3,9 @@ Timestamp: 2026-08-07T20-50
 Epic: quickfiler-per-file-coverage (parent issue #136)
 Child: F7 quickfiler-qfc-home-controller-coverage (issue #433)
 Target file: QuickFiler/Controllers/QfcHomeController.cs
-Target file (absolute): C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-afcf27830d48e5590\QuickFiler\Controllers\QfcHomeController.cs
+Target file (absolute): <repo-root>\.claude\worktrees\agent-afcf27830d48e5590\QuickFiler\Controllers\QfcHomeController.cs
 Line count: 487 (500-line hard limit; 13 lines of headroom)
-Worktree: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-afcf27830d48e5590
+Worktree: <repo-root>\.claude\worktrees\agent-afcf27830d48e5590
 Base commit: 74be1964
 Upstream contract: F1 quickfiler-coverage-ledger (wave 0) — not yet on disk
 Toolchain executed: none (msbuild/vstest deliberately not run; measurement deferred to F1's harness)

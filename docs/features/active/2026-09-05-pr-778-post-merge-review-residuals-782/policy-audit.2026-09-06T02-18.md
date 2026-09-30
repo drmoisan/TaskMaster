@@ -63,7 +63,7 @@ each was offered as a fact to verify and one of them is inaccurate.
 
 2. Caller text, verbatim:
 
-   > Worktree root `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`; branch checked out; tree
+   > Worktree root `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`; branch checked out; tree
    > clean. Use `git -C <worktree-root> ...` and Read / Grep / Glob. No `cd`, `cat`, `grep`, or `sed`
    > via a shell.
 
@@ -155,7 +155,7 @@ inherited from `origin/main` and none of it is attributable to this delivery.
 | 2.8 | Comment why, not what; comments match behavior | PASS | The three corrected comment passages (`WpfDispatcherYield.cs:53-59`, `EmailMoveMonitorTests.cs:27-40`, `QfcItemController.InitializationTests.Part2.cs:121-131`) each replace a claim falsified by PR #778 with the mechanism the code has today. Verified by reading both sides of the diff. |
 | 2.9 | Mandatory toolchain loop, one uninterrupted pass | PASS | Re-executed by this reviewer: format check, analyzer build, nullable build all exit 0 at the current head. The delivery's own loop-closure record `evidence/qa-gates/r-p4-t7-loop-closure.md` states `PASS NUMBER: 1`. |
 | 2.10 | Dependencies — none added | PASS | No `packages.config`, `.csproj` `<Reference>`, or `<PackageReference>` change. The only `.csproj` edit adds two `<Compile Include>` entries. |
-| 2.11 | No absolute host paths in artifacts | FAIL | **Correction to this reviewer's cycle-1 row 2.11, which recorded PASS.** Two committed artifacts embed the absolute host path including the account name: `plan.2026-09-05T15-47.md:42` and `research/research.2026-09-05T16-10.md:6`, both reading `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`. The cycle-1 evidence sentence was scoped to `evidence/` artifacts, where the substitution is genuinely complete; the criterion is stated over artifacts generally. Non-blocking: 827 committed documents under `docs/` on `origin/main` already carry the same path, no `.claude/rules/` file or `CLAUDE.md` section codifies the prohibition, and the two occurrences are a negligible addition to an established repository-wide pattern. Recorded as finding N1. |
+| 2.11 | No absolute host paths in artifacts | FAIL | **Correction to this reviewer's cycle-1 row 2.11, which recorded PASS.** Two committed artifacts embed the absolute host path including the account name: `plan.2026-09-05T15-47.md:42` and `research/research.2026-09-05T16-10.md:6`, both reading `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`. The cycle-1 evidence sentence was scoped to `evidence/` artifacts, where the substitution is genuinely complete; the criterion is stated over artifacts generally. Non-blocking: 827 committed documents under `docs/` on `origin/main` already carry the same path, no `.claude/rules/` file or `CLAUDE.md` section codifies the prohibition, and the two occurrences are a negligible addition to an established repository-wide pattern. Recorded as finding N1. |
 | 2.12 | Bugfix workflow — failing regression test first | PASS | Three separate RED-first records exist and are corroborated by committed TRX counters: `evidence/regression-testing/p4-t7-fail-before.md` (exit 1, both guards removed together so the demonstration is not vacuous), `p4-t8-pass-after.md` (exit 0 after `git checkout HEAD --` restore), and `r-p1-t7-fail-before.md` (TRX `outcome="Failed"`, 2 total, 1 failed). |
 
 ## 3. Language-Specific Code Change Policy Compliance (C#)

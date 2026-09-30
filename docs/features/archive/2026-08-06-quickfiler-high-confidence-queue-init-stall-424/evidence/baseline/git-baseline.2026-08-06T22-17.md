@@ -2,7 +2,7 @@
 
 - **Issue:** #424
 - **Task:** [P0-T3]
-- **Repo root:** `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-04T18-38`
+- **Repo root:** `<user-profile>\repos\TaskMaster-wt\2026-08-04T18-38`
 - **Branch:** `bug/quickfiler-high-confidence-queue-init-stall-424`
 
 Timestamp: 2026-08-06T22-17

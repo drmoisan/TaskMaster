@@ -6,6 +6,6 @@ Raw Highlights:
 - Total tests: 3930
 - Passed: 3928
 - Skipped: 2
-- Code coverage results: `C:\Users\DanMoisan\repos\TaskMaster\coverage\coverage.cobertura.xml`
+- Code coverage results: `<repo-root>\coverage\coverage.cobertura.xml`
 - Line coverage: 78.16% (157742/201826)
 - Branch coverage: 63.24% (18020/28495)

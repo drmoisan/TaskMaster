@@ -1,13 +1,13 @@
 Timestamp: 2026-07-03T22-05-04:00
-Command: dotnet-coverage merge "docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest-results\01b8e2df-8bd7-4041-bb9b-20df582a4dc3\DanMoisan_MEGALODON4_2026-07-03.22_05_15.coverage" -o docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest.cobertura.xml -f cobertura
+Command: dotnet-coverage merge "docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest-results\01b8e2df-8bd7-4041-bb9b-20df582a4dc3\<user>_<host>_2026-07-03.22_05_15.coverage" -o docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest.cobertura.xml -f cobertura
 EXIT_CODE: 0
 Output Summary: P3 coverage conversion and extraction passed. Repository-path coverage was 13120/57379 = 22.87%; focused new-code coverage for QfcStreamingDequeueConfidenceGate.cs was 57/60 = 95.00%.
 
 Conversion Output:
 ```text
 dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.9]
-Including file C:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest-results\01b8e2df-8bd7-4041-bb9b-20df582a4dc3\DanMoisan_MEGALODON4_2026-07-03.22_05_15.coverage.
-Merged into file C:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest.cobertura.xml.
+Including file <repo-root>\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest-results\01b8e2df-8bd7-4041-bb9b-20df582a4dc3\<user>_<host>_2026-07-03.22_05_15.coverage.
+Merged into file <repo-root>\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\r4-vstest.cobertura.xml.
 ```
 
 Numeric Coverage:

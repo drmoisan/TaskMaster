@@ -1,7 +1,7 @@
 # Phase 3 — Nullable / Type-Check Build After Defect-1 Contract Removal (Issue #449, [P3-T5])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command:
 ```

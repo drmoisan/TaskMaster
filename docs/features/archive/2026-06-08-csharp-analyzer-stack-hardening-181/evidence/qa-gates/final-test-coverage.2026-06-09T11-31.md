@@ -7,7 +7,7 @@ EXIT_CODE: 0
 Output Summary:
 - Total tests: 4065; Passed: 4065; Failed: 0; Skipped: 0.
 - Test Run Successful (EXIT_CODE 0).
-- Coverage source: TestResults/.../DanMoisan_MEGALODON4_2026-06-09.12_55_39.coverage
+- Coverage source: TestResults/.../<user>_<host>_2026-06-09.12_55_39.coverage
   -> merged to evidence/qa-gates/final-coverage.2026-06-09T11-31.xml
 
 Numeric post-change coverage:

@@ -5,7 +5,7 @@ Command: pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -
 EXIT_CODE: 0
 
 Output Summary:
-Coverage output: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml
+Coverage output: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml
 dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.9]
   Passed ExecuteMovesAsync_WhenAlreadyExecuting_ReturnsWithoutAccessingNullFields [204 ms]
   Passed QuickFileMetrics_WRITE_WithEmptyList_SkipsBodyAndDoesNotThrow [6 ms]
@@ -70,7 +70,7 @@ Output:
 ```text
 Using vstest.console: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
 Discovered 8 test assemblies.
-Coverage output: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml
+Coverage output: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml
 dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.9]
 
 SessionId: 175edcbc-44d7-47fd-ba99-97a1feed74cc
@@ -78,7 +78,7 @@ VSTest version 18.7.0 (x64)
 
 Starting test execution, please wait...
 A total of 8 test files matched the specified pattern.
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ExecuteMovesAsync_WhenAlreadyExecuting_ReturnsWithoutAccessingNullFields [204 ms]
   Passed QuickFileMetrics_WRITE_WithEmptyList_SkipsBodyAndDoesNotThrow [6 ms]
   Passed QuickFileMetrics_WRITE_WithNullList_SkipsBodyAndDoesNotThrow [< 1 ms]
@@ -547,7 +547,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-
   Passed EfcViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
   Passed ItemViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
   Passed EfcViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ItemViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults [< 1 ms]
   Passed AddOption_WhenNewDuplicateAndEmptyInputs_UpdatesSelectionState [261 ms]
   Passed ToggleMethods_WhenOptionExists_AddRemoveAndUpdateSelectionState [1 ms]
@@ -557,7 +557,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-
   Passed ResolvePrefix_WhenMissingOrInvalid_UsesDefaultOrThrows [5 ms]
   Passed FilterToSelected_AfterStateTransitions_ReloadsOnlySelectedControls [3 ms]
   Passed LoadSelections_WhenExistingSelectionsUseBothForms_TogglesMatchingOptions [1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed SearchAndReload_WhenFilterChanges_ReplacesVisibleCheckboxes [5 ms]
   Passed UpdateSelections_AfterFiltering_SynchronizesPrivateSelectionLists [1 ms]
   Passed SelectControlMethods_WhenPositionsChange_UpdateFocusIndexOrThrow [8 ms]
@@ -754,8 +754,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-
   Passed LoadAsync_WhenTimingEnabled_RecordsAllPhasesInStartupOrderWithLoadBasicFirst [5 ms]
   Passed LoadAsync_WhenTimingEnabled_EmitsExactlyOneTableWithPhaseNamesAndTotal [9 ms]
   Passed LoadAsync_PreservesPhaseOrderingAndYieldCount_WhenTimingOnVersusOff [8 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed LoadSequentialAsync_InvokesProbeForEachBoundaryInStartupOrder [3 ms]
   Passed LoadSequentialAsync_InvokesProbeExactlyOncePerBoundary [2 ms]
   Passed HighConfidenceModeEnabled_Default_IsFalse [< 1 ms]
@@ -875,7 +875,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-
   Passed SetProjectId_MalformedId_ShowsErrorDialogAndReturnsFalse [773 ms]
   Passed AutoCodeIdAsync_WithEmptyAndExistingIds_UsesBranchSpecificTransitions [38 ms]
   Passed SetProjectId_ChangeConfirmedYes_UpdatesProjectId [15 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ReadOnlyPropertyTransitions_UpdateCachedStateWithoutWritingFields [11 ms]
   Passed SetProjectId_ChangeConfirmedNo_LeavesProjectIdUnchanged [13 ms]
   Passed SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction [24 ms]
@@ -3534,7 +3534,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-
   Passed InitAsync_WhenResourcesDeserializeLoaders_AddsConvertersAndWritesCurrentConfiguration [82 ms]
   Passed WireNotifications_OnMappedToChange_RaisesPropertyChanged [1 ms]
   Passed OlFolder_Setter_RefreshesNameAndRelativePath [1 ms]
-Error opening data file C:\Users\DanMoisan\AppData\Local\TaskMaster\tessdata/eng.traineddata
+Error opening data file <user-profile>\AppData\Local\TaskMaster\tessdata/eng.traineddata
 Please make sure the TESSDATA_PREFIX environment variable is set to your "tessdata" directory.
 Failed loading language 'eng'
 Tesseract couldn't load any languages!
@@ -3545,7 +3545,7 @@ Tesseract couldn't load any languages!
   Passed Config_SetAndGet_RoundTrips [< 1 ms]
   Passed ReadConfigurationAsync_WithFixtureResources_ProducesBreakdownRowPerEntry [1 ms]
   Passed MailHelpers_SetAndGet_RoundTrips [< 1 ms]
-Error opening data file C:\Users\DanMoisan\AppData\Local\TaskMaster\tessdata/eng.traineddata
+Error opening data file <user-profile>\AppData\Local\TaskMaster\tessdata/eng.traineddata
 Please make sure the TESSDATA_PREFIX environment variable is set to your "tessdata" directory.
 Failed loading language 'eng'
 Tesseract couldn't load any languages!
@@ -5046,8 +5046,8 @@ Tesseract couldn't load any languages!
   Passed ToFormattedText_ForNumericDictionaries_FormatsExpectedDecimalPlaces [4 ms]
   Passed ArrayToDatatable_WithHeadersAndNestedValues_BuildsExpectedTable [1 ms]
   Passed ArrayToDatatable_WithHeaderLengthMismatch_ThrowsArgumentException [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
-MSTest Executor: Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\SVGControl.Test\bin\Debug\SVGControl.Test.dll (Workers: 24, Scope: ClassLevel).
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
+MSTest Executor: Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\SVGControl.Test\bin\Debug\SVGControl.Test.dll (Workers: 24, Scope: ClassLevel).
   Passed ToFormattedTextAndMarkdown_ForTwoDimensionalArray_RenderAllPrimitiveCells [< 1 ms]
   Passed DataFramePrettyHelpers_RenderRowsMarkdownAndConsoleOutput [2 ms]
   Passed ArrayToDatatable_WithoutHeaders_BuildsDefaultColumns [1 ms]
@@ -5098,7 +5098,7 @@ Test Run Successful.
 Total tests: 4999
      Passed: 4999
  Total time: 51.4114 Seconds
-Code coverage results: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml.
+Code coverage results: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml.
 Post-processing coverage XML for Koverage compatibility...
-Done. Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml
+Done. Coverage artifact: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\qa-gates\remediation-cycle2-current-coverage.cobertura.xml
 ```

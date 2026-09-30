@@ -9,7 +9,7 @@ Output Summary:
 "Tool 'csharpier' (version '1.2.6') was restored. Available commands: csharpier /
 Restore was successful." Ran with an explicit `--tool-manifest` path pointing at the
 item worktree's own repo-root `dotnet-tools.json`
-(C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aa274c17b2c682ab3\dotnet-tools.json)
+(<repo-root>\.claude\worktrees\agent-aa274c17b2c682ab3\dotnet-tools.json)
 because the Bash tool's cwd resets to the session-root worktree between calls, and a
 plain `dotnet tool restore` with no manifest argument would otherwise walk up from that
 session-root cwd and restore the sibling worktree's manifest instead of this item
