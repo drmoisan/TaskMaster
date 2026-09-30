@@ -9,7 +9,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 1
 - recolor_generation: 0
-- last_updated: 2026-09-30T08-17
+- last_updated: 2026-09-30T08-22
 - next_step: await cohort 1 children (929, 940, 942); 941 to launch only after its admission appears in the checkpoint
 
 ## Items
@@ -22,7 +22,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 929 | docs/features/active/2026-09-28-package-manifest-consistency-residuals-929 | 1 | in_flight | worktree_created |  |  |
 | 930 | docs/features/active/2026-09-28-csharp-latent-hazards-uithread-ilglobals-comments-930 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/935 | dcce3c8169f7ec528e4b706bba66931017d60794 |
 | 931 | docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/939 | ddbab26a0149bf2ca5d0256e60686ad79e74d90c |
-| 942 | docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/946 |  |
+| 942 | docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/946 | b305903e275b8abf58e8e65831c189f517568fe4 |
 | 940 | docs/features/active/2026-09-29-filesystem-wrapper-tests-open-repository-solution-file-940 | 1 | in_flight | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
@@ -35,7 +35,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 929 | 2026-09-29T08-46 | 2026-09-30T07-05 |  |  |
 | 930 | 2026-09-29T08-46 | 2026-09-29T08-47 | 2026-09-29T10-31 |  |
 | 931 | 2026-09-29T08-46 | 2026-09-29T08-47 | 2026-09-29T20-45 |  |
-| 942 | 2026-09-30T00-52 | 2026-09-30T07-05 |  |  |
+| 942 | 2026-09-30T00-52 | 2026-09-30T07-05 | 2026-09-30T08-21 |  |
 | 940 | 2026-09-30T01-30 | 2026-09-30T07-05 |  |  |
 
 ## Cohorts
