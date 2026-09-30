@@ -3,42 +3,711 @@
 - **Issue:** #942
 - **Parent (optional):** none
 - **Owner:** drmoisan
+- **Work Mode:** full-bug (acceptance criteria come from `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md` only; no user story exists for this item and none is to be authored)
 - **Last Updated:** 2026-09-29T23-07
-- **Status:** Draft
-- **Version:** 0.1
+- **Status:** Ready for preflight
+- **Version:** 1.0
+- **Plan path continuity:** this file is updated in place for every preflight revision round. No timestamped sibling plan file is created for this cycle.
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Fail-closed evidence rule:** every command-bearing task writes one evidence artifact carrying `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. A task whose artifact is missing or incomplete stays unchecked, and the plan outcome is BLOCKED or INCOMPLETE, never PASS.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Evidence accounting rule:** the artifact path is named in the task text. Do not mark an evidence-bearing task complete without the artifact on disk at that exact path.
 
+**Evidence location:** every artifact lives under `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/` in the canonical sub-kinds `baseline/`, `regression-testing/`, `qa-gates/` and `other/`. EVIDENCE_LOCATION_OVERRIDE_REJECTED: none supplied; no artifacts-tree evidence path appears in this plan. In task text the token FEATURE abbreviates `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942`; the Write Set below spells every path in full.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+## Requirement sources
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+- Acceptance criteria: `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, section `## Acceptance Criteria`, lines 228 to 241: fourteen checkbox lines `- [ ] AC1 —` through `- [ ] AC14 —`, each on one line. The check-off edit changes only `- [ ] ACn —` to `- [x] ACn —`.
+- Design record: `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/research/2026-09-29T23-20-engine-toggle-prime-fault-race-research.md` (sections 2, 4, 6, 7, 8 and 9 govern this plan).
+- Issue metadata: `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/issue.md` carries `- Work Mode: full-bug` at line 12 and no acceptance-criteria section. It is not an acceptance-criteria source for this cycle.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#942-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+## Write Set (every file this plan creates or modifies)
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+Code files (the only paths outside the feature folder this plan may change):
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+- `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`
+- `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs`
+- `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` (new)
+- `TaskMaster.Test/TaskMaster.Test.csproj`
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+Feature documents:
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md` (check-off edits only)
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/plan.2026-09-29T23-07.md` (task check-off edits only)
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+Evidence files, all new, fixed names (the write time is the `Timestamp:` field):
+
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/phase0-instructions-read.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/scope-and-anchor.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/bootstrap-sdk.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/bootstrap-tool-restore.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/bootstrap-nuget-restore.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/bootstrap-dotnet-coverage.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/csharpier-check-baseline.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/msbuild-analyzer-baseline.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/msbuild-nullable-baseline.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/stall-probe.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/coordinator-tests-baseline.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/coverage-baseline.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/file-line-counts-baseline.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/baseline/phase0-commit.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/regression-testing/build-before-reorder.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/regression-testing/prime-fault-ordering-fail-before.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/regression-testing/build-after-reorder.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/regression-testing/prime-fault-ordering-pass-after.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/harness-hook-edit-scope.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/csproj-registration.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/production-reorder-scope.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/implementation-commit.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/csharpier-format.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/file-line-counts.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/csharpier-check-final.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/msbuild-analyzer-final.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/msbuild-nullable-final.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/coverage-post-change.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/toolchain-final-pass.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/original-test-unchanged.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/determinism-tokens.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/footprint-scope.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/qa-gates/evidence-hygiene.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/other/ac-status-summary.md`
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/evidence/other/reduced-audit-handoff.md`
+
+Files this plan must not touch, stated so the executor fails closed rather than infers: TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs, TaskMaster/Ribbon/RibbonController.EngineCommands.cs, TaskMaster.runsettings, scripts/vscode/TaskMaster.cli.runsettings, every file under scripts/vscode/, every file under .claude/, every file under config/, and every file under docs/features/potential/. No potential entry is written by this plan: the spec records hazard B as promoted separately by the coordinator, so that promotion is outside this plan's Write Set. No orchestration state file is written or named by any task. No raw test-result document (trx), raw coverage document (cobertura, coverage, coveragexml) or msbuild log is copied into the feature folder under any name; raw documents stay under the repository coverage directory, which .gitignore line 144 ignores (line 145 re-includes only its .gitkeep).
+
+## AC identity table
+
+Each ID names one checkbox in the spec's `## Acceptance Criteria` section, in document order (spec lines 228 to 241).
+
+| ID | Spec line | Opening words of the criterion |
+|---|---|---|
+| AC1 | 228 | CompletePrime invokes the injected error-log delegate before it removes the engine key |
+| AC2 | 229 | The summary documentation on CompletePrime describes the report-then-clear order |
+| AC3 | 230 | The private Harness exposes an internal settable OnLogError hook |
+| AC4 | 231 | A new partial contains the test GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged |
+| AC5 | 232 | The new test uses MSTest attributes, a strict Moq mock, FluentAssertions with reason strings |
+| AC6 | 233 | The test project contains an explicit Compile Include item for the new partial |
+| AC7 | 234 | Fail-before evidence exists as prime-fault-ordering-fail-before.md |
+| AC8 | 235 | Pass-after evidence exists as prime-fault-ordering-pass-after.md |
+| AC9 | 236 | Every test method in the coordinator fixture passes in the pass-after run, and the original test is byte-for-byte unchanged |
+| AC10 | 237 | Neither the new partial nor the Harness change introduces a sleep, delay, retry, wall-clock read, timeout, parallelism attribute, blocking wait, temporary file or scheduler seam |
+| AC11 | 238 | The final toolchain pass recorded in toolchain-final-pass.md |
+| AC12 | 239 | Coverage evidence exists as coverage-baseline.md and coverage-post-change.md |
+| AC13 | 240 | The diff against the merge base modifies no repository file outside the four code files and this feature folder |
+| AC14 | 241 | Each of the three source files is at or below the five-hundred-line ceiling |
+
+## Verified tree facts (re-derived against this worktree while authoring)
+
+1. `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` is 415 content lines (416 with the trailing newline). No nullable directive. `GetPrimeTask` documentation 237 to 246 with the `returns` element at 242 to 246; body 247 to 255. `StartPrimeIfNeeded` 261 to 278 with `lock (_primeGate)` at 269 and the assignment at 276. `StartObservedPrime` 290 to 303. `CompletePrime` documentation 327 to 340 (`summary` 327 to 331, `remarks` 332 to 340); body 341 to 355: status test 343, `return;` 345, `_primeTasks.TryRemove(engineName, out _);` 348, `var failure =` 350 to 352, `_logError(BuildPrimeFailedMessage(engineName), failure);` 354. The file carries exactly one `catch (` (181) and exactly one `lock (` (269).
+2. `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs` is 459 content lines. No nullable directive. `[TestClass]` at 22 on `public partial class EngineToggleStateCoordinatorTests` at 23. `GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse` 213 to 243 (`[TestMethod]` at 212), fetching the handle after the trigger at 223 to 224. `Harness` 403 to 441: constructor 405 to 417 with the error-log lambda on the single line 415; `OnInvalidate` 430 to 434; `Invalidations` 436; `Errors` 440. `LoggedError` 446 to 457. The file declares sixteen test methods: fifteen `[TestMethod]` lines and one `[DataTestMethod]` line (101, three data rows). The lambda `(_, _) => { }` at 35 proves discard parameters compile in this project.
+3. `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs` is 277 content lines: a second partial with no `[TestClass]`, usings System, System.Threading.Tasks, FluentAssertions, Microsoft.VisualStudio.TestTools.UnitTesting and Moq. `GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker` captures the handle before the trigger at 211 to 215.
+4. `TaskMaster.Test/TaskMaster.Test.csproj`: `<Compile Include="Ribbon\EngineToggleStateCoordinatorTests.cs" />` at 352 and `<Compile Include="Ribbon\EngineToggleStateCoordinatorTests.Race.cs" />` at 359, the latter followed by the EngineTogglePressedStateCacheTests entry at 360 and the AssemblyInfo entry at 361. Explicit compile items; an unlisted file is not compiled. The project file is excluded from the formatter by .csharpierignore line 12.
+5. `TaskMaster/Ribbon/RibbonController.EngineCommands.cs` 67 to 77 wires the production sink as `(message, exception) => logger.Error(message, exception)`; it does not re-enter the coordinator. Not modified.
+6. TaskMaster.Test/packages.config: FluentAssertions 8.11.0 (line 7), Moq 4.21.0 (41), MSTest 4.4.1 (42 to 44). FluentAssertions renders a failed `BeSameAs` as `Expected ... to refer to ..., but found ...`; the phrase `to refer to` is the stable fragment.
+7. TaskMaster.runsettings lines 4 to 7 and scripts/vscode/TaskMaster.cli.runsettings lines 4 to 7 both set Workers 0 and Scope ClassLevel; the root file additionally declares a Code Coverage collector (9 to 29). Neither is modified.
+8. scripts/vscode/Invoke-MSTestWithCoverage.ps1 (462 lines): `Get-DotnetCoverageArgumentList` 41 to 95 hard-codes the LiveOutlook exclusion at 91 and the trx logger at 93 with no extension point; `Invoke-DotnetCoverageCollection` throws at 262 on a non-zero collector exit, after vstest has written the trx; `Invoke-MSTestWithCoverageMain` 274 to 457 with `-ResultsDirectory` default coverage\test-results and `-LogFileName` default mstest-coverage-run.trx (297, 298), assembly discovery 348 to 355 (filters bin\Debug, excludes obj, ref and a .claude segment relative to the search root), post-processing in place 399 to 402, scoped-run threshold gate 406 to 409, the `First-party coverage:` line 410, the JaCoCo projection written beside the document as coverage.cobertura.jacoco.xml 415 to 423, the trx summary 430 to 447, and the raw-document retention rule 449 to 453 (retained only when the output's parent directory is the repository coverage directory, so the default output path is retained). Entry guard at 459 to 461, so dot-sourcing is safe. It prints `Discovered N test assemblies.` (374) and never prints a discovered path.
+9. scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1: `Get-CoberturaClassLineSummary` 160 to 258 (LineMap keyed by line number, TotalLines, CoveredLines, TotalBranches, CoveredBranches); `Merge-CoberturaClassesByFilename` 260 to 405 merges every class element sharing a filename into one, so a post-processed document carries exactly one class element per source file per package; `ConvertTo-KoverageCoberturaXml` 407 to 471 rewrites filename attributes to workspace-relative paths with native separators (backslash on this host) and recomputes the root counters. Threshold functions in Invoke-MSTestWithCoverage.Threshold.ps1: 80 percent line (52 to 55), 75 percent branch (122 to 125). Scope gate in Invoke-MSTestWithCoverage.Scope.ps1 59 to 104. First-party line shape in Invoke-MSTestWithCoverage.FirstParty.ps1 117 to 120. Projection, reconciliation and retention predicate in Invoke-MSTestWithCoverage.Projection.ps1 14 to 81, 83 to 146 and 148 to 197. Trx summary in Invoke-MSTest.TrxSummary.ps1: `Get-TrxRunSummary` 12 to 101 (Skipped derived at 98), `Format-TrxRunSummary` 103 to 150 (five lines, the last `Failed tests: ` followed by names or `none`).
+10. .gitignore: the coverage-directory ignore at 144 and the gitkeep re-include at 145; coverage\.gitkeep is tracked so the coverage directory always exists after checkout. .csharpierignore excludes the evidence tree (4), cobertura, coverage, coveragexml and trx files (5 to 8), csproj, props and targets (12 to 14), packages.config (16) and app.config (18); CSharpier 1.2.6 (dotnet-tools.json, repository root) also processes xml files not so excluded. global.json pins SDK 8.0.205 with latestFeature roll-forward under .dotnet-sdk; scripts/vscode/Install-RepoDotNetSdk.ps1 installs it (default version parameter 8.0.205). scripts/vscode/Invoke-Restore.ps1 takes SolutionPath, Configuration and Platform (defaults TaskMaster.sln, Debug, Any CPU). coverage.config excludes third-party modules only (14 to 20).
+11. .claude/hooks/validate-planner-output.ps1 line 95 requires a separator-bearing path token on every task's opening line; line 339 requires the final phase's title or task text to carry QA vocabulary.
+12. The .dotnet-sdk, packages and TaskMaster.Test\bin\Debug trees were not observable from the planning session (they are git-ignored; a miss is inconclusive), so every bootstrap task is guarded and gated on its post-task marker.
+13. Host constraint carried from the sibling item #931 plan in this same run: four UtilitiesCS.Test shell-icon test classes (`HelperClasses.ShellUtilities_Tests`, `HelperClasses.ShellUtilitiesStatic_Tests`, `HelperClasses.SysImageListHelperTests`, `EmailIntelligence.OSBrowser_Tests`) have stalled vstest on this workstation; CI executes them. Whether the stall reproduces today is unknown, so P0-T13 measures it and the result selects the coverage route (Decision D-6).
+
+## Design decisions (do not redesign)
+
+- **D-1 Fix shape.** In `CompletePrime`, `_primeTasks.TryRemove(engineName, out _);` moves to after `_logError(BuildPrimeFailedMessage(engineName), failure);`. The early return, the `failure` computation, the synthesized `TaskCanceledException`, the message builder and the `StartPrimeIfNeeded` lock are untouched. No `try`, `catch`, `finally` or lock is added to `CompletePrime`. The spec's non-goals (hazard B, try-finally hardening, the Race partial, the wiring, the run settings, the original test) are binding.
+- **D-2 Documentation literals (quoted here so the presence gates are exonerated; each is written on ONE physical line).** The `summary` element on `CompletePrime` is replaced by four lines whose third line carries the token `and only then is the in-flight marker cleared`; the comment placed immediately above the `_logError` statement begins with the token `Report-then-clear is load-bearing`; the `returns` element on `GetPrimeTask` gains two sentences, one line of which carries the token `cleared only after that report has returned`. Each token has zero occurrences in the tree today. The full texts are in the Delivered Source section.
+- **D-3 Harness hook.** `internal Action<string, Exception> OnLogError { get; set; }` is added after `OnInvalidate`, documented with a summary whose first line carries the token `invoked from inside the error-log sink`. The single-line error-log lambda at line 415 becomes a block whose first statement is `Errors.Add(new LoggedError(message, exception));` and whose second is `OnLogError?.Invoke(message, exception);`. No other line of that file changes; no `[TestMethod]` line is added or removed.
+- **D-4 New partial.** `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` follows the Race partial's shape: no `[TestClass]` (the attribute applies to the whole type from the primary file), usings System, System.Threading.Tasks, FluentAssertions and Microsoft.VisualStudio.TestTools.UnitTesting (Moq is not named directly, so its using is omitted to avoid an unnecessary-using diagnostic), one region, one `[TestMethod]`. The full text is in the Delivered Source section. Its csproj entry is inserted immediately after the Race entry (line 359).
+- **D-5 Fail-before is a real run, not a dossier.** The hook, the partial and the csproj entry compile against the unchanged production file, so P1-T5 runs the coordinator class with the reorder absent and the new test fails on the `BeSameAs(prime)` assertion deterministically (research section 8.2). The failing assertion's message carries `to refer to`.
+- **D-6 Coverage route is selected by a recorded observation.** P0-T13 runs the four shell-icon classes alone and records `STALL-PROBE: CLEAR` or `REPRODUCES`. `COVERAGE-ROUTE: RUNNER` (CLEAR) runs scripts/vscode/Invoke-MSTestWithCoverage.ps1 verbatim (CLAUDE.md step 4). `COVERAGE-ROUTE: DIRECT` (REPRODUCES) issues the runner's own inner collector invocation with the four-class exclusion appended and post-processes with the runner's own helpers, because the runner hard-codes its filter (fact 8). Both routes yield the same committed forms: the `First-party coverage:` line, the JaCoCo package projection text, the trx-derived summary text and the per-file coordinator figures, all transcribed into Markdown. Under DIRECT the CLAUDE.md floors are applied to the post-processed document by the runner's own threshold functions and a NOT MET result is treated exactly as a runner exit non-zero.
+- **D-7 Repository-wide rate is recorded, per-file figures are gated.** The merged repository-wide line rate is not reproducible across runs of an identical tree, so P3-T10 compares it in two branches (comparable denominators within 1 percent of lines-valid: gate with 0.5 percentage points of tolerance; otherwise record and do not gate) and puts the no-regression weight on the coordinator file: lines-valid equal to baseline (the change adds no executable statement), covered lines not lower, covered branches not lower, and every Cobertura line element inside the `CompletePrime` span with hits at least 1.
+- **D-8 Anchor.** The merge base is the caller-supplied commit `ddbab26a0149bf2ca5d0256e60686ad79e74d90c`. P0-T4 verifies it is an ancestor of HEAD and equals `git merge-base origin/main HEAD`; a mismatch is `BASE-SHA MISMATCH`: stop and report. Every diff gate carries that literal as its ref operand. Paths already changed between the anchor and HEAD at P0-T4 (inherited from the promotion commits on this branch) and every path under .claude/agent-memory/ form the inherited set, recorded once and subtracted by rule in P3-T14; the subtraction is recorded as `INHERITED-AND-EXCLUDED:` beside `THIS-ITEM-FOOTPRINT:`.
+- **D-9 Commits.** Three commits: P0-T16 (feature folder only, the exempt tree docs/features/active/), P2-T8 (the four code files plus the feature folder), P3-T30 (feature folder). Each is `git add -- <pathspecs>` then a separate `git commit`, one command per invocation, never chained, never `git add -A`. No `-m` paragraph contains an angle bracket, a dollar sign or a backtick; an attribution trailer, when the session requires one, is a second `-m` paragraph with the address written bare. A PreToolUse refusal of any `git add`, `git commit`, `.cs` edit or `.csproj` edit is reported verbatim as `PRE-IMPLEMENTATION GATE BLOCKED` and stops the run; the executor does not modify hooks, checkpoints or permission configuration.
+- **D-10 Git gates are pathspec-scoped and anchored.** Every `git diff` carries the anchor as ref operand; every name-listing diff is paired with a porcelain span in the same task; no gate asserts an empty unscoped porcelain. Porcelain gates after a commit admit this plan file (its check-off mark is written after each commit) and assert scope (no entry under TaskMaster/ or TaskMaster.Test/), never membership or count.
+- **D-11 Check-offs follow the loop.** Every acceptance criterion's evidence is either a post-format observation (line counts, hunks, tokens) or a final-run observation, and the format pass can reflow the edited files, so every check-off task sits in Phase 3 after P3-T9 and reads the artifact that survived the final pass. Each check-off task flips exactly one checkbox and completes with the box unchecked when its evidence does not hold, recording `ACn: NOT MET` in the summary.
+- **D-12 Fixed artifact names.** No artifact name carries a timestamp; acceptance conditions name files exactly. The write time is the `Timestamp:` field (ISO yyyy-MM-ddTHH-mm).
+
+## Delivered source (the executor writes these texts; CSharpier output wins on any layout difference)
+
+**Production file `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`.**
+
+`GetPrimeTask` `returns` element (replaces lines 242 to 246):
+
+        /// <returns>
+        /// The prime task, or <see cref="Task.CompletedTask"/> when no prime has been started for
+        /// the key. The returned task never faults: a prime fault is observed inside the prime
+        /// itself and reported through <c>logError</c>. For a key whose prime did not run to
+        /// completion, the marker is cleared only after that report has returned, so a caller that
+        /// receives <see cref="Task.CompletedTask"/> can rely on the fault having been reported.
+        /// </returns>
+
+`CompletePrime` `summary` element (replaces lines 327 to 331):
+
+        /// <summary>
+        /// Observes the outcome of a prime. On any outcome other than ran-to-completion the cache
+        /// is left unset — so the key still reports unchecked — the failure is reported through
+        /// <c>logError</c>, and only then is the in-flight marker cleared so a later read may
+        /// re-prime.
+        /// </summary>
+
+`CompletePrime` body (replaces lines 341 to 355; the `remarks` element between is unchanged):
+
+        private void CompletePrime(Task completed, string engineName)
+        {
+            if (completed.Status == TaskStatus.RanToCompletion)
+            {
+                return;
+            }
+
+            var failure =
+                (Exception)completed.Exception?.GetBaseException()
+                ?? new TaskCanceledException(completed);
+
+            // Report-then-clear is load-bearing: the marker stays registered until the report has
+            // returned, so a caller that observes the marker absent — including one that fetched the
+            // prime handle after the fault — is guaranteed the fault has already been reported.
+            _logError(BuildPrimeFailedMessage(engineName), failure);
+            _primeTasks.TryRemove(engineName, out _);
+        }
+
+**Primary fixture `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs`.**
+
+Error-log lambda (replaces line 415):
+
+                    (message, exception) =>
+                    {
+                        Errors.Add(new LoggedError(message, exception));
+                        OnLogError?.Invoke(message, exception);
+                    }
+
+Hook property, inserted after the `OnInvalidate` property (after line 434, before the blank line preceding `Invalidations`):
+
+            /// <summary>
+            /// An optional extra observer invoked from inside the error-log sink, immediately after
+            /// the error has been appended to <see cref="Errors"/>, so a test can probe coordinator
+            /// state at the exact moment a fault is reported.
+            /// </summary>
+            internal Action<string, Exception> OnLogError { get; set; }
+
+**New partial `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` (whole text).**
+
+    using System;
+    using System.Threading.Tasks;
+    using FluentAssertions;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    namespace TaskMaster.Test.Ribbon
+    {
+        /// <summary>
+        /// Regression for issue #942: the prime-fault report must precede the in-flight marker's
+        /// removal, so any caller that observes the marker absent observes a report that has already
+        /// completed. A third partial of the coordinator fixture, so the private <c>Harness</c> and
+        /// <c>LoggedError</c> types are reused; the primary file is close to the 500-line ceiling.
+        /// </summary>
+        public partial class EngineToggleStateCoordinatorTests
+        {
+            #region Issue #942 — prime fault report precedes marker removal
+
+            /// <summary>
+            /// Regression for issue #942. Invariant: for a key whose prime did not run to completion,
+            /// the in-flight marker is present until the fault report has returned. The discriminator
+            /// is the prime handle observed from inside the error-log sink: it is the still-registered
+            /// continuation under the fixed order and <see cref="Task.CompletedTask"/> under the
+            /// defective one, on the same thread, so the outcome is a function of program order
+            /// rather than of scheduling. No sleep, delay, gate, timer or parallelism attribute.
+            /// </summary>
+            [TestMethod]
+            public async Task GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged()
+            {
+                // Arrange
+                var harness = new Harness();
+                var probe = new TaskCompletionSource<bool>();
+                var failure = new InvalidOperationException("configuration load failed");
+                harness.Engines.Setup(x => x.EngineActiveAsync(SpamEngine)).Returns(probe.Task);
+                harness.Coordinator.GetPressed(SpamEngine);
+                var prime = harness.Coordinator.GetPrimeTask(SpamEngine);
+                Task handleSeenBySink = null;
+                harness.OnLogError = (_, _) =>
+                    handleSeenBySink = harness.Coordinator.GetPrimeTask(SpamEngine);
+
+                // Act
+                probe.SetException(failure);
+                await prime;
+
+                // Assert
+                // If this test passes without the production reorder in CompletePrime, the negative
+                // control has lost isolation: investigate the run rather than accepting it.
+                handleSeenBySink
+                    .Should()
+                    .BeSameAs(
+                        prime,
+                        "while the fault is being reported the prime handle must still be registered, "
+                            + "so a caller that fetches it after the trigger awaits the report"
+                    );
+                harness.Errors.Should().ContainSingle("a prime fault is reported exactly once");
+                harness.Errors[0].Message.Should().Contain(SpamEngine);
+                harness.Errors[0].Exception.Should().BeSameAs(failure);
+                harness.Invalidations.Should().BeEmpty("a failed prime changed no state to display");
+                harness
+                    .Coordinator.GetPrimeTask(SpamEngine)
+                    .Should()
+                    .BeSameAs(
+                        Task.CompletedTask,
+                        "once the handle has completed the marker has been cleared so a later read may re-prime"
+                    );
+            }
+
+            #endregion Issue #942 — prime fault report precedes marker removal
+        }
+    }
+
+**Project file `TaskMaster.Test/TaskMaster.Test.csproj`.**
+
+One line inserted immediately after line 359: `<Compile Include="Ribbon\EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs" />` with the same four-space indentation as its neighbours.
+
+## Execution conventions
+
+- **Working directory and paths.** `WORKTREE` denotes the absolute path of the item worktree supplied in the delegation prompt; it is substituted into every payload's first line and is never written into an artifact. Every artifact records repository-relative paths only. No artifact, and no line of this plan, carries an absolute host path, an account name or a machine name.
+- **Payload channel.** Each indented payload block below is executed as one PowerShell 7 invocation (`pwsh -NoProfile -Command` with the payload in single quotes, or the session's PowerShell tool), with the worktree as the current directory. Payloads use double quotes only, so the outer single quotes never conflict. The `Command:` field of the artifact records the canonical command the payload runs (named in each payload's note), not the payload text.
+- **Exit codes.** `EXIT_CODE:` records the printed `_EXIT_CODE:` value of the payload's principal command. Deliberately failing runs carry `ExpectedExitCode:` equal to the observed non-zero value. A task that runs several commands names one as the row and records the others as named `Output Summary:` lines.
+- **Tool resolution.** MSBuild and vstest.console.exe are resolved through vswhere inside each payload (`TOOLS` prelude below); the resolved paths are used, never printed into an artifact.
+- **TOOLS prelude** (the first lines of every build and test payload after the `Set-Location`):
+
+        $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+        $msbuild = & $vswhere -latest -products * -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1
+        $vstest = & $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1
+        New-Item -ItemType Directory -Path "coverage\logs" -Force | Out-Null
+
+- **Stall handling.** Every direct vstest run carries the hang-dump blame switch (CollectHangDump, TestTimeout 4min, HangDumpType None, spelled out in the CMD-VSTEST payload), so a stalled test is named in a Sequence document under the results directory; a run that produces one is recorded as failed with that test name. The RUNNER coverage route passes no blame argument (fixed argument list), so P0-T14 and P3-T8 bound it by wall clock: a run still in progress after 120 minutes is `COVERAGE RUN STALLED`: stop and report.
+- **Restart rule (Phase 3).** If any of P3-T1 through P3-T8 fails or rewrites a file after P3-T1, fix the cause, restart at P3-T1 and record both the failed pass and the clean pass in P3-T9.
+
+## Command reference
+
+**CMD-REBUILD** (`GATEARGS` is either the analyzer pair, EnableNETAnalyzers true with EnforceCodeStyleInBuild true, or the nullable switch, TreatWarningsAsErrors true, each written in the msbuild property form the `Command:` field quotes; `TASKID` substituted; the `Command:` field records `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" GATEARGS`, resolved through vswhere, plus /nodeReuse:false and a normal-verbosity file logger under the ignored coverage directory):
+
+    Set-Location -LiteralPath "WORKTREE"
+    TOOLS
+    $log = "coverage\logs\TASKID.msbuild.log"
+    if (Test-Path -LiteralPath $log) { Remove-Item -LiteralPath $log -Force }
+    $global:LASTEXITCODE = 0
+    & $msbuild TaskMaster.sln /t:Rebuild /m /nodeReuse:false /p:Configuration=Debug "/p:Platform=Any CPU" GATEARGS "/flp:LogFile=$log;Verbosity=normal" | Out-Null
+    Write-Output ("MSBUILD_EXIT_CODE: " + $LASTEXITCODE)
+    $lines = Get-Content -LiteralPath $log -Encoding UTF8
+    Write-Output ("ERRORS: " + (($lines | Select-String -Pattern "^\s*(\d+) Error\(s\)" | Select-Object -Last 1).Matches[0].Groups[1].Value))
+    Write-Output ("WARNINGS: " + (($lines | Select-String -Pattern "^\s*(\d+) Warning\(s\)" | Select-Object -Last 1).Matches[0].Groups[1].Value))
+    Write-Output ("SKIP_CORECOMPILE_LINES: " + @($lines | Where-Object { $_.Contains("Skipping target ""CoreCompile""") }).Count)
+    Write-Output ("CSC_OUT_TASKMASTER: " + @($lines | Where-Object { $_.Contains("/out:obj\Debug\TaskMaster.dll") }).Count)
+    Write-Output ("CSC_OUT_TASKMASTER_TEST: " + @($lines | Where-Object { $_.Contains("/out:obj\Debug\TaskMaster.Test.dll") }).Count)
+    Write-Output ("WRITESET_DIAGNOSTIC_LINES: " + @($lines | Where-Object { ($_.Contains("EngineToggleStateCoordinator")) -and ($_ -match "(error|warning) [A-Z]+\d+") }).Count)
+    Write-Output ("TEST_DLL_EXISTS: " + (Test-Path -LiteralPath "TaskMaster.Test\bin\Debug\TaskMaster.Test.dll"))
+    Write-Output ("UCS_TEST_DLL_EXISTS: " + (Test-Path -LiteralPath "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll"))
+
+Under /t:Rebuild the `SKIP_CORECOMPILE_LINES` count is 0 by construction; the two `CSC_OUT_` counts are the non-vacuity observation that the compiler ran for the two Write Set projects (MSBuild echoes the csc command line under each project's CoreCompile heading at normal verbosity). `ERRORS:` is read from the summary line, so `0 Error(s)` is not mistaken for a substring of a larger count.
+
+**CMD-BUILD** (plain incremental build so that a scoped test run observes a fresh assembly; `TASKID` substituted; `Command:` records `msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`):
+
+    Set-Location -LiteralPath "WORKTREE"
+    TOOLS
+    $log = "coverage\logs\TASKID.msbuild.log"
+    if (Test-Path -LiteralPath $log) { Remove-Item -LiteralPath $log -Force }
+    $before = (Get-Item -LiteralPath "TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" -ErrorAction SilentlyContinue).LastWriteTimeUtc
+    $global:LASTEXITCODE = 0
+    & $msbuild TaskMaster.sln /t:Build /m /nodeReuse:false /p:Configuration=Debug "/p:Platform=Any CPU" "/flp:LogFile=$log;Verbosity=normal" | Out-Null
+    Write-Output ("MSBUILD_EXIT_CODE: " + $LASTEXITCODE)
+    $lines = Get-Content -LiteralPath $log -Encoding UTF8
+    Write-Output ("ERRORS: " + (($lines | Select-String -Pattern "^\s*(\d+) Error\(s\)" | Select-Object -Last 1).Matches[0].Groups[1].Value))
+    $after = (Get-Item -LiteralPath "TaskMaster.Test\bin\Debug\TaskMaster.Test.dll").LastWriteTimeUtc
+    Write-Output ("TEST_DLL_ADVANCED: " + ($null -eq $before -or $after -gt $before))
+    Write-Output ("CSC_OUT_TASKMASTER_TEST: " + @($lines | Where-Object { $_.Contains("/out:obj\Debug\TaskMaster.Test.dll") }).Count)
+
+**CMD-VSTEST** (`ASSEMBLY`, `FILTER`, `TASKID` and the `NAMES` list substituted; `Command:` records `vstest.console.exe ASSEMBLY /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:FILTER" "/ResultsDirectory:coverage\test-results\942\TASKID" "/Logger:trx;LogFileName=TASKID.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None"`, resolved through vswhere):
+
+    Set-Location -LiteralPath "WORKTREE"
+    TOOLS
+    $results = "coverage\test-results\942\TASKID"
+    if (Test-Path -LiteralPath $results) { Remove-Item -LiteralPath $results -Recurse -Force }
+    $names = @(NAMES)
+    $global:LASTEXITCODE = 0
+    & $vstest "ASSEMBLY" /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:FILTER" "/ResultsDirectory:$results" "/Logger:trx;LogFileName=TASKID.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" 2>&1 | Tee-Object -FilePath "coverage\logs\TASKID.vstest.log" | Out-Null
+    Write-Output ("VSTEST_EXIT_CODE: " + $LASTEXITCODE)
+    $trxPath = Join-Path $results "TASKID.trx"
+    Write-Output ("TRX_PRESENT: " + (Test-Path -LiteralPath $trxPath))
+    Write-Output ("SEQUENCE_FILES: " + @(Get-ChildItem -LiteralPath $results -Recurse -Filter "Sequence_*.xml" -ErrorAction SilentlyContinue).Count)
+    if (-not (Test-Path -LiteralPath $trxPath)) { exit 3 }
+    [xml]$trx = Get-Content -LiteralPath $trxPath -Raw -Encoding UTF8
+    $ns = New-Object System.Xml.XmlNamespaceManager($trx.NameTable)
+    $ns.AddNamespace("t", "http://microsoft.com/schemas/VisualStudio/TeamTest/2010")
+    $counters = $trx.SelectSingleNode("//t:ResultSummary/t:Counters", $ns)
+    Write-Output ("COUNTERS total=" + $counters.GetAttribute("total") + " executed=" + $counters.GetAttribute("executed") + " passed=" + $counters.GetAttribute("passed") + " failed=" + $counters.GetAttribute("failed"))
+    $all = @($trx.SelectNodes("//t:UnitTestResult", $ns))
+    Write-Output ("RESULT_COUNT: " + $all.Count)
+    foreach ($r in $all) { if ($names -contains $r.GetAttribute("testName")) { Write-Output ("RESULT " + $r.GetAttribute("testName") + " = " + $r.GetAttribute("outcome")) } }
+    foreach ($r in $all) { if ($r.GetAttribute("outcome") -eq "Failed") { Write-Output ("FAILED " + $r.GetAttribute("testName")); $msg = $r.SelectSingleNode("t:Output/t:ErrorInfo/t:Message", $ns); Write-Output ("MESSAGE " + $r.GetAttribute("testName") + " :: " + $(if ($msg) { $msg.InnerText } else { "(no message)" })) } }
+
+The trx stays under the ignored coverage directory. The artifact transcribes the `COUNTERS`, `RESULT_COUNT:`, `RESULT`, `FAILED` and `MESSAGE` lines (absolute paths inside a message are replaced by the placeholder REDACTED-PATH before transcription).
+
+Substitutions used by this plan: `ASSEMBLY-TM` is the built test assembly TaskMaster.Test\bin\Debug\TaskMaster.Test.dll; `ASSEMBLY-UCS` is the built test assembly UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll; `FILTER-COORD` is `FullyQualifiedName~TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests`; `FILTER-STALL` is `FullyQualifiedName~HelperClasses.ShellUtilities_Tests|FullyQualifiedName~HelperClasses.ShellUtilitiesStatic_Tests|FullyQualifiedName~HelperClasses.SysImageListHelperTests|FullyQualifiedName~EmailIntelligence.OSBrowser_Tests`; `NAMES-COORD` is `"GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse", "GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged", "GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker", "GetPressed_WhenPrimeIsCanceled_LeavesToggleReportingUnchecked"`; `NAMES-NONE` is empty.
+
+**CMD-COVERAGE-RUNNER** (CLAUDE.md step 4 route; `STAGE` is `baseline` or `final`; `Command:` records `pwsh -NoProfile -File scripts\vscode\Invoke-MSTestWithCoverage.ps1`):
+
+    Set-Location -LiteralPath "WORKTREE"
+    New-Item -ItemType Directory -Path "coverage\logs" -Force | Out-Null
+    foreach ($f in @("coverage\coverage.cobertura.xml", "coverage\coverage.cobertura.jacoco.xml", "coverage\test-results\mstest-coverage-run.trx", "coverage\test-results\mstest-coverage-run.summary.txt")) { if (Test-Path -LiteralPath $f) { Remove-Item -LiteralPath $f -Force } }
+    foreach ($f in @("coverage\STAGE-942.cobertura.xml", "coverage\STAGE-942.trx")) { if (Test-Path -LiteralPath $f) { Remove-Item -LiteralPath $f -Force } }
+    $script = Join-Path (Get-Location).Path "scripts\vscode\Invoke-MSTestWithCoverage.ps1"
+    $global:LASTEXITCODE = 0
+    & pwsh -NoProfile -File $script 2>&1 | Tee-Object -FilePath "coverage\logs\STAGE-942.runner.log" | Out-Null
+    Write-Output ("RUNNER_EXIT_CODE: " + $LASTEXITCODE)
+    $log = Get-Content -LiteralPath "coverage\logs\STAGE-942.runner.log" -Raw -Encoding UTF8
+    Write-Output ("DISCOVERED_LINE: " + [regex]::Match($log, "Discovered \d+ test assemblies\.").Value)
+    Write-Output ("FIRST_PARTY_LINE: " + [regex]::Match($log, "First-party coverage: [^\r\n]*").Value)
+    Write-Output ("THRESHOLD_MESSAGE: " + [regex]::Match($log, "Cobertura (line|branch) coverage [^\r\n]*threshold\.").Value)
+    Write-Output ("COLLECT_FAILURE_MESSAGE: " + [regex]::Match($log, "MSTest with coverage failed with exit code \d+").Value)
+    Write-Output ("DOCUMENT_PRESENT: " + (Test-Path -LiteralPath "coverage\coverage.cobertura.xml"))
+    Write-Output ("TRX_PRESENT: " + (Test-Path -LiteralPath "coverage\test-results\mstest-coverage-run.trx"))
+    if (Test-Path -LiteralPath "coverage\coverage.cobertura.xml") { Copy-Item -LiteralPath "coverage\coverage.cobertura.xml" -Destination "coverage\STAGE-942.cobertura.xml" -Force }
+    if (Test-Path -LiteralPath "coverage\test-results\mstest-coverage-run.trx") { Copy-Item -LiteralPath "coverage\test-results\mstest-coverage-run.trx" -Destination "coverage\STAGE-942.trx" -Force }
+
+The runner's lines naming the resolved vstest path and the coverage output carry absolute paths and stay in the ignored log; only the named `_LINE`, `_MESSAGE` and `_PRESENT` values are transcribed. The stale-output removal makes every `_PRESENT` value an observation of this run.
+
+**CMD-COVERAGE-DIRECT** (the runner's inner invocation issued directly with the four-class exclusion; `STAGE` substituted; `Command:` records `dotnet-coverage collect --output coverage\STAGE-942.cobertura.xml --output-format cobertura --settings coverage\effective-coverage-942.config -- vstest.console.exe <N test assemblies> /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:<filter>" "/ResultsDirectory:coverage\test-results\942\STAGE" "/Logger:trx;LogFileName=STAGE-942.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None"`):
+
+    Set-Location -LiteralPath "WORKTREE"
+    . (Join-Path (Get-Location).Path "scripts\vscode\Invoke-MSTestWithCoverage.ps1")
+    $ErrorActionPreference = "Continue"
+    $repo = (Get-Location).Path
+    New-Item -ItemType Directory -Path "coverage\logs" -Force | Out-Null
+    foreach ($f in @("coverage\STAGE-942.cobertura.xml", "coverage\STAGE-942.trx")) { if (Test-Path -LiteralPath $f) { Remove-Item -LiteralPath $f -Force } }
+    $canonical = Get-Content -LiteralPath "coverage.config" -Raw -Encoding UTF8
+    $derived = ConvertTo-DerivedCoverageSettingsXml -CanonicalSettingsXml $canonical
+    $effective = Join-Path $repo "coverage\effective-coverage-942.config"
+    Set-Content -LiteralPath $effective -Value $derived -Encoding UTF8 -NoNewline
+    $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+    $vstest = & $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1
+    $rootLen = $repo.TrimEnd([char]92).Length
+    $asm = @(Get-ChildItem -Path $repo -Recurse -Filter "*.Test.dll" | Where-Object { $_.FullName -like "*\bin\Debug\*" -and $_.FullName -notlike "*\obj\*" -and $_.FullName -notlike "*\ref\*" -and $_.FullName.Substring($rootLen) -notlike "\.claude\*" } | Select-Object -ExpandProperty FullName)
+    $filter = "TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests"
+    $output = Join-Path $repo "coverage\STAGE-942.cobertura.xml"
+    $settings = Join-Path $repo "scripts\vscode\TaskMaster.cli.runsettings"
+    $results = Join-Path $repo "coverage\test-results\942\STAGE"
+    if (Test-Path -LiteralPath $results) { Remove-Item -LiteralPath $results -Recurse -Force }
+    $global:LASTEXITCODE = 0
+    & dotnet-coverage collect --output $output --output-format cobertura --settings $effective -- $vstest @asm "/Settings:$settings" /InIsolation "/TestCaseFilter:$filter" "/ResultsDirectory:$results" "/Logger:trx;LogFileName=STAGE-942.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" 2>&1 | Tee-Object -FilePath "coverage\logs\STAGE-942.collect.log" | Out-Null
+    Write-Output ("COLLECT_EXIT_CODE: " + $LASTEXITCODE)
+    Write-Output ("ASSEMBLY_COUNT: " + $asm.Count)
+    $asm | ForEach-Object { Write-Output ("ASSEMBLY: " + $_.Substring($rootLen)) }
+    Write-Output ("SEQUENCE_FILES: " + @(Get-ChildItem -LiteralPath $results -Recurse -Filter "Sequence_*.xml" -ErrorAction SilentlyContinue).Count)
+    if (Test-Path -LiteralPath (Join-Path $results "STAGE-942.trx")) { Copy-Item -LiteralPath (Join-Path $results "STAGE-942.trx") -Destination "coverage\STAGE-942.trx" -Force }
+    Write-Output ("TRX_PRESENT: " + (Test-Path -LiteralPath "coverage\STAGE-942.trx"))
+    Write-Output ("DOCUMENT_PRESENT: " + (Test-Path -LiteralPath $output))
+
+**CMD-COVERAGE-POST** (post-process if raw, summarise the trx, apply the floors, print the first-party line, the projection, the root counters and the coordinator figures; `STAGE` substituted; `RAW` is `True` under DIRECT and under a RUNNER run whose `COLLECT_FAILURE_MESSAGE:` is non-empty, otherwise `False`, because a completed runner run has already post-processed the document in place):
+
+    Set-Location -LiteralPath "WORKTREE"
+    . (Join-Path (Get-Location).Path "scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1")
+    . (Join-Path (Get-Location).Path "scripts\vscode\Invoke-MSTest.TrxSummary.ps1")
+    $ErrorActionPreference = "Continue"
+    $repo = (Get-Location).Path
+    $summary = Get-TrxRunSummary -TrxContent (Get-Content -LiteralPath "coverage\STAGE-942.trx" -Raw -Encoding UTF8)
+    Write-Output "SUMMARY-BEGIN"
+    Write-Output (Format-TrxRunSummary -Summary $summary)
+    Write-Output "SUMMARY-END"
+    Write-Output ("FAILED-SET: " + (@($summary.FailedTestName) -join ", "))
+    $doc = Get-Content -LiteralPath "coverage\STAGE-942.cobertura.xml" -Raw -Encoding UTF8
+    if ("RAW" -eq "True") { $doc = ConvertTo-KoverageCoberturaXml -XmlContent $doc -RepoRoot $repo; Set-Content -LiteralPath "coverage\STAGE-942.cobertura.xml" -Value $doc -Encoding UTF8 -NoNewline }
+    try { Assert-CoberturaLineCoverageThreshold -CoberturaXml $doc; Write-Output "LINE-FLOOR: MET" } catch { Write-Output ("LINE-FLOOR: NOT MET " + $_.Exception.Message) }
+    try { Assert-CoberturaBranchCoverageThreshold -CoberturaXml $doc; Write-Output "BRANCH-FLOOR: MET" } catch { Write-Output ("BRANCH-FLOOR: NOT MET " + $_.Exception.Message) }
+    Write-Output (Get-CoberturaFirstPartyCoverageReport -CoberturaXml $doc)
+    [xml]$xml = $doc
+    $root = $xml.SelectSingleNode("/coverage")
+    Write-Output ("ROOT line-rate=" + $root.GetAttribute("line-rate") + " branch-rate=" + $root.GetAttribute("branch-rate") + " lines-covered=" + $root.GetAttribute("lines-covered") + " lines-valid=" + $root.GetAttribute("lines-valid") + " branches-covered=" + $root.GetAttribute("branches-covered") + " branches-valid=" + $root.GetAttribute("branches-valid"))
+    $projection = ConvertTo-JacocoPackageProjection -XmlDocument $xml
+    Assert-JacocoProjectionReconciliation -XmlDocument $xml -ProjectionXml $projection
+    Write-Output "PROJECTION-BEGIN"
+    Write-Output $projection
+    Write-Output "PROJECTION-END"
+    $target = "TaskMaster/Ribbon/EngineToggleStateCoordinator.cs"
+    $classes = @($xml.SelectNodes("//class[@filename]") | Where-Object { $_.GetAttribute("filename").Replace([string][char]92, "/").EndsWith($target) })
+    Write-Output ("COORD-CLASS-NODES: " + $classes.Count)
+    if ($classes.Count -eq 1) {
+        $s = Get-CoberturaClassLineSummary -ClassNode $classes[0]
+        Write-Output ("COORD-LINES covered=" + $s.CoveredLines + " valid=" + $s.TotalLines)
+        Write-Output ("COORD-BRANCHES covered=" + $s.CoveredBranches + " valid=" + $s.TotalBranches)
+        $src = Get-Content -LiteralPath "TaskMaster\Ribbon\EngineToggleStateCoordinator.cs" -Encoding UTF8
+        $start = 0; for ($i = 0; $i -lt $src.Count; $i++) { if ($src[$i].Contains("private void CompletePrime(")) { $start = $i + 1; break } }
+        $end = 0; for ($i = $start; $i -lt $src.Count; $i++) { if ($src[$i].TrimEnd() -eq "        }") { $end = $i + 1; break } }
+        Write-Output ("COMPLETEPRIME-SPAN: " + $start + "-" + $end)
+        $inSpan = @($s.LineMap.Keys | Where-Object { $_ -ge $start -and $_ -le $end } | Sort-Object)
+        Write-Output ("COMPLETEPRIME-LINE-ELEMENTS: " + $inSpan.Count)
+        foreach ($n in $inSpan) { Write-Output ("COMPLETEPRIME-LINE " + $n + " hits=" + $s.LineMap[$n].Hits) }
+        Write-Output ("COMPLETEPRIME-UNCOVERED: " + @($inSpan | Where-Object { $s.LineMap[$_].Hits -lt 1 }).Count)
+    }
+
+The `COMPLETEPRIME-SPAN` is derived from the source file as it stands when the payload runs (the anchored file in Phase 0, the fixed file in Phase 3), so each stage measures its own statement set. The projection and the summary block are the two CLAUDE.md committed forms; the `COORD-` and `COMPLETEPRIME-` lines are figures, not documents.
+
+**CMD-HASH** (SHA-256 of the three formatter-visible Write Set files; hashes only, never the Path property):
+
+    Set-Location -LiteralPath "WORKTREE"
+    foreach ($p in @("TaskMaster\Ribbon\EngineToggleStateCoordinator.cs", "TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.cs", "TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs")) { if (Test-Path -LiteralPath $p) { Write-Output ("HASH " + $p + " = " + (Get-FileHash -Algorithm SHA256 -LiteralPath $p).Hash) } else { Write-Output ("HASH " + $p + " = ABSENT") } }
+
+**CMD-LINECOUNT** (content line counts of the three source files):
+
+    Set-Location -LiteralPath "WORKTREE"
+    foreach ($p in @("TaskMaster\Ribbon\EngineToggleStateCoordinator.cs", "TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.cs", "TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs")) { if (Test-Path -LiteralPath $p) { Write-Output ("LINES " + $p + " = " + @(Get-Content -LiteralPath $p -Encoding UTF8).Count) } else { Write-Output ("LINES " + $p + " = ABSENT") } }
+
+**CMD-TOKEN-COUNT** (`FILE` and the `TOKEN` list substituted; ordinal, case-sensitive substring counts per physical line, so a wrapped token reads 0 and the plan's single-line requirement is enforced by the count):
+
+    Set-Location -LiteralPath "WORKTREE"
+    $src = Get-Content -LiteralPath "FILE" -Encoding UTF8
+    foreach ($t in @(TOKEN)) { Write-Output ("TOKEN [" + $t + "] = " + @($src | Where-Object { $_.Contains($t) }).Count) }
+    foreach ($t in @(TOKEN)) { $idx = 0; for ($i = 0; $i -lt $src.Count; $i++) { if ($src[$i].Contains($t)) { $idx = $i + 1; break } }; Write-Output ("FIRST-LINE [" + $t + "] = " + $idx) }
+
+### Phase 0 — Policy Reads, Bootstrap, Anchor and Baseline Capture
+
+- [ ] [P0-T1] Read the policy documents in the mandatory order — CLAUDE.md, then .claude/rules/general-code-change.md, then .claude/rules/general-unit-test.md, then .claude/rules/csharp.md — plus .claude/rules/plan-acceptance-gates.md and .claude/rules/tonality.md, and record the read in FEATURE/evidence/baseline/phase0-instructions-read.md.
+  - Acceptance: the artifact carries `Timestamp:`, a `Policy Order:` line naming the four mandatory documents in that order, and one line per document read recording its top-level heading count. No policy document is modified.
+- [ ] [P0-T2] Read the acceptance-criteria source `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, the issue document `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/issue.md` and the research record `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/research/2026-09-29T23-20-engine-toggle-prime-fault-race-research.md` in full, and record the Write Set and the prohibited paths in FEATURE/evidence/baseline/scope-and-anchor.md (this task creates the file; P0-T4 appends to it).
+  - Acceptance: the artifact lists the four code paths of the Write Set verbatim, names the eight prohibited paths and trees from the Write Set section, records that issue.md line 12 reads `- Work Mode: full-bug`, and records that the spec's acceptance section holds exactly 14 lines beginning `- [ ] AC` and 0 lines beginning `- [x] AC`, counted from the file.
+- [ ] [P0-T3] Provision the repository .NET SDK with scripts/vscode/Install-RepoDotNetSdk.ps1 (guarded) and record it in FEATURE/evidence/baseline/bootstrap-sdk.md.
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; if (-not (Test-Path -LiteralPath ".dotnet-sdk\sdk\8.0.205")) { & .\scripts\vscode\Install-RepoDotNetSdk.ps1 }; "SDK_MARKER=$(Test-Path -LiteralPath ".dotnet-sdk\sdk\8.0.205")"; dotnet --version'`
+  - Acceptance: `SDK_MARKER=True`, `dotnet --version` printed a version string rather than the global.json error message, `EXIT_CODE: 0`. The installer's filesystem marker is the gate; the version equality is not asserted because global.json rolls forward within the feature band.
+- [ ] [P0-T4] Record the anchor and the pre-change tree state by appending to FEATURE/evidence/baseline/scope-and-anchor.md.
+  - Command: `git rev-parse HEAD`; `git merge-base --is-ancestor ddbab26a0149bf2ca5d0256e60686ad79e74d90c HEAD`; `git merge-base origin/main HEAD`; `git diff --name-status ddbab26a0149bf2ca5d0256e60686ad79e74d90c HEAD`; `git status --porcelain --untracked-files=all`.
+  - Acceptance, all required: `HEAD-SHA:` records the first command's output as an observation (no expected value); the ancestor check exits 0 and `git merge-base origin/main HEAD` prints exactly `ddbab26a0149bf2ca5d0256e60686ad79e74d90c`, otherwise the artifact records `BASE-SHA MISMATCH` with both values and the run stops; `INHERITED-COMMITTED:` lists every path the name-status diff prints (expected: promotion-commit paths under docs/features/potential/ and .claude/agent-memory/; the list is recorded, not gated) or `NONE`; `PRE-EXISTING-WORKTREE-PATHS:` lists every porcelain line verbatim or `NONE`; and no porcelain line names a path under TaskMaster/ or TaskMaster.Test/ (otherwise `CODE TREE DIRTY AT ANCHOR`: stop and report). The porcelain output is not asserted empty: this feature folder and agent-memory files are expected in it.
+- [ ] [P0-T5] Restore the manifest tools with `dotnet tool restore` at the repository root (the manifest is dotnet-tools.json at the root) and record it in FEATURE/evidence/baseline/bootstrap-tool-restore.md.
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; dotnet tool restore; "RESTORE_EXIT=$LASTEXITCODE"; dotnet tool list --local; dotnet tool run csharpier check --help | Out-Null; "CHECK_HELP_EXIT=$LASTEXITCODE"'`
+  - Acceptance: `RESTORE_EXIT=0`, the local tool list contains a row whose first column is `csharpier` and whose version is `1.2.6`, and `CHECK_HELP_EXIT=0`. The version line is read from the list row, not from a version switch, because the pinned tool's version switch has not been observed on this manifest.
+- [ ] [P0-T6] Restore NuGet packages with scripts/vscode/Invoke-Restore.ps1 and record it in FEATURE/evidence/baseline/bootstrap-nuget-restore.md.
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; $env:MSBUILDDISABLENODEREUSE = "1"; & .\scripts\vscode\Invoke-Restore.ps1; "RESTORE_EXIT=$LASTEXITCODE"; "PACKAGE_DIRS=$(@(Get-ChildItem -LiteralPath packages -Directory -ErrorAction SilentlyContinue).Count)"; foreach ($proj in @("TaskMaster\TaskMaster.csproj", "TaskMaster.Test\TaskMaster.Test.csproj")) { $dir = Split-Path -Parent $proj; [xml]$x = Get-Content -LiteralPath $proj -Raw; $missing = @($x.SelectNodes("//*[local-name()=""Analyzer""]") | Where-Object { -not (Test-Path -LiteralPath (Join-Path $dir $_.GetAttribute("Include"))) }).Count; "ANALYZER_MISSING $proj = $missing" }'`
+  - Acceptance: `RESTORE_EXIT=0`, `PACKAGE_DIRS=` at least 1, and both `ANALYZER_MISSING` values are 0 (every analyzer Include of the two Write Set projects resolves relative to its own project directory). A non-zero `ANALYZER_MISSING` is `ANALYZER PATH SKEW`: stop and report the unresolved Include values; it is an environment defect, not a plan defect.
+- [ ] [P0-T7] Provision the dotnet-coverage global tool (guarded) and record it in FEATURE/evidence/baseline/bootstrap-dotnet-coverage.md.
+  - Command: `pwsh -NoProfile -Command 'if (-not (Get-Command dotnet-coverage -ErrorAction SilentlyContinue)) { dotnet tool install --global dotnet-coverage }; "DOTNET_COVERAGE_RESOLVED=$($null -ne (Get-Command dotnet-coverage -ErrorAction SilentlyContinue))"; dotnet-coverage --version'`
+  - Acceptance: `DOTNET_COVERAGE_RESOLVED=True`, a version line is printed, `EXIT_CODE: 0`.
+- [ ] [P0-T8] Capture the read-only formatter baseline with `dotnet tool run csharpier check .` and record the verbatim unformatted-file set in FEATURE/evidence/baseline/csharpier-check-baseline.md.
+  - Acceptance: the artifact records the exit code and, when non-zero, every path CSharpier reported as unformatted, one per line. If the set is non-empty the run stops with `FORMAT BASELINE NOT CLEAN`: AC11 requires the repository-wide check to report no differences, and repairing pre-existing drift would widen the footprint beyond the Write Set, so the decision belongs to the orchestrator. `EXIT_CODE: 0` is therefore the gate.
+- [ ] [P0-T9] Capture the analyzer baseline with `CMD-REBUILD` (`GATEARGS` analyzers, `TASKID` p0-t9) and record it in FEATURE/evidence/baseline/msbuild-analyzer-baseline.md (`Command:` records `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`).
+  - Acceptance, all required: `EXIT_CODE: 0`; `ERRORS: 0`; `SKIP_CORECOMPILE_LINES: 0`; `CSC_OUT_TASKMASTER:` and `CSC_OUT_TASKMASTER_TEST:` each at least 1; `WRITESET_DIAGNOSTIC_LINES: 0`; `WARNINGS:` recorded as `ANALYZER-BASELINE-WARNINGS:` (the comparison basis for P3-T5); `TEST_DLL_EXISTS: True` and `UCS_TEST_DLL_EXISTS: True`. A non-zero exit is `ANALYZER BASELINE NOT CLEAN`: stop and report.
+- [ ] [P0-T10] Capture the nullable baseline with `CMD-REBUILD` (`GATEARGS` nullable, `TASKID` p0-t10) and record it in FEATURE/evidence/baseline/msbuild-nullable-baseline.md (`Command:` records `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`; no Nullable property override).
+  - Acceptance, all required: `EXIT_CODE: 0`; `ERRORS: 0`; `SKIP_CORECOMPILE_LINES: 0`; both `CSC_OUT_` counts at least 1; `WRITESET_DIAGNOSTIC_LINES: 0`; `WARNINGS:` recorded as `NULLABLE-BASELINE-WARNINGS:`; both `-DLL-EXISTS:` values `True`. A non-zero exit is `NULLABLE BASELINE NOT CLEAN`: stop and report.
+- [ ] [P0-T11] Record the pre-change line counts and hashes of the Write Set source files with `CMD-LINECOUNT` and `CMD-HASH` in FEATURE/evidence/baseline/file-line-counts-baseline.md.
+  - Acceptance: `LINES TaskMaster\Ribbon\EngineToggleStateCoordinator.cs = 415`, `LINES TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.cs = 459`, the PrimeFaultOrdering path reads `ABSENT` for both commands, and two `HASH` values are recorded as `BASE-HASH-PROD:` and `BASE-HASH-TEST:`. These counts are advisory; the authoritative audit is P3-T3 after the format pass.
+- [ ] [P0-T12] Capture the pre-change coordinator fixture run with `CMD-VSTEST` (`ASSEMBLY-TM`, `FILTER-COORD`, `TASKID` p0-t12, `NAMES-COORD`) and record it in FEATURE/evidence/baseline/coordinator-tests-baseline.md.
+  - Acceptance: `TRX_PRESENT: True`; `SEQUENCE_FILES: 0`; the `COUNTERS` line is present with `executed` at least 1 and is recorded as `BASELINE-COUNTERS:` with its total as `BASELINE-TOTAL:`; a `RESULT` line for `GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse` appears with its outcome recorded (Passed is expected; Failed is admissible here because that test is the racy original), and no `RESULT` line names `GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged` (the test does not exist yet); `BASELINE-FAILED:` lists every `FAILED` name or `NONE`. `EXIT_CODE:` is recorded without a gate; when it is non-zero, `ExpectedExitCode:` carries the observed value (presentational). A non-empty `BASELINE-FAILED:` is recorded, not repaired: it is the population P2-T5 is compared against, and a failure of the original test here is consistent with the defect under repair.
+- [ ] [P0-T13] Run the stall probe with `CMD-VSTEST` (`ASSEMBLY-UCS`, `FILTER-STALL`, `TASKID` p0-t13, `NAMES-NONE`) and record FEATURE/evidence/baseline/stall-probe.md.
+  - Acceptance: the artifact records `EXIT_CODE:` (the printed `VSTEST_EXIT_CODE:`, or 3 when the trx is absent), `ExpectedExitCode:` equal to the observed value when non-zero (presentational; nothing is gated on it), `TRX_PRESENT:`, `SEQUENCE_FILES:`, the `COUNTERS` line when present and every `MESSAGE` line; then exactly one `STALL-PROBE:` line — `CLEAR` when `EXIT_CODE: 0`, `failed` is 0 and `SEQUENCE_FILES: 0`, otherwise `REPRODUCES` — and exactly one `COVERAGE-ROUTE:` line — `RUNNER` under `CLEAR`, `DIRECT` under `REPRODUCES` — with the sentence that the four excluded classes are a pre-existing local stall executed by CI (fact 13). The probe is invoked once and never re-run. Both `STALL-PROBE:` values complete this task.
+- [ ] [P0-T14] Capture the baseline repository-wide test-and-coverage run by the route P0-T13 fixed and record FEATURE/evidence/baseline/coverage-baseline.md (fixed name per the spec). Under `RUNNER` run `CMD-COVERAGE-RUNNER` with `STAGE` baseline; under `DIRECT` run `CMD-COVERAGE-DIRECT` with `STAGE` baseline; then, unless branch (d0) applies, run `CMD-COVERAGE-POST` with `STAGE` baseline and `RAW` per the Command Reference rule.
+  - Artifact: `Timestamp:`, `Command:` (the route's canonical command and the filter it applied), `EXIT_CODE:` (`RUNNER_EXIT_CODE:` or `COLLECT_EXIT_CODE:`), `ExpectedExitCode:` equal to the observed value when non-zero, and an `Output Summary:` recording `COVERAGE-ROUTE:`, `RAW:`, `DISCOVERED_LINE:` or `ASSEMBLY_COUNT:` with every `ASSEMBLY:` line, `TRX_PRESENT:`, `SEQUENCE_FILES:` (DIRECT), `THRESHOLD_MESSAGE:` and `COLLECT_FAILURE_MESSAGE:` (RUNNER), `LINE-FLOOR:`, `BRANCH-FLOOR:`, the `First-party coverage:` line, the `ROOT` line, the projection verbatim between `PROJECTION-BEGIN` and `PROJECTION-END`, the five summary lines verbatim between `SUMMARY-BEGIN` and `SUMMARY-END`, `FAILED-SET:`, `COORD-CLASS-NODES:`, `COORD-LINES`, `COORD-BRANCHES`, `COMPLETEPRIME-SPAN:`, `COMPLETEPRIME-LINE-ELEMENTS:`, every `COMPLETEPRIME-LINE` row and `COMPLETEPRIME-UNCOVERED:`. The `First-party coverage:` line is the numeric baseline headline (lines covered over valid with the percentage, branches likewise). A prospective sentence states that the planned change adds no executable statement to the coordinator, so `COORD-LINES valid=` is expected to be unchanged at P3-T10.
+  - Branches, checked in order: (d0) `SEQUENCE_FILES:` greater than 0 (DIRECT) or `TRX_PRESENT: False` is `COVERAGE RUN ABORTED`: stop, report the last lines of the collector log with absolute paths replaced, do not run `CMD-COVERAGE-POST`, do not re-run. (c) a `THRESHOLD_MESSAGE:` (RUNNER) or a `LINE-FLOOR: NOT MET` or `BRANCH-FLOOR: NOT MET` line is `COVERAGE FLOOR BASELINE NOT MET`: the projection is recorded and the run stops, because AC11 requires the coverage route to pass and this item changes no floor-relevant line. (b) a non-zero exit with no floor failure and a non-empty `FAILED-SET:` that is exactly the single name `TryAddValuesAsync_UpdatesExistingValue` (UtilitiesCS.Test/Extensions/DictionaryExtensions_Tests.cs line 237; a known sporadic failure tracked as issue 780, unrelated to this change) is recorded as `BASELINE-ADMISSIBLE-FAILURE:` and completes this task with `ExpectedExitCode:` equal to the observed value; any other non-empty `FAILED-SET:` is `BASELINE NOT GREEN`: stop and report the `Failed tests:` summary line (the baseline population must be green for the AC11 exit-zero requirement to be reachable). (a) exit 0 with both floors met: complete. (d) anything else, in particular a non-zero exit with an empty `FAILED-SET:`, is `COVERAGE RUN ABORTED` with the same handling as (d0).
+  - Acceptance, all required: branch (a); `COORD-CLASS-NODES: 1`; `COMPLETEPRIME-SPAN: 341-355`; `COMPLETEPRIME-LINE-ELEMENTS:` at least 4; `COMPLETEPRIME-UNCOVERED: 0`; the projection block contains a `package` element named `TaskMaster` with a `LINE` and a `BRANCH` counter; the summary block's first line begins `Test run outcome:`; the artifact contains no absolute path. coverage\baseline-942.cobertura.xml and coverage\baseline-942.trx remain on disk, git-ignored, for P3-T10.
+- [ ] [P0-T15] Verify the evidence completeness of Phase 0 by listing FEATURE/evidence/baseline/ and record the listing at the end of FEATURE/evidence/baseline/scope-and-anchor.md under a `PHASE0-ARTIFACTS:` heading.
+  - Acceptance: every artifact named by P0-T1 through P0-T14 exists at its exact path; every command-bearing artifact among them carries `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`; and every artifact whose recorded `EXIT_CODE:` is non-zero carries `ExpectedExitCode:` with that same value.
+- [ ] [P0-T16] Commit the feature folder — `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/issue.md`, the research record, this plan and every Phase 0 artifact — and record FEATURE/evidence/baseline/phase0-commit.md.
+  - Command: `git add -- docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942` then `git commit -m "docs(942): plan and Phase 0 baseline evidence for the prime-fault ordering fix" -- docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942` then `git status --porcelain -- docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942`.
+  - Acceptance: the commit exits 0; `PHASE0-COMMIT-SHA:` records `git rev-parse HEAD` as an observation; the porcelain span scoped to the feature folder lists no entry other than this plan file and the artifact this task itself writes (both are written after the commit); no path outside the feature folder is staged by this task. The pathspec form keeps the commit within the exempt tree.
+
+### Phase 1 — Regression Test First (fails against the unchanged production file)
+
+- [ ] [P1-T1] Add the `OnLogError` hook to the `Harness` in `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs`: replace line 415 with the five-line lambda block and insert the documented property after the `OnInvalidate` property, exactly as the Delivered Source section states. Run `CMD-TOKEN-COUNT` with `FILE` `TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.cs` and `TOKEN` `"internal Action<string, Exception> OnLogError { get; set; }", "OnLogError?.Invoke(message, exception);", "Errors.Add(new LoggedError(message, exception));", "invoked from inside the error-log sink", "[TestMethod]"` and record it in FEATURE/evidence/qa-gates/harness-hook-edit-scope.md (this task creates the file; P2-T6 appends to it).
+  - Acceptance: the first four tokens each count exactly 1 (each was 0 at the anchor); `FIRST-LINE` of `OnLogError?.Invoke(message, exception);` equals `FIRST-LINE` of `Errors.Add(new LoggedError(message, exception));` plus 1 (the invoke immediately follows the append); the `[TestMethod]` count equals its count at the anchor, which is 15 (fact 2: sixteen test methods, of which one is a `[DataTestMethod]`, and the substring `[TestMethod]` does not occur inside `[DataTestMethod]`), so no test method was added or removed. No other file is modified by this task.
+- [ ] [P1-T2] Create `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` with the whole text given in the Delivered Source section, then run `CMD-TOKEN-COUNT` with `FILE` `TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` and `TOKEN` `"public async Task GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged()", "[TestMethod]", "[TestClass]", "public partial class EngineToggleStateCoordinatorTests", "handleSeenBySink", "harness.OnLogError =", "var prime = harness.Coordinator.GetPrimeTask(SpamEngine);", "probe.SetException(failure);", "await prime;", "has lost isolation", "Regression for issue #942", "Task.CompletedTask", ".ContainSingle(", ".BeEmpty(", ".BeSameAs(", "using Moq;"` and record the counts in FEATURE/evidence/regression-testing/build-before-reorder.md (this task creates the file; P1-T4 appends to it).
+  - Acceptance: the method line, `[TestMethod]`, `public partial class EngineToggleStateCoordinatorTests`, `harness.OnLogError =`, `var prime = harness.Coordinator.GetPrimeTask(SpamEngine);`, `probe.SetException(failure);`, `await prime;` and `has lost isolation` each count exactly 1; `[TestClass]` and `using Moq;` count 0; `handleSeenBySink` at least 3; `Regression for issue #942` at least 1; `Task.CompletedTask` at least 1; `.ContainSingle(`, `.BeEmpty(` and `.BeSameAs(` at least 1 each; and `FIRST-LINE` of `var prime = harness.Coordinator.GetPrimeTask(SpamEngine);` and of `harness.OnLogError =` are both less than `FIRST-LINE` of `probe.SetException(failure);` (the handle is captured and the probe installed before the trigger).
+- [ ] [P1-T3] Register the new partial in `TaskMaster.Test/TaskMaster.Test.csproj` by inserting `<Compile Include="Ribbon\EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs" />` immediately after the Race entry at line 359, and record FEATURE/evidence/qa-gates/csproj-registration.md.
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; $p = Get-Content -LiteralPath "TaskMaster.Test\TaskMaster.Test.csproj" -Encoding UTF8; $race = 0; $new = 0; for ($i = 0; $i -lt $p.Count; $i++) { if ($p[$i].Contains("EngineToggleStateCoordinatorTests.Race.cs")) { $race = $i + 1 }; if ($p[$i].Contains("EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs")) { $new = $i + 1 } }; "RACE_LINE=$race NEW_LINE=$new NEW_COUNT=$(@($p | Where-Object { $_.Contains("EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs") }).Count)"; git diff --numstat ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster.Test/TaskMaster.Test.csproj'`
+  - Acceptance: `NEW_COUNT=1`, `NEW_LINE` equals `RACE_LINE` plus 1, and the anchored numstat line for the project file reports 1 insertion and 0 deletions. The project file is outside the formatter (fact 10), so no format pass follows this edit.
+- [ ] [P1-T4] Build with `CMD-BUILD` (`TASKID` p1-t4) so the test assembly carries the hook and the new test, appending the result to FEATURE/evidence/regression-testing/build-before-reorder.md.
+  - Acceptance: `MSBUILD_EXIT_CODE: 0`, `ERRORS: 0`, `TEST_DLL_ADVANCED: True`, `CSC_OUT_TASKMASTER_TEST:` at least 1. A green build here is what makes the next task's failure a genuine assertion failure rather than a compile error; the production file is unchanged from the anchor at this point (P2-T6 proves it retrospectively through `BASE-HASH-PROD:`).
+- [ ] [P1-T5] [expect-fail] Run the coordinator fixture against the unchanged production file with `CMD-VSTEST` (`ASSEMBLY-TM`, `FILTER-COORD`, `TASKID` p1-t5, `NAMES-COORD`) and record FEATURE/evidence/regression-testing/prime-fault-ordering-fail-before.md (fixed name per the spec).
+  - Artifact: `Timestamp:`, `Command:`, `EXIT_CODE:` (non-zero), `ExpectedExitCode:` equal to the observed value, an `Output Summary:` with the `COUNTERS` line, every `RESULT`, `FAILED` and `MESSAGE` line, plus an `Environment of the control:` paragraph stating that the production file is byte-identical to the merge base `ddbab26a0149bf2ca5d0256e60686ad79e74d90c` (its `CMD-HASH` value equals `BASE-HASH-PROD:` from P0-T11, recorded here as `PROD-HASH-AT-CONTROL:`), that the hook, the new partial and its csproj entry are present, and that the run settings are unchanged (their anchored diff, `git diff --exit-code ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster.runsettings scripts/vscode/TaskMaster.cli.runsettings`, exits 0).
+  - Acceptance, all required: `TRX_PRESENT: True`; `SEQUENCE_FILES: 0`; `EXIT_CODE:` non-zero; `RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Failed`; the `MESSAGE` line for that test contains `to refer to` (the FluentAssertions `BeSameAs` failure fragment, fact 6); the `COUNTERS` total equals `BASELINE-TOTAL:` plus 1; every `FAILED` name is either the new test or `GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse` (the racy original may fail here, which is consistent with the defect); `PROD-HASH-AT-CONTROL:` equals `BASE-HASH-PROD:`. If the new test is reported `Passed`, the negative control has lost isolation: stop and report `FAIL-BEFORE NOT REPRODUCED`; do not proceed to Phase 2.
+
+### Phase 2 — Minimal Production Fix and Green Flip
+
+- [ ] [P2-T1] Reorder `CompletePrime` in `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` so that `_logError(BuildPrimeFailedMessage(engineName), failure);` precedes `_primeTasks.TryRemove(engineName, out _);`, inserting the three-line why-comment above the `_logError` statement exactly as the Delivered Source section states. No other line of the method changes.
+  - Acceptance (verified by P2-T6): within the `CompletePrime` span the `_logError(` line index is less than the `_primeTasks.TryRemove(engineName, out _);` line index; the span contains `return;`, `GetBaseException()` and `new TaskCanceledException(completed)`; the span contains zero lines containing `try`, `catch` or `lock (`; and the line carrying `Report-then-clear is load-bearing` is exactly 3 lines above the `_logError(` line.
+- [ ] [P2-T2] Replace the `summary` element on `CompletePrime` and extend the `returns` element on `GetPrimeTask` in `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` with the texts given in the Delivered Source section, each documented token on one physical line.
+  - Acceptance (verified by P2-T6): `and only then is the in-flight marker cleared` counts exactly 1 and its line lies within the twelve lines above the `private void CompletePrime(` line; `cleared only after that report has returned` counts exactly 1 and its line lies within the eight lines above the `internal Task GetPrimeTask(` line. The `remarks` element on `CompletePrime` is unchanged.
+- [ ] [P2-T3] Build with `CMD-BUILD` (`TASKID` p2-t3) and record FEATURE/evidence/regression-testing/build-after-reorder.md.
+  - Acceptance: `MSBUILD_EXIT_CODE: 0`, `ERRORS: 0`, `TEST_DLL_ADVANCED: True`, `CSC_OUT_TASKMASTER_TEST:` at least 1.
+- [ ] [P2-T4] Re-run the original reproduction and the regression test together: run `CMD-VSTEST` (`ASSEMBLY-TM`, `FILTER-COORD`, `TASKID` p2-t4, `NAMES-COORD`) and record FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md (fixed name per the spec).
+  - Artifact: `Timestamp:`, `Command:` (identical to P1-T5's except the task id segments), `EXIT_CODE: 0`, an `Output Summary:` with the `COUNTERS` line, every `RESULT` line and the sentence that the only production difference between this run and P1-T5 is the statement reorder and documentation in `CompletePrime` and `GetPrimeTask` of `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` (the hook, the partial and the csproj entry were present in both runs), with `PROD-HASH-AFTER:` from `CMD-HASH` differing from `BASE-HASH-PROD:`.
+  - Acceptance, all required: `EXIT_CODE: 0`; `TRX_PRESENT: True`; `SEQUENCE_FILES: 0`; the `COUNTERS` line has `failed` 0 and total equal to `BASELINE-TOTAL:` plus 1; `RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Passed`; `RESULT GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse = Passed`; `RESULT GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker = Passed`; `RESULT GetPressed_WhenPrimeIsCanceled_LeavesToggleReportingUnchecked = Passed`; no `FAILED` line.
+- [ ] [P2-T5] Compare the pass-after population against the baseline population by reading FEATURE/evidence/baseline/coordinator-tests-baseline.md and FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md, appending a `POPULATION-COMPARISON:` paragraph to the latter.
+  - Acceptance: the pass-after total equals `BASELINE-TOTAL:` plus 1; the pass-after `failed` is 0; every name in `BASELINE-FAILED:` (when not `NONE`) appears as `Passed` in the pass-after `RESULT` lines or is recorded by name as still failing (in which case the run stops with `PASS-AFTER NOT GREEN`).
+- [ ] [P2-T6] Verify the production edit scope and the documentation tokens of `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` and record FEATURE/evidence/qa-gates/production-reorder-scope.md; append the harness-file hunk check to FEATURE/evidence/qa-gates/harness-hook-edit-scope.md.
+  - Command, production: `CMD-TOKEN-COUNT` with `FILE` `TaskMaster\Ribbon\EngineToggleStateCoordinator.cs` and `TOKEN` `"private void CompletePrime(", "_logError(BuildPrimeFailedMessage(engineName), failure);", "_primeTasks.TryRemove(engineName, out _);", "Report-then-clear is load-bearing", "and only then is the in-flight marker cleared", "cleared only after that report has returned", "internal Task GetPrimeTask(", "catch (", "lock (", "new TaskCanceledException(completed)", "GetBaseException()"`; then `git diff -U0 ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` and `git diff --numstat ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`.
+  - Command, harness: `git diff -U0 ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs` together with `CMD-TOKEN-COUNT` on that file with `TOKEN` `"private sealed class Harness", "private sealed class LoggedError"`.
+  - Acceptance, production, all required: `FIRST-LINE` of `_logError(BuildPrimeFailedMessage(engineName), failure);` is less than `FIRST-LINE` of `_primeTasks.TryRemove(engineName, out _);` and both are greater than `FIRST-LINE` of `private void CompletePrime(`; `FIRST-LINE` of `Report-then-clear is load-bearing` equals `FIRST-LINE` of the `_logError(` token minus 3; `catch (` counts exactly 1 and `lock (` counts exactly 1 (both unchanged from the anchor, fact 1); the three documentation tokens count exactly 1 each and satisfy the position clauses of P2-T2; `new TaskCanceledException(completed)` and `GetBaseException()` count exactly 1 each; every `@@` hunk of the anchored diff has a new-side start line at or above 242 (the `returns` element of `GetPrimeTask`) — no hunk touches the constructor, `GetPressed`, `HandleToggleClickAsync`, `ExecuteToggleAsync`, `StartPrimeIfNeeded`, `StartObservedPrime` or `ApplyPrimeAsync`; the numstat deletion count is at most 8, and the artifact quotes every removed line to show each is one of: a line of the `CompletePrime` summary element, a line of the `GetPrimeTask` returns element, the `TryRemove` statement, or a blank line adjacent to that statement.
+  - Acceptance, harness, all required: every `@@` hunk of the anchored diff has a new-side start line greater than `FIRST-LINE` of `private sealed class Harness` and less than `FIRST-LINE` of `private sealed class LoggedError`; the diff adds and removes zero lines containing `[TestMethod]`; the numstat deletion count is exactly 1 (the replaced single-line lambda).
+- [ ] [P2-T7] Verify that the original reproduction test is byte-for-byte unchanged and record FEATURE/evidence/qa-gates/original-test-unchanged.md.
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; function Get-MethodText([string[]]$lines) { $s = 0; for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i].Contains("GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse()")) { $s = $i; break } }; $e = 0; for ($i = $s; $i -lt $lines.Count; $i++) { if ($lines[$i].TrimEnd() -eq "        }") { $e = $i; break } }; return ((@($lines[($s - 1)..$e]) | ForEach-Object { $_.TrimEnd() }) -join "`n") }; $base = @(git show ddbab26a0149bf2ca5d0256e60686ad79e74d90c:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs); $now = Get-Content -LiteralPath "TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.cs" -Encoding UTF8; $sha = [System.Security.Cryptography.SHA256]::Create(); $h1 = [BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes((Get-MethodText $base)))); $h2 = [BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes((Get-MethodText $now)))); "BASE_METHOD_SHA=$h1"; "NOW_METHOD_SHA=$h2"; "METHOD_UNCHANGED=$($h1 -eq $h2)"; "METHOD_LINES=$(((Get-MethodText $now) -split "`n").Count)"'`
+  - Acceptance: `METHOD_UNCHANGED=True` and `METHOD_LINES=32` (the `[TestMethod]` line 212 through the closing brace at 243, fact 2). The extraction starts one line above the method signature (its attribute) and ends at the first eight-space closing brace, so the whole method body is compared; trailing whitespace is trimmed on both sides so a carriage-return difference between the blob and the checkout cannot produce a false mismatch, while any change to the method's text still does.
+- [ ] [P2-T8] Commit the implementation — `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`, `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs`, `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs`, `TaskMaster.Test/TaskMaster.Test.csproj` and the feature folder — and record FEATURE/evidence/qa-gates/implementation-commit.md.
+  - Command: `git add -- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs TaskMaster.Test/TaskMaster.Test.csproj docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942` then `git commit -m "fix(ribbon): report a prime fault before clearing its in-flight marker (issue 942)"` then `git show --name-only --format= HEAD` then `git status --porcelain -- TaskMaster TaskMaster.Test`.
+  - Acceptance: the commit exits 0; `IMPLEMENTATION-COMMIT-SHA:` records `git rev-parse HEAD` as an observation; the `git show` name list contains exactly the four code paths plus paths under the feature folder and nothing else; the porcelain span scoped to the two code trees prints no line. This commit stages paths outside every exempt tree, so it runs only in a session whose pre-implementation checkpoint is ready; a hook refusal is `PRE-IMPLEMENTATION GATE BLOCKED`.
+
+### Phase 3 — Final QA Toolchain Loop, Coverage Delta, Footprint and Acceptance
+
+The loop is format, then the read-only format check, then the analyzer rebuild, then the nullable rebuild, then the coverage-enabled test run, in the CLAUDE.md order. If any step fails or rewrites a file after P3-T1, restart at P3-T1. P3-T9 records that a single pass completed clean.
+
+- [ ] [P3-T1] Run the formatter repository-wide with `dotnet tool run csharpier format .` and record FEATURE/evidence/qa-gates/csharpier-format.md with a before-and-after observation.
+  - Command: `CMD-HASH` before; `git status --porcelain -- . ":(exclude)docs/features" ":(exclude).claude"` before; `dotnet tool run csharpier format .`; `CMD-HASH` after; the same scoped porcelain span after.
+  - Acceptance: the artifact records six hashes (three before, three after) and defines the rewritten-file count as the number of Write Set paths whose two hashes differ; it records both scoped porcelain outputs verbatim and requires them to be identical line sets (the repository-wide format rewrote no file outside the Write Set; a difference is `FORMAT WIDENED FOOTPRINT`: stop and report, because P0-T8 established a clean drift baseline). The console line `Formatted N files` is not used as the rewritten count: CSharpier reports files processed, not files changed. A non-zero rewritten count is not itself a restart trigger; a later failing step is.
+- [ ] [P3-T2] Re-run the scope and token gates on the formatted files: repeat the P2-T6 production and harness checks and the P2-T7 method comparison, appending `POST-FORMAT:` sections to FEATURE/evidence/qa-gates/production-reorder-scope.md, FEATURE/evidence/qa-gates/harness-hook-edit-scope.md and FEATURE/evidence/qa-gates/original-test-unchanged.md.
+  - Acceptance: every clause of P2-T6 and P2-T7 holds on the post-format tree, with the numstat deletion counts re-recorded (the `Report-then-clear` comment's three-line offset and the `_logError` before `TryRemove` order are format-stable; a reflow that breaks a single-line token is repaired by re-wrapping the comment, which is a Write Set edit, and the loop restarts at P3-T1).
+- [ ] [P3-T3] Audit the post-format line counts of the three source files with `CMD-LINECOUNT` and record FEATURE/evidence/qa-gates/file-line-counts.md.
+  - Acceptance: `LINES` for `TaskMaster\Ribbon\EngineToggleStateCoordinator.cs`, `TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.cs` and `TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` are each at most 500 (expected roughly 422, 470 and 75). This is the authoritative AC14 audit; P0-T11 was advisory.
+- [ ] [P3-T4] Verify formatting repository-wide, read-only, with `dotnet tool run csharpier check .` and record FEATURE/evidence/qa-gates/csharpier-check-final.md.
+  - Acceptance: `EXIT_CODE: 0` and the output reports no unformatted file. A non-zero exit restarts the loop at P3-T1.
+- [ ] [P3-T5] Run the analyzer gate with `CMD-REBUILD` (`GATEARGS` analyzers, `TASKID` p3-t5) and record FEATURE/evidence/qa-gates/msbuild-analyzer-final.md (`Command:` records `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`).
+  - Acceptance, all required: `EXIT_CODE: 0`; `ERRORS: 0`; `SKIP_CORECOMPILE_LINES: 0` (no project reported a skipped CoreCompile target); `CSC_OUT_TASKMASTER:` and `CSC_OUT_TASKMASTER_TEST:` each at least 1; `WRITESET_DIAGNOSTIC_LINES: 0`; `WARNINGS:` at most `ANALYZER-BASELINE-WARNINGS:` from P0-T9.
+- [ ] [P3-T6] Run the nullable type-check gate with `CMD-REBUILD` (`GATEARGS` nullable, `TASKID` p3-t6) and record FEATURE/evidence/qa-gates/msbuild-nullable-final.md (`Command:` records `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`; no Nullable property override).
+  - Acceptance, all required: `EXIT_CODE: 0`; `ERRORS: 0`; `SKIP_CORECOMPILE_LINES: 0`; both `CSC_OUT_` counts at least 1; `WRITESET_DIAGNOSTIC_LINES: 0`; `WARNINGS:` at most `NULLABLE-BASELINE-WARNINGS:` from P0-T10; `TEST_DLL_EXISTS: True`.
+- [ ] [P3-T7] Re-run the coordinator fixture on the rebuilt assembly with `CMD-VSTEST` (`ASSEMBLY-TM`, `FILTER-COORD`, `TASKID` p3-t7, `NAMES-COORD`) and append a `FINAL-FIXTURE-RUN:` section to FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md.
+  - Acceptance: `EXIT_CODE: 0`; `SEQUENCE_FILES: 0`; `COUNTERS` `failed` 0 and total equal to `BASELINE-TOTAL:` plus 1; all four `NAMES-COORD` names `Passed`. This confirms the fixture on the exact assembly the coverage run measures.
+- [ ] [P3-T8] Run the coverage-enabled test gate by the route P0-T13 fixed and record FEATURE/evidence/qa-gates/coverage-post-change.md (fixed name per the spec): under `RUNNER` run `CMD-COVERAGE-RUNNER` with `STAGE` final, under `DIRECT` run `CMD-COVERAGE-DIRECT` with `STAGE` final, then `CMD-COVERAGE-POST` with `STAGE` final and `RAW` per the rule, with the same artifact fields as P0-T14.
+  - Re-run rule: when the first attempt's `FAILED-SET:` is exactly the single name `TryAddValuesAsync_UpdatesExistingValue` (the issue 780 sporadic failure P0-T14 admits), the same command is run once more with the first attempt recorded as `FIRST-ATTEMPT-FAILED-SET:` and the second attempt's values recorded as the run; no other failure and no second re-run is admitted.
+  - Acceptance, all required: branch (a) of P0-T14's branch rule (exit 0, both floors met, `FAILED-SET:` empty) on the recorded attempt; `SEQUENCE_FILES: 0` (DIRECT) and `TRX_PRESENT: True`; the summary block's second line reports `failed 0`; `COORD-CLASS-NODES: 1`; `COMPLETEPRIME-UNCOVERED: 0`; the projection block contains the `TaskMaster` package with both counters; `RESULT`-level proof that the new test executed is taken from P3-T7, because the runner's summary carries counts and failed names only. Any other outcome is a failing step: repair and restart at P3-T1 (a stall is `COVERAGE RUN STALLED` or `ABORTED`: stop and report). Under `RUNNER` the runner's own 80 percent line and 75 percent branch assertions are the floor gate; under `DIRECT` the `LINE-FLOOR:` and `BRANCH-FLOOR:` lines are.
+- [ ] [P3-T9] Record the loop closure in FEATURE/evidence/qa-gates/toolchain-final-pass.md (fixed name per the spec).
+  - Acceptance: the artifact lists P3-T1 through P3-T8 with each step's `Command:` and exit code, states the pass number, states for P3-T5 and P3-T6 that `SKIP_CORECOMPILE_LINES: 0` and both `CSC_OUT_` counts are at least 1 (the analyzer and nullable gates compiled rather than short-circuited), states for P3-T4 that the check reported no differences, and states for P3-T8 the route and that the run exited 0. If any pass failed, both the failed pass and the clean pass are recorded, and the clean pass is the one whose steps ran in order with no intervening file rewrite.
+- [ ] [P3-T10] Compute the coverage comparison from FEATURE/evidence/baseline/coverage-baseline.md and FEATURE/evidence/qa-gates/coverage-post-change.md and append a `COMPARISON:` section to FEATURE/evidence/qa-gates/coverage-post-change.md.
+  - Rows, all required: `COORD-LINES-BASELINE:` and `COORD-LINES-FINAL:` (covered over valid, both stages); `COORD-BRANCHES-BASELINE:` and `COORD-BRANCHES-FINAL:`; `COMPLETEPRIME-ELEMENTS-BASELINE:` and `-FINAL:`; `COMPLETEPRIME-UNCOVERED-FINAL:`; `FIRST-PARTY-BASELINE:` and `FIRST-PARTY-FINAL:` (the two `First-party coverage:` lines verbatim); `ROOT-BASELINE:` and `ROOT-FINAL:` (the two `ROOT` lines); `DENOMINATOR-BRANCH:` either `COMPARABLE` (the two root lines-valid figures differ by at most 1 percent of the baseline figure; then the final root line-rate must be at least the baseline root line-rate minus 0.005) or `INCOMPARABLE` (recorded, not gated, with the one-sentence reason from D-7); `CHANGED-LINES:` the added line numbers of `git diff -U0 ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` that fall inside `COMPLETEPRIME-SPAN:` (final), each with its `hits` value from the final `COMPLETEPRIME-LINE` rows or `no line element` for a comment or brace line.
+  - Acceptance, all required: `COORD-LINES-FINAL` valid equals `COORD-LINES-BASELINE` valid (no executable statement added; a mismatch is `COORD-LINES-VALID CHANGED`: record both and treat AC12 as NOT MET); `COORD-LINES-FINAL` covered at least `COORD-LINES-BASELINE` covered; `COORD-BRANCHES-FINAL` covered at least baseline covered; `COMPLETEPRIME-ELEMENTS-FINAL` equals `COMPLETEPRIME-ELEMENTS-BASELINE`; `COMPLETEPRIME-UNCOVERED-FINAL: 0`; every `CHANGED-LINES` entry that has a line element has hits at least 1; exactly one `DENOMINATOR-BRANCH:` value is recorded and, under `COMPARABLE`, its rate clause holds. The two-dot anchored diff is used deliberately: the coverage document was generated from the working tree after the format pass, so pre-format committed line numbers would not align.
+- [ ] [P3-T11] Verify the determinism-token constraints of AC10 over the anchored diff of the test directory and record FEATURE/evidence/qa-gates/determinism-tokens.md.
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; $added = @(git diff -U0 ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster.Test/Ribbon | Where-Object { $_.StartsWith("+") -and -not $_.StartsWith("+++") }); "ADDED-LINE-COUNT: $($added.Count)"; foreach ($t in @("Thread.Sleep", "Task.Delay", "DoNotParallelize", "[Timeout", "Timeout=", "DateTime.Now", "DateTime.UtcNow", "Stopwatch", ".Wait(", ".Result", "ManualResetEvent", "SemaphoreSlim", "GetTempFileName", "TaskScheduler", "while (", "for (", "Retry")) { "ADDED-TOKEN [$t] = $(@($added | Where-Object { $_.Contains($t) }).Count)" }; git diff --exit-code ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster.runsettings scripts/vscode/TaskMaster.cli.runsettings | Out-Null; "RUNSETTINGS_DIFF_EXIT=$LASTEXITCODE"; git diff --exit-code ddbab26a0149bf2ca5d0256e60686ad79e74d90c -- TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs TaskMaster/Ribbon/RibbonController.EngineCommands.cs | Out-Null; "NONGOAL_FILES_DIFF_EXIT=$LASTEXITCODE"'`
+  - Acceptance: `ADDED-LINE-COUNT:` at least 60 (the new partial plus the hook; a smaller figure means the diff missed the new file); every `ADDED-TOKEN` count is 0; `RUNSETTINGS_DIFF_EXIT=0`; `NONGOAL_FILES_DIFF_EXIT=0`. The token list is applied to added lines of the test directory only, so this plan's own prose cannot trip it.
+- [ ] [P3-T12] Verify that no raw test-result or coverage document entered the repository and record it in FEATURE/evidence/qa-gates/footprint-scope.md (this task creates the file; P3-T14 appends to it).
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; $ext = @(".trx", ".xml", ".coverage", ".coveragexml", ".cobertura"); $added = @(git diff --name-only --diff-filter=A ddbab26a0149bf2ca5d0256e60686ad79e74d90c HEAD); $added | ForEach-Object { "ADDED-PATH: $_" }; "RAW-DOCS-COMMITTED: $(@($added | Where-Object { $ext -contains [IO.Path]::GetExtension($_).ToLowerInvariant() }).Count)"; $untracked = @(git status --porcelain --untracked-files=all -- docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | ForEach-Object { $_.Substring(3) }); "RAW-DOCS-UNTRACKED-IN-FEATURE: $(@($untracked | Where-Object { $ext -contains [IO.Path]::GetExtension($_).ToLowerInvariant() }).Count)"'` (the name-listing diff enumerates committed additions since the anchor; the porcelain span covers untracked files in the feature folder).
+  - Acceptance: `RAW-DOCS-COMMITTED: 0` and `RAW-DOCS-UNTRACKED-IN-FEATURE: 0`; the artifact lists every `ADDED-PATH:` line so the classification is auditable, and that list contains `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` (the positive control that the enumeration saw the committed additions). The porcelain companion is required because a name-listing diff cannot see an untracked file.
+- [ ] [P3-T13] Sweep the feature folder, including this plan, for host identifiers and record FEATURE/evidence/qa-gates/evidence-hygiene.md.
+  - Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "WORKTREE"; $acct = Split-Path -Leaf $env:USERPROFILE; $machine = $env:COMPUTERNAME; $files = @(Get-ChildItem -LiteralPath "docs\features\active\2026-09-29-engine-toggle-prime-fault-logging-test-races-942" -Recurse -File -Filter "*.md"); $a = 0; $m = 0; $d = 0; foreach ($f in $files) { $c = Get-Content -LiteralPath $f.FullName -Raw -Encoding UTF8; $a += ([regex]::Matches($c, [regex]::Escape($acct), "IgnoreCase")).Count; $m += ([regex]::Matches($c, [regex]::Escape($machine), "IgnoreCase")).Count; $d += ([regex]::Matches($c, "[A-Za-z]:[\\/]Users[\\/]")).Count }; "FILES_SCANNED=$($files.Count) ACCOUNT_HITS=$a MACHINE_HITS=$m DRIVE_USERS_HITS=$d"'`
+  - Acceptance: `ACCOUNT_HITS=0`, `MACHINE_HITS=0`, `DRIVE_USERS_HITS=0`, `FILES_SCANNED=` at least 36. The two tokens are derived at run time and neither value is written into the artifact. A non-zero count is repaired by replacing the occurrence with the placeholder REDACTED-PATH and re-running this task.
+- [ ] [P3-T14] Verify the change footprint against the anchor and append it to FEATURE/evidence/qa-gates/footprint-scope.md.
+  - Command: `git diff --name-status ddbab26a0149bf2ca5d0256e60686ad79e74d90c HEAD` and `git status --porcelain --untracked-files=all`.
+  - Acceptance, all required: `INHERITED-AND-EXCLUDED:` lists the paths that appear in the diff and are members of `INHERITED-COMMITTED:` from P0-T4 or lie under .claude/agent-memory/ (the standing allowance of D-8), or `NONE`; `THIS-ITEM-FOOTPRINT:` lists every remaining path, and every one of them is one of the four code paths or lies under `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/`; the four code paths are all present in the footprint (the new partial with status A); TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs, TaskMaster/Ribbon/RibbonController.EngineCommands.cs, TaskMaster.runsettings and scripts/vscode/TaskMaster.cli.runsettings are absent from the footprint; no porcelain line names a path under TaskMaster/ or TaskMaster.Test/; every other porcelain line is under the feature folder, under .claude/agent-memory/, or a member of `PRE-EXISTING-WORKTREE-PATHS:` from P0-T4, and the composition is stated without a count. The porcelain companion is required beside the name-listing diff.
+- [ ] [P3-T15] Check off AC1 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing the `POST-FORMAT:` section of FEATURE/evidence/qa-gates/production-reorder-scope.md.
+  - Acceptance: either exactly one checkbox changes from `- [ ] AC1 —` to `- [x] AC1 —` because that section shows `_logError(` before `TryRemove`, `catch (` and `lock (` each 1, the early return and the two exception tokens present and zero `try`, `catch` or `lock (` lines inside the span; or the box stays unchecked and `AC1: NOT MET` is recorded with the failing values in P3-T29. The criterion text is unmodified. This task completes in either case.
+- [ ] [P3-T16] Check off AC2 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing the three documentation-token rows of FEATURE/evidence/qa-gates/production-reorder-scope.md.
+  - Acceptance: exactly one checkbox flips, or `AC2: NOT MET` is recorded; the cited rows show each token counting 1 at its required position.
+- [ ] [P3-T17] Check off AC3 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/qa-gates/harness-hook-edit-scope.md.
+  - Acceptance: exactly one checkbox flips, or `AC3: NOT MET` is recorded; the artifact shows the four hook tokens at 1, the append-then-invoke adjacency, every hunk inside the `Harness` span and zero `[TestMethod]` lines added or removed.
+- [ ] [P3-T18] Check off AC4 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing the token counts in FEATURE/evidence/regression-testing/build-before-reorder.md and the `RESULT` lines of FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md.
+  - Acceptance: exactly one checkbox flips, or `AC4: NOT MET` is recorded; the counts show the capture-before-trigger order, the sink probe, the `BeSameAs` assertions, the `ContainSingle` and `BeEmpty` assertions and the `Task.CompletedTask` assertion, and the test is `Passed` in the pass-after run.
+- [ ] [P3-T19] Check off AC5 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/regression-testing/build-before-reorder.md.
+  - Acceptance: exactly one checkbox flips, or `AC5: NOT MET` is recorded; the artifact shows `[TestMethod]` 1, `Regression for issue #942` at least 1, `has lost isolation` 1, and the harness's strict mock and reason-bearing FluentAssertions calls are those quoted in the Delivered Source section (the Arrange, Act and Assert comments are part of that text).
+- [ ] [P3-T20] Check off AC6 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/qa-gates/csproj-registration.md and the `RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Passed` line of FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md.
+  - Acceptance: exactly one checkbox flips, or `AC6: NOT MET` is recorded.
+- [ ] [P3-T21] Check off AC7 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/regression-testing/prime-fault-ordering-fail-before.md.
+  - Acceptance: exactly one checkbox flips, or `AC7: NOT MET` is recorded; the artifact carries `Timestamp:`, `Command:`, a non-zero `EXIT_CODE:`, a matching `ExpectedExitCode:`, the merge-base commit with `PROD-HASH-AT-CONTROL:` equal to `BASE-HASH-PROD:`, and the new test `Failed` with a message containing `to refer to`.
+- [ ] [P3-T22] Check off AC8 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md.
+  - Acceptance: exactly one checkbox flips, or `AC8: NOT MET` is recorded; the artifact shows `EXIT_CODE: 0`, both named tests `Passed`, and the only-production-difference statement.
+- [ ] [P3-T23] Check off AC9 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing the `COUNTERS` line and `POPULATION-COMPARISON:` of FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md and the `POST-FORMAT:` section of FEATURE/evidence/qa-gates/original-test-unchanged.md.
+  - Acceptance: exactly one checkbox flips, or `AC9: NOT MET` is recorded; `failed` is 0 with total `BASELINE-TOTAL:` plus 1 and `METHOD_UNCHANGED=True`.
+- [ ] [P3-T24] Check off AC10 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/qa-gates/determinism-tokens.md.
+  - Acceptance: exactly one checkbox flips, or `AC10: NOT MET` is recorded; every `ADDED-TOKEN` count is 0 and `RUNSETTINGS_DIFF_EXIT=0`.
+- [ ] [P3-T25] Check off AC11 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/qa-gates/toolchain-final-pass.md.
+  - Acceptance: exactly one checkbox flips, or `AC11: NOT MET` is recorded; the artifact records one clean pass in order with the check reporting no differences, both rebuilds at exit 0 with `SKIP_CORECOMPILE_LINES: 0`, and the coverage run at exit 0.
+- [ ] [P3-T26] Check off AC12 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing the `COMPARISON:` section of FEATURE/evidence/qa-gates/coverage-post-change.md, FEATURE/evidence/baseline/coverage-baseline.md and FEATURE/evidence/qa-gates/footprint-scope.md.
+  - Acceptance: exactly one checkbox flips, or `AC12: NOT MET` is recorded; the comparison shows the coordinator file's covered lines and covered branches not lower than baseline with equal lines-valid, `COMPLETEPRIME-UNCOVERED-FINAL: 0`, every changed line with a line element covered, and `RAW-DOCS-COMMITTED: 0` with `RAW-DOCS-UNTRACKED-IN-FEATURE: 0`.
+- [ ] [P3-T27] Check off AC13 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/qa-gates/footprint-scope.md and the `NONGOAL_FILES_DIFF_EXIT=0` row of FEATURE/evidence/qa-gates/determinism-tokens.md.
+  - Acceptance: exactly one checkbox flips, or `AC13: NOT MET` is recorded; `THIS-ITEM-FOOTPRINT:` holds only the four code paths and feature-folder paths, the four non-goal files are absent, and the `INHERITED-AND-EXCLUDED:` subtraction is stated on the artifact (quoted from D-8; the spec's criterion text carries no inherited-path carve-out, so the subtraction is recorded as a divergence the reviewer can audit rather than hidden).
+- [ ] [P3-T28] Check off AC14 in `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, citing FEATURE/evidence/qa-gates/file-line-counts.md.
+  - Acceptance: exactly one checkbox flips, or `AC14: NOT MET` is recorded; all three counts are at most 500.
+- [ ] [P3-T29] Write the acceptance-criteria status summary to FEATURE/evidence/other/ac-status-summary.md.
+  - Required contents: the source file path, `TOTAL: <checked> of 14` counted from the `- [x] AC` lines actually present in the spec's acceptance section, `UNMET:` listing every `ACn: NOT MET` recorded by P3-T15 through P3-T28 with its failing values, or `NONE`, and the text of every remaining unchecked criterion.
+  - Acceptance: the checked count equals the number of `- [x] AC` lines in the spec, counted from the file rather than summed from this plan's claims; the `UNMET:` line is present.
+- [ ] [P3-T30] Record the reduced-audit handoff in FEATURE/evidence/other/reduced-audit-handoff.md and commit the feature folder — `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md`, this plan and every Phase 1 to Phase 3 artifact.
+  - Handoff contents: pointers to FEATURE/evidence/qa-gates/toolchain-final-pass.md, FEATURE/evidence/qa-gates/coverage-post-change.md, FEATURE/evidence/qa-gates/footprint-scope.md, FEATURE/evidence/regression-testing/prime-fault-ordering-fail-before.md, FEATURE/evidence/regression-testing/prime-fault-ordering-pass-after.md and FEATURE/evidence/other/ac-status-summary.md; the `COVERAGE-ROUTE:` used; the statement that hazard B (registration racing removal on a synchronous non-success prime, NB-2 of the issue 735 code review) is out of scope and is promoted separately by the coordinator, so no potential entry was written by this run; and the statement that the coverage-route test evidence committed is projections only.
+  - Command: `git add -- docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942` then `git commit -m "docs(942): final QA, coverage comparison, footprint and acceptance evidence"` then `git status --porcelain -- docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 TaskMaster TaskMaster.Test`.
+  - Acceptance: the handoff artifact is written before the commit and records `PRE-FINAL-COMMIT-HEAD:` (the P2-T8 commit id, from `git rev-parse HEAD` at write time) as an observation; the commit exits 0 and its id is transcribed into the executor's completion message rather than into any artifact (an artifact written after this commit would be left untracked); the porcelain span lists no entry other than this plan file (its own check-off mark for this task lands after the commit and is committed by the orchestrator) and no entry under TaskMaster/ or TaskMaster.Test/. The pathspec form keeps the commit within the exempt tree.
+
+## Planner Adversarial Self-Review
+
+SELF-REVIEW: RE-DERIVED THIS PASS
+
+Authoring pass, 2026-09-29. Every citation below was read directly against this worktree in this pass; sibling regions were re-read where an edit lands.
+
+- `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` — length 415 content lines; no nullable directive; `GetPrimeTask` doc 237 to 246 with `returns` 242 to 246, body 247 to 255; `StartPrimeIfNeeded` 261 to 278 with the lock at 269 and the assignment at 276; `StartObservedPrime` 290 to 303 (continuation options 299 to 301); `CompletePrime` doc 327 to 340 with `summary` 327 to 331 and `remarks` 332 to 340; body 341 to 355 with `TryRemove` at 348, `var failure` 350 to 352, `_logError` at 354; exactly one `catch (` at 181 and one `lock (` at 269; `Task.CompletedTask` at 243, 251, 254. Sibling region re-read: the only other `_logError` call is at 183 inside the click boundary and is untouched; the `remarks` element between the replaced `summary` and the body stays as the D-1 fix leaves it.
+- `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs` — length 459 content lines; `[TestClass]` 22, class 23 already `partial`; `[TestMethod]` and `[DataTestMethod]` counts 15 and 1 (16 methods: 4 constructor, 6 GetPressed including the data-row method and the original fault test, 3 ExecuteToggleAsync, 3 HandleToggleClickAsync); the original fault test 212 to 243 fetching the handle post-trigger at 223 to 224; `Harness` 403 to 441, constructor 405 to 417, error-log lambda on the single line 415, `OnInvalidate` 430 to 434, `Invalidations` 436, `Errors` 440; `LoggedError` 446 to 457; discard lambda `(_, _) => { }` at 35. Sibling region re-read: `OnInvalidate?.Invoke(controlId);` at 412 is the null-conditional precedent the hook mirrors.
+- `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs` — length 277 content lines; header usings 1 to 5 (includes Moq); no `[TestClass]`; `partial` at 28; capture-before-trigger 211 to 215; post-trigger fetch at 263; `#endregion` at 275. Not modified; P3-T11 gates its diff to exit 0.
+- `TaskMaster.Test/TaskMaster.Test.csproj` — the primary fixture entry at 352, the Race entry at 359 followed by the EngineTogglePressedStateCacheTests entry at 360 and the AssemblyInfo entry at 361; the item group closes at 362. Insertion after 359 lands between two existing entries.
+- `TaskMaster/Ribbon/RibbonController.EngineCommands.cs` — the lazily built coordinator 67 to 77, sink at 76. Not modified.
+- TaskMaster.Test/packages.config — FluentAssertions 8.11.0 at 7, Moq 4.21.0 at 41, MSTest 4.4.1 at 42 to 44.
+- TaskMaster.runsettings — Workers and Scope at 5 and 6, collector 9 to 29; scripts/vscode/TaskMaster.cli.runsettings — Workers and Scope at 5 and 6, no collector.
+- scripts/vscode/Invoke-MSTestWithCoverage.ps1 — 462 lines; argument list 41 to 95 (filter 91, trx logger 93); collection throw 262; main 274 to 457 (defaults 296 to 298, discovery 348 to 355, output 361 to 365, results directory 367 to 371, `Discovered` 374, post-process 399 to 402, scope gate 406 to 409, first-party line 410, projection 415 to 423, summary 430 to 447, retention 449 to 453); entry guard 459 to 461.
+- scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 — `Get-CoberturaClassLineSummary` 160 to 258 (LineMap 192, axes 195 to 196, outputs 251 to 257); `Merge-CoberturaClassesByFilename` 260 to 405; `ConvertTo-KoverageCoberturaXml` 407 to 471 (filename rewrite 437 to 439, merge 442, root counters 455 to 461).
+- scripts/vscode/Invoke-MSTestWithCoverage.Threshold.ps1 — line floor 52 to 55, branch floor 122 to 125. scripts/vscode/Invoke-MSTestWithCoverage.Scope.ps1 — gate 59 to 104. scripts/vscode/Invoke-MSTestWithCoverage.FirstParty.ps1 — line shape 117 to 120, report 123 to 162. scripts/vscode/Invoke-MSTestWithCoverage.Projection.ps1 — projection 14 to 81, reconciliation 83 to 146, retention 148 to 197. scripts/vscode/Invoke-MSTest.TrxSummary.ps1 — `Get-TrxRunSummary` 12 to 101, `Format-TrxRunSummary` 103 to 150.
+- scripts/vscode/Invoke-Restore.ps1 — parameters SolutionPath, Configuration, Platform at 1 to 10. scripts/vscode/Install-RepoDotNetSdk.ps1 — version default 8.0.205 at 3 and 45. global.json — 8.0.205, latestFeature, .dotnet-sdk path. dotnet-tools.json — csharpier 1.2.6 at the repository root.
+- .gitignore — 140 to 141 coverage extensions, 144 the coverage-directory ignore, 145 the gitkeep re-include. .csharpierignore — 4 to 8, 12 to 14, 16, 18. coverage.config — excludes 14 to 20. coverage\.gitkeep present.
+- .claude/hooks/validate-planner-output.ps1 — path regex at 95 applied at 304 to 306; final-phase QA vocabulary at 339 to 340.
+- .claude/rules/plan-acceptance-gates.md — rule table 31 to 44, attribution window 52 to 54; applied to every command span in this plan (every `git diff` carries the anchor literal; every name-listing diff has a porcelain companion; the formatter task records hashes and a scoped porcelain before-and-after; no coverage argument of the Python form appears).
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md` — status and version at 7 and 8; Write Set 64 to 71; acceptance checkboxes 228 to 241 (fourteen, all unchecked); the fixed evidence names at 211, 212, 218, 220, 221.
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/issue.md` — work mode at 12; no acceptance section.
+- `docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/research/2026-09-29T23-20-engine-toggle-prime-fault-race-research.md` — sections 2.1, 4, 6 (Approach 1 and rejected alternatives), 7, 8.1 to 8.4, 9.
+- Literal absence checks — `OnLogError`, `handleSeenBySink`, `PrimeHandleStaysRegisteredUntilFaultIsLogged`, `PrimeFaultOrdering`, `has lost isolation`, `error-log sink`, `only then is the in-flight marker cleared`, `Report-then-clear is load-bearing`, `cleared only after that report has returned`: 0 occurrences across every .cs and .csproj file. Banned determinism tokens across the three coordinator test files: 0.
+
+Sibling-region findings that shaped this plan:
+
+1. The coverage runner now deletes the raw Cobertura document unless it was written to the repository coverage directory itself (Projection.ps1 148 to 197), and writes a JaCoCo projection plus a trx summary beside it. The plan therefore leaves the runner's default output path in place, copies stage documents under the ignored coverage directory, and transcribes the projection, the first-party line, the summary and the per-file figures into Markdown; no xml file is written into the feature folder (AC12 forbids any).
+2. The runner's post-processor merges every class element sharing a filename into one (Helpers.ps1 260 to 405) and rewrites filenames to backslash-relative paths, so the coordinator figures are read from exactly one class node after a separator normalisation, and `COORD-CLASS-NODES: 1` is a hard gate.
+3. The runner prints a count of discovered assemblies and never a path; the DIRECT route prints relative `ASSEMBLY:` lines from its own enumeration, and the RUNNER route records only the count line.
+4. The pre-fix `catch (` and `lock (` counts are both exactly 1, so AC1's no-catch, no-lock clause is gated on those counts staying at 1 rather than on a zero that could never be false.
+5. The `GetPrimeTask` `returns` element sits at 242 to 246, below the constructor and above `StartPrimeIfNeeded`, so the production hunk-position clause is a single lower bound (242) rather than a list.
+6. The main fixture's `[TestMethod]` count is 15, not 16: the null-or-whitespace key test is a `[DataTestMethod]`, whose text does not contain the `[TestMethod]` substring. P1-T1 gates on 15.
+7. The branch already carries promotion commits touching docs/features/potential/ and .claude/agent-memory/ (recent history), so an anchored footprint gate must subtract an inherited set recorded at P0-T4; D-8 and P3-T14 do so explicitly and P3-T27 records the divergence from AC13's literal wording.
+
+## Planner Internal Review Record
+
+PLANNER-INTERNAL-REVIEW: PASS
+
+CITATION-TO-TREE: PASS
+AC-TRACEABILITY: PASS
+SCOPE-BOUNDARY: PASS
+
+CITATION: TaskMaster/Ribbon/EngineToggleStateCoordinator.cs | length 415; lines 181, 237-255, 261-278, 269, 276, 290-303, 327-340, 341-355, 348, 350-352, 354
+CITATION: TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs | length 459; lines 22-23, 35, 212-243, 223-224, 403-441, 405-417, 412, 415, 430-434, 436, 440, 446-457
+CITATION: TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs | length 277; lines 1-5, 28, 211-215, 263, 275
+CITATION: TaskMaster.Test/TaskMaster.Test.csproj | lines 352, 359, 360, 361, 362
+CITATION: TaskMaster/Ribbon/RibbonController.EngineCommands.cs | lines 67-77
+CITATION: TaskMaster.Test/packages.config | lines 7, 41, 42-44
+CITATION: TaskMaster.runsettings | lines 5-6, 9-29
+CITATION: scripts/vscode/TaskMaster.cli.runsettings | lines 5-6
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.ps1 | length 462; lines 41-95, 91, 93, 262, 274-457, 296-298, 348-355, 374, 399-402, 406-410, 415-423, 430-453, 459-461
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 | lines 160-258, 260-405, 407-471
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.Threshold.ps1 | lines 52-55, 122-125
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.Scope.ps1 | lines 59-104
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.FirstParty.ps1 | lines 117-120, 123-162
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.Projection.ps1 | lines 14-81, 83-146, 148-197
+CITATION: scripts/vscode/Invoke-MSTest.TrxSummary.ps1 | lines 12-101, 103-150
+CITATION: scripts/vscode/Invoke-Restore.ps1 | lines 1-10
+CITATION: scripts/vscode/Install-RepoDotNetSdk.ps1 | lines 3, 45
+CITATION: global.json | sdk version, rollForward and paths
+CITATION: dotnet-tools.json | csharpier 1.2.6
+CITATION: .gitignore | lines 140-141, 144, 145
+CITATION: .csharpierignore | lines 4-8, 12-14, 16, 18
+CITATION: coverage.config | lines 14-20
+CITATION: .claude/hooks/validate-planner-output.ps1 | lines 95, 304-306, 339-340
+CITATION: .claude/rules/plan-acceptance-gates.md | lines 31-44, 52-54
+CITATION: docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/spec.md | lines 7-8, 64-71, 211-221, 228-241
+CITATION: docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/issue.md | line 12
+CITATION: docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942/research/2026-09-29T23-20-engine-toggle-prime-fault-race-research.md | sections 2.1, 4, 6, 7, 8.1-8.4, 9
+
+AC-INVENTORY: AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC8, AC9, AC10, AC11, AC12, AC13, AC14
+
+AC-MAPPING: AC1 | IMPLEMENTATION: P2-T1 | TESTS: P2-T6, P3-T2 | EVIDENCE: evidence/qa-gates/production-reorder-scope.md
+AC-MAPPING: AC2 | IMPLEMENTATION: P2-T2 | TESTS: P2-T6, P3-T2 | EVIDENCE: evidence/qa-gates/production-reorder-scope.md
+AC-MAPPING: AC3 | IMPLEMENTATION: P1-T1 | TESTS: P2-T6, P3-T2 | EVIDENCE: evidence/qa-gates/harness-hook-edit-scope.md
+AC-MAPPING: AC4 | IMPLEMENTATION: P1-T2 | TESTS: P2-T4 | EVIDENCE: evidence/regression-testing/build-before-reorder.md, evidence/regression-testing/prime-fault-ordering-pass-after.md
+AC-MAPPING: AC5 | IMPLEMENTATION: P1-T2 | TESTS: P1-T2 token counts | EVIDENCE: evidence/regression-testing/build-before-reorder.md
+AC-MAPPING: AC6 | IMPLEMENTATION: P1-T3 | TESTS: P1-T3, P2-T4 | EVIDENCE: evidence/qa-gates/csproj-registration.md, evidence/regression-testing/prime-fault-ordering-pass-after.md
+AC-MAPPING: AC7 | IMPLEMENTATION: P1-T1, P1-T2, P1-T3 | TESTS: P1-T5 | EVIDENCE: evidence/regression-testing/prime-fault-ordering-fail-before.md
+AC-MAPPING: AC8 | IMPLEMENTATION: P2-T1 | TESTS: P2-T4 | EVIDENCE: evidence/regression-testing/prime-fault-ordering-pass-after.md
+AC-MAPPING: AC9 | IMPLEMENTATION: N/A no-change requirement on the original test | TESTS: P2-T4, P2-T5, P2-T7, P3-T2 | EVIDENCE: evidence/regression-testing/prime-fault-ordering-pass-after.md, evidence/qa-gates/original-test-unchanged.md
+AC-MAPPING: AC10 | IMPLEMENTATION: N/A prohibition on the test-side change | TESTS: P3-T11 | EVIDENCE: evidence/qa-gates/determinism-tokens.md
+AC-MAPPING: AC11 | IMPLEMENTATION: N/A toolchain requirement | TESTS: P3-T1, P3-T4, P3-T5, P3-T6, P3-T8 | EVIDENCE: evidence/qa-gates/toolchain-final-pass.md
+AC-MAPPING: AC12 | IMPLEMENTATION: N/A coverage-evidence requirement | TESTS: P0-T14, P3-T8, P3-T10, P3-T12 | EVIDENCE: evidence/baseline/coverage-baseline.md, evidence/qa-gates/coverage-post-change.md, evidence/qa-gates/footprint-scope.md
+AC-MAPPING: AC13 | IMPLEMENTATION: N/A scope-boundary requirement | TESTS: P3-T11, P3-T14 | EVIDENCE: evidence/qa-gates/footprint-scope.md, evidence/qa-gates/determinism-tokens.md
+AC-MAPPING: AC14 | IMPLEMENTATION: P1-T2 (separate partial keeps the primary fixture under the ceiling) | TESTS: P3-T3 | EVIDENCE: evidence/qa-gates/file-line-counts.md
+
+UNRESOLVED-GAPS: NONE
+
+DIRECTIVE: PREFLIGHT VALIDATION ONLY
