@@ -1,22 +1,21 @@
 # Acceptance-criteria check-off ledger (P6-T17 to P6-T36)
 
-Timestamp: 2026-09-29T22-33
+Timestamp: 2026-09-29T23-35
 Command: git grep -c -e "^- \[x\] AC" -- docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927/spec.md
 EXIT_CODE: 0
 Output Summary:
-- The count command printed 17 for spec.md.
-- TOTAL: 17 of 20
-- UNMET: AC4 (AC4: PENDING P6-T38), AC13 (AC13: NOT MET), AC16 (pending P6-T37)
+- The count command printed 18 for spec.md.
+- TOTAL: 18 of 20
+- UNMET: AC4 (AC4: PENDING P6-T38), AC13 (AC13: NOT MET)
 
 ### Acceptance Criteria Status
 - Source: docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927/spec.md
 - Total AC items: 20
-- Checked off (delivered): 17
-- Remaining (unchecked): 3
+- Checked off (delivered): 18
+- Remaining (unchecked): 2
 - Items remaining:
   - AC4: PENDING P6-T38 (Ruling 1: the check-off waits on the CI Pester coverage figure; the tick and this line's update land inside the P6-T38 commit)
   - AC13: NOT MET
-  - AC16: pending P6-T37 (the CI outcome on the pull-request head)
 
 Per-criterion record:
 - AC1: MET (P6-T17). guard-pre-sweep-run.md: ExpectedExitCode: 1, EXIT_CODE: 1, HYGIENE Findings=1839, which equals RAW-POPULATION: 625 (P0-T17) plus PROFILE-PATH-FILES-NOW: 1214 (the P1-T12 MEASUREMENT-CORRECTION).
@@ -34,7 +33,7 @@ Per-criterion record:
 - AC13: NOT MET (P6-T29). The csharpier check exit code is 0. P6-T7 and P6-T8 each show ZERO-ERRORS=1 and SKIP-CORECOMPILE=0. The summary shows failed 0 with passed 7346, not below BASELINE-PASSED: 7343. The coverage clause fails: first-party line 85.92 is below the P0-T14 85.93, and branch 80.08 is below the P0-T14 80.09. The denominators are comparable under D10 (lines-valid 65736 against 65737). The whole difference is in the UtilitiesCS package, and the branch changes no production C# file (csharp-coverage-projection.md). The spec names the CI mstest-coverage context on the pull-request head as the authoritative pass; P6-T37 records it.
 - AC14: MET (P6-T30). powershell-toolchain-pass.md: final-iteration REWRITTEN=0; the line PoshQC analyze: pass (0 findings); tool reports no count; both P6-T2 channel lines ok=true.
 - AC15: MET (P6-T31). P5-T1 every KEY| count 1 with CONCURRENCY=0, NEEDS=0, LASTEXIT=0; P5-T2 single uses line with no needs and no steps; P1-T10 both hygiene entries (the _pester.yml lines 41 and 45 re-read in this run); P5-T3 CONTEXT-LINE=1, PREDICTED=1, PESTER-ROW=1, ROW=1; P5-T4 ACTIONLINT-EXIT=0.
-- AC16: pending P6-T37
+- AC16: MET (P6-T37). ci-hygiene-context.md: on head 67a69cb23916878c436fa570d587847b7a0745fa exactly one check-run begins hygiene / (CAPTURED-CONTEXT: hygiene / Repository hygiene guard, conclusion success); the six pre-existing contexts each report success; the ruleset GET lists no hygiene / context; RULESET-MODIFIED: no; CONFIRMING-RUN: HYGIENE Findings=0 with exit 0.
 - AC17: MET (P6-T32). guard-post-sweep-run.md: EXIT_CODE: 0, FINDING-LINES=0, HYGIENE Findings=0, enumeration statement present.
 - AC18: MET (P6-T33). p6-t13-evidence-form.md: NON-MD=0, MISSING-FIELDS=0, ADDED-RAW=0, ADDED-RAW-UNTRACKED=0, and the statement that the helper log and raw tool outputs are under the scratch expression or the ignored directories.
 - AC19: MET (P6-T34). p6-t14-scope-containment.md: OUTSIDE-WRITE-SET=0, GOVERNANCE=0, MCP-CONFIG=0, BUILD-INPUTS=0, PROD-CS=0, SIBLING-2026-09-28=0, ANCESTRY-1-EXIT=0, ANCESTRY-2-EXIT=0, ANCESTRY-3-EXIT=0, ANCESTRY-CONTROL-EXIT=1, no ANCESTRY-CONTROL: NOT OBSERVED line, NO-FORCE-PUSH recorded.
