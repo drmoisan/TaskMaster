@@ -22,7 +22,7 @@ Total tests: 3943
 Total time: 50.8229 Seconds
 
 === .coverage results file (absolute path) ===
-C:\Users\DanMoisan\repos\TaskMaster\TestResults\e4602ebf-d5a7-4a35-b20a-a6b0fc46467d\DanMoisan_MEGALODON4_2026-06-02.10_52_07.coverage
+<repo-root>\TestResults\e4602ebf-d5a7-4a35-b20a-a6b0fc46467d\<user>_<host>_2026-06-02.10_52_07.coverage
 
 === Failure analysis ===
 The 9 failures match the documented pre-existing regression baseline

@@ -17,9 +17,9 @@ Test Run Successful.
 Total tests: 4835
      Passed: 4835
  Total time: 45.8756 Seconds
-Code coverage results: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\remediation-baseline\remediation-baseline-coverage.cobertura.xml.
+Code coverage results: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\remediation-baseline\remediation-baseline-coverage.cobertura.xml.
 Post-processing coverage XML for Koverage compatibility...
-Done. Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\remediation-baseline\remediation-baseline-coverage.cobertura.xml
+Done. Coverage artifact: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\remediation-baseline\remediation-baseline-coverage.cobertura.xml
 MSTEST_COVERAGE_EXIT_CODE: 0
 REPOSITORY_LINE_COVERAGE: 45.59%
 ```

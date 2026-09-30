@@ -2,7 +2,7 @@
 
 - Date: 2026-07-15T17-10
 - Scope: research only, no production code changed.
-- Workspace: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a1e77dc4a849cd790`
+- Workspace: `<repo-root>/.claude/worktrees/agent-a1e77dc4a849cd790`
 
 ## 1. Root-cause confirmation and body-render path
 

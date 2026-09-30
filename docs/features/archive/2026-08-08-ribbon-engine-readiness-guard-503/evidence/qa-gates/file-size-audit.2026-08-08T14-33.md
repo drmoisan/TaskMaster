@@ -6,7 +6,7 @@ This is the **authoritative** file-size audit, measured after the P6-T1 CSharpie
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git diff --name-only 003c5715055d7d1933db68a742531332756e30b2..HEAD | ForEach-Object { if (Test-Path $_) { '{0}={1}' -f $_, (Get-Content $_ | Measure-Object -Line).Lines } }"
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git diff --name-only 003c5715055d7d1933db68a742531332756e30b2..HEAD | ForEach-Object { if (Test-Path $_) { '{0}={1}' -f $_, (Get-Content $_ | Measure-Object -Line).Lines } }"
 ```
 
 Corroborating command (physical line counts, the stricter measure — `Measure-Object -Line` does not count blank lines, as recorded in the P0-T11 measurement-method note):

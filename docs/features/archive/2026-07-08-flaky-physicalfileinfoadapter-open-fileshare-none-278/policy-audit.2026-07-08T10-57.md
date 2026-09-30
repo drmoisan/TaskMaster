@@ -96,7 +96,7 @@ All four stages passed in a single pass with no auto-fix / no file changes, sati
 
 **Canonical artifact status:** No `artifacts/csharp/coverage.xml` was present in the repository at audit time (it is not committed, consistent with `.gitignore`d build/coverage output). Per the mandatory verification procedure, this review located the executor's own already-produced raw coverage data instead of rerunning coverage generation:
 
-- The executor's own MSTest run for this session produced `TestResults/1f67cdaa-0fe5-4fa9-a04c-1c29765bc640/DanMoisan_MEGALODON4_2026-07-08.06_38_34.coverage` (the full-suite run matching `evidence/qa-gates/mstest-full-final.2026-07-08T01-20.md`'s reported "4173 passed, 0 failed").
+- The executor's own MSTest run for this session produced `TestResults/1f67cdaa-0fe5-4fa9-a04c-1c29765bc640/<user>_<host>_2026-07-08.06_38_34.coverage` (the full-suite run matching `evidence/qa-gates/mstest-full-final.2026-07-08T01-20.md`'s reported "4173 passed, 0 failed").
 - This review converted that pre-existing `.coverage` file to Cobertura XML with `dotnet-coverage merge -f cobertura -o artifacts/csharp/coverage.xml <path>.coverage` (a lossless format conversion of already-collected data; no test was re-executed) and parsed the result, then removed the generated 29 MB file after verification (not committed; not required evidence per the Evidence Location Invariant, which governs this reviewer's own produced evidence, not ad hoc verification scratch files).
 
 **Independently verified coverage figures (first-party `UtilitiesCS` module, this feature's module):**

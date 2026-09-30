@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T15-07Z
 
-Command: `cd "C:/Users/DanMoisan/repos/TaskMaster-wt/2026-07-21T10-25" && sha256sum QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs coverage.config scripts/vscode/TaskMaster.cli.runsettings && wc -l QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs && grep -nE "Thread\.Sleep|Task\.Delay|SpinWait|Stopwatch|DateTime\.|Timeout|WaitOne|DoNotParallelize|\[Ignore|TestCategory|for *\(|while *\(" QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs && grep -n "BreadcrumbUiThreadDispatch" coverage.config scripts/vscode/TaskMaster.cli.runsettings TaskMaster.runsettings`
+Command: `cd "<user-profile>/repos/TaskMaster-wt/2026-07-21T10-25" && sha256sum QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs coverage.config scripts/vscode/TaskMaster.cli.runsettings && wc -l QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs && grep -nE "Thread\.Sleep|Task\.Delay|SpinWait|Stopwatch|DateTime\.|Timeout|WaitOne|DoNotParallelize|\[Ignore|TestCategory|for *\(|while *\(" QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs && grep -n "BreadcrumbUiThreadDispatch" coverage.config scripts/vscode/TaskMaster.cli.runsettings TaskMaster.runsettings`
 
 EXIT_CODE: 0
 

@@ -14,4 +14,4 @@ Output Summary:
 - Against the pre-remediation baseline (89.45%, 1424/1592), coverage increased by +0.27 percentage points. No regression.
 - The >= 80% testable-denominator floor is met (89.72%). The coverage.runsettings restricts ModulePaths to TaskVisualization.dll, so this total is the TaskVisualization project figure.
 - Per-method (from cobertura): AddChoicesToDict line-rate=1.0 (100%), AddColorCategory line-rate=1.0 (100%). DefaultCreateCategory is absent from the measured method list (honored [ExcludeFromCodeCoverage] — the single new exempt line). SetUpDeleteDialog and DeleteFilterDialog are absent (removed).
-- Attachment: TestResults/5cee451a-68a5-4086-8bfe-44786a429e36/DanMoisan_MEGALODON4_2026-07-10.08_04_06.cobertura.xml
+- Attachment: TestResults/5cee451a-68a5-4086-8bfe-44786a429e36/<user>_<host>_2026-07-10.08_04_06.cobertura.xml

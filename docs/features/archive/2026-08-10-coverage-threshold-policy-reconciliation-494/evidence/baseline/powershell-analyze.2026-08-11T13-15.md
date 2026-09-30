@@ -1,5 +1,5 @@
 Timestamp: 2026-08-11T13-15
-Command: `mcp__drm-copilot__run_poshqc_analyze(workspace_root: "C:\\Users\\DanMoisan\\repos\\TaskMaster")`
+Command: `mcp__drm-copilot__run_poshqc_analyze(workspace_root: "<repo-root>")`
 EXIT_CODE: 1
 
 Reported Diagnostic Count: 339

@@ -1,6 +1,6 @@
 Command: vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Test\bin\Debug\QuickFiler.Test.dll TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /EnableCodeCoverage
 vstest.console.exe path: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
-Working directory: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+Working directory: <user-profile>\repos\TaskMaster-wt-2026-06-01-08-21
 Timestamp (UTC): 2026-06-01T17-35-23Z
 
 == Test results (PRE-REMEDIATION baseline) ==
@@ -31,7 +31,7 @@ The test count increased from 3965 (prior 16-37-55Z baseline) to 3989; the prior
 was captured before the test assemblies were last rebuilt at 13:01-13:12.
 
 == Coverage baseline (from instrumented .coverage, converted via dotnet-coverage merge -f cobertura) ==
-Coverage file: TestResults/d5737379-0b0a-45be-a6fa-d3235fa25bd8/DanMoisan_MEGALODON4_2026-06-01.13_39_21.coverage
+Coverage file: TestResults/d5737379-0b0a-45be-a6fa-d3235fa25bd8/<user>_<host>_2026-06-01.13_39_21.coverage
 Cobertura output: artifacts/csharp/baseline-coverage.xml
 
 Per in-scope production module (cobertura line-rate):

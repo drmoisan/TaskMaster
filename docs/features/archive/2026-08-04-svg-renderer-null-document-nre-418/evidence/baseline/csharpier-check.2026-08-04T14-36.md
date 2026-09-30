@@ -7,7 +7,7 @@ Timestamp: 2026-08-04T14-57
 
 Command: `dotnet tool run csharpier check .`
 
-Working directory: repository root (`c:\Users\DanMoisan\source\repos\drmoisan\TaskMaster`),
+Working directory: repository root (`<user-profile>\source\repos\drmoisan\TaskMaster`),
 with `DOTNET_ROOT` and `PATH` pointed at the repo-local `.dotnet-sdk` installed by task
 `[P0-T1]`.
 

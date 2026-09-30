@@ -3,8 +3,8 @@ Command: pwsh -NoProfile -Command "$coverage = Get-ChildItem -LiteralPath 'TestR
 EXIT_CODE: 0
 Output Summary:
 - dotnet-coverage version: 18.5.2.0 [win-x64 - .NET 10.0.9].
-- Input coverage file: C:\Users\DanMoisan\repos\TaskMaster\TestResults\issue218-baseline\66001d66-6732-4adf-8cf3-a0c2f7574488\DanMoisan_MEGALODON4_2026-06-26.20_42_21.coverage.
-- Output Cobertura XML: C:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-06-26-qfc-high-confidence-queue-filter-218\evidence\baseline\coverage-baseline-218.cobertura.xml.
+- Input coverage file: <repo-root>\TestResults\issue218-baseline\66001d66-6732-4adf-8cf3-a0c2f7574488\<user>_<host>_2026-06-26.20_42_21.coverage.
+- Output Cobertura XML: <repo-root>\docs\features\active\2026-06-26-qfc-high-confidence-queue-filter-218\evidence\baseline\coverage-baseline-218.cobertura.xml.
 - Output Cobertura XML size: 29383952 bytes.
 - Baseline line coverage: 62.03% (100491 / 162006 lines).
 - Baseline branch coverage reported by Cobertura root: 100.00%.

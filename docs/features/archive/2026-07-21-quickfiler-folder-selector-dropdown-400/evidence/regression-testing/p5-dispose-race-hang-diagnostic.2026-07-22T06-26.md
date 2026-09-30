@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T06:26:05.9299648Z
 
-Command: `& { $workspace='C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25'; $owned=@(Get-CimInstance Win32_Process | Where-Object { ($_.Name -in @('vstest.console.exe','testhost.exe','testhost.net481.x86.exe')) -and $_.CommandLine -like "*$workspace*" }); Write-Output "OWNED_TEST_PROCESSES=$($owned.Count)"; $owned | Select-Object ProcessId,ParentProcessId,Name,CommandLine | Format-List }`
+Command: `& { $workspace='<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25'; $owned=@(Get-CimInstance Win32_Process | Where-Object { ($_.Name -in @('vstest.console.exe','testhost.exe','testhost.net481.x86.exe')) -and $_.CommandLine -like "*$workspace*" }); Write-Output "OWNED_TEST_PROCESSES=$($owned.Count)"; $owned | Select-Object ProcessId,ParentProcessId,Name,CommandLine | Format-List }`
 
 EXIT_CODE: 0
 

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T19-18Z
 
-Command: `$tool='C:\Users\DanMoisan\.dotnet\tools\csharpier.exe'; $f1=(Resolve-Path 'QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs').Path; $f2=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.Part2.cs').Path; & $tool format $f1 $f2 --log-level Information; & $tool format $f1 $f2 --log-level Information; & $tool check $f1 $f2 --log-level Information; $code=$LASTEXITCODE`
+Command: `$tool='<user-profile>\.dotnet\tools\csharpier.exe'; $f1=(Resolve-Path 'QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs').Path; $f2=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.Part2.cs').Path; & $tool format $f1 $f2 --log-level Information; & $tool format $f1 $f2 --log-level Information; & $tool check $f1 $f2 --log-level Information; $code=$LASTEXITCODE`
 
 EXIT_CODE: 0
 

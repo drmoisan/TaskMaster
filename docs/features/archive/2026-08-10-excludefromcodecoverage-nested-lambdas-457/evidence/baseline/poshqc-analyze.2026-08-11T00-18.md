@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-11T00-18
 Command: `mcp__drm-copilot__run_poshqc_analyze` with
-`workspace_root = C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a` and
+`workspace_root = <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a` and
 `scan_folders = ["scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"]`,
 paired with
 `pwsh -NoProfile -Command 'Invoke-ScriptAnalyzer -Path "<file>"'` for each file in the scan set
@@ -14,7 +14,7 @@ MCP Result (verbatim):
 {
   "ok": false,
   "tool": "run_poshqc_analyze",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a",
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a",
   "summary": "Command exited with code 1.",
   "stderr_excerpt": "Exception: PSScriptAnalyzer reported 1 issue(s)."
 }

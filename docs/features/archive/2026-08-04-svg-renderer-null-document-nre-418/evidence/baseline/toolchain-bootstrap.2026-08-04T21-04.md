@@ -8,7 +8,7 @@ Task: `[P0-T1]`
 Branch: `bug/svg-renderer-null-document-nre-418`
 HEAD: `a5695656e711f98a8ae6ad334115c0f8666c509f`
 Base: `ce0c91e6` (PR #419, repository-wide NuGet package update) — merge-base with HEAD confirmed as `ce0c91e6`
-Repository root: `c:\Users\DanMoisan\repos\TaskMaster`
+Repository root: `<repo-root>`
 
 ## Why this artifact exists alongside `toolchain-bootstrap.2026-08-04T14-36.md`
 
@@ -59,14 +59,14 @@ EXIT_CODE: 0 / 0 / 0
 
 ## Output Summary
 
-- `.dotnet-sdk/` exists at `c:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk`. `Install-RepoDotNetSdk.ps1`
-  reported `Repo-local .NET SDK 8.0.205 is already installed at C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk`
+- `.dotnet-sdk/` exists at `<repo-root>\.dotnet-sdk`. `Install-RepoDotNetSdk.ps1`
+  reported `Repo-local .NET SDK 8.0.205 is already installed at <repo-root>\.dotnet-sdk`
   and exited 0. The script is idempotent; no reinstall occurred.
 - `dotnet tool restore` reported `Tool 'csharpier' (version '1.2.6') was restored. Available commands: csharpier`
   followed by `Restore was successful.`, and exited 0.
 - `dotnet tool run csharpier --version` prints `1.2.6` — matches the `dotnet-tools.json` manifest pin.
 - `dotnet-coverage --version` resolves and prints `18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3`
-  from `C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage`.
+  from `<user-profile>\.dotnet\tools\dotnet-coverage`.
 - `Get-Command dotnet-coverage` resolves, so the third command (`dotnet tool install --global dotnet-coverage`)
   was skipped exactly as the task text authorizes: "skip the install only if `Get-Command dotnet-coverage`
   already resolves". This is a task-text-authorized skip branch, not a policy waiver.

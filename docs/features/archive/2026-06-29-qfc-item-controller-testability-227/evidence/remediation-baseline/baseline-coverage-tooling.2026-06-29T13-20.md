@@ -8,7 +8,7 @@ EXIT_CODE: 0
 
 ## Tooling availability
 
-- `dotnet-coverage`: PRESENT — `C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage`, version
+- `dotnet-coverage`: PRESENT — `<user-profile>\.dotnet\tools\dotnet-coverage`, version
   `18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3`.
 - `vstest.console.exe`: PRESENT — located via vswhere at
   `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`.

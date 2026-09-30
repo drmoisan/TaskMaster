@@ -9,15 +9,15 @@
 
 ## Files Read (in order, current worktree root)
 
-1. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a07a8dff4c16f3a93\CLAUDE.md`
-2. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a07a8dff4c16f3a93\.claude\rules\general-code-change.md`
-3. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a07a8dff4c16f3a93\.claude\rules\general-unit-test.md`
-4. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a07a8dff4c16f3a93\.claude\rules\csharp.md`
+1. `<repo-root>\.claude\worktrees\agent-a07a8dff4c16f3a93\CLAUDE.md`
+2. `<repo-root>\.claude\worktrees\agent-a07a8dff4c16f3a93\.claude\rules\general-code-change.md`
+3. `<repo-root>\.claude\worktrees\agent-a07a8dff4c16f3a93\.claude\rules\general-unit-test.md`
+4. `<repo-root>\.claude\worktrees\agent-a07a8dff4c16f3a93\.claude\rules\csharp.md`
 
 ## Note on Path Correction
 
 The plan's P0-T1 task text referenced a stale preparation-worktree absolute path
-(`C:\Users\DanMoisan\repos\TaskMaster-wt\swordfish-removal-integration\...`) which no
+(`<user-profile>\repos\TaskMaster-wt\swordfish-removal-integration\...`) which no
 longer exists. Per explicit orchestrator instruction, the four policy files were instead
 read from the current worktree root listed above (repo-relative paths are identical;
 only the absolute worktree prefix differs). No policy content differs between the stale

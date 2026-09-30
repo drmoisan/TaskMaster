@@ -12,7 +12,7 @@ MCP Result (verbatim):
 {
   "ok": false,
   "tool": "run_poshqc_analyze",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a",
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a",
   "summary": "Command exited with code 1.",
   "stderr_excerpt": "Exception: PSScriptAnalyzer reported 1 issue(s)."
 }

@@ -1,7 +1,7 @@
 # Baseline Step 4 — MSTest run with coverage (UtilitiesCS.Test)
 
 Timestamp: 2026-06-10T12-38 (UTC)
-Command: `vstest.console.exe C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /InIsolation`
+Command: `vstest.console.exe <user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /InIsolation`
 EXIT_CODE: 0
 Output Summary: Test Run Successful — Total tests: 3814, Passed: 3814, Failed: 0 (40.0 s).
 Coverage headline (from `coverage.xml`, this folder): `UtilitiesCS.dll` line coverage 85.31% strict-covered (35047/41083), 87.49% including partially covered lines (35944/41083). This satisfies the >= 80% repository policy threshold for the production assembly in scope.

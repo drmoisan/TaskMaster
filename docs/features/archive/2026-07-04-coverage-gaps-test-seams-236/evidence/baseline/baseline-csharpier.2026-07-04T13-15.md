@@ -7,7 +7,7 @@ Environment Setup:
 ```text
 pwsh -File scripts/vscode/Install-RepoDotNetSdk.ps1
 EXIT_CODE: 0
-Installed repo-local .NET SDK 8.0.205 to C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\.dotnet-sdk.
+Installed repo-local .NET SDK 8.0.205 to <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\.dotnet-sdk.
 ```
 
 Tool Restore:

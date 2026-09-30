@@ -9,7 +9,7 @@ Output:
 ?? docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/
 
 In-scope change set for this plan (per Scope and Constraints):
-- c:\Users\DanMoisan\repos\TaskMaster\.gitignore  (single production/config file)
+- <repo-root>\.gitignore  (single production/config file)
 - docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/  (feature folder + evidence)
 
 File-type analysis:

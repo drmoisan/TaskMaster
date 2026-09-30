@@ -3,7 +3,7 @@
 Timestamp: 2026-08-11T00-30
 Command: `pwsh -NoProfile -Command '& { & "<repo-root>\scripts\vscode\Invoke-MSTestWithCoverage.ps1" -SearchRoot . -Configuration Debug -CoverageOutput "coverage\coverage.cobertura.xml" } | ForEach-Object { "{0:o} {1}" -f [datetime]::UtcNow, $_ }'`
 `<repo-root>` resolved at run time with `git rev-parse --show-toplevel` =
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`. Not hard-coded.
+`<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`. Not hard-coded.
 The single-quoted-outer / double-quoted-inner quoting form mandated by Conventions was used verbatim
 and executed correctly, emitting timestamped stdout lines.
 EXIT_CODE: 1 (both attempts) — see "Deviation" below. The post-processing step that produces every
@@ -123,7 +123,7 @@ Verbatim source timestamps from the timestamped stdout:
 
 ```
 2026-08-11T04:16:27.2901433Z Post-processing coverage XML for Koverage compatibility...
-2026-08-11T04:16:45.9314107Z Done. Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a\coverage\coverage.cobertura.xml
+2026-08-11T04:16:45.9314107Z Done. Coverage artifact: <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a\coverage\coverage.cobertura.xml
 ```
 
 Derived duration: **18.6413 seconds** (04:16:45.9314107 − 04:16:27.2901433).
@@ -136,7 +136,7 @@ only that observed wall-clock post-processing time be recorded before and after.
 - Runner's printed count (verbatim): `Discovered 9 test assemblies.`
 - Executing repository root resolved at run time (`git rev-parse --show-toplevel`, equivalently
   `(Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path` from `scripts/vscode/`):
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`
+  `<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`
 - Independently reproduced count using
   `Get-ChildItem -Path <resolvedSearchRoot> -Recurse -Filter '*.Test.dll'` filtered to `\bin\Debug\`
   and excluding `\obj\` and `\ref\`: **9**

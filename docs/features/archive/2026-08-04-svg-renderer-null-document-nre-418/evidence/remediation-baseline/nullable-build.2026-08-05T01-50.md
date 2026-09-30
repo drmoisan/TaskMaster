@@ -72,8 +72,8 @@ Complete verbatim output:
 
 ```
 
-  SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll
-CSC : error CS8630: Invalid 'nullable' value: 'Enable' for C# 7.3. Please use language version '8.0' or greater. [C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\SVGControl.Test.csproj]
+  SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll
+CSC : error CS8630: Invalid 'nullable' value: 'Enable' for C# 7.3. Please use language version '8.0' or greater. [<repo-root>\SVGControl.Test\SVGControl.Test.csproj]
 ```
 
 ### Per-code per-file diagnostic table
@@ -119,7 +119,7 @@ Complete verbatim output:
 
 ```
 
-  SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll
+  SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll
 ```
 
 ### Per-code per-file diagnostic table

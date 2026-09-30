@@ -10,7 +10,7 @@ Files audited (the five test files in plan section 4.3):
 4. `TaskMaster.Test\Ribbon\EngineCommandRefreshPlannerTests.cs`
 5. `TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs`
 
-Command (run from `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55`, one fixed-string grep per banned token, summed across the five files):
+Command (run from `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55`, one fixed-string grep per banned token, summed across the five files):
 
 ```
 for p in "Path.GetTempPath" "Path.GetTempFileName" "Thread.Sleep" "Task.Delay" \

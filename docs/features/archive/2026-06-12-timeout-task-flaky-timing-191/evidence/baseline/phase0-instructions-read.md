@@ -9,14 +9,14 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific rules — language in scope)
 
 Files read:
-- c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md
-- c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-code-change.md
-- c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-unit-test.md
-- c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\csharp.md
-- c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\policy-compliance-order\SKILL.md
-- c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\atomic-plan-contract\SKILL.md
-- c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
-- c:\Users\DanMoisan\repos\TaskMaster\.claude\skills\acceptance-criteria-tracking\SKILL.md
+- <repo-root>\CLAUDE.md
+- <repo-root>\.claude\rules\general-code-change.md
+- <repo-root>\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\rules\csharp.md
+- <repo-root>\.claude\skills\policy-compliance-order\SKILL.md
+- <repo-root>\.claude\skills\atomic-plan-contract\SKILL.md
+- <repo-root>\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
+- <repo-root>\.claude\skills\acceptance-criteria-tracking\SKILL.md
 
 Notes:
 - Work Mode: minor-audit. AC source is issue.md `## Acceptance Criteria` (AC1–AC6) only.

@@ -2,7 +2,7 @@
 
 - **Feature:** `2026-08-07-quickfiler-efc-home-controller-coverage-437` (issue #437)
 - **Epic:** #136 `quickfiler-per-file-coverage`, child F8
-- **Production file:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeControllerDependencyFactories.cs` (268 lines)
+- **Production file:** `<repo-root>\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeControllerDependencyFactories.cs` (268 lines)
 - **Method:** static analysis only. No build, no test run, no coverage run was performed.
 - **Coverage status of the file itself:** the file carries **no** `[ExcludeFromCodeCoverage]`
   attribute, so it is already inside the coverage denominator.

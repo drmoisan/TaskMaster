@@ -168,7 +168,7 @@ inspects the pre-existing canonical coverage artifacts and does not re-run cover
   the two scripts' top-level host-bound bodies (real `vswhere.exe` / `vstest.console.exe` /
   `dotnet-coverage` invocations and live `bin/<Configuration>` filesystem discovery) that cannot be
   unit-tested deterministically per the no-external-dependency rule. A maintainer-ratified exemption
-  (`evidence/qa-gates/powershell-coverage-exemption.md`, authorized by dan@danmoisan.org for issue
+  (`evidence/qa-gates/powershell-coverage-exemption.md`, authorized by dan@<user>.org for issue
   #283) covers exactly those enumerated host-bound line ranges; the pure argument-builder and
   path-resolver seams are fully covered by the 11 passing RunSettings tests. This is the PowerShell
   analogue of the CLAUDE.md COM/VSTO testable-denominator exemption. The prior remediation-inputs R3

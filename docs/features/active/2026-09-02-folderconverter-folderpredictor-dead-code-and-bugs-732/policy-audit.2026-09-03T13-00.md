@@ -5,7 +5,7 @@
 - HEAD: b1e78c4a78d1298a3704d293770a3dbe96e19718
 - Anchor (resolved base): origin/main tip 87233f867ad60c0a5c0d19b09cc121ae536d7ba1 (re-fetched; `git merge-base origin/main HEAD` == origin/main tip, confirming origin/main is a direct ancestor of HEAD — the two-dot diff `origin/main..HEAD` is the correct, non-degraded scope)
 - Work Mode: `full-bug` (declared in issue.md) — AC source is `spec.md` only, per policy-compliance-order and acceptance-criteria-tracking
-- Reviewer worktree: C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-aa274c17b2c682ab3 (all reads/writes performed here per binding instructions)
+- Reviewer worktree: <repo-root>/.claude/worktrees/agent-aa274c17b2c682ab3 (all reads/writes performed here per binding instructions)
 
 ## Rejected Scope Narrowing
 

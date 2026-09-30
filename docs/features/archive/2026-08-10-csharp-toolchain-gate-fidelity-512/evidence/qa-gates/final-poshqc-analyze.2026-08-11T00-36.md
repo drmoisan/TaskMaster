@@ -1,7 +1,7 @@
 # Final QC step 2 (PowerShell) — PoshQC analyze ([P6-T2])
 
 Timestamp: 2026-08-11T00-36
-Command: `mcp__drm-copilot__run_poshqc_analyze` with `workspace_root = "C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`
+Command: `mcp__drm-copilot__run_poshqc_analyze` with `workspace_root = "<repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`
 EXIT_CODE: 1
 
 **`EXIT_CODE: 0` is not the acceptance condition for this task and is not asserted.** PoshQC analyze
@@ -14,7 +14,7 @@ the [P0-T15] baseline multiset**.
 {
   "ok": false,
   "tool": "run_poshqc_analyze",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
   "summary": "Command exited with code 1.",
   "stderr_excerpt": "Exception: PSScriptAnalyzer reported 16 issue(s)."
 }

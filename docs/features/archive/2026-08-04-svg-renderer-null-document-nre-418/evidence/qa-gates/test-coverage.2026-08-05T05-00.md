@@ -43,7 +43,7 @@ Total is **6150**, equal to the basis figure transcribed in
 `evidence/remediation-baseline/coverage-basis.2026-08-05T05-00.md` § 1 — satisfying "at least". The count
 is unchanged rather than higher because this cycle adds no test; it changes only build configuration.
 
-The final artifact line: `Done. Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster\coverage\coverage.cobertura.xml`.
+The final artifact line: `Done. Coverage artifact: <repo-root>\coverage\coverage.cobertura.xml`.
 
 ## Numeric repository-wide coverage
 

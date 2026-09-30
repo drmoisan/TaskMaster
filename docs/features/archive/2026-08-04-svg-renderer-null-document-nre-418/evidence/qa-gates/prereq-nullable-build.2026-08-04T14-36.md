@@ -9,7 +9,7 @@ Branch: `bug/svg-renderer-null-document-nre-418`
 HEAD: `296eac953c5ac3f69c429c7554ab47218e64e852`
 Base: `ce0c91e6` (PR #419 repository-wide NuGet package update)
 MSBuild: `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe`
-Working directory: repository root (`C:\Users\DanMoisan\repos\TaskMaster`)
+Working directory: repository root (`<repo-root>`)
 
 ## Command (plan-commanded, authoritative)
 

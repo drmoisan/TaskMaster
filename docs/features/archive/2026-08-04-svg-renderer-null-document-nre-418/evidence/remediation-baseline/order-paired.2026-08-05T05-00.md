@@ -85,8 +85,8 @@ Command: sha256sum SVGControl.Test/bin/Debug/SVGControl.Test.dll VBFunctions.Tes
 523a9248098ef9fea99e7317525c3a75664068b51eb4691a7debb0b513fa9160 *VBFunctions.Test/bin/Debug/VBFunctions.Test.dll
 
 Command: ls -l --time-style=full-iso <same two paths>
--rwxr-xr-x 1 DanMoisan 197121 54272 2026-08-04 22:23:49.209201400 -0400 SVGControl.Test/bin/Debug/SVGControl.Test.dll
--rwxr-xr-x 1 DanMoisan 197121  6656 2026-08-04 22:24:59.801849100 -0400 VBFunctions.Test/bin/Debug/VBFunctions.Test.dll
+-rwxr-xr-x 1 <user> 197121 54272 2026-08-04 22:23:49.209201400 -0400 SVGControl.Test/bin/Debug/SVGControl.Test.dll
+-rwxr-xr-x 1 <user> 197121  6656 2026-08-04 22:24:59.801849100 -0400 VBFunctions.Test/bin/Debug/VBFunctions.Test.dll
 ```
 
 Both modification timestamps precede this session's first command, so neither assembly was rewritten

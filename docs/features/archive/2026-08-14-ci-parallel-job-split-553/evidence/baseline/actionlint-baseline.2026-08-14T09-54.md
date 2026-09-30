@@ -13,7 +13,7 @@ Expand-Archive "$dir\actionlint.zip" -DestinationPath $dir -Force
 & "$dir\actionlint.exe" -no-color
 ```
 
-`<SCRATCH>` = `C:\Users\DANMOI~1\AppData\Local\Temp\claude\C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-14T09-01\012c26d5-57f2-4f08-bc74-bf50a60b1e4e\scratchpad`
+`<SCRATCH>` = `<user-profile>\AppData\Local\Temp\claude\C--Users-<user>-repos-TaskMaster-wt-2026-08-14T09-01\012c26d5-57f2-4f08-bc74-bf50a60b1e4e\scratchpad`
 
 EXIT_CODE: 0
 

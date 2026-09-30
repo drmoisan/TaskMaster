@@ -1,7 +1,7 @@
 # `[expect-fail]` — Defect 2 Regression Test Observed FAILING Before the Fix (Issue #449, [P1-T6])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 Test: `QuickFiler.Controllers.Tests.QfcExplorerControllerTests.OpenQFItem_WhenActiveExplorerChangesAfterConstruction_UsesTheConstructorCapturedExplorer`
 Production code state: **UNFIXED**. `QuickFiler/Controllers/QfcExplorerController.cs:140` still reads
 `_globals.Ol.App.ActiveExplorer().CurrentFolder = (MAPIFolder)mailItem.Parent;`. [P2-T1] has not run.

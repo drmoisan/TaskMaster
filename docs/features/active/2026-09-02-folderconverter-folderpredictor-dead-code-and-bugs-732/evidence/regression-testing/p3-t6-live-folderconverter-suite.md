@@ -12,5 +12,5 @@ Output Summary:
 "Test Run Successful. Total tests: 22 Passed: 22." Failed: 0. Passed (22) equals the
 grep-derived N (22), satisfying AC3's "remain compiled and passing under their existing
 test suite" clause. TRX results file:
-coverage\trx\p3-t6\DanMoisan_MEGALODON4_2026-09-03_07_35_26_net481.trx (gitignored
+coverage\trx\p3-t6\<user>_<host>_2026-09-03_07_35_26_net481.trx (gitignored
 under coverage/*).

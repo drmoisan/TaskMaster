@@ -56,7 +56,7 @@ cannot produce `CS8618` and confuse attribution).
 ## The diagnostic, quoted verbatim
 
 ```
-19>C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb\UtilitiesCS\Extensions\QueueExtensions.cs(25,20): error CS8603: Possible null reference return. [C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb\UtilitiesCS\UtilitiesCS.csproj]
+19><repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb\UtilitiesCS\Extensions\QueueExtensions.cs(25,20): error CS8603: Possible null reference return. [<repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb\UtilitiesCS\UtilitiesCS.csproj]
 ```
 
 It matches `error CS8603`, is attributed to the perturbed file

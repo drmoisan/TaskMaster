@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T06:36:30.8529439Z
 
-Command: `$paths = @('C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbDropDownCoverageThresholdTests.cs'); $paths | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `$paths = @('<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbDropDownCoverageThresholdTests.cs'); $paths | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 EXIT_CODE: 0
 

@@ -38,8 +38,8 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
     }
 
     It 'strips active and stale TaskMaster roots while preserving already relative paths' {
-        $worktreeRoot = 'C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57'
-        $canonicalRoot = 'C:\Users\DanMoisan\repos\TaskMaster'
+        $worktreeRoot = 'C:\repo\TaskMaster-wt-2026-07-04-12-57'
+        $canonicalRoot = 'C:\repo\TaskMaster'
         $relativeSource = 'ToDoModel\Data Model\ToDo\ToDoItem.cs'
 
         ConvertTo-KoverageRelativePath -Path "$canonicalRoot\$relativeSource" -RepoRoot $worktreeRoot -PathSeparator '\' |
@@ -101,7 +101,7 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
   <packages>
     <package name="ToDoModel" line-rate="0" branch-rate="0" complexity="1">
       <classes>
-        <class name="ToDoModel.ToDoItem" filename="C:\Users\DanMoisan\repos\TaskMaster\ToDoModel\Data Model\ToDo\ToDoItem.cs" line-rate="0.5" branch-rate="0" complexity="2">
+        <class name="ToDoModel.ToDoItem" filename="C:\repo\TaskMaster\ToDoModel\Data Model\ToDo\ToDoItem.cs" line-rate="0.5" branch-rate="0" complexity="2">
           <methods />
           <lines>
             <line number="10" hits="1" branch="False" />
@@ -121,7 +121,7 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
 </coverage>
 '@
 
-        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57' -PathSeparator '\'
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo\TaskMaster-wt-2026-07-04-12-57' -PathSeparator '\'
         $classNodes = @($resultXml.SelectNodes('//class[@filename="ToDoModel\Data Model\ToDo\ToDoItem.cs"]'))
         $line11 = $resultXml.SelectSingleNode('//class[@filename="ToDoModel\Data Model\ToDo\ToDoItem.cs"]/lines/line[@number="11"]')
 

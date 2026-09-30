@@ -22,4 +22,4 @@ Test Result:
 - Failed: 1
 - Total time: 0.1518 Seconds
 Evidence Source:
-- Transcript: c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_3BQWuNJnTrnu2sVDP7vwaWvX__vscode-1778175287271\content.txt
+- Transcript: <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_3BQWuNJnTrnu2sVDP7vwaWvX__vscode-1778175287271\content.txt

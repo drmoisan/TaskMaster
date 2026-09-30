@@ -2,9 +2,9 @@
 
 Timestamp: `2026-07-22T07:52Z`
 
-Working directory: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25`
+Working directory: `<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25`
 
-Command: `@(<the 12 fully expanded P5 production/test source paths listed below>) | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `@(<the 12 fully expanded P5 production/test source paths listed below>) | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 CSharpier version: `1.3.0`
 

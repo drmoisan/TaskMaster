@@ -10,11 +10,11 @@ Policy Order:
 5. docs/features/epics/utilitiescs-nullable-remediation/epic.md (epic manifest)
 
 Files Read (exact paths in this worktree):
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a075d3c18cf9d6a65\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a075d3c18cf9d6a65\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a075d3c18cf9d6a65\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a075d3c18cf9d6a65\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a075d3c18cf9d6a65\docs\features\epics\utilitiescs-nullable-remediation\epic.md
+- <repo-root>\.claude\worktrees\agent-a075d3c18cf9d6a65\CLAUDE.md
+- <repo-root>\.claude\worktrees\agent-a075d3c18cf9d6a65\.claude\rules\general-code-change.md
+- <repo-root>\.claude\worktrees\agent-a075d3c18cf9d6a65\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\worktrees\agent-a075d3c18cf9d6a65\.claude\rules\csharp.md
+- <repo-root>\.claude\worktrees\agent-a075d3c18cf9d6a65\docs\features\epics\utilitiescs-nullable-remediation\epic.md
 
 Additional requirement sources read for execution context:
 - docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/plan.2026-07-18T23-13.md

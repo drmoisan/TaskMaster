@@ -9,19 +9,19 @@ rules that apply to the files in scope (C# for this delivery).
 
 Files read, in order, with absolute paths:
 
-1. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\CLAUDE.md`
+1. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\CLAUDE.md`
    — all embedded sections: Project Guidelines, Policy Compliance Order, General Code
    Change Policy (including the Bugfix Workflow), C# Code Change Policy, General Unit
    Test Policy, C# Unit Test Policy, Tone Policy, and the C# Toolchain ordering.
-2. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\general-code-change.md`
-3. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\general-unit-test.md`
-4. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\quality-tiers.md`
-5. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\tonality.md`
+2. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\general-code-change.md`
+3. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\general-unit-test.md`
+4. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\quality-tiers.md`
+5. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\tonality.md`
 
 Additional language-specific rule read because every production and test file in this
 delivery is C# (step 4 of the policy-compliance order):
 
-6. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\csharp.md`
+6. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\.claude\rules\csharp.md`
 
 Binding constraints extracted for this delivery:
 

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-11T00-20
 Command (policy record): `mcp__drm-copilot__run_poshqc_test` with
-`workspace_root = C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a` and
+`workspace_root = <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a` and
 `scan_folders = ["tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"]`
 Command (paired direct run, source of every numeric value below):
 `pwsh -NoProfile -Command 'Import-Module Pester -MinimumVersion 5.0; $c = New-PesterConfiguration; $c.Run.Path = "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"; $c.Run.PassThru = $true; $c.Output.Verbosity = "Detailed"; $c.CodeCoverage.Enabled = $true; $c.CodeCoverage.Path = "scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1"; $c.CodeCoverage.OutputPath = "docs/features/active/2026-08-10-excludefromcodecoverage-nested-lambdas-457/evidence/baseline/pester-coverage.2026-08-11T00-20.xml"; $r = Invoke-Pester -Configuration $c; "Passed=$($r.PassedCount) Failed=$($r.FailedCount) Skipped=$($r.SkippedCount) Coverage=$($r.CodeCoverage.CoveragePercent)"; $hit = @($r.CodeCoverage.CommandsExecuted | Where-Object { $_.File -like "*Invoke-MSTestWithCoverage.ClosureFilter.ps1" }).Count; $miss = @($r.CodeCoverage.CommandsMissed | Where-Object { $_.File -like "*Invoke-MSTestWithCoverage.ClosureFilter.ps1" }).Count; "ClosureFilterCommands=$($hit+$miss) Executed=$hit Percent=$(if (($hit+$miss) -gt 0) { [math]::Round(100*$hit/($hit+$miss),2) } else { 0 })"; if ($r.FailedCount -gt 0) { exit 1 } else { exit 0 }'`
@@ -11,7 +11,7 @@ EXIT_CODE: 0 (from the paired direct run)
 MCP Result (verbatim):
 
 ```json
-{"ok":true,"tool":"run_poshqc_test","workspace_root":"C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC test against 'C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 1 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_test","workspace_root":"<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC test against '<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 1 selected scan folder(s)."}
 ```
 
 `run_poshqc_test` returns only `{ok, tool, workspace_root, summary}` — no exit code, no counts, no

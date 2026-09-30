@@ -12,5 +12,5 @@ CreateFolder tests
 InjectedDirectory_CreateFolder_WhenPromptSuppliesName_CreatesFolderAndDirectoryPath,
 CreateFolder_WhenAncestorIsNull_UsesArchiveRootAndCreatesFolder) still pass after the
 fix, satisfying AC6. TRX results file:
-coverage\trx\p2-t5\DanMoisan_MEGALODON4_2026-09-03_07_32_42_net481.trx (gitignored
+coverage\trx\p2-t5\<user>_<host>_2026-09-03_07_32_42_net481.trx (gitignored
 under coverage/*).

@@ -275,7 +275,7 @@ Assessment of every step of the proposed change for unattended execution:
 
 ## Evidence Sources
 
-- `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-14T09-01\.github\workflows\ci.yml` (read in full)
+- `<user-profile>\repos\TaskMaster-wt\2026-08-14T09-01\.github\workflows\ci.yml` (read in full)
 - `docs/features/active/2026-08-14-ci-parallel-job-split-553/evidence/baseline/ci-sequential-baseline.2026-08-14T13-05.md` (measured baseline; authoritative)
 - `docs/features/active/2026-08-14-ci-parallel-job-split-553/issue.md`, `spec.md` (promoted content; substitute for the absent promoted-entry file)
 - `.claude/rules/ci-workflows.md`, `.claude/rules/benchmark-baselines.md`

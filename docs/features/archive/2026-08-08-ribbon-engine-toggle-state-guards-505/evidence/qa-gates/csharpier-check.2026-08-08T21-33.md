@@ -5,7 +5,7 @@ Timestamp: 2026-08-08T21-33
 Command:
 
 ```
-pwsh -NoProfile -Command "Set-Location '<REPO>'; & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' check ."
+pwsh -NoProfile -Command "Set-Location '<REPO>'; & '<user-profile>\.dotnet\tools\csharpier.exe' check ."
 ```
 
 EXIT_CODE: **0**

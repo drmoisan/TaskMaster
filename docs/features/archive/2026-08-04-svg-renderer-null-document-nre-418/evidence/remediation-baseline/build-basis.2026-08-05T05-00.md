@@ -84,7 +84,7 @@ Transcribed exactly as the source artifact records it:
 | 1 | warning | (no code) | `QuickFiler/QuickFiler.csproj` | same |
 | 1 | warning | (no code) | `TaskMaster/TaskMaster.csproj` | same |
 | 1 | warning | (no code) | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | same |
-| 1 | warning | `CS2002` | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | `Source file 'C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times` |
+| 1 | warning | `CS2002` | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | `Source file '<repo-root>\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times` |
 | **0** | **error** | — | — | — |
 
 **Total: 6 warnings, 0 errors.** Five code-less `System.Reactive` `packages.config` advisories plus one
@@ -144,7 +144,7 @@ Complete per-code per-file diagnostic table, transcribed exactly:
 
 **Total diagnostics: 0** (0 errors, 0 warnings), measured in the source artifact by
 `grep -cE "(warning|error) [A-Z]+[0-9]+"` = 0. Verbatim output was the single line
-`SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll`.
+`SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll`.
 
 ### 3.3 Supplementary forced project-scope rebuild — `SVGControl.Test`
 

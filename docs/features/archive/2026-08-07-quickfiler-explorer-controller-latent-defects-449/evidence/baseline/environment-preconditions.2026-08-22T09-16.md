@@ -1,7 +1,7 @@
 # Baseline — Environment Preconditions (Issue #449, [P0-T6])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command: see the per-finding `Command:` lines below; each finding names the exact command that
 established it. Aggregate exit code for the verification set:

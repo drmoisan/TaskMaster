@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T07:43:43.3431270Z
 
-Command: `@('C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler\Viewers\ItemViewer.Breadcrumb.cs','C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs','C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbPopupControlDispatchTests.cs','C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbSelectorOpenRetryTests.cs') | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `@('<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler\Viewers\ItemViewer.Breadcrumb.cs','<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs','<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbPopupControlDispatchTests.cs','<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbSelectorOpenRetryTests.cs') | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 EXIT_CODE: 0
 

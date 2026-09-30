@@ -19,7 +19,7 @@ foreach ($t in $targets) { '{0}: before={1}' -f $t, (Get-FileHash -LiteralPath (
 
 # the format call
 mcp__drm-copilot__run_poshqc_format
-    workspace_root = 'C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a'
+    workspace_root = '<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a'
     scan_folders   = ['scripts/vscode', 'tests/scripts/vscode']
 
 # part 2 (after) — same two measurements
@@ -28,7 +28,7 @@ mcp__drm-copilot__run_poshqc_format
 EXIT_CODE: 0
 
 MCP payload `ok`: `true`. MCP payload `summary` (verbatim):
-`Ran bundled PoshQC format against 'C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a' with 2 selected scan folder(s).`
+`Ran bundled PoshQC format against '<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a' with 2 selected scan folder(s).`
 
 Output Summary:
 

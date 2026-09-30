@@ -1,7 +1,7 @@
 # Final QC Step 5 — Second Consecutive Full-Suite Run, AC-13 Determinism (Issue #449, [P7-T7])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command (identical to [P7-T6], only the output path differs):
 ```

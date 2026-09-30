@@ -12,15 +12,15 @@ dotnet-coverage version: `18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3`
 $coverageArgs = @(
     'collect',
     '--output',
-    'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-popup-ui-boundary-composition.2026-07-22T07-59.cobertura.xml',
+    '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-popup-ui-boundary-composition.2026-07-22T07-59.cobertura.xml',
     '--output-format',
     'cobertura',
     '--settings',
-    'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\coverage.config',
+    '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\coverage.config',
     '--',
     'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe',
-    'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll',
-    '/Settings:C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\scripts\vscode\TaskMaster.cli.runsettings',
+    '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll',
+    '/Settings:<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\scripts\vscode\TaskMaster.cli.runsettings',
     '/InIsolation',
     '/TestCaseFilter:FullyQualifiedName~BreadcrumbUiThreadDispatchTests|FullyQualifiedName~BreadcrumbSelectorToggleUiBoundaryTests|FullyQualifiedName~BreadcrumbPopupControlDispatchTests|FullyQualifiedName~BreadcrumbSelectorOpenRetryTests|FullyQualifiedName~BreadcrumbDropDownReadinessTests|FullyQualifiedName~BreadcrumbCollapsedSurfaceReadinessTests|FullyQualifiedName~BreadcrumbDropDownCoverageThresholdTests|FullyQualifiedName~BreadcrumbDuplicateIdentityIntegrationTests|FullyQualifiedName~BreadcrumbBridgeCoordinatorProbabilityTests'
 )

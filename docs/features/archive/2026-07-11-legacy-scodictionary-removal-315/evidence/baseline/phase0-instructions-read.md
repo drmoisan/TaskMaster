@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md
 
 Files read in this session (P0-T1..P0-T4):
-- P0-T1: C:/Users/DanMoisan/repos/TaskMaster-wt/legacy-scodictionary-removal-315/CLAUDE.md (read in full)
-- P0-T2: C:/Users/DanMoisan/repos/TaskMaster-wt/legacy-scodictionary-removal-315/.claude/rules/general-code-change.md (read in full)
-- P0-T3: C:/Users/DanMoisan/repos/TaskMaster-wt/legacy-scodictionary-removal-315/.claude/rules/general-unit-test.md (read in full)
-- P0-T4: C:/Users/DanMoisan/repos/TaskMaster-wt/legacy-scodictionary-removal-315/.claude/rules/csharp.md (read in full)
+- P0-T1: <user-profile>/repos/TaskMaster-wt/legacy-scodictionary-removal-315/CLAUDE.md (read in full)
+- P0-T2: <user-profile>/repos/TaskMaster-wt/legacy-scodictionary-removal-315/.claude/rules/general-code-change.md (read in full)
+- P0-T3: <user-profile>/repos/TaskMaster-wt/legacy-scodictionary-removal-315/.claude/rules/general-unit-test.md (read in full)
+- P0-T4: <user-profile>/repos/TaskMaster-wt/legacy-scodictionary-removal-315/.claude/rules/csharp.md (read in full)
 
 Notes:
 - C# toolchain order (format -> analyzers -> nullable -> test) confirmed from CLAUDE.md and csharp.md.

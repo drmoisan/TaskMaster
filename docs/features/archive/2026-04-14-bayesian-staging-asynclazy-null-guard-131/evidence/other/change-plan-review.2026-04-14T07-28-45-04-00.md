@@ -3,7 +3,7 @@
 Timestamp: 2026-04-14T07:28:45-04:00
 
 Reviewed File:
-- `c:\Users\DanMoisan\repos\TaskMaster\change-plan.md`
+- `<repo-root>\change-plan.md`
 
 Review Findings:
 - `change-plan.md` was reviewed before Phase 0 execution.

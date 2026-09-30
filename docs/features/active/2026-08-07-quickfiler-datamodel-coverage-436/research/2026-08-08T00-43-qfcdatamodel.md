@@ -2,7 +2,7 @@
 
 - Feature: `quickfiler-datamodel-coverage` (issue #436), child F5 of epic `quickfiler-per-file-coverage` (#136)
 - Target file: `QuickFiler/Controllers/QfcDatamodel.cs` — 496 lines, `[ExcludeFromCodeCoverage]` at line 25
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a923053598cf4ccea`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a923053598cf4ccea`
 - Created: 2026-08-08T00-43
 - Scope: this one production file. Sibling partials `QfcDatamodel.QueueProcessing.cs` and
   `QfcDatamodel.FrameBuilding.cs`, and `EfcDataModel.cs`, are researched separately; they appear here

@@ -2,7 +2,7 @@
 
 - Feature: F10 `quickfiler-item-controller-coverage` (issue #453), epic #136
 - Branch: `feature/quickfiler-item-controller-coverage`
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a359b62de7a79b16e`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a359b62de7a79b16e`
 - Production file: `QuickFiler/Controllers/QfcItemController.MailActions.cs` — **224 lines**, no
   `[ExcludeFromCodeCoverage]` attribute anywhere in the file (verified by full read).
 - Primary test file: `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs` (184 lines)

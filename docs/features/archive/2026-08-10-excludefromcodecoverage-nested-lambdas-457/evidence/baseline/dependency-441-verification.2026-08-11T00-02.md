@@ -4,7 +4,7 @@ Timestamp: 2026-08-11T00-02
 Command: `pwsh -NoProfile -File <scratchpad>/p0t1-verify-441.ps1` (dot-sources `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` and runs the three checks below)
 EXIT_CODE: 0
 
-Working directory: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`
+Working directory: `<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`
 Branch: `bug/excludefromcodecoverage-nested-lambdas-457`
 HEAD: `1c221399a72d9102c357e4d5164f5f0bb5c7fd2e`
 

@@ -113,7 +113,7 @@ edits, and it did genuinely recompile the affected chain:
 
 The `[P1-T4]` log contains the explicit line
 `Compilation request SVGControl.Test, PathToTool=...\Roslyn\csc.exe` and the output line
-`SVGControl.Test -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\bin\Debug\SVGControl.Test.dll`.
+`SVGControl.Test -> <repo-root>\SVGControl.Test\bin\Debug\SVGControl.Test.dll`.
 **`SVGControl.Test` — the only project this cycle modifies — was therefore genuinely recompiled under
 `-EnableNETAnalyzers -EnforceCodeStyleInBuild` and emitted zero warnings and zero errors.** Its
 five-warning inventory is composed of the identical five code-less `System.Reactive` advisories from the

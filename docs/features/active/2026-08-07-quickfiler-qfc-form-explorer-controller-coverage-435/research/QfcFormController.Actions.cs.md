@@ -4,7 +4,7 @@ Timestamp: 2026-08-07T22-05
 
 | Field | Value |
 | --- | --- |
-| Production file | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.Actions.cs` |
+| Production file | `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.Actions.cs` |
 | Exact line count | 302 |
 | `[ExcludeFromCodeCoverage]` | **No.** The file declares `internal partial class QfcFormController` at line 18 with no attribute; no member carries the attribute either. Verified by reading the entire file. |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj` line 320: `<Compile Include="Controllers\QfcFormController.Actions.cs" />` |

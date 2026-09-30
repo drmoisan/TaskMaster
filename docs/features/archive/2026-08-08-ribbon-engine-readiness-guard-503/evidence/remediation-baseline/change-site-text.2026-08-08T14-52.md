@@ -7,7 +7,7 @@ EXIT_CODE: 0
 
 ## Change site 1 — F1
 
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs`, method `RibbonExplorerXml_EveryEngineBackedControlDeclaresGetEnabledCallback`, lines 180-207, quoted verbatim with line numbers:
+`<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs`, method `RibbonExplorerXml_EveryEngineBackedControlDeclaresGetEnabledCallback`, lines 180-207, quoted verbatim with line numbers:
 
 ```csharp
 180	            var document = LoadRibbonDocument();
@@ -50,7 +50,7 @@ The `ContainKey` assertion at lines 191-197 is correct and is not part of the F1
 
 ## Change site 2 — F2
 
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster\Ribbon\RibbonExplorer.xml`, the three `TriageSet*` `<button>` elements inside `<group id="TriageGroup" ...>`, lines 447-466 quoted verbatim with line numbers (the enclosing `group` open tag at 447 and the following `menu` open tag at 466 are shown for boundary context and are **not** modified):
+`<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster\Ribbon\RibbonExplorer.xml`, the three `TriageSet*` `<button>` elements inside `<group id="TriageGroup" ...>`, lines 447-466 quoted verbatim with line numbers (the enclosing `group` open tag at 447 and the following `menu` open tag at 466 are shown for boundary context and are **not** modified):
 
 ```xml
 447	        <group id="TriageGroup" imageMso="Filter" label="Triage">

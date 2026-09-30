@@ -16,7 +16,7 @@ The terminal wrapper exit code was `1`; it did not time out.
 `Invoke-MSTestWithCoverage.ps1` exited while creating its output directory. It treated the supplied absolute `CoverageOutput` path as workspace-relative and constructed an invalid doubled path beginning:
 
 ```text
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\...
+<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\...
 ```
 
 No test child process started. No Cobertura file or effective-settings file was created, no tests were discovered or executed, and no terminal coverage totals are available.

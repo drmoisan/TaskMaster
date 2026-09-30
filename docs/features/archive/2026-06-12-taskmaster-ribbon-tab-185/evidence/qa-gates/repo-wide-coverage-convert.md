@@ -5,7 +5,7 @@ Timestamp: 2026-06-12T11-21
 Command:
 ```
 dotnet-coverage merge -f cobertura -o artifacts/csharp/coverage.xml \
-  coverage-out/b14cd307-66bd-448e-9977-df5cf2dc5ca6/DanMoisan_MEGALODON4_2026-06-12.11_20_53.coverage
+  coverage-out/b14cd307-66bd-448e-9977-df5cf2dc5ca6/<user>_<host>_2026-06-12.11_20_53.coverage
 ```
 (dotnet-coverage v18.5.2.0)
 

@@ -26,7 +26,7 @@ There is no `scripts/dev_tools/` directory in TaskMaster. `scripts/` contains on
 
 ## Observed Behavior
 
-Verified on 2026-08-14 in `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-14T09-01`:
+Verified on 2026-08-14 in `<user-profile>\repos\TaskMaster-wt\2026-08-14T09-01`:
 
 - `find . -name "validate_orchestrator_state*"` (excluding `node_modules` and
   `.claude/worktrees`) returns nothing.

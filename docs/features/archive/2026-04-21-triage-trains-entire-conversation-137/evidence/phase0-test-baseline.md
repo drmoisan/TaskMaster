@@ -14,7 +14,7 @@ Skipped: 2
 Line coverage: 78.20%
 Branch coverage: 63.25%
 
-Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster\coverage\coverage.cobertura.xml
+Coverage artifact: <repo-root>\coverage\coverage.cobertura.xml
 
 Notes:
 - 2 skipped tests: `People_Deserialize_CanDeserializePatternCorrectly`, `Constructor_WithOutlookItem_ShouldInitializeProperties` (pre-existing skips, not new failures).

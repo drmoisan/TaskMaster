@@ -7,7 +7,7 @@ EXIT_CODE: 1
 Output Summary:
 - Total tests: 4065; Passed: 4058; Failed: 7 (run 1). A second confirmation run produced 8
   failures (the count varies run-to-run), confirming the non-determinism this cycle remediates.
-- Coverage source: TestResults/.../DanMoisan_MEGALODON4_2026-06-09.11_46_14.coverage
+- Coverage source: TestResults/.../<user>_<host>_2026-06-09.11_46_14.coverage
   -> merged to evidence/baseline/baseline-coverage.2026-06-09T11-31.xml
 
 Numeric coverage (line coverage = lines_covered / (covered + partial + not_covered)):

@@ -1,7 +1,7 @@
 # Constrained Small-Path Handoff
 
 Timestamp: 2026-04-14T08:01:14.8674606-04:00
-Controlling Plan: `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
+Controlling Plan: `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
 Requirements Source: `issue.md` `## Acceptance Criteria` only
 
 In-Scope Production Files:

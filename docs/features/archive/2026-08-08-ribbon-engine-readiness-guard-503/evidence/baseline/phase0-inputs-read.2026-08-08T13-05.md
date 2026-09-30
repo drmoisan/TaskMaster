@@ -4,9 +4,9 @@ Timestamp: 2026-08-08T13-05
 
 Files read (absolute paths):
 
-1. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
-2. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\issue.md`
-3. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\research\2026-08-08T12-45-ribbon-engine-readiness-guard-research.md`
+1. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
+2. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\issue.md`
+3. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\research\2026-08-08T12-45-ribbon-engine-readiness-guard-research.md`
 
 Resolved work mode: **`full-bug`**, taken from the persisted marker `- Work Mode: full-bug` at `issue.md:12` and restated at `spec.md:9`.
 

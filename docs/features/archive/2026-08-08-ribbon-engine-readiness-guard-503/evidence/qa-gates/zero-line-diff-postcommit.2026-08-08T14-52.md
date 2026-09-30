@@ -6,7 +6,7 @@ Post-commit HEAD: `00bc47bb2d9f82cc4b63b13fbfbd251627e858b1`
 
 ## Command 1 — protected-path check, path-scoped
 
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git diff --numstat 003c5715055d7d1933db68a742531332756e30b2..HEAD -- TaskMaster/AppGlobals/AppItemEngines.cs UtilitiesCS/Interfaces/IGlobals/IAppItemEngines.cs TaskMaster/AppGlobals/ApplicationGlobals.cs"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git diff --numstat 003c5715055d7d1933db68a742531332756e30b2..HEAD -- TaskMaster/AppGlobals/AppItemEngines.cs UtilitiesCS/Interfaces/IGlobals/IAppItemEngines.cs TaskMaster/AppGlobals/ApplicationGlobals.cs"`
 EXIT_CODE: 0
 
 Output, verbatim:
@@ -23,7 +23,7 @@ The diff is **path-scoped** (`-- <paths>`) precisely so the enclosing branch dif
 
 ## Command 2 — scope check over the remediation commit's own diff
 
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git show --numstat --format= HEAD"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git show --numstat --format= HEAD"`
 EXIT_CODE: 0
 
 The scope check is taken over the **remediation commit's own diff**, not the whole-branch diff. The whole-branch diff necessarily contains every implementation-cycle path and would make an unscoped gate unsatisfiable.

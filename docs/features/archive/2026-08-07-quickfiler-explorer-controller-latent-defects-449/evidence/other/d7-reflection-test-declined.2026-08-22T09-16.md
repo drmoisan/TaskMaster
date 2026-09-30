@@ -1,7 +1,7 @@
 # D7 — Optional Reflection Contract Test DECLINED (Issue #449, [P6-T13])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command:
 ```

@@ -5,7 +5,7 @@ Date: 2026-08-26
 Work mode: `full-bug`
 
 All Outlook and filesystem identifiers in this document are fabricated placeholders
-(`\\mailbox@example.com`, `\\other@example.org`, `C:\Users\testuser\OneDrive - Contoso`) per
+(`\\mailbox@example.com`, `\\other@example.org`, `<user-profile>\OneDrive - Contoso`) per
 the host-identifier leakage constraint tracked in open issue #602.
 
 ---
@@ -103,7 +103,7 @@ filing surface regardless of how it reached the selection. #499 remains open and
 
 `ArchiveStemContract.IsFullOutlookPath` returns `true` for three shapes: a `\\`-rooted store path,
 a value leading with a single `\` or `/`, and a drive-rooted value whose second character is `:`
-(for example `C:\Users\testuser\OneDrive - Contoso`).
+(for example `<user-profile>\OneDrive - Contoso`).
 
 Including the drive-rooted shape is a deliberate decision. A drive-rooted value can never be a
 valid archive-relative stem; no legitimate stem carries a volume separator in position 1; and

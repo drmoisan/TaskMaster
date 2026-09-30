@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T06:37:19.2976437Z
 
-Command: `& 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' /InIsolation '/TestCaseFilter:FullyQualifiedName~BreadcrumbDropDownCoverageThresholdTests.OpenAsync_RollbackCallbackFailsOnce_OuterPipelineCompletesRecovery|FullyQualifiedName~BreadcrumbDropDownCoverageThresholdTests.OpenAsync_FocusCallback' '/Logger:console;Verbosity=normal'`
+Command: `& 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' /InIsolation '/TestCaseFilter:FullyQualifiedName~BreadcrumbDropDownCoverageThresholdTests.OpenAsync_RollbackCallbackFailsOnce_OuterPipelineCompletesRecovery|FullyQualifiedName~BreadcrumbDropDownCoverageThresholdTests.OpenAsync_FocusCallback' '/Logger:console;Verbosity=normal'`
 
 EXIT_CODE: 1
 

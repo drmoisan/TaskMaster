@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T16-15
 
 Task: [P0-T6]
 
-Command: `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe check C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0`
+Command: `<user-profile>\.dotnet\tools\csharpier.exe check <repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0`
 
 EXIT_CODE: 0
 
@@ -14,7 +14,7 @@ Checked 1488 files in 2739ms.
 
 ## Tool resolution
 
-`C:\Users\DanMoisan\.dotnet\tools\csharpier.exe --version` -> `1.3.0`.
+`<user-profile>\.dotnet\tools\csharpier.exe --version` -> `1.3.0`.
 
 The global tool is invoked directly rather than through `dotnet tool run csharpier` because this
 checkout has no `.config/dotnet-tools.json` manifest (the manifest at repo root is named

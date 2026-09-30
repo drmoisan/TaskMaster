@@ -11,7 +11,7 @@ Branch: `feature/quickfiler-keyboard-actions-coverage`
 
 | Attribute | Value |
 | --- | --- |
-| Path | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\IQfcKeyboardHandler.cs` |
+| Path | `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\IQfcKeyboardHandler.cs` |
 | Line count | 37 |
 | Type | `public interface IQfcKeyboardHandler` (line 9), namespace `QuickFiler.Interfaces` |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj:366` `<Compile Include="Interfaces\IQfcKeyboardHandler.cs" />` |
@@ -211,7 +211,7 @@ An architecture-style assertion — "`KeyboardHandler` is the only type in the `
 
 ## 9. Sources
 
-All paths relative to `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\`.
+All paths relative to `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\`.
 
 **Policy**
 - `CLAUDE.md` — § UT2 (coverage exemption and testable denominator), § CUT1–CUT2

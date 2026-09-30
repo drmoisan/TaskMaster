@@ -15,4 +15,4 @@ Relevant Stack Frames:
 - TaskMaster.AppToDoObjects.<LoadProjInfoAsync>d__21.MoveNext()
 - TaskMaster.Test.AppGlobals.AppToDoObjectsTests.<LoadProjInfoAsync_DoesNotReadOutlookApplicationFromWorkerThread>d__18.MoveNext()
 Evidence Source Logs:
-- c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_aEPaBd2nXnB4kWO0tT9N8WKH__vscode-1777946811202\content.txt
+- <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_aEPaBd2nXnB4kWO0tT9N8WKH__vscode-1777946811202\content.txt

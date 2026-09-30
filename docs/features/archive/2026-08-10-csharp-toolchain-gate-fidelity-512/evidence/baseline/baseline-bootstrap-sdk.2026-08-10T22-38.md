@@ -8,14 +8,14 @@ EXIT_CODE: 0
 
 ```
 Downloading .NET SDK 8.0.205 from https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.205/dotnet-sdk-8.0.205-win-x64.zip...
-Installed repo-local .NET SDK 8.0.205 to C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb\.dotnet-sdk.
+Installed repo-local .NET SDK 8.0.205 to <repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb\.dotnet-sdk.
 ```
 
 ## Verification
 
 ```
 $ ls -la .dotnet-sdk/dotnet.exe
--rwxr-xr-x 1 DanMoisan 197121 147216 Apr 16  2024 .dotnet-sdk/dotnet.exe*
+-rwxr-xr-x 1 <user> 197121 147216 Apr 16  2024 .dotnet-sdk/dotnet.exe*
 
 $ ./.dotnet-sdk/dotnet.exe --version
 8.0.205

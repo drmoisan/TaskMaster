@@ -16,10 +16,10 @@ Files read in the policy-compliance order defined by `.claude/skills/policy-comp
 
 ## Files Read
 
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\CLAUDE.md`
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-code-change.md`
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-unit-test.md`
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\csharp.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\CLAUDE.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-code-change.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-unit-test.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\csharp.md`
 
 All four policy files were read before any code change. C# toolchain order confirmed:
 CSharpier (format) -> analyzer msbuild (lint) -> nullable/TreatWarningsAsErrors msbuild (type-check) -> vstest /EnableCodeCoverage (test); restart from CSharpier on any failure or auto-fix.

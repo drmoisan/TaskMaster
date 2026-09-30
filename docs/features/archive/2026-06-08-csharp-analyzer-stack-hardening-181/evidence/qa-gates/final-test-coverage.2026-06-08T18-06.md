@@ -21,7 +21,7 @@ Output Summary:
   authoritative 80%/90% policy gate is the CI run, which applies the repo's coverage
   scoping. The whitespace-only change does not alter coverage scoping.
 - Coverage attachment: TestResults\16387297-91d4-4a0f-9ddc-f669cad9149d\
-  DanMoisan_MEGALODON4_2026-06-08.14_22_42.coverage (15.9 MB).
+  <user>_<host>_2026-06-08.14_22_42.coverage (15.9 MB).
 
 ## Failing tests (flaky wall-clock-timer family — not a regression)
 The 7 failures are all timer/timing/threading-sensitive tests from the known-flaky

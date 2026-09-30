@@ -21,10 +21,10 @@
 
 ### Phase 0 — Baseline Capture
 
-- [x] [P0-T1] Read `c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md` in full (policy-reading order position 1 of 4 per `policy-compliance-order`).
-- [x] [P0-T2] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-code-change.md` in full (policy-reading order position 2 of 4).
-- [x] [P0-T3] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-unit-test.md` in full (policy-reading order position 3 of 4).
-- [x] [P0-T4] Read `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\csharp.md` in full (policy-reading order position 4 of 4, C#-specific).
+- [x] [P0-T1] Read `<repo-root>\CLAUDE.md` in full (policy-reading order position 1 of 4 per `policy-compliance-order`).
+- [x] [P0-T2] Read `<repo-root>\.claude\rules\general-code-change.md` in full (policy-reading order position 2 of 4).
+- [x] [P0-T3] Read `<repo-root>\.claude\rules\general-unit-test.md` in full (policy-reading order position 3 of 4).
+- [x] [P0-T4] Read `<repo-root>\.claude\rules\csharp.md` in full (policy-reading order position 4 of 4, C#-specific).
 - [x] [P0-T5] Write `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/evidence/other/phase0-instructions-read.md` containing `Timestamp:`, a `Policy Order:` list (the four files from P0-T1–P0-T4 in the order read), and confirmation that all four were read in full before any implementation task began. Acceptance: file exists at this exact path with all three required fields present.
 - [x] [P0-T6] On branch `bug/stale-app-config-binding-redirects-354` (pre-fix state, no `app.config` edits yet), from repo root run `taskkill //F //IM MSBuild.exe //T`, then `taskkill //F //IM VBCSCompiler.exe //T` (both are safe no-ops if no matching process exists), then `nuget restore TaskMaster.sln`. Write `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/evidence/baseline/restore-baseline.<timestamp>.md` with `Timestamp:`, `Command:` (the exact `nuget restore TaskMaster.sln` invocation), `EXIT_CODE:`, and `Output Summary:` (restore result, package count or first error). Acceptance: artifact exists with `EXIT_CODE: 0`.
 - [x] [P0-T7] On the same pre-fix branch state, from repo root run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true -nodeReuse:false`. Write `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/evidence/baseline/build-baseline.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (exact error count and warning count from build output). Acceptance: artifact exists and records the exact pre-fix error/warning counts (do not assume 0 errors — record whatever the build actually reports).

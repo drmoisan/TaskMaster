@@ -7,7 +7,7 @@ Timestamp: 2026-08-04T15-06
 
 Command: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath SVGControl.Test/SVGControl.Test.csproj -Configuration Debug -Platform AnyCPU`
 
-Working directory: repository root (`c:\Users\DanMoisan\source\repos\drmoisan\TaskMaster`)
+Working directory: repository root (`<user-profile>\source\repos\drmoisan\TaskMaster`)
 
 EXIT_CODE: 1
 
@@ -23,7 +23,7 @@ the repository's real broken state as observed. Nothing was repaired.
 ## Verbatim `EnsureNuGetPackageBuildImports` Error
 
 ```text
-C:\Users\DanMoisan\source\repos\drmoisan\TaskMaster\SVGControl.Test\SVGControl.Test.csproj(162,5): error : This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is ..\packages\MSTest.TestAdapter.3.1.1\build\net462\MSTest.TestAdapter.props.
+<user-profile>\source\repos\drmoisan\TaskMaster\SVGControl.Test\SVGControl.Test.csproj(162,5): error : This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is ..\packages\MSTest.TestAdapter.3.1.1\build\net462\MSTest.TestAdapter.props.
 ```
 
 MSBuild attributed the error to the `EnsureNuGetPackageBuildImports` target:

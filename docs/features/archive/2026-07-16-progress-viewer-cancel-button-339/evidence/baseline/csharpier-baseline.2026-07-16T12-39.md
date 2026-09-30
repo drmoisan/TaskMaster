@@ -40,7 +40,7 @@ Command Output:
 
 ```text
 Downloading .NET SDK 8.0.205 from https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.205/dotnet-sdk-8.0.205-win-x64.zip...
-Installed repo-local .NET SDK 8.0.205 to C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-16T12-27\.dotnet-sdk.
+Installed repo-local .NET SDK 8.0.205 to <user-profile>\repos\TaskMaster-wt\2026-07-16T12-27\.dotnet-sdk.
 ```
 
 ## Exact Approved Formatter Retry
