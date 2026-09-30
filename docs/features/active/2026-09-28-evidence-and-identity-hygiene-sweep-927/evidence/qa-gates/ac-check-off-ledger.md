@@ -1,20 +1,19 @@
 # Acceptance-criteria check-off ledger (P6-T17 to P6-T36)
 
-Timestamp: 2026-09-29T23-37
+Timestamp: 2026-09-29T23-40
 Command: git grep -c -e "^- \[x\] AC" -- docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927/spec.md
 EXIT_CODE: 0
 Output Summary:
-- The count command printed 19 for spec.md.
-- TOTAL: 19 of 20
-- UNMET: AC13 (AC13: NOT MET)
+- The count command printed 20 for spec.md.
+- TOTAL: 20 of 20
+- UNMET: none
 
 ### Acceptance Criteria Status
 - Source: docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927/spec.md
 - Total AC items: 20
-- Checked off (delivered): 19
-- Remaining (unchecked): 1
-- Items remaining:
-  - AC13: NOT MET
+- Checked off (delivered): 20
+- Remaining (unchecked): 0
+- Items remaining: none
 
 Per-criterion record:
 - AC1: MET (P6-T17). guard-pre-sweep-run.md: ExpectedExitCode: 1, EXIT_CODE: 1, HYGIENE Findings=1839, which equals RAW-POPULATION: 625 (P0-T17) plus PROFILE-PATH-FILES-NOW: 1214 (the P1-T12 MEASUREMENT-CORRECTION).
@@ -29,7 +28,7 @@ Per-criterion record:
 - AC10: MET (P6-T26). GATE9=0; D18 residual LEGACY-USER-ANYCASE-FILES=9 (recorded, not a condition of the check-off).
 - AC11: MET (P6-T27). redaction-fidelity.md: EOL-MISMATCH=0, BOM-MISMATCH=0, WRITTEN-COMPARED=1052, BOM-COMPARED=1052 (P4-T4 FILES-WRITTEN=1052), REMOVED-LINES=31761 equal to ADDED-LINES=31761, MULTISET-FILES=1052, MULTISET-UNMATCHED=0, LINECOUNT-MISMATCH=0, MULTISET-UTF16-DECODED=1, CONTROL-MULTISET-UNMATCHED=1, REMOVED-UNMATCHED=8 recorded with the eight CoreClean lines and the moved-not-changed explanation, XML-REWRITTEN=0, VERIFY-DECODED-FILES=1 (UTF16-SCANNED=1), VERIFY-WRITTEN-SET=1052, second run FILES-WRITTEN=0 with RULE1=0 to RULE8=0 and equal numstat hashes; P4-T9 EOL-INDEX-MISMATCH=0.
 - AC12: MET (P6-T28). P3-T16 failed=0 with all thirteen classes present; P3-T17 two named tests Passed; P3-T9 census PREFIX-SITES=0; the fixture profile-path grep printed nothing; the research note grep printed three placeholder lines, each containing repos.
-- AC13: NOT MET (P6-T29). The csharpier check exit code is 0. P6-T7 and P6-T8 each show ZERO-ERRORS=1 and SKIP-CORECOMPILE=0. The summary shows failed 0 with passed 7346, not below BASELINE-PASSED: 7343. The coverage clause fails: first-party line 85.92 is below the P0-T14 85.93, and branch 80.08 is below the P0-T14 80.09. The denominators are comparable under D10 (lines-valid 65736 against 65737). The whole difference is in the UtilitiesCS package, and the branch changes no production C# file (csharp-coverage-projection.md). The spec names the CI mstest-coverage context on the pull-request head as the authoritative pass; P6-T37 records it.
+- AC13: MET (P6-T39, re-anchored). The csharpier check exit code is 0. P6-T7 and P6-T8 each show ZERO-ERRORS=1 and SKIP-CORECOMPILE=0. csharp-coverage-reanchor.md: baseline main push run 36651909330 at merge base ddbab26a0 (LinePercent=85.92 BranchPercent=80.08, Total=7346 Passed=7346); pull-request CI run 36664415704 on head 67a69cb23916878c436fa570d587847b7a0745fa (LinePercent=85.92 BranchPercent=80.08, Total=7346 Passed=7346, mstest-coverage job success); MAIN-MOVED=0; MSTEST-COMPARE=NOT-BELOW; PR-CI-FAILED-ZERO=1; PR-CI-PASSED-NOT-BELOW=1; negative control CONTROL-MSTEST-COMPARE=BELOW (local 85.92 and 80.08 against stale P0-T14 85.93 and 80.09). Supersedes the P6-T29 NOT MET record, which was measured against the pre-merge P0-T14 figures.
 - AC14: MET (P6-T30). powershell-toolchain-pass.md: final-iteration REWRITTEN=0; the line PoshQC analyze: pass (0 findings); tool reports no count; both P6-T2 channel lines ok=true.
 - AC15: MET (P6-T31). P5-T1 every KEY| count 1 with CONCURRENCY=0, NEEDS=0, LASTEXIT=0; P5-T2 single uses line with no needs and no steps; P1-T10 both hygiene entries (the _pester.yml lines 41 and 45 re-read in this run); P5-T3 CONTEXT-LINE=1, PREDICTED=1, PESTER-ROW=1, ROW=1; P5-T4 ACTIONLINT-EXIT=0.
 - AC16: MET (P6-T37). ci-hygiene-context.md: on head 67a69cb23916878c436fa570d587847b7a0745fa exactly one check-run begins hygiene / (CAPTURED-CONTEXT: hygiene / Repository hygiene guard, conclusion success); the six pre-existing contexts each report success; the ruleset GET lists no hygiene / context; RULESET-MODIFIED: no; CONFIRMING-RUN: HYGIENE Findings=0 with exit 0.

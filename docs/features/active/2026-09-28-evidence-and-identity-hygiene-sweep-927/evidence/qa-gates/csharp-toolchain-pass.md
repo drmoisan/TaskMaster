@@ -35,3 +35,4 @@ The four C# commands of this loop (iter1):
 | P6-T9 | scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug | 0 (passed 7346, failed 0) | n/a |
 
 The raw TRX document, the raw Cobertura document and the console log stay under the ignored coverage/ directory and are not committed.
+RE-ANCHORED 2026-09-29 by P6-T39: BASELINE-MSTEST-RUN-ID=36651909330 (main push run at merge base ddbab26a0); baseline LinePercent=85.92 BranchPercent=80.08; pull-request CI run 36664415704 LinePercent=85.92 BranchPercent=80.08; MSTEST-COMPARE=NOT-BELOW (see csharp-coverage-reanchor.md).
