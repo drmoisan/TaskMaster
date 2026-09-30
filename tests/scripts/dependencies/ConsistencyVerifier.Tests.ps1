@@ -54,9 +54,9 @@ BeforeAll {
 </Project>
 '@
 
-    # Reproduces QuickFiler.Test/QuickFiler.Test.csproj lines 8 and 514: two Exists() guarded
-    # Import elements naming a package no manifest declares, with no matching Error guard, so
-    # the build is unaffected. Tracked separately; no exception is hard-coded for it here.
+    # Reproduces the shape QuickFiler.Test/QuickFiler.Test.csproj carried at lines 8 and 537 until
+    # issue 929 removed both imports: two Exists() guarded Import elements naming a package no
+    # manifest declares, with no matching Error guard. No exception is hard-coded for it here.
     $script:GuardedUnmanifestedProject = @'
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
@@ -236,6 +236,31 @@ Describe 'ConsistencyVerifier detection surfaces' {
             $detection.FindingCount | Should -Be 1
             $detection.Finding[0].PackageFolder | Should -BeExactly 'Fabrikam.Core.3.1.0'
         }
+
+        It 'reports an Import whose package the manifest does not declare, with Kind Import' {
+            # Arrange: two guarded Import elements name a package the manifest omits.
+            $project = $script:GuardedUnmanifestedProject
+
+            # Act
+            $detection = Find-PackageAbsentFromManifest -ProjectText $project -ManifestText $script:Manifest
+
+            # Assert: both imports are reported, each as an Import naming the altcover folder.
+            $detection.FindingCount | Should -Be 2 -Because 'both guarded imports name the unmanifested package'
+            @($detection.Finding | Where-Object { $_.Kind -ne 'Import' }).Count | Should -Be 0 -Because 'every finding is an Import element'
+            @($detection.Finding | Where-Object { $_.PackageFolder -ne 'altcover.8.6.45' }).Count | Should -Be 0 -Because 'every finding names the altcover package folder'
+        }
+
+        It 'reports no Import finding when the manifest declares the imported package' {
+            # Arrange: the agreeing project imports a package its own manifest declares.
+            $project = $script:AgreeingProject
+
+            # Act
+            $detection = Find-PackageAbsentFromManifest -ProjectText $project -ManifestText $script:Manifest
+
+            # Assert: the examined count guards the empty Import-kind subset.
+            @($detection.Finding | Where-Object { $_.Kind -eq 'Import' }).Count | Should -Be 0 -Because 'the manifest declares the imported package'
+            $detection.ExaminedCount | Should -BeGreaterThan 0 -Because 'a zero examined count would mean the detector never fired'
+        }
     }
 
     Context 'Missing Roslyn segment aggregation' {
@@ -272,7 +297,7 @@ Describe 'ConsistencyVerifier detection surfaces' {
     Context 'Guarded import of a package no manifest declares' {
 
         It 'reports exactly 2 guarded imports of an unmanifested package and still succeeds' {
-            # Arrange: the live shape from QuickFiler.Test, reproduced in memory. Both imports
+            # Arrange: the shape QuickFiler.Test carried before issue 929, reproduced in memory. Both imports
             # are Exists() guarded and carry no matching Error element, so the build is
             # unaffected, but the invariant this tooling enforces is still violated.
             $project = $script:GuardedUnmanifestedProject
