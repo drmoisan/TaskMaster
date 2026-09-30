@@ -37,3 +37,15 @@ Substitutions recorded for the recheck: plan correction C1 (New-Object System.Se
 Command: the P3-T13 command, unchanged. Output: FILES_SCANNED=32 ACCOUNT_HITS=0 MACHINE_HITS=0 DRIVE_USERS_HITS=0 (the FILES_SCANNED floor does not apply here). Re-run after this artifact was written, immediately before the git add: FILES_SCANNED=33 ACCOUNT_HITS=0 MACHINE_HITS=0 DRIVE_USERS_HITS=0.
 
 ## Commit
+
+(Written after the commit; this section is committed by P3-T35.)
+
+- git add exited 0 (line-ending notices only).
+- git commit exited 0: `[bug/engine-toggle-prime-marker-registration-races-removal-944 edc5c3af2] fix(ribbon): register the prime marker before the prime starts (issue 944)`; 14 files changed, 709 insertions, 24 deletions. The attribution trailer was the second -m paragraph `Co-Authored-By: Claude Opus 5.5 noreply@anthropic.com`.
+- IMPLEMENTATION-COMMIT-SHA: edc5c3af2787e40ccb2d6b51876c7a08ad2845b5 (observed with git rev-parse HEAD)
+- git show --name-only --format= HEAD: the three code paths TaskMaster/Ribbon/EngineToggleStateCoordinator.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeRegistration.cs and TaskMaster.Test/TaskMaster.Test.csproj, plus eleven paths under docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944/ (plan.2026-09-30T07-20.md, evidence/baseline/phase0-commit.md, evidence/qa-gates/csproj-registration.md, evidence/qa-gates/implementation-commit.md, evidence/qa-gates/production-edit-scope.md, evidence/qa-gates/protected-regions-unchanged.md, evidence/regression-testing/build-after-fix.md, evidence/regression-testing/build-before-fix.md, evidence/regression-testing/prime-registration-fail-before.md, evidence/regression-testing/prime-registration-partial-tokens.md, evidence/regression-testing/prime-registration-pass-after.md); nothing else.
+- git status --porcelain -- TaskMaster TaskMaster.Test: no line.
+- PUSH: git push origin bug/engine-toggle-prime-marker-registration-races-removal-944 exited 0: `5d1f4ede6..edc5c3af2  bug/engine-toggle-prime-marker-registration-races-removal-944 -> bug/engine-toggle-prime-marker-registration-races-removal-944` (no force push).
+- No PreToolUse refusal of the git add or git commit occurred.
+
+Verdict: every P2-T8 acceptance clause holds. From this commit on, no code file is edited.

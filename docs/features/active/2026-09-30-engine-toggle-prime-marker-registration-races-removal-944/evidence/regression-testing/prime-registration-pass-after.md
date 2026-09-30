@@ -40,3 +40,20 @@ P2-T5, Timestamp: 2026-09-30T13-37. Sources: evidence/baseline/coordinator-tests
 - BASELINE-FAILED is NONE, so no baseline name needs to be matched.
 - The single fail-before FAILED name, GetPressed_WhenPrimeStarts_RegistersPrimeHandleBeforeActivationReadRuns, appears as Passed in the pass-after run.
 - No name is still failing; PASS-AFTER NOT GREEN does not apply.
+
+## FINAL-FIXTURE-RUN:
+
+P3-T7, pass 1, Timestamp: 2026-09-30T13-48. Command: vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:FullyQualifiedName~TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" "/ResultsDirectory:coverage\test-results\944\p3-t7" "/Logger:trx;LogFileName=p3-t7.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" (CMD-VSTEST, ASSEMBLY-TM, FILTER-COORD, NAMES-944), run on the assembly rebuilt by the P3-T6 nullable rebuild from the committed tree (edc5c3af2). EXIT_CODE: 0.
+
+Output Summary:
+VSTEST_EXIT_CODE: 0 (13-48-18 to 13-48-22 UTC); TRX_PRESENT: True; SEQUENCE_FILES: 0
+COUNTERS total=28 executed=28 passed=28 failed=0 (failed 0; total 28 = BASELINE-TOTAL 25 plus 3)
+RESULT_COUNT: 28
+RESULT GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker = Passed
+RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Passed
+RESULT GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse = Passed
+RESULT GetPressed_WhenPrimeStarts_RegistersPrimeHandleBeforeActivationReadRuns = Passed
+RESULT GetPressed_AfterPrimeIsCanceledSynchronously_LaterReadStartsNewPrime = Passed
+RESULT GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime = Passed
+RESULT GetPressed_AfterPrimeFaultsSynchronously_LaterReadStartsNewPrime = Passed
+No FAILED line. All seven NAMES-944 names Passed. Every P3-T7 clause holds.

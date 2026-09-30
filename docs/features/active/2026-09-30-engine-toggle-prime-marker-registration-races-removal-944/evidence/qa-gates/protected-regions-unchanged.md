@@ -29,3 +29,25 @@ REGION PRIME-START left=259-306 right=260-328 equal=False
 PROTECTED_FILES_DIFF_EXIT=0
 RUNSETTINGS_DIFF_EXIT=0
 ```
+
+## POST-FORMAT:
+
+P3-T2, pass 1, Timestamp: 2026-09-30T13-44. Command: the P2-T7 commands (CMD-REGION-COMPARE LEFT ANCHOR-SHA RIGHT WORKING for PROTECTED and EDIT-WINDOWS, with plan correction C1: New-Object System.Security.Cryptography.SHA256Managed; the two protected-file git diff --exit-code commands), re-run on the tree after the P3-T1 repository-wide format. EXIT_CODE: 0.
+
+Output Summary: every P2-T7 clause holds on the post-format tree: all seven PROTECTED rows equal=True, both EDIT-WINDOWS rows equal=False, no TOKEN-MISSING, PROTECTED_FILES_DIFF_EXIT=0, RUNSETTINGS_DIFF_EXIT=0. CompletePrime (summary, remarks, body, including its _primeTasks.TryRemove(engineName, out _); statement) and ApplyPrimeAsync are identical to the re-anchored origin/main, GetPrimeTask is untouched, and the _primeTasks declaration is unchanged.
+
+```
+SET PROTECTED
+REGION HEAD left=1-57 right=1-57 equal=True
+REGION PRESSED-STATE left=62-70 right=62-70 equal=True
+REGION PRIMETASKS-DECLARATION left=77-80 right=78-81 equal=True
+REGION MIDDLE left=81-236 right=82-237 equal=True
+REGION GETPRIMETASK left=237-258 right=238-259 equal=True
+REGION APPLYPRIME-AND-COMPLETEPRIME left=307-361 right=329-383 equal=True
+REGION TAIL left=362-420 right=384-442 equal=True
+SET EDIT-WINDOWS
+REGION GATE-AND-TASKS-FIELDS left=58-80 right=58-81 equal=False
+REGION PRIME-START left=259-306 right=260-328 equal=False
+PROTECTED_FILES_DIFF_EXIT=0
+RUNSETTINGS_DIFF_EXIT=0
+```
