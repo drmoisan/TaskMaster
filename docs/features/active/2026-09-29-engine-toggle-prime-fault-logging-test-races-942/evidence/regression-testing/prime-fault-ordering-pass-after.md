@@ -28,3 +28,19 @@ Timestamp: 2026-09-30T07-39 (P2-T5; read from evidence/baseline/coordinator-test
 - Pass-after failed: 0.
 - BASELINE-FAILED: NONE, so no baseline failure needs to be re-checked; no test is recorded as still failing.
 - Result: the pass-after population is the baseline population plus the new regression test, all passed. No PASS-AFTER NOT GREEN.
+
+## FINAL-FIXTURE-RUN:
+
+Timestamp: 2026-09-30T07-48 (P3-T7, on the assembly rebuilt by the P3-T5 and P3-T6 gates)
+Command: vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:FullyQualifiedName~TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" "/ResultsDirectory:coverage\test-results\942\p3-t7" "/Logger:trx;LogFileName=p3-t7.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None"
+EXIT_CODE: 0
+
+- VSTEST_EXIT_CODE: 0
+- TRX_PRESENT: True
+- SEQUENCE_FILES: 0
+- COUNTERS total=25 executed=25 passed=25 failed=0 (total = BASELINE-TOTAL plus 1)
+- RESULT GetPressed_WhenPrimeIsCanceled_LeavesToggleReportingUnchecked = Passed
+- RESULT GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse = Passed
+- RESULT GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker = Passed
+- RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Passed
+- No FAILED line.

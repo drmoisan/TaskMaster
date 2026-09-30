@@ -39,3 +39,25 @@ Output Summary:
 - The diff adds and removes zero lines containing `[TestMethod]`.
 - Numstat: `12	1	TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs` (deletions exactly 1: the replaced single-line lambda).
 - All harness clauses hold.
+
+## POST-FORMAT:
+
+Timestamp: 2026-09-30T07-45
+Task: P3-T2
+Command: the P1-T1 CMD-TOKEN-COUNT with its exact TOKEN list, and the P2-T6 harness commands (anchored `git diff -U0`, `git diff --numstat`, CMD-TOKEN-COUNT for the Harness boundary tokens), re-run after the P3-T1 repository-wide format pass
+EXIT_CODE: 0
+
+Output Summary:
+- TOKEN [internal Action<string, Exception> OnLogError { get; set; }] = 1; FIRST-LINE 445
+- TOKEN [OnLogError?.Invoke(message, exception);] = 1; FIRST-LINE 418
+- TOKEN [Errors.Add(new LoggedError(message, exception));] = 1; FIRST-LINE 417
+- TOKEN [invoked from inside the error-log sink] = 1; FIRST-LINE 441
+- TOKEN [[TestMethod]] = 15; FIRST-LINE 30
+- Adjacency: invoke (418) = append (417) plus 1.
+- TOKEN [private sealed class Harness] = 1; FIRST-LINE 403
+- TOKEN [private sealed class LoggedError] = 1; FIRST-LINE 457
+- TOKEN [new Mock<IAppItemEngines>(MockBehavior.Strict)] = 1; FIRST-LINE 424
+- Hunk headers: `@@ -415 +415,5 @@` (start 415) and `@@ -435,0 +440,7 @@` (start 440); both inside (403, 457), so every hunk lies inside the Harness type.
+- The diff adds and removes zero lines containing `[TestMethod]`.
+- Numstat: `12	1	TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs` (deletions exactly 1).
+- Every clause of P1-T1 and the P2-T6 harness clauses holds on the post-format tree.

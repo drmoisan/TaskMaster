@@ -18,3 +18,13 @@ Scoped format:
 - HASH after TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.cs = AA754469AA204624B14E3BBF4E229EAE57FEEA6722561F956382A4A6BEEAA3FC
 - HASH after TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs = AA88DC05B45CE2E0D935014778779C5B500025BCFD237AEE05A184CED7D6F8DB
 - PRECOMMIT-FORMAT-REWRITES: 0 (each path's two hashes are equal; the Delivered Source layout was already formatter-stable, so no PRECOMMIT-FORMAT-RECHECK was required)
+
+Commit (recorded after the commit; this section is committed with the P3-T30 commit):
+
+- git commit exited 0: 15 files changed.
+- IMPLEMENTATION-COMMIT-SHA: 509f7f0a576d82dd668821dbb4bbb181f3a45912
+- Pushed to origin bug/engine-toggle-prime-fault-logging-test-races-942 (3c9f75b66..509f7f0a5).
+- git show --name-only --format= HEAD listed exactly the four code paths (TaskMaster/Ribbon/EngineToggleStateCoordinator.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs, TaskMaster.Test/TaskMaster.Test.csproj) plus eleven paths under the feature folder, and nothing else.
+- git status --porcelain -- TaskMaster TaskMaster.Test printed no line.
+- No PreToolUse refusal occurred on the git add or the git commit.
+- From this commit on, no code file is edited.

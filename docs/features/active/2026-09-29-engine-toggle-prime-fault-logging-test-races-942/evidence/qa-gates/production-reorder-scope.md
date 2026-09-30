@@ -74,3 +74,41 @@ Clause check (P2-T1, P2-T2, P2-T6 production acceptance):
 - `new TaskCanceledException(completed)` = 1 and `GetBaseException()` = 1.
 - SPAN start 344 equals FIRST-LINE of `private void CompletePrime(`.
 - All clauses hold.
+
+## POST-FORMAT:
+
+Timestamp: 2026-09-30T07-45
+Task: P3-T2
+Command: the P2-T6 production token count, span measurement (same `$lk` adaptation) and anchored `git diff -U0` / `git diff --numstat` against 231e1c0b55105aeb626bf5a6e8d0266a567cacad, re-run on the tree after the P3-T1 repository-wide format pass
+EXIT_CODE: 0
+
+Output Summary:
+
+- TOKEN [private void CompletePrime(] = 1; FIRST-LINE 344
+- TOKEN [_logError(BuildPrimeFailedMessage(engineName), failure);] = 1; FIRST-LINE 358
+- TOKEN [_primeTasks.TryRemove(engineName, out _);] = 1; FIRST-LINE 359
+- TOKEN [Report-then-clear is load-bearing] = 1; FIRST-LINE 355
+- TOKEN [and only then is the in-flight marker cleared] = 1; FIRST-LINE 332
+- TOKEN [cleared only after that report has returned] = 1; FIRST-LINE 246
+- TOKEN [internal Task GetPrimeTask(] = 1; FIRST-LINE 249
+- TOKEN [catch (] = 1; FIRST-LINE 181
+- TOKEN [lock (] = 1; FIRST-LINE 271
+- TOKEN [new TaskCanceledException(completed)] = 1; FIRST-LINE 353
+- TOKEN [GetBaseException()] = 1; FIRST-LINE 352
+- SPAN=344-360
+- SPAN_RETURN=1
+- SPAN_RANTOCOMPLETION=1
+- SPAN_TRY=0
+- SPAN_CATCH=0
+- SPAN_LOCK=0
+- G = 249, S = 332, R = 359; windows [243, 248] and [330, 359].
+- Hunk headers: `@@ -245 +245,3 @@` (245-247, window 1); `@@ -329,2 +331,3 @@` (331-333, window 2); `@@ -348,2 +350,0 @@` (350, window 2); `@@ -353,0 +355,3 @@` (355-357, window 2); `@@ -354,0 +359 @@` (359, window 2). Every hunk lies inside a window.
+- Numstat: `10	5	TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` (deletions 5, at most 8).
+- Removed lines re-quoted and classified:
+  1. `        /// itself and reported through <c>logError</c>.` — GetPrimeTask returns element line.
+  2. `        /// is left unset — so the key still reports unchecked — the in-flight marker is cleared so` — CompletePrime summary line.
+  3. `        /// a later read may re-prime, and the failure is reported through <c>logError</c>.` — CompletePrime summary line.
+  4. `            _primeTasks.TryRemove(engineName, out _);` — the TryRemove statement.
+  5. (empty line) — the blank line adjacent to the TryRemove statement.
+- Display note: the pwsh console decoded the em dashes of removed line 2 through the console code page when printing `git diff` output; the line is quoted here with its actual characters, which the pre-format P2-T6 diff printed correctly from Bash.
+- Every clause of P2-T6 (and the P2-T1 and P2-T2 position clauses) holds on the post-format tree: `_logError(` (358) precedes `TryRemove` (359), both after 344; the comment is exactly 3 lines above `_logError(`; `catch (` and `lock (` each 1; both exception tokens 1; the documentation tokens at their required positions. No POST-COMMIT CODE REWRITE.
