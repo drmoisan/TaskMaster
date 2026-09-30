@@ -64,6 +64,13 @@ Failure detail (read from the trx; absolute paths replaced with REDACTED-PATH):
 
 Both failures are in QuickFiler.Test, a project this item does not modify, and both are five-second wall-clock waits that timed out; the baseline run at the anchor (P0-T18) passed all 7324 tests. Whether the failures are load-induced or reproducible is not established by this run; the plan admits no re-run for them, so no re-run was performed.
 
+COORDINATOR-RULING (recorded 2026-09-30 by the item orchestrator before the restart):
+
+- FIRST-ATTEMPT-EXIT-CODE: 1
+- FIRST-ATTEMPT-FAILED-SET: QuickFiler.Controllers.Tests.QfcDatamodelLivenessTests.RemainingLoadActive_AcrossAsyncVoidFirstAwait_StaysTrueWhileLoaderProduces (duration 00:00:07.04), QuickFiler.Controllers.Tests.QfcDatamodelLivenessTests.RemainingLoadActive_AfterLoaderCompletes_BecomesFalse (duration 00:00:05.02); the failure messages are the two FAILED lines above, recorded verbatim from the trx.
+- Basis: every first-attempt failure is in QfcDatamodelLivenessTests (QuickFiler.Test), which this item neither changes nor covers: the item's footprint is TaskMaster/Ribbon/EngineToggleStateCoordinator.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeRegistration.cs and TaskMaster.Test/TaskMaster.Test.csproj, and QuickFiler.Test carries no ProjectReference to TaskMaster.csproj.
+- Ruling: one full restart of P3-T1 through P3-T8 is approved on that basis only. The restart must pass with zero failures; there is no second restart; AC14 wording does not change. This is a single re-measurement of a gate, not a fix, and it sets no precedent. The plan revision log records it as R3-1.
+
 JaCoCo package projection:
 
 ```
