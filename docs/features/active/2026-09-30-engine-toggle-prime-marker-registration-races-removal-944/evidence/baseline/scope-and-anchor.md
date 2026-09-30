@@ -46,3 +46,31 @@ Feature folder: docs/features/active/2026-09-30-engine-toggle-prime-marker-regis
 
 - issue.md line 12: `- Work Mode: full-bug`
 - spec.md `## Acceptance Criteria`: 18 lines beginning `- [ ] AC`; 0 lines beginning `- [x] AC` (counted from the file).
+
+## PHASE0-ARTIFACTS:
+
+Appended by P0-T19 at 2026-09-30T13-28. Listing of docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944/evidence/baseline/ (19 files), with a field check (Timestamp, Command, EXIT_CODE, Output Summary, ExpectedExitCode where EXIT_CODE is non-zero):
+
+| Artifact (task) | Timestamp | Command | EXIT_CODE | Output Summary | ExpectedExitCode |
+|---|---|---|---|---|---|
+| phase0-instructions-read.md (P0-T1) | yes | yes | 0 | yes | n/a |
+| scope-and-anchor.md (P0-T2, P0-T19) | yes | yes | 0 | yes | n/a |
+| upstream-942-check.md (P0-T3) | yes | yes | 0 | yes | n/a |
+| pre-merge-docs-commit.md (P0-T4) | yes | yes | 0 | yes | n/a |
+| anchor-merge.md (P0-T5) | yes | yes | 0 | yes | n/a |
+| anchor-production-shape.md (P0-T6) | yes | yes | 0 | yes | n/a |
+| anchor-edit-regions.md (P0-T7) | yes | yes | 0 | yes | n/a |
+| anchor-test-side.md (P0-T8) | yes | yes | 0 | yes | n/a |
+| bootstrap-sdk.md (P0-T9) | yes | yes | 0 | yes | n/a |
+| bootstrap-tool-restore.md (P0-T10) | yes | yes | 0 | yes | n/a |
+| bootstrap-nuget-restore.md (P0-T11) | yes | yes | 0 | yes | n/a |
+| bootstrap-dotnet-coverage.md (P0-T12) | yes | yes | 0 | yes | n/a |
+| csharpier-check-baseline.md (P0-T13) | yes | yes | 0 | yes | n/a |
+| msbuild-analyzer-baseline.md (P0-T14) | yes | yes | 0 | yes | n/a |
+| msbuild-nullable-baseline.md (P0-T15) | yes | yes | 0 | yes | n/a |
+| stall-probe.md (P0-T16) | yes | yes | 1 | yes | 1 |
+| coordinator-tests-baseline.md (P0-T17) | yes | yes | 0 | yes | n/a |
+| coverage-baseline.md (P0-T18) | yes | yes | 0 | yes | n/a |
+| file-line-counts-baseline.md (P0-T19) | yes | yes | 0 | yes | n/a |
+
+Every artifact named by P0-T1 through P0-T19 exists at its exact path; the one non-zero EXIT_CODE (stall-probe.md, 1) carries ExpectedExitCode: 1.
