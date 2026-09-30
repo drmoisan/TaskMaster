@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 1
 - recolor_generation: 2
-- last_updated: 2026-09-30T10-33
-- next_step: 944 awaiting coordinator ruling on the P3-T8 re-run rule; 940 awaiting AC8 ruling; 929 running; 945 held on 940; 941 awaiting admission
+- last_updated: 2026-09-30T10-37
+- next_step: 940 applying AC8 ruling then P2-T7 onward; 944 approved restart P3-T1..P3-T8; 945 held on 940 merge; 941 not admitted
 
 ## Items
 
