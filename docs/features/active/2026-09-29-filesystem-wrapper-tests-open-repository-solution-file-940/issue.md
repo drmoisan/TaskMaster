@@ -68,7 +68,9 @@ A unit test depends on environment state it does not control, which is the root 
 - [ ] AC5: No temporary file or directory is created by any test in either file, and no test introduces `DoNotParallelize`, a worker-count or scope change, a retry, or a sleep.
 - [ ] AC6: A negative-control run shows that each rewritten test fails when the wrapper or adapter delegation it verifies is deliberately broken, and the control change is reverted before the final QC pass.
 - [ ] AC7: The three additional root-walk sites named under Suspected Cause (`RibbonControllerTests.cs`, `FSharpCoreHintPathAlignmentTests.cs`, `SortEmail_Tests.cs`) are each classified in an evidence artifact as either a legitimate repository-file read or an instance of this defect class; none is modified by this change.
-- [ ] AC8: The C# toolchain passes in order (CSharpier check, analyzer rebuild, TreatWarningsAsErrors rebuild, MSTest with coverage) with no new failures relative to the baseline and with repository line coverage at or above the baseline figure.
+- [ ] AC8: The C# toolchain passes in order (CSharpier check, analyzer rebuild, TreatWarningsAsErrors rebuild, MSTest with coverage) with no new failures relative to the baseline, with covered lines and covered branches not lower than the baseline in each of the three changed wrapper and adapter files (PhysicalDirectoryInfoAdapter.cs, PhysicalFileInfoAdapter.cs, DirectoryInfoWrapper.cs), and first-party line coverage at least 80 percent and branch coverage at least 75 percent.
+
+Note (2026-09-30): AC8 amended per coordinator ruling (option 1) during P2-T7: the package-level and repository-level not-lower comparison was replaced by the per-file no-regression rule for the three changed files, lines and branches, after two identical measurements showed run-to-run variance in files this item does not touch.
 
 ## Next Step
 
