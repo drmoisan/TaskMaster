@@ -284,3 +284,98 @@ ADDED-TOKEN [ExecuteSynchronously] = 0
 REMOVED: (the same twelve lines as the top section, in the same order)
 34	12	TaskMaster/Ribbon/EngineToggleStateCoordinator.cs
 ```
+
+## PASS-2:
+
+POST-FORMAT: (pass 2) P3-T2, pass 2, Timestamp: 2026-09-30T15-05. Commands: CMD-TOKEN-COUNT (TOKENS-PROD), CMD-PRIME-SPANS, CMD-PHRASE-COUNT, the P2-T6 added-lines payload and git diff --numstat ANCHOR-SHA -- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs (ANCHOR-SHA b305903e275b8abf58e8e65831c189f517568fe4, kept for pass 2 per the Phase 3 pass-2 anchor paragraph), re-run on the tree after the pass-2 P3-T1 repository-wide format (production hash B3C6FEB2A86E36E95AC34F6108D87C8E117A94949F6FCE0B3AF26D824D6E3086, unchanged by P3-T1; 442 lines). EXIT_CODE: 0.
+
+Output Summary: every P2-T6 clause (tokens, spans, added lines, documentation) holds on the pass-2 post-format tree; every row equals the pass-1 POST-FORMAT row. The same substitutions as the top section apply (concatenated output strings; the added-lines payload run in its own invocation; DELETED labels transcribed as REMOVED; token count and FIRST-LINE printed on one row per token; span rows printed on one line per signature).
+
+Tokens (count, FIRST-LINE):
+
+```
+TOKEN [Serializes the at-most-one-prime decision.] = 1 FIRST-LINE=59
+TOKEN [marker registration, and the start of the prime] = 1 FIRST-LINE=60
+TOKEN [task start; no await occurs inside it.] = 0 FIRST-LINE=0
+TOKEN [The registration marker per engine key: registered before the prime starts] = 1 FIRST-LINE=73
+TOKEN [prime per engine key. Its presence is the] = 0 FIRST-LINE=0
+TOKEN [private void StartPrimeIfNeeded(] = 1 FIRST-LINE=264
+TOKEN [lock (_primeGate)] = 1 FIRST-LINE=272
+TOKEN [if (_primeTasks.ContainsKey(engineName))] = 1 FIRST-LINE=274
+TOKEN [Registration precedes the start (issue #944)] = 1 FIRST-LINE=279
+TOKEN [var marker = new TaskCompletionSource<bool>(] = 1 FIRST-LINE=283
+TOKEN [TaskCreationOptions.RunContinuationsAsynchronously] = 1 FIRST-LINE=284
+TOKEN [_primeTasks[engineName] = marker.Task;] = 1 FIRST-LINE=286
+TOKEN [StartObservedPrime(engines, engineName, controlId, marker);] = 1 FIRST-LINE=287
+TOKEN [_primeTasks[engineName] = StartObservedPrime(] = 0 FIRST-LINE=0
+TOKEN [private void StartObservedPrime(] = 1 FIRST-LINE=303
+TOKEN [private Task StartObservedPrime(] = 0 FIRST-LINE=0
+TOKEN [TaskCompletionSource<bool> marker] = 1 FIRST-LINE=307
+TOKEN [_ = ApplyPrimeAsync(engines, engineName, controlId)] = 1 FIRST-LINE=310
+TOKEN [return ApplyPrimeAsync(] = 0 FIRST-LINE=0
+TOKEN [completed => CompletePrime(completed, engineName),] = 0 FIRST-LINE=0
+TOKEN [CompletePrime(completed, engineName);] = 1 FIRST-LINE=316
+TOKEN [marker.SetResult(true);] = 1 FIRST-LINE=320
+TOKEN [SetResult(] = 1 FIRST-LINE=320
+TOKEN [SetException(] = 0 FIRST-LINE=0
+TOKEN [SetCanceled(] = 0 FIRST-LINE=0
+TOKEN [TrySet] = 0 FIRST-LINE=0
+TOKEN [CancellationToken.None,] = 1 FIRST-LINE=323
+TOKEN [TaskContinuationOptions.None,] = 1 FIRST-LINE=324
+TOKEN [TaskScheduler.Default] = 1 FIRST-LINE=325
+TOKEN [ExecuteSynchronously] = 0 FIRST-LINE=0
+TOKEN [The continuation task itself is discarded;] = 1 FIRST-LINE=298
+TOKEN [the value a test awaits is the marker] = 1 FIRST-LINE=299
+TOKEN [The returned continuation task always] = 0 FIRST-LINE=0
+TOKEN [catch (] = 1 FIRST-LINE=182
+TOKEN [lock (] = 1 FIRST-LINE=272
+TOKEN [_primeTasks[] = 1 FIRST-LINE=286
+TOKEN [_primeTasks.TryRemove(engineName, out _);] = 1 FIRST-LINE=381
+TOKEN [_primeTasks.TryAdd(] = 0 FIRST-LINE=0
+TOKEN [_primeTasks.AddOrUpdate(] = 0 FIRST-LINE=0
+TOKEN [_primeTasks.GetOrAdd(] = 0 FIRST-LINE=0
+TOKEN [_primeTasks.Clear(] = 0 FIRST-LINE=0
+TOKEN [Monitor.] = 0 FIRST-LINE=0
+TOKEN [SemaphoreSlim] = 0 FIRST-LINE=0
+TOKEN [Mutex] = 0 FIRST-LINE=0
+TOKEN [ReaderWriterLockSlim] = 0 FIRST-LINE=0
+```
+
+Spans (SPAN-LINES in CMD-PRIME-SPANS token order: lock, ContainsKey, Registration comment, marker, RunContinuationsAsynchronously, store, call, discard ApplyPrimeAsync, CompletePrime call, SetResult, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default, _logError, TryRemove):
+
+```
+SPAN [private void StartPrimeIfNeeded(] = 264-289 TRY=0 FINALLY=0 CATCH=0 LOCK=1 BEFORE-END-IS-LOCK-CLOSE=True KEYWORD try/finally=0/0 SPAN-LINES=272,274,279,283,284,286,287,0,0,0,0,0,0,0,0
+SPAN [private void StartObservedPrime(] = 303-327 TRY=1 FINALLY=1 CATCH=0 LOCK=0 BEFORE-END-IS-LOCK-CLOSE=False KEYWORD try/finally=314/318 SPAN-LINES=0,0,0,0,0,0,0,310,316,320,323,324,325,0,0
+SPAN [private void CompletePrime(] = 366-382 TRY=0 FINALLY=0 CATCH=0 LOCK=0 BEFORE-END-IS-LOCK-CLOSE=False KEYWORD try/finally=0/0 SPAN-LINES=0,0,0,0,0,0,0,0,0,0,0,0,0,380,381
+JOINED [The returned continuation task always completes successfully] = 0
+```
+
+Span clauses: StartPrimeIfNeeded 272 < 274 < 279 < 283; 284 = 283 + 1; 286 > 284; 287 = 286 + 1 and 287 < 289 - 1; lock close before end True. StartObservedPrime 310 < 314 < 316 < 318 < 320 < 323 < 324 < 325. CompletePrime 380 < 381 with TRY, CATCH and LOCK 0. All hold.
+
+Added lines:
+
+```
+ADDED-LINE-COUNT: 34
+REMOVED-LINE-COUNT: 12
+ADDED-CATCH-LINES: 0
+ADDED-TOKEN [lock (] = 0
+ADDED-TOKEN [lock(] = 0
+ADDED-TOKEN [Monitor] = 0
+ADDED-TOKEN [SemaphoreSlim] = 0
+ADDED-TOKEN [Mutex] = 0
+ADDED-TOKEN [ReaderWriterLockSlim] = 0
+ADDED-TOKEN [ExecuteSynchronously] = 0
+REMOVED:         /// Serializes the at-most-one-prime decision. Held only across a dictionary probe and a
+REMOVED:         /// task start; no await occurs inside it.
+REMOVED:         /// The in-flight — or most recently completed — prime per engine key. Its presence is the
+REMOVED:         /// at-most-one-prime guard; its value is the test-observable handle returned by
+REMOVED:         /// <see cref="GetPrimeTask"/>.
+REMOVED:                 _primeTasks[engineName] = StartObservedPrime(engines, engineName, controlId);
+REMOVED:         /// observed, so no unobserved task remains. The returned continuation task always
+REMOVED:         /// completes successfully, which is what makes it safe for a test to await.
+REMOVED:         private Task StartObservedPrime(
+REMOVED:             string controlId
+REMOVED:             return ApplyPrimeAsync(engines, engineName, controlId)
+REMOVED:                     completed => CompletePrime(completed, engineName),
+34	12	TaskMaster/Ribbon/EngineToggleStateCoordinator.cs
+```

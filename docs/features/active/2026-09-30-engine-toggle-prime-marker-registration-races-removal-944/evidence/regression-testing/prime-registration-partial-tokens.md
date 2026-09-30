@@ -126,3 +126,62 @@ Output Summary: every P1-T1 clause holds on the post-format tree. Rows re-printe
 | `using System.Threading;` | 1 (1) | 2 |
 
 Ordering (test 1, by FIRST-LINE): 39 < 45 < 46 < 49 < 54 <= 56 < 59 < 70. Holds.
+
+## PASS-2:
+
+POST-FORMAT: (pass 2) P3-T2, pass 2, Timestamp: 2026-09-30T15-04. Command: CMD-TOKEN-COUNT (FILE TaskMaster.Test\Ribbon\EngineToggleStateCoordinatorTests.PrimeRegistration.cs, TOKEN list TOKENS-PARTIAL) on the tree after the pass-2 P3-T1 repository-wide format (partial hash E7582241265ED1838921593C38420CEB1C3C8E9F101DD1405F55945C45A3A73B, unchanged by P3-T1; 175 lines). EXIT_CODE: 0.
+
+Output Summary: every P1-T1 clause holds on the pass-2 post-format tree; every row equals the pass-1 POST-FORMAT row. Rows re-printed (count, required value, FIRST-LINE):
+
+| Token | Count | FIRST-LINE |
+|---|---|---|
+| `public async Task GetPressed_WhenPrimeStarts_RegistersPrimeHandleBeforeActivationReadRuns()` | 1 (1) | 32 |
+| `public async Task GetPressed_AfterPrimeFaultsSynchronously_LaterReadStartsNewPrime()` | 1 (1) | 85 |
+| `public async Task GetPressed_AfterPrimeIsCanceledSynchronously_LaterReadStartsNewPrime()` | 1 (1) | 132 |
+| `[TestMethod]` | 3 (3) | 31 |
+| `[TestClass]` | 0 (0) | 0 |
+| `public partial class EngineToggleStateCoordinatorTests` | 1 (1) | 17 |
+| `var harness = new Harness();` | 3 (3) | 35 |
+| `new Mock<` | 0 (0) | 0 |
+| `MockBehavior` | 0 (0) | 0 |
+| `private sealed class` | 0 (0) | 0 |
+| `var handleCompletedDuringRead = true;` | 1 (1) | 39 |
+| `Task handleSeenDuringRead = null;` | 1 (1) | 37 |
+| `handleSeenDuringRead = harness.Coordinator.GetPrimeTask(SpamEngine);` | 1 (1) | 44 |
+| `handleCompletedDuringRead = handleSeenDuringRead.IsCompleted;` | 1 (1) | 45 |
+| `return Task.FromException<bool>(failure);` | 1 (1) | 46 |
+| `// Act` | 3 (3) | 49 |
+| `// Arrange` | 3 (3) | 34 |
+| `// Assert` | 3 (3) | 52 |
+| `.Should()` | 13 (ordering only) | 54 |
+| `must be registered before the activation read runs` | 1 (1) | 56 |
+| `await handleSeenDuringRead;` | 1 (1) | 59 |
+| `.NotBeSameAs(` | 1 (1) | 68 |
+| `a failed prime removes its marker before its handle completes` | 1 (1) | 70 |
+| `with no marker registered the returned handle is already complete` | 1 (1) | 74 |
+| `a faulted prime is reported exactly once` | 1 (1) | 60 |
+| `the sink receives the injected exception unchanged` | 2 (2) | 64 |
+| `.BeSameAs(failure` | 2 (2) | 64 |
+| `.ContainSingle(` | 3 (3) | 60 |
+| `SetupSequence(x => x.EngineActiveAsync(SpamEngine))` | 2 (2) | 91 |
+| `.Returns(Task.FromException<bool>(failure))` | 1 (1) | 92 |
+| `.Returns(Task.FromCanceled<bool>(new CancellationToken(true)))` | 1 (1) | 138 |
+| `.Returns(Task.FromResult(true));` | 2 (2) | 93 |
+| `harness.Coordinator.GetPressed(SpamEngine);` | 5 (5) | 50 |
+| `await harness.Coordinator.GetPrimeTask(SpamEngine);` | 2 (2) | 97 |
+| `var secondPrime = harness.Coordinator.GetPrimeTask(SpamEngine);` | 2 (2) | 99 |
+| `await secondPrime;` | 2 (2) | 100 |
+| `Times.Exactly(2),` | 2 (2) | 105 |
+| `a failed prime leaves no marker behind, so the later read starts a new prime` | 1 (1) | 106 |
+| `a canceled prime leaves no marker behind, so the later read starts a new prime` | 1 (1) | 152 |
+| `the new prime read the engine as active and cached that value` | 2 (2) | 111 |
+| `only the successful prime changed state to display` | 2 (2) | 116 |
+| `new[] { SpamToggleControlId },` | 2 (2) | 115 |
+| `.BeAssignableTo<OperationCanceledException>(` | 1 (1) | 168 |
+| `a canceled task carries no exception to unwrap, so one is synthesized` | 1 (1) | 169 |
+| `Regression for issue #944` | 1 (at least 1) | 22 |
+| `Invariant: the prime handle is registered before the activation read runs.` | 1 (1) | 23 |
+| `using Moq;` | 1 (1) | 6 |
+| `using System.Threading;` | 1 (1) | 2 |
+
+Ordering (test 1, by FIRST-LINE): 39 < 45 < 46 < 49 < 54 <= 56 < 59 < 70. Holds.

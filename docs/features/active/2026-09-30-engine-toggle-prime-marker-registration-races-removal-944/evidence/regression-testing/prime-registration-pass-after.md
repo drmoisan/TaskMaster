@@ -57,3 +57,20 @@ RESULT GetPressed_AfterPrimeIsCanceledSynchronously_LaterReadStartsNewPrime = Pa
 RESULT GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime = Passed
 RESULT GetPressed_AfterPrimeFaultsSynchronously_LaterReadStartsNewPrime = Passed
 No FAILED line. All seven NAMES-944 names Passed. Every P3-T7 clause holds.
+
+## PASS-2:
+
+FINAL-FIXTURE-RUN: (pass 2) P3-T7, pass 2, Timestamp: 2026-09-30T15-08. Command: vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:FullyQualifiedName~TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" "/ResultsDirectory:coverage\test-results\944\p3-t7" "/Logger:trx;LogFileName=p3-t7.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" (CMD-VSTEST, ASSEMBLY-TM, FILTER-COORD, NAMES-944), run on the assembly rebuilt by the pass-2 P3-T6 nullable rebuild from the committed tree at aac783905 (production and test files byte-identical to edc5c3af2). EXIT_CODE: 0.
+
+Output Summary:
+VSTEST_EXIT_CODE: 0 (15-08-31 to 15-08-33 UTC); TRX_PRESENT: True; SEQUENCE_FILES: 0
+COUNTERS total=28 executed=28 passed=28 failed=0 (failed 0; total 28 = BASELINE-TOTAL 25 plus 3)
+RESULT_COUNT: 28
+RESULT GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker = Passed
+RESULT GetPressed_AfterPrimeFaultsSynchronously_LaterReadStartsNewPrime = Passed
+RESULT GetPressed_WhenPrimeStarts_RegistersPrimeHandleBeforeActivationReadRuns = Passed
+RESULT GetPressed_AfterPrimeIsCanceledSynchronously_LaterReadStartsNewPrime = Passed
+RESULT GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime = Passed
+RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Passed
+RESULT GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse = Passed
+No FAILED line. All seven NAMES-944 names Passed. Every P3-T7 clause holds on pass 2. Substitution: output lines printed by string concatenation; values unchanged.
