@@ -3,9 +3,9 @@
 - **Issue:** #942
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-29T23-40
+- **Last Updated:** 2026-09-30T01-30
 - **Status:** Ready for planning
-- **Version:** 0.2
+- **Version:** 0.3
 
 > Formatting note for later editors: inline code spans around repository paths in this document are the change footprint. Only files listed under "Write Set" in the Scope section, and the evidence projections named in the Test Strategy section (which sit under that same feature folder), are backticked. Out-of-scope files are cited in plain prose on purpose; do not add backticks to them. Acceptance-criterion lines deliberately contain no digits, no angle brackets, and no percent signs; counts are written as words.
 
