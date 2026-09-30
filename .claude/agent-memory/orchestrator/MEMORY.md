@@ -240,3 +240,5 @@
 - [A bad switch may be INLINE, not upstream](plan-defect-may-be-inline-not-upstream.md)
 - [Run the failing class ALONE before blaming parallelism](run-the-failing-class-alone-before-blaming-parallelism.md)
 - [Build-lock: COORDINATOR-HOLD, waiter kill](shared-build-lock-coordinator-hold-and-waiter-kill.md)
+- [Planner prompts need issue + branch lines every round](planner-prompt-needs-issue-and-branch-lines-every-round.md)
+- [Clock via `git var GIT_COMMITTER_IDENT` when pwsh is refused](read-the-clock-with-git-var-when-pwsh-is-refused.md)
