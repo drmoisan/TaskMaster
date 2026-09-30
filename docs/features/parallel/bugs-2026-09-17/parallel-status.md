@@ -36,8 +36,8 @@ carry command tasks and both run msbuild and vstest, so they are serialized. See
 
 | issue_num | branch_name | worktree_path | complexity_band |
 | --- | --- | --- | --- |
-| 895 | `bug/fsharp-core-hintpath-netstandard21-skew-895` | `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a8bc4dc5978785885` | C3 |
-| 900 | `bug/breadcrumb-thread-affinity-tests-assume-taskrun-distinct-thread-900` | `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-acb02d4502ebff3b7` | C3 |
+| 895 | `bug/fsharp-core-hintpath-netstandard21-skew-895` | `<repo-root>/.claude/worktrees/agent-a8bc4dc5978785885` | C3 |
+| 900 | `bug/breadcrumb-thread-affinity-tests-assume-taskrun-distinct-thread-900` | `<repo-root>/.claude/worktrees/agent-acb02d4502ebff3b7` | C3 |
 
 ## Cohorts
 

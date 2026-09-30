@@ -7,7 +7,7 @@ dotnet-coverage collect "<vstest>" "<dll>" /InIsolation /TestCaseFilter:TestCate
 
 Where:
 VSTEST_PATH: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
-DISCOVERED_ASSEMBLY: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cd2e1147794981e\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (begins with the workspace root C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cd2e1147794981e)
+DISCOVERED_ASSEMBLY: <repo-root>\.claude\worktrees\agent-a1cd2e1147794981e\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (begins with the workspace root <repo-root>\.claude\worktrees\agent-a1cd2e1147794981e)
 
 EXIT_CODE: 1 (dotnet-coverage/vstest exit code; vstest reports non-zero when any test fails, consistent with the 17 pre-existing failures below, not with a tooling error)
 

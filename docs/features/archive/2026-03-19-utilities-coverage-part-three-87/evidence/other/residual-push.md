@@ -1,7 +1,7 @@
 # Evidence: Branch Push
 
 - **Timestamp:** 2026-03-27T08:22 UTC
-- **Command:** `git -C c:\Users\DanMoisan\repos\TaskMaster-residual-clean push -u origin chore/mixed-branch-excluded-work-clean`
+- **Command:** `git -C <user-profile>\repos\TaskMaster-residual-clean push -u origin chore/mixed-branch-excluded-work-clean`
 - **EXIT_CODE:** 0
 - **Branch:** chore/mixed-branch-excluded-work-clean
 - **Remote:** origin

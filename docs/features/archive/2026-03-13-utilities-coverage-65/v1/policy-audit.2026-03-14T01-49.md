@@ -56,7 +56,7 @@ The branch now passes format, analyzer, nullable, and full MSTest validation on 
 
 ## Appendix A — commands run during this review
 
-Check-only / validation commands executed from `C:\Users\DanMoisan\repos\TaskMaster`:
+Check-only / validation commands executed from `<repo-root>`:
 
 1. `dotnet format TaskMaster.sln --verify-no-changes --no-restore`
 2. `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`

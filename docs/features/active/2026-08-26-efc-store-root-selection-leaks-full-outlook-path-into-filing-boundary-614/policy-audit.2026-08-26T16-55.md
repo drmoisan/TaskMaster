@@ -287,7 +287,7 @@ git diff c279d40b..HEAD | grep -icE "<account>|<account-email>"   ->  0
 ```
 
 All host identifiers in added lines are fabricated placeholders (`\\mailbox@example.com`,
-`\\other@example.org`, `C:\Users\testuser\OneDrive - Contoso`). Verdict: **PASS**.
+`\\other@example.org`, `<user-profile>\OneDrive - Contoso`). Verdict: **PASS**.
 
 ## 8. Gaps and Exceptions
 

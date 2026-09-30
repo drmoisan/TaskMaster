@@ -1,5 +1,5 @@
 Timestamp: 2026-03-14T13-23
-Coverage Source: C:\Users\DanMoisan\repos\TaskMaster-2026-03-14T11-01\coverage\coverage.cobertura.xml
+Coverage Source: <user-profile>\repos\TaskMaster-2026-03-14T11-01\coverage\coverage.cobertura.xml
 
 | Exact File Path | Classification | Justification |
 | --- | --- | --- |

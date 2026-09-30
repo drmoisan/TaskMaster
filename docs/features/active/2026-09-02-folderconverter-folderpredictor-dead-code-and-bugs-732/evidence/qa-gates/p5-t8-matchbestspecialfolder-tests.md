@@ -11,5 +11,5 @@ EXIT_CODE: 0
 Output Summary:
 "Test Run Successful. Total tests: 9 Passed: 9." Failed: 0. Passed (9) equals the
 grep-derived N (9). TRX results file:
-coverage\trx\p5-t8\DanMoisan_MEGALODON4_2026-09-03_07_40_15_net481.trx (gitignored
+coverage\trx\p5-t8\<user>_<host>_2026-09-03_07_40_15_net481.trx (gitignored
 under coverage/*).

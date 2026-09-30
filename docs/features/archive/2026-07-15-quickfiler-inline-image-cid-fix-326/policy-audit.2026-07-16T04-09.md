@@ -168,7 +168,7 @@ context in which `N/A` is a permitted verdict per this audit's contract.
 ### Independent verification performed (raw `.coverage` conversion, not a re-run of test generation)
 
 A raw MSTest coverage file was already present at
-`TestResults/7c9c72aa-643c-43aa-9701-2f07730bcdc3/DanMoisan_MEGALODON4_2026-07-15.23_49_29.coverage`
+`TestResults/7c9c72aa-643c-43aa-9701-2f07730bcdc3/<user>_<host>_2026-07-15.23_49_29.coverage`
 (produced by the executor's own P4-T4 final run; this reviewer did not re-run tests or coverage
 generation). This reviewer converted it to Cobertura via
 `dotnet-coverage merge <file> -f cobertura -o <scratch>/final-coverage.cobertura.xml` (a
@@ -364,7 +364,7 @@ git diff --stat 6d4535c654f2768568ff48e79f64fb9eacfdf62c HEAD -- "QuickFiler/**/
 git diff --name-only 6d4535c654f2768568ff48e79f64fb9eacfdf62c HEAD | grep -E "^artifacts/(baselines|baseline|qa|qa-gates|evidence|coverage|regression-testing|post-change)/"
 grep -rn "InternalsVisibleTo" UtilitiesCS/Properties/AssemblyInfo.cs
 grep -n "ProjectReference" QuickFiler/QuickFiler.csproj
-dotnet-coverage merge TestResults/7c9c72aa-643c-43aa-9701-2f07730bcdc3/DanMoisan_MEGALODON4_2026-07-15.23_49_29.coverage -f cobertura -o <scratch>/final-coverage.cobertura.xml
+dotnet-coverage merge TestResults/7c9c72aa-643c-43aa-9701-2f07730bcdc3/<user>_<host>_2026-07-15.23_49_29.coverage -f cobertura -o <scratch>/final-coverage.cobertura.xml
 dotnet tool run csharpier check <8 touched .cs files>
 find . -iname "coverage.xml"
 ```

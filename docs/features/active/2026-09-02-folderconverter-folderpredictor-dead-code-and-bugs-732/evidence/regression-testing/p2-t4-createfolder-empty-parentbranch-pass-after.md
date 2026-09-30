@@ -9,5 +9,5 @@ Output Summary:
 "Test Run Successful. Total tests: 1 Passed: 1." Failed: 0. Confirms the GREEN half of
 the RED/GREEN pair required by AC5 -- the same test that failed in P1-T4 now passes
 after the P2-T1 fix. TRX results file:
-coverage\trx\p2-t4\DanMoisan_MEGALODON4_2026-09-03_07_32_15_net481.trx (gitignored
+coverage\trx\p2-t4\<user>_<host>_2026-09-03_07_32_15_net481.trx (gitignored
 under coverage/*).

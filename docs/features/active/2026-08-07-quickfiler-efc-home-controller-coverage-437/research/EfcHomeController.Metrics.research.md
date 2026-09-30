@@ -1,7 +1,7 @@
 # Research — `QuickFiler/Controllers/EfcHomeController.Metrics.cs`
 
 - **Feature:** `2026-08-07-quickfiler-efc-home-controller-coverage-437` (epic child F8, issue #437, parent epic #136)
-- **Production file:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeController.Metrics.cs`
+- **Production file:** `<repo-root>\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeController.Metrics.cs`
 - **Size:** 87 lines (limit 500 — compliant, see § 9)
 - **`[ExcludeFromCodeCoverage]`:** absent. The file is already inside the coverage denominator.
 - **Research date:** 2026-08-07
@@ -172,7 +172,7 @@ so the date/time half of the clock requirement is satisfied today and needs no n
 *Closes: line 23 (the only uncovered line) and the line-18 `moved.Count != 0` branch outcome.*
 
 - **Arrange.** Reuse `MetricsTests.CreateController(specialFolders, writer)` verbatim: it builds a
-  `FakeApplicationGlobals` carrying `{"MyDocuments": "C:/Users/Test/Documents"}`, an
+  `FakeApplicationGlobals` carrying `{"MyDocuments": "<user-profile>/Documents"}`, an
   `EfcHomeControllerDependencies` with a fixed `metricsNowFactory` and a recording
   `metricsLineWriter`, and constructs a real `EfcHomeController` through its internal constructor.
   Then supply a non-null `_stopWatch`, because that helper passes `mail: null`, so
@@ -200,7 +200,7 @@ so the date/time half of the clock requirement is satisfied today and needs no n
   (`Subject`, `ToRecipientsName`, `SenderName`, `SentDate` set on a plain `new MailItemHelper { ... }`).
 
 - **Assert.** The recording writer received exactly one call; `Filename == "metrics.csv"`;
-  `FolderRoot == "C:/Users/Test/Documents"`; and the single emitted line contains the duration
+  `FolderRoot == "<user-profile>/Documents"`; and the single emitted line contains the duration
   fields produced by an elapsed value of zero (`",0,0.00,"`), which proves the
   `_stopWatch.Elapsed.Seconds` argument actually flowed through line 23 rather than the test having
   silently taken the early-return path.

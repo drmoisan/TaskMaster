@@ -7,7 +7,7 @@ Command (actually executed): `csharpier check .`
 
 Tooling note: `dotnet tool run csharpier` is not resolvable in this environment (the repo-local dotnet
 SDK is absent and `dotnet tool run` reports the tool cannot be loaded). CSharpier is installed as a global
-.NET tool (`C:\Users\DanMoisan\.dotnet\tools\csharpier`, version 1.3.0). CSharpier v1 uses the `check`
+.NET tool (`<user-profile>\.dotnet\tools\csharpier`, version 1.3.0). CSharpier v1 uses the `check`
 subcommand as the non-mutating verification equivalent of the legacy `--check` flag. The invocation is
 functionally identical: it verifies formatting without writing files.
 

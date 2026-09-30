@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-04T10-12
 
-MCP inputs: `workspace_root = C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25`; `scan_folders = ["tests/scripts/vscode"]`.
+MCP inputs: `workspace_root = <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25`; `scan_folders = ["tests/scripts/vscode"]`.
 
 MCP result: `{"ok":true,"tool":"run_poshqc_test","summary":"Ran bundled PoshQC test against the requested workspace with 1 selected scan folder."}`
 

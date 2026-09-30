@@ -7,14 +7,14 @@ Timestamp: 2026-08-04T14-55
 
 Command: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-Restore.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU"`
 
-Working directory: repository root (`c:\Users\DanMoisan\source\repos\drmoisan\TaskMaster`)
+Working directory: repository root (`<user-profile>\source\repos\drmoisan\TaskMaster`)
 
 EXIT_CODE: 0
 
 Output Summary: Restore succeeded. MSBuild reported `Build succeeded.` with
 `1 Warning(s)` and `0 Error(s)`, elapsed `00:00:40.14`. NuGet reported
 `Installed: 91 package(s) to packages.config projects` into
-`C:\Users\DanMoisan\source\repos\drmoisan\TaskMaster\packages`. The single warning is a
+`<user-profile>\source\repos\drmoisan\TaskMaster\packages`. The single warning is a
 pre-existing vulnerability advisory unrelated to `SVGControl` or `SVGControl.Test`:
 
 ```text
@@ -36,13 +36,13 @@ Building solution configuration "Debug|Any CPU".
 
 NuGet config files used:
 
-- `C:\Users\DanMoisan\AppData\Roaming\NuGet\NuGet.Config`
+- `<user-profile>\AppData\Roaming\NuGet\NuGet.Config`
 - `C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.config`
 - `C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config`
 
 Feeds used:
 
-- `C:\Users\DanMoisan\.nuget\packages\`
+- `<user-profile>\.nuget\packages\`
 - `https://api.nuget.org/v3/index.json`
 - `C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\`
 

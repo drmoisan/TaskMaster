@@ -2,7 +2,7 @@ VSTest version 18.8.0 (x64)
 
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
+<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
   Passed SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscriptions [218 ms]
   Standard Output Messages:
       Warning:
@@ -57,4 +57,4 @@ Test Run Successful.
 Total tests: 19
      Passed: 19
  Total time: 3.7270 Seconds
-Results File: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing\nonnumeric-adapter-member-coverage-focused-pass-after.2026-07-27T06-31.trx
+Results File: <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing\nonnumeric-adapter-member-coverage-focused-pass-after.2026-07-27T06-31.trx

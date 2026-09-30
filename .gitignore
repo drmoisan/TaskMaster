@@ -140,6 +140,12 @@ _TeamCity*
 *.coverage
 *.coveragexml
 
+# Raw test-platform and coverage-collector documents are prohibited committed evidence
+# (CLAUDE.md, "Committed Test Evidence Format"). The CI hygiene guard rejects them by content;
+# these name patterns only stop an accidental git add.
+*.trx
+*cobertura*.xml
+
 # dotnet-coverage Cobertura output (read by Koverage extension)
 coverage/*
 !coverage/.gitkeep

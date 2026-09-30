@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T17-24Z
 
-Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.Part2.cs').Path; $tool='C:\Users\DanMoisan\.dotnet\tools\csharpier.exe'; & $tool format $file --log-level Information; $first=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; & $tool format $file --log-level Information; $second=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; & $tool check $file --log-level Information; $code=$LASTEXITCODE`
+Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.Part2.cs').Path; $tool='<user-profile>\.dotnet\tools\csharpier.exe'; & $tool format $file --log-level Information; $first=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; & $tool format $file --log-level Information; $second=(Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash; & $tool check $file --log-level Information; $code=$LASTEXITCODE`
 
 EXIT_CODE: 0
 

@@ -15,7 +15,7 @@ Method: loaded artifacts/csharp/coverage.xml as [xml] via PowerShell (Get-Conten
 
 === Example line elements for QfcHighConfidencePreFilter.cs ===
 Production file:
-  C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Controllers\QfcHighConfidencePreFilter.cs
+  <repo-root>\QuickFiler\Controllers\QfcHighConfidencePreFilter.cs
   example <line number="50" hits="1" />
   example <line number="65" hits="1" />
   example <line number="75" hits="1" />

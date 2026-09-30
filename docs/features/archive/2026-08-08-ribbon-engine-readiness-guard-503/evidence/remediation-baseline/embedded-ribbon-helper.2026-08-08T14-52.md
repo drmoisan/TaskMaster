@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P0-T3]
-Command: `pwsh -NoProfile -File <SCRATCH>\Assert-EmbeddedRibbon.ps1 -RepoRoot 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'`
+Command: `pwsh -NoProfile -File <SCRATCH>\Assert-EmbeddedRibbon.ps1 -RepoRoot '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'`
 EXIT_CODE: 0
 
 ## Why this helper exists

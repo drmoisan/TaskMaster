@@ -23,7 +23,7 @@ and per the repository's `policy-compliance-order` skill.
 ## Output Summary
 
 All five policy files were read in full from the item worktree
-`C:/Users/DanMoisan/repos/TaskMaster-wt/bugs-2026-09-11-item-742`.
+`<user-profile>/repos/TaskMaster-wt/bugs-2026-09-11-item-742`.
 
 Constraints carried into execution:
 

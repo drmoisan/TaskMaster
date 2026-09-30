@@ -22,14 +22,14 @@ Timestamp: 2026-08-04T14-45
 
 Command: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Install-RepoDotNetSdk.ps1`
 
-Working directory: repository root (`c:\Users\DanMoisan\source\repos\drmoisan\TaskMaster`)
+Working directory: repository root (`<user-profile>\source\repos\drmoisan\TaskMaster`)
 
 EXIT_CODE: 0
 
 Output Summary: Downloaded SDK `8.0.205` from
 `https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.205/dotnet-sdk-8.0.205-win-x64.zip`
 and extracted it. Script reported
-`Installed repo-local .NET SDK 8.0.205 to C:\Users\DanMoisan\source\repos\drmoisan\TaskMaster\.dotnet-sdk.`
+`Installed repo-local .NET SDK 8.0.205 to <user-profile>\source\repos\drmoisan\TaskMaster\.dotnet-sdk.`
 The version marker directory `.dotnet-sdk/sdk/8.0.205` exists on disk, satisfying the
 `global.json` pin (`sdk.version = 8.0.205`, `paths = [".dotnet-sdk", "$host$"]`).
 

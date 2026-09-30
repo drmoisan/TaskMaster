@@ -21,7 +21,7 @@
 ## Concurrency Note (environmental, flagged)
 
 A separate agent was concurrently running its own full MSTest+coverage suite in a sibling worktree
-(`C:\Users\DanMoisan\repos\TaskMaster-wt\utilitiescs-nullable-outlook-folder-store-365`). Source is
+(`<user-profile>\repos\TaskMaster-wt\utilitiescs-nullable-outlook-folder-store-365`). Source is
 isolated (distinct worktrees), but the two runs share global test tooling (vstest.console,
 dotnet-coverage, testhost) and the machine's CPU. Two earlier attempts aborted with
 "Test host process crashed" (partial results: 522 and 927 passed, 0 failed) purely from that

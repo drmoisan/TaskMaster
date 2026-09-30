@@ -112,7 +112,7 @@ populated; it is written in Phase 6.
 ### 1.3 Forbidden-path search
 
 - **SearchScope:** the whole worktree, specifically
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\artifacts\`
+  `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\artifacts\`
 - **SearchPatterns:** `artifacts/**` — in particular the forbidden evidence sub-paths
   `artifacts/baselines/`, `artifacts/baseline/`, `artifacts/qa/`, `artifacts/qa-gates/`,
   `artifacts/evidence/`, `artifacts/coverage/`, `artifacts/regression-testing/`,
@@ -265,7 +265,7 @@ the five enumerated by the amended AC-16.
 
 ### Forbidden-path search (final)
 
-- **SearchScope:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\artifacts\`
+- **SearchScope:** `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\artifacts\`
   and the entire worktree
 - **SearchPatterns:** `artifacts/**`, specifically `artifacts/baselines/`, `artifacts/baseline/`,
   `artifacts/qa/`, `artifacts/qa-gates/`, `artifacts/evidence/`, `artifacts/coverage/`,

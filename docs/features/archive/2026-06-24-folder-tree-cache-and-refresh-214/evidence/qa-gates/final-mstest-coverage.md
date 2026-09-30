@@ -1,13 +1,13 @@
 # Final MSTest Coverage
 
 Timestamp: 2026-06-24T19:13:08-04:00
-Command: C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe collect --output docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\final-coverage-repository.xml --output-format xml -- C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"TestCategory!=LiveOutlook" /ResultsDirectory:docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\coverage-results-repository
+Command: <user-profile>\.dotnet\tools\dotnet-coverage.exe collect --output docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\final-coverage-repository.xml --output-format xml -- C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"TestCategory!=LiveOutlook" /ResultsDirectory:docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\coverage-results-repository
 EXIT_CODE: 0
 Output Summary: PASS. MSTest coverage completed. Total tests: 4167; Passed: 4167; Failed: 0. Repository line coverage 82.91% (99030/119447 covered or partial lines) across 10 modules using module-level line attributes. final-coverage.runsettings was not used.
 
 VSTest Path: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
-Coverage Attachment: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-24-14-52\docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\coverage-results-repository\6cf41eab-ed21-4750-bd52-894e809827ba\DanMoisan_MEGALODON4_2026-06-24.19_11_08.coverage
-Merge Command: C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe merge --output docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\final-coverage-repository.xml --output-format xml <latest .coverage attachment>
+Coverage Attachment: <user-profile>\repos\TaskMaster-wt-2026-06-24-14-52\docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\coverage-results-repository\6cf41eab-ed21-4750-bd52-894e809827ba\<user>_<host>_2026-06-24.19_11_08.coverage
+Merge Command: <user-profile>\.dotnet\tools\dotnet-coverage.exe merge --output docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\final-coverage-repository.xml --output-format xml <latest .coverage attachment>
 Merge Exit Code: 0
 Coverage XML: docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\qa-gates\final-coverage-repository.xml
 Runsettings: final-coverage.runsettings was not used.

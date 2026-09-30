@@ -86,10 +86,10 @@ Two committed artifacts embed the reviewer's own workstation path and account na
 
 ```text
 plan.2026-09-05T15-47.md:42
-**Worktree root.** All other paths are relative to `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`.
+**Worktree root.** All other paths are relative to `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`.
 
 research/research.2026-09-05T16-10.md:6
-- Research root (worktree): `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`
+- Research root (worktree): `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`
 ```
 
 Cycle 1's policy audit recorded row 2.11 as PASS with the evidence "Evidence artifacts substitute

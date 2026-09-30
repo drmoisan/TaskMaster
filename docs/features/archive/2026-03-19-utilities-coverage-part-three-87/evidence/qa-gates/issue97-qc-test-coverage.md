@@ -1,7 +1,7 @@
 # Issue #97 QC: Test Coverage
 
 - **Timestamp:** 2026-03-26T18:22 EDT
-- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-issue97-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
+- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location '<user-profile>\repos\TaskMaster-issue97-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
 - **EXIT_CODE:** 1 (due to 14 pre-existing failures on `origin/development`, not caused by issue #97)
 - **Output Summary:**
   - Test Run: Total 2869, Passed 2853, Failed 14, Skipped 2
@@ -9,7 +9,7 @@
     - 11 in UtilitiesSwordfish.Test: ToBase10/ToBase36 conversion tests
     - 3 in ToDoModel.Test: Constructor/Property tests
   - **Issue #97 regression status:** Zero regressions. All QuickFiler.Test tests passed.
-  - Coverage artifact: `c:\Users\DanMoisan\repos\TaskMaster-issue97-clean\coverage\coverage.cobertura.xml`
+  - Coverage artifact: `<user-profile>\repos\TaskMaster-issue97-clean\coverage\coverage.cobertura.xml`
   - **QuickFiler package coverage (post-change):**
     - Line rate: 20.99%
     - Branch rate: 7.91%

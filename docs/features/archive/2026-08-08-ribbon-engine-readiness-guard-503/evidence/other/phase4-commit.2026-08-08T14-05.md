@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T14-05
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git add -A; git commit -m 'fix(#503): engine-readiness guard for engine-backed ribbon commands'; git status --porcelain; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git add -A; git commit -m 'fix(#503): engine-readiness guard for engine-backed ribbon commands'; git status --porcelain; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
 ```
 
 EXIT_CODE: 0

@@ -1,5 +1,5 @@
 Timestamp: 2026-04-08T11-39
-Reviewed File: c:\Users\DanMoisan\repos\TaskMaster\change-plan.md
+Reviewed File: <repo-root>\change-plan.md
 Review Result:
 - `change-plan.md` was reviewed before executing the approved small-path plan.
 - The current repository-wide change plan concerns Codex/MCP runtime migration work and does not replace or expand this bug-specific minor-audit plan.

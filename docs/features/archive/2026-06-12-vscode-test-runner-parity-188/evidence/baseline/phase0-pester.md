@@ -2,7 +2,7 @@
 
 Timestamp: 2026-06-12T18-24
 
-Command: mcp__drm-copilot__run_poshqc_test (workspace_root=c:\Users\DanMoisan\repos\TaskMaster, scan_folders=["tests/scripts/vscode"]); cross-checked with `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/scripts/vscode' -Output Detailed"`
+Command: mcp__drm-copilot__run_poshqc_test (workspace_root=<repo-root>, scan_folders=["tests/scripts/vscode"]); cross-checked with `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/scripts/vscode' -Output Detailed"`
 
 EXIT_CODE: 1
 

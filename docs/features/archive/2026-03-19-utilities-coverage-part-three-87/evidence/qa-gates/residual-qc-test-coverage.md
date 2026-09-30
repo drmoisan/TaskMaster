@@ -1,7 +1,7 @@
 # Evidence: QA Test + Coverage
 
 - **Timestamp:** 2026-03-27T08:18 UTC
-- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-residual-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
+- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location '<user-profile>\repos\TaskMaster-residual-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
 - **EXIT_CODE:** 0
 - **Output Summary:**
 

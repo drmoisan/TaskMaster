@@ -2,7 +2,7 @@
 
 Timestamp: 2026-06-12T18-36
 
-Command: mcp__drm-copilot__run_poshqc_analyze (workspace_root=c:\Users\DanMoisan\repos\TaskMaster, scan_folders=["scripts/vscode", "tests/scripts/vscode"])
+Command: mcp__drm-copilot__run_poshqc_analyze (workspace_root=<repo-root>, scan_folders=["scripts/vscode", "tests/scripts/vscode"])
 
 EXIT_CODE: 1 (pre-existing folder-wide baseline debt; not a regression)
 

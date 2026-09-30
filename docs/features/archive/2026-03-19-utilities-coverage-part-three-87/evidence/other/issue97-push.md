@@ -1,7 +1,7 @@
 # Issue #97 Push
 
 - **Timestamp:** 2026-03-26T18:26 EDT
-- **Command:** `git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean push -u origin bug/getmovediagnostics-null-guard-97-clean`
+- **Command:** `git -C <user-profile>\repos\TaskMaster-issue97-clean push -u origin bug/getmovediagnostics-null-guard-97-clean`
 - **EXIT_CODE:** 0
 - **Branch:** bug/getmovediagnostics-null-guard-97-clean
 - **Remote:** origin

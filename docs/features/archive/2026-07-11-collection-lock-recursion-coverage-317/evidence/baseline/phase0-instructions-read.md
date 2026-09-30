@@ -9,12 +9,12 @@ Timestamp: 2026-07-11T19-40
 3. `.claude/rules/general-unit-test.md`
 4. `.claude/rules/csharp.md`
 
-## Files Read (feature worktree `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317`)
+## Files Read (feature worktree `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317`)
 
-1. `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/CLAUDE.md`
-2. `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/.claude/rules/general-code-change.md`
-3. `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/.claude/rules/general-unit-test.md`
-4. `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/.claude/rules/csharp.md`
+1. `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/CLAUDE.md`
+2. `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/.claude/rules/general-code-change.md`
+3. `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/.claude/rules/general-unit-test.md`
+4. `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/.claude/rules/csharp.md`
 
 ## Quoted Sections
 

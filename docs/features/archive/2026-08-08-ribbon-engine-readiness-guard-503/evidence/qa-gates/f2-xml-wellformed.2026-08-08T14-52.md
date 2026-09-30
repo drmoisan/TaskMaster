@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P2-T3]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; [xml]$d = Get-Content 'TaskMaster\Ribbon\RibbonExplorer.xml' -Raw; $d.DocumentElement.LocalName; $d.DocumentElement.NamespaceURI"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; [xml]$d = Get-Content 'TaskMaster\Ribbon\RibbonExplorer.xml' -Raw; $d.DocumentElement.LocalName; $d.DocumentElement.NamespaceURI"`
 EXIT_CODE: 0
 
 ## Output Summary

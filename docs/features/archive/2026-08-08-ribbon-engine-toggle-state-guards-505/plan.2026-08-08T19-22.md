@@ -10,7 +10,7 @@
 - **Branch:** `bug/ribbon-engine-toggle-state-guards-505`
 - **Base:** `origin/main`
 - **Merge-base:** `f910ff2f`
-- **Feature folder:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\`
+- **Feature folder:** `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\`
 
 **Fail-closed evidence rule:** Every baseline, regression, QA-gate, and coverage-comparison artifact named in this plan is mandatory. If any required artifact is missing or is missing a required field, the outcome is BLOCKED or INCOMPLETE, never PASS.
 
@@ -36,11 +36,11 @@ Expected outcome: one new host-neutral `internal sealed EngineToggleStateCoordin
 
 | Token | Value |
 |---|---|
-| `<REPO>` | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f` |
+| `<REPO>` | `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f` |
 | `<FEATURE>` | `<REPO>\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505` |
 | `<MERGE_BASE>` | `f910ff2f` (the full 40-character SHA is recorded by P0-T4 and used verbatim thereafter) |
 | `<TS>` | ISO-8601 capture timestamp in `yyyy-MM-ddTHH-mm` form, substituted at write time |
-| `<CSHARPIER>` | `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe` |
+| `<CSHARPIER>` | `<user-profile>\.dotnet\tools\csharpier.exe` |
 | `<MSBUILD>` | `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe` |
 | `<VSTEST>` | `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe` |
 

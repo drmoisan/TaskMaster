@@ -4,7 +4,7 @@
 - Reviewer: feature-reviewer (authoritative feature-review)
 - Branch under review: `feature/taskvisualization-secondary-testability-298` @ `f2d2d476b507ef4fb713d54d7c39575989f7f433`
 - Diff base: `epic/winforms-testability-refactor-integration` @ `949dddd2df0df4511fcc0ff44c4d77c38821c54c` (merge-base = integration head; clean linear descendant)
-- Diff command: `git -C C:/Users/DanMoisan/repos/TaskMaster-wt/winforms-298 diff 949dddd2df0df4511fcc0ff44c4d77c38821c54c...HEAD`
+- Diff command: `git -C <user-profile>/repos/TaskMaster-wt/winforms-298 diff 949dddd2df0df4511fcc0ff44c4d77c38821c54c...HEAD`
 - Work mode: `full-feature` (AC sources = `spec.md` Definition of Done/alignment + `issue.md` `## Acceptance Criteria`; `user-story.md` intentionally absent per `spec.md` "User Story Applicability")
 
 ## Executive Summary

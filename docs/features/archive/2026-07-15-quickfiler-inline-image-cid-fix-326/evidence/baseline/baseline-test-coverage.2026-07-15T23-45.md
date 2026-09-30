@@ -11,7 +11,7 @@
 ## Coverage Conversion
 
 The `.coverage` binary output
-(`TestResults/65053df9-8568-497e-a4ea-806d85f5e840/DanMoisan_MEGALODON4_2026-07-15.23_32_41.coverage`)
+(`TestResults/65053df9-8568-497e-a4ea-806d85f5e840/<user>_<host>_2026-07-15.23_32_41.coverage`)
 was converted to Cobertura XML via
 `Microsoft.CodeCoverage.Console.exe merge <file> --output <out>.cobertura.xml --output-format cobertura`
 (Microsoft.CodeCoverage.Console v18.7.0.0) to extract numeric per-assembly line-coverage percentages.

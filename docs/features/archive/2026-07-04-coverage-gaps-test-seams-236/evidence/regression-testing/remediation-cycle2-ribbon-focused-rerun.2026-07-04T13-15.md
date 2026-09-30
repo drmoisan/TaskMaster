@@ -10,7 +10,7 @@ VSTest version 18.7.0 (x64)
 
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ToggleHighConfidenceMode_FlipsStoredValue [310 ms]
 
 Test Run Successful.

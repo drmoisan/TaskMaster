@@ -8,7 +8,7 @@
   artifact is folded into `spec.md`.
 - **Feature:** F6 `quickfiler-qfc-form-explorer-controller-coverage`, issue #435, epic #136, wave 1, band C3.
 - **File under research:**
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcExplorerController.cs`
+  `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcExplorerController.cs`
 - **Exact line count:** 323 lines (line 323 is the closing namespace brace). Matches the epic's
   Feature File Assignments entry (`Controllers/QfcExplorerController.cs` (323) `[X]`).
 - **Compiled:** yes — `QuickFiler/QuickFiler.csproj:316`

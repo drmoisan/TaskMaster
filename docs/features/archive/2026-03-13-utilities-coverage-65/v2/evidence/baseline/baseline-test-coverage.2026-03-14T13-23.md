@@ -9,5 +9,5 @@ Output Summary:
 - Failed: 0
 - Skipped: 3
 - Total time: 23.8433 seconds
-- Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster-2026-03-14T11-01\coverage\coverage.cobertura.xml
+- Coverage artifact: <user-profile>\repos\TaskMaster-2026-03-14T11-01\coverage\coverage.cobertura.xml
 - OutlookObjects baseline coverage headline: 19.31% line coverage

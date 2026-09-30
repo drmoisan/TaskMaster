@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-25T03-31Z
 
-Command: `mcp__drm-copilot__run_poshqc_analyze(workspace_root="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25", scan_folders=["scripts/vscode","tests/scripts/vscode"])`
+Command: `mcp__drm-copilot__run_poshqc_analyze(workspace_root="<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25", scan_folders=["scripts/vscode","tests/scripts/vscode"])`
 
 EXIT_CODE: 0
 

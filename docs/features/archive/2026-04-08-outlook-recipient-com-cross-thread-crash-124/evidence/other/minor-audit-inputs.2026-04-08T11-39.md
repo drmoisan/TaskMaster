@@ -1,7 +1,7 @@
 Timestamp: 2026-04-08T11-39
 Work Mode: minor-audit
-Requirements Source: c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-08-outlook-recipient-com-cross-thread-crash-124\issue.md
-Plan Path: c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-08-outlook-recipient-com-cross-thread-crash-124\plan.2026-04-08T00-00.md
+Requirements Source: <repo-root>\docs\features\active\2026-04-08-outlook-recipient-com-cross-thread-crash-124\issue.md
+Plan Path: <repo-root>\docs\features\active\2026-04-08-outlook-recipient-com-cross-thread-crash-124\plan.2026-04-08T00-00.md
 Acceptance Criteria Section Present: Yes (`## Acceptance Criteria`)
 Acceptance Criteria (verbatim):
 - [ ] `MailItemHelper` no longer relies on background `Task.Run` evaluation of Outlook COM-backed lazy sender/recipient properties during the `ProcessMailItemAsync` tokenization path.

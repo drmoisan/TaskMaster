@@ -1,6 +1,6 @@
 Using vstest.console: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
 Discovered 9 test assemblies.
-Coverage output: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\docs\features\active\2026-08-26-qfc-remove-stackmoveditems-parameter-629\evidence\qa-gates\p2-t5-final-coverage.cobertura.xml
+Coverage output: <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\docs\features\active\2026-08-26-qfc-remove-stackmoveditems-parameter-629\evidence\qa-gates\p2-t5-final-coverage.cobertura.xml
 dotnet-coverage v18.10.0.0 [win-x64 - .NET 10.0.11]
 
 SessionId: e8d90f3f-759b-4475-b8f4-d2a01a0b8895
@@ -8,7 +8,7 @@ VSTest version 18.9.0 (x64)
 
 Starting test execution, please wait...
 A total of 9 test files matched the specified pattern.
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed CreateAsync_PublicWrapper_UsesInjectedDefaultDependencies [185 ms]
   Passed LoadFinderAsync_PublicWrapper_UsesInjectedDefaultDependencies [2 ms]
   Passed Run_WithoutMail_ShowsMessageThroughInjectedSeam [6 ms]
@@ -1314,7 +1314,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed EfcViewerQueue_Dequeue_UsesInjectedCoreAndRestoresReplacementCount [< 1 ms]
   Passed ItemViewerQueue_BuildMethods_DelegateToInjectedCore [< 1 ms]
   Passed ItemViewerQueue_DequeueAndChunk_DelegateToInjectedCore [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\SVGControl.Test\bin\Debug\SVGControl.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\SVGControl.Test\bin\Debug\SVGControl.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed EfcViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
   Passed ItemViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
   Passed EfcViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults [< 1 ms]
@@ -1386,7 +1386,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed SetDefaultImage_OnASelector_LeavesTheRendererDocumentNonNull [374 ms]
   Passed TryGetSvgDocument_WithNullPayload_ThrowsArgumentNullException [< 1 ms]
   Passed TryGetSvgDocument_WithMalformedBytes_ReturnsFalseAndCapturesTheException [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed DefaultImageConstructor_DoesNotThrow [< 1 ms]
   Passed UseDefaultImageSetterToFalse_DoesNotThrowAndRecordsTheNewValue [1 ms]
   Passed TryGetSvgDocument_WithEmptyBytes_ReturnsFalseAndCapturesAnXmlException [1 ms]
@@ -1453,7 +1453,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed SearchTextKeyDown_OnDown_MovesFocusToFirstOption [< 1 ms]
   Passed SearchTextKeyUp_OnEnter_TriggersOkExit [< 1 ms]
   Passed SelectPageDown_WhenScrollFits_DoesNothing [1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed DrawFocus_DefaultBody_DrawsFocusRectangleOnUnshownCheckBox [318 ms]
   Passed SelectPageDown_WhenNoRowBelowViewport_SelectsLastControl [2 ms]
   Passed SelectPageDown_WhenRowBelowViewport_ScrollsToIt [6 ms]
@@ -1834,7 +1834,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed EmitPerStoreInboxAttribution_RevertsContext_EvenWhenGetDefaultFolderThrows [< 1 ms]
   Passed LoadAsync_AssignsStoresWrapperFromConfigAndCompletes [2 ms]
   Passed LoadStoresAsync_WhenConfigMissing_BuildsFreshStoresWrapper [1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed LoadStoresAsync_WhenConfigDeserializesToNull_BuildsFreshStoresWrapper [2 ms]
   Passed LoadStoresAsync_WhenDeserializeThrows_AbsorbsExceptionAndLeavesStoresWrapperNull [3 ms]
   Passed BuildFreshStoresWrapper_WhenLiveStoresAvailable_ReturnsInitializedWrapper [19 ms]
@@ -1888,7 +1888,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed HandleModelCanDrop_DropOnSelf_SetsNoneEffect [3 ms]
   Passed HandleModelCanDrop_ReorderAboveItem_SetsMoveEffect [< 1 ms]
   Passed HandleModelCanDrop_BackgroundAllRoots_SaysAlreadyRoots [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed HandleModelCanDrop_DropOnDescendant_SaysParadox [< 1 ms]
   Passed HandleModelDropped_DefaultLocation_ReturnsEarly [1 ms]
   Passed TreeLvActivateItem_WhenUnsupportedType_FiresMessageSeam [61 ms]
@@ -2048,7 +2048,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed AssignPeople_Cancel_LeavesStateUnchanged [14 ms]
   Passed AssignPeople_PassesOutlookItemWrapper_NotInnerObject [10 ms]
   Passed ToggleXlGroupNav_Off_TogglesSectorTipsWithoutThrowing [23 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed AssignContext_Selection_UpdatesActiveAndFacade [15 ms]
   Passed AssignProject_Selection_UpdatesActiveFacadeAndProgram [10 ms]
   Passed AssignTopic_Selection_UpdatesActiveAndFacade [15 ms]
@@ -2177,7 +2177,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed SetProjectId_ChangeConfirmedYes_UpdatesProjectId [12 ms]
   Passed SetProjectId_ChangeConfirmedNo_LeavesProjectIdUnchanged [19 ms]
   Passed SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction [28 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed SetProjectId_ChangeConfirmedNo_WithUpdateAction_DoesNotInvokeAction [11 ms]
   Passed CompareTo_EqualOrdinalThenShorterOtherLength_ReturnsNegativeOne [< 1 ms]
   Passed CompareTo_EqualOrdinalThenLongerOtherLength_ReturnsPositiveOne [< 1 ms]
@@ -6958,7 +6958,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\wor
   Passed ArrayToDatatable_WithHeadersAndNestedValues_BuildsExpectedTable [< 1 ms]
   Passed ArrayToDatatable_WithHeaderLengthMismatch_ThrowsArgumentException [< 1 ms]
   Passed ToFormattedTextAndMarkdown_ForTwoDimensionalArray_RenderAllPrimitiveCells [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed DataFramePrettyHelpers_RenderRowsMarkdownAndConsoleOutput [1 ms]
   Passed ArrayToDatatable_WithoutHeaders_BuildsDefaultColumns [< 1 ms]
   Passed ToFormattedText_WithTitleOnlyAndLongTitle_WrapsInsertedEmptyMessageRow [< 1 ms]
@@ -6971,7 +6971,7 @@ Test Run Successful.
 Total tests: 6949
      Passed: 6949
  Total time: 32.6907 Seconds
-Code coverage results: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\docs\features\active\2026-08-26-qfc-remove-stackmoveditems-parameter-629\evidence\qa-gates\p2-t5-final-coverage.cobertura.xml.
+Code coverage results: <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\docs\features\active\2026-08-26-qfc-remove-stackmoveditems-parameter-629\evidence\qa-gates\p2-t5-final-coverage.cobertura.xml.
 Post-processing coverage XML for Koverage compatibility...
-Done. Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af0f8e9da64a25da0\docs\features\active\2026-08-26-qfc-remove-stackmoveditems-parameter-629\evidence\qa-gates\p2-t5-final-coverage.cobertura.xml
+Done. Coverage artifact: <repo-root>\.claude\worktrees\agent-af0f8e9da64a25da0\docs\features\active\2026-08-26-qfc-remove-stackmoveditems-parameter-629\evidence\qa-gates\p2-t5-final-coverage.cobertura.xml
 EXIT_CODE: 0

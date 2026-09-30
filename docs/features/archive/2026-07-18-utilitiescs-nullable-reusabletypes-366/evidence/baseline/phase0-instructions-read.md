@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and standards)
 
 Files read (all four, in required order):
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-aac70fb1e66a2e16a/CLAUDE.md
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-aac70fb1e66a2e16a/.claude/rules/general-code-change.md
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-aac70fb1e66a2e16a/.claude/rules/general-unit-test.md
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-aac70fb1e66a2e16a/.claude/rules/csharp.md
+- <repo-root>/.claude/worktrees/agent-aac70fb1e66a2e16a/CLAUDE.md
+- <repo-root>/.claude/worktrees/agent-aac70fb1e66a2e16a/.claude/rules/general-code-change.md
+- <repo-root>/.claude/worktrees/agent-aac70fb1e66a2e16a/.claude/rules/general-unit-test.md
+- <repo-root>/.claude/worktrees/agent-aac70fb1e66a2e16a/.claude/rules/csharp.md
 
 Also read for scope compliance:
 - docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/plan.2026-07-18T22-04.md (approved plan; Scope Invariants section)

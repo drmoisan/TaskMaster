@@ -54,21 +54,21 @@
 
 ### Phase 0 — Policy Reads and Remediation Baseline
 
-- [x] [P0-T1] Read `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\CLAUDE.md`
+- [x] [P0-T1] Read `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\CLAUDE.md`
       in full (this worktree's copy, not any other worktree path). Acceptance: file read
       confirmed and its C# coverage exemption clause (UT2, 80% testable-denominator floor / 90%
       new-code) and 500-line file limit (§4.1) are recorded verbatim in
       `docs/features/active/2026-07-07-store-disable-service-261/evidence/remediation-baseline/phase0-instructions-read.md`.
-- [x] [P0-T2] Read `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-code-change.md`
+- [x] [P0-T2] Read `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-code-change.md`
       in full. Acceptance: file read confirmed and appended to the same
       `phase0-instructions-read.md` artifact with `Timestamp:` and `Policy Order:` fields.
-- [x] [P0-T3] Read `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-unit-test.md`
+- [x] [P0-T3] Read `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-unit-test.md`
       in full. Acceptance: file read confirmed and appended to the same artifact; note in the
       artifact that this remediation follows CLAUDE.md's explicit COM/VSTO coverage-exemption
       thresholds (already the established baseline for this feature per `spec.md` AC15 delivery
       annotations), not the generic 85%/75% figures in this file, per the Policy Compliance Order
       precedence (CLAUDE.md first).
-- [x] [P0-T4] Read `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\csharp.md`
+- [x] [P0-T4] Read `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\csharp.md`
       in full. Acceptance: file read confirmed and appended to the same artifact, completing the
       explicit list of files read required by the Phase 0 contract.
 - [x] [P0-T5] Capture the current line count of

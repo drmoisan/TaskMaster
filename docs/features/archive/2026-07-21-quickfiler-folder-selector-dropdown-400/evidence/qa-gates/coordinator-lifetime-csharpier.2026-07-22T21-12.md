@@ -2,7 +2,7 @@
 
 Timestamp: `2026-07-22T21:12:00-04:00`
 
-Command: `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe format <three P6 batch-A production files and three approved tests>` repeated twice, followed by `csharpier.exe check` over the same six files.
+Command: `<user-profile>\.dotnet\tools\csharpier.exe format <three P6 batch-A production files and three approved tests>` repeated twice, followed by `csharpier.exe check` over the same six files.
 
 Result: PASS. Both format commands and the final check returned exit code `0`. The final files and SHA-256 hashes were:
 

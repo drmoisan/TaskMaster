@@ -8,9 +8,9 @@ A runtime (non-compile) red is structurally impossible for #503 because the defe
 
 ## Search record
 
-- SearchScope: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\evidence\regression-testing\`
+- SearchScope: `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\evidence\regression-testing\`
 - SearchPatterns: `fail-before-*.md`
-- SearchResult: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\evidence\regression-testing\fail-before-503.2026-08-08T13-22.md`
+- SearchResult: `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\evidence\regression-testing\fail-before-503.2026-08-08T13-22.md`
 
 ## Alternative proof
 

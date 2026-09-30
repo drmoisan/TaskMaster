@@ -3,7 +3,7 @@
 ## 1. Header
 
 - **Timestamp:** `2026-08-07T22-00`
-- **Production file:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.cs`
+- **Production file:** `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.cs`
 - **Exact line count:** 196 lines (verified by full read; last line `196` is the closing namespace brace)
 - **`[ExcludeFromCodeCoverage]`:** **NO.** The file contains no `ExcludeFromCodeCoverage` attribute anywhere. The type is declared `internal partial class QfcFormController : IQfcFormController` (line 19) with no attribute list.
 - **Epic child:** F6 (`quickfiler-qfc-form-explorer-controller-coverage`, issue #435), wave 1, band C3.
@@ -318,8 +318,8 @@ F1 (`quickfiler-coverage-denominator-and-exemption-ledger`, wave 0, C3) is the s
 
 Both scripts were read and exist:
 
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.ps1` (349 lines)
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1`
+- `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.ps1` (349 lines)
+- `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1`
 
 Command (run from repo root; `-CoverageOutput` is resolved relative to the repo root by `Join-Path $repoRoot $CoverageOutput` at line 308):
 

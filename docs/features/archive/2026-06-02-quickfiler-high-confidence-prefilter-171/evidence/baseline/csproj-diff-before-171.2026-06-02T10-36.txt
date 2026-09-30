@@ -26,7 +26,7 @@ index 790f9e3e..e103e33b 100644
 +    </NuGetPackageImportStamp>
      <IsWebBootstrapper>False</IsWebBootstrapper>
      <BootstrapperEnabled>true</BootstrapperEnabled>
-     <PublishUrl>C:\Users\DanMoisan\OneDrive - The Real Good Food Company\TM\</PublishUrl>
+     <PublishUrl><user-profile>\OneDrive - The Real Good Food Company\TM\</PublishUrl>
 @@ -498,15 +492,14 @@
    </ItemGroup>
    <PropertyGroup>

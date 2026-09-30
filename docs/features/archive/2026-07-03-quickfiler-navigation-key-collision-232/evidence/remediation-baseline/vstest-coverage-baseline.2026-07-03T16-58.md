@@ -35,4 +35,4 @@ Output Summary:
   - `QuickFiler.Controllers.QfcHighConfidencePreFilter.<>c__DisplayClass1_0` = 1
   - `QuickFiler.Controllers.QfcHighConfidencePreFilter.<FilterAsync>d__1` = 1
   - `QuickFiler.Controllers.QfcHighConfidencePreFilter.<>c__DisplayClass1_0.<<FilterAsync>b__0>d` = 1
-- Generated baseline XML: `<scratchpad>\results-baseline\d07e2ba8-46be-47d7-bcbb-da99d0dacd7a\DanMoisan_MEGALODON4_2026-07-03.17_09_38.cobertura.xml`
+- Generated baseline XML: `<scratchpad>\results-baseline\d07e2ba8-46be-47d7-bcbb-da99d0dacd7a\<user>_<host>_2026-07-03.17_09_38.cobertura.xml`

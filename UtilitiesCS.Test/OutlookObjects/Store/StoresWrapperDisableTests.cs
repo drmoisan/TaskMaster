@@ -64,7 +64,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
         {
             var store = CreateStore(
                 "Workspace",
-                @"C:\Users\Dan\GOOGLE\Google Apps Sync\sync.ost",
+                @"C:\Fixtures\testuser\GOOGLE\Google Apps Sync\sync.ost",
                 "user@example.com"
             );
 

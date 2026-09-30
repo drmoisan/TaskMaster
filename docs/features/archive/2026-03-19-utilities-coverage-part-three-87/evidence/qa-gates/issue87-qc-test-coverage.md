@@ -2,12 +2,12 @@
 
 - **Timestamp:** 2026-03-27T02:23 UTC
 - **Branch:** `feature/utilities-coverage-part-three-87-clean`
-- **Worktree:** `c:\Users\DanMoisan\repos\TaskMaster-issue87-clean`
-- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-issue87-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
+- **Worktree:** `<user-profile>\repos\TaskMaster-issue87-clean`
+- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location '<user-profile>\repos\TaskMaster-issue87-clean'; pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug"`
 - **EXIT_CODE:** 0
 - **Output Summary:**
   - **Total tests:** 3367 | **Passed:** 3365 | **Skipped:** 2 | **Failed:** 0
-  - **Coverage artifact:** `c:\Users\DanMoisan\repos\TaskMaster-issue87-clean\coverage\coverage.cobertura.xml`
+  - **Coverage artifact:** `<user-profile>\repos\TaskMaster-issue87-clean\coverage\coverage.cobertura.xml`
   - **Repository-wide line coverage:** 70.41%
   - **Repository-wide branch coverage:** 54.16%
   - **UtilitiesCS line coverage:** 69.64%

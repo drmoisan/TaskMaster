@@ -8,7 +8,7 @@ Command: vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Enabl
 
 EXIT_CODE: 0
 
-Output Summary: Total tests: 488. Passed: 488. Failed: 0. Total time: 8.35 seconds. Coverage attachment: `TestResults/a795de02-37e9-43c0-af26-1fde57a37e47/DanMoisan_MEGALODON4_2026-07-06.23_36_12.coverage`. Test count increased from the baseline's 486 to 488 (the two new `QfcCollectionControllerDarkModeTests` regression tests); no other test count change.
+Output Summary: Total tests: 488. Passed: 488. Failed: 0. Total time: 8.35 seconds. Coverage attachment: `TestResults/a795de02-37e9-43c0-af26-1fde57a37e47/<user>_<host>_2026-07-06.23_36_12.coverage`. Test count increased from the baseline's 486 to 488 (the two new `QfcCollectionControllerDarkModeTests` regression tests); no other test count change.
 
 Numeric post-change coverage headline: converted via `dotnet-coverage merge <file> -f cobertura -o ...`. Archived at `docs/features/active/2026-07-06-quickfiler-darkmode-stale-subscription-251/evidence/qa-gates/coverage-xml/final-coverage.cobertura.xml`.
 

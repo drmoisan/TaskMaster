@@ -8,7 +8,7 @@
 ## Diff anchor used (stated verbatim for later readers)
 
 ```
-git -C C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a3324f355df219b0e diff b13d5b7b HEAD
+git -C <repo-root>/.claude/worktrees/agent-a3324f355df219b0e diff b13d5b7b HEAD
 ```
 
 Two-dot, against `b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0`. That SHA is simultaneously the current

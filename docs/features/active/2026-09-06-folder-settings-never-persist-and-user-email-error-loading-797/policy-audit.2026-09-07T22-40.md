@@ -20,7 +20,7 @@ The `policy-audit-template-usage` skill names the MCP tool `mcp__drm-copilot__re
 The caller supplied the branch diff in a form restricted by file type. The relevant caller text, verbatim:
 
 > THE DIFF, PRE-GENERATED FOR YOU:
-> C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a46162b1321fb4a50/artifacts/797-source-review.patch
+> <repo-root>/.claude/worktrees/agent-a46162b1321fb4a50/artifacts/797-source-review.patch
 > That file is `git diff origin/main HEAD` restricted to `*.cs` and `*.csproj`. It is 82274 bytes and is the complete and authoritative source footprint of this change against `main`.
 
 and

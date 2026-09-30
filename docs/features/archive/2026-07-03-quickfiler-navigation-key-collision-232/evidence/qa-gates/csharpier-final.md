@@ -6,7 +6,7 @@ Command: `csharpier format .`
 (Preceded by `csharpier check .` which reported `Checked 1232 files` with zero files requiring
 formatting.)
 
-Tooling note: The globally installed CSharpier v1.3.0 (`C:\Users\DanMoisan\.dotnet\tools\csharpier`)
+Tooling note: The globally installed CSharpier v1.3.0 (`<user-profile>\.dotnet\tools\csharpier`)
 is used, as at baseline. CSharpier v1 uses the `check`/`format` subcommands.
 
 EXIT_CODE: 0

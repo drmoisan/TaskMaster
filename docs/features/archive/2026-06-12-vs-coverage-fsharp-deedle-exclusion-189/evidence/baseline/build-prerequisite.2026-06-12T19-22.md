@@ -14,6 +14,6 @@ Output Summary:
 - Resolved `vstest.console.exe` (vswhere `-latest -products *`, mirroring `Invoke-MSTestWithCoverage.ps1` lines 115-123):
   `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe`
 - Resolved `UtilitiesCS.Test.dll` (discovery mirroring lines 129-135, a `*.Test.dll` under `bin\Debug\`):
-  `c:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll`
+  `<repo-root>\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll`
   (2,843,136 bytes, dated Jun 12 18:31 — already built; no rebuild required).
 - Build/discovery check succeeded. No new build logic authored; the existing artifact under `bin\Debug\` was used.

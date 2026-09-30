@@ -26,13 +26,13 @@
 
 ## Conventions Used in This Plan
 
-- `FEATURE` = `docs/features/active/2026-08-14-ci-parallel-job-split-553` (relative to the repository root `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-14T09-01`).
+- `FEATURE` = `docs/features/active/2026-08-14-ci-parallel-job-split-553` (relative to the repository root `<user-profile>\repos\TaskMaster-wt\2026-08-14T09-01`).
 - `<TS>` = execution-time ISO-8601 timestamp in the form `yyyy-MM-ddTHH-mm` per `evidence-and-timestamp-conventions`.
 - All evidence artifacts go to `FEATURE/evidence/<kind>/` (canonical scheme). Every command-step evidence artifact records `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
 - All commands run from the repository root unless stated otherwise. Shell is PowerShell (`pwsh`); `gh` commands run identically from PowerShell. `jq` is NOT installed in this environment and must not be used; JSON manipulation uses `ConvertFrom-Json` / `ConvertTo-Json -Depth 20` (the default depth of 2 truncates nested objects). The only permitted `--jq` usage is the filter argument built into `gh api --jq`, which is compiled into `gh`.
 - `BASELINE_SHA` = the commit recorded by P0-T2. Diff-scoped verifications reference `BASELINE_SHA`, never a live `HEAD` expectation.
 - `BRANCH` = the branch name recorded by P0-T2 via `git rev-parse --abbrev-ref HEAD` (expected value: `feature/ci-parallel-job-split-553`). Tasks reference `BRANCH`; never hard-code a branch name into a command.
-- `SCRATCH` = the session scratchpad directory `C:\Users\DANMOI~1\AppData\Local\Temp\claude\C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-14T09-01\012c26d5-57f2-4f08-bc74-bf50a60b1e4e\scratchpad`. ALL temporary files (tool downloads, temp JSON projections, helper scripts) go under `SCRATCH`, never under `$env:TEMP` (shared with concurrent agents in sibling worktrees) and never under the feature folder.
+- `SCRATCH` = the session scratchpad directory `<user-profile>\AppData\Local\Temp\claude\C--Users-<user>-repos-TaskMaster-wt-2026-08-14T09-01\012c26d5-57f2-4f08-bc74-bf50a60b1e4e\scratchpad`. ALL temporary files (tool downloads, temp JSON projections, helper scripts) go under `SCRATCH`, never under `$env:TEMP` (shared with concurrent agents in sibling worktrees) and never under the feature folder.
 - actionlint flag form: actionlint 1.7.7's `-color` is a BOOLEAN flag ("Always enable colorful output"); it takes no value. The correct way to suppress color is `-no-color`. Do not write `-color never` — Go's flag parser consumes `-color` as the boolean and treats `never` as a positional FILE argument, failing with `could not read "never"` (exit 3).
 - Helper persistence: shell state does not persist between tool invocations in this environment. The executor MUST write the `Test-BlockContained` and `Test-CalleeContract` function definitions below once to a single file `SCRATCH\helpers-553.ps1` and dot-source that file (`. "<SCRATCH>\helpers-553.ps1"`) in every pwsh invocation that calls either helper (P0-T5, P1-T1 through P1-T6, P2-T1, P3-T5). `SCRATCH\helpers-553.ps1` is created at first use, in P0-T5 — the plan's earliest helper invocation is P0-T5's `Test-BlockContained` verification of the reference blocks.
 
@@ -91,7 +91,7 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
 - [x] [P0-T3] Obtain actionlint 1.7.7 (windows_amd64) into the session scratchpad and run the pre-change lint baseline; write `FEATURE/evidence/baseline/actionlint-baseline.<TS>.md`
   - Command:
     ```powershell
-    $v = '1.7.7'; $dir = 'C:\Users\DANMOI~1\AppData\Local\Temp\claude\C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-14T09-01\012c26d5-57f2-4f08-bc74-bf50a60b1e4e\scratchpad\actionlint-553'
+    $v = '1.7.7'; $dir = '<user-profile>\AppData\Local\Temp\claude\C--Users-<user>-repos-TaskMaster-wt-2026-08-14T09-01\012c26d5-57f2-4f08-bc74-bf50a60b1e4e\scratchpad\actionlint-553'
     New-Item -ItemType Directory -Force $dir | Out-Null
     Invoke-WebRequest "https://github.com/rhysd/actionlint/releases/download/v${v}/actionlint_${v}_windows_amd64.zip" -OutFile "$dir\actionlint.zip"
     Expand-Archive "$dir\actionlint.zip" -DestinationPath $dir -Force

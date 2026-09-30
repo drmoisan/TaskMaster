@@ -2,7 +2,7 @@
 
 Timestamp: `2026-07-22T08:23:00Z`
 
-Command: `@('QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs') | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `@('QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs') | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 EXIT_CODE: `0`
 

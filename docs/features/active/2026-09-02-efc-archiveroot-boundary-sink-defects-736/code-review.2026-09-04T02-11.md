@@ -165,7 +165,7 @@ compliant, but the next single-line addition anywhere in the file breaks the cei
 before the sibling finding-3 item lands.
 
 **OBS-5 — committed evidence retains the absolute path shape, though not the identity.** All 407
-`C:\Users\…` occurrences in added content read `C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-<id>\…`.
+`C:\Users\…` occurrences in added content read `<repo-root>\.claude\worktrees\agent-<id>\…`.
 The account name is gone — a sweep of all 9,605 added content lines and of all eight commits'
 feature-folder trees found zero unredacted tokens, and sanitization was done in-task rather than
 after commit, so no pre-sanitization blob is reachable. What remains is drive letter, repo layout,

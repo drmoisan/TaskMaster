@@ -1,7 +1,7 @@
 # Baseline Toolchain Step 2 — CSharpier Check, Read-Only (Issue #449, [P0-T9])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command:
 `pwsh -NoProfile -Command 'Set-Location "<WORKTREE>"; dotnet tool run csharpier check .; "CSHARPIER_CHECK_EXIT=$LASTEXITCODE"'`

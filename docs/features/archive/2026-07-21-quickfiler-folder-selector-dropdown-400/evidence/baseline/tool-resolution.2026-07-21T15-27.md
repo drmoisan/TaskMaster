@@ -6,9 +6,9 @@ EXIT_CODE: 0
 
 | Tool | Absolute path | Version |
 |---|---|---|
-| CSharpier | `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe` | 1.3.0.0 |
+| CSharpier | `<user-profile>\.dotnet\tools\csharpier.exe` | 1.3.0.0 |
 | MSBuild | `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe` | 18.8.2.0 |
-| dotnet-coverage | `C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe` | 18.5.2.0 |
+| dotnet-coverage | `<user-profile>\.dotnet\tools\dotnet-coverage.exe` | 18.5.2.0 |
 | VSTest | `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe` | 18.800.26.27701 |
 
 ResolvedVSTestPath: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe

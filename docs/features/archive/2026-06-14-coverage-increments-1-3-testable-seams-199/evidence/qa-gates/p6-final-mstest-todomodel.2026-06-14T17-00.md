@@ -1,6 +1,6 @@
 ---
 Timestamp: 2026-06-14T17-00
-Command: vstest.console.exe C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-12-10-29\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /EnableCodeCoverage /InIsolation
+Command: vstest.console.exe <user-profile>\repos\TaskMaster-wt-2026-06-12-10-29\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /EnableCodeCoverage /InIsolation
 EXIT_CODE: 0
 Output Summary:
   Total tests: 98 (baseline: 94; 4 new change-confirmation tests added by Phase 6)
@@ -31,7 +31,7 @@ Output Summary:
     - SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction
     - SetProjectId_ChangeConfirmedNo_WithUpdateAction_DoesNotInvokeAction
 
-  Coverage binary: TestResults/b4641dbc-b605-434c-900b-5310f39c796b/DanMoisan_MEGALODON4_2026-06-15.08_27_20.coverage
+  Coverage binary: TestResults/b4641dbc-b605-434c-900b-5310f39c796b/<user>_<host>_2026-06-15.08_27_20.coverage
   Merged XML: artifacts/csharp/p6-final-coverage.xml
 
   FINAL TEST GATE: PASS

@@ -13,4 +13,4 @@ Output Summary:
 - Total tests: 385.
 - Passed: 385.
 - Failed: 0.
-- Coverage attachment produced: `docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\remediation-10-53-vstest-results\dcb60815-7e8e-42a9-9509-02af57cc1900\DanMoisan_MEGALODON4_2026-07-04.11_16_47.coverage`.
+- Coverage attachment produced: `docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\remediation-10-53-vstest-results\dcb60815-7e8e-42a9-9509-02af57cc1900\<user>_<host>_2026-07-04.11_16_47.coverage`.

@@ -1,6 +1,6 @@
 Timestamp: 2026-08-31T10:00:39-04:00
 
-Command: `Get-Content evidence/remediation-baseline/p1-t2-csharpier-baseline-enumeration.2026-08-31T10-00.md`; `git -C C:\\Users\\DanMoisan\\AppData\\Local\\Temp\\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200 rev-parse HEAD`
+Command: `Get-Content evidence/remediation-baseline/p1-t2-csharpier-baseline-enumeration.2026-08-31T10-00.md`; `git -C <user-profile>\\AppData\\Local\\Temp\\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200 rev-parse HEAD`
 
 EXIT_CODE: 0
 

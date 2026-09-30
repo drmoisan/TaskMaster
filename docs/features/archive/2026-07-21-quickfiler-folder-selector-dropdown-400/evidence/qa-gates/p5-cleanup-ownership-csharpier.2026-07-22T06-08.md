@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T06:08:32.7484094Z
 
-Command: `@('C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler\Viewers\BreadcrumbPopupUiOperations.cs','C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbPopupControlDispatchTests.cs') | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `@('<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler\Viewers\BreadcrumbPopupUiOperations.cs','<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\Viewers\BreadcrumbPopupControlDispatchTests.cs') | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 EXIT_CODE: 0
 

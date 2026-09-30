@@ -17,6 +17,6 @@ Output Summary:
   - FolderTreeSnapshotQueries.GetAncestorChain (new method): 100% line (24/24).
   - Combined new production code: 96.92% line (126/130) — exceeds the 90% new-code threshold.
 - IFolderHierarchyProvider.cs is type-only (interface, no executable lines) and legitimately absent from the executable denominator.
-- Coverage report: `DanMoisan_MEGALODON4_2026-07-18.08_13_41.cobertura.xml`.
+- Coverage report: `<user>_<host>_2026-07-18.08_13_41.cobertura.xml`.
 
 Test gate green; all new tests pass; no coverage regression versus baseline.

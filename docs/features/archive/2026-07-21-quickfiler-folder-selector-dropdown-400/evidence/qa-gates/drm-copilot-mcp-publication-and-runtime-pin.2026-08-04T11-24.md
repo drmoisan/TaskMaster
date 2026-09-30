@@ -1,13 +1,13 @@
 Timestamp: 2026-08-04T11-24
-Command: npm view '@danmoisan/drm-copilot-mcp@1.0.21' version dist.integrity dist.tarball --json; download `dist.tarball` in memory and calculate SHA-512 SRI with Node.js `crypto.createHash('sha512')`
+Command: npm view '@<user>/drm-copilot-mcp@1.0.21' version dist.integrity dist.tarball --json; download `dist.tarball` in memory and calculate SHA-512 SRI with Node.js `crypto.createHash('sha512')`
 EXIT_CODE: 0
-Output Summary: Independent npm registry publication verified for `@danmoisan/drm-copilot-mcp@1.0.21`. The published registry SRI exactly matched the independently downloaded tarball hash, so the conditional activation requirement is satisfied.
+Output Summary: Independent npm registry publication verified for `@<user>/drm-copilot-mcp@1.0.21`. The published registry SRI exactly matched the independently downloaded tarball hash, so the conditional activation requirement is satisfied.
 
 ## Immutable package identity
 
-- Package: `@danmoisan/drm-copilot-mcp`
+- Package: `@<user>/drm-copilot-mcp`
 - Version: `1.0.21`
-- Tarball: `https://registry.npmjs.org/@danmoisan/drm-copilot-mcp/-/drm-copilot-mcp-1.0.21.tgz`
+- Tarball: `https://registry.npmjs.org/@<user>/drm-copilot-mcp/-/drm-copilot-mcp-1.0.21.tgz`
 - Registry SRI: `sha512-6Ehxshezrcz7YIPc1PN0xsiDw0uspHFEBW0qnOi2+lXUzId/4GDY9wZ4hP1RYUYQUsX2l7h728XDAHXq55TO7A==`
 - Downloaded tarball SRI: `sha512-6Ehxshezrcz7YIPc1PN0xsiDw0uspHFEBW0qnOi2+lXUzId/4GDY9wZ4hP1RYUYQUsX2l7h728XDAHXq55TO7A==`
 - Downloaded bytes: `944656`
@@ -15,9 +15,9 @@ Output Summary: Independent npm registry publication verified for `@danmoisan/dr
 
 ## Activation
 
-The independent publication condition passed. `.codex/config.toml` now pins the `drm-copilot` MCP server exactly to `@danmoisan/drm-copilot-mcp@1.0.21`.
+The independent publication condition passed. `.codex/config.toml` now pins the `drm-copilot` MCP server exactly to `@<user>/drm-copilot-mcp@1.0.21`.
 
-Command: Fresh `@modelcontextprotocol/sdk` `StdioClientTransport({ command: 'npx.cmd', args: ['-y', '@danmoisan/drm-copilot-mcp@1.0.21'] })` processes, each connected through `Client`, then calling `validate_orchestration_artifacts`.
+Command: Fresh `@modelcontextprotocol/sdk` `StdioClientTransport({ command: 'npx.cmd', args: ['-y', '@<user>/drm-copilot-mcp@1.0.21'] })` processes, each connected through `Client`, then calling `validate_orchestration_artifacts`.
 EXIT_CODE: 0
 Output Summary: Every SDK process identified the server as `drmCopilotExtension` version `1.0.21`; the CRLF compatibility plan, original CRLF plan, recovered remediation plan, and canonical checkpoint all validated with `ok: true` and `isError: false`.
 

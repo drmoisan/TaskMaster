@@ -76,7 +76,7 @@ Coverage note: `KbdActions.cs` is a pre-existing low-coverage file. Consistent w
 
 ## Appendix A — live review-time commands run
 
-Check-only / review commands executed from `C:\Users\DanMoisan\repos\TaskMaster` during this re-review:
+Check-only / review commands executed from `<repo-root>` during this re-review:
 
 1. `git branch --show-current`
 2. `git rev-parse HEAD`

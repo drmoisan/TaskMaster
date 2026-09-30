@@ -106,7 +106,7 @@ Every diagnostic's emitting project is `SVGControl.Test\SVGControl.Test.csproj`.
 project reference built successfully inside this invocation and emitted nothing:
 
 ```
-  SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll
+  SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll
 ```
 
 **This set is empty, so the measurement is NOT vacuous.** `SVGControl.Test` reached its own

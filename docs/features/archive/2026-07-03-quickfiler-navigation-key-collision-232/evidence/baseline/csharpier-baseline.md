@@ -6,7 +6,7 @@ Command: `csharpier check .`
 
 Tooling note: The repo-local .NET SDK (`.dotnet-sdk`, per `global.json` 8.0.205) is not installed
 in this worktree, so `dotnet tool run csharpier` is unavailable. The globally installed CSharpier
-tool (`C:\Users\DanMoisan\.dotnet\tools\csharpier`, version 1.3.0) is used instead, which CLAUDE.md
+tool (`<user-profile>\.dotnet\tools\csharpier`, version 1.3.0) is used instead, which CLAUDE.md
 explicitly approves (`csharpier .`). CSharpier v1 uses the `check`/`format` subcommands (the older
 `csharpier . --check` positional/flag form is not valid in v1).
 

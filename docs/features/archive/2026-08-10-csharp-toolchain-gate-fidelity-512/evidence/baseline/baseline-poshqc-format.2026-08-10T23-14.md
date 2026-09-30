@@ -1,7 +1,7 @@
 # Baseline — PoshQC format against the unmodified tree ([P0-T18])
 
 Timestamp: 2026-08-10T23-14
-Command: `mcp__drm-copilot__run_poshqc_format` with `workspace_root = "C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`
+Command: `mcp__drm-copilot__run_poshqc_format` with `workspace_root = "<repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`
 EXIT_CODE: 0
 
 ## Return payload (verbatim)
@@ -10,8 +10,8 @@ EXIT_CODE: 0
 {
   "ok": true,
   "tool": "run_poshqc_format",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
-  "summary": "Ran bundled PoshQC format against 'C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-ac1a08c3569adb7eb' with 2 selected scan folder(s)."
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
+  "summary": "Ran bundled PoshQC format against '<repo-root>\\.claude\\worktrees\\agent-ac1a08c3569adb7eb' with 2 selected scan folder(s)."
 }
 ```
 

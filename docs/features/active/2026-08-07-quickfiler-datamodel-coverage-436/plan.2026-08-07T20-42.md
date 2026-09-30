@@ -62,7 +62,7 @@ Every evidence artifact records `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Out
 ## Command Register
 
 Every command-bearing task names one of these identifiers. Commands run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a923053598cf4ccea`.
+`<repo-root>\.claude\worktrees\agent-a923053598cf4ccea`.
 
 - **CMD-BOOTSTRAP** — `pwsh -File scripts/vscode/Install-RepoDotNetSdk.ps1`, then `dotnet tool restore`,
   then `dotnet-coverage --version` (installing the global tool with `dotnet tool install --global dotnet-coverage` if it does not resolve).

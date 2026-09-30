@@ -6,7 +6,7 @@ Timestamp: 2026-08-08T13-13
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; 'TaskMaster\Ribbon\RibbonViewer.cs','TaskMaster\Ribbon\RibbonExplorer.xml','TaskMaster\ThisAddIn.cs','TaskMaster\Ribbon\RibbonController.Intelligence.cs','TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs','TaskMaster\AppGlobals\AppItemEngines.cs','UtilitiesCS\Interfaces\IGlobals\IAppItemEngines.cs' | ForEach-Object { '{0}={1}' -f $_, (Get-Content $_ | Measure-Object -Line).Lines }"
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; 'TaskMaster\Ribbon\RibbonViewer.cs','TaskMaster\Ribbon\RibbonExplorer.xml','TaskMaster\ThisAddIn.cs','TaskMaster\Ribbon\RibbonController.Intelligence.cs','TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs','TaskMaster\AppGlobals\AppItemEngines.cs','UtilitiesCS\Interfaces\IGlobals\IAppItemEngines.cs' | ForEach-Object { '{0}={1}' -f $_, (Get-Content $_ | Measure-Object -Line).Lines }"
 ```
 
 EXIT_CODE: 0

@@ -16,17 +16,17 @@ A total of 7 test files matched the specified pattern.
   Passed ConversationInfo_WhenSetBeforeAccessWithCountAtZero_ReturnsCachedValueWithoutThrowing [< 1 ms]
   Passed LoadDfAsync_ConsumesConversationSnapshotsWithoutRepeatedUiPublishes [107 ms]
 Unhandled Exception: System.NullReferenceException: Object reference not set to an instance of an object.
-   at QuickFiler.Helper_Classes.ConversationResolver.<LoadConversationInfoAsync>d__48.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 88
+   at QuickFiler.Helper_Classes.ConversationResolver.<LoadConversationInfoAsync>d__48.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 88
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
    at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
-   at QuickFiler.Helper_Classes.ConversationResolver.<BackgroundInitInfoItemsAsync>d__10.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.cs:line 218
+   at QuickFiler.Helper_Classes.ConversationResolver.<BackgroundInitInfoItemsAsync>d__10.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.cs:line 218
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
    at System.Runtime.CompilerServices.ConfiguredTaskAwaitable.ConfiguredTaskAwaiter.GetResult()
-   at QuickFiler.Helper_Classes.ConversationResolver.<Handler_PropertyChanged>d__71.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 314
+   at QuickFiler.Helper_Classes.ConversationResolver.<Handler_PropertyChanged>d__71.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 314
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
@@ -39,17 +39,17 @@ All invocations on the mock must have a corresponding setup.
    at Moq.CastleProxyFactory.Interceptor.Intercept(IInvocation underlying) in /_/src/Moq/Interception/CastleProxyFactory.cs:line 113
    at Castle.DynamicProxy.AbstractInvocation.Proceed()
    at Castle.Proxies.IOlObjectsProxy.get_App()
-   at QuickFiler.Helper_Classes.ConversationResolver.<LoadConversationInfoAsync>d__48.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 88
+   at QuickFiler.Helper_Classes.ConversationResolver.<LoadConversationInfoAsync>d__48.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 88
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
    at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
-   at QuickFiler.Helper_Classes.ConversationResolver.<BackgroundInitInfoItemsAsync>d__10.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.cs:line 218
+   at QuickFiler.Helper_Classes.ConversationResolver.<BackgroundInitInfoItemsAsync>d__10.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.cs:line 218
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
    at System.Runtime.CompilerServices.ConfiguredTaskAwaitable.ConfiguredTaskAwaiter.GetResult()
-   at QuickFiler.Helper_Classes.ConversationResolver.<Handler_PropertyChanged>d__71.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 314
+   at QuickFiler.Helper_Classes.ConversationResolver.<Handler_PropertyChanged>d__71.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 314
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
@@ -62,17 +62,17 @@ All invocations on the mock must have a corresponding setup.
    at Moq.CastleProxyFactory.Interceptor.Intercept(IInvocation underlying) in /_/src/Moq/Interception/CastleProxyFactory.cs:line 113
    at Castle.DynamicProxy.AbstractInvocation.Proceed()
    at Castle.Proxies.IOlObjectsProxy.get_App()
-   at QuickFiler.Helper_Classes.ConversationResolver.<LoadConversationInfoAsync>d__48.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 88
+   at QuickFiler.Helper_Classes.ConversationResolver.<LoadConversationInfoAsync>d__48.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 88
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
    at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
-   at QuickFiler.Helper_Classes.ConversationResolver.<BackgroundInitInfoItemsAsync>d__10.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.cs:line 218
+   at QuickFiler.Helper_Classes.ConversationResolver.<BackgroundInitInfoItemsAsync>d__10.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.cs:line 218
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
    at System.Runtime.CompilerServices.ConfiguredTaskAwaitable.ConfiguredTaskAwaiter.GetResult()
-   at QuickFiler.Helper_Classes.ConversationResolver.<Handler_PropertyChanged>d__71.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 314
+   at QuickFiler.Helper_Classes.ConversationResolver.<Handler_PropertyChanged>d__71.MoveNext() in <repo-root>\QuickFiler\Helper Classes\ConversationResolver.Loading.cs:line 314
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
@@ -2796,7 +2796,7 @@ All invocations on the mock must have a corresponding setup.
      at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 267
    at FluentAssertions.Numeric.NumericAssertionsBase`3.Be(T expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Numeric/NumericAssertionsBase.cs:line 45
-   at UtilitiesCS.Test.EmailIntelligence.Triage_OlLogicTests.<TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_TotalEmailCountIncrementsOnce>d__22.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs:line 406
+   at UtilitiesCS.Test.EmailIntelligence.Triage_OlLogicTests.<TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_TotalEmailCountIncrementsOnce>d__22.MoveNext() in <repo-root>\UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs:line 406
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
@@ -2814,7 +2814,7 @@ All invocations on the mock must have a corresponding setup.
      at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 267
    at FluentAssertions.Numeric.NumericAssertionsBase`3.Be(T expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Numeric/NumericAssertionsBase.cs:line 45
-   at UtilitiesCS.Test.EmailIntelligence.Triage_OlLogicTests.<TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_MatchEmailCountIncrementsOnce>d__23.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs:line 463
+   at UtilitiesCS.Test.EmailIntelligence.Triage_OlLogicTests.<TrainSelectionAsync_WhenSelectionContainsTwoMailItems_TrainsOnlyFirstItem_MatchEmailCountIncrementsOnce>d__23.MoveNext() in <repo-root>\UtilitiesCS.Test\EmailIntelligence\ClassifierGroups\Triage\Triage_OlLogicTests.cs:line 463
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
@@ -2929,11 +2929,11 @@ All invocations on the mock must have a corresponding setup.
   Passed Imconcattb_WithValidBitmaps_ReturnsCombinedBitmap [< 1 ms]
   Passed Imconcattb_WithSmallBitmaps_ReturnsCombined [< 1 ms]
   Passed Imconcatlr_WithValidBitmaps_ReturnsCombinedBitmap [< 1 ms]
-Error opening data file C:\Users\DanMoisan\AppData\Local\TaskMaster\tessdata/eng.traineddata
+Error opening data file <user-profile>\AppData\Local\TaskMaster\tessdata/eng.traineddata
 Please make sure the TESSDATA_PREFIX environment variable is set to your "tessdata" directory.
 Failed loading language 'eng'
 Tesseract couldn't load any languages!
-Error opening data file C:\Users\DanMoisan\AppData\Local\TaskMaster\tessdata/eng.traineddata
+Error opening data file <user-profile>\AppData\Local\TaskMaster\tessdata/eng.traineddata
 Please make sure the TESSDATA_PREFIX environment variable is set to your "tessdata" directory.
 Failed loading language 'eng'
 Tesseract couldn't load any languages!
@@ -4130,7 +4130,7 @@ Test Run Failed.
      Failed: 2
     Skipped: 2
  Total time: 44.3916 Seconds
-Exception: C:\Users\DanMoisan\repos\TaskMaster\scripts\vscode\Invoke-MSTest.ps1:54:5
+Exception: <repo-root>\scripts\vscode\Invoke-MSTest.ps1:54:5
 Line |
   54 |      throw "MSTest execution failed with exit code $LASTEXITCODE"
      |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

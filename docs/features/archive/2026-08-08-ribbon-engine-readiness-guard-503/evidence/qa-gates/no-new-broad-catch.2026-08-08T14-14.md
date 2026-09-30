@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-14
 
-Commands (run from `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55`):
+Commands (run from `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55`):
 
 ```
 # per-file absolute count over every added/modified .cs path in the section 4 scope lock

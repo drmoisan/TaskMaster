@@ -8,7 +8,7 @@ EXIT_CODE: 0
 
 Output Summary:
 - Total tests: 200. Passed: 200. Failed: 0. Skipped: 0.
-- Coverage attachment: `TestResults/.../DanMoisan_MEGALODON4_2026-07-07.22_11_07.coverage`, converted to Cobertura via `dotnet-coverage merge -f cobertura` for numeric extraction.
+- Coverage attachment: `TestResults/.../<user>_<host>_2026-07-07.22_11_07.coverage`, converted to Cobertura via `dotnet-coverage merge -f cobertura` for numeric extraction.
 
 Headline coverage (baseline):
 - `TaskMaster` package (production assembly): 63.64% line, 100.00% branch.

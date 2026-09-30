@@ -178,7 +178,7 @@ directory is not a project. `[P2-T7]` expects an assembly count of 9 on that bas
 ```
 Command: ls -la packages/ExCSS.4.3.2/lib/net48/ExCSS.dll
 EXIT_CODE: 0
-Output:  -rwxr-xr-x 1 DanMoisan 197121 368128 Jul 23 19:21 packages/ExCSS.4.3.2/lib/net48/ExCSS.dll
+Output:  -rwxr-xr-x 1 <user> 197121 368128 Jul 23 19:21 packages/ExCSS.4.3.2/lib/net48/ExCSS.dll
 ```
 
 **The `HintPath` target exists**, 368128 bytes.

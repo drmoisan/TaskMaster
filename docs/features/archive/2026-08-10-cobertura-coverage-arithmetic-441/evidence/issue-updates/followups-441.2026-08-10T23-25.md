@@ -152,7 +152,7 @@ prohibited.
 > `scripts/vscode/Invoke-MSTestWithCoverage.ps1:296-302` filters discovered `*.Test.dll` paths on
 > `\bin\<Configuration>\`, `\obj\` and `\ref\` only. There is no `\.claude\` guard.
 >
-> Running with `-SearchRoot .` from the main checkout (`C:\Users\DanMoisan\repos\TaskMaster`)
+> Running with `-SearchRoot .` from the main checkout (`<repo-root>`)
 > therefore descends into `.claude\worktrees\agent-*\**` and picks up stale sibling-worktree
 > assemblies, producing bogus `AssemblyInitialize` signature failures and a coverage figure computed
 > over the wrong assembly set.

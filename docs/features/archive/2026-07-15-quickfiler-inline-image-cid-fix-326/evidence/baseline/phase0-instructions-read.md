@@ -2,7 +2,7 @@
 
 - **Timestamp:** 2026-07-15T23-27
 - **Feature:** quickfiler-inline-image-cid-fix (#326)
-- **Workspace root used for this execution:** `C:/Users/DanMoisan/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326`
+- **Workspace root used for this execution:** `<user-profile>/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326`
   (the plan's embedded workspace-root reference to `.../TaskMaster/.claude/worktrees/agent-a1e77dc4a849cd790`
   is a stale planning-worktree path from an earlier preparation run and was not used; per the resuming
   agent's explicit instruction, the equivalent files were read at the current worktree root instead.)
@@ -16,10 +16,10 @@
 
 ## Files Read
 
-1. `C:/Users/DanMoisan/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/CLAUDE.md`
-2. `C:/Users/DanMoisan/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/.claude/rules/general-code-change.md`
-3. `C:/Users/DanMoisan/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/.claude/rules/general-unit-test.md`
-4. `C:/Users/DanMoisan/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/.claude/rules/csharp.md`
+1. `<user-profile>/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/CLAUDE.md`
+2. `<user-profile>/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/.claude/rules/general-code-change.md`
+3. `<user-profile>/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/.claude/rules/general-unit-test.md`
+4. `<user-profile>/repos/TaskMaster-wt/quickfiler-inline-image-cid-fix-326/.claude/rules/csharp.md`
 
 ## Quoted Sections
 

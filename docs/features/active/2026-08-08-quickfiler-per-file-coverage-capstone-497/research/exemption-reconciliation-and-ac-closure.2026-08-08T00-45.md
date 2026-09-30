@@ -3,7 +3,7 @@
 - **Feature:** `docs/features/active/2026-08-08-quickfiler-per-file-coverage-capstone-497` (issue **#497**, epic child **F16**)
 - **Epic:** `quickfiler-per-file-coverage` (parent issue **#136**), integration branch `epic/quickfiler-per-file-coverage-integration`
 - **Branch under analysis:** `feature/quickfiler-per-file-coverage-capstone`
-- **Worktree:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8b4d64f3ad6053b3`
+- **Worktree:** `<repo-root>\.claude\worktrees\agent-a8b4d64f3ad6053b3`
 - **Timestamp:** 2026-08-08T00-45
 - **Scope boundary:** This artifact covers the exemption/ledger reconciliation surface, the acceptance-criteria closure mapping, and the defect trail. The measurement harness, csproj denominator derivation, Cobertura parsing mechanics, and toolchain command forms are covered by a parallel researcher and are **not** duplicated here.
 

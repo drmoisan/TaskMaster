@@ -575,7 +575,7 @@ reachable from any TRX the plan touches (R4.3), so the rule still has to be writ
 ### R7.1 The five-file claim under-counts the repository
 
 `SearchScope:` `.claude/agent-memory/`.
-`SearchPatterns:` `(?i)danmoisan|megalodon|real good food|C:\\Users\\|c:/Users/`.
+`SearchPatterns:` `(?i)<user>|megalodon|real good food|C:\\Users\\|c:/Users/`.
 `SearchResult:` **32 occurrences across 23 files.** The five named in `issue.md:30` are all in that
 set. The other eighteen files include, among others:
 
