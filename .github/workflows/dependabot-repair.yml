@@ -10,8 +10,8 @@ name: dependabot-repair
 # name appears nowhere in this file: it is a security regression for a convenience gain, and GitHub
 # restricts it by default from 2026-11-02.
 #
-# Credential: a GitHub App installation token minted from DEPENDABOT_REPAIR_APP_ID and
-# DEPENDABOT_REPAIR_APP_PRIVATE_KEY. When those secrets are absent the token step fails, the job
+# Credential: a GitHub App installation token minted from the App's Client ID, stored in
+# DEPENDABOT_REPAIR_APP_ID, and the private key in DEPENDABOT_REPAIR_APP_PRIVATE_KEY. When those secrets are absent the token step fails, the job
 # stops before it can push, and the pull request keeps the behaviour it has today. See
 # .github/workflows/README.md for the degraded mode and the installation runbook.
 
@@ -48,7 +48,7 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.DEPENDABOT_REPAIR_APP_ID }}
+          client-id: ${{ secrets.DEPENDABOT_REPAIR_APP_ID }}
           private-key: ${{ secrets.DEPENDABOT_REPAIR_APP_PRIVATE_KEY }}
 
       - name: Checkout the Dependabot branch
