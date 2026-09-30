@@ -1,27 +1,26 @@
 # Acceptance-criteria check-off ledger (P6-T17 to P6-T36)
 
-Timestamp: 2026-09-29T23-35
+Timestamp: 2026-09-29T23-37
 Command: git grep -c -e "^- \[x\] AC" -- docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927/spec.md
 EXIT_CODE: 0
 Output Summary:
-- The count command printed 18 for spec.md.
-- TOTAL: 18 of 20
-- UNMET: AC4 (AC4: PENDING P6-T38), AC13 (AC13: NOT MET)
+- The count command printed 19 for spec.md.
+- TOTAL: 19 of 20
+- UNMET: AC13 (AC13: NOT MET)
 
 ### Acceptance Criteria Status
 - Source: docs/features/active/2026-09-28-evidence-and-identity-hygiene-sweep-927/spec.md
 - Total AC items: 20
-- Checked off (delivered): 18
-- Remaining (unchecked): 2
+- Checked off (delivered): 19
+- Remaining (unchecked): 1
 - Items remaining:
-  - AC4: PENDING P6-T38 (Ruling 1: the check-off waits on the CI Pester coverage figure; the tick and this line's update land inside the P6-T38 commit)
   - AC13: NOT MET
 
 Per-criterion record:
 - AC1: MET (P6-T17). guard-pre-sweep-run.md: ExpectedExitCode: 1, EXIT_CODE: 1, HYGIENE Findings=1839, which equals RAW-POPULATION: 625 (P0-T17) plus PROFILE-PATH-FILES-NOW: 1214 (the P1-T12 MEASUREMENT-CORRECTION).
 - AC2: MET (P6-T18). pester-hygiene-fail-before.md: ExpectedExitCode: 1, EXIT_CODE: 1, Failed=31.
 - AC3: MET (P6-T19). pester-hygiene-pass-after.md: Failed=0 Skipped=0 with all thirty spec-listed It names Passed; P6-T3 HYGIENE Failed=0.
-- AC4: PENDING P6-T38
+- AC4: MET (P6-T38). pester-coverage-projection.md: CI run 36664415704 on head 67a69cb23916878c436fa570d587847b7a0745fa, pester job success; PESTER Passed=373 Failed=0 Skipped=0 (floor 342 plus 31 = 373, MET); COVERAGE LinePercent=94.51 Covered=1721 Total=1821 (at or above 80.00 and at or above 94.53 minus 0.50 = 94.03, MET); per-file Test-RepositoryHygiene.ps1 90.91, Test-RepositoryHygiene.Rules.ps1 100.00, Test-RepositoryHygiene.Git.ps1 91.89 (each at or above 90.00, MET); ARTIFACT-COVERAGE equal to the log figures; MAIN-MOVED=0; BASELINE-DRIFT-PS-FILES=0.
 - AC5: MET (P6-T21). P6-T12: PATTERN=0, ACCOUNT=0, HOST=0, SHORT=0, ENV=0, CLOCK=0, ALLOW=0, FILE-IO=0, MOCK-GIT=0; P6-T11: OVER-500=0.
 - AC6: MET (P6-T22). P6-T3 IT| lines for the three named orchestration tests read Passed.
 - AC7: MET (P6-T23). raw-document-removal.md: GATE5A=0, GATE5B=0, GATE5C=0, PROJECTIONS-TRACKED=18, RUNLOG-TRACKED=0, TRX-TRACKED=0.
