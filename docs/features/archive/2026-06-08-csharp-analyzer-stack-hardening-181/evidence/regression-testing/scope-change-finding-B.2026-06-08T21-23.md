@@ -12,12 +12,12 @@ The plan ([P1-T2], [P1-T3]) is premised on a minimal `FilePathHelper.cs` constru
 
 ### 1. The direct constructor already yields the correct FileName
 
-A reflection probe loading the built `UtilitiesCS.dll` constructed `new FilePathHelper("pplkey.json", "C:\\Users\\user\\AppData\\Roaming")` (the exact inputs the converter would pass during the People deserialization) and observed:
+A reflection probe loading the built `UtilitiesCS.dll` constructed `new FilePathHelper("pplkey.json", "<user-profile>\\AppData\\Roaming")` (the exact inputs the converter would pass during the People deserialization) and observed:
 
 ```
 FileName=[pplkey.json]
-FolderPath=[C:\Users\user\AppData\Roaming]
-FilePath=[C:\Users\user\AppData\Roaming\pplkey.json]
+FolderPath=[<user-profile>\AppData\Roaming]
+FilePath=[<user-profile>\AppData\Roaming\pplkey.json]
 ```
 
 It also confirmed the `Constructor_WithFileNameAndFolderPath_ShouldSetFilePath` invariant:

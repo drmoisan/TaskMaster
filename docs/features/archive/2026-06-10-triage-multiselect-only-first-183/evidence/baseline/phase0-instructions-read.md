@@ -10,11 +10,11 @@ Policy Order:
 5. docs/features/active/2026-06-10-triage-multiselect-only-first-183/issue.md (sole requirements source for this minor-audit plan; section `## Acceptance Criteria` AC1–AC5)
 
 Files Read (in order):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-10-08-46\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-10-08-46\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-10-08-46\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-10-08-46\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-10-08-46\docs\features\active\2026-06-10-triage-multiselect-only-first-183\issue.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-10-08-46\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-10-08-46\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-10-08-46\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-10-08-46\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-10-08-46\docs\features\active\2026-06-10-triage-multiselect-only-first-183\issue.md
 
 Fail-closed checks (minor-audit):
 - spec.md present in feature folder: NO (correct for minor-audit)

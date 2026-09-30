@@ -200,8 +200,8 @@ Verbatim output:
 
 ```
 
-  SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll
-  SVGControl.Test -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\bin\Debug\SVGControl.Test.dll
+  SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll
+  SVGControl.Test -> <repo-root>\SVGControl.Test\bin\Debug\SVGControl.Test.dll
 ```
 
 - `CS86xx` count: **0** (`grep -c "CS86"` returns 0)

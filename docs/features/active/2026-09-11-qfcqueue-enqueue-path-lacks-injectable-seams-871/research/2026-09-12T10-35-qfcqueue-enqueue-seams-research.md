@@ -2,7 +2,7 @@
 
 - **Issue:** #871 (bug, work mode full-bug), parallel run `bugs-2026-09-11`
 - **Feature folder:** `docs/features/active/2026-09-11-qfcqueue-enqueue-path-lacks-injectable-seams-871/`
-- **Worktree:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-acf29b54f5a64e04b`
+- **Worktree:** `<repo-root>\.claude\worktrees\agent-acf29b54f5a64e04b`
 - **Timestamp:** 2026-09-12T10-35
 - **Tooling available to this agent:** Read, Grep, Glob only. No Bash, no git, no compiler, no test runner.
   Nothing in this document was verified by executing a command. Every claim is a static read of a
@@ -52,7 +52,7 @@ must be replaced, so the replacement is derived here in full.
   (under `QuickFiler.Test/`). The family includes every partial part of `QuickFiler.Controllers.QfcQueue`
   and every `[TestClass]` that targets it. It excludes no member of either partition.
 - **Exhaustive Search Scope:** the entire worktree at
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-acf29b54f5a64e04b`, both partitions,
+  `<repo-root>\.claude\worktrees\agent-acf29b54f5a64e04b`, both partitions,
   all directories, not restricted to any one directory or to any one named file.
 - **Inclusion Rules:** file name matches `QfcQueue*.cs`; file is tracked in the worktree; file
   compiles into either `QuickFiler` or `QuickFiler.Test`.

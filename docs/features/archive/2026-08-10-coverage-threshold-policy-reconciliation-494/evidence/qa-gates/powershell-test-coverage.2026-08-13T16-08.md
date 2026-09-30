@@ -1,7 +1,7 @@
 Timestamp: 2026-08-13T16-08
-Command: mcp__drm-copilot__run_poshqc_test { workspace_root: "C:\\Users\\DanMoisan\\repos\\TaskMaster", scan_folders: ["tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1", "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"] }
+Command: mcp__drm-copilot__run_poshqc_test { workspace_root: "<repo-root>", scan_folders: ["tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1", "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"] }
 EXIT_CODE: 0
-MCP Result: { "ok": true, "summary": "Ran bundled PoshQC test against 'C:\\Users\\DanMoisan\\repos\\TaskMaster' with 2 selected scan folder(s)." }
+MCP Result: { "ok": true, "summary": "Ran bundled PoshQC test against '<repo-root>' with 2 selected scan folder(s)." }
 
 Command: $c = New-PesterConfiguration; $c.Run.Path = @('tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1', 'tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1'); $c.Run.PassThru = $true; $c.CodeCoverage.Enabled = $true; $c.CodeCoverage.Path = @('scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1', 'scripts/vscode/Invoke-MSTestWithCoverage.ps1'); $c.CodeCoverage.OutputFormat = 'JaCoCo'; $c.CodeCoverage.OutputPath = 'docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/qa-gates/powershell-coverage.2026-08-13T16-08.xml'; $c.Output.Verbosity = 'None'; $r = Invoke-Pester -Configuration $c; exit [int]($r.FailedCount -ne 0)
 EXIT_CODE: 0

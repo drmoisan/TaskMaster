@@ -73,7 +73,7 @@ present and `ExCSS.dll` is in the output per `[P1-T4]`).
 | Code | `CS2002` |
 | Severity | warning |
 | Emitting project | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` |
-| Verbatim text (from the basis) | `Source file 'C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times` |
+| Verbatim text (from the basis) | `Source file '<repo-root>\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times` |
 | Present in basis | yes (1 occurrence) |
 | Present in `[P2-T4]` | **no** (`grep -c 'CS2002'` = 0) |
 | Disposition | **Expected removal. Not a regression. No fix required. No loop restart.** |

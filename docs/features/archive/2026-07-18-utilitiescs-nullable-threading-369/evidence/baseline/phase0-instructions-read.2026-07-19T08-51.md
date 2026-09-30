@@ -23,15 +23,15 @@ Then the requirements sources:
 
 ## Files Read (explicit list)
 
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\spec.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\user-story.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\issue.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\research\research-findings.2026-07-18T22-45.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\plan.2026-07-18T22-04.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\CLAUDE.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\.claude\rules\general-code-change.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\.claude\rules\csharp.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\spec.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\user-story.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\issue.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\research\research-findings.2026-07-18T22-45.md
+- <repo-root>\.claude\worktrees\agent-a01d6eefe1f9bff5a\docs\features\active\utilitiescs-nullable-threading\plan.2026-07-18T22-04.md
 
 ## Key Constraints Confirmed
 

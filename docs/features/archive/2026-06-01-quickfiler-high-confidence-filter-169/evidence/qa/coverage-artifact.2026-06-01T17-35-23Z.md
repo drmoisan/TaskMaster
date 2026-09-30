@@ -16,12 +16,12 @@ vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Te
 vstest path: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe`
 
 Source `.coverage` file:
-`TestResults/850a8907-3a68-4ad5-a717-55c98775a764/DanMoisan_MEGALODON4_2026-06-01.13_43_34.coverage`
+`TestResults/850a8907-3a68-4ad5-a717-55c98775a764/<user>_<host>_2026-06-01.13_43_34.coverage`
 
 Conversion to canonical Cobertura XML:
 
 ```
-dotnet-coverage merge TestResults\850a8907-3a68-4ad5-a717-55c98775a764\DanMoisan_MEGALODON4_2026-06-01.13_43_34.coverage -f cobertura -o artifacts\csharp\coverage.xml
+dotnet-coverage merge TestResults\850a8907-3a68-4ad5-a717-55c98775a764\<user>_<host>_2026-06-01.13_43_34.coverage -f cobertura -o artifacts\csharp\coverage.xml
 ```
 
 dotnet-coverage version: 18.5.2 (v18.5.2.0 [win-x64 - .NET 10.0.8]). Cobertura format used

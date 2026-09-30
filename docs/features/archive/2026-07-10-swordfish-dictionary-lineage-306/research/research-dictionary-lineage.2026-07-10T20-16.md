@@ -10,7 +10,7 @@ on-disk JSON compatibility for persisted dictionaries. Deletion of `UtilitiesSwo
 migration are explicitly out of scope (F2/F3/F5).
 
 All file references are relative to the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a0bb15bdb226acc2c`.
+`<repo-root>\.claude\worktrees\agent-a0bb15bdb226acc2c`.
 
 ---
 

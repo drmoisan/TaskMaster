@@ -39,7 +39,7 @@ artifact. This clause is non-overridable.
 **The #584 folder.** Every path written as `#584/<name>` resolves against
 `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/`.
 
-**Worktree root.** All other paths are relative to `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-09-05T10-47`.
+**Worktree root.** All other paths are relative to `<user-profile>\repos\TaskMaster-wt\2026-09-05T10-47`.
 
 **Diff anchor.** The lightweight git tag `pre-782-base` already exists and is re-anchored to
 `736c2cf2` under SD23. No task in this plan creates, moves, deletes, or re-points it.

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P3-T6]
-Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -Configuration Debug -CoverageOutput coverage\remediation-final.cobertura.xml` run from `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55`
+Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -Configuration Debug -CoverageOutput coverage\remediation-final.cobertura.xml` run from `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55`
 EXIT_CODE: 0
 
 ## Filename disambiguation (recorded)

@@ -2,7 +2,7 @@
 
 - **Feature:** `2026-08-07-quickfiler-efc-home-controller-coverage-437` (issue #437)
 - **Epic:** #136 `quickfiler-per-file-coverage`, child F8
-- **Production file:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeController.Timing.cs` (43 lines)
+- **Production file:** `<repo-root>\.claude\worktrees\agent-aea998f94efaa2eb4\QuickFiler\Controllers\EfcHomeController.Timing.cs` (43 lines)
 - **Research date:** 2026-08-07
 - **Method:** static read of the production file, of its sole caller
   (`EfcHomeController.HandleSelectionChangedAsync`), and of all seven existing

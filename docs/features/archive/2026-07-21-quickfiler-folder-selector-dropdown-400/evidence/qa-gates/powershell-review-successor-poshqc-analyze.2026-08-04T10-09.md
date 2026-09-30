@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-04T10-09
 
-MCP inputs: `workspace_root = C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25`; `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`.
+MCP inputs: `workspace_root = <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25`; `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`.
 
 MCP result: `{"ok":false,"tool":"run_poshqc_analyze","summary":"Command exited with code 1.","stderr_excerpt":"PSScriptAnalyzer reported 16 issue(s)."}`
 

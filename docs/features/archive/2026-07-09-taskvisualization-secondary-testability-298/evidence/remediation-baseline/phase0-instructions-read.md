@@ -5,10 +5,10 @@ Timestamp: 2026-07-10T07-55
 Policy Order: CLAUDE.md -> .claude/rules/general-code-change.md -> .claude/rules/general-unit-test.md -> .claude/rules/csharp.md
 
 Files Read:
-- C:/Users/DanMoisan/repos/TaskMaster-wt/winforms-298/CLAUDE.md
-- C:/Users/DanMoisan/repos/TaskMaster-wt/winforms-298/.claude/rules/general-code-change.md
-- C:/Users/DanMoisan/repos/TaskMaster-wt/winforms-298/.claude/rules/general-unit-test.md
-- C:/Users/DanMoisan/repos/TaskMaster-wt/winforms-298/.claude/rules/csharp.md
+- <user-profile>/repos/TaskMaster-wt/winforms-298/CLAUDE.md
+- <user-profile>/repos/TaskMaster-wt/winforms-298/.claude/rules/general-code-change.md
+- <user-profile>/repos/TaskMaster-wt/winforms-298/.claude/rules/general-unit-test.md
+- <user-profile>/repos/TaskMaster-wt/winforms-298/.claude/rules/csharp.md
 
 Notes:
 - All four policy documents were read in full this cycle before any edits.

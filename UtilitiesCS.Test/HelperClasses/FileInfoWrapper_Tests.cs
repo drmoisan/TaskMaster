@@ -12,6 +12,11 @@ namespace UtilitiesCS.Test.HelperClasses
     [TestClass]
     public class FileInfoWrapper_Tests
     {
+        // Issue #931: a rooted literal that is not expected to exist and does not point into the
+        // repository. The three metadata tests assert only path computations and Exists, so no
+        // file handle is opened and the outcome does not depend on any other process.
+        private const string FixturePath = @"C:\Repo\fixture.sln";
+
         [TestMethod]
         public void Constructor_WhenFileInfoIsNull_ThrowsArgumentNullException()
         {
@@ -26,7 +31,7 @@ namespace UtilitiesCS.Test.HelperClasses
         public void Properties_ShouldMirrorWrappedFileInfo()
         {
             // Arrange
-            var file = GetSolutionFile();
+            var file = new FileInfo(FixturePath);
             var wrapper = new FileInfoWrapper(file);
 
             // Assert
@@ -42,7 +47,7 @@ namespace UtilitiesCS.Test.HelperClasses
         public void ExplicitDirectoryCast_ShouldReturnWrappedContainingDirectory()
         {
             // Arrange
-            var wrapper = new FileInfoWrapper(GetSolutionFile());
+            var wrapper = new FileInfoWrapper(new FileInfo(FixturePath));
 
             // Act
             var directoryWrapper = (DirectoryInfoWrapper)wrapper;
@@ -55,13 +60,26 @@ namespace UtilitiesCS.Test.HelperClasses
         [TestMethod]
         public void OpenRead_ShouldReturnReadableStreamForWrappedFile()
         {
-            // Arrange
-            var wrapper = new FileInfoWrapper(GetSolutionFile());
+            // Arrange: the sentinel is a stream this test opens and owns over the running test
+            // host's own loaded assembly image, read-only with read-write sharing, so no other
+            // process's handle can deny the open and no repository or temporary file is involved
+            // (issue #931). The seam's OpenRead member returns the concrete FileStream type, so a
+            // MemoryStream cannot stand in for it through the seam.
+            using var sentinel = new FileStream(
+                typeof(FileInfoWrapper_Tests).Assembly.Location,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite
+            );
+            var fileInfo = new Mock<IFileInfo>(MockBehavior.Strict);
+            fileInfo.Setup(x => x.OpenRead()).Returns(sentinel);
+            var wrapper = new FileInfoWrapper(fileInfo.Object);
 
             // Act
-            using var stream = wrapper.OpenRead();
+            FileStream stream = wrapper.OpenRead();
 
             // Assert
+            stream.Should().BeSameAs(sentinel);
             stream.CanRead.Should().BeTrue();
             stream.Length.Should().BeGreaterThan(0);
         }
@@ -70,7 +88,7 @@ namespace UtilitiesCS.Test.HelperClasses
         public void ToString_ShouldDelegateToWrappedFileInfo()
         {
             // Arrange
-            var file = GetSolutionFile();
+            var file = new FileInfo(FixturePath);
             var wrapper = new FileInfoWrapper(file);
 
             // Act
@@ -334,26 +352,6 @@ namespace UtilitiesCS.Test.HelperClasses
             wrapper.Refresh();
             wrapper.SetAccessControl(fileSecurity);
             wrapper.ToString().Should().Be("wrapped-file");
-        }
-
-        private static FileInfo GetSolutionFile()
-        {
-            var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-
-            while (current is not null)
-            {
-                var solutionPath = Path.Combine(current.FullName, "TaskMaster.sln");
-                if (File.Exists(solutionPath))
-                {
-                    return new FileInfo(solutionPath);
-                }
-
-                current = current.Parent;
-            }
-
-            throw new InvalidOperationException(
-                "The TaskMaster solution file could not be located from the test assembly path."
-            );
         }
     }
 }

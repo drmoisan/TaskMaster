@@ -11,5 +11,5 @@ Output Summary:
 - Baseline coverage (production assembly UtilitiesCS.dll, first-party):
   - Line coverage: 88.49% (35834 / 40496 lines).
   - Branch coverage: 82.21% (8257 / 10044 branches).
-- Coverage report: Cobertura (`DanMoisan_MEGALODON4_2026-07-18.08_04_07.cobertura.xml`). Single package `UtilitiesCS`.
+- Coverage report: Cobertura (`<user>_<host>_2026-07-18.08_04_07.cobertura.xml`). Single package `UtilitiesCS`.
 - Note: the collector emitted a transient "Profiler was not initialized" message from an isolated worker; the merged Cobertura attachment was nonetheless produced with the numeric rates above.

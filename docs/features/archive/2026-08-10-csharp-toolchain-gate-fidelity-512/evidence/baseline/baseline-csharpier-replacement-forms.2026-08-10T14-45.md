@@ -28,7 +28,7 @@ disagree with CI."
 **The first half of that claim does not reproduce.** A global CSharpier is present on this machine:
 
 ```
-Get-Command csharpier -> C:\Users\DanMoisan\.dotnet\tools\csharpier.exe
+Get-Command csharpier -> <user-profile>\.dotnet\tools\csharpier.exe
 global version: 1.3.0
 ```
 

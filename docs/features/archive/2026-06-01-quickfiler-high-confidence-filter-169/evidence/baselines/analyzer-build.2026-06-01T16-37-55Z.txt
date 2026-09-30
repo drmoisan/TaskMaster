@@ -1,5 +1,5 @@
 Command: msbuild TaskMaster.sln /t:Build /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
-Working directory: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+Working directory: <user-profile>\repos\TaskMaster-wt-2026-06-01-08-21
 Timestamp (UTC): 2026-06-01T16-37-55Z
 MSBuild: 18.6.3+84d3e95b4 for .NET Framework
 

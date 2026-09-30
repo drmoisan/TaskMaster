@@ -11,12 +11,12 @@ Policy Order:
 6. `.claude/rules/benchmark-baselines.md`
 
 Files read (in the order above, in full):
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a990f1a3b96eb6fae\CLAUDE.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\general-code-change.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\general-unit-test.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\csharp.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\ci-workflows.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\benchmark-baselines.md`
+- `<repo-root>\.claude\worktrees\agent-a990f1a3b96eb6fae\CLAUDE.md`
+- `<repo-root>\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\general-code-change.md`
+- `<repo-root>\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\general-unit-test.md`
+- `<repo-root>\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\csharp.md`
+- `<repo-root>\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\ci-workflows.md`
+- `<repo-root>\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\benchmark-baselines.md`
 
 Also read for feature context (per delegation directive, not part of the six-file policy order above):
 - `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/issue.md`

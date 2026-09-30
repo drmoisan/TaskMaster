@@ -1,7 +1,7 @@
 # Research: Issue #742 — Date/time rendering missing `CultureInfo.InvariantCulture`
 
 This is a re-verification pass. Every claim below was re-derived by reading the current
-worktree (`C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6f0fc7cce6d28aaa`)
+worktree (`<repo-root>/.claude/worktrees/agent-a6f0fc7cce6d28aaa`)
 on 2026-09-12, not carried over from the prior research artifact
 (`agent-a1324bb743d9f3fbe`) or from the issue body. Where a claim from the prior artifact
 was checked and found accurate, it is retained; where it could not be verified as written,

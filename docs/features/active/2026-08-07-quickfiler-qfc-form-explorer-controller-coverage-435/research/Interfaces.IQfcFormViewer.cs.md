@@ -6,7 +6,7 @@ Timestamp: 2026-08-07T22-40
 
 | Field | Value |
 | --- | --- |
-| Production file | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Interfaces\IQfcFormViewer.cs` |
+| Production file | `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Interfaces\IQfcFormViewer.cs` |
 | Exact line count | 51 |
 | Declared namespace | **`QuickFiler`** (line 10) — **not** `QuickFiler.Interfaces`, despite the file living in the `Interfaces/` folder. See §3, "Namespace/folder mismatch". |
 | Declared type | `public interface IQfcFormViewer : IForm` (line 12) |

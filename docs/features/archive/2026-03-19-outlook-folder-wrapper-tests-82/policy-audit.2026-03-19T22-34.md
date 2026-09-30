@@ -86,7 +86,7 @@ Per-file final coverage recorded in the canonical coverage gate:
 
 ## Appendix A — live review-time commands run
 
-Check-only validation commands executed from `C:\Users\DanMoisan\repos\TaskMaster` during this review:
+Check-only validation commands executed from `<repo-root>` during this review:
 
 1. `csharpier format . --compilation-errors-as-warnings`
 2. `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe TaskMaster.sln /m /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`

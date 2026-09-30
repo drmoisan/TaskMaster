@@ -20,7 +20,7 @@ Total tests: 233
 
 ## Produced .coverage path
 
-`C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-29-09-38\TestResults\3fdf5b12-d7b2-46d6-b1b1-e91fdc638167\DanMoisan_MEGALODON4_2026-06-29.12_35_42.coverage`
+`<user-profile>\repos\TaskMaster-wt-2026-06-29-09-38\TestResults\3fdf5b12-d7b2-46d6-b1b1-e91fdc638167\<user>_<host>_2026-06-29.12_35_42.coverage`
 
 ## Output Summary
 

@@ -5,7 +5,7 @@ Timestamp: 2026-08-08T16-16
 Task: [P0-T7]
 
 Command: `pwsh -File scripts/vscode/Invoke-Restore.ps1` (run from the workspace root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0`)
+`<repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0`)
 
 EXIT_CODE: 0
 
@@ -35,7 +35,7 @@ MSBuild version 18.8.2+ce25c0108 for .NET Framework
 
 ```
 Feeds used:
-    C:\Users\DanMoisan\.nuget\packages\
+    <user-profile>\.nuget\packages\
     https://api.nuget.org/v3/index.json
     C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
 

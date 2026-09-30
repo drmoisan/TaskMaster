@@ -7,16 +7,16 @@ Policy Order:
 5. .github/instructions/csharp-unit-test.instructions.md
 
 Files Read:
-- c:\Users\DanMoisan\repos\TaskMaster\.github\copilot-instructions.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\instructions\general-code-change.instructions.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\instructions\general-unit-test.instructions.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\instructions\csharp-code-change.instructions.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\instructions\csharp-unit-test.instructions.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\skills\policy-compliance-order\SKILL.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\skills\atomic-plan-contract\SKILL.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\skills\acceptance-criteria-tracking\SKILL.md
-- c:\Users\DanMoisan\repos\TaskMaster\.github\skills\evidence-and-timestamp-conventions\SKILL.md
-- c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-27-quickfiler-navigation-key-collision-111\issue.md
-- c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-03-27-quickfiler-navigation-key-collision-111\plan.2026-03-27T12-45.md
+- <repo-root>\.github\copilot-instructions.md
+- <repo-root>\.github\instructions\general-code-change.instructions.md
+- <repo-root>\.github\instructions\general-unit-test.instructions.md
+- <repo-root>\.github\instructions\csharp-code-change.instructions.md
+- <repo-root>\.github\instructions\csharp-unit-test.instructions.md
+- <repo-root>\.github\skills\policy-compliance-order\SKILL.md
+- <repo-root>\.github\skills\atomic-plan-contract\SKILL.md
+- <repo-root>\.github\skills\acceptance-criteria-tracking\SKILL.md
+- <repo-root>\.github\skills\evidence-and-timestamp-conventions\SKILL.md
+- <repo-root>\docs\features\active\2026-03-27-quickfiler-navigation-key-collision-111\issue.md
+- <repo-root>\docs\features\active\2026-03-27-quickfiler-navigation-key-collision-111\plan.2026-03-27T12-45.md
 
 Output Summary: Verified minor-audit boundary and loaded the required repository policy and execution-contract files before Phase 0 baseline commands.

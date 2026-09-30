@@ -5,10 +5,10 @@
 
 ## Files Read
 
-1. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\CLAUDE.md` (full file)
-2. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-code-change.md` (full file)
-3. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-unit-test.md` (full file)
-4. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\csharp.md` (full file)
+1. `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\CLAUDE.md` (full file)
+2. `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-code-change.md` (full file)
+3. `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-unit-test.md` (full file)
+4. `<repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\csharp.md` (full file)
 
 ## [P0-T1] CLAUDE.md — Key Clauses Recorded Verbatim
 

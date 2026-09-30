@@ -5,7 +5,7 @@ Timestamp: 2026-08-07T22-05
 Scope of this document: cross-cutting facts that every per-file F4 research artifact and the F4
 atomic plan depend on. Authored by the MOVE-MONITOR cluster researcher because that cluster is the
 smallest. All claims below are verified by reading files in the worktree
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a04d34f22febda6bf` and are cited
+`<repo-root>\.claude\worktrees\agent-a04d34f22febda6bf` and are cited
 `file:line`.
 
 Upstream contract: child F1 (`quickfiler-coverage-denominator-and-exemption-ledger`) owns (a) the

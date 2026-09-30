@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific code + test standards)
 
 Files read (in the required order above):
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\csharp.md
 
 Supporting skill/context files also consulted for this remediation:
 - .claude/skills/atomic-plan-contract/SKILL.md

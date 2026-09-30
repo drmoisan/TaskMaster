@@ -14,15 +14,15 @@ The repository contains nine surviving `.coverage` binaries under `./TestResults
 between `10_51_16` and `11_46_50` (the Phase 0–7 toolchain runs):
 
 ```
-TestResults/ee0b20f2-.../DanMoisan_MEGALODON4_2026-06-29.10_51_16.coverage
-TestResults/0d138fcc-.../DanMoisan_MEGALODON4_2026-06-29.10_59_19.coverage
-TestResults/c12d4e22-.../DanMoisan_MEGALODON4_2026-06-29.11_09_53.coverage
-TestResults/05daaf5a-.../DanMoisan_MEGALODON4_2026-06-29.11_14_56.coverage
-TestResults/194d0923-.../DanMoisan_MEGALODON4_2026-06-29.11_21_40.coverage
-TestResults/1a5a166c-.../DanMoisan_MEGALODON4_2026-06-29.11_29_57.coverage
-TestResults/866673d0-.../DanMoisan_MEGALODON4_2026-06-29.11_34_04.coverage
-TestResults/37bdce83-.../DanMoisan_MEGALODON4_2026-06-29.11_41_44.coverage
-TestResults/2425c4d0-.../DanMoisan_MEGALODON4_2026-06-29.11_46_50.coverage
+TestResults/ee0b20f2-.../<user>_<host>_2026-06-29.10_51_16.coverage
+TestResults/0d138fcc-.../<user>_<host>_2026-06-29.10_59_19.coverage
+TestResults/c12d4e22-.../<user>_<host>_2026-06-29.11_09_53.coverage
+TestResults/05daaf5a-.../<user>_<host>_2026-06-29.11_14_56.coverage
+TestResults/194d0923-.../<user>_<host>_2026-06-29.11_21_40.coverage
+TestResults/1a5a166c-.../<user>_<host>_2026-06-29.11_29_57.coverage
+TestResults/866673d0-.../<user>_<host>_2026-06-29.11_34_04.coverage
+TestResults/37bdce83-.../<user>_<host>_2026-06-29.11_41_44.coverage
+TestResults/2425c4d0-.../<user>_<host>_2026-06-29.11_46_50.coverage
 ```
 
 No `.coverage` binary from the 12-40 / 12-50 run that produced the canonical 233/233 and 82.74%

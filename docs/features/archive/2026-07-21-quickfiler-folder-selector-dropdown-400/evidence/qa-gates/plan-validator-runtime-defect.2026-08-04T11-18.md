@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-04T11-18
 
-Command: `mcp__drm-copilot__validate_orchestration_artifacts(workspace_root='C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25', artifact_type='plan', artifact_path='docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md')`
+Command: `mcp__drm-copilot__validate_orchestration_artifacts(workspace_root='<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25', artifact_type='plan', artifact_path='docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md')`
 
 EXIT_CODE: 1
 

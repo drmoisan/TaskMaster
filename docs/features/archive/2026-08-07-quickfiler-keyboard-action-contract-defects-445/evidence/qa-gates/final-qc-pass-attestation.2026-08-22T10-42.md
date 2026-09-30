@@ -4,7 +4,7 @@ Timestamp: 2026-08-22T10-42
 
 ## Command: the ordered list of P5-T1 through P5-T7 commands as executed
 
-All run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`, with `DOTNET` = `C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk\dotnet.exe`.
+All run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`, with `DOTNET` = `<repo-root>\.dotnet-sdk\dotnet.exe`.
 
 **Stage 1 — Formatting (P5-T1, mutating, scoped):**
 ```

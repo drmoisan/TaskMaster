@@ -1,7 +1,7 @@
 # Reduced-Audit Handoff
 
 Timestamp: 2026-04-13T23-19
-Plan Path: `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-13-outlook-com-sta-materialization-128\plan.2026-04-13T22-47.md`
+Plan Path: `<repo-root>\docs\features\active\2026-04-13-outlook-com-sta-materialization-128\plan.2026-04-13T22-47.md`
 
 ## Changed Files
 

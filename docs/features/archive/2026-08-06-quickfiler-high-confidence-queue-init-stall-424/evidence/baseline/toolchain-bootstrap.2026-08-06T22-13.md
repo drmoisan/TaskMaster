@@ -2,7 +2,7 @@
 
 - **Issue:** #424
 - **Task:** [P0-T1]
-- **Repo root:** `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-04T18-38`
+- **Repo root:** `<user-profile>\repos\TaskMaster-wt\2026-08-04T18-38`
 - **Branch:** `bug/quickfiler-high-confidence-queue-init-stall-424`
 
 Timestamp: 2026-08-06T22-13
@@ -12,7 +12,7 @@ Timestamp: 2026-08-06T22-13
 Command: `pwsh -NoProfile -Command "& ./scripts/vscode/Install-RepoDotNetSdk.ps1"`
 EXIT_CODE: 0
 
-Output Summary: `Repo-local .NET SDK 8.0.205 is already installed at C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-04T18-38\.dotnet-sdk.` No download or install action was required; the script returned without error.
+Output Summary: `Repo-local .NET SDK 8.0.205 is already installed at <user-profile>\repos\TaskMaster-wt\2026-08-04T18-38\.dotnet-sdk.` No download or install action was required; the script returned without error.
 
 ## Step 2 — Local dotnet tool manifest restore
 
@@ -40,7 +40,7 @@ Output Summary: `1.2.6`
 Command: `dotnet-coverage --version`
 EXIT_CODE: 0
 
-Output Summary: `18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3` (resolved from the global tools path `C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe`).
+Output Summary: `18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3` (resolved from the global tools path `<user-profile>\.dotnet\tools\dotnet-coverage.exe`).
 
 ## Aggregate
 

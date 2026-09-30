@@ -9,7 +9,7 @@ Before this successful run, two blocking environment issues were resolved (neith
 
 1. NuGet packages were not restored in this fresh worktree. Ran
    `nuget.exe restore TaskMaster.sln` (nuget.exe located at
-   `C:\Users\DanMoisan\AppData\Local\Microsoft\WinGet\Packages\Microsoft.NuGet_Microsoft.Winget.Source_8wekyb3d8bbwe\nuget.exe`).
+   `<user-profile>\AppData\Local\Microsoft\WinGet\Packages\Microsoft.NuGet_Microsoft.Winget.Source_8wekyb3d8bbwe\nuget.exe`).
    170 packages restored to the (gitignored) `packages/` folder.
 
 2. After restore, `VBFunctions.csproj` and `UtilitiesCS.csproj` still failed with `CSC : error CS0006`

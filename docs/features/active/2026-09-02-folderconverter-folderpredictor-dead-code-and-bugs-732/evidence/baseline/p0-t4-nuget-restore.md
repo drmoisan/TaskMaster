@@ -9,4 +9,4 @@ Output Summary:
 MSBuild Restore target on TaskMaster.sln succeeded: "Build succeeded. 0 Warning(s) 0 Error(s)"
 in 4.13s. "Installed: 172 package(s) to packages.config projects." The `packages/`
 directory now exists at the worktree root
-(C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aa274c17b2c682ab3\packages).
+(<repo-root>\.claude\worktrees\agent-aa274c17b2c682ab3\packages).

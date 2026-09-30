@@ -6,7 +6,7 @@
 - **Last Updated:** 2026-05-07
 - **Status:** Revised in place — Phase 4 converted from manual Outlook validation to fully automated static implementation inspection
 - **Work Mode:** `full-bug`
-- **Plan Path:** `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\remediation-plan.2026-05-06T20-33.md`
+- **Plan Path:** `<repo-root>\docs\features\active\2026-05-05-outlook-startup-ui-thread-deblock-141\remediation-plan.2026-05-06T20-33.md`
 - **Requirements Sources:** `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/spec.md`
 - **Supporting Context:** `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/remediation-inputs.2026-05-06T20-33.md`, `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/policy-audit.2026-05-06T20-33.md`, `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/code-review.2026-05-06T20-33.md`, `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/feature-audit.2026-05-06T20-33.md`, `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/other/remediation-scope.2026-05-06T21-10-15-04-00.md`, `docs/features/active/2026-05-05-outlook-startup-ui-thread-deblock-141/evidence/qa-gates/csharp-coverage-summary.2026-05-06T21-57-28-04-00.md`, `artifacts/pr_context.summary.txt`, `artifacts/pr_context.appendix.txt`, `artifacts/orchestration/orchestrator-state.json`
 

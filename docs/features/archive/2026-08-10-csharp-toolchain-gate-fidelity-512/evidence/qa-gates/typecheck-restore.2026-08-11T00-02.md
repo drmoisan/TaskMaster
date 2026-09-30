@@ -32,7 +32,7 @@ in the compiler's view of the tree and not merely in `git status`.
 
 ```
 $ ls -la UtilitiesCS/bin/Debug/UtilitiesCS.dll
--rwxr-xr-x 1 DanMoisan 197121 17612288 Aug 10 23:13 UtilitiesCS/bin/Debug/UtilitiesCS.dll*
+-rwxr-xr-x 1 <user> 197121 17612288 Aug 10 23:13 UtilitiesCS/bin/Debug/UtilitiesCS.dll*
 
 $ ls -d */bin/Debug | wc -l
 18

@@ -6,7 +6,7 @@ Timestamp: 2026-08-07T22-40
 
 | Field | Value |
 | --- | --- |
-| Production file | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Interfaces\IFilerFormController.cs` |
+| Production file | `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Interfaces\IFilerFormController.cs` |
 | Exact line count | 25 |
 | Declared namespace | `QuickFiler.Interfaces` (line 7) |
 | Declared type | `public interface IFilerFormController` (line 9) — no base interface |

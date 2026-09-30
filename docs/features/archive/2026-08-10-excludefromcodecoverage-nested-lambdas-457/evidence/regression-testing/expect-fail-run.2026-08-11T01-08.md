@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-11T01-08
 Command (policy record): `mcp__drm-copilot__run_poshqc_test` with
-`workspace_root = C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a` and
+`workspace_root = <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a` and
 `scan_folders = ["tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Tests.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"]`
 Command (paired direct run, source of every numeric value and per-test name below):
 `pwsh -NoProfile -Command 'Import-Module Pester -MinimumVersion 5.0; $c = New-PesterConfiguration; $c.Run.Path = @("tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Tests.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"); $c.Run.PassThru = $true; $c.Output.Verbosity = "None"; $c.CodeCoverage.Enabled = $true; $c.CodeCoverage.Path = "scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1"; $c.CodeCoverage.OutputPath = "<FEATURE>/evidence/regression-testing/pester-coverage.2026-08-11T01-08.xml"; $r = Invoke-Pester -Configuration $c; …; if ($r.FailedCount -gt 0) { exit 1 } else { exit 0 }'`
@@ -13,7 +13,7 @@ MCP Result:
 {
   "ok": false,
   "tool": "run_poshqc_test",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a",
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a",
   "summary": "Command exited with code 10."
 }
 ```

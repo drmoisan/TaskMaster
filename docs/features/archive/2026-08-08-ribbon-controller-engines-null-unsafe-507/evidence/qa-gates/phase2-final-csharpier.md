@@ -3,7 +3,7 @@
 Timestamp: 2026-08-08T16-55
 
 Command: `csharpier .`
-Invocation used: `C:/Users/DanMoisan/.dotnet/tools/csharpier format .` (CSharpier 1.3.0 requires the
+Invocation used: `<user-profile>/.dotnet/tools/csharpier format .` (CSharpier 1.3.0 requires the
 `format`/`check` subcommand; see the Phase 0 baseline artifact for the same note.)
 
 EXIT_CODE: 0

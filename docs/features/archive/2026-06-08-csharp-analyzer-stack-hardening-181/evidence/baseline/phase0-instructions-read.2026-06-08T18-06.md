@@ -10,11 +10,11 @@ Policy Order:
 5. .claude/rules/ci-workflows.md
 
 Files Read (explicit list):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\ci-workflows.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\ci-workflows.md
 
 Notes:
 - Policy order resolved per `policy-compliance-order` skill. CLAUDE.md and the two

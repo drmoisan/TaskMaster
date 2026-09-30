@@ -1,7 +1,7 @@
 # Evidence: Focused Diff Verification
 
 - **Timestamp:** 2026-03-27T08:06 UTC
-- **Command:** `git -C c:\Users\DanMoisan\repos\TaskMaster-residual-clean diff --name-only origin/development...chore/mixed-branch-excluded-work-clean`
+- **Command:** `git -C <user-profile>\repos\TaskMaster-residual-clean diff --name-only origin/development...chore/mixed-branch-excluded-work-clean`
 - **EXIT_CODE:** 0
 - **Output Summary:**
 

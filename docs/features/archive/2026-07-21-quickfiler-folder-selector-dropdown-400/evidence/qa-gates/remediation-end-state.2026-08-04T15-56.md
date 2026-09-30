@@ -6,7 +6,7 @@ Output Summary: The final remediation worktree contains only the P11 byte-normal
 ## Reconciliation
 
 - Source/test scope: `scripts/vscode/Invoke-MSTestWithCoverage.ps1` and `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1` are the planned P11 paths; the fresh review verified scoped PSScriptAnalyzer has zero findings, focused Pester passes 25/25, and wrapper command coverage is 90.00%.
-- Configuration scope: `.codex/config.toml` changes only the verified `@danmoisan/drm-copilot-mcp@1.0.21` pin recorded by P11-T15.
+- Configuration scope: `.codex/config.toml` changes only the verified `@<user>/drm-copilot-mcp@1.0.21` pin recorded by P11-T15.
 - Evidence scope: all modified or untracked feature paths belong to the P11 normalization/recovery/coverage/validation evidence, P10 validation evidence, bounded runbook, or the new independent policy/code/feature audit trio.
 - Acceptance criteria: the authoritative `spec.md` has 19 of 19 criteria checked; the independent feature audit records 19 PASS results.
 - Validators: the fresh published SDK server version `1.0.21` validated the executed remediation plan and the new policy-audit, code-review, and feature-audit artifacts with `ok: true` and `isError: false`.

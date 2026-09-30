@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P4-T2]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; Select-String -Path 'docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md' -Pattern '\*\*AC19|\*\*AC20|\*\*AC21'"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; Select-String -Path 'docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md' -Pattern '\*\*AC19|\*\*AC20|\*\*AC21'"`
 EXIT_CODE: 0
 
 ## Output Summary

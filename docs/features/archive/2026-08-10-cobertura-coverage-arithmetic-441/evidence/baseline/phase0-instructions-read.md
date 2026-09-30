@@ -6,8 +6,8 @@ Policy Order: `CLAUDE.md` -> `.claude/rules/general-code-change.md` -> `.claude/
 
 ## Resolved `<ROOT>`
 
-- `git rev-parse --show-toplevel` output: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a1cc35d4011888c2a`
-- Resolved `<ROOT>` (backslash form): `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a`
+- `git rev-parse --show-toplevel` output: `<repo-root>/.claude/worktrees/agent-a1cc35d4011888c2a`
+- Resolved `<ROOT>` (backslash form): `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a`
 - Resolution acceptance: the directory contains both
   `scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1` and
   `docs\features\active\2026-08-10-cobertura-coverage-arithmetic-441\spec.md`. Both were read in
@@ -17,14 +17,14 @@ Policy Order: `CLAUDE.md` -> `.claude/rules/general-code-change.md` -> `.claude/
 
 | Task | File |
 | --- | --- |
-| P0-T1 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\CLAUDE.md` |
-| P0-T2 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\.claude\rules\general-code-change.md` |
-| P0-T3 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\.claude\rules\general-unit-test.md` |
-| P0-T4 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\.claude\rules\powershell.md` |
-| P0-T5 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\docs\features\active\2026-08-10-cobertura-coverage-arithmetic-441\spec.md` |
-| P0-T6 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\docs\features\active\2026-08-10-cobertura-coverage-arithmetic-441\research\2026-08-10T14-20-cobertura-arithmetic-research.md` |
-| P0-T7 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1` |
-| P0-T7 | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a\tests\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.Tests.ps1` |
+| P0-T1 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\CLAUDE.md` |
+| P0-T2 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\.claude\rules\general-code-change.md` |
+| P0-T3 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\.claude\rules\general-unit-test.md` |
+| P0-T4 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\.claude\rules\powershell.md` |
+| P0-T5 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\docs\features\active\2026-08-10-cobertura-coverage-arithmetic-441\spec.md` |
+| P0-T6 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\docs\features\active\2026-08-10-cobertura-coverage-arithmetic-441\research\2026-08-10T14-20-cobertura-arithmetic-research.md` |
+| P0-T7 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1` |
+| P0-T7 | `<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a\tests\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.Tests.ps1` |
 
 Seven distinct policy/spec/research/source paths are enumerated above (P0-T7 contributes two source
 files, giving eight rows across seven tasks).

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T12:48:51Z
 
-Command: `TOOL="/c/Users/DanMoisan/.dotnet/tools/csharpier.exe"; F1="QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs"; F2="QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs"; "$TOOL" format "$F1" "$F2" --log-level Information; "$TOOL" format "$F1" "$F2" --log-level Information; "$TOOL" check "$F1" "$F2" --log-level Information; wc -l "$F1" "$F2"`
+Command: `TOOL="/c/Users/<user>/.dotnet/tools/csharpier.exe"; F1="QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs"; F2="QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs"; "$TOOL" format "$F1" "$F2" --log-level Information; "$TOOL" format "$F1" "$F2" --log-level Information; "$TOOL" check "$F1" "$F2" --log-level Information; wc -l "$F1" "$F2"`
 
 EXIT_CODE: 0
 

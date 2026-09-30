@@ -69,7 +69,7 @@ namespace QuickFiler.Test.Controllers
         {
             // Arrange / Act / Assert
             EfcSelectionGuard
-                .IsValidFilingSelection(@"C:\Users\testuser\OneDrive - Contoso")
+                .IsValidFilingSelection(@"C:\Fixtures\testuser\OneDrive - Contoso")
                 .Should()
                 .BeFalse("a drive-rooted filesystem path is not an archive-relative stem");
         }
@@ -179,7 +179,7 @@ namespace QuickFiler.Test.Controllers
                 @"\Archive\Clients",
                 @"\External\Clients",
                 @"\\mailbox@example.com",
-                @"C:\Users\testuser\OneDrive - Contoso",
+                @"C:\Fixtures\testuser\OneDrive - Contoso",
                 "==== SUGGESTIONS ====",
             };
             int evaluated = 0;

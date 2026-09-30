@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P4-T3]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git add -A; git commit -m 'fix(#503): make the AC5 ribbon-XML assertion non-vacuous and restore RibbonExplorer.xml line count'; git rev-parse HEAD; git status --porcelain"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git add -A; git commit -m 'fix(#503): make the AC5 ribbon-XML assertion non-vacuous and restore RibbonExplorer.xml line count'; git rev-parse HEAD; git status --porcelain"`
 EXIT_CODE: 0
 
 ## Pre-commit gate satisfied

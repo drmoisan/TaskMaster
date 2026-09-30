@@ -34,11 +34,11 @@ are recorded here for completeness:
    `feature-audit.2026-09-04T02-11.md`. The full-diff audit proceeded.
 
 2. Verbatim: *"A DECOY untracked mirror of this feature folder exists under
-   `C:/Users/DanMoisan/repos/TaskMaster-wt/2026-09-02T08-47/docs/features/active/...`. Do not read,
+   `<user-profile>/repos/TaskMaster-wt/2026-09-02T08-47/docs/features/active/...`. Do not read,
    edit, or cite it."*
    Disposition: **accepted, not a narrowing.** This disambiguates two copies of the same folder
    rather than excluding any part of the branch diff. All evidence in this audit was read from the
-   worktree at `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a9f3f171e35df71ef`.
+   worktree at `<repo-root>/.claude/worktrees/agent-a9f3f171e35df71ef`.
 
 `artifacts/orchestration/orchestrator-state.json` was checked and does not appear in the branch
 diff at all, so its `skip-worktree` status required no adjudication.
@@ -64,7 +64,7 @@ Every claim this review could re-derive from primary artifacts was re-derived ra
 | Repo line 85.46% / branch 79.52% | Read `/coverage/@line-rate` and `@branch-rate` | Confirmed: `0.85459` / `0.795242` |
 | Changed lines 59 coverable, 52 covered, 88.14% | Re-derived the changed-line set from `git diff -U0` and re-joined it to the Cobertura per-line `hits` | Confirmed exactly: 59 / 52 / 88.1356% |
 | Uncovered changed lines outside `U` = 0 | Same join, enumerating every uncovered changed coverable line | Confirmed: the uncovered set is exactly `U`, cardinality 7, **0 members outside it** |
-| No unredacted host token in any committed artifact | `git grep -i -E "danmoisan\|megalodon\|dmoisan"` over **every** branch commit, plus an added-content sweep over the whole diff | Confirmed: 0 hits in all 8 commits and 0 hits across 9,605 added content lines |
+| No unredacted host token in any committed artifact | `git grep -i -E "<user>\|megalodon\|dmoisan"` over **every** branch commit, plus an added-content sweep over the whole diff | Confirmed: 0 hits in all 8 commits and 0 hits across 9,605 added content lines |
 
 The one item requiring independent adjudication — AC12's check-off against an 88.14% strict
 aggregate — is adjudicated in `feature-audit.2026-09-04T02-11.md` as **PARTIAL**. The coverage
@@ -253,10 +253,10 @@ Files written under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence
 
 | Sweep | Result |
 |---|---|
-| Unredacted account/host tokens (`danmoisan`, `megalodon`, `dmoisan`, `realgoodfoods`, `danmoi~1`, case-insensitive) across all 9,605 added content lines | **0** |
+| Unredacted account/host tokens (`<user>`, `megalodon`, `dmoisan`, `realgoodfoods`, `<user>`, case-insensitive) across all 9,605 added content lines | **0** |
 | Same tokens in any changed **path name** | **0** |
 | Same tokens in the feature-folder tree of **every one of the 8 branch commits** (`git grep` per commit) | **0** — sanitization was performed in-task, not after commit, so no pre-sanitization blob is reachable in branch history |
-| Absolute `C:\Users\…` paths in added content | 407 lines, all of the form `C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-<id>\…` |
+| Absolute `C:\Users\…` paths in added content | 407 lines, all of the form `<repo-root>\.claude\worktrees\agent-<id>\…` |
 
 **Verdict: PASS.** The account name is replaced by the literal `REDACTED` in all 407 occurrences,
 which satisfies the account/host-name prohibition. The residual absolute-path *shape* — drive,
@@ -474,7 +474,7 @@ Commands run by **this review** (all check-only, no mutation):
 
 - `git merge-base origin/main HEAD`; `git log --oneline origin/main..HEAD`
 - `git diff --numstat origin/main...HEAD`; `git diff -U0 origin/main...HEAD -- <4 production files>`
-- `git grep -i -l -E "danmoisan|megalodon|dmoisan" <each of 8 commits> -- <feature folder>`
+- `git grep -i -l -E "<user>|megalodon|dmoisan" <each of 8 commits> -- <feature folder>`
 - `git status --porcelain=v1 --ignored --untracked-files=all -- coverage artifacts`
 - PowerShell XML joins over `coverage/p0-t6-baseline.cobertura.xml` and
   `coverage/p6-t6-postchange.cobertura.xml`; regex counts over the two detailed msbuild logs;

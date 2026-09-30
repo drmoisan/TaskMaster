@@ -7,7 +7,7 @@ requires. A non-zero result here is the **expected** outcome for this task only.
 
 ## Channel 1 — the MCP function (the recorded channel)
 
-Command: `mcp__drm-copilot__run_poshqc_test` with `workspace_root = "C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["tests/scripts/vscode"]`
+Command: `mcp__drm-copilot__run_poshqc_test` with `workspace_root = "<repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["tests/scripts/vscode"]`
 EXIT_CODE: 2
 
 Return payload, verbatim:
@@ -16,7 +16,7 @@ Return payload, verbatim:
 {
   "ok": false,
   "tool": "run_poshqc_test",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
   "summary": "Command exited with code 2."
 }
 ```

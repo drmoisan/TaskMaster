@@ -2,7 +2,7 @@
 
 Timestamp: 2026-06-28T17-31
 
-Command: `dotnet-coverage merge -o docs/features/active/2026-06-26-qfc-high-confidence-queue-filter-218/evidence/qa-gates/final-coverage-cycle2-218.cobertura.xml -f cobertura TestResults/issue218-remediation-cycle2-final/22036a90-56ec-4696-b768-942ab7028136/DanMoisan_MEGALODON4_2026-06-28.17_53_03.coverage`
+Command: `dotnet-coverage merge -o docs/features/active/2026-06-26-qfc-high-confidence-queue-filter-218/evidence/qa-gates/final-coverage-cycle2-218.cobertura.xml -f cobertura TestResults/issue218-remediation-cycle2-final/22036a90-56ec-4696-b768-942ab7028136/<user>_<host>_2026-06-28.17_53_03.coverage`
 (dotnet-coverage v18.5.2; run with `MSYS_NO_PATHCONV=1`)
 
 EXIT_CODE: 0

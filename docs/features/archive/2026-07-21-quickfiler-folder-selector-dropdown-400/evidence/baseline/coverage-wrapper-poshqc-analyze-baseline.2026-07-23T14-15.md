@@ -1,7 +1,7 @@
 # Coverage wrapper PoshQC analyzer baseline
 
 - Timestamp: `2026-07-23T14-15Z`
-- Command: `mcp__drm-copilot__run_poshqc_analyze workspace_root=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[scripts/vscode,tests/scripts/vscode]`
+- Command: `mcp__drm-copilot__run_poshqc_analyze workspace_root=<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[scripts/vscode,tests/scripts/vscode]`
 - EXIT_CODE: `1`
 - Output Summary: `The folder scan reported 22 existing PSScriptAnalyzer issues. A supplementary direct scan of the two authorized files reported zero findings.`
 

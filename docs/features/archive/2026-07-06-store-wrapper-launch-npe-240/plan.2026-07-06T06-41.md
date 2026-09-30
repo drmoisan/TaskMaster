@@ -21,10 +21,10 @@
 
 ### Phase 0 — Policy Read & Baseline Capture
 
-- [x] [P0-T1] Read `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\CLAUDE.md` in full (policy order position 1). Acceptance: file read start-to-end; no section skipped.
-- [x] [P0-T2] Read `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-code-change.md` (policy order position 2). Acceptance: file read start-to-end.
-- [x] [P0-T3] Read `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-unit-test.md` (policy order position 3). Acceptance: file read start-to-end.
-- [x] [P0-T4] Read `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\csharp.md` (policy order position 4, C#-specific). Acceptance: file read start-to-end.
+- [x] [P0-T1] Read `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\CLAUDE.md` in full (policy order position 1). Acceptance: file read start-to-end; no section skipped.
+- [x] [P0-T2] Read `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-code-change.md` (policy order position 2). Acceptance: file read start-to-end.
+- [x] [P0-T3] Read `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-unit-test.md` (policy order position 3). Acceptance: file read start-to-end.
+- [x] [P0-T4] Read `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\csharp.md` (policy order position 4, C#-specific). Acceptance: file read start-to-end.
 - [x] [P0-T5] Write `docs/features/active/2026-07-06-store-wrapper-launch-npe-240/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:` (ISO-8601 `yyyy-MM-ddTHH-mm`), `Policy Order:` (the 4-item ordered list from P0-T1-T4), and an explicit list of the 4 file paths read. Acceptance: artifact exists with all three fields populated.
 - [x] [P0-T6] Confirm `docs/features/active/2026-07-06-store-wrapper-launch-npe-240/issue.md` contains an explicit `## Acceptance Criteria` heading with AC1-AC6 listed beneath it, and treat only that section as the AC source for this minor-audit plan. Record the confirmation (heading present, AC1-AC6 count = 6) in `docs/features/active/2026-07-06-store-wrapper-launch-npe-240/evidence/baseline/ac-source-confirmation.md`. Acceptance: artifact records `## Acceptance Criteria` found at issue.md and lists AC1-AC6 verbatim.
 - [x] [P0-T7] Capture the git baseline by running `git rev-parse HEAD` and `git branch --show-current` from the repo root. Write `docs/features/active/2026-07-06-store-wrapper-launch-npe-240/evidence/baseline/git-baseline.md` with `Timestamp:`, `Command:` (both commands), `EXIT_CODE:`, and `Output Summary:` (branch name and short SHA). Acceptance: artifact contains both command outputs.

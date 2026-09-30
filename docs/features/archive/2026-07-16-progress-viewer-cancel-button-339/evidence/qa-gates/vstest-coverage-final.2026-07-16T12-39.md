@@ -41,7 +41,7 @@ Assembly Results:
 Current-run Counters and Coverage:
 
 ```text
-RUNSETTINGS_PATH=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-16T12-27\docs\features\active\2026-07-16-progress-viewer-cancel-button-339\evidence\other\p2-t4-single-worker-classlevel.2026-07-16T15-49.runsettings
+RUNSETTINGS_PATH=<user-profile>\repos\TaskMaster-wt\2026-07-16T12-27\docs\features\active\2026-07-16-progress-viewer-cancel-button-339\evidence\other\p2-t4-single-worker-classlevel.2026-07-16T15-49.runsettings
 MSTEST_WORKERS=1
 MSTEST_SCOPE=ClassLevel
 ASSEMBLY_COUNT=8
@@ -76,7 +76,7 @@ Command Output:
 ```text
 EXACT_PLAN_COMMAND_SHA256=a8836c2804b540bd9ccb2bc1d91e72391e6a19a46f4c8eb1509f7082a691fdb0
 EXIT_CODE=1
-Exception: Process timed out after 600000 ms: C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe
+Exception: Process timed out after 600000 ms: <user-profile>\.dotnet\tools\dotnet-coverage.exe
 ```
 
 Failure Verification:
@@ -149,7 +149,7 @@ Command Output:
 ```text
 EXACT_PLAN_COMMAND_SHA256=a8836c2804b540bd9ccb2bc1d91e72391e6a19a46f4c8eb1509f7082a691fdb0
 EXIT_CODE=1
-Exception: Process timed out after 600000 ms: C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe
+Exception: Process timed out after 600000 ms: <user-profile>\.dotnet\tools\dotnet-coverage.exe
 ```
 
 Failure Verification:

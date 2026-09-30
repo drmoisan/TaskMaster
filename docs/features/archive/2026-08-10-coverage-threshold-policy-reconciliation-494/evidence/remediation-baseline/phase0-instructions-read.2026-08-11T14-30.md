@@ -17,5 +17,5 @@ Policy Order:
 ## Binding boundaries
 
 - TaskMaster `CLAUDE.md` and executable `.claude/**` paths must not be modified.
-- No write is authorized in `C:\Users\DanMoisan\repos\drm-copilot` or any other upstream checkout.
+- No write is authorized in `<user-profile>\repos\drm-copilot` or any other upstream checkout.
 - For this `full-bug` feature, `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` is the acceptance-criteria source for executor check-off.

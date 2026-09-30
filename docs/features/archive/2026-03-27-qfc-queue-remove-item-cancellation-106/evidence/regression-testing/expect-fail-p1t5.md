@@ -17,7 +17,7 @@ System.OperationCanceledException: The operation was canceled.
 
 Stack trace root:
   at QuickFiler.Controllers.Tests.QfcQueueTests.<RemoveItem_WhenTokenPreCancelled_DoesNotThrow>d__0.MoveNext()
-    in C:\Users\DanMoisan\repos\TaskMaster\QuickFiler.Test\Controllers\QfcQueueTests.cs:line 56
+    in <repo-root>\QuickFiler.Test\Controllers\QfcQueueTests.cs:line 56
 ```
 
 Test counts: Total 2874 | Passed 2871 | Failed 1 | Skipped 2

@@ -22,7 +22,7 @@ Output Summary:
 - Passed: 12.
 - Failed: 0.
 
-Command: & 'C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe' collect --output 'docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\regression-testing\remediation-cycle2-todoitem-focused-coverage.cobertura.xml' --output-format cobertura -- 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /TestCaseFilter:"FullyQualifiedName~ToDoItemCoverageExpansionTests" /InIsolation
+Command: & '<user-profile>\.dotnet\tools\dotnet-coverage.exe' collect --output 'docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\regression-testing\remediation-cycle2-todoitem-focused-coverage.cobertura.xml' --output-format cobertura -- 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /TestCaseFilter:"FullyQualifiedName~ToDoItemCoverageExpansionTests" /InIsolation
 EXIT_CODE: 0
 Output Summary:
 - Test Run Successful.

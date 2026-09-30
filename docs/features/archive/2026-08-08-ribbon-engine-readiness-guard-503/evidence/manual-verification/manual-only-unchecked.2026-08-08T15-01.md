@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T15-01
 
-Source file audited: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
+Source file audited: `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
 
 Command:
 ```

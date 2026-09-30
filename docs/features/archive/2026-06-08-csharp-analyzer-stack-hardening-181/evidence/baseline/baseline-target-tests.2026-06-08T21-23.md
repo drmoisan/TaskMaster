@@ -44,7 +44,7 @@ Stack trace:
 at Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowAssertFailed(String assertionName, String message)
 at Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowAssertAreEqualFailed(Object expected, Object actual, String userMessage)
 at Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual[T](T expected, T actual, String message, String expectedExpression, String actualExpression)
-at ToDoModel.Tests.Data_Model.People.PeopleScoDictionaryNewTests.People_Deserialize_CanDeserializePatternCorrectly() in C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\ToDoModel.Test\Data Model\People\PeopleScoDictionaryNewTests.cs:line 258
+at ToDoModel.Tests.Data_Model.People.PeopleScoDictionaryNewTests.People_Deserialize_CanDeserializePatternCorrectly() in <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\ToDoModel.Test\Data Model\People\PeopleScoDictionaryNewTests.cs:line 258
 ```
 
 Interpretation: deserialization routes through `FilePathHelperConverter.ReadJson` -> `new FilePathHelper(fileName, folderPath)` with `fileName == "pplkey.json"`. The observed empty `FileName` confirms the direct `(fileName, folderPath)` constructor's terminal `FilePath = Path.Combine(...)` line (or the property-set ordering it triggers) clears/overwrites `_fileName` after it is set. This grounds the [P1-T2] diagnosis in the actual runtime failure rather than the assumed mechanism: the empty-`FileName` outcome must be eliminated by correcting the constructor so `FileName` survives initialization.

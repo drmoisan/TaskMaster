@@ -11,7 +11,7 @@ Branch: `feature/quickfiler-keyboard-actions-coverage`
 
 | Attribute | Value |
 | --- | --- |
-| Path | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\IItemControler.cs` |
+| Path | `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\IItemControler.cs` |
 | Line count | 15 lines of source |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj:358` `<Compile Include="Interfaces\IItemControler.cs" />` |
 | `[ExcludeFromCodeCoverage]` status | **Absent.** Grep for `ExcludeFromCodeCoverage` across `QuickFiler\Interfaces\` returned no matches. |

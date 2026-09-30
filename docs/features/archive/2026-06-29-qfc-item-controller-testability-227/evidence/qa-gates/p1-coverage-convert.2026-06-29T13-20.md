@@ -2,7 +2,7 @@
 
 Timestamp: 2026-06-29T13-20
 
-Command: dotnet-coverage merge TestResults/3fdf5b12-d7b2-46d6-b1b1-e91fdc638167/DanMoisan_MEGALODON4_2026-06-29.12_35_42.coverage -f cobertura -o artifacts/csharp/coverage.xml
+Command: dotnet-coverage merge TestResults/3fdf5b12-d7b2-46d6-b1b1-e91fdc638167/<user>_<host>_2026-06-29.12_35_42.coverage -f cobertura -o artifacts/csharp/coverage.xml
 
 EXIT_CODE: 0
 
@@ -10,7 +10,7 @@ EXIT_CODE: 0
 
 ```
 dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.9]
-Including file ...\DanMoisan_MEGALODON4_2026-06-29.12_35_42.coverage.
+Including file ...\<user>_<host>_2026-06-29.12_35_42.coverage.
 Merged into file ...\artifacts/csharp/coverage.xml.
 ```
 

@@ -2,11 +2,11 @@
 
 Timestamp: 2026-07-25T03-33Z
 
-Command: `mcp__drm-copilot__run_poshqc_test(workspace_root="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25", scan_folders=["tests/scripts/vscode"])`
+Command: `mcp__drm-copilot__run_poshqc_test(workspace_root="<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25", scan_folders=["tests/scripts/vscode"])`
 
 EXIT_CODE: 4294967295
 
-Output Summary: P8-T41 remains blocked. The required MCP command returned `ok: false` and exit code `4294967295`. The active and current registry version of `@danmoisan/drm-copilot-mcp` is 1.0.18. Its bundled Pester settings still include the drm-copilot-only coverage path `scripts/powershell/Publish-DrmCopilotExtension.ps1`. In the TaskMaster consumer workspace, Pester discovers 30 tests but fails during `RunStart` before executing them because that coverage path does not exist.
+Output Summary: P8-T41 remains blocked. The required MCP command returned `ok: false` and exit code `4294967295`. The active and current registry version of `@<user>/drm-copilot-mcp` is 1.0.18. Its bundled Pester settings still include the drm-copilot-only coverage path `scripts/powershell/Publish-DrmCopilotExtension.ps1`. In the TaskMaster consumer workspace, Pester discovers 30 tests but fails during `RunStart` before executing them because that coverage path does not exist.
 
 ## Required MCP result
 
@@ -18,10 +18,10 @@ Output Summary: P8-T41 remains blocked. The required MCP command returned `ok: f
 
 ## Current package verification
 
-- Active package: `@danmoisan/drm-copilot-mcp`
+- Active package: `@<user>/drm-copilot-mcp`
 - Active package version: `1.0.18`
-- Active package path: `C:\Users\DanMoisan\AppData\Local\npm-cache\_npx\bc9f2e765aac2c41\node_modules\@danmoisan\drm-copilot-mcp`
-- `npm view @danmoisan/drm-copilot-mcp version`: `1.0.18`
+- Active package path: `<user-profile>\AppData\Local\npm-cache\_npx\bc9f2e765aac2c41\node_modules\@<user>\drm-copilot-mcp`
+- `npm view @<user>/drm-copilot-mcp version`: `1.0.18`
 - Bundled settings path: `resources/powershell/PoshQC/settings/pester.runsettings.psd1`
 - Invalid consumer-workspace coverage input: `scripts/powershell/Publish-DrmCopilotExtension.ps1`
 
@@ -29,14 +29,14 @@ Output Summary: P8-T41 remains blocked. The required MCP command returned `ok: f
 
 Diagnostic command:
 
-`pwsh -NoProfile -ExecutionPolicy Bypass -File <active-package>\resources\templates\run-poshqc-test.ps1 -WorkspaceRoot C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25 -ScanFoldersJson '["tests/scripts/vscode"]'`
+`pwsh -NoProfile -ExecutionPolicy Bypass -File <active-package>\resources\templates\run-poshqc-test.ps1 -WorkspaceRoot <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25 -ScanFoldersJson '["tests/scripts/vscode"]'`
 
 Diagnostic result:
 
 - Pester discovery: 30 tests in 4 files.
 - Pester phase reached: `Starting code coverage`.
 - Failure phase: `RunStart`.
-- Error: `Resolve-CoverageInfo: Could not resolve coverage path 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\scripts\powershell\Publish-DrmCopilotExtension.ps1'`.
+- Error: `Resolve-CoverageInfo: Could not resolve coverage path '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\scripts\powershell\Publish-DrmCopilotExtension.ps1'`.
 - Diagnostic process exit code: `-1`.
 
 The diagnostic invocation reproduces the MCP failure from the same bundled script and configuration. It is not used as a substitute for the required MCP result.

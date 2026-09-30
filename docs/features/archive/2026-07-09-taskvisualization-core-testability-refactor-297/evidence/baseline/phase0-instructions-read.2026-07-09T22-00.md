@@ -9,7 +9,7 @@ Policy Order:
 4. .claude/rules/csharp.md (C# language-specific rules)
 
 Files read (in required order):
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-09T15-31\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-09T15-31\CLAUDE.md
 - .claude/rules/general-code-change.md
 - .claude/rules/general-unit-test.md
 - .claude/rules/csharp.md

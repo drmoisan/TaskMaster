@@ -29,7 +29,7 @@ Numeric baseline coverage (line coverage from the merged coverage XML):
 - All three changed production files this cycle live in UtilitiesCS.dll
   (TimeOutTask.cs, OlTableExtensions.TableAccess.cs, TimerWrapper.cs).
 
-Coverage source: TestResults/beb50a72-d70f-4108-80ce-51a85208d897/DanMoisan_MEGALODON4_2026-06-09.18_24_57.coverage
+Coverage source: TestResults/beb50a72-d70f-4108-80ce-51a85208d897/<user>_<host>_2026-06-09.18_24_57.coverage
 Merged to: evidence/baseline/baseline-coverage.2026-06-09T18-00.xml (via dotnet-coverage merge -f xml)
 
 Coverage headline for no-regression comparison: UtilitiesCS.dll = 85.46% line coverage at baseline.

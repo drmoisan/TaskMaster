@@ -1,7 +1,7 @@
 # Issue #97 Focused Diff
 
 - **Timestamp:** 2026-03-26T18:07 EDT
-- **Command:** `git -C c:\Users\DanMoisan\repos\TaskMaster-issue97-clean diff --name-only origin/development...bug/getmovediagnostics-null-guard-97-clean`
+- **Command:** `git -C <user-profile>\repos\TaskMaster-issue97-clean diff --name-only origin/development...bug/getmovediagnostics-null-guard-97-clean`
 - **EXIT_CODE:** 0
 - **Output Summary:** After removing 5 out-of-scope files (`.codex/skills/**`, `.github/skills.zip`, `docs/features/potential/**`), the clean branch diff is limited to:
   - `QuickFiler/Controllers/QfcCollectionController.cs`

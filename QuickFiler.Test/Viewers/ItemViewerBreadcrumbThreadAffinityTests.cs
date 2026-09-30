@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -25,9 +24,11 @@ namespace QuickFiler.Test.Viewers
     /// to the test's own thread and restored in a <c>finally</c>. Only the same-thread
     /// <c>Dispatcher.Invoke(Action)</c> fast path is used, which runs its callback inline at
     /// <see cref="DispatcherPriority.Send"/> and needs no message pump.
+    /// The three cross-thread cases and <c>ClearViewerDispatcher</c> live in the continuation
+    /// partial file (issue #931).
     /// </remarks>
     [TestClass]
-    public sealed class ItemViewerBreadcrumbThreadAffinityTests
+    public sealed partial class ItemViewerBreadcrumbThreadAffinityTests
     {
         /// <summary>
         /// The production shape of issue #781: the viewer is constructed inside a dispatcher
@@ -197,155 +198,6 @@ namespace QuickFiler.Test.Viewers
         }
 
         /// <summary>
-        /// A genuine cross-thread call must still fail fast with a diagnostic naming the operation,
-        /// and must not be an <see cref="ObjectDisposedException"/>.
-        /// </summary>
-        /// <remarks>
-        /// Issue #900: the worker is a dedicated thread created by <c>RunOnDedicatedWorkerThread</c>,
-        /// never a <c>Task.Run</c> work item. A work item queued from a thread-pool thread lands on
-        /// that thread's local queue, and a blocking wait on it can run the delegate inline on the
-        /// constructing thread, in which case <c>Dispatcher.CheckAccess()</c> is true and the guard
-        /// never throws. A thread object this test constructs is never the object that constructed
-        /// the viewer, so the precondition asserted inside the delegate holds by construction under
-        /// any scheduler, including the <c>Workers=0</c> class-level parallel run. The helper's
-        /// untimed <c>Thread.Join()</c> is a completion wait for one synchronous call on a dedicated
-        /// non-pool thread; unlike the previous blocking <c>GetResult()</c> shape it never parks a
-        /// thread-pool slot waiting on another thread-pool slot, so it adds no starvation risk under
-        /// parallel execution. <c>BeOfType</c> is an exact-type check, so the derived
-        /// <see cref="ObjectDisposedException"/> is excluded by it as well as by the explicit
-        /// <c>NotBeOfType</c> that documents the intent.
-        /// </remarks>
-        [TestMethod]
-        public void InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic()
-        {
-            // Arrange
-            using (var scope = new ViewerScope())
-            {
-                BreadcrumbPopupUiOperations operations = InertOperations();
-                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-
-                // Act
-                Exception captured = RunOnDedicatedWorkerThread(() =>
-                {
-                    bool isOwnerThread = scope.Viewer.UiDispatcher.CheckAccess();
-                    isOwnerThread
-                        .Should()
-                        .BeFalse(
-                            "the dedicated worker thread must not be the thread that constructed "
-                                + "the viewer, or the boundary assertion would pass vacuously"
-                        );
-                    scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
-                });
-
-                // Assert
-                captured
-                    .Should()
-                    .NotBeNull(
-                        "a worker thread is not the thread that constructed the viewer, so the "
-                            + "guard must throw rather than admit the call"
-                    );
-                captured.Should().BeOfType<InvalidOperationException>();
-                captured.Message.Should().Contain("InitializeBreadcrumbPipeline");
-                captured.Should().NotBeOfType<ObjectDisposedException>();
-            }
-        }
-
-        /// <summary>
-        /// The same cross-thread contract on the three-argument <c>ConfigureBreadcrumbDropDown</c>
-        /// overload, whose guard is its first statement and therefore throws before any argument
-        /// check or control access.
-        /// </summary>
-        /// <remarks>
-        /// Issue #900: the worker is a dedicated thread created by <c>RunOnDedicatedWorkerThread</c>
-        /// rather than a <c>Task.Run</c> work item, for the reason given on
-        /// <c>InitializeBreadcrumbPipeline_WorkerThread_ThrowsBoundaryDiagnostic</c>: a pool work
-        /// item can be inlined onto the constructing thread, and a thread this test creates cannot.
-        /// The precondition inside the delegate proves the call is off the owning thread before the
-        /// guarded member runs. The helper's untimed <c>Thread.Join()</c> waits for one synchronous
-        /// call on a non-pool thread and parks no thread-pool slot, so it is safe under the
-        /// <c>Workers=0</c> class-level parallel run.
-        /// </remarks>
-        [TestMethod]
-        public void ConfigureBreadcrumbDropDown_WorkerThread_ThrowsBoundaryDiagnostic()
-        {
-            // Arrange
-            using (var scope = new ViewerScope())
-            {
-                var host = new InertDropDownHost();
-
-                // Act
-                Exception captured = RunOnDedicatedWorkerThread(() =>
-                {
-                    bool isOwnerThread = scope.Viewer.UiDispatcher.CheckAccess();
-                    isOwnerThread
-                        .Should()
-                        .BeFalse(
-                            "the dedicated worker thread must not be the thread that constructed "
-                                + "the viewer, or the boundary assertion would pass vacuously"
-                        );
-                    scope.Viewer.ConfigureBreadcrumbDropDown(
-                        host,
-                        () => new Rectangle(0, 0, 10, 10),
-                        () => new Rectangle(0, 0, 1920, 1040)
-                    );
-                });
-
-                // Assert
-                captured
-                    .Should()
-                    .NotBeNull(
-                        "a worker thread is not the thread that constructed the viewer, so the "
-                            + "guard must throw rather than admit the call"
-                    );
-                captured.Should().BeOfType<InvalidOperationException>();
-                captured.Message.Should().Contain("ConfigureBreadcrumbDropDown");
-                captured.Should().NotBeOfType<ObjectDisposedException>();
-            }
-        }
-
-        /// <summary>
-        /// A viewer with no owning dispatcher stays inert, which is what keeps
-        /// <c>FormatterServices.GetUninitializedObject</c>-built viewers in other test files from
-        /// throwing. This is the only test covering the null-owner escape.
-        /// </summary>
-        /// <remarks>
-        /// Seeding first and repeating the same provider are both required: a worker thread's
-        /// ambient context is null, so a first-time initialization would throw at
-        /// <c>BreadcrumbUiDispatcher.CaptureCurrent()</c> regardless of the guard, and only the
-        /// already-initialized early return can witness the escape. It still discriminates, because
-        /// the pre-fix guard reads the non-null captured context and rejects the worker-thread call.
-        /// </remarks>
-        [TestMethod]
-        public void InitializeBreadcrumbPipeline_NullOwningDispatcher_DoesNotThrow()
-        {
-            // Arrange
-            using (var scope = new ViewerScope())
-            {
-                BreadcrumbPopupUiOperations operations = InertOperations();
-                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-                scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
-                object before = scope.Viewer.BreadcrumbCoordinator;
-                ClearViewerDispatcher(scope.Viewer);
-
-                // Act
-                Action act = () =>
-                    Task.Run(() =>
-                            scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations)
-                        )
-                        .GetAwaiter()
-                        .GetResult();
-
-                // Assert
-                act.Should()
-                    .NotThrow(
-                        "a viewer with no owning dispatcher has no boundary to enforce and must "
-                            + "stay inert"
-                    );
-                scope.Viewer.BreadcrumbCoordinator.Should().BeSameAs(before);
-            }
-        }
-
-        /// <summary>
         /// Builds injected breadcrumb operations over a queue that is never installed as the ambient
         /// context, so posted work stays queued on this thread and nothing escapes the test.
         /// </summary>
@@ -353,54 +205,6 @@ namespace QuickFiler.Test.Viewers
             new BreadcrumbPopupUiOperations(
                 new BreadcrumbUiDispatcher(new DrainableSynchronizationContext(), _ => { })
             );
-
-        /// <summary>
-        /// Assigns <see langword="null"/> to the viewer's private owning-dispatcher field, asserting
-        /// the field still exists so a rename fails the test loudly rather than silently.
-        /// </summary>
-        private static void ClearViewerDispatcher(QuickFiler.ItemViewer viewer)
-        {
-            FieldInfo field = typeof(QuickFiler.ItemViewer).GetField(
-                "_uiDispatcher",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-            field
-                .Should()
-                .NotBeNull("ItemViewer must still declare the private _uiDispatcher field");
-            field.SetValue(viewer, null);
-        }
-
-        /// <summary>
-        /// Runs <paramref name="action"/> on a dedicated background thread, joins it, and returns
-        /// the exception it threw, or <see langword="null"/> when it completed normally.
-        /// </summary>
-        /// <remarks>
-        /// Issue #900: a <c>Task.Run</c> work item is not guaranteed to run on a thread other than
-        /// the caller's, so it cannot stand in for a different thread in a thread-identity test. A
-        /// thread this method constructs is distinct from every live thread by construction. The
-        /// untimed <c>Join()</c> is a completion wait on one bounded synchronous call, not a sleep or
-        /// a wall-clock wait, and the waiting thread and the waited-for thread are never both
-        /// thread-pool workers, so the wait cannot starve the pool under parallel execution.
-        /// </remarks>
-        private static Exception RunOnDedicatedWorkerThread(Action action)
-        {
-            Exception captured = null;
-            var thread = new Thread(() =>
-            {
-                try
-                {
-                    action();
-                }
-                catch (Exception error)
-                {
-                    captured = error;
-                }
-            });
-            thread.IsBackground = true;
-            thread.Start();
-            thread.Join();
-            return captured;
-        }
 
         /// <summary>A drop-down host that records nothing and does nothing.</summary>
         private sealed class InertDropDownHost : IBreadcrumbDropDownHost

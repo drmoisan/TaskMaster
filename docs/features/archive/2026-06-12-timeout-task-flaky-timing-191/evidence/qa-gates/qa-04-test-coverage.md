@@ -17,5 +17,5 @@ Coverage (post-change, from the .coverage attachment merged to evidence/qa-gates
 - The `TimeOutTask` type's functions are exercised (e.g., MarshalTaskResults 100%, TimeoutAfter overloads covered), confirming the success-path test still drives the production code path.
 - The change is test-only (an attribute and a timeout-argument literal); it introduces no new executable production lines, so changed-line coverage cannot regress.
 
-Coverage attachment: TestResults\9af7f401-dea3-422b-8f11-0ecbc24b02df\DanMoisan_MEGALODON4_2026-06-12.20_40_28.coverage
+Coverage attachment: TestResults\9af7f401-dea3-422b-8f11-0ecbc24b02df\<user>_<host>_2026-06-12.20_40_28.coverage
 Merged XML: docs/features/active/2026-06-12-timeout-task-flaky-timing-191/evidence/qa-gates/coverage-post.xml

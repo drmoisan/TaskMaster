@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-This directory holds the CI orchestrator and the six callee reusable workflows
+This directory holds the CI orchestrator and the seven callee reusable workflows
 it invokes. The split was introduced by issue #553 to replace a single
 sequential `quality-gates` job, whose measured wall clock was 444s, with
 independent gate jobs that GitHub Actions schedules concurrently and that report
@@ -14,13 +14,14 @@ references each gate with `uses:`. It contains no inline `steps:`.
 
 | File | Runner | Gate | Timeout |
 | --- | --- | --- | --- |
-| `ci.yml` | n/a (orchestrator) | Invokes the six callees below | n/a |
+| `ci.yml` | n/a (orchestrator) | Invokes the seven callees below | n/a |
 | `_actionlint.yml` | `ubuntu-latest` | Downloads actionlint 1.7.7 and lints every workflow file | 10 min |
 | `_format-check.yml` | `windows-latest` | `dotnet csharpier check .` | 10 min |
 | `_build-analyzers.yml` | `windows-latest` | `msbuild /t:Build` with `EnableNETAnalyzers` and `EnforceCodeStyleInBuild` | 30 min |
 | `_build-nullable.yml` | `windows-latest` | `msbuild /t:Rebuild` with `TreatWarningsAsErrors` | 30 min |
 | `_mstest-coverage.yml` | `windows-latest` | Plain `msbuild /t:Build`, then `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, which runs the suite under `dotnet-coverage`, post-processes the result into a first-party Cobertura projection, and asserts 80% line and 75% branch against it; uploads the Cobertura document as the `test-results` artifact | 30 min |
-| `_pester.yml` | `windows-latest` | Pester over `tests/scripts/vscode` with JaCoCo coverage scoped to `scripts/vscode`; asserts the `LINE` figure at 80% and exits non-zero on any test failure; uploads the JaCoCo document as the `pester-coverage` artifact | 10 min |
+| `_pester.yml` | `windows-latest` | Pester over `tests/scripts/dependencies`, `tests/scripts/hygiene` and `tests/scripts/vscode` with JaCoCo coverage scoped to `scripts/dependencies`, `scripts/hygiene` and `scripts/vscode`; asserts the `LINE` figure at 80% and exits non-zero on any test failure; uploads the JaCoCo document as the `pester-coverage` artifact | 10 min |
+| `_hygiene.yml` | `ubuntu-latest` | Runs scripts/hygiene/Test-RepositoryHygiene.ps1 over the tracked tree: fails on a raw test-platform or coverage-collector document (classified by content) or on a Windows user-profile path pattern in any tracked file outside .claude; prints path and line only | 10 min |
 
 Structural properties that are deliberate and should not be changed casually:
 
@@ -171,7 +172,7 @@ Two caveats:
 
 The required context names take the form `<caller job id> / <callee job name>` —
 the job id used in `ci.yml`, then the `name:` of the job inside the callee. The
-six contexts this pipeline reports are, verbatim:
+seven contexts this pipeline reports are, verbatim:
 
 ```
 actionlint / actionlint
@@ -180,6 +181,7 @@ build-analyzers / Build with analyzers and code style enforcement
 build-nullable / Build with nullable warnings treated as errors
 mstest-coverage / Run MSTest suite with coverage
 pester / Run Pester suite with coverage
+hygiene / Repository hygiene guard
 ```
 
 The sixth entry is the one context issue #869 adds. It is **predicted** until a
@@ -189,6 +191,8 @@ report under their existing names. Issue #869 changes no job name, so its C#
 threshold assertion adds no context of its own: the issue text's expectation of
 two new contexts is superseded, and only `pester / Run Pester suite with
 coverage` needs adding to the ruleset.
+
+The seventh entry, `hygiene / Repository hygiene guard`, is added by issue #927. It is **predicted** until a live run against the pull request head SHA confirms it with the same check-runs query; the ruleset update that makes it required is an operator follow-up after the first green run and is not part of that change.
 
 Do not hand-write these strings when editing branch protection; capture them from
 a live run as described in the next section.

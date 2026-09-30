@@ -17,7 +17,7 @@ Command: & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Ex
 EXIT_CODE: 0
 Output Summary: Test Run Successful. Total tests: 8. Passed: 8. Failed: 0.
 
-Command: & 'C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe' collect --settings 'coverage.config' --output 'docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\regression-testing\remediation-cycle2-projectdata-focused-coverage.cobertura.xml' --output-format cobertura -- 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /TestCaseFilter:"FullyQualifiedName~ProjectDataCoverageExpansionTests" /InIsolation
+Command: & '<user-profile>\.dotnet\tools\dotnet-coverage.exe' collect --settings 'coverage.config' --output 'docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\regression-testing\remediation-cycle2-projectdata-focused-coverage.cobertura.xml' --output-format cobertura -- 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /TestCaseFilter:"FullyQualifiedName~ProjectDataCoverageExpansionTests" /InIsolation
 EXIT_CODE: 0
 Output Summary: Test Run Successful. Total tests: 8. Passed: 8. Failed: 0. Cobertura output written to docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\regression-testing\remediation-cycle2-projectdata-focused-coverage.cobertura.xml. The existing coverage.config was used to avoid instrumenting third-party Deedle/FSharp assemblies; no coverage configuration was modified.
 

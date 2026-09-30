@@ -1,7 +1,7 @@
 # Test File 500-Line Cap — Measurement and SPLIT PERFORMED (Issue #449, [P6-T14])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command: `grep -c '' <each test file>` (not `wc -l`, which under-reports by one for a file with no
 terminating newline)

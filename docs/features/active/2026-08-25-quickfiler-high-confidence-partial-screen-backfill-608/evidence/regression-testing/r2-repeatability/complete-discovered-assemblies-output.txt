@@ -2,7 +2,7 @@ VSTest version 18.8.0 (x64)
 
 Starting test execution, please wait...
 A total of 9 test files matched the specified pattern.
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed Constructor_WithNoOverrides_InstallsProductionDefaults [63 ms]
   Passed Constructor_WithOverrides_PreservesInjectedDelegates [173 ms]
   Passed LoadSelection_WithExplicitMail_ReturnsOnlyExplicitMail [79 ms]
@@ -417,7 +417,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
      at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277
    at FluentAssertions.Collections.GenericCollectionAssertions`3.ContainSingle(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1214
-   at QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests.<DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem>d__21.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs:line 184
+   at QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests.<DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem>d__21.MoveNext() in <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs:line 184
 --- End of stack trace from previous location where exception was thrown ---
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
@@ -945,7 +945,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed EfcViewerQueue_Dequeue_UsesInjectedCoreAndRestoresReplacementCount [< 1 ms]
   Passed ItemViewerQueue_BuildMethods_DelegateToInjectedCore [< 1 ms]
   Passed ItemViewerQueue_DequeueAndChunk_DelegateToInjectedCore [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\SVGControl.Test\bin\Debug\SVGControl.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\SVGControl.Test\bin\Debug\SVGControl.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed EfcViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
   Passed ItemViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
   Passed EfcViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults [< 1 ms]
@@ -1018,7 +1018,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed TryGetSvgDocument_WithNullPayload_ThrowsArgumentNullException [< 1 ms]
   Passed TryGetSvgDocument_WithMalformedBytes_ReturnsFalseAndCapturesTheException [3 ms]
   Passed DefaultImageConstructor_DoesNotThrow [4 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed TryGetSvgDocument_WithEmptyBytes_ReturnsFalseAndCapturesAnXmlException [1 ms]
   Passed UseDefaultImageSetterToFalse_DoesNotThrowAndRecordsTheNewValue [1 ms]
   Passed TryGetSvgDocument_WhenTheParseSeamReturnsNull_ReturnsFalseWithNoCapturedError [179 ms]
@@ -1087,7 +1087,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed SelectPageDown_WhenNoRowBelowViewport_SelectsLastControl [3 ms]
   Passed DrawFocus_DefaultBody_DrawsFocusRectangleOnUnshownCheckBox [532 ms]
   Passed SelectPageDown_WhenRowBelowViewport_ScrollsToIt [11 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed SelectPageUp_WhenRowAboveViewport_ScrollsToIt [2 ms]
   Passed SelectPageUp_WhenNoRowAboveViewport_SelectsFirstControl [< 1 ms]
   Passed HideArchive_WhenToggled_ReloadsFilteredAndOriginalOptions [101 ms]
@@ -1458,7 +1458,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed HighConfidenceModeEnabled_Default_IsFalse [< 1 ms]
   Passed HighConfidenceThreshold_Default_IsZeroPointNine [< 1 ms]
   Passed HighConfidenceModeEnabled_WhenSetTrue_ReadsBackTrue [6 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed HighConfidenceThreshold_WhenSet_ReadsBackSameValue [7 ms]
   Passed Constructor_AssignsControllerOnViewer [216 ms]
   Passed RouteDrop_Background_RoutesToRoots_ReturnsTrue [241 ms]
@@ -1503,7 +1503,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed FindChildByID_FoundAtDepth_ReturnsNode [< 1 ms]
   Passed FindChildByID_NotFound_ReturnsNull [< 1 ms]
   Passed FindChildByID_NullId_MatchesEmptyIdNode [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed HandleModelCanDrop_DropOnSelf_SetsNoneEffect [3 ms]
   Passed HandleModelCanDrop_ReorderAboveItem_SetsMoveEffect [< 1 ms]
   Passed HandleModelCanDrop_BackgroundAllRoots_SaysAlreadyRoots [1 ms]
@@ -1674,7 +1674,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed CaptureDuration_Negative_InvokesNotifierAndLeavesTotalWorkUnchanged [9 ms]
   Passed CaptureDuration_NonInteger_PropagatesFormatException [5 ms]
   Passed OK_Action_NoCategorySelected_DoesNotApplyOrSetDialogResult [11 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed Cancel_Action_HidesSetsCancelAndDisposes [6 ms]
   Passed Disabled_InitializeSortToExisting_StateUnderTest_ExpectedBehavior [11 ms]
   Passed ToBase10_StateUnderTest_ExpectedBehavior_10 [18 ms]
@@ -1795,7 +1795,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed ReadOnlyPropertyTransitions_UpdateCachedStateWithoutWritingFields [12 ms]
   Passed SetProjectId_ChangeConfirmedNo_LeavesProjectIdUnchanged [11 ms]
   Passed SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction [18 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed SetProjectId_ChangeConfirmedNo_WithUpdateAction_DoesNotInvokeAction [13 ms]
   Passed CompareTo_EqualOrdinalThenShorterOtherLength_ReturnsNegativeOne [< 1 ms]
   Passed CompareTo_EqualOrdinalThenLongerOtherLength_ReturnsPositiveOne [< 1 ms]
@@ -6494,11 +6494,11 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-
   Passed ArrayToDatatable_WithoutHeaders_BuildsDefaultColumns [< 1 ms]
   Passed ToFormattedText_WithTitleOnlyAndLongTitle_WrapsInsertedEmptyMessageRow [< 1 ms]
   Passed ToFormattedText_WithHeadersOnly_UsesWideEmptyMessageAndHeaderDivider [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ToFormattedText_WithNullCellsAndImplicitJustifications_CoversWidthNormalization [< 1 ms]
   Passed ReflectionHelpers_CoverInternalFormattingBranches [8 ms]
   Passed ComputerInfo_PropertyTests [28 ms]
-Results File: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\TestResults\docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/regression-testing/r2-repeatability/complete-discovered-assemblies.trx
+Results File: <user-profile>\repos\TaskMaster-wt\2026-08-25T11-36\TestResults\docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/regression-testing/r2-repeatability/complete-discovered-assemblies.trx
 
 Total tests: 6476
      Passed: 6475

@@ -9,7 +9,7 @@ Policy Order: The required policy reading order for this repository (per `policy
 4. `.claude/rules/csharp.md` (C#-specific toolchain and standards)
 
 Files Read (from the current worktree root
-`C:\Users\DanMoisan\repos\TaskMaster-wt\utilitiescs-nullable-outlook-folder-store-365`):
+`<user-profile>\repos\TaskMaster-wt\utilitiescs-nullable-outlook-folder-store-365`):
 - `CLAUDE.md` — read in full.
 - `.claude/rules/general-code-change.md` — read in full.
 - `.claude/rules/general-unit-test.md` — read in full.

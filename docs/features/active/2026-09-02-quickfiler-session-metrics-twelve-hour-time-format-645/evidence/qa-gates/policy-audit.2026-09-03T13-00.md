@@ -2,7 +2,7 @@
 
 - Timestamp: 2026-09-03T13-00
 - Reviewer: feature-review agent (independent reaudit; issue #645, parallel mode, item worktree
-  `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6cd1c774527c71c3`)
+  `<repo-root>/.claude/worktrees/agent-a6cd1c774527c71c3`)
 - Work mode: `full-bug` (per `issue.md` § "Work Mode: full-bug"); AC source is `spec.md` §
   Acceptance Criteria, 10 items.
 - Branch: `bug/quickfiler-session-metrics-twelve-hour-time-format-645`, HEAD `099dab6e` (confirmed
@@ -30,17 +30,17 @@ review's other findings. It does not attempt to narrow the audit to a task, phas
 Ran directly against both Cobertura files at current HEAD (not the remediation's own artifacts):
 
 ```
-git -C <worktree> grep -c "DanMoisan" -- evidence/baseline/coverage-baseline.cobertura.xml
-git -C <worktree> grep -c "DanMoisan" -- evidence/qa-gates/coverage-final.cobertura.xml
+git -C <worktree> grep -c "<user>" -- evidence/baseline/coverage-baseline.cobertura.xml
+git -C <worktree> grep -c "<user>" -- evidence/qa-gates/coverage-final.cobertura.xml
 ```
 
 Both commands returned exit code 1 (git grep's "no match" exit code) with no output, i.e.
 **0 matches** in each file. Corroborated by a second, independent method: the Grep tool
 (ripgrep-backed, case-insensitive) scanning the two XML files directly reported 0 occurrences of
-`DanMoisan` (the only hits in the whole `evidence/` tree are in narrative `.md` files describing
+`<user>` (the only hits in the whole `evidence/` tree are in narrative `.md` files describing
 the remediation, not in the two Cobertura XML files themselves). A third, regex-based sweep run via
-a PowerShell script against the raw file content (`[regex]::Matches($c,'DanMoisan')`) also returned
-`DanMoisan=0` for both files, plus `CUsers=0` for the pattern `C:\Users` (case-insensitive),
+a PowerShell script against the raw file content (`[regex]::Matches($c,'<user>')`) also returned
+`<user>=0` for both files, plus `CUsers=0` for the pattern `C:\Users` (case-insensitive),
 confirming no alternate rendering of the leaked path survives.
 
 **Independently-derived count: 0 for both files (expected: 0). Verdict: PASS.**
@@ -55,12 +55,12 @@ Both files were parsed with `[xml]$content` in a fresh PowerShell process:
 ```
 
 Both parsed successfully with root element `coverage` and no parse exception. `git show 099dab6e --stat`
-reports exactly 4,016 changed lines per file (2,007 `DanMoisan`-bearing `filename=` lines + 1 BOM
+reports exactly 4,016 changed lines per file (2,007 `<user>`-bearing `filename=` lines + 1 BOM
 line, ×2 for insertion/deletion), consistent with a scoped textual substitution rather than a
 structural rewrite; a `filename="..."` attribute count of 3,147 per file is unchanged before/after
 (only attribute *values* changed, not attribute count or element structure). Spot-checked sample
 attribute: `filename="QuickFiler\Controllers\EfcHomeController.cs"` (was
-`filename="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a6cd1c774527c71c3\QuickFiler\Controllers\EfcHomeController.cs"`).
+`filename="<repo-root>\.claude\worktrees\agent-a6cd1c774527c71c3\QuickFiler\Controllers\EfcHomeController.cs"`).
 
 **Verdict: PASS.**
 

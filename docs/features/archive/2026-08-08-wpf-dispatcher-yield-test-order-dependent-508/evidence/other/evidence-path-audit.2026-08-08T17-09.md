@@ -78,7 +78,7 @@ execution directive restated it. Nothing required correction.
 ## Scratch files
 
 Temporary scripts and logs used during execution were written to the session scratchpad at
-`C:\Users\DANMOI~1\AppData\Local\Temp\claude\…\scratchpad\`, outside the repository, per the
+`<user-profile>\AppData\Local\Temp\claude\…\scratchpad\`, outside the repository, per the
 scratchpad convention. None is an evidence artifact and none is inside the workspace.
 
 Output Summary: PASS. All 39 evidence artifacts reside under

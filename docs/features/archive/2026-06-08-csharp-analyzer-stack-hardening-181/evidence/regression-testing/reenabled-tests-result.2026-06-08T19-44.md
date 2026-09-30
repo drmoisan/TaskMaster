@@ -3,7 +3,7 @@
 Timestamp: 2026-06-08T19-44
 
 Command: vstest.console.exe <7 first-party Test.dll> /EnableCodeCoverage /InIsolation /Logger:trx
-TRX: docs/features/active/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/DanMoisan_MEGALODON4_2026-06-08_19_57_49_net481.trx
+TRX: docs/features/active/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/<user>_<host>_2026-06-08_19_57_49_net481.trx
 
 EXIT_CODE: 1
 

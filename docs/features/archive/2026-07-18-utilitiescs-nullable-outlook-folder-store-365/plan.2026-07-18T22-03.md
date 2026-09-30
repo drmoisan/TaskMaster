@@ -21,7 +21,7 @@
 
 **All work must comply with these policies; do not duplicate their content here.** All policy
 files above MUST be read from the current worktree root
-(`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a2627015d44378748`), not any
+(`<repo-root>\.claude\worktrees\agent-a2627015d44378748`), not any
 planning-worktree absolute path.
 
 ## Epic Dependency Note (Wave 1 / Wave 0 Fan-In)

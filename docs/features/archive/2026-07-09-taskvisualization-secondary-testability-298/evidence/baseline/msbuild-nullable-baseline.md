@@ -8,7 +8,7 @@ projects skipped, matching how this gate operates in CI). Zero warnings-as-error
 surfaced for the solution as built.
 
 Captured on the pre-#298 baseline ref `epic/winforms-testability-refactor-integration`
-(`949dddd2`) in worktree `C:\Users\DanMoisan\repos\TaskMaster-wt\winforms-integration`.
+(`949dddd2`) in worktree `<user-profile>\repos\TaskMaster-wt\winforms-integration`.
 
 Note on the operative gate: `TaskVisualization.csproj` is not nullable-enabled
 (`<Nullable>` unset) and has pre-existing nullable diagnostics under a forced full

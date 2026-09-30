@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T10:23:00Z
 
-Command: `$files=@((Resolve-Path 'QuickFiler/Viewers/BreadcrumbDropDownHost.cs').Path,(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs').Path); $tool='C:\Users\DanMoisan\.dotnet\tools\csharpier.exe'; @($files) | & $tool pipe-files`
+Command: `$files=@((Resolve-Path 'QuickFiler/Viewers/BreadcrumbDropDownHost.cs').Path,(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs').Path); $tool='<user-profile>\.dotnet\tools\csharpier.exe'; @($files) | & $tool pipe-files`
 
 EXIT_CODE: 0
 

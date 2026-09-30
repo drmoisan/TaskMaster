@@ -7,7 +7,7 @@ Output Summary:
 - Total tests: 74 passed, 0 failed
 - QuickFiler.Test.dll (test assembly) line_coverage: 86.29% (1297/1503 lines covered)
 - QuickFiler.dll (production module) line_coverage: 19.44% (2958/15134 lines covered)
-- Coverage file saved to TestResults/fd9fb9f3-e6de-4d43-a38a-c9b450a7e7fa/DanMoisan_MEGALODON4_2026-03-25.11_49_14.coverage
+- Coverage file saved to TestResults/fd9fb9f3-e6de-4d43-a38a-c9b450a7e7fa/<user>_<host>_2026-03-25.11_49_14.coverage
 - QfcHomeController.QuickFileMetrics_WRITE: not covered at baseline (0% — no tests for this method)
 - QfcHomeController.WriteMoveToCalendar: not covered at baseline
 - QfcCollectionController.GetMoveDiagnostics: not covered at baseline

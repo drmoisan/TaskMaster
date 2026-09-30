@@ -26,7 +26,7 @@ It is included in the recorded pre-existing set even though it passed on the P0-
 
 ## Search scope for this determination
 
-- SearchScope: the full P0-T9 vstest console output at `C:\Users\DANMOI~1\AppData\Local\Temp\claude\C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-08T11-55\ef7e1b49-f808-435f-8b58-e04bac54f30b\scratchpad\p0t9.log`
+- SearchScope: the full P0-T9 vstest console output at `<user-profile>\AppData\Local\Temp\claude\C--Users-<user>-repos-TaskMaster-wt-2026-08-08T11-55\ef7e1b49-f808-435f-8b58-e04bac54f30b\scratchpad\p0t9.log`
 - SearchPatterns: `Failed`, `Skipped`, `Total tests`, `Test Run`
 - SearchResult: `Test Run Successful.` / `Total tests: 6293` / `Passed: 6293`; no `Failed:` or `Skipped:` line was emitted.
 

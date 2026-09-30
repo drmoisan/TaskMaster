@@ -3,8 +3,8 @@
 - **Timestamp:** 2026-08-21T18-20
 - **Issue:** #449 (`quickfiler-explorer-controller-latent-defects`)
 - **Epic:** `quickfiler-suite-determinism-foundation` (wave 0, C3)
-- **Worktree:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a78a924c87d7f1f73`
-- **Authoritative requirements:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a78a924c87d7f1f73\docs\features\potential\promoted\2026-08-07-quickfiler-explorer-controller-latent-defects.md`
+- **Worktree:** `<repo-root>\.claude\worktrees\agent-a78a924c87d7f1f73`
+- **Authoritative requirements:** `<repo-root>\.claude\worktrees\agent-a78a924c87d7f1f73\docs\features\potential\promoted\2026-08-07-quickfiler-explorer-controller-latent-defects.md`
 - **Mode:** research-only. No C# file, `.csproj`, or `.claude/**` file was modified.
 
 All line numbers in this document were re-derived by reading the files in this worktree, per the epic's
@@ -537,7 +537,7 @@ fix, so a reviewer does not read it as an unrelated refactor.
 
 ### 5.1 File, class, and project-file entry
 
-- **Path:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a78a924c87d7f1f73\QuickFiler.Test\Controllers\QfcExplorerControllerTests.cs`
+- **Path:** `<repo-root>\.claude\worktrees\agent-a78a924c87d7f1f73\QuickFiler.Test\Controllers\QfcExplorerControllerTests.cs`
 - **Class:** `QfcExplorerControllerTests`
 - **Namespace:** `QuickFiler.Controllers.Tests` — matches `QuickFiler.Test/Controllers/QfcHomeControllerTests.cs:20`.
 

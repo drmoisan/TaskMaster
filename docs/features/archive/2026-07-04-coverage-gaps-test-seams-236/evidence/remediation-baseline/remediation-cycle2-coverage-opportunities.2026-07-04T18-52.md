@@ -1,5 +1,5 @@
 Timestamp: 2026-07-04T18-52
-Command: PowerShell XML parser over docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/remediation-baseline/remediation-cycle2-baseline-coverage.cobertura.xml; normalize active worktree and stale C:\Users\DanMoisan\repos\TaskMaster roots; merge line entries by normalized file path and line number.
+Command: PowerShell XML parser over docs/features/active/2026-07-04-coverage-gaps-test-seams-236/evidence/remediation-baseline/remediation-cycle2-baseline-coverage.cobertura.xml; normalize active worktree and stale <repo-root> roots; merge line entries by normalized file path and line number.
 EXIT_CODE: 0
 Output Summary:
 - Baseline repository line coverage: 46.25% (83400/180333).
@@ -12,7 +12,7 @@ Output Summary:
 
 ## Stale-Root Duplicate Filename Groups
 
-Representative duplicate groups where relative worktree paths and stale `C:\Users\DanMoisan\repos\TaskMaster\...` paths describe the same repository file:
+Representative duplicate groups where relative worktree paths and stale `<repo-root>\...` paths describe the same repository file:
 
 | Normalized path | Entries |
 | --- | ---: |

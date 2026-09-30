@@ -11,7 +11,7 @@ Branch: `feature/quickfiler-keyboard-actions-coverage`
 
 | Attribute | Value |
 | --- | --- |
-| Path | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\IMailItemActions.cs` |
+| Path | `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\IMailItemActions.cs` |
 | Line count | 35 lines of source (file ends at line 35; a trailing newline yields 36 in some counters) |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj:367` `<Compile Include="Interfaces\IMailItemActions.cs" />` |
 | `[ExcludeFromCodeCoverage]` status | **Absent.** A grep for `ExcludeFromCodeCoverage` across `QuickFiler\Interfaces\` returned no matches. No attribute exists on the file, the interface, or any member. |

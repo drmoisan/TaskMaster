@@ -4,9 +4,9 @@ Timestamp: `2026-07-22T22:04:24-04:00`
 
 Commands:
 
-`C:\Users\DanMoisan\.dotnet\tools\csharpier.exe format QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs QuickFiler/Viewers/BreadcrumbDropDownHost.cs QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs QuickFiler.Test/Viewers/BreadcrumbPendingOpenCloseTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleConcurrencyTests.cs`
+`<user-profile>\.dotnet\tools\csharpier.exe format QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs QuickFiler/Viewers/BreadcrumbDropDownHost.cs QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs QuickFiler.Test/Viewers/BreadcrumbPendingOpenCloseTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleConcurrencyTests.cs`
 
-`C:\Users\DanMoisan\.dotnet\tools\csharpier.exe check QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs QuickFiler/Viewers/BreadcrumbDropDownHost.cs QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs QuickFiler.Test/Viewers/BreadcrumbPendingOpenCloseTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleConcurrencyTests.cs`
+`<user-profile>\.dotnet\tools\csharpier.exe check QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs QuickFiler/Viewers/BreadcrumbDropDownHost.cs QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs QuickFiler.Test/Viewers/BreadcrumbPendingOpenCloseTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleTests.cs QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleConcurrencyTests.cs`
 
 Result: PASS. The stable format pass changed zero files and returned exit code `0`. The subsequent check returned `EXIT_CODE: 0`.
 

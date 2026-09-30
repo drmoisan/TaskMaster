@@ -52,7 +52,7 @@ The bounded adaptation authorised by `[P1-T6]` — prepending
 `[System.Reflection.Metadata.PEReaderExtensions]` resolved in the pwsh host as written.
 
 The payload additionally carries a leading
-`Set-Location -LiteralPath "C:/Users/DanMoisan/repos/TaskMaster-wt/bugs-2026-09-11-item-879"`
+`Set-Location -LiteralPath "<user-profile>/repos/TaskMaster-wt/bugs-2026-09-11-item-879"`
 statement, because the executor was launched without worktree isolation and pwsh would otherwise
 start in the coordinator session worktree, resolving every repository-relative path in the wrong
 tree. That statement changes no measurement; it fixes the tree the measurement is taken against.

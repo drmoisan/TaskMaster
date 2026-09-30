@@ -47,7 +47,7 @@ The `UpdateUI(ConversationInfo.Expanded)` call in `LoadConversationInfoAsync()` 
 - Snippet:
 ```
 QuickFiler.dll!QuickFiler.Helper_Classes.ConversationResolver.LoadConversationInfo() Line 285
-  at C:\Users\DanMoisan\repos\TaskMaster.worktrees\copilot-worktree-2026-03-19T01-51-14\QuickFiler\Helper Classes\ConversationResolver.cs(285)
+  at <repo-root>.worktrees\copilot-worktree-2026-03-19T01-51-14\QuickFiler\Helper Classes\ConversationResolver.cs(285)
 ```
 
 ## Impact / Severity

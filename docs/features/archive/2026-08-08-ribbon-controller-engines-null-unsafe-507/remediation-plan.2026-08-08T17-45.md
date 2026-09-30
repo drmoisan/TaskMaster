@@ -7,7 +7,7 @@ Scope: remediate finding B1 only (`TaskMaster.Test/Ribbon/RibbonControllerTests.
 out of scope for this cycle and is being promoted to a separate tracked issue by the orchestrator.
 No task in this plan touches `TaskMaster/Ribbon/RibbonViewer.cs`.
 
-- Workspace: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7e887d12b262219`
+- Workspace: `<repo-root>\.claude\worktrees\agent-ad7e887d12b262219`
 - Branch: `bug/ribbon-controller-engines-null-unsafe-507`
 - HEAD at plan authoring: `e589fad7`
 - Merge base: `003c5715055d7d1933db68a742531332756e30b2`
@@ -16,7 +16,7 @@ No task in this plan touches `TaskMaster/Ribbon/RibbonViewer.cs`.
 
 ## Verified toolchain paths
 
-- csharpier: `C:/Users/DanMoisan/.dotnet/tools/csharpier`
+- csharpier: `<user-profile>/.dotnet/tools/csharpier`
 - msbuild: `C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/MSBuild.exe`
 - vstest.console.exe: `C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/CommonExtensions/Microsoft/TestWindow/vstest.console.exe`
 
@@ -81,7 +81,7 @@ No task in this plan touches `TaskMaster/Ribbon/RibbonViewer.cs`.
 
 ### Phase 1 — Full QA Loop and Scope Verification
 
-- [x] [P1-T1] Run `C:/Users/DanMoisan/.dotnet/tools/csharpier .` from the workspace root and record
+- [x] [P1-T1] Run `<user-profile>/.dotnet/tools/csharpier .` from the workspace root and record
   the result (`Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` — files reformatted, if
   any, and final exit status) in
   `docs/features/active/2026-08-08-ribbon-controller-engines-null-unsafe-507/evidence/qa-gates/csharpier-format.2026-08-08T17-45.md`.
@@ -101,7 +101,7 @@ No task in this plan touches `TaskMaster/Ribbon/RibbonViewer.cs`.
   Do not add `/p:Nullable=enable` to this command. Acceptance: `EXIT_CODE: 0`. If this stage fails
   or changes any file, restart from P1-T1.
 - [x] [P1-T4] Discover test assemblies by searching the workspace root
-  (`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7e887d12b262219`) for
+  (`<repo-root>\.claude\worktrees\agent-ad7e887d12b262219`) for
   `**\bin\**\*.Test.dll`, filtering out any path whose portion relative to the workspace root
   contains a nested `.claude` segment, `\obj\`, or `\ref\`, and record the resulting assembly list
   (`Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` listing all discovered assembly paths

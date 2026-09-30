@@ -69,7 +69,7 @@ non-canonical evidence path.
 ## Host-Path Hygiene
 
 - SearchScope: the entire feature folder, recursive.
-- SearchPatterns: `C:\\Users\\DanMoisan`, `DanMoisan`, `DESKTOP-`, `/Users/DanMoisan`.
+- SearchPatterns: `<user-profile>`, `<user>`, `DESKTOP-`, `/Users/<user>`.
 - SearchResult: zero matches across all 39 Markdown files.
 
 The executor sanitised the worktree prefix to `<WT>` in `evidence/regression-testing/p1-t6-red-new-test.md`

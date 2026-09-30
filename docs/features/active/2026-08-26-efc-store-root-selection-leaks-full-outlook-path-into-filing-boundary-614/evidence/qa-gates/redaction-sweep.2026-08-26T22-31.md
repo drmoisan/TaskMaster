@@ -23,7 +23,7 @@ SearchResult:
 - The changed AC16 spec hunk contains no address-shaped string or user-profile path.
 - Cycle-2 evidence contains no address-shaped string.
 - No real `C:\Users\<account>` path occurs in changed content or cycle-2 evidence.
-- The fabricated `C:\Users\testuser\OneDrive - Contoso` source-test literal remains authorized. The existing `C:\Users\<user>` notation is a generic placeholder and is outside the changed spec hunk.
+- The fabricated `<user-profile>\OneDrive - Contoso` source-test literal remains authorized. The existing `C:\Users\<user>` notation is a generic placeholder and is outside the changed spec hunk.
 - No real mailbox address, account name, host name, or organization name was found.
 
 Verdict: PASS.

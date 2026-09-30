@@ -59,7 +59,7 @@ The scoped folder-wrapper coverage feature is well-evidenced and passes its docu
 
 ## Appendix A — commands run during this review
 
-Check-only / validation commands executed from `C:\Users\DanMoisan\repos\TaskMaster`:
+Check-only / validation commands executed from `<repo-root>`:
 
 1. Refresh canonical PR context artifacts with a direct git-based equivalent for `feature/outlook-folder-wrapper-tests-82` vs `origin/development`
 2. `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`

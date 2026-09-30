@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T16-11
 
 Task: [P0-T3]
 
-Workspace root: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0`
+Workspace root: `<repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0`
 Branch: `bug/wpf-dispatcher-yield-test-order-dependent-508`
 
 ## Command 1 — HEAD

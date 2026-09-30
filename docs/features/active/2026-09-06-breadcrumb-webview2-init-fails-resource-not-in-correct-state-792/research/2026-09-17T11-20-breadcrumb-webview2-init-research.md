@@ -5,7 +5,7 @@
 - **Status:** Research complete (revision 2). Both open questions are answered. One new causal finding,
   now labelled for provenance.
 - **Method:** every citation below was derived against the **item worktree**
-  `C:/Users/DanMoisan/repos/TaskMaster-wt/item-792` (HEAD `8d3ea6426`, which has merged current
+  `<user-profile>/repos/TaskMaster-wt/item-792` (HEAD `8d3ea6426`, which has merged current
   `origin/main` `e7cbb5722`) using Read/Grep on absolute paths. External SDK behavior was
   established from Microsoft Learn reference pages and is marked `[V-web]`.
 - **Revision note.** Revision 1 of this artifact measured the session worktree

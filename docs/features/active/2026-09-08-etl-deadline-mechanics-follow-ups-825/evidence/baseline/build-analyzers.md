@@ -26,12 +26,12 @@ above was taken. The counted tokens carry no absolute path and are unaffected by
 
 Deviation recorded. D7 names two rewrites: the worktree root to the literal `<repo-root>` and the
 main checkout root to the literal `<main-checkout-root>`. Both were applied, in that order, because
-the main checkout root C:\Users\DanMoisan\repos\TaskMaster is a proper prefix of the worktree root
-C:\Users\DanMoisan\repos\TaskMaster-wt\rr0908-825 and rewriting the shorter string first would
+the main checkout root <repo-root> is a proper prefix of the worktree root
+<user-profile>\repos\TaskMaster-wt\rr0908-825 and rewriting the shorter string first would
 corrupt the longer one. After those two rewrites, 21 lines still contained the token `C:\Users\`,
 in two further leak classes D7 does not name: the MSBuildUserExtensionsPath property expanded from
 the environment, and a _DeploymentUrl property reassignment naming a OneDrive folder. Both carry
 the host account name. P9-T4's confirming check requires a zero count of `C:\Users\` in this log, so
-a third rewrite was applied, mapping the user profile root C:\Users\DanMoisan to the literal
+a third rewrite was applied, mapping the user profile root <user-profile> to the literal
 `<user-profile-root>`. It ran after the two D7 rewrites, so it touches only the residual
 occurrences. The count of lines containing `C:\Users\` in this log is now 0.

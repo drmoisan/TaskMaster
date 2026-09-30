@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and coding standards)
 
 Files Read (absolute paths, current feature worktree):
-- C:/Users/DanMoisan/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/CLAUDE.md
-- C:/Users/DanMoisan/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/.claude/rules/general-code-change.md
-- C:/Users/DanMoisan/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/.claude/rules/general-unit-test.md
-- C:/Users/DanMoisan/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/.claude/rules/csharp.md
+- <user-profile>/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/CLAUDE.md
+- <user-profile>/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/.claude/rules/general-code-change.md
+- <user-profile>/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/.claude/rules/general-unit-test.md
+- <user-profile>/repos/TaskMaster-wt/swordfish-dictionary-lineage-306/.claude/rules/csharp.md
 
 No policy document was modified.
 

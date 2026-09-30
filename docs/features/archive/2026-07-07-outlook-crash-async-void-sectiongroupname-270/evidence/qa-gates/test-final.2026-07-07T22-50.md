@@ -12,7 +12,7 @@ Output Summary:
 - The updated existing test PASSES: `OlInboxItemsItemAdd_WhenProcessingThrows_ContainsAndDoesNotRethrow` (formerly `..._RethrowsThroughSynchronizationContext`). Under the P2 contain-and-log fix, the fault is contained in `HandleInboxItemAddAsync`, so nothing is posted to the captured `SynchronizationContext` and `CapturedException` is null. This test would FAIL against the old `catch { throw; }` rethrow behavior, confirming it now encodes the corrected contract.
 - The prior pass's single failure (201/202) is resolved; the scope-authorized P2-T4 edit closed the last red test.
 
-Coverage attachment: `TestResults/29586bcb-ff2a-419f-ac1d-37952d4c7793/DanMoisan_MEGALODON4_2026-07-07.22_48_32.coverage`, merged to Cobertura via `dotnet-coverage merge -f cobertura` for numeric extraction.
+Coverage attachment: `TestResults/29586bcb-ff2a-419f-ac1d-37952d4c7793/<user>_<host>_2026-07-07.22_48_32.coverage`, merged to Cobertura via `dotnet-coverage merge -f cobertura` for numeric extraction.
 
 Headline coverage (post-change):
 - `TaskMaster` production package: 64.07% line (baseline 63.64%).
