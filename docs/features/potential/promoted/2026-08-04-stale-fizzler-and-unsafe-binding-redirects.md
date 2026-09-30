@@ -1,11 +1,14 @@
-# stale-fizzler-and-unsafe-binding-redirects (Potential Bug)
+# stale-fizzler-and-unsafe-binding-redirects (Issue #953)
 
 - Date captured: 2026-08-04
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/stale-fizzler-and-unsafe-binding-redirects/ (Issue #953)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #953
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/953
+- Last Updated: 2026-09-30
 ## Summary
 
 Two families of `app.config` binding redirects name assembly versions that are not deployed. Twelve project configs redirect `Fizzler` to `1.3.0.0` while the deployed assembly is `1.3.1.0`, and `SVGControl/app.config` redirects `System.Runtime.CompilerServices.Unsafe` to `6.0.2.0` while the deployed assembly is `6.0.3.0` and all sixteen sibling configs say `6.0.3.0`. This is the same defect class as bug #418, where a redirect to a non-deployed `ExCSS` version caused `SvgDocument.Open` to fail in hosts that apply the redirect.
