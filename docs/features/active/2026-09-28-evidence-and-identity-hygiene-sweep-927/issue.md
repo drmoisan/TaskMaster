@@ -90,3 +90,8 @@ The repository is out of compliance with its own committed-evidence policy acros
 - [ ] Move to active fix folder / branch
 
 Consolidates: #602 (non-`.claude` portion), #671 (remaining existing-file portion), #884, #727 sub-finding 5 (plan-file exclusion).
+
+## Delivery note
+- Commit count: before the delivery-note commit, the branch carries 33 commits of its own relative to origin/main (31 non-merge commits and 2 merges of main). The delivery-note commit makes 34.
+- The branch ruleset was not modified by this change. No ruleset write was issued, and the required-status-check list was read only.
+- Acceptance status at this point: 17 of 20 criteria checked in spec.md. AC4 waits on the CI Pester coverage figure (P6-T38), and AC16 waits on the CI outcome on the pull-request head (P6-T37). AC13 is NOT MET locally: first-party C# line and branch coverage were each 0.01 percentage points below the Phase 0 baseline, while the test run reported 7346 passed and 0 failed. The detail is in evidence/qa-gates/ac-check-off-ledger.md.
