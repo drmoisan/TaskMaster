@@ -208,12 +208,12 @@ Negative controls (each: mutated run exit 1 with the predicted failure text; rev
 
 | Check | Command / method | Result |
 |---|---|---|
-| Confidentiality masking scan | Grep of the feature folder for `DanMoisan`, `C:/Users`, `C:\Users`, `DANMOI~1`, `Program Files`, `DESKTOP-`, `LAPTOP-`, `runUser`, `MachineName`, `COMPUTERNAME`, UNC prefixes; Grep `-o` for every drive-letter path | PASS. Zero account, profile, host or `Program Files` matches. The only drive-letter paths are the fixture literal `C:\Repo` (spec.md:89, plan lines 95/130/695, research line 259). The one `COMPUTERNAME` hit is the plan's sweep command reading `$env:COMPUTERNAME` as a token source, not a value. Placeholders `<repo-root>` used in the mutation projections. |
+| Confidentiality masking scan | Grep of the feature folder for the developer account name, the `<drive>:/Users` and `<drive>:\Users` prefixes, the 8.3 short-name alias of the profile directory, `Program Files`, `DESKTOP-`, `LAPTOP-`, `runUser`, `MachineName`, `COMPUTERNAME`, UNC prefixes; Grep `-o` for every drive-letter path | PASS. Zero account, profile, host or `Program Files` matches. The only drive-letter paths are the fixture literal `C:\Repo` (spec.md:89, plan lines 95/130/695, research line 259). The one `COMPUTERNAME` hit is the plan's sweep command reading `$env:COMPUTERNAME` as a token source, not a value. Placeholders `<repo-root>` used in the mutation projections. |
 | Suppression scan (added lines) | Read of the full diff | PASS. No `#pragma warning disable`, `[SuppressMessage]`, `[ExcludeFromCodeCoverage]`, or `.editorconfig` change. |
 | Workflow change scan | Name-only diff | PASS. No `.github/workflows` file changed on this branch. |
 | Raw evidence document scan | Glob `**/*.{trx,xml,coverage}` under the feature folder; diff name list | PASS. Zero matches. |
 | Coverage exclusion policy | Read of `coverage.config` | PASS (not changed). The `<ModulePath>` excludes name only third-party modules (Deedle, FSharp, Castle.Core, FluentAssertions, Moq, Microsoft.Testing, MSTest); no production path excluded; file not in the diff. |
-| Architecture boundaries | Read of the diff | PASS (not applicable to the diff content: no production code; test code adds no VSTO/Interop reference beyond the pre-existing `System.Windows.Threading.Dispatcher` and WinForms `Panel` uses already in these files). |
+| Architecture boundaries | Read of the diff | PASS (the diff contains no production code; the test code adds no VSTO/Interop reference beyond the pre-existing `System.Windows.Threading.Dispatcher` and WinForms `Panel` uses already in these files). |
 | Runsettings integrity | `RUNSETTINGS-HASH-NOW` in every projection | PASS. 199408CA...7FFA in every run, equal to P0-T4. |
 
 ## 8. Gaps and Exceptions
