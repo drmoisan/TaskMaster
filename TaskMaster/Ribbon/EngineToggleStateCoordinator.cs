@@ -56,8 +56,8 @@ namespace TaskMaster
         private readonly Action<string, Exception> _logError;
 
         /// <summary>
-        /// Serializes the at-most-one-prime decision. Held only across a dictionary probe and a
-        /// task start; no await occurs inside it.
+        /// Serializes the at-most-one-prime decision. Held only across a dictionary probe, the
+        /// marker registration, and the start of the prime; no await occurs inside it.
         /// </summary>
         private readonly object _primeGate = new object();
 
@@ -70,9 +70,10 @@ namespace TaskMaster
             new EngineTogglePressedStateCache();
 
         /// <summary>
-        /// The in-flight — or most recently completed — prime per engine key. Its presence is the
-        /// at-most-one-prime guard; its value is the test-observable handle returned by
-        /// <see cref="GetPrimeTask"/>.
+        /// The registration marker per engine key: registered before the prime starts, removed by
+        /// <see cref="CompletePrime"/> when the prime faults or is canceled, and retained after a
+        /// successful prime. Its presence is the at-most-one-prime guard; its value is the
+        /// test-observable handle returned by <see cref="GetPrimeTask"/>.
         /// </summary>
         private readonly ConcurrentDictionary<string, Task> _primeTasks = new ConcurrentDictionary<
             string,
@@ -275,7 +276,15 @@ namespace TaskMaster
                     return;
                 }
 
-                _primeTasks[engineName] = StartObservedPrime(engines, engineName, controlId);
+                // Registration precedes the start (issue #944): a prime can complete on any
+                // thread, including before StartObservedPrime returns, and it must always find
+                // its own marker to remove; registering afterwards let a finished prime's
+                // removal run first and leave a stale marker that blocked every later re-prime.
+                var marker = new TaskCompletionSource<bool>(
+                    TaskCreationOptions.RunContinuationsAsynchronously
+                );
+                _primeTasks[engineName] = marker.Task;
+                StartObservedPrime(engines, engineName, controlId, marker);
             }
         }
 
@@ -286,18 +295,31 @@ namespace TaskMaster
         /// The observer is a continuation rather than a <c>catch</c> clause, so this type keeps
         /// exactly one <c>catch</c> — the click boundary. Reading
         /// <see cref="Task.Exception"/> inside <see cref="CompletePrime"/> marks the fault
-        /// observed, so no unobserved task remains. The returned continuation task always
-        /// completes successfully, which is what makes it safe for a test to await.
+        /// observed, so no unobserved task remains. The continuation task itself is discarded;
+        /// the value a test awaits is the marker, which the continuation completes only through
+        /// <c>SetResult</c> in a <c>finally</c> after <see cref="CompletePrime"/> exits, so it
+        /// never faults or cancels.
         /// </remarks>
-        private Task StartObservedPrime(
+        private void StartObservedPrime(
             IAppItemEngines engines,
             string engineName,
-            string controlId
+            string controlId,
+            TaskCompletionSource<bool> marker
         )
         {
-            return ApplyPrimeAsync(engines, engineName, controlId)
+            _ = ApplyPrimeAsync(engines, engineName, controlId)
                 .ContinueWith(
-                    completed => CompletePrime(completed, engineName),
+                    completed =>
+                    {
+                        try
+                        {
+                            CompletePrime(completed, engineName);
+                        }
+                        finally
+                        {
+                            marker.SetResult(true);
+                        }
+                    },
                     CancellationToken.None,
                     TaskContinuationOptions.None,
                     TaskScheduler.Default
