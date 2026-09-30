@@ -96,13 +96,13 @@ permissions listed in step 6 below and skip to step 10.
 8. Under **Where can this GitHub App be installed?**, select **Only on this account**.
 9. Click **Create GitHub App**.
 
-### Part B — Record the App ID and generate a private key
+### Part B — Record the Client ID and generate a private key
 
-10. On the App's settings page that appears after creation, locate the **App ID** in the "About"
-    section near the top of the page and record it. The adjacent **Client ID** is also shown; record
-    it as well, because the `actions/create-github-app-token` action now documents `client-id` as
-    the recommended input and continues to accept the legacy `app-id` input. Neither value is a
-    secret in the cryptographic sense, but this runbook stores the App ID as a repository secret to
+10. On the App's settings page that appears after creation, locate the **Client ID** in the "About"
+    section near the top of the page and record it. The numeric **App ID** shown beside it is not
+    needed: the repair workflow passes the Client ID to the `actions/create-github-app-token` action
+    as its `client-id` input, which the action documents as the recommended input. The Client ID is
+    not a secret in the cryptographic sense, but this runbook stores it as a repository secret to
     keep the workflow configuration uniform.
 11. On the same page, scroll to the **Private keys** section and click **Generate a private key**.
     A `.pem` file downloads automatically. GitHub issues the key in PKCS#1 `RSAPrivateKey` PEM
@@ -126,9 +126,9 @@ permissions listed in step 6 below and skip to step 10.
 19. Click **Settings** on the repository navigation bar.
 20. In the sidebar's "Security" section, select **Secrets and variables**, then **Actions**.
 21. Select the **Secrets** tab, then click **New repository secret**.
-22. Create the App ID secret:
+22. Create the Client ID secret:
     - **Name** — `DEPENDABOT_REPAIR_APP_ID`
-    - **Secret** — the App ID value recorded in step 10
+    - **Secret** — the Client ID value recorded in step 10
     - Click **Add secret**.
 23. Click **New repository secret** again and create the private key secret:
     - **Name** — `DEPENDABOT_REPAIR_APP_PRIVATE_KEY`
@@ -151,7 +151,7 @@ permissions listed in step 6 below and skip to step 10.
       id: app-token
       uses: actions/create-github-app-token@v3
       with:
-        app-id: ${{ secrets.DEPENDABOT_REPAIR_APP_ID }}
+        client-id: ${{ secrets.DEPENDABOT_REPAIR_APP_ID }}
         private-key: ${{ secrets.DEPENDABOT_REPAIR_APP_PRIVATE_KEY }}
 
     - name: Check out the Dependabot branch

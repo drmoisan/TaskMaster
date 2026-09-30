@@ -242,7 +242,9 @@ namespace TaskMaster
         /// <returns>
         /// The prime task, or <see cref="Task.CompletedTask"/> when no prime has been started for
         /// the key. The returned task never faults: a prime fault is observed inside the prime
-        /// itself and reported through <c>logError</c>.
+        /// itself and reported through <c>logError</c>. For a key whose prime did not run to
+        /// completion, the marker is cleared only after that report has returned, so a caller that
+        /// receives <see cref="Task.CompletedTask"/> can rely on the fault having been reported.
         /// </returns>
         internal Task GetPrimeTask(string engineName)
         {
@@ -326,8 +328,9 @@ namespace TaskMaster
 
         /// <summary>
         /// Observes the outcome of a prime. On any outcome other than ran-to-completion the cache
-        /// is left unset — so the key still reports unchecked — the in-flight marker is cleared so
-        /// a later read may re-prime, and the failure is reported through <c>logError</c>.
+        /// is left unset — so the key still reports unchecked — the failure is reported through
+        /// <c>logError</c>, and only then is the in-flight marker cleared so a later read may
+        /// re-prime.
         /// </summary>
         /// <remarks>
         /// The status is tested rather than the exception. A CANCELED task carries a null
@@ -345,13 +348,15 @@ namespace TaskMaster
                 return;
             }
 
-            _primeTasks.TryRemove(engineName, out _);
-
             var failure =
                 (Exception)completed.Exception?.GetBaseException()
                 ?? new TaskCanceledException(completed);
 
+            // Report-then-clear is load-bearing: the marker stays registered until the report has
+            // returned, so a caller that observes the marker absent — including one that fetched the
+            // prime handle after the fault — is guaranteed the fault has already been reported.
             _logError(BuildPrimeFailedMessage(engineName), failure);
+            _primeTasks.TryRemove(engineName, out _);
         }
 
         /// <summary>
