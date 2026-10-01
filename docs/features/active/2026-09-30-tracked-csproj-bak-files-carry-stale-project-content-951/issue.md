@@ -66,11 +66,11 @@ Probably Visual Studio or NuGet migration backups that were committed by acciden
 
 ## Acceptance Criteria
 
-- [ ] AC-1: No `*.csproj.bak` file is tracked. `git ls-files -- "*.csproj.bak"` prints nothing, and the eight listed paths are deleted from the index and the working tree.
-- [ ] AC-2: `.gitignore` excludes backup copies of project files by the exact line `*.csproj.bak`, and `git check-ignore -v` reports that rule for each of the eight deleted paths.
-- [ ] AC-3: The new ignore rule does not shadow any tracked file. `git ls-files -ci --exclude-standard -- "*.bak"` prints nothing, and the other three tracked backup files (`TaskMaster.sln.bak`, `TaskTree/TaskTree.vbproj.bak`, `TaskVisualization/TaskVisualization.vbproj.bak`) remain tracked and unmodified.
-- [ ] AC-4: Nothing in the repository reads the deleted files. A fixed-string search of `scripts/`, `.github/`, `.claude/lib/`, `*.csproj`, `*.sln`, and `*.targets` for `.csproj.bak` returns no match on the end-state tree.
-- [ ] AC-5: The change set against `origin/main` consists only of the eight deletions, the `.gitignore` edit, and files under `docs/features/`.
+- [x] AC-1: No `*.csproj.bak` file is tracked. `git ls-files -- "*.csproj.bak"` prints nothing, and the eight listed paths are deleted from the index and the working tree.
+- [x] AC-2: `.gitignore` excludes backup copies of project files by the exact line `*.csproj.bak`, and `git check-ignore -v` reports that rule for each of the eight deleted paths.
+- [x] AC-3: The new ignore rule does not shadow any tracked file. `git ls-files -ci --exclude-standard -- "*.bak"` prints nothing, and the other three tracked backup files (`TaskMaster.sln.bak`, `TaskTree/TaskTree.vbproj.bak`, `TaskVisualization/TaskVisualization.vbproj.bak`) remain tracked and unmodified.
+- [x] AC-4: Nothing in the repository reads the deleted files. A fixed-string search of `scripts/`, `.github/`, `.claude/lib/`, `*.csproj`, `*.sln`, and `*.targets` for `.csproj.bak` returns no match on the end-state tree.
+- [x] AC-5: The change set against `origin/main` consists only of the eight deletions, the `.gitignore` edit, and files under `docs/features/`.
 
 ## Next Step
 
