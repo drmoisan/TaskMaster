@@ -885,15 +885,40 @@ namespace UtilitiesCS
             }
         }
 
+        /// <summary>
+        /// Saves the attachment to <paramref name="filePathSave"/> and creates the destination
+        /// directory on disk. The overload that takes a directory-creation delegate is the test
+        /// seam.
+        /// </summary>
         [ExcludeFromCodeCoverage]
-        internal static async Task<bool> TrySaveAttachmentAsync(
+        internal static Task<bool> TrySaveAttachmentAsync(
             this Attachment attachment,
             string filePathSave
         )
         {
+            return TrySaveAttachmentAsync(
+                attachment,
+                filePathSave,
+                path => System.IO.Directory.CreateDirectory(path)
+            );
+        }
+
+        /// <summary>
+        /// Saves the attachment to <paramref name="filePathSave"/>. The
+        /// <paramref name="createDirectory"/> delegate receives the destination directory before
+        /// the attachment is saved, so a caller can replace directory creation (for example, a
+        /// unit test that must not touch the file system).
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        internal static async Task<bool> TrySaveAttachmentAsync(
+            this Attachment attachment,
+            string filePathSave,
+            Action<string> createDirectory
+        )
+        {
             try
             {
-                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePathSave));
+                createDirectory(Path.GetDirectoryName(filePathSave));
                 await Task.Run(() => attachment.SaveAsFile(filePathSave));
                 return true;
             }
@@ -933,7 +958,7 @@ namespace UtilitiesCS
                             _removeReadOnly = YesNoToAllResponse.Empty;
                         }
                     }
-                    return await TrySaveAttachmentAsync(attachment, filePathSave);
+                    return await TrySaveAttachmentAsync(attachment, filePathSave, createDirectory);
                 }
                 else if (
                     (_removeReadOnly == YesNoToAllResponse.No)
