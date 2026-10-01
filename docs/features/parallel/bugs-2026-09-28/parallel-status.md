@@ -9,7 +9,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 3
 - recolor_generation: 3
-- last_updated: 2026-10-01T11-57
+- last_updated: 2026-10-01T12-05
 - next_step: All admitted items merged; hold on new launches until the coordinator releases each newly admitted item
 
 ## Items
@@ -27,6 +27,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 945 | docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/957 | 9b3eea58447c264eae6f95a4bfee3bfcec7fb17f |
 | 944 | docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/954 | 829ad415db99bf13b70a7766fe85dfa0d521f706 |
 | 941 | docs/features/active/2026-09-29-breadcrumb-dispatch-message-and-handoff-record-inaccurate-941 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/958 | 6c710a45dd61710658ea8e60588fb4108cf15b6f |
+| 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -43,6 +44,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 945 | 2026-09-30T08-49 | 2026-09-30T12-07 | 2026-10-01T06-31 |  |
 | 944 | 2026-09-30T09-08 | 2026-09-30T09-12 | 2026-09-30T11-43 |  |
 | 941 | 2026-10-01T06-28 | 2026-10-01T06-33 | 2026-10-01T11-57 |  |
+| 951 | 2026-10-01T12-05 |  |  |  |
 
 ## Cohorts
 
@@ -59,7 +61,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 0 | 3 | 882, 927, 928, 930, 931 |
 | 1 | 3 | 929, 940, 942 |
 | 2 | 3 | 944, 945 |
-| 3 | 3 | 941 |
+| 3 | 3 | 941, 951 |
 
 ## Conflict Edges
 
@@ -74,6 +76,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 940 | 941 | path_overlap | path_overlap:docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931/evidence/qa-gates/p4-t13-follow-up-handoff.2026-09-29T09-46.md |
 | 941 | 944 | path_overlap | path_overlap:.claude/hooks/validate-planner-output.ps1 |
 | 941 | 945 | path_overlap | path_overlap:FEATURE/issue.md |
+| 927 | 951 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.ps1 |
+| 940 | 951 | path_overlap | path_overlap:UtilitiesCS.Test/HelperClasses/PhysicalFileSystemAdapters_Tests.cs |
 
 ## Mutations
 
@@ -84,6 +88,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 945 | 2026-09-30T08-49 |  | scheduled |  | 1 |
 | add | 944 | 2026-09-30T09-08 |  | scheduled |  | 2 |
 | add | 941 | 2026-10-01T06-28 |  | scheduled |  | 3 |
+| add | 951 | 2026-10-01T12-05 |  | scheduled |  | 3 |
 
 ## Drift Events
 
