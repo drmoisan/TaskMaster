@@ -122,3 +122,15 @@ not the full record.
   0 blocking after relocating the gate into the path-loaded part file (details in
   [[928-review-residuals]] and [[pester-breakpoint-coverage-binds-to-first-parsefile-copy]]). Residuals P-1
   to P-4 owed by the orchestrator (P-4: the bundled PoshQC coverage document never covers `scripts/`).
+- **#942** (EngineToggleStateCoordinator `CompletePrime` report-then-clear reorder, parallel run
+  bugs-2026-09-28, no-Bash full-bug): 14/14 AC PASS, 0 blocking, first-party 85.32/79.73 -> 85.31/79.72
+  (DIRECT route, same four shell-icon classes excluded both stages), coordinator 143/143 and 37/38 at both
+  stages with the moved `TryRemove` line hits=1, verified by reading the gitignored
+  `coverage/final-942.cobertura.xml` class element directly. Fail-before was a real run against the
+  hash-identical base file (24/1, `BeSameAs` text). Residuals, all non-blocking: hazard B (registration
+  racing removal on a synchronous non-success prime; promoted as #944 per the session branch name), a
+  throwing error sink would now leave the marker registered (log4net sink never throws; `try/finally`
+  is a documented non-goal), `artifacts/csharp/coverage.xml` unpopulated (runner writes `coverage/`),
+  `quality-tiers.yml` still absent. Hook note: a stale session-cwd `pr_context.summary.txt` listing only
+  `.csproj`/`.yml`/`.md` disarms the C# check (`^\.cs$` does not match `.csproj`); artifact tokens were
+  advertised with the 3-`..` traversal form from [[928-review-residuals]], no mirror written.

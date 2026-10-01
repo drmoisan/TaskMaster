@@ -7,7 +7,8 @@
 - [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — the residual may already be its own issue
 - [Footprint AC forbids on-branch follow-up promotion](footprint-ac-forbids-onbranch-followup-promotion.md)
 - [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — skip-worktree BEFORE first write
-- [Bootstrapping the first checkpoint write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it
+- [Bootstrapping the first checkpoint write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it · [Glob hides an ignored checkpoint](glob-hides-gitignored-checkpoint-read-before-first-write.md) — probe with Read first
+- [PoshQC JUnit + branch CI as PowerShell gate sources](poshqc-junit-and-branch-ci-sources-for-powershell-gates.md) — ci.yml skips branch pushes; strip ANSI from Pester log
 - [Checkpoint gate exact key names](checkpoint-gate-exact-key-requirements.md) — pre-impl wants `lifecycle_ready`
 - [Flat keys + step-status enum](orchestrator-state-flat-keys-and-enum.md) · [validator divergence](orchestrator-state-validator-divergence.md) · [`completed` write-locks](step-status-completed-write-locks-checkpoint.md)
 - [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) · [namespaces + owner race](checkpoint-receipt-namespaces-and-owner-race.md) — 8-key receipts; MCP DOES accept `agents`; extra keys ignored

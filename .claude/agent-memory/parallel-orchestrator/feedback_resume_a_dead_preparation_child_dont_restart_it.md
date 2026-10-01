@@ -235,5 +235,11 @@ Three further mechanics on this rung:
   nothing was rewritten. Re-derive anyway and say so — the value of the pass is the confirmation,
   and a resume that skips it cannot tell agreement from luck.
 
+**Fourth case, 2026-10-01 `/parallel-add 941`: a `next_step` reading "941 not admitted" meant the
+WRITE was missing, not the preparation.** Branch had the clearance commit, worktree `item-941` clean
+and unlocked; whole add ran with no child. Also check main has not touched the plan's target files
+since the branch's merge-base (`git log <base>..origin/main -- <targets>` empty) before calling the
+plan current.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].

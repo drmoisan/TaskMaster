@@ -46,3 +46,7 @@ Two practical notes. Escape `$` and inner double quotes when the wrapper is a Ba
 string, or avoid the problem by keeping the wrapper to a single quoted path operand. And when the
 script must both compute and write, have it build the full serialized output BEFORE opening the
 target for writing, per [[serialize-before-truncating-the-checkpoint]].
+
+**Prefix every scratch file name with the operation (`add944_*.txt`).** Concurrent parallel-orchestrator
+forks share ONE session scratchpad. On 2026-09-30 a sibling add overwrote my generic `summ.txt`
+between two of my calls, so a re-run would have executed its script, not mine.

@@ -138,6 +138,24 @@ from silent corruption into a re-run. On 812 the guard passed, so the decision s
 sibling landed in the final minutes it would have aborted and forced the recompute that the
 verdict-inversion cases above make mandatory.
 
+**A generation bump must re-emit EVERY current-generation row, not just the recolored keys.**
+`RecolorResult.cohort_assignments` names only the unstarted set, but invariant 13 then counts only
+rows whose `generation` equals the NEW `recolor_generation`, so pinned `in_flight` items vanish from
+coverage unless their rows are carried forward. On `/parallel-add 945` (2026-09-30, generation 0 to
+1) the correct write was: copy each old current-generation row at its index with `generation: 1`
+and the recolored keys removed, then merge each assignment into the row at its index (new row only
+when absent). Merged items may be carried too; exactly-one coverage accepts them.
+
+**Pass the FULL current-cohort membership, MERGED members included, and let the engine defer.**
+Refines the 646 note above, which hand-placed the candidate at the next index on the ADMIT branch.
+Observed 2026-09-30 on `/parallel-add 944`: the candidate's only current-cohort edge was to 942,
+which had merged mid-preparation. `decide_admission` with the documented full membership returned
+`DEFER_AND_RECOLOR`, and `recolor_unstarted` put it at cohort 2 with generation 1 to 2. That is the
+engine-produced form of the same placement, and ADMIT into cohort 1 would have failed Layer 2's
+structural reading (two conflicting items in one cohort, merged or not). Barrier cost is nil: both
+prior-cohort neighbours were already merged. Do not filter terminal members out of the set to
+avoid the generation bump.
+
 **`current_cohort_members` must include `scheduled` members, not just pinned ones.** That is
 exactly what made 656 defer: 646 was never in flight, only admitted and waiting. An admission
 check written against the `in_flight` subset alone would have missed it and admitted 656
