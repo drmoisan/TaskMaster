@@ -302,7 +302,7 @@ namespace QuickFiler.Test.Viewers
             dispatchWithoutContext
                 .Should()
                 .ThrowAsync<InvalidOperationException>()
-                .WithMessage("*cannot marshal cross-thread UI work*")
+                .WithMessage("*outside an executing Dispatch callback*")
                 .GetAwaiter()
                 .GetResult();
         }
