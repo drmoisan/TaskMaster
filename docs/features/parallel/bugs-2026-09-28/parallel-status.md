@@ -7,10 +7,10 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - parallel_slug: bugs-2026-09-28
 - mode: open
 - max_concurrency: 6
-- current_cohort: 1
-- recolor_generation: 2
-- last_updated: 2026-09-30T12-07
-- next_step: 945 running; 941 not admitted (coordinator to re-run /parallel-add 941)
+- current_cohort: 2
+- recolor_generation: 3
+- last_updated: 2026-10-01T06-30
+- next_step: 945 opening PR and driving CI; 941 being re-admitted by the coordinator
 
 ## Items
 
@@ -24,8 +24,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 931 | docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/939 | ddbab26a0149bf2ca5d0256e60686ad79e74d90c |
 | 942 | docs/features/active/2026-09-29-engine-toggle-prime-fault-logging-test-races-942 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/946 | b305903e275b8abf58e8e65831c189f517568fe4 |
 | 940 | docs/features/active/2026-09-29-filesystem-wrapper-tests-open-repository-solution-file-940 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/955 | 039cf779110df3313b3324299d019cabfccce980 |
-| 945 | docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945 | 2 | in_flight | worktree_created |  |  |
+| 945 | docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945 | 2 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/957 |  |
 | 944 | docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/954 | 829ad415db99bf13b70a7766fe85dfa0d521f706 |
+| 941 | docs/features/active/2026-09-29-breadcrumb-dispatch-message-and-handoff-record-inaccurate-941 | 3 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -41,6 +42,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 940 | 2026-09-30T01-30 | 2026-09-30T07-05 | 2026-09-30T12-06 |  |
 | 945 | 2026-09-30T08-49 | 2026-09-30T12-07 |  |  |
 | 944 | 2026-09-30T09-08 | 2026-09-30T09-12 | 2026-09-30T11-43 |  |
+| 941 | 2026-10-01T06-28 |  |  |  |
 
 ## Cohorts
 
@@ -54,6 +56,10 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 0 | 2 | 882, 927, 928, 930, 931 |
 | 1 | 2 | 929, 940, 942 |
 | 2 | 2 | 944, 945 |
+| 0 | 3 | 882, 927, 928, 930, 931 |
+| 1 | 3 | 929, 940, 942 |
+| 2 | 3 | 944, 945 |
+| 3 | 3 | 941 |
 
 ## Conflict Edges
 
@@ -64,6 +70,10 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 940 | 945 | path_overlap | path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_Tests.cs |
 | 927 | 944 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
 | 942 | 944 | path_overlap | path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs; path_overlap:TaskMaster.Test/TaskMaster.Test.csproj; path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs; path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs |
+| 931 | 941 | path_overlap | path_overlap:QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs; path_overlap:docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931/plan.2026-09-28T20-01.md |
+| 940 | 941 | path_overlap | path_overlap:docs/features/active/2026-09-28-tests-depend-on-uncontrolled-environment-931/evidence/qa-gates/p4-t13-follow-up-handoff.2026-09-29T09-46.md |
+| 941 | 944 | path_overlap | path_overlap:.claude/hooks/validate-planner-output.ps1 |
+| 941 | 945 | path_overlap | path_overlap:FEATURE/issue.md |
 
 ## Mutations
 
@@ -73,6 +83,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 940 | 2026-09-30T01-30 |  | scheduled |  | 0 |
 | add | 945 | 2026-09-30T08-49 |  | scheduled |  | 1 |
 | add | 944 | 2026-09-30T09-08 |  | scheduled |  | 2 |
+| add | 941 | 2026-10-01T06-28 |  | scheduled |  | 3 |
 
 ## Drift Events
 
