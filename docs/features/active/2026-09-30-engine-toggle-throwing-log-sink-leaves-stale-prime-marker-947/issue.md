@@ -44,13 +44,13 @@ The marker stays registered, no re-prime starts, and the continuation task fault
 
 ## Acceptance Criteria
 
-- [ ] When the `logError` sink throws while `CompletePrime` reports a faulted or canceled prime, the engine's prime marker is still removed, so a later `GetPressed` for the same engine starts a new prime (`EngineActiveAsync` is invoked a second time).
-- [ ] The report-then-clear ordering in `CompletePrime` is preserved: the sink is invoked before the marker is removed (the clear is not reordered ahead of the report), and the existing tests in `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` pass without modification.
-- [ ] A throwing `logError` sink leaves no faulted task unobserved: the sink exception is contained inside `CompletePrime`, so the prime continuation has no remaining throw source, and a deterministic test asserts that the task returned by `GetPrimeTask` for the first prime ends in `RanToCompletion` (not `Faulted`) after the sink has thrown.
-- [ ] A regression test reproducing the Steps to Reproduce fails on the pre-fix code and passes after the fix, with the failing run recorded under the feature folder's `evidence/regression-testing/`.
-- [ ] New tests use MSTest, Moq, and FluentAssertions, create no temporary files, and use no `Thread.Sleep` or `Task.Delay`; the C# toolchain (CSharpier, analyzers, nullable type-check, MSTest with coverage) passes, and the changed lines in `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` are covered.
-- [ ] When the `logError` sink throws while `HandleToggleClickAsync` reports a faulted toggle, `HandleToggleClickAsync` does not throw and still attempts the report: the sink exception is contained inside the click boundary by its own guarded sink call, the sink receives the toggle fault unchanged, and no control is invalidated.
-- [ ] A separate regression test for the `HandleToggleClickAsync` call site, using a throwing sink on a faulted toggle, fails on the pre-fix code and passes after the fix, with the failing run recorded under the feature folder's `evidence/regression-testing/`.
+- [x] When the `logError` sink throws while `CompletePrime` reports a faulted or canceled prime, the engine's prime marker is still removed, so a later `GetPressed` for the same engine starts a new prime (`EngineActiveAsync` is invoked a second time).
+- [x] The report-then-clear ordering in `CompletePrime` is preserved: the sink is invoked before the marker is removed (the clear is not reordered ahead of the report), and the existing tests in `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` pass without modification.
+- [x] A throwing `logError` sink leaves no faulted task unobserved: the sink exception is contained inside `CompletePrime`, so the prime continuation has no remaining throw source, and a deterministic test asserts that the task returned by `GetPrimeTask` for the first prime ends in `RanToCompletion` (not `Faulted`) after the sink has thrown.
+- [x] A regression test reproducing the Steps to Reproduce fails on the pre-fix code and passes after the fix, with the failing run recorded under the feature folder's `evidence/regression-testing/`.
+- [x] New tests use MSTest, Moq, and FluentAssertions, create no temporary files, and use no `Thread.Sleep` or `Task.Delay`; the C# toolchain (CSharpier, analyzers, nullable type-check, MSTest with coverage) passes, and the changed lines in `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` are covered.
+- [x] When the `logError` sink throws while `HandleToggleClickAsync` reports a faulted toggle, `HandleToggleClickAsync` does not throw and still attempts the report: the sink exception is contained inside the click boundary by its own guarded sink call, the sink receives the toggle fault unchanged, and no control is invalidated.
+- [x] A separate regression test for the `HandleToggleClickAsync` call site, using a throwing sink on a faulted toggle, fails on the pre-fix code and passes after the fix, with the failing run recorded under the feature folder's `evidence/regression-testing/`.
 
 ## Logs / Screenshots
 

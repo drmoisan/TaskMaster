@@ -45,3 +45,36 @@ RESULT GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime = Passed
 ```
 
 The trx stays under the git-ignored coverage directory and is not copied into the feature folder.
+
+## FINAL-FIXTURE-RUN:
+
+Timestamp: 2026-10-01T18-06
+Task: P2-T7 (coordinator fixture re-run on the assembly rebuilt by P2-T6)
+Command: vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:FullyQualifiedName~TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" "/ResultsDirectory:coverage\test-results\947\p2-t7" "/Logger:trx;LogFileName=p2-t7.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None"
+EXIT_CODE: 0
+
+Output Summary:
+- VSTEST_EXIT_CODE: 0
+- TRX_PRESENT: True
+- SEQUENCE_FILES: 0
+- COUNTERS total=32 executed=32 passed=32 failed=0 (total equals BASELINE-TOTAL: 28 plus 4)
+- All twelve NAMES-947 entries read Passed; no FAILED line.
+- STRAY_TEST_PROCESSES: 0 before the run.
+- Result: P2-T7 acceptance holds.
+
+```
+COUNTERS total=32 executed=32 passed=32 failed=0
+RESULT_COUNT: 32
+RESULT GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker = Passed
+RESULT HandleToggleClickAsync_WhenToggleFaults_LogsErrorDoesNotThrowDoesNotInvalidate = Passed
+RESULT GetPressed_WhenLogSinkThrowsOnCanceledPrime_LaterReadStartsNewPrime = Passed
+RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Passed
+RESULT GetPressed_AfterPrimeFaultsSynchronously_LaterReadStartsNewPrime = Passed
+RESULT GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime = Passed
+RESULT GetPressed_WhenLogSinkThrowsOnFaultedPrime_LaterReadStartsNewPrime = Passed
+RESULT HandleToggleClickAsync_WhenLogSinkThrowsOnToggleFault_DoesNotThrowAndAttemptsReport = Passed
+RESULT GetPressed_AfterPrimeIsCanceledSynchronously_LaterReadStartsNewPrime = Passed
+RESULT GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse = Passed
+RESULT GetPressed_WhenPrimeStarts_RegistersPrimeHandleBeforeActivationReadRuns = Passed
+RESULT GetPressed_WhenLogSinkThrows_FirstPrimeCompletesAndMarkerIsCleared = Passed
+```
