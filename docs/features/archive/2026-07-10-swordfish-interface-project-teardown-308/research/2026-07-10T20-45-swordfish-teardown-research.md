@@ -3,7 +3,7 @@
 - Feature: swordfish-interface-project-teardown (epic `swordfish-removal`, child F5, wave 1)
 - Mode: PREPARATION (planning only). Findings are grounded in the CURRENT worktree source
   (F1–F4 not yet merged) and reason explicitly about the post-F1–F4 end-state.
-- Worktree root: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a60b2db6bdd19bba3`
+- Worktree root: `<repo-root>\.claude\worktrees\agent-a60b2db6bdd19bba3`
 - All searches below were run against that root.
 
 ---

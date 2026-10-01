@@ -15,7 +15,7 @@ Output Summary:
 Command Output Excerpt:
 
 ```text
-UtilitiesCS.Test -> C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-16T12-27\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll
+UtilitiesCS.Test -> <user-profile>\repos\TaskMaster-wt\2026-07-16T12-27\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll
 
 Build succeeded.
     21 Warning(s)

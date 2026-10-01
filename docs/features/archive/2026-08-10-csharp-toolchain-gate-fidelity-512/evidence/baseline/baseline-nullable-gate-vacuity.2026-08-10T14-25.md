@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-10T14-25
 Branch: bug/csharp-toolchain-gate-fidelity-512 (from origin/epic/build-ci-coverage-gate-fidelity-integration @ edf3d34c)
-Worktree: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af19fe9c37ece6a65
+Worktree: <repo-root>\.claude\worktrees\agent-af19fe9c37ece6a65
 MSBuild: C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe
 Bootstrap: `scripts/vscode/Install-RepoDotNetSdk.ps1` then `scripts/vscode/Invoke-Restore.ps1` (NuGet restore), both EXIT_CODE 0.
 

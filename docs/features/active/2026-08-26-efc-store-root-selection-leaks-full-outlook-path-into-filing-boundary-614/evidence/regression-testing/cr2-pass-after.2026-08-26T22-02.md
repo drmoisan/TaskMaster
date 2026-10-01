@@ -42,6 +42,6 @@ by a named passing test in this run:
 | `\Archive2\Clients` (separator-boundary near miss) | `\Archive` | rejected | `IsValidFilingSelection_SeparatorBoundaryNearMiss_IsRejected` |
 | `\Archive\Clients` | `string.Empty` (degrade path) | rejected | `IsValidFilingSelection_RootedTargetWithUnavailableRoot_IsRejected` |
 | `\Archive\Clients` | `null` | rejected | `IsValidFilingSelection_SingleSeparatorLeadingSelection_IsRejected` |
-| `C:\Users\testuser\OneDrive - Contoso` (drive-rooted) | `\Archive` | rejected | `IsValidFilingSelection_DriveRootedSelection_IsRejected` |
+| `<user-profile>\OneDrive - Contoso` (drive-rooted) | `\Archive` | rejected | `IsValidFilingSelection_DriveRootedSelection_IsRejected` |
 
 Raw TRX was written to the gitignored `coverage\trx\p3-t4\` tree, not under `evidence/`.

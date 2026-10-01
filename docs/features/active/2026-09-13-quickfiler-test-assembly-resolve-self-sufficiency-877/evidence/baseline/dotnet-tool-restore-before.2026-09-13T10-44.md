@@ -1,7 +1,7 @@
 # Baseline: dotnet tool restore — issue #877
 
 Timestamp: 2026-09-13T10-44
-Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/Users/DanMoisan/repos/TaskMaster-wt/bug-877-test-isolation"; Write-Host "CWD=$((Get-Location).Path)"; dotnet tool restore; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
+Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "<user-profile>/repos/TaskMaster-wt/bug-877-test-isolation"; Write-Host "CWD=$((Get-Location).Path)"; dotnet tool restore; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
 EXIT_CODE: 0
 Output Summary: `Tool 'csharpier' (version '1.2.6') was restored. Available commands: csharpier` followed by `Restore was successful.` The manifest-pinned CSharpier version 1.2.6 is available in this worktree. Run under an acquired build lock, released immediately after the command returned.
 

@@ -9,7 +9,7 @@ DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED
 - **Version:** 1.0
 - **Work Mode:** `minor-audit`
 - **Requirements Source:** `docs/features/active/2026-04-13-outlook-com-sta-materialization-128/issue.md`
-- **Plan Path:** `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-13-outlook-com-sta-materialization-128\plan.2026-04-13T22-47.md`
+- **Plan Path:** `<repo-root>\docs\features\active\2026-04-13-outlook-com-sta-materialization-128\plan.2026-04-13T22-47.md`
 
 ## Overview
 

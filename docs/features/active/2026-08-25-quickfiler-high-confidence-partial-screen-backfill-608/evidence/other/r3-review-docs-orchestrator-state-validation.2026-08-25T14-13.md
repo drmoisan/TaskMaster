@@ -1,5 +1,5 @@
 Timestamp: 2026-08-25T14-13
-Command: mcp__drm-copilot__validate_orchestration_artifacts({ workspace_root: "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-08-25T11-36", artifact_type: "orchestrator-state", artifact_path: "artifacts/orchestration/orchestrator-state.json", require_codex_topology: true, require_codex_model_routing: true })
+Command: mcp__drm-copilot__validate_orchestration_artifacts({ workspace_root: "<user-profile>\\repos\\TaskMaster-wt\\2026-08-25T11-36", artifact_type: "orchestrator-state", artifact_path: "artifacts/orchestration/orchestrator-state.json", require_codex_topology: true, require_codex_model_routing: true })
 EXIT_CODE: 0
 Output Summary: Validation succeeded after the parent orchestration workflow repaired the existing delegation receipts with session-verified metadata. This documentation task did not modify the checkpoint.
 
@@ -7,7 +7,7 @@ Output Summary: Validation succeeded after the parent orchestration workflow rep
 
 ```json
 {
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-08-25T11-36",
+  "workspace_root": "<user-profile>\\repos\\TaskMaster-wt\\2026-08-25T11-36",
   "artifact_type": "orchestrator-state",
   "artifact_path": "artifacts/orchestration/orchestrator-state.json",
   "require_codex_topology": true,

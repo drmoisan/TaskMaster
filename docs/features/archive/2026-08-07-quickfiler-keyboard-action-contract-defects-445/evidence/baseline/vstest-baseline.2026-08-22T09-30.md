@@ -6,7 +6,7 @@ Command:
 ```powershell
 & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' @assemblies /EnableCodeCoverage /InIsolation '/TestCaseFilter:TestCategory!=LiveOutlook' '/ResultsDirectory:coverage'
 ```
-with `@assemblies` the 9-element relative-path list resolved in P0-T14. Run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`. `/InIsolation` is present, per Non-negotiable Command Constraint 3.
+with `@assemblies` the 9-element relative-path list resolved in P0-T14. Run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`. `/InIsolation` is present, per Non-negotiable Command Constraint 3.
 
 EXIT_CODE: 0
 

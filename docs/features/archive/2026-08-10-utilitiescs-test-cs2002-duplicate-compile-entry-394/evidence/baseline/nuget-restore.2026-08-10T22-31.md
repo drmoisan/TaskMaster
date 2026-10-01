@@ -1,6 +1,6 @@
 Timestamp: 2026-08-10T22-31
 
-Command: `nuget restore TaskMaster.sln` (run via `pwsh -NoProfile -Command "nuget restore TaskMaster.sln"` from repository root; `nuget.exe` resolved from PATH at `C:\Users\DanMoisan\AppData\Local\Microsoft\WinGet\Packages\Microsoft.NuGet_Microsoft.Winget.Source_8wekyb3d8bbwe\nuget.exe`)
+Command: `nuget restore TaskMaster.sln` (run via `pwsh -NoProfile -Command "nuget restore TaskMaster.sln"` from repository root; `nuget.exe` resolved from PATH at `<user-profile>\AppData\Local\Microsoft\WinGet\Packages\Microsoft.NuGet_Microsoft.Winget.Source_8wekyb3d8bbwe\nuget.exe`)
 
 EXIT_CODE: 0
 

@@ -8,7 +8,7 @@ git rev-parse HEAD
 git rev-parse --abbrev-ref HEAD
 git status --porcelain
 ```
-Run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d` (the value returned by `git rev-parse --show-toplevel`, resolved once at execution time per the plan's Resolved Environment section).
+Run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d` (the value returned by `git rev-parse --show-toplevel`, resolved once at execution time per the plan's Resolved Environment section).
 
 EXIT_CODE: 0
 
@@ -41,6 +41,6 @@ No tracked source file is modified at baseline.
 
 ## Agent-worktree bootstrap confirmation (independently verified, not assumed)
 
-`.dotnet-sdk` and `packages/` are provisioned in this worktree as Windows directory junctions to the main checkout (`C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk` and `C:\Users\DanMoisan\repos\TaskMaster\packages`). Neither appears in the `git status --porcelain` output above, which confirms both are ignored (`.gitignore` patterns `.dotnet*/` and `**/[Pp]ackages/*`). The bootstrap therefore introduces no tracked change and no scope-lock risk for P4-T3.
+`.dotnet-sdk` and `packages/` are provisioned in this worktree as Windows directory junctions to the main checkout (`<repo-root>\.dotnet-sdk` and `<repo-root>\packages`). Neither appears in the `git status --porcelain` output above, which confirms both are ignored (`.gitignore` patterns `.dotnet*/` and `**/[Pp]ackages/*`). The bootstrap therefore introduces no tracked change and no scope-lock risk for P4-T3.
 
 Output Summary: HEAD is the full 40-character SHA `c551eabab0aa0a6b1a284252811a2e1de819634e`. Branch is `bug/quickfiler-keyboard-action-contract-defects-445-exec`. `git status --porcelain` reports exactly two entries, both this executor's own Phase 0 artifacts (the plan checklist check-off and the new `evidence/` tree); zero tracked source files are modified. The `.dotnet-sdk` and `packages/` junctions are confirmed gitignored by their absence from the status output. The recorded SHA is a datum only; no later task in this plan asserts a specific SHA value.

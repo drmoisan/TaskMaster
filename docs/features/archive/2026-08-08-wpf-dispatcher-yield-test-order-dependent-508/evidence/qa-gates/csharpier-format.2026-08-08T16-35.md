@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T16-35
 
 Task: [P2-T1] — final QC loop, pass 1
 
-Command: `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe format C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0`
+Command: `<user-profile>\.dotnet\tools\csharpier.exe format <repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0`
 
 EXIT_CODE: 0
 

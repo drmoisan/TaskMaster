@@ -1,12 +1,12 @@
 # Epic Audit: build-ci-coverage-gate-fidelity
 
 - Epic folder: `docs/features/epics/build-ci-coverage-gate-fidelity/`
-- Worktree: `c:\Users\DanMoisan\repos\TaskMaster-wt\epic-build-ci-coverage-gate-fidelity`
+- Worktree: `<user-profile>\repos\TaskMaster-wt\epic-build-ci-coverage-gate-fidelity`
 - Branch: `epic/build-ci-coverage-gate-fidelity-integration`
 - Head verified: `22b5de02325331b0dcd660222dba33a1f1b66450` (confirmed against
   `.git/refs/heads/epic/build-ci-coverage-gate-fidelity-integration` in the shared repository, since
   this worktree's `.git` is a pointer file to
-  `C:\Users\DanMoisan\repos\TaskMaster\.git\worktrees\epic-build-ci-coverage-gate-fidelity`)
+  `<repo-root>\.git\worktrees\epic-build-ci-coverage-gate-fidelity`)
 - Audit timestamp: 2026-08-15T09-30
 - Stage: fan-in — all five child features merged into the integration branch; final
   integration-to-`main` PR not yet opened (confirmed: `epic-status.md`'s Integration PR table has all

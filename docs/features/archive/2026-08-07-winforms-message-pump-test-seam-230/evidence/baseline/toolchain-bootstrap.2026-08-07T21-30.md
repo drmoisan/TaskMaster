@@ -11,7 +11,7 @@ Task: [P0-T1]
 - Output Summary: Downloaded .NET SDK 8.0.205 from
   `https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.205/dotnet-sdk-8.0.205-win-x64.zip`
   and installed it to
-  `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-07T20-30\.dotnet-sdk`.
+  `<user-profile>\repos\TaskMaster-wt\2026-08-07T20-30\.dotnet-sdk`.
   Before this step `.dotnet-sdk` did not exist in this fresh worktree, so
   `global.json` (`sdk.version 8.0.205`, `paths: [".dotnet-sdk", "$host$"]`)
   could not be satisfied by the globally installed SDK.
@@ -55,7 +55,7 @@ resolve identically in this worktree. Remaining plan tasks use the plain
 - Command: `dotnet-coverage --version`
 - EXIT_CODE: 0
 - Output Summary: `18.5.2+6e39b75eaf98f2691cf62dbf259669cc13851fd3`. Already
-  present on PATH (`C:\Users\DanMoisan\.dotnet\tools`); the conditional
+  present on PATH (`<user-profile>\.dotnet\tools`); the conditional
   `dotnet tool install --global dotnet-coverage` was therefore not required and
   was not run.
 

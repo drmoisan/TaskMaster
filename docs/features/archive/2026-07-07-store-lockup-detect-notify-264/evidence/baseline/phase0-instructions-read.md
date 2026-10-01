@@ -9,13 +9,13 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and coding standards)
 
 Files read start-to-end (absolute paths, this worktree):
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a9482bb2b78a348e7\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a9482bb2b78a348e7\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a9482bb2b78a348e7\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a9482bb2b78a348e7\.claude\rules\csharp.md
+- <repo-root>\.claude\worktrees\agent-a9482bb2b78a348e7\CLAUDE.md
+- <repo-root>\.claude\worktrees\agent-a9482bb2b78a348e7\.claude\rules\general-code-change.md
+- <repo-root>\.claude\worktrees\agent-a9482bb2b78a348e7\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\worktrees\agent-a9482bb2b78a348e7\.claude\rules\csharp.md
 
 Note on plan P0-T1 path reference: the plan text names
-`C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-07-13-21\CLAUDE.md`, an author-time
+`<user-profile>\repos\TaskMaster-wt-2026-07-07-13-21\CLAUDE.md`, an author-time
 worktree path. The equivalent canonical files were read from the active execution worktree
 (paths above); content is identical policy text.
 

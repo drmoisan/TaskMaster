@@ -1,7 +1,7 @@
 # Targeted Regression Verification
 
 Timestamp: 2026-04-14T08:05:27.6558282-04:00
-Source Artifact: `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-mstest-coverage.2026-04-14T08-05.md`
+Source Artifact: `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-mstest-coverage.2026-04-14T08-05.md`
 
 Verified Test Files:
 - `UtilitiesCS.Test\Extensions\TraceExtensions_Tests.cs`

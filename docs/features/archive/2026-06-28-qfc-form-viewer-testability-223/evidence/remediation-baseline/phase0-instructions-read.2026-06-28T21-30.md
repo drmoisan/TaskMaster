@@ -15,18 +15,18 @@ Policy Order: The repository mandatory policy reading order was followed:
    - .claude/skills/policy-compliance-order/SKILL.md
 
 Files read (explicit list):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\csharp.md (C# code/test policy as embedded in CLAUDE.md sections; rules file referenced via policy-compliance-order)
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\powershell.md (coverage script is PowerShell)
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\ci-workflows.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\tonality.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\atomic-plan-contract\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\acceptance-criteria-tracking\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\policy-compliance-order\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\docs\features\active\2026-06-28-qfc-form-viewer-testability-223\remediation-plan.2026-06-28T21-30.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-50\docs\features\active\2026-06-28-qfc-form-viewer-testability-223\remediation-inputs.2026-06-28T21-30.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\csharp.md (C# code/test policy as embedded in CLAUDE.md sections; rules file referenced via policy-compliance-order)
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\powershell.md (coverage script is PowerShell)
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\ci-workflows.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\rules\tonality.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\atomic-plan-contract\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\acceptance-criteria-tracking\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\.claude\skills\policy-compliance-order\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\docs\features\active\2026-06-28-qfc-form-viewer-testability-223\remediation-plan.2026-06-28T21-30.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-50\docs\features\active\2026-06-28-qfc-form-viewer-testability-223\remediation-inputs.2026-06-28T21-30.md
 
 Output Summary: All required policy and skill files for this remediation cycle were read in the mandated order. Key constraints affirmed for this cycle: no `.cs` production/test edits; no edits to `.claude/rules/**` or `CLAUDE.md`; no weakening of coverage thresholds or `[ExcludeFromCodeCoverage]` exemptions; the only permitted non-evidence output path is `artifacts/csharp/coverage.xml`; all other artifacts go under the feature `evidence/<kind>/` canonical folders.

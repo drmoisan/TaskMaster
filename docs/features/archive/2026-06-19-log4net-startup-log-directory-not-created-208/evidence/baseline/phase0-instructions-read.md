@@ -9,14 +9,14 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific code standards)
 
 Files Read (policy documents, in order):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-09-09-14\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-09-09-14\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-09-09-14\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-09-09-14\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-09-09-14\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-09-09-14\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-09-09-14\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-09-09-14\.claude\rules\csharp.md
 
 Files Read (in-scope source files):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-09-09-14\TaskMaster\log4net.config
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-09-09-14\TaskMaster\ThisAddIn.cs
+- <user-profile>\repos\TaskMaster-wt-2026-07-09-09-14\TaskMaster\log4net.config
+- <user-profile>\repos\TaskMaster-wt-2026-07-09-09-14\TaskMaster\ThisAddIn.cs
 
 Output Summary: All four policy documents were read in the mandated order and both in-scope source
 files were read. The C# toolchain (CSharpier format, .NET analyzers, nullable/type-check, MSTest +

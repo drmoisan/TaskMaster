@@ -7,7 +7,7 @@ Command:
 & 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /fl '/flp:logfile=msbuild-nullable-baseline.log;verbosity=detailed'
 (Select-String -SimpleMatch -Pattern 'Skipping target "CoreCompile"' -Path msbuild-nullable-baseline.log | Measure-Object).Count
 ```
-Run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`. This is character-for-character the command in `.github/workflows/ci.yml` except for the deliberate `/t:Rebuild` substitution and the file logger. **No `/p:Nullable=enable` was added**, per Non-negotiable Command Constraint 2.
+Run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`. This is character-for-character the command in `.github/workflows/ci.yml` except for the deliberate `/t:Rebuild` substitution and the file logger. **No `/p:Nullable=enable` was added**, per Non-negotiable Command Constraint 2.
 
 EXIT_CODE: 0
 

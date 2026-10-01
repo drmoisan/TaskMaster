@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T15-10
 
 ### Acceptance Criteria Status
 
-- Source: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
+- Source: `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\spec.md`
 - Work mode: `full-bug` (persisted in `issue.md`), so `spec.md` is the **sole** authoritative AC source per `.claude/skills/acceptance-criteria-tracking/SKILL.md`. No `user-story.md` exists and none was created.
 - Total AC items: **30**
 - Checked off (delivered): **27**

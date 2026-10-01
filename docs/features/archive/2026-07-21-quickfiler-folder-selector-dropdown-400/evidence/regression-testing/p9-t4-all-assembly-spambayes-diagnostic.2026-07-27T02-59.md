@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-27T02-59Z
 
-Command: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe QuickFiler.Test\\bin\\Debug\\QuickFiler.Test.dll Tags.Test\\bin\\Debug\\Tags.Test.dll TaskMaster.Test\\bin\\Debug\\TaskMaster.Test.dll TaskTree.Test\\bin\\Debug\\TaskTree.Test.dll TaskVisualization.Test\\bin\\Debug\\TaskVisualization.Test.dll ToDoModel.Test\\bin\\Debug\\ToDoModel.Test.dll UtilitiesCS.Test\\bin\\Debug\\UtilitiesCS.Test.dll VBFunctions.Test\\bin\\Debug\\VBFunctions.Test.dll /ResultsDirectory:C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook /Logger:console;verbosity=detailed /Logger:trx;LogFileName=p9-t4-all-assembly-spambayes-diagnostic.2026-07-27T02-59.trx`
+Command: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe QuickFiler.Test\\bin\\Debug\\QuickFiler.Test.dll Tags.Test\\bin\\Debug\\Tags.Test.dll TaskMaster.Test\\bin\\Debug\\TaskMaster.Test.dll TaskTree.Test\\bin\\Debug\\TaskTree.Test.dll TaskVisualization.Test\\bin\\Debug\\TaskVisualization.Test.dll ToDoModel.Test\\bin\\Debug\\ToDoModel.Test.dll UtilitiesCS.Test\\bin\\Debug\\UtilitiesCS.Test.dll VBFunctions.Test\\bin\\Debug\\VBFunctions.Test.dll /ResultsDirectory:<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook /Logger:console;verbosity=detailed /Logger:trx;LogFileName=p9-t4-all-assembly-spambayes-diagnostic.2026-07-27T02-59.trx`
 
 EXIT_CODE: 1
 
@@ -10,7 +10,7 @@ Output Summary: Expected fail-before result verified. VSTest discovered 6,047 te
 
 ## Results-directory and TRX proof
 
-- Resolved results directory: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing`
+- Resolved results directory: `<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing`
 - Canonical TRX: `evidence/regression-testing/p9-t4-all-assembly-spambayes-diagnostic.2026-07-27T02-59.trx`
 - Canonical TRX exists: `true`
 - Canonical TRX SHA-256: `C073B9E35134FECFB64EB015D11F475B7FEB70FD3823F684058B611AC358E235`

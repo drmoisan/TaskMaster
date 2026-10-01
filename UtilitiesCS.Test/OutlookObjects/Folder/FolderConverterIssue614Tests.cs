@@ -15,7 +15,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     public class FolderConverterIssue614Tests
     {
         private const string MailboxArchive = @"\\mailbox@example.com\Archive";
-        private const string OneDriveRoot = @"C:\Users\testuser\OneDrive - Contoso";
+        private const string OneDriveRoot = @"C:\Fixtures\testuser\OneDrive - Contoso";
 
         // ------------------------------------------------------------------------ AC6 (D5a)
 

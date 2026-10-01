@@ -6,14 +6,14 @@
 
 ## Required Command
 
-`mcp__drm-copilot__run_poshqc_test workspace_root=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[tests/scripts/vscode]`
+`mcp__drm-copilot__run_poshqc_test workspace_root=<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[tests/scripts/vscode]`
 
 ## Output Summary
 
 - Required MCP result: `ok: false`
 - Required MCP exit code: `4294967295`
 - Source or test file changes caused by this command: `0`
-- Active `@danmoisan/drm-copilot-mcp` version: `1.0.17`
+- Active `@<user>/drm-copilot-mcp` version: `1.0.17`
 - Active runner SHA-256: `18CCDDD4A3099AFBFDEDDF5440705CD31C9D9329C512E14A3210EB40C50D198A`
 - Current MCP schema parameters: `workspace_root`, `scan_folders`
 - Repository-local Pester settings override: unavailable

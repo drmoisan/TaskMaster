@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md (C# code-change and C# unit-test policy — the in-scope language)
 
 Files read:
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt\2026-07-20T12-52\.claude\rules\csharp.md
 
 Supporting policy skills read for execution context:
 - .claude/skills/policy-compliance-order/SKILL.md

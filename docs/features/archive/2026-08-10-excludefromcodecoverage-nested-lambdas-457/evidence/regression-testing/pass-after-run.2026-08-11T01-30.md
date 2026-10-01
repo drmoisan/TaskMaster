@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-11T01-30
 Command (policy record): `mcp__drm-copilot__run_poshqc_test` with
-`workspace_root = C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a` and
+`workspace_root = <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a` and
 `scan_folders = ["tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Tests.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"]`
 Command (paired direct run, source of every numeric value and per-test result below): the Conventions
 Pester command with
@@ -14,7 +14,7 @@ EXIT_CODE: **0** (from the paired direct run — the substantive gate at this ta
 MCP Result:
 
 ```json
-{"ok":true,"tool":"run_poshqc_test","workspace_root":"C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC test against 'C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 2 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_test","workspace_root":"<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC test against '<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 2 selected scan folder(s)."}
 ```
 
 No `ok:true` gate is imposed at this task; AC 7's "completed `run_poshqc_test` step" is discharged by

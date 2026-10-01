@@ -2,7 +2,7 @@
 
 - **Timestamp:** 2026-03-26T16:45 UTC
 - **Branch:** `bug/quickfiler-gui-not-expanding-96-clean`
-- **Worktree:** `c:\Users\DanMoisan\repos\TaskMaster-issue96-clean`
+- **Worktree:** `<user-profile>\repos\TaskMaster-issue96-clean`
 - **Command:** `dotnet tool run csharpier format .`
 - **Files processed:** 969
 - **Files changed:** 0

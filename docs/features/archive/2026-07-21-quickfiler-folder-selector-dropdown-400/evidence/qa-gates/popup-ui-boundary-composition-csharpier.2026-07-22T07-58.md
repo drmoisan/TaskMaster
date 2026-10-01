@@ -2,7 +2,7 @@
 
 Timestamp: `2026-07-22T07:58Z`
 
-Command: `@(<the 12 fully expanded P5 production/test source paths>) | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `@(<the 12 fully expanded P5 production/test source paths>) | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 CSharpier version: `1.3.0`
 

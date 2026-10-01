@@ -19,7 +19,7 @@ Successful.`, 55.3753 seconds). Baseline was `6294`/`6294`; final is `6296`/`629
 matches the two new regression tests added in Phase 1, zero failures in either run.
 
 Coverage file
-`TestResults/b512946c-8694-4c57-9bbd-32fc62fdcc1b/DanMoisan_MEGALODON4_2026-08-08.15_54_14.coverage`
+`TestResults/b512946c-8694-4c57-9bbd-32fc62fdcc1b/<user>_<host>_2026-08-08.15_54_14.coverage`
 converted via `dotnet-coverage merge <file> -f cobertura -o
 docs/features/active/2026-08-08-ribbon-controller-engines-null-unsafe-507/evidence/qa-gates/phase2-final-coverage.cobertura.xml`
 (exit 0). Repo-wide `line-rate`: `0.6165729148230514` = **61.66%**, versus the Phase 0 baseline's

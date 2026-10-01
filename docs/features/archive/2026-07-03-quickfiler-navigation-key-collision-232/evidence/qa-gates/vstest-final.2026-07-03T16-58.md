@@ -38,7 +38,7 @@ Output Summary:
   - `QuickFiler.Controllers.QfcHighConfidencePreFilter.<FilterAsync>d__1` = 1
   - `QuickFiler.Controllers.QfcHighConfidencePreFilter.<>c__DisplayClass1_0.<<FilterAsync>b__0>d` = 1
 - Generated authoritative coverage XML (absolute path):
-  `C:\Users\DanMoisan\AppData\Local\Temp\claude\C--Users-DanMoisan-repos-TaskMaster-wt-2026-07-03-10-11\96ed752d-d407-42e0-a011-d6a2309c7736\scratchpad\results-final\18b07c6a-cedc-4703-bd54-b708d8fbe057\DanMoisan_MEGALODON4_2026-07-03.17_15_55.cobertura.xml`
+  `<user-profile>\AppData\Local\Temp\claude\C--Users-<user>-repos-TaskMaster-wt-2026-07-03-10-11\96ed752d-d407-42e0-a011-d6a2309c7736\scratchpad\results-final\18b07c6a-cedc-4703-bd54-b708d8fbe057\<user>_<host>_2026-07-03.17_15_55.cobertura.xml`
 - No source or tracked file was changed by this step, so no loop restart is required. All four Final QA
   toolchain steps (CSharpier format, analyzer build, nullable/TreatWarningsAsErrors build, vstest coverage)
   passed their gate criteria in a single pass.

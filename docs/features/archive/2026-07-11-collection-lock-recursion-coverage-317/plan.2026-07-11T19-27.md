@@ -8,7 +8,7 @@
 - **Version:** 0.2
 - **Work Mode:** full-bug (spec.md present, defect/restoration; no user-story.md; enforces spec-driven expectations and the full QA loop per `atomic-plan-contract`)
 - **Feature folder (`<FEATURE>`):** `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317`
-- **Worktree:** `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317`, branch cut from `main` at `5ecbc4c6`
+- **Worktree:** `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317`, branch cut from `main` at `5ecbc4c6`
 - **Timestamp token:** every `<TS>` placeholder below MUST be substituted with the real ISO-8601
   timestamp (`yyyy-MM-ddTHH-mm`) at the moment the artifact is written, per
   `evidence-and-timestamp-conventions`.
@@ -41,7 +41,7 @@ never PASS.
 ### Phase 0 — Baseline Capture & Policy Read
 
 - [x] [P0-T1] Read `CLAUDE.md` in full (policy reading order position 1) in the feature worktree
-      `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/CLAUDE.md`.
+      `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317/CLAUDE.md`.
       Acceptance: the file has been read in this execution session (confirmed by quoting its
       Policy Compliance Order section verbatim in the Phase 0 evidence artifact from P0-T5).
 - [x] [P0-T2] Read `.claude/rules/general-code-change.md` (policy reading order position 2) in the

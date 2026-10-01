@@ -4,7 +4,7 @@ Timestamp: 2026-08-07T22-05
 
 | Field | Value |
 | --- | --- |
-| Production file | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.EventHandlers.cs` |
+| Production file | `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.EventHandlers.cs` |
 | Exact line count | 399 |
 | `[ExcludeFromCodeCoverage]` | **No.** The file declares `internal partial class QfcFormController` at line 18 with no attribute; no member in the file carries the attribute either. Verified by reading the entire file. |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj` line 319: `<Compile Include="Controllers\QfcFormController.EventHandlers.cs" />` |

@@ -10,11 +10,11 @@ Policy Order:
 5. .claude/rules/powershell.md (PowerShell-specific toolchain and standards)
 
 Files Read (in order):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-08-12-12\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\powershell.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-08-12-12\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-07-08-12-12\.claude\rules\powershell.md
 
 Notes:
 - This remediation is evidence-persistence plus a maintainer-ratified PowerShell coverage exemption. It makes no source-behavior change to the shipped fix (the seam `TaskMaster.Test/AppGlobals/LiveOutlookHarnessRunner.cs`, the integration test, `.github/workflows/ci.yml`, or the QC argument builders).

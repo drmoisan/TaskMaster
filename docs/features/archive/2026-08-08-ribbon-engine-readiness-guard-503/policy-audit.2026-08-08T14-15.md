@@ -214,7 +214,7 @@ Commands executed this session (all check-only except the two builds, which writ
 - `git rev-parse HEAD` -> `d0955dc4c7be61b654dbeb0804d5520fde5a5a4c`
 - `git diff --name-status 003c5715055d7d1933db68a742531332756e30b2...HEAD` (scope derivation)
 - `git diff --numstat 003c5715055d7d1933db68a742531332756e30b2...HEAD` (language enumeration and line deltas)
-- `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe check .` -> exit 0, 1498 files
+- `<user-profile>\.dotnet\tools\csharpier.exe check .` -> exit 0, 1498 files
 - `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` -> exit 0
 - `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true` -> exit 0
 - `msbuild TaskMaster\TaskMaster.csproj /t:Rebuild /p:Configuration=Debug /p:Nullable=enable /p:TreatWarningsAsErrors=true` -> exit 1, 195 errors, 0 in authored files (forced-recompile verification of the gate above)

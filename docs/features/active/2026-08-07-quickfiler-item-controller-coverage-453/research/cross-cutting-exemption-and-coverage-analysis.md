@@ -2,7 +2,7 @@
 
 - Epic: #136 `quickfiler-per-file-coverage`, child F10 `quickfiler-item-controller-coverage` (issue #453)
 - Branch: `feature/quickfiler-item-controller-coverage`
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a359b62de7a79b16e`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a359b62de7a79b16e`
 - Research date: 2026-08-07
 - Companion artifact: `open-issues-and-sibling-boundaries.md` (same folder)
 

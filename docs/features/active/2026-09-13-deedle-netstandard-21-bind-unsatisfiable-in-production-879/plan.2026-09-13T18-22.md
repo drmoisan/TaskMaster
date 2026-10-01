@@ -500,7 +500,7 @@ task, `[P2-T3]`.
 
 Four read-backs selected their TRX with `-Filter "*.trx"` followed by `[0]`. `Get-ChildItem` returns
 results in name-ascending order rather than write-time order, and `TestResults/p2-expect-fail` already
-holds `DanMoisan_MEGALODON4_2026-09-13_23_35_52_net481.trx` from the superseded version 1.0 run — the
+holds `<user>_<host>_2026-09-13_23_35_52_net481.trx` from the superseded version 1.0 run — the
 run that recorded the vacuous `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` and that
 carries no `DEEDLE_RECORD_CONVERSION_OUTCOME=` line. A TRX written on 2026-09-14 sorts after that name,
 so the unpinned selection would have read the superseded run and reported a false negative
@@ -1025,13 +1025,13 @@ the only absolute paths this plan contains.
 Acquire (referred to below as **LOCK-ACQUIRE**):
 
 ```
-pwsh -NoProfile -Command '& ([scriptblock]::Create((Get-Content -Raw "C:/Users/DanMoisan/repos/TaskMaster-wt/parallel-build-lock/acquire.txt"))) -Item "879"'
+pwsh -NoProfile -Command '& ([scriptblock]::Create((Get-Content -Raw "<user-profile>/repos/TaskMaster-wt/parallel-build-lock/acquire.txt"))) -Item "879"'
 ```
 
 Release (referred to below as **LOCK-RELEASE**):
 
 ```
-pwsh -NoProfile -Command '& ([scriptblock]::Create((Get-Content -Raw "C:/Users/DanMoisan/repos/TaskMaster-wt/parallel-build-lock/release.txt"))) -Item "879"'
+pwsh -NoProfile -Command '& ([scriptblock]::Create((Get-Content -Raw "<user-profile>/repos/TaskMaster-wt/parallel-build-lock/release.txt"))) -Item "879"'
 ```
 
 LOCK-ACQUIRE must print `ACQUIRED 879` and exit 0 before the gated command runs. LOCK-RELEASE must print
@@ -2241,7 +2241,7 @@ nullable gate or the full suite: those gates would be evaluated against a delibe
 
       **Why the TRX name is pinned, and why the directory is emptied first.** `TestResults/p2-expect-fail`
       currently holds two superseded TRX files. The first is
-      `DanMoisan_MEGALODON4_2026-09-13_23_35_52_net481.trx`, written by the version 1.0 run, which
+      `<user>_<host>_2026-09-13_23_35_52_net481.trx`, written by the version 1.0 run, which
       recorded the vacuous `AfterInstall_DeedleTypeInitializerSucceeds OUTCOME=Passed` and carries no
       `DEEDLE_RECORD_CONVERSION_OUTCOME=` line. `Get-ChildItem` returns results in name-ascending rather
       than write-time order, so an unpinned `-Filter "*.trx"` followed by `[0]` would select it. The

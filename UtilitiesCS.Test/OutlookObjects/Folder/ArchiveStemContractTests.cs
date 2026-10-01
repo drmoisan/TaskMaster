@@ -51,7 +51,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         {
             // Arrange / Act
             bool outputValue = ArchiveStemContract.IsFullOutlookPath(
-                @"C:\Users\testuser\OneDrive - Contoso"
+                @"C:\Fixtures\testuser\OneDrive - Contoso"
             );
 
             // Assert: recorded #614 decision, a volume separator in position 1 is never a stem.
@@ -133,7 +133,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         public void RequireArchiveRelativeStem_DriveRootedValue_ThrowsWithoutEmbeddingTheValue()
         {
             // Arrange
-            const string driveRooted = @"C:\Users\testuser\OneDrive - Contoso";
+            const string driveRooted = @"C:\Fixtures\testuser\OneDrive - Contoso";
             Action act = () =>
                 ArchiveStemContract.RequireArchiveRelativeStem(driveRooted, "fsPath");
 

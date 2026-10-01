@@ -14,7 +14,7 @@ EXIT_CODE: 0
 Output Summary:
 - `Test Run Successful. Total tests: 42, Passed: 42`.
 - ACCEPTANCE FAILURE: a code-coverage attachment WAS produced on this normal (no-`/collect`) run:
-  `...\TestResults\bdc4e269-...\DanMoisan_MEGALODON4_2026-06-12.19_31_33.coverage`.
+  `...\TestResults\bdc4e269-...\<user>_<host>_2026-06-12.19_31_33.coverage`.
 - AC5 requires "produces no code-coverage attachment". This was NOT satisfied by the current edit. AC3 (opt-in, no coverage forced on a normal run) is therefore also NOT satisfied.
 
 ## Diagnosis (controlled comparison)

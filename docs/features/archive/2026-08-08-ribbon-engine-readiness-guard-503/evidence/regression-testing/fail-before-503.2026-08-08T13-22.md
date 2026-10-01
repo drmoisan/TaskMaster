@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T13-22
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU'; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU'; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
 ```
 
 EXIT_CODE: **1** (non-zero — this is the expected outcome for this `[expect-fail]` task)
@@ -14,10 +14,10 @@ EXIT_CODE: **1** (non-zero — this is the expected outcome for this `[expect-fa
 ```
 Build FAILED.
 
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(46,28): error CS0246: The type or namespace name 'EngineReadinessGate' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(47,30): error CS0246: The type or namespace name 'EngineGatedCommandRunner' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(81,28): error CS0246: The type or namespace name 'EngineReadinessGate' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(82,30): error CS0246: The type or namespace name 'EngineGatedCommandRunner' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
+<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(46,28): error CS0246: The type or namespace name 'EngineReadinessGate' could not be found (are you missing a using directive or an assembly reference?) [<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
+<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(47,30): error CS0246: The type or namespace name 'EngineGatedCommandRunner' could not be found (are you missing a using directive or an assembly reference?) [<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
+<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(81,28): error CS0246: The type or namespace name 'EngineReadinessGate' could not be found (are you missing a using directive or an assembly reference?) [<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
+<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\EngineGatedCommandRunnerTests.cs(82,30): error CS0246: The type or namespace name 'EngineGatedCommandRunner' could not be found (are you missing a using directive or an assembly reference?) [<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\TaskMaster.Test.csproj]
 
     5 Warning(s)
     4 Error(s)

@@ -1,7 +1,7 @@
 # Research — Issue #317: Re-express lock-recursion regression coverage for `ConcurrentObservableCollection<T>`
 
 - **Timestamp:** 2026-07-11T21-15
-- **Worktree:** `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317`, branch cut from `main` at `5ecbc4c6`
+- **Worktree:** `<user-profile>/repos/TaskMaster-wt/collection-lock-recursion-coverage-317`, branch cut from `main` at `5ecbc4c6`
 - **Issue:** #317
 
 ## Tool-access caveat (read first)

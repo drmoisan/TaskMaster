@@ -2,7 +2,7 @@
 
 ## Validator results
 
-- Plan command: `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: plan`, artifact path `docs/features/active/2026-08-04-folder-tree-dispatcher-thread-affinity-420/remediation-plan.2026-08-04T19-47.md`, and workspace root `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-04T18-38`.
+- Plan command: `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: plan`, artifact path `docs/features/active/2026-08-04-folder-tree-dispatcher-thread-affinity-420/remediation-plan.2026-08-04T19-47.md`, and workspace root `<user-profile>\repos\TaskMaster-wt\2026-08-04T18-38`.
 - Plan result: `ok: true`. Summary: the exact remediation plan was validated.
 - Plan continuity check: after `[P7-T3]` was checked on disk, the same plan validator was rerun and returned `ok: true`.
 - Completed feature-evidence command: `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: policy-audit`, artifact path `docs/features/active/2026-08-04-folder-tree-dispatcher-thread-affinity-420/policy-audit.2026-08-04T19-47.md`, and the same workspace root.

@@ -12,4 +12,4 @@ Output Summary:
 - The exact Phase 5 Utilities verification command completed successfully.
 - The project-scoped `UtilitiesCS.Test\UtilitiesCS.Test.csproj` build completed with referenced projects up to date.
 - All four focused Utilities regressions passed on the green path.
-- Source Transcript: c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_6vLWE4VVcROREPLBNaa48azg__vscode-1778175287750\content.txt
+- Source Transcript: <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_6vLWE4VVcROREPLBNaa48azg__vscode-1778175287750\content.txt

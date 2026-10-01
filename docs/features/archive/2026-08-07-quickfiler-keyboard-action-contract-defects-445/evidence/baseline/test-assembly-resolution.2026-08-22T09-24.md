@@ -8,7 +8,7 @@ $assemblies = Get-ChildItem -Path . -Recurse -Filter '*.Test.dll' | Where-Object
 $assemblies.Count
 $assemblies
 ```
-Run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`.
+Run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`.
 
 EXIT_CODE: 0
 
@@ -34,7 +34,7 @@ Count is **9**, one per `*.Test.csproj`, and the list includes `.\QuickFiler.Tes
 `WS` is itself located under `.claude\worktrees\`:
 
 ```
-C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a6e508cbcd1e0a79d
+<repo-root>\.claude\worktrees\agent-a6e508cbcd1e0a79d
 ```
 
 Every assembly's `FullName` therefore contains the literal `\.claude\`. Applying the exclusion to the absolute path would match all nine and discard every assembly in the workspace, producing an empty list and a vacuously green test run. The exclusion is applied only after `Resolve-Path -Relative` rewrites each path relative to `WS`, at which point `\.claude\` appears only in a genuinely foreign sibling agent worktree. This was verified empirically: the count is 9, not 0.

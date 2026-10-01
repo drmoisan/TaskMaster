@@ -30,7 +30,7 @@ C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\Tes
 ```
 Command: ls -la "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/Extensions/TestPlatform/vstest.console.exe"
 EXIT_CODE: 0
-Output:  -rwxr-xr-x 1 DanMoisan 197121 337264 Jul 17 13:09 .../vstest.console.exe*
+Output:  -rwxr-xr-x 1 <user> 197121 337264 Jul 17 13:09 .../vstest.console.exe*
 ```
 
 The file exists, is 337264 bytes, and is executable.

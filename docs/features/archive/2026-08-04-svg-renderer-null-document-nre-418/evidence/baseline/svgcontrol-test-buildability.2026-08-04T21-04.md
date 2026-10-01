@@ -24,7 +24,7 @@ from the full solution recompile recorded in `analyzer-build.2026-08-04T21-04.md
 genuine `csc` compile of `SVGControl.Test`).
 
 Output produced:
-`SVGControl.Test -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\bin\Debug\SVGControl.Test.dll`
+`SVGControl.Test -> <repo-root>\SVGControl.Test\bin\Debug\SVGControl.Test.dll`
 (28672 bytes, present on disk).
 
 ### `EnsureNuGetPackageBuildImports` error text

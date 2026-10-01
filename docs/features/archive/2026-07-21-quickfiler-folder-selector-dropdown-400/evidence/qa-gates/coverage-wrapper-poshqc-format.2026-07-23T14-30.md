@@ -1,7 +1,7 @@
 # Coverage wrapper PoshQC format gate
 
 - Timestamp: `2026-07-23T14:30:41Z`
-- Command: `mcp__drm-copilot__run_poshqc_format workspace_root=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[scripts/vscode,tests/scripts/vscode]`
+- Command: `mcp__drm-copilot__run_poshqc_format workspace_root=<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[scripts/vscode,tests/scripts/vscode]`
 - Tool result: `ok: true`
 - Scanned PowerShell files before: `12`
 - Scanned PowerShell files after: `12`

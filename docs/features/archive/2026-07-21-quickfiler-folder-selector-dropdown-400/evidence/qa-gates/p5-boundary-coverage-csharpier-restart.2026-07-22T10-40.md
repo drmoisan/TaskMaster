@@ -4,7 +4,7 @@ Timestamp: 2026-07-22T10:40:46Z
 
 Reason: The analyzer pass identified C# 8 nullable syntax in the new test while the exact solution build compiles that project as C# 7.3. Only the new test file was corrected, so the Phase 5 toolchain restarted at P5-T135.
 
-Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs').Path; $tool='C:\Users\DanMoisan\.dotnet\tools\csharpier.exe'; @($file) | & $tool pipe-files`
+Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs').Path; $tool='<user-profile>\.dotnet\tools\csharpier.exe'; @($file) | & $tool pipe-files`
 
 EXIT_CODE: 0
 

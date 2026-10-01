@@ -6,7 +6,7 @@ CoverageOutput: `docs/features/active/2026-07-21-quickfiler-folder-selector-drop
 
 The argument is workspace-relative and non-rooted: no drive, leading separator, or `..` segment. `Join-Path $repoRoot $CoverageOutput` resolved to:
 
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml`
+`<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml`
 
 The resolved target is under the workspace root.
 

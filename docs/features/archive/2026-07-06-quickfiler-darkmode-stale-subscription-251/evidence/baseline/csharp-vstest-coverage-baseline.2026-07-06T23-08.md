@@ -8,7 +8,7 @@ Command: vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Enabl
 
 EXIT_CODE: 0
 
-Output Summary: Total tests: 486. Passed: 486. Failed: 0. Total time: 8.55 seconds. Coverage attachment: `TestResults/acd32e6f-c34e-41a3-9669-7b862050fe97/DanMoisan_MEGALODON4_2026-07-06.23_22_05.coverage`.
+Output Summary: Total tests: 486. Passed: 486. Failed: 0. Total time: 8.55 seconds. Coverage attachment: `TestResults/acd32e6f-c34e-41a3-9669-7b862050fe97/<user>_<host>_2026-07-06.23_22_05.coverage`.
 
 Numeric baseline coverage headline: the `.coverage` attachment was converted to Cobertura via `dotnet-coverage merge <file> -f cobertura -o ...` (CodeCoverage.exe's `analyze` verb is non-functional in this VS18 install and only prints usage; `dotnet-coverage merge` is the working conversion path). The converted report is archived at `docs/features/active/2026-07-06-quickfiler-darkmode-stale-subscription-251/evidence/baseline/coverage-xml/baseline-coverage.cobertura.xml`.
 

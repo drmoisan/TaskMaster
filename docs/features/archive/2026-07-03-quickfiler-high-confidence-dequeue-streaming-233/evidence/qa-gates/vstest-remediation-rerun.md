@@ -10,9 +10,9 @@ Output Summary:
   - Passed: 387
   - Failed: 0
   - Total time: 6.5258 seconds
-- Coverage attachment path: `C:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\vstest-remediation-rerun-results\8efc792b-5656-400a-9453-f7c0d350aab0\DanMoisan_MEGALODON4_2026-07-03.19_07_05.coverage`
+- Coverage attachment path: `<repo-root>\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\vstest-remediation-rerun-results\8efc792b-5656-400a-9453-f7c0d350aab0\<user>_<host>_2026-07-03.19_07_05.coverage`
 - Coverage conversion command: `dotnet-coverage merge <latest .coverage> -o docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\vstest-remediation-rerun.cobertura.xml -f cobertura`
-- Coverage conversion output: `Merged into file C:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\vstest-remediation-rerun.cobertura.xml.`
+- Coverage conversion output: `Merged into file <repo-root>\docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\vstest-remediation-rerun.cobertura.xml.`
 - Numeric post-change coverage values from `vstest-remediation-rerun.cobertura.xml`:
   - Raw Cobertura lines: 15267/80133 = 19.05%
   - Repository-path lines: 13120/57396 = 22.86%

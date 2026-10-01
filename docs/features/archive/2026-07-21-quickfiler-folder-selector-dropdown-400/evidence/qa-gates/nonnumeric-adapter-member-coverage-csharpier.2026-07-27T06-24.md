@@ -5,13 +5,13 @@ Timestamp: 2026-07-27T06:24:05-04:00
 ## Commands and Results
 
 ```powershell
-& 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' format QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupControlDispatchTests.cs QuickFiler.Test/Viewers/BreadcrumbSelectorOpenRetryTests.cs QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs
+& '<user-profile>\.dotnet\tools\csharpier.exe' format QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupControlDispatchTests.cs QuickFiler.Test/Viewers/BreadcrumbSelectorOpenRetryTests.cs QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs
 ```
 
 Format exit code: `0` (`Formatted 8 files in 2726ms.`)
 
 ```powershell
-& 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' check QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupControlDispatchTests.cs QuickFiler.Test/Viewers/BreadcrumbSelectorOpenRetryTests.cs QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs
+& '<user-profile>\.dotnet\tools\csharpier.exe' check QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupControlDispatchTests.cs QuickFiler.Test/Viewers/BreadcrumbSelectorOpenRetryTests.cs QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs
 ```
 
 Stable-check exit code: `0` (`Checked 8 files in 1590ms.`)

@@ -3,7 +3,7 @@
 Timestamp: 2026-08-11T01-42
 Iteration: **2**
 Command: `mcp__drm-copilot__run_poshqc_format` with
-`workspace_root = C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a` and
+`workspace_root = <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a` and
 `scan_folders = ["scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1", "scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Tests.ps1", "tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1"]`
 EXIT_CODE: MCP `ok:true` (the format surface emits no process exit code)
 
@@ -14,7 +14,7 @@ Iteration 2 exists because the `[P3-T3]` iteration-1 analyze gate failed on a ne
 MCP Result (verbatim):
 
 ```json
-{"ok":true,"tool":"run_poshqc_format","workspace_root":"C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC format against 'C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 4 selected scan folder(s)."}
+{"ok":true,"tool":"run_poshqc_format","workspace_root":"<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a","summary":"Ran bundled PoshQC format against '<repo-root>\\.claude\\worktrees\\agent-a3f0c78078ca2265a' with 4 selected scan folder(s)."}
 ```
 
 ## Files rewritten

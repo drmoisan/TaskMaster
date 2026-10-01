@@ -27,12 +27,12 @@ namespace ToDoModel.Tests.Data_Model.People
             var fs = new Mock<IFileSystemFolderPaths>();
             var specialFolders = new Dictionary<string, string>()
             {
-                { "AppData", "C:\\Users\\user\\AppData\\Roaming" },
-                { "Flow", "C:\\Users\\user\\AppData\\Roaming\\Flow" },
-                { "MyDocuments", "C:\\Users\\user\\Documents" },
-                { "PreReads", "C:\\Users\\user\\Documents\\PreReads" },
-                { "OneDrive", "C:\\Users\\user\\OneDrive" },
-                { "PythonStaging", "C:\\Users\\user\\Documents\\PythonStaging" },
+                { "AppData", "C:\\Fixtures\\user\\AppData\\Roaming" },
+                { "Flow", "C:\\Fixtures\\user\\AppData\\Roaming\\Flow" },
+                { "MyDocuments", "C:\\Fixtures\\user\\Documents" },
+                { "PreReads", "C:\\Fixtures\\user\\Documents\\PreReads" },
+                { "OneDrive", "C:\\Fixtures\\user\\OneDrive" },
+                { "PythonStaging", "C:\\Fixtures\\user\\Documents\\PythonStaging" },
             }.ToConcurrentDictionary();
             fs.Setup(f => f.SpecialFolders).Returns(specialFolders);
             _mockGlobals.Setup(g => g.FS).Returns(fs.Object);

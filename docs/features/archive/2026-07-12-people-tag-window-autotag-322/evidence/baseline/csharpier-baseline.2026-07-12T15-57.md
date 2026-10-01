@@ -11,6 +11,6 @@ files modified).
 - `dotnet tool run csharpier .` failed with: "The repo-local .NET SDK is missing. Run
   ./scripts/vscode/Install-RepoDotNetSdk.ps1 from the repository root, then retry." No
   `.dotnet-sdk` directory is present in this worktree.
-- The globally-installed `csharpier` tool (`C:\Users\DanMoisan\.dotnet\tools\csharpier.exe`,
+- The globally-installed `csharpier` tool (`<user-profile>\.dotnet\tools\csharpier.exe`,
   v1.3.0) was used instead, per the C# Code Change Policy's approved-command list: "`csharpier .`
   (if installed globally)".

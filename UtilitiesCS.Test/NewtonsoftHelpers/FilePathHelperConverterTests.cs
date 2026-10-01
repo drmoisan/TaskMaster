@@ -172,7 +172,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Arrange
             var converter = this.CreateFilePathHelperConverter();
             var specialFolders = new ConcurrentDictionary<string, string>(
-                new Dictionary<string, string> { { "AppData", @"C:\Users\Test\AppData" } }
+                new Dictionary<string, string> { { "AppData", @"C:\Fixtures\Test\AppData" } }
             );
             this.mockFileSystemFolderPaths.Setup(x => x.SpecialFolders).Returns(specialFolders);
             var info = new Dictionary<string, string>
@@ -186,7 +186,7 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var result = converter.ExtractFolderPath(info);
 
             // Assert
-            result.Should().Be(System.IO.Path.Combine(@"C:\Users\Test\AppData", "SubDir"));
+            result.Should().Be(System.IO.Path.Combine(@"C:\Fixtures\Test\AppData", "SubDir"));
         }
 
         [TestMethod]
@@ -257,13 +257,13 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             // Arrange
             var converter = this.CreateFilePathHelperConverter();
             var specialFolders = new ConcurrentDictionary<string, string>(
-                new Dictionary<string, string> { { "AppData", @"C:\Users\Test\AppData" } }
+                new Dictionary<string, string> { { "AppData", @"C:\Fixtures\Test\AppData" } }
             );
             this.mockFileSystemFolderPaths.Setup(x => x.SpecialFolders).Returns(specialFolders);
 
             // Act
             var (name, relativePath) = converter.GetSerializablePath(
-                @"C:\Users\Test\AppData\SubDir\file.json"
+                @"C:\Fixtures\Test\AppData\SubDir\file.json"
             );
 
             // Assert

@@ -128,14 +128,14 @@ for reclamation via `scripts/bash/cleanup-worktrees.sh`.
 
 | issue_num | worktree_path | first denied at |
 | --- | --- | --- |
-| 813 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-813` | 2026-09-09T14:37:00Z |
-| 815 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-815` | 2026-09-09T15:40:00Z |
-| 817 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-817` | pending retry |
-| 821 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-821` | pending retry |
-| 823 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-823` | pending retry |
-| 824 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-824` | pending retry |
-| 825 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-825` | pending retry |
-| 826 | `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-826` | pending retry |
+| 813 | `<user-profile>/repos/TaskMaster-wt/rr0908-813` | 2026-09-09T14:37:00Z |
+| 815 | `<user-profile>/repos/TaskMaster-wt/rr0908-815` | 2026-09-09T15:40:00Z |
+| 817 | `<user-profile>/repos/TaskMaster-wt/rr0908-817` | pending retry |
+| 821 | `<user-profile>/repos/TaskMaster-wt/rr0908-821` | pending retry |
+| 823 | `<user-profile>/repos/TaskMaster-wt/rr0908-823` | pending retry |
+| 824 | `<user-profile>/repos/TaskMaster-wt/rr0908-824` | pending retry |
+| 825 | `<user-profile>/repos/TaskMaster-wt/rr0908-825` | pending retry |
+| 826 | `<user-profile>/repos/TaskMaster-wt/rr0908-826` | pending retry |
 
 All eight remain on disk at epic completion. They are clean and their branches are fully contained
 in `main`, so this is a disk-reclamation matter only, not a correctness one. Reclaim with

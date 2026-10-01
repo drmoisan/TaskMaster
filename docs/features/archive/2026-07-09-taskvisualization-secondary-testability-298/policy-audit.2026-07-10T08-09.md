@@ -4,7 +4,7 @@
 - Reviewer: feature-reviewer (authoritative remediation-cycle-1 REAUDIT / exit audit)
 - Branch under review: `feature/taskvisualization-secondary-testability-298` @ `b49dbebca7aece65c3a9dd75636835f4edc049a7`
 - Diff base: `epic/winforms-testability-refactor-integration` @ `949dddd2df0df4511fcc0ff44c4d77c38821c54c` (merge-base = integration head; clean linear descendant)
-- Diff command: `git -C C:/Users/DanMoisan/repos/TaskMaster-wt/winforms-298 diff 949dddd2df0df4511fcc0ff44c4d77c38821c54c...HEAD`
+- Diff command: `git -C <user-profile>/repos/TaskMaster-wt/winforms-298 diff 949dddd2df0df4511fcc0ff44c4d77c38821c54c...HEAD`
 - Work mode: `full-feature` (AC sources = `spec.md` Definition of Done / alignment + `issue.md` `## Acceptance Criteria`; `user-story.md` intentionally absent per `spec.md` "User Story Applicability")
 - Prior cycle artifacts: `policy-audit.2026-07-10T07-40.md`, `code-review.2026-07-10T07-40.md`, `feature-audit.2026-07-10T07-40.md`, `remediation-inputs.2026-07-10T07-40.md` (verdict NOT READY TO MERGE, findings B1, B2, M1, M2)
 

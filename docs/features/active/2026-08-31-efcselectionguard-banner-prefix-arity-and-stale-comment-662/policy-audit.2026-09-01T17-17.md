@@ -303,7 +303,7 @@ C# verdicts above are therefore evidence-backed and not artifact-absent.
 
 | Check | Result |
 |---|---|
-| Account name (`DanMoisan`) anywhere in the feature folder | 0 matches |
+| Account name (`<user>`) anywhere in the feature folder | 0 matches |
 | User-profile path (`C:\Users\…`) anywhere in the feature folder | 0 matches |
 | Machine name anywhere in the feature folder | 0 matches, per `evidence/qa-gates/scope-and-commit.md` `ResidualMatchCount=0`, re-confirmed by reviewer grep |
 | XML-family evidence artifacts that parse | 8 of 8 |

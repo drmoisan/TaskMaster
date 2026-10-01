@@ -3,7 +3,7 @@
 - **Timestamp:** 2026-07-11T12-52
 - **Feature:** swordfish-interface-project-teardown (#308), epic swordfish-removal child F5
 - **Branch:** feature/swordfish-interface-project-teardown-308 @ 1b65f7a7 (integration tip)
-- **Worktree:** C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ad68b716cb2fe3638
+- **Worktree:** <repo-root>/.claude/worktrees/agent-ad68b716cb2fe3638
 
 ## Policy Order
 
@@ -17,10 +17,10 @@ policy-compliance order:
 
 ## Files Read (in order)
 
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ad68b716cb2fe3638/CLAUDE.md
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ad68b716cb2fe3638/.claude/rules/general-code-change.md
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ad68b716cb2fe3638/.claude/rules/general-unit-test.md
-- C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ad68b716cb2fe3638/.claude/rules/csharp.md
+- <repo-root>/.claude/worktrees/agent-ad68b716cb2fe3638/CLAUDE.md
+- <repo-root>/.claude/worktrees/agent-ad68b716cb2fe3638/.claude/rules/general-code-change.md
+- <repo-root>/.claude/worktrees/agent-ad68b716cb2fe3638/.claude/rules/general-unit-test.md
+- <repo-root>/.claude/worktrees/agent-ad68b716cb2fe3638/.claude/rules/csharp.md
 
 ## Key constraints applied to this execution
 

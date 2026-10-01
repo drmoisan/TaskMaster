@@ -10,4 +10,4 @@
 - Failure:
   - Expected `Regex.IsMatch(source,@"CreateAsync[\s\S]*snapshot load[\s\S]*background initialization")` to be `True` because `CreateAsync` should define an explicit snapshot-load stage before any background initialization stage begins, but found `False`.
 - Source Transcript:
-  - `c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_ruUB7Z5J7UvJL8yW4CGCWOCB__vscode-1778175287353\content.txt`
+  - `<user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_ruUB7Z5J7UvJL8yW4CGCWOCB__vscode-1778175287353\content.txt`

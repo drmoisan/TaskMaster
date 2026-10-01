@@ -3,10 +3,10 @@ Timestamp: 2026-08-10T22-31
 Policy Order: CLAUDE.md, general-code-change.md, general-unit-test.md, csharp.md
 
 Files read (P0-T1 through P0-T4), in order, full contents, no edits made:
-1. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a267ee5c24c8a630d\CLAUDE.md`
-2. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a267ee5c24c8a630d\.claude\rules\general-code-change.md`
-3. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a267ee5c24c8a630d\.claude\rules\general-unit-test.md`
-4. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a267ee5c24c8a630d\.claude\rules\csharp.md`
+1. `<repo-root>\.claude\worktrees\agent-a267ee5c24c8a630d\CLAUDE.md`
+2. `<repo-root>\.claude\worktrees\agent-a267ee5c24c8a630d\.claude\rules\general-code-change.md`
+3. `<repo-root>\.claude\worktrees\agent-a267ee5c24c8a630d\.claude\rules\general-unit-test.md`
+4. `<repo-root>\.claude\worktrees\agent-a267ee5c24c8a630d\.claude\rules\csharp.md`
 
 Key confirmations relevant to this feature's scope:
 - CLAUDE.md documents the C# toolchain commands (CSharpier, analyzer build, nullable build, vstest) and the policy compliance order (CLAUDE.md -> general-code-change -> general-unit-test -> C# code/unit test policy).

@@ -15,7 +15,7 @@ Test Run: Successful
 - Total time:   3.9633 Seconds
 
 Coverage file generated (binary .coverage):
-`C:\Users\DanMoisan\repos\TaskMaster\TestResults\953d9d33-913a-4180-91f3-f63b852602bd\DanMoisan_MEGALODON4_2026-03-25.10_37_58.coverage`
+`<repo-root>\TestResults\953d9d33-913a-4180-91f3-f63b852602bd\<user>_<host>_2026-03-25.10_37_58.coverage`
 
 Note: vstest.console with /EnableCodeCoverage produces a binary .coverage file and does not
 print an inline line-coverage percentage to stdout. The coverage binary is available for

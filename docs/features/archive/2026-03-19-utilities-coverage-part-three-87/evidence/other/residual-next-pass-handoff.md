@@ -16,7 +16,7 @@ The residual excluded non-#87, non-#96, non-#97 work has been recovered from the
 | Base ref | `origin/development` (SHA: 33600336676f3b28295eb373c355677ba578ba41) |
 | Head SHA | a2aa8c8779bb40aba9681a9169706bb075878761 |
 | PR | #100 |
-| Worktree path | `c:\Users\DanMoisan\repos\TaskMaster-residual-clean` |
+| Worktree path | `<user-profile>\repos\TaskMaster-residual-clean` |
 
 ## Scope Recovered
 

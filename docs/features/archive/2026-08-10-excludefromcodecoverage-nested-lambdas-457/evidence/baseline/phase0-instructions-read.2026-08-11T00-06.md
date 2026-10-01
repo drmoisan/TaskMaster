@@ -18,7 +18,7 @@ Per `.claude/skills/policy-compliance-order/SKILL.md` and the plan's `[P0-T2]` r
 ## Files Read
 
 All paths are repo-relative to the executing worktree
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`.
+`<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`.
 
 | # | Repo-relative path | Lines |
 |---|---|---|

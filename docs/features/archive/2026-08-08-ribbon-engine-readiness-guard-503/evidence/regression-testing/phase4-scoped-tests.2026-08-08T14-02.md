@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T14-02
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'TaskMaster.Test\bin\Debug\TaskMaster.Test.dll' /InIsolation /TestCaseFilter:'FullyQualifiedName~TaskMaster.Test.Ribbon'; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'TaskMaster.Test\bin\Debug\TaskMaster.Test.dll' /InIsolation /TestCaseFilter:'FullyQualifiedName~TaskMaster.Test.Ribbon'; Write-Host \"EXIT_CODE=$LASTEXITCODE\""
 ```
 
 The solution was rebuilt immediately before this run (see the Phase 4 build logs), so no edit post-dates the tested binary.

@@ -11,7 +11,7 @@ Branch: `feature/quickfiler-keyboard-actions-coverage`
 
 | Attribute | Value |
 | --- | --- |
-| Path | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Controllers\QfcFormKeyHandler.cs` |
+| Path | `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Controllers\QfcFormKeyHandler.cs` |
 | Line count | 20 |
 | Type | `internal static class QfcFormKeyHandler` (line 10), namespace `QuickFiler.Controllers` |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj:321` `<Compile Include="Controllers\QfcFormKeyHandler.cs" />` |
@@ -201,7 +201,7 @@ These 8 cases are the cheapest, lowest-risk tasks in child F3 and depend on noth
 
 ## 9. Sources
 
-All paths relative to `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\`.
+All paths relative to `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\`.
 
 **Policy**
 - `CLAUDE.md` — § UT2 (coverage floors, testable denominator, COM/VSTO exemption), § CUT1–CUT3 (MSTest/Moq/FluentAssertions, toolchain commands)

@@ -31,7 +31,7 @@ against redacted input and no gate result was derived from a redacted file.
 | Original token | Replacement in `*.trx` | Replacement in Markdown |
 |---|---|---|
 | absolute worktree path | `REDACTED-REPO-ROOT` | `<repo-root>` |
-| machine name | `REDACTED-HOST` | `<host>` |
+| machine name | `<host>` | `<host>` |
 | account name | `REDACTED-USER` | `<user>` |
 
 Angle-bracket placeholders are used in Markdown but not in TRX. `<` is not legal inside an XML

@@ -2,7 +2,7 @@
 
 Timestamp: `2026-07-22T09-00`
 
-Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbSelectorToggleUiBoundaryTests.cs').Path; $before=(Get-FileHash -Algorithm SHA256 $file).Hash; @($file) | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files; $code=$LASTEXITCODE; $after=(Get-FileHash -Algorithm SHA256 $file).Hash; "BEFORE=$before"; "AFTER=$after"; "LINES=$((Get-Content $file).Count)"; exit $code`
+Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbSelectorToggleUiBoundaryTests.cs').Path; $before=(Get-FileHash -Algorithm SHA256 $file).Hash; @($file) | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files; $code=$LASTEXITCODE; $after=(Get-FileHash -Algorithm SHA256 $file).Hash; "BEFORE=$before"; "AFTER=$after"; "LINES=$((Get-Content $file).Count)"; exit $code`
 
 EXIT_CODE: `0`
 

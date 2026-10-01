@@ -2,7 +2,7 @@
 
 - Feature: `quickfiler-item-controller-coverage` (issue #453), epic child F10 of epic #136
 - Branch: `feature/quickfiler-item-controller-coverage`
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a359b62de7a79b16e`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a359b62de7a79b16e`
 - Production file: `QuickFiler/Interfaces/IQfcItemController.cs` (107 lines)
 - Coverage report examined:
   `docs/features/active/2026-08-06-quickfiler-high-confidence-queue-init-stall-424/evidence/qa-gates/coverage-final.cobertura.xml`

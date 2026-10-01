@@ -25,7 +25,7 @@ EXIT_CODE: 0
 
 Output Summary: `Total tests: 6294`, `Passed: 6294`, `Failed: 0`, `Skipped: 0` (`Test Run
 Successful.`, 1.0151 minutes). Coverage file
-`TestResults/278d775f-d952-4eeb-98f6-1f4f00e47f0a/DanMoisan_MEGALODON4_2026-08-08.15_43_02.coverage`
+`TestResults/278d775f-d952-4eeb-98f6-1f4f00e47f0a/<user>_<host>_2026-08-08.15_43_02.coverage`
 was converted to Cobertura via `dotnet-coverage merge <file> -f cobertura -o
 docs/features/active/2026-08-08-ribbon-controller-engines-null-unsafe-507/evidence/baseline/phase0-baseline-coverage.cobertura.xml`
 (exit 0). Repo-wide `line-rate` from the Cobertura root `<coverage>` element:

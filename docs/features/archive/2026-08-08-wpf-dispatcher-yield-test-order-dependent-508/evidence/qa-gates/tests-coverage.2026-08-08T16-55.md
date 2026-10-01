@@ -39,7 +39,7 @@ NESTED_WORKTREE_SEGMENT_COUNT=0
 ```
 
 - ASSERTION 1 PASS: all 9 paths begin with the workspace-root prefix
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0\`.
+  `<repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0\`.
 - ASSERTION 2 PASS: no path contains a `\.claude\worktrees\` segment **after** that prefix, so no
   stale sibling agent-worktree build was discovered.
 

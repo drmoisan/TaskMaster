@@ -14,6 +14,6 @@ UtilitiesCS.FolderPredictor.CreateFolder(...) FolderPredictor.cs:line 691. This
 confirms the RED half of the RED/GREEN pair required by AC5: the new test fails against
 the pre-fix defect, and the failure message contains the single-line token
 `IndexOutOfRangeException`. TRX results file:
-coverage\trx\p1-t4\DanMoisan_MEGALODON4_2026-09-03_07_30_26_net481.trx (gitignored
+coverage\trx\p1-t4\<user>_<host>_2026-09-03_07_30_26_net481.trx (gitignored
 under coverage/*). EXIT_CODE 1 is the expected outcome for this [expect-fail] task, not
 a toolchain failure.

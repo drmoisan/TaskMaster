@@ -8,7 +8,7 @@
 - **Status:** Complete
 
 All file paths below are relative to the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f`.
+`<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f`.
 All line numbers were verified against the current branch head in this worktree.
 
 ---

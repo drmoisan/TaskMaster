@@ -31,7 +31,7 @@ New F1 tests (all passed):
 
 Coverage (final, from the emitted `.coverage` attachment converted to Cobertura via
 `dotnet-coverage merge ... -f cobertura`):
-- Coverage attachment: `TestResults\34ff8786-9831-4ea6-8705-3399a584534b\DanMoisan_MEGALODON4_2026-07-10.23_56_51.coverage`
+- Coverage attachment: `TestResults\34ff8786-9831-4ea6-8705-3399a584534b\<user>_<host>_2026-07-10.23_56_51.coverage`
 - Repo-wide line coverage (merged, includes all instrumented assemblies including vendored packages): 63.18% (lines-covered 107,189 / lines-valid 169,669).
 - Per scope-lock production file (line coverage; interface-only files map no executable regions):
   - `TaskMaster\AppGlobals\AppToDoObjects.cs`: 200/315 = 63.5%

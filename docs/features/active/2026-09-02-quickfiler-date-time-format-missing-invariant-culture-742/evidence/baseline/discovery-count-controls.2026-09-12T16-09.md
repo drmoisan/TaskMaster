@@ -9,7 +9,7 @@ Zero-match reading convention: `git grep -c PATTERN -- path` prints no line at a
 when `path` has zero matching lines; it never prints a `0`.
 
 Every command below was executed with `git -C <worktree>` from the item worktree
-`C:/Users/DanMoisan/repos/TaskMaster-wt/bugs-2026-09-11-item-742`. The `-C` form is an invocation
+`<user-profile>/repos/TaskMaster-wt/bugs-2026-09-11-item-742`. The `-C` form is an invocation
 detail of this execution environment and does not change any pattern or pathspec.
 
 ---

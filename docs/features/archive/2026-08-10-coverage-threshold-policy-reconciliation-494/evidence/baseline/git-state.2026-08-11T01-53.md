@@ -3,7 +3,7 @@
 Timestamp: 2026-08-11T01-53
 
 Task: [P0-T2]
-Workspace root: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-abfcaf9319a44bae2
+Workspace root: <repo-root>\.claude\worktrees\agent-abfcaf9319a44bae2
 
 ## Command 1
 

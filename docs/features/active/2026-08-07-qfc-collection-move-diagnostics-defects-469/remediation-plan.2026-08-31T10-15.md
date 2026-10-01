@@ -14,7 +14,7 @@ unstaged and unchanged.
   `evidence/remediation-baseline/p1-t4-isolated-worktree-cleanup.2026-08-31T10-00.md`
   is historical evidence of `EPIC_WORKTREE_REMOVAL_BLOCKED`. Preserve it.
 - The retained detached worktree at
-  `C:\\Users\\DanMoisan\\AppData\\Local\\Temp\\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200`
+  `<user-profile>\\AppData\\Local\\Temp\\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200`
   is a separate cleanup item, explicitly excluded from issue #469 completion.
   This plan must not retry, bypass, request, or perform its removal.
 - Issue #469 reconciliation may use the completed 35-path baseline evidence at
@@ -31,7 +31,7 @@ unstaged and unchanged.
 
 - [x] [P0-T1] Record the authorized cleanup scope change in `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/remediation-baseline/p0-t1-cleanup-scope-change.2026-08-31T10-15.md`. Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, the exact P1-T4 blocked-attempt artifact path, its `EPIC_WORKTREE_REMOVAL_BLOCKED` result, the retained absolute worktree path, and the explicit statement that cleanup is excluded from issue #469 delivery.
 
-- [x] [P0-T2] Verify the retained worktree at `C:\\Users\\DanMoisan\\AppData\\Local\\Temp\\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200` remains present, detached at exactly `be9bedb48bd96460392712b33e96aeed34d475ba`, and clean. Run `git -C <retained-path> rev-parse HEAD`, `git -C <retained-path> status --short`, and `git worktree list --porcelain`. Record the results in `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/remediation-baseline/p0-t2-retained-worktree-verification.2026-08-31T10-15.md`. Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, `RetainedWorktree:`, `ResolvedCommit: be9bedb48bd96460392712b33e96aeed34d475ba`, `Detached: true`, and `WorktreeStatus: clean`. Any missing path, different revision, attached branch, or worktree change is a blocked state; do not run P6-T2 reconciliation.
+- [x] [P0-T2] Verify the retained worktree at `<user-profile>\\AppData\\Local\\Temp\\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200` remains present, detached at exactly `be9bedb48bd96460392712b33e96aeed34d475ba`, and clean. Run `git -C <retained-path> rev-parse HEAD`, `git -C <retained-path> status --short`, and `git worktree list --porcelain`. Record the results in `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/remediation-baseline/p0-t2-retained-worktree-verification.2026-08-31T10-15.md`. Acceptance: the artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, `RetainedWorktree:`, `ResolvedCommit: be9bedb48bd96460392712b33e96aeed34d475ba`, `Detached: true`, and `WorktreeStatus: clean`. Any missing path, different revision, attached branch, or worktree change is a blocked state; do not run P6-T2 reconciliation.
 
 ### Phase 1 — Existing baseline evidence validation
 

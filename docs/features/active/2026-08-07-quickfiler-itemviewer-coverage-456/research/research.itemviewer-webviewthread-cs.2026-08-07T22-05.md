@@ -2,7 +2,7 @@
 
 - Feature: F14 `quickfiler-itemviewer-coverage` (issue #456), child of epic #136 `quickfiler-per-file-coverage`
 - Timestamp: 2026-08-07T22-05
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5e4b635834feedd7`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a5e4b635834feedd7`
 - Target file: `QuickFiler/Viewers/ItemViewer.WebViewThread.cs` (**37 physical lines**)
 - Compile entry: `QuickFiler/QuickFiler.csproj:431-434` (`<DependentUpon>ItemViewer.cs</DependentUpon>`, `<SubType>UserControl</SubType>`)
 

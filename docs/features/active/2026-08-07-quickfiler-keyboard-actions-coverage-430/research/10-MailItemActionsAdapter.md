@@ -11,7 +11,7 @@ Branch: `feature/quickfiler-keyboard-actions-coverage`
 
 | Attribute | Value |
 | --- | --- |
-| Path | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\MailItemActionsAdapter.cs` |
+| Path | `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Interfaces\MailItemActionsAdapter.cs` |
 | Line count | 47 lines of source |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj:368` `<Compile Include="Interfaces\MailItemActionsAdapter.cs" />` |
 | `[ExcludeFromCodeCoverage]` status | **Absent.** Grep for `ExcludeFromCodeCoverage` across `QuickFiler\Interfaces\` returned no matches. (Historical note: a stale exemption on this type was removed during issue #227 cycle-2; see `.claude/agent-memory/task-researcher/feedback_exemption_audit_check_proven_techniques.md:18–20`, which records that the type's claimed "COM barrier" was false because `MailItem` is an interop **interface** and was already fully `Mock<MailItem>`-tested.) |

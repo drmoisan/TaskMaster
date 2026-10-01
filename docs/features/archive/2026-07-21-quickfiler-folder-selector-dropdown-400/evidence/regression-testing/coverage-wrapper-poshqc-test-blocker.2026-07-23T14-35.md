@@ -1,7 +1,7 @@
 # Coverage wrapper PoshQC test gate blocker
 
 - Timestamp: `2026-07-23T14:35:21Z`
-- Required command: `mcp__drm-copilot__run_poshqc_test workspace_root=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[tests/scripts/vscode]`
+- Required command: `mcp__drm-copilot__run_poshqc_test workspace_root=<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[tests/scripts/vscode]`
 - Required-command result: `ok: false`
 - Required-command EXIT_CODE: `4294967295`
 - Gate status: `BLOCKED_EXTERNAL_TOOLING`
@@ -10,7 +10,7 @@
 
 ## Reproduction
 
-The installed `@danmoisan/drm-copilot-mcp` package is version `1.0.17`.
+The installed `@<user>/drm-copilot-mcp` package is version `1.0.17`.
 Its bundled entry point was invoked directly with the same workspace and scan
 folder:
 
@@ -20,7 +20,7 @@ The bundled path discovered all four Pester files and all 30 tests under
 `tests/scripts/vscode`. It passed 30/30 with zero failures and zero skips. After
 the tests completed, Pester coverage processing emitted:
 
-`Could not resolve coverage path 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\scripts\powershell\Publish-DrmCopilotExtension.ps1': Cannot find path 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\scripts\powershell\Publish-DrmCopilotExtension.ps1' because it does not exist.`
+`Could not resolve coverage path '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\scripts\powershell\Publish-DrmCopilotExtension.ps1': Cannot find path '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\scripts\powershell\Publish-DrmCopilotExtension.ps1' because it does not exist.`
 
 PowerShell reports that terminal `-1` as the unsigned process result
 `4294967295`.
@@ -29,7 +29,7 @@ PowerShell reports that terminal `-1` as the unsigned process result
 
 | Bundled artifact | Version or SHA-256 |
 |---|---|
-| `@danmoisan/drm-copilot-mcp` | `1.0.17` |
+| `@<user>/drm-copilot-mcp` | `1.0.17` |
 | `resources/templates/run-poshqc-test.ps1` | `18CCDDD4A3099AFBFDEDDF5440705CD31C9D9329C512E14A3210EB40C50D198A` |
 | `resources/powershell/PoshQC/settings/pester.runsettings.psd1` | `72ACA24A1BAC93F0108CB960026B21A805E26609599D579C4AB3A3E33944B47C` |
 

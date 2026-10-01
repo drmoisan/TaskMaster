@@ -6,8 +6,8 @@ Command: MSYS_NO_PATHCONV=1 vstest.console.exe "QuickFiler.Test\bin\Debug\QuickF
 
 EXIT_CODE: 1
 
-TRX: docs/features/active/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/DanMoisan_MEGALODON4_2026-06-08_19_57_49_net481.trx
-Coverage: docs/features/active/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/56e1c77d-cad9-458d-950b-8c783b33d1d7/DanMoisan_MEGALODON4_2026-06-08.19_58_46.coverage
+TRX: docs/features/active/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/<user>_<host>_2026-06-08_19_57_49_net481.trx
+Coverage: docs/features/active/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/56e1c77d-cad9-458d-950b-8c783b33d1d7/<user>_<host>_2026-06-08.19_58_46.coverage
 
 ## Output Summary
 

@@ -4,7 +4,7 @@ Timestamp: `2026-07-22T07:59Z`
 
 VSTest path: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe`
 
-Assembly: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`
+Assembly: `<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`
 
 Command: `& $vstestPath $assembly /InIsolation "/TestCaseFilter:$filter" '/Logger:console;Verbosity=detailed'`
 

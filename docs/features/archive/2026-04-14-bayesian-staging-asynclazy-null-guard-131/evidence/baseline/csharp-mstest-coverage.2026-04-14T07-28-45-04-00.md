@@ -6,7 +6,7 @@ EXIT_CODE: 0
 Output Summary: Test run succeeded with `Total tests: 3938`, `Passed: 3936`, `Failed: 0`, `Skipped: 2`, `Total time: 47.0298 Seconds`, and overall line coverage `78.21%` from `coverage\bayesian-staging-asynclazy-null-guard-131-baseline.cobertura.xml`.
 
 Coverage Artifact Path:
-- `c:\Users\DanMoisan\repos\TaskMaster\coverage\bayesian-staging-asynclazy-null-guard-131-baseline.cobertura.xml`
+- `<repo-root>\coverage\bayesian-staging-asynclazy-null-guard-131-baseline.cobertura.xml`
 
 Coverage Details:
 - Cobertura `line-rate`: `0.782134`

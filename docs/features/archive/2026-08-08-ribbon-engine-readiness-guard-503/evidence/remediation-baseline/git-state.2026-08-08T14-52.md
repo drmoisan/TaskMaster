@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P0-T5]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git rev-parse HEAD; git rev-parse --abbrev-ref HEAD; git status --porcelain"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git rev-parse HEAD; git rev-parse --abbrev-ref HEAD; git status --porcelain"`
 EXIT_CODE: 0
 
 ## Output Summary

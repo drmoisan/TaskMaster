@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T16-22Z
 
-Command: `cd "C:/Users/DanMoisan/repos/TaskMaster-wt/2026-07-21T10-25" && sha256sum QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs coverage.config scripts/vscode/TaskMaster.cli.runsettings && wc -l QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs && git status --porcelain -- QuickFiler QuickFiler.Test && grep -nE "Thread\.Sleep|Task\.Delay|SpinWait|Stopwatch|Timeout|WaitOne|DoNotParallelize|\[Ignore|TestCategory" QuickFiler/Viewers/BreadcrumbUiDispatcher.cs QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs`
+Command: `cd "<user-profile>/repos/TaskMaster-wt/2026-07-21T10-25" && sha256sum QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs coverage.config scripts/vscode/TaskMaster.cli.runsettings && wc -l QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs && git status --porcelain -- QuickFiler QuickFiler.Test && grep -nE "Thread\.Sleep|Task\.Delay|SpinWait|Stopwatch|Timeout|WaitOne|DoNotParallelize|\[Ignore|TestCategory" QuickFiler/Viewers/BreadcrumbUiDispatcher.cs QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs`
 
 EXIT_CODE: 0
 

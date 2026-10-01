@@ -2,7 +2,7 @@
 
 Timestamp: `2026-07-22T08:41:42.9249804+00:00`
 
-Command: `$files=@((Resolve-Path 'QuickFiler/Viewers/BreadcrumbMessengerHub.cs').Path,(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs').Path); @($files) | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `$files=@((Resolve-Path 'QuickFiler/Viewers/BreadcrumbMessengerHub.cs').Path,(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbCollapsedSurfaceReadinessTests.cs').Path); @($files) | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 EXIT_CODE: `0`
 

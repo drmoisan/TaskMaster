@@ -48,7 +48,7 @@ All four steps run fresh at 2026-03-26T19-19.
 | **A2 Lint** | `Invoke-VSBuild.ps1 -EnableNETAnalyzers -EnforceCodeStyleInBuild` | ✅ PASS | EXIT_CODE: 0; `Build succeeded. 16 Warning(s) 0 Error(s)` — all warnings pre-existing |
 | **A3 Type-check** | `Invoke-VSBuild.ps1 -EnableNullable -TreatWarningsAsErrors` | ✅ PASS | EXIT_CODE: 0; `Build succeeded. 0 Warning(s) 0 Error(s)` |
 | **A4 Regression** | `vstest.console.exe /TestCaseFilter:"FullyQualifiedName~ConversationResolver"` | ✅ PASS | EXIT_CODE: 0; 8/8 PASS — see test list in Section C |
-| **A5 Full suite + Coverage** | `vstest.console.exe /InIsolation /EnableCodeCoverage` | ✅ PASS | EXIT_CODE: 0; 82/82 PASS; coverage file `DanMoisan_MEGALODON4_2026-03-26.19_20_12.coverage` |
+| **A5 Full suite + Coverage** | `vstest.console.exe /InIsolation /EnableCodeCoverage` | ✅ PASS | EXIT_CODE: 0; 82/82 PASS; coverage file `<user>_<host>_2026-03-26.19_20_12.coverage` |
 
 **Toolchain verdict: All four steps (format → lint → type-check → test) PASS in a single clean pass.**
 

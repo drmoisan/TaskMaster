@@ -12,4 +12,4 @@ Relevant Stack Frames:
 - TaskMaster.Test.AppGlobals.ApplicationGlobalsTests.LoadSequentialAsync_KeepsComPhasesOnCallerThreadAndYieldsBetweenHeavyPhases()
 - FluentAssertions.Numeric.NumericAssertionsBase`3.BeGreaterThan(T expected, String because, Object[] becauseArgs)
 Evidence Source Logs:
-- c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_y1aehrJyMr4mRwzShAJtwfMU__vscode-1777946811315\content.txt
+- <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_y1aehrJyMr4mRwzShAJtwfMU__vscode-1777946811315\content.txt

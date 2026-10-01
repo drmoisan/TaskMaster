@@ -20,7 +20,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCo
 EXIT_CODE: 0
 
 Coverage artifact read: `coverage/coverage.cobertura.xml`
-(`C:\Users\DanMoisan\repos\TaskMaster\coverage\coverage.cobertura.xml`, Cobertura version 1.9,
+(`<repo-root>\coverage\coverage.cobertura.xml`, Cobertura version 1.9,
 timestamp 1785878330).
 
 ## Output Summary
