@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 4
 - recolor_generation: 4
-- last_updated: 2026-10-01T17-29
-- next_step: 947 running (single child under quota pacing); no other launches until released
+- last_updated: 2026-10-01T18-40
+- next_step: 947 PR 963 open; await child report and CI confirmation
 
 ## Items
 
@@ -28,7 +28,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 944 | docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/954 | 829ad415db99bf13b70a7766fe85dfa0d521f706 |
 | 941 | docs/features/active/2026-09-29-breadcrumb-dispatch-message-and-handoff-record-inaccurate-941 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/958 | 6c710a45dd61710658ea8e60588fb4108cf15b6f |
 | 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/960 | 9a3d2dd3e8ec60af65b0d4f9f728eefc0aaaf970 |
-| 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | in_flight | worktree_created |  |  |
+| 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/963 |  |
 
 ## Item Lifecycle Timestamps
 
