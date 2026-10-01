@@ -69,8 +69,8 @@ Scope is bounded by `research/2026-09-29T23-05-breadcrumb-dispatch-message-resea
 - [x] AC5: A new MSTest regression test in `QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs` calls `DispatchValue` on the owner thread of an owner-thread-only dispatcher, outside any executing callback, and asserts the faulted task carries `outside an executing Dispatch callback`. The test fails before the AC1 change and passes after it.
 - [x] AC6: The handoff record `docs/features/active/breadcrumb-thread-affinity-tests-assume-taskrun-distinct-thread-900/evidence/other/p5-t14-follow-up-handoff.2026-09-17T02-39.md` attributes only the `Dispatch` site test (`BreadcrumbPopupBoundaryCoverageTests.cs`) to the owner-thread-id check, attributes the `BreadcrumbUiThreadDispatchTests.cs` `DispatchValue` site to the executing-callback and null-context checks, and cites the owner-thread comparison at `BreadcrumbUiDispatcher.cs` lines 276-277 rather than the storage and pass-through lines 40, 54 and 64.
 - [x] AC7: No other test in the solution asserts either message text without a matching update: a search of all `*.cs` files for `cannot marshal` returns only the line 86 assertion and the unchanged line 101 production literal.
-- [ ] AC8: The C# toolchain passes in order with no failures: `dotnet tool run csharpier check .`, the analyzers `msbuild TaskMaster.sln /t:Rebuild ...` command, the nullable `msbuild TaskMaster.sln /t:Rebuild ... /p:TreatWarningsAsErrors=true` command, and MSTest with coverage through `scripts/vscode/Invoke-MSTestWithCoverage.ps1`.
-- [ ] AC9: Coverage does not regress on the changed lines, and no changed file exceeds 500 lines.
+- [x] AC8: The C# toolchain passes in order with no failures: `dotnet tool run csharpier check .`, the analyzers `msbuild TaskMaster.sln /t:Rebuild ...` command, the nullable `msbuild TaskMaster.sln /t:Rebuild ... /p:TreatWarningsAsErrors=true` command, and MSTest with coverage through `scripts/vscode/Invoke-MSTestWithCoverage.ps1`.
+- [x] AC9: Coverage does not regress on the changed lines, and no changed file exceeds 500 lines.
 
 ## Next Step
 
