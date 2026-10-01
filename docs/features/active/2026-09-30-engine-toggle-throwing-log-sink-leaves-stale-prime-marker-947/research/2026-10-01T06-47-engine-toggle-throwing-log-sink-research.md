@@ -170,3 +170,10 @@ Policy checks: MSTest, Moq (strict mock with `SetupSequence`), FluentAssertions;
 ## 8. Numeric Derivation Evidence
 
 No numeric count, enumeration, or population is proposed for a `spec.md` acceptance criterion by this research. The line counts in §1 describe the current tree and are not proposed acceptance values. The `Times.Exactly(2)` in Test A is the issue's own AC1 wording ("invoked a second time"), not a newly derived count.
+
+## 9. Addendum (2026-10-01): second call site consolidated into scope
+
+- A maintainer comment on issue 947 (posted 2026-10-01T15:57:04Z) consolidates follow-up item 1 of section 7 into this issue instead of a separate issue: `HandleToggleClickAsync` (`TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`, `_logError(BuildToggleFailedMessage(engineName), ex);` at line 184, inside the `catch (Exception ex)` clause at 182 to 185) must also contain a throwing sink, with its own regression test using a throwing sink.
+- `issue.md` records the consolidation in a `## Scope Consolidation` section and carries two appended acceptance criteria (AC6 and AC7) for the second site; AC1 to AC5 are unchanged.
+- The plan applies approach (b) at both sites inline (a nested `try` / `catch (Exception)` around each sink call, following `RibbonCommandBoundary.SafeLog`). Approach (c) remains rejected for the reason in section 6; a shared private helper was considered and not adopted because it is a refactor beyond the minimal fix.
+- Section 7 item 1 is therefore no longer a follow-up candidate. Section 7 item 2 is unaffected.

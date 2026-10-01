@@ -8,7 +8,7 @@
 
 - Issue: #947
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/947
-- Last Updated: 2026-09-30
+- Last Updated: 2026-10-01
 - Work Mode: minor-audit
 
 ## Summary
@@ -36,6 +36,12 @@ The marker is cleared whether or not the log sink throws, a later `GetPressed` s
 
 The marker stays registered, no re-prime starts, and the continuation task faults unobserved.
 
+## Scope Consolidation
+
+- Source: maintainer comment by drmoisan on https://github.com/drmoisan/TaskMaster/issues/947, posted 2026-10-01T15:57:04Z, recorded here on 2026-10-01.
+- Comment text: "Same root cause, second call site, found during #947 preparation and consolidated here instead of filed separately. `HandleToggleClickAsync` in `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` calls `_logError` without a guard (line ~184). A sink that throws can therefore escape a method documented as never throwing. The fix for #947 should cover both sites: `CompletePrime` and `HandleToggleClickAsync`. Each site needs its own regression test using a throwing sink."
+- Effect on this issue: the sixth and seventh acceptance criteria below cover the second call site. The first five criteria are unchanged.
+
 ## Acceptance Criteria
 
 - [ ] When the `logError` sink throws while `CompletePrime` reports a faulted or canceled prime, the engine's prime marker is still removed, so a later `GetPressed` for the same engine starts a new prime (`EngineActiveAsync` is invoked a second time).
@@ -43,6 +49,8 @@ The marker stays registered, no re-prime starts, and the continuation task fault
 - [ ] A throwing `logError` sink leaves no faulted task unobserved: the sink exception is contained inside `CompletePrime`, so the prime continuation has no remaining throw source, and a deterministic test asserts that the task returned by `GetPrimeTask` for the first prime ends in `RanToCompletion` (not `Faulted`) after the sink has thrown.
 - [ ] A regression test reproducing the Steps to Reproduce fails on the pre-fix code and passes after the fix, with the failing run recorded under the feature folder's `evidence/regression-testing/`.
 - [ ] New tests use MSTest, Moq, and FluentAssertions, create no temporary files, and use no `Thread.Sleep` or `Task.Delay`; the C# toolchain (CSharpier, analyzers, nullable type-check, MSTest with coverage) passes, and the changed lines in `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` are covered.
+- [ ] When the `logError` sink throws while `HandleToggleClickAsync` reports a faulted toggle, `HandleToggleClickAsync` does not throw and still attempts the report: the sink exception is contained inside the click boundary by its own guarded sink call, the sink receives the toggle fault unchanged, and no control is invalidated.
+- [ ] A separate regression test for the `HandleToggleClickAsync` call site, using a throwing sink on a faulted toggle, fails on the pre-fix code and passes after the fix, with the failing run recorded under the feature folder's `evidence/regression-testing/`.
 
 ## Logs / Screenshots
 
