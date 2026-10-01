@@ -33,5 +33,10 @@ and as [[never-mix-gh-utc-with-local-timestamps]].
 - **Correct it in place and record the correction.** When you find a fabricated value, fix it and
   write a short record naming what was wrong, what the real value is, how you established it, and why
   it mattered. A silent fix leaves the next reader unable to tell which other values were composed.
+- **Children compose them too, so check every child-written artifact stamp against the commit
+  that carried it.** On `/parallel-add 951` (2026-10-01) the preflight child wrote
+  `preflight-clearance.2026-10-01T07-40.md` with `Timestamp: 07-40`; its own commit was
+  `12:02:53-04:00`, so the stamp was about 4.5 hours in the past (it echoed the plan's `07-10` name).
+  `git log -1 --format=%cd --date=iso-strict` settles it; fix with `git mv` plus a source line.
 - The tell is a timestamp that was never the output of anything. If you cannot name the command that
   produced it, you invented it.

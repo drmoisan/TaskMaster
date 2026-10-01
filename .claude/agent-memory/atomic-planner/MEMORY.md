@@ -2,6 +2,7 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#947 pass A](project_947_passA_second_call_site_consolidation_seams.md) — consolidated second call site mid-plan: nested catch arm end keyed to the header's own indent; re-derive "N catch clauses" doc tokens; drop the promotion handoff
 - [#940 R3](project_940_r3_per_file_coverage_rule_and_post_merge_reanchor_seams.md) — package/repo not-lower gates trip on run-to-run variance in untouched files; per-file lines+branches rule with an in-memory negative control; Cobertura `condition-coverage="50% (1/2)"` + backslash filenames; ANCHOR-SHA-2 = `git rev-parse <merge>^2` gated equal under the source trees; foreign vstest probe without sleep
 - [#929 R5](project_929_r5_text_auto_terminator_only_formatter_rewrite_seam.md) — `* text=auto` makes a terminator-only formatter rewrite uncommittable (exit 1, nothing to commit); key the commit branch on `git diff --numstat HEAD` non-empty, record FORMAT-REWRITE-TERMINATOR-ONLY otherwise, sweep every "that rewrite is committed at" sibling
 - [#929 R4](project_929_r4_wrapper_led_hook_containment_and_actions_log_seams.md) — pr-author hook matches gh+pr+create as substrings in any pwsh payload (never `create` in a gh payload); strip SGR escapes from Actions logs; gh run download dir collision; cancel-in-progress re-select; PoshQC third koverage.xml; wrap dotnet/msbuild in Set-Location

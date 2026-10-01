@@ -241,5 +241,13 @@ and unlocked; whole add ran with no child. Also check main has not touched the p
 since the branch's merge-base (`git log <base>..origin/main -- <targets>` empty) before calling the
 plan current.
 
+**Fifth case, 2026-10-01 `/parallel-add 951`: preflight REVISIONS REQUIRED landed, then the child
+stopped.** The reviewer's verbatim replacement text survives in the dead child's transcript at
+`<scratchpad-parent>/tasks/<child-agent-id>.output`: find the JSONL `user` line whose text holds
+`<task-notification>` and `PREFLIGHT: REVISIONS REQUIRED` (run python with `PYTHONIOENCODING=utf-8`;
+the text is HTML-escaped, so `&lt;TS&gt;` means `<TS>`). The grandchild's own `.output` was empty.
+Apply the text yourself (Edit is allowed in `docs/features/active/`), commit, push, then delegate
+ONE confirming preflight non-isolated in the same worktree. One child, about 4 minutes.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].
