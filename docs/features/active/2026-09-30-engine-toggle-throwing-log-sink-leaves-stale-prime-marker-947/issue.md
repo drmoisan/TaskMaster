@@ -40,7 +40,7 @@ The marker stays registered, no re-prime starts, and the continuation task fault
 
 - [ ] When the `logError` sink throws while `CompletePrime` reports a faulted or canceled prime, the engine's prime marker is still removed, so a later `GetPressed` for the same engine starts a new prime (`EngineActiveAsync` is invoked a second time).
 - [ ] The report-then-clear ordering in `CompletePrime` is preserved: the sink is invoked before the marker is removed (the clear is not reordered ahead of the report), and the existing tests in `TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs` pass without modification.
-- [ ] A throwing `logError` sink leaves no faulted task unobserved: neither the prime continuation nor the task returned by `GetPrimeTask` ends in the `Faulted` state, verified by a deterministic test.
+- [ ] A throwing `logError` sink leaves no faulted task unobserved: the sink exception is contained inside `CompletePrime`, so the prime continuation has no remaining throw source, and a deterministic test asserts that the task returned by `GetPrimeTask` for the first prime ends in `RanToCompletion` (not `Faulted`) after the sink has thrown.
 - [ ] A regression test reproducing the Steps to Reproduce fails on the pre-fix code and passes after the fix, with the failing run recorded under the feature folder's `evidence/regression-testing/`.
 - [ ] New tests use MSTest, Moq, and FluentAssertions, create no temporary files, and use no `Thread.Sleep` or `Task.Delay`; the C# toolchain (CSharpier, analyzers, nullable type-check, MSTest with coverage) passes, and the changed lines in `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` are covered.
 
