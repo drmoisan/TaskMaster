@@ -7,7 +7,7 @@ Status note: authored in two passes on 2026-10-01; scope consolidated per the ma
 - **Owner:** drmoisan
 - **Work Mode:** minor-audit (acceptance criteria come from the `## Acceptance Criteria` section of `docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947/issue.md` only; `spec.md` and `user-story.md` are intentionally absent and must stay absent)
 - **Last Updated:** 2026-10-01 (pass B; the planner had no clock reading, so no time of day is recorded)
-- **Status:** Draft for preflight (both authoring passes complete; awaiting MCP plan validation and atomic-executor preflight)
+- **Status:** Approved for execution (both authoring passes complete; MCP plan validation ok; atomic-executor preflight cleared in round 2 after the round 1 revisions were applied)
 - **Version:** 1.0
 - **Plan path continuity:** this file is updated in place for every preflight revision round. No timestamped sibling plan file is created for this cycle.
 
@@ -949,9 +949,9 @@ AC-MAPPING: AC5 | IMPLEMENTATION: P1-T1 partial (MSTest, Moq, FluentAssertions, 
 AC-MAPPING: AC6 | IMPLEMENTATION: P1-T7 edits E1, E5 and E6 (guarded sink call inside the click-boundary catch) | TESTS: HandleToggleClickAsync_WhenLogSinkThrowsOnToggleFault_DoesNotThrowAndAttemptsReport and HandleToggleClickAsync_WhenToggleFaults_LogsErrorDoesNotThrowDoesNotInvalidate | EVIDENCE: throwing-sink-pass-after.md, production-edit-scope.md POST-FORMAT and coverage-summary.md COMPARISON CATCH-ARM 1, checked off by P2-T20
 AC-MAPPING: AC7 | IMPLEMENTATION: P1-T1 partial with the click-boundary test, run before P1-T7 | TESTS: HandleToggleClickAsync_WhenLogSinkThrowsOnToggleFault_DoesNotThrowAndAttemptsReport | EVIDENCE: throwing-sink-fail-before.md (P1-T6) and throwing-sink-pass-after.md, checked off by P2-T21
 UNRESOLVED-GAPS: NONE
-PREFLIGHT: AWAITING ATOMIC-EXECUTOR
+PREFLIGHT: ALL CLEAR
 
-The line above is a status marker, not an executor signal: the planner cannot issue a preflight result for its own plan. The clearance signal is the atomic-executor's return under DIRECTIVE: PREFLIGHT VALIDATION ONLY.
+The signal above records the atomic-executor return of preflight round 2 under DIRECTIVE: PREFLIGHT VALIDATION ONLY.
 
 ## Planner Adversarial Self-Review
 
