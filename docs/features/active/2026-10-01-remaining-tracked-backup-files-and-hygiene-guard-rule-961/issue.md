@@ -69,13 +69,13 @@ Pre-plan findings recorded by the preparation run (verified against the worktree
 
 ## Acceptance Criteria
 
-- [ ] AC-1: No tracked backup file remains. `git ls-files -- "*.bak"` prints nothing, and the three files `TaskMaster.sln.bak`, `TaskTree/TaskTree.vbproj.bak` and `TaskVisualization/TaskVisualization.vbproj.bak` are deleted from the index and the worktree.
-- [ ] AC-2: `.gitignore` carries a `*.bak` rule, so `git check-ignore -q TaskMaster.sln.bak` exits 0 for a re-created file of that name.
-- [ ] AC-3: The repository hygiene guard reports `HYGIENE backup-file <path>` for every tracked path whose extension is `.bak` (case-insensitive), counts each as a finding, and exits 1; paths under the `.claude/` governance directory stay excluded as for the existing rules.
-- [ ] AC-4: Pester tests under `tests/scripts/hygiene/` prove the rule: a negative control seeds a tracked `.bak` path and asserts the finding line and exit code 1, and positive cases assert zero findings for `.bak`-lookalike names and for a clean listing.
-- [ ] AC-5: The hygiene guard run against the final tree prints `HYGIENE Findings=0` and exits 0.
-- [ ] AC-6: PoshQC format, analyze and test pass for the changed PowerShell files. The PoshQC test run over `tests/scripts/hygiene` reports `errors="0" failures="0"` in `artifacts/pester/pester-junit.xml` with a test count above the 31-test baseline. Line coverage of `scripts/hygiene` is measured by CI (`_pester.yml`), because the PoshQC coverage document does not include `scripts/hygiene` in its denominator; locally, every added statement is exercised by a named test.
-- [ ] AC-7: `.github/workflows/README.md` describes the backup-file rule in the `_hygiene.yml` row.
+- [x] AC-1: No tracked backup file remains. `git ls-files -- "*.bak"` prints nothing, and the three files `TaskMaster.sln.bak`, `TaskTree/TaskTree.vbproj.bak` and `TaskVisualization/TaskVisualization.vbproj.bak` are deleted from the index and the worktree.
+- [x] AC-2: `.gitignore` carries a `*.bak` rule, so `git check-ignore -q TaskMaster.sln.bak` exits 0 for a re-created file of that name.
+- [x] AC-3: The repository hygiene guard reports `HYGIENE backup-file <path>` for every tracked path whose extension is `.bak` (case-insensitive), counts each as a finding, and exits 1; paths under the `.claude/` governance directory stay excluded as for the existing rules.
+- [x] AC-4: Pester tests under `tests/scripts/hygiene/` prove the rule: a negative control seeds a tracked `.bak` path and asserts the finding line and exit code 1, and positive cases assert zero findings for `.bak`-lookalike names and for a clean listing.
+- [x] AC-5: The hygiene guard run against the final tree prints `HYGIENE Findings=0` and exits 0.
+- [x] AC-6: PoshQC format, analyze and test pass for the changed PowerShell files. The PoshQC test run over `tests/scripts/hygiene` reports `errors="0" failures="0"` in `artifacts/pester/pester-junit.xml` with a test count above the 31-test baseline. Line coverage of `scripts/hygiene` is measured by CI (`_pester.yml`), because the PoshQC coverage document does not include `scripts/hygiene` in its denominator; locally, every added statement is exercised by a named test.
+- [x] AC-7: `.github/workflows/README.md` describes the backup-file rule in the `_hygiene.yml` row.
 
 ## Proposed Fix / Validation Ideas
 
