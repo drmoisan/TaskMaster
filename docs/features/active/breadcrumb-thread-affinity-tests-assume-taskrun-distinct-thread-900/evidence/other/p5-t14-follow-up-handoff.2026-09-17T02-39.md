@@ -21,14 +21,17 @@ promotion-type: bug
 ### Summary
 
 Two tests assert that a cross-thread call fails, while obtaining their "different thread" from a
-`Task.Run` delegate, against `BreadcrumbUiDispatcher`'s owner-thread-id check rather than against
-`ItemViewer`'s boundary guard. They share the assumption that issue #900 removed from
+`Task.Run` delegate. Only the first is exercising `BreadcrumbUiDispatcher`'s owner-thread-id check
+(through `Dispatch`, rather than `ItemViewer`'s boundary guard); the second reaches `DispatchValue`,
+which never reads the owner thread id. They share the assumption that issue #900 removed from
 `ItemViewerBreadcrumbThreadAffinityTests`: `Task.Run` guarantees only a thread-pool thread, never a
 different one. When the test body is itself on a pool thread, the work item lands on that thread's
 own local work-stealing queue and a blocking wait can pop it back and run the delegate inline on the
 same thread, at which point the owner check passes and the expected failure never occurs. This is
 the same defect class, against a different guard, in different files, and it is not fixed under
-#900.
+#900. The inlining hazard described here applies to the `Dispatch` site only. `DispatchValue` on an
+owner-only dispatcher faults for every caller outside an executing dispatcher callback, on any
+thread, so the second site's outcome does not depend on which thread runs the delegate.
 
 ### Citations
 
@@ -38,17 +41,20 @@ the same defect class, against a different guard, in different files, and it is 
   `Task.Run` delegate, and `executions` must be 0. An inlined delegate passes the owner test and
   defeats both assertions.
 - `QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs:298-307`: creates a dispatcher for the
-  current thread and then awaits a `Task.Run` delegate expected to throw a cross-thread marshalling
-  error.
-- `QuickFiler/Viewers/BreadcrumbUiDispatcher.cs:40`, `:54`, `:64`: the owner check compares
-  `Environment.CurrentManagedThreadId` against `_ownerThreadId`.
+  current thread and then awaits a `Task.Run` delegate (line 301) that calls `DispatchValue`,
+  expected to fault with a marshalling error. `DispatchValue` does not use the owner-thread-id check
+  (`BreadcrumbUiDispatcher.cs:180-188`); it faults for every caller outside an executing callback,
+  including the owner thread, so this site is not exposed to the inlining hazard.
+- `QuickFiler/Viewers/BreadcrumbUiDispatcher.cs:40`, `:54`, `:64`: where `_ownerThreadId` is stored
+  and supplied; the owner check compares `Environment.CurrentManagedThreadId` against it at
+  `:276-277`, and is used by `Dispatch` only.
 
 ### Note carried forward from the research artifact
 
-The second site uses `await Task.Run(...)` rather than a blocking `GetResult()`. `await` does not
-attempt wait-inlining, so that site is exposed only to genuine idle-thread reuse rather than to the
-inlining path. Its exposure is lower but not zero. The first site, which blocks, carries the same
-exposure as the two tests #900 repaired.
+The second site uses `await Task.Run(...)` rather than a blocking `GetResult()`. It has no
+inlining exposure and no idle-thread-reuse exposure, because its outcome does not depend on which
+thread runs the delegate (see the correction in the Summary above). The first site, which blocks,
+carries the same exposure as the two tests #900 repaired.
 
 ### Suggested remedy
 
