@@ -815,6 +815,11 @@
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.AttachmentSaving.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.LegacyAttachmentSaving.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.MailItemSort.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.TrySaveAttachment.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.UndoAndMoveLog.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
     <Compile Include="OutlookObjects\Folder\FolderRow.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScore.cs" />
