@@ -121,3 +121,26 @@ function Get-RawEvidenceDocumentKind {
 
     return 'none'
 }
+
+function Test-BackupFilePath {
+    <#
+    .SYNOPSIS
+        Tests whether a tracked path is a backup file.
+    .DESCRIPTION
+        A path is a backup file when its final extension equals .bak, compared case-insensitively.
+        Only the final extension is compared, so a directory named bak, a longer extension such as
+        .bakery and a path whose final extension is another value are not backup files.
+    .PARAMETER RelativePath
+        The repository-relative path of the tracked file.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RelativePath
+    )
+
+    return [System.IO.Path]::GetExtension($RelativePath) -ieq '.bak'
+}

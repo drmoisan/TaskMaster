@@ -21,7 +21,7 @@ references each gate with `uses:`. It contains no inline `steps:`.
 | `_build-nullable.yml` | `windows-latest` | `msbuild /t:Rebuild` with `TreatWarningsAsErrors` | 30 min |
 | `_mstest-coverage.yml` | `windows-latest` | Plain `msbuild /t:Build`, then `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, which runs the suite under `dotnet-coverage`, post-processes the result into a first-party Cobertura projection, and asserts 80% line and 75% branch against it; uploads the Cobertura document as the `test-results` artifact | 30 min |
 | `_pester.yml` | `windows-latest` | Pester over `tests/scripts/dependencies`, `tests/scripts/hygiene` and `tests/scripts/vscode` with JaCoCo coverage scoped to `scripts/dependencies`, `scripts/hygiene` and `scripts/vscode`; asserts the `LINE` figure at 80% and exits non-zero on any test failure; uploads the JaCoCo document as the `pester-coverage` artifact | 10 min |
-| `_hygiene.yml` | `ubuntu-latest` | Runs scripts/hygiene/Test-RepositoryHygiene.ps1 over the tracked tree: fails on a raw test-platform or coverage-collector document (classified by content) or on a Windows user-profile path pattern in any tracked file outside .claude; prints path and line only | 10 min |
+| `_hygiene.yml` | `ubuntu-latest` | Runs scripts/hygiene/Test-RepositoryHygiene.ps1 over the tracked tree: fails on a raw test-platform or coverage-collector document (classified by content), on a tracked backup file whose final extension is .bak (case-insensitive, finding line `HYGIENE backup-file <path>`) or on a Windows user-profile path pattern in any tracked file outside .claude; prints the rule name, the path and, for a profile path, a line number only | 10 min |
 
 Structural properties that are deliberate and should not be changed casually:
 

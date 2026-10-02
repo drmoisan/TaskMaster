@@ -156,4 +156,49 @@ Describe 'Invoke-RepositoryHygieneMain' {
         $result.FindingCount | Should -Be 1 -Because 'an unreadable record is a finding, never skipped silently'
         $result.ExitCode | Should -Be 1
     }
+
+    It 'reports a tracked backup file as a finding and fails the guard' {
+        $backup = 'TaskMaster.sln.bak'
+        $script:Listing = ConvertTo-EolListing -Path @($backup)
+        $script:Content[$backup] = 'plain text'
+
+        $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
+
+        @($result.Lines) | Should -Be @('HYGIENE backup-file TaskMaster.sln.bak', 'HYGIENE Findings=1')
+        $result.ExitCode | Should -Be 1 -Because 'a tracked backup file fails the guard'
+    }
+
+    It 'reports zero findings for backup-lookalike names' {
+        $lookalikes = @('docs/bak/notes.md', 'notes.bakery', 'notes.bak.md', 'backup', 'docs/features/x/Makefile')
+        $script:Listing = ConvertTo-EolListing -Path $lookalikes
+        foreach ($item in $lookalikes) { $script:Content[$item] = 'plain text' }
+
+        $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
+
+        @($result.Lines) | Should -Be @('HYGIENE Findings=0')
+        $result.FindingCount | Should -Be 0 -Because 'none of the lookalike names has a final .bak extension'
+        $result.ExitCode | Should -Be 0
+    }
+
+    It 'drops a governance-directory backup record before the backup rule runs' {
+        $governed = '.claude/agent-memory/notes.bak'
+        $script:Listing = ConvertTo-EolListing -Path @($governed)
+        $script:Content[$governed] = 'plain text'
+
+        $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
+
+        @($result.Lines) | Should -Be @('HYGIENE Findings=0')
+        $result.ExitCode | Should -Be 0 -Because 'the governance skip runs ahead of the backup rule'
+    }
+
+    It 'still scans a backup file for a profile path' {
+        $backup = 'docs/features/x/old.bak'
+        $script:Listing = ConvertTo-EolListing -Path @($backup)
+        $script:Content[$backup] = $script:Violation
+
+        $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
+
+        @($result.Lines) | Should -Be @('HYGIENE backup-file docs/features/x/old.bak', 'HYGIENE profile-path docs/features/x/old.bak:1', 'HYGIENE Findings=2')
+        $result.ExitCode | Should -Be 1 -Because 'both the backup-file rule and the profile-path rule fire'
+    }
 }

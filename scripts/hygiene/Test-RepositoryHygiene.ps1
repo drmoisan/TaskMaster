@@ -1,6 +1,7 @@
 ﻿# Repository hygiene guard. Enumerates the tracked files through git ls-files and fails when any
 # tracked file outside the governance directory is a raw test-platform or raw coverage-collector
-# document (rule A) or contains a line matching the generic user-profile path pattern (rule B).
+# document (rule A), contains a line matching the generic user-profile path pattern (rule B), or
+# is a backup file whose final extension is .bak (rule C).
 # Finding lines carry the rule name, the path and a line number only, never the matched text, so
 # the CI log cannot echo an identifier. The guard carries no exemption mechanism of any kind.
 
@@ -12,11 +13,12 @@ Set-StrictMode -Version Latest
 function Invoke-RepositoryHygieneMain {
     <#
     .SYNOPSIS
-        Applies both hygiene rules to every tracked file and returns the findings and exit decision.
+        Applies the hygiene rules to every tracked file and returns the findings and exit decision.
     .DESCRIPTION
         Drops records under the governance directory by a path-prefix test, classifies each
         remaining record with Get-RawEvidenceDocumentKind (content is passed only for the xml
-        extension), and scans its decoded text with Find-UserProfilePathMatch. Emits
+        extension), and scans its decoded text with Find-UserProfilePathMatch. A record whose final
+        extension is .bak yields "HYGIENE backup-file <path>" and is still content-scanned. Emits
         "HYGIENE raw-document <path>", "HYGIENE profile-path <path>:<line>" once per file with the
         first matching line, "HYGIENE unreadable <path>" when the content delegate throws, and a
         final "HYGIENE Findings=<n>" line. Writes nothing to any stream.
@@ -37,6 +39,10 @@ function Invoke-RepositoryHygieneMain {
     foreach ($record in @(Get-TrackedFileRecord)) {
         if ($record.Path.StartsWith($governancePrefix, [System.StringComparison]::Ordinal)) {
             continue
+        }
+
+        if (Test-BackupFilePath -RelativePath $record.Path) {
+            $lines.Add('HYGIENE backup-file ' + $record.Path)
         }
 
         $text = $null
