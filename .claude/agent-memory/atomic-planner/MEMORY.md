@@ -2,6 +2,7 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#928 R5](project_928_backtick_descoping_blast_radius_seams.md) — every inline span is a WRITE claim to the parallel scheduler; a "Glob pattern **/*.xml" span serializes the item; accepted vs dropped token shapes; fenced blocks unharvested; context paths in plain prose only
 - [#839](project_839_createcancellationtoken_init_plan_seams.md) — lone dead-comment deletion not CSharpier-stable; post-commit porcelain must admit the plan's own check-off; never record a porcelain COUNT; Phase 0 diff sentences prospective; exempt commit form `-m ... -- path`
 - [#838 R1–R2](project_838_gettableinviewasync_null_contract_plan_seams.md) — timed CTS ctors DO exist (13 lines); porcelain gates assert SCOPE only; folder-wide commit task names NO artifact; repeatable literals at-least-one; ExpectedExitCode = observed value
 - [#871](project_871_qfcqueue_enqueue_seams_plan_seams.md) — relocated-vs-new must be diff-derived (whitespace-stripped +/- match); a PS try/catch can't catch an external process (use 2>&1 + $LASTEXITCODE); a projected repo-wide rate over 65k lines can't fail (gate the delta); scope-lock needs an anchor carve-out
