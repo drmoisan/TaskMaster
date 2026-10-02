@@ -27,6 +27,7 @@
 - [Multi-line trx MESSAGE; Markdown-indent width](project_trx_message_multiline_and_markdown_indent_width.md) (Moq Verify splits reason and count onto two lines; recount wrap claims without the 4-space indent)
 - [Ambient drainable SyncContext is vacuous](project_ambient_drainable_synccontext_is_vacuous_without_async_continuations.md) (same-thread SetResult inlines; needs RunContinuationsAsynchronously)
 - [Glob blind under .claude/worktrees](project_glob_tool_blind_under_claude_worktrees.md) (empty Glob in an item worktree is not absence; use Read/Grep)
+- [Stall probe treats a failure as a stall](project_stall_probe_clear_rule_treats_a_failure_as_a_stall.md) (fast shell-icon failure picks DIRECT, so a runner-verbatim AC becomes unreachable)
 - [gh/CI-log traps](project_gh_ci_log_and_download_gotchas.md) (createdAt trips pr-author hook; ANSI in Pester log; gh download never overwrites) · [Abbreviated caller facts](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md)
 
 ## Build / toolchain environment

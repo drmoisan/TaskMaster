@@ -274,5 +274,11 @@ pre-implementation gate deny its atomic-executor PREFLIGHT call, so omit that ma
 preparation-phase subagent prompts. Meanwhile 956 merged and 948 launched, so the verdict was
 re-derived against a pinned set that did not exist when the add started.
 
+**Eighth case, 2026-10-02 `/parallel-add 952`: fourth rung again, diagnosed in five calls.** The
+session checkout's own branch was the item branch, one commit atop the CURRENT `origin/main`
+(`prepare issue 952 ... preflight-cleared minimal-audit plan`) carrying the clearance artifact; worktree
+clean, re-hashed plan blob equal to the clearance's. No child delegated; ADMIT into the in-flight
+cohort because its only current-cohort member (950) shared no edge.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].

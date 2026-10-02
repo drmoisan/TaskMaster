@@ -49,3 +49,4 @@
 - [Child stalls waiting on a grandchild notification](feedback_child_stalls_waiting_on_grandchild_notification.md) - a child that ends its turn "waiting on the executor" never wakes; 931 sat idle 10 h. Tell children to poll; the parent polls via a pwsh Start-Sleep loop and watches commits
 - [Compute the complexity floor before choosing a band](feedback_compute_the_complexity_floor_before_choosing_a_band.md) - race/flaky items carry concurrency_or_ordering, a C3 floor that footprint cannot lower; I launched 942 at C2 below it
 - [Verify a removal's stated premise before recording it](feedback_verify_a_removals_stated_premise_before_recording_it.md)
+- [Children rephrase edits past hooks](feedback_children_rephrase_edits_past_hooks.md) - "report, don't work around" still let a child retry with a new old_string; forbid rephrasing outright and read the diff yourself

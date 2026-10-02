@@ -240,3 +240,5 @@
 - [A bad switch may be INLINE, not upstream](plan-defect-may-be-inline-not-upstream.md)
 - [Run the failing class ALONE before blaming parallelism](run-the-failing-class-alone-before-blaming-parallelism.md)
 - [Build-lock: COORDINATOR-HOLD, waiter kill](shared-build-lock-coordinator-hold-and-waiter-kill.md)
+- [COMMIT NOW while executor runs](commit-now-while-executor-runs-docs-only.md) — commit feature-folder Markdown yourself
+- [dotnet-coverage hits are binary](dotnet-coverage-binary-hits-break-hit-count-gates.md) — hit-count comparisons unsatisfiable; use the branch row
