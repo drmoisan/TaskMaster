@@ -2,6 +2,7 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#930 R0-R4](project_930_uithread_ilglobals_comments_plan_seams.md) — enumerate gated names in check-off citations, never count them; runner writes `<stem>.cobertura.jacoco.xml` + trx summary; dot-source + redefine Get-DotnetCoverageArgumentList; Bash collapses `''`, misbinds `""` inside `$( )`, halves `\\` (use [char]39/34/92); processed Cobertura filenames are backslash-separated; Grep-tool literals need regex escaping note; config/blast-radius.json `"modules"` key in source scope; no /t:Build for intermediate compiles
 - [#839](project_839_createcancellationtoken_init_plan_seams.md) — lone dead-comment deletion not CSharpier-stable; post-commit porcelain must admit the plan's own check-off; never record a porcelain COUNT; Phase 0 diff sentences prospective; exempt commit form `-m ... -- path`
 - [#838 R1–R2](project_838_gettableinviewasync_null_contract_plan_seams.md) — timed CTS ctors DO exist (13 lines); porcelain gates assert SCOPE only; folder-wide commit task names NO artifact; repeatable literals at-least-one; ExpectedExitCode = observed value
 - [#871](project_871_qfcqueue_enqueue_seams_plan_seams.md) — relocated-vs-new must be diff-derived (whitespace-stripped +/- match); a PS try/catch can't catch an external process (use 2>&1 + $LASTEXITCODE); a projected repo-wide rate over 65k lines can't fail (gate the delta); scope-lock needs an anchor carve-out
