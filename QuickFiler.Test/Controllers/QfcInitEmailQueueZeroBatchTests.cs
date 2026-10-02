@@ -144,7 +144,8 @@ namespace QuickFiler.Controllers.Tests
             IList<MailItem> result = null;
 
             // Act
-            System.Action act = () => result = model.InitEmailQueue(0, new SynchronousBackgroundWorker());
+            System.Action act = () =>
+                result = model.InitEmailQueue(0, new SynchronousBackgroundWorker());
 
             // Assert
             act.Should().NotThrow();

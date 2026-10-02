@@ -20,3 +20,17 @@ RESULT Transaction_SecondCallerCannotInstallUntilTheFirstRestores = Failed durat
 MESSAGE Transaction_SecondCallerCannotInstallUntilTheFirstRestores :: Expected observedByB to refer to <null> because the first transaction restores before it releases the gate, so the waiter cannot observe the pre-restore value, but found System.Windows.Threading.Dispatcher { HasShutdownFinished = False, HasShutdownStarted = False, Hooks = System.Windows.Threading.DispatcherHooks{ }, Thread = System.Threading.Thread { ApartmentState = ApartmentState.STA {value: 0}, CurrentCulture = en-US, CurrentUICulture = en-US, ExecutionContext = System.Threading.ExecutionContext{ }, IsAlive = True, IsBackground = True, IsThreadPoolThread = False, ManagedThreadId = 37, Name = "UiThreadDispatcherFixture.ParkedDispatcher", Priority = ThreadPriority.Normal {value: 2}, ThreadState = ThreadState.Background|WaitSleepJoin {value: 36} } }.
 
 The message contains `to refer to` and `ParkedDispatcher`: the CI failure signature of spec Repro and Evidence (the second caller observed the parked dispatcher where the null baseline was expected).
+
+## R4-PASS-AFTER:
+
+Timestamp: 2026-10-02T01-09
+Task: P4-T6
+
+Fail-before (P1-T6, pre-fix shape with the injected gate-free writer, run alone):
+RESULT Transaction_SecondCallerCannotInstallUntilTheFirstRestores = Failed duration=00:00:00.1933723
+
+Pass-after, fixed tree with the baseline pin taken inside the gate (P3-T12), no injected writer:
+- FEATURE/evidence/regression-testing/targets-pass-after.md (P4-T4, nine targets): RESULT Transaction_SecondCallerCannotInstallUntilTheFirstRestores = Passed duration=00:00:00.0730800
+- FEATURE/evidence/regression-testing/concurrent-classes-pass-after.md (P4-T5, concurrent with QfcItemController_FocusAndThemeTests under Workers=0 / ClassLevel): RESULT Transaction_SecondCallerCannotInstallUntilTheFirstRestores = Passed duration=00:00:00.0035572
+
+R4-PASS-AFTER: Passed in both pass-after artifacts. This completes the Defect B fail-before and pass-after pair. Phase 5 batch A (P5-T11) separately runs the pinned shape with the same injected writer.

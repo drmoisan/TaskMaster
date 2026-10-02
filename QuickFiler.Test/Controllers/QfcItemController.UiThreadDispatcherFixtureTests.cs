@@ -232,9 +232,10 @@ namespace QuickFiler.Controllers.Tests
                         Task waiter = Task.Run(async () =>
                         {
                             secondCallerStarted.Set();
-                            UiThreadDispatcherTransaction transactionB = await UiThreadDispatcherFixture
-                                .BeginTransactionAsync()
-                                .ConfigureAwait(false);
+                            UiThreadDispatcherTransaction transactionB =
+                                await UiThreadDispatcherFixture
+                                    .BeginTransactionAsync()
+                                    .ConfigureAwait(false);
                             try
                             {
                                 observedByB = UiThreadDispatcherFixture.Current;
