@@ -62,6 +62,13 @@ everything does — so neither an all-clear nor an all-conflict result is self-v
    radius. Harmless when every neighbour is merged (placement only), but it serializes the item
    against any later add, so record it in `blast_radius_note` as a live glob.
 
+6. **The derivation can MISS the actual write set, and the branch diff cannot catch it before
+   execution.** Observed 2026-10-02 on `/parallel-add 953`: the plan's eleven `<Project>/app.config`
+   targets (listed in backticks) were absent from the 17 derived paths, while a census citation
+   `*/*.csproj` (a read) was harvested as a live glob that contends with every item. A preparation
+   branch holds only docs, so the diff reconciliation shows nothing of the code write set. Compare the
+   derived paths against the child's reported write set and append missing targets as exact entries.
+
 **How to apply:** Before trusting a fresh computation, replay it against the edges already
 in `parallel-orchestrator-state.json` and require an exact match on `conflict`, on the
 reason `kind` set, and on each `detail` string. That replay is what proves the convention

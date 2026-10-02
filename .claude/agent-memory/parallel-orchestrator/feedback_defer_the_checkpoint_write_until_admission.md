@@ -164,6 +164,12 @@ passing 3 returns index 3, a Layer 2 structural violation. Cohorts 0-3 held no n
 so 4 is the correctly re-derived value (and the lowest non-terminal index after the write). Assert
 in the write script that no current-generation row holds both ends of an edge.
 
+**Two reads that disagree are usually two snapshots straddling a concurrent write, not a torn
+checkpoint.** On `/parallel-add 961` (2026-10-02) my first read showed generation 7 with no 953 item
+and the next read showed a 953 add mutation at generation 8, which looked like a half-applied add.
+The file mtime was 50 seconds old: `/parallel-add 953` had written between my two reads. Compare the
+mtime with the clock and re-read everything from ONE load before diagnosing a partial write.
+
 **`current_cohort_members` must include `scheduled` members, not just pinned ones.** That is
 exactly what made 656 defer: 646 was never in flight, only admitted and waiting. An admission
 check written against the `in_flight` subset alone would have missed it and admitted 656
