@@ -228,3 +228,29 @@ Repository figures: the first-party line rate is 85.35% in both runs and the roo
 - exactly one DENOMINATOR-BRANCH value, rate clause holds: MET (COMPARABLE)
 
 P3-T10 STOPPED: the hit-count clause of D-8 cannot be satisfied with this collector. The dotnet-coverage Cobertura output records `hits` as a binary covered flag: P0-T17 read all 133464 line elements of the baseline document and found MAX-HITS=1 and GT1=0. A line executed many times therefore reports hits=1, and the guard line can never report more hits than the record line. Both guard outcomes are proved by the branch element on the guard line (`condition-coverage` covered=2 of total=2), and at test level by `GetPressed_WhenPrimeFaultsRepeatedly_LogsFirstFaultOnly` (one report across five faulted polls). The task box is left unchecked, pending a plan correction from the orchestrator.
+
+### Clause results (plan version 0.7)
+
+Timestamp: 2026-10-02T03-52. Resume of P3-T10 under plan version 0.7 (resume rule). The `## COMPARISON: (P3-T10)` section above stands as this task's comparison, and its `CMD-CHANGED-LINES` output stands as this task's run of that command. No code file has changed since commit c4c4e7585 (`git diff --stat c4c4e7585 HEAD -- TaskMaster TaskMaster.Test` printed nothing; the scoped porcelain span printed nothing), and coverage\final-948.cobertura.xml and coverage\baseline-948.cobertura.xml are still on disk.
+
+- FIRST-PARTY-DELTA: lines 85.35% minus 85.35% = +0.00 points; branches 79.74% minus 79.75% = -0.01 points (read from FIRST-PARTY-BASELINE and FIRST-PARTY-FINAL)
+- NOT-LOWERED-STATEMENT: HOLDS: CHANGED PACKAGE NOT LOWER (the branch delta is negative, so the first-party form does not apply; TaskMaster package LINE covered 2467 to 2477 and missed 802 to 802, BRANCH covered 517 to 519 and missed 211 to 211, from the two projection blocks). Packages whose LINE or BRANCH covered value fell: UtilitiesCS (LINE covered 38909 to 38901; BRANCH covered 9434 to 9432).
+
+Clause results:
+
+- COORD-FILE-LINE-RATE-FINAL at least 90.00: MET (100)
+- RECORD-LINE-FINAL hits at least 1: MET (hits=1)
+- GUARD-BRANCH-ROW ON GUARD LINE, guard covered equals total, total at least 2: MET (ON GUARD LINE; GUARD-LINE 421 branch=True covered=2 total=2)
+- SINK-LINE-FINAL hits at least 1: MET (hits=1)
+- CHANGED-LINES-UNCOVERED 0 and CHANGED-LINES-WITH-ELEMENT at least 3: MET (0 and 15)
+- METHOD CompletePrime final elements strictly greater than baseline, final uncovered at most baseline: MET (20 greater than 15; 0 at most 0)
+- METHOD BuildPrimeFailedMessage final uncovered at most baseline: MET (0 at most 0)
+- COORD-LINES-FINAL covered at least COORD-LINES-BASELINE covered: MET (177 at least 167)
+- COORD-UNCOVERED-FINAL at most COORD-UNCOVERED-BASELINE: MET (0 at most 0)
+- COORD-BRANCHES-FINAL covered at least baseline covered: MET (39 at least 37)
+- exactly one DENOMINATOR-BRANCH value, and under COMPARABLE its rate clause holds: MET (COMPARABLE; 0.853451 at least 0.848535)
+- NOT-LOWERED-STATEMENT begins HOLDS: MET (HOLDS: CHANGED PACKAGE NOT LOWER)
+
+P3-T10 RESULT: every acceptance clause of plan version 0.7 is MET.
+
+SUPERSEDED: the preceding Clause results subsection evaluated the version 0.5 acceptance; P3-T29 reads only this subsection.
