@@ -2,6 +2,10 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#953 R3](project_953_r3_grep_gitignore_directory_path_and_measured_line_lengths.md) — Grep honours .gitignore for a DIRECTORY path (root+glob over artifacts/ returns nothing; pass the absolute file path), Glob does not; a `none` outcome needs its positive control in the same task; measure line lengths with `^.{N,}` probes, never estimate; leading `<` in a pattern works
+- [#953 R2](project_953_r2_grep_long_line_omission_and_cr_anchor_seams.md) — Grep tool omits lines over ~500 chars (JUnit read needs `-n` + Read offset/limit); ripgrep `$` fails before CR (`\r?$` on executor-written files); "before Phase 1" wrong when tests are authored in P1 (anchor to task ids); expect-fail needs a wrong-reason branch keyed to `Expected `/`, but got `
+- [#953 R1](project_953_r1_pwsh_refused_and_count_recheck_seams.md) — Bash guard refuses pwsh (od/rm fallbacks, `git -C <root>`, absolute operands); re-count `-A 1` blocks per file (16 not 17); Glob hash-set folders (14 not 13); `-Force` count-0 self-hits the module comment; `-o` must extend past `Version=`; `'*packages.config'` pathspec; `[AllowEmptyString()]` on Mandatory `[string[]]`; ls-files --eol fields space-padded
+- [#953 R0](project_953_fizzler_redirect_sweep_and_ratchet_plan_seams.md) — ripgrep strips the BOM (zero-hit Grep inconclusive); text=auto hides CRLF loss from git diff (gate `git ls-files --eol` w/ column); shared attribute string on a sibling block needs a two-line Edit; banned double quotes push the JUnit read onto Read/Grep with delete-before freshness
 - [#956 R1](project_956_r1_spec_self_hit_and_raw_doc_name_seams.md) — spec-wording counts self-hit the AC line; `cobertura` substring matches tracked agent-memory .md (anchor `cobertura[^/]*\.xml$`); orchestrator-amended AC needs a P0 literal check
 
 - [#945 R0](project_945_sortemail_trysave_directory_seam_plan_seams.md) — whitespace-stripped token census; compile-red fail-before (runtime-red would create a real dir); uncommitted-fix control via backup copy; no-commit plan, two-dot MERGE-BASE gates
