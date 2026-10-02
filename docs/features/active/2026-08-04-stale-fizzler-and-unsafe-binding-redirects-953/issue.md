@@ -6,6 +6,8 @@
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Work Mode: minor-audit
+
 ## Summary
 
 Two families of `app.config` binding redirects name assembly versions that are not deployed. Twelve project configs redirect `Fizzler` to `1.3.0.0` while the deployed assembly is `1.3.1.0`, and `SVGControl/app.config` redirects `System.Runtime.CompilerServices.Unsafe` to `6.0.2.0` while the deployed assembly is `6.0.3.0` and all sixteen sibling configs say `6.0.3.0`. This is the same defect class as bug #418, where a redirect to a non-deployed `ExCSS` version caused `SvgDocument.Open` to fail in hosts that apply the redirect.
@@ -68,6 +70,23 @@ The single Fizzler config already at `1.3.1.0` should be identified, since it ma
 - [ ] Manual verification notes: confirm the twelve Fizzler redirects and the one `Unsafe` outlier, then re-verify each edited config against its deployed assembly version rather than against its sibling configs.
 
 Referred here from #418, which scoped both out explicitly: "Fizzler binding redirects" and "`System.Runtime.CompilerServices.Unsafe` redirects in any project other than `SVGControl.Test`". #418's `evidence/baseline/` artifacts and its research artifact carry the supporting assembly-metadata analysis.
+
+## Preparation Reconciliation (2026-10-02, origin/main 59cbab04f)
+
+The record above was captured 2026-08-04. The state on main at preparation time differs in three respects; the Acceptance Criteria below are written against the current state.
+
+- The `System.Runtime.CompilerServices.Unsafe` outlier is already fixed. All 17 `app.config` files redirect it to `6.0.3.0`, including `SVGControl/app.config` (changed by issue 929, PR 949). No edit is planned for it.
+- Fizzler: 13 configs carry a redirect. `SVGControl/app.config` (fixed by issue 929) and `UtilitiesCS/app.config` read `1.3.1.0`; eleven still read `oldVersion="0.0.0.0-1.3.0.0" newVersion="1.3.0.0"`. The deployed `Fizzler.dll` is `1.3.1.0` and the only csproj `Reference` for it is `1.3.1.0`.
+- A gate asserting that every `newVersion` in the repository matches a deployed version is not satisfiable today. A text-only measurement (all 17 configs, 1176 redirect entries, 18 csproj files) found 148 entries in 16 distinct assembly and version pairs whose `newVersion` is below the only csproj `Reference` version (Fizzler is one of the 16), and 29 entries for 3 assemblies with no csproj `Reference`. The gate in this fix therefore ratchets: it fails on any mismatch outside a recorded known-debt set and fails when a known-debt entry stops mismatching. Correcting the other 15 pairs is out of scope for this fix and is reported as a follow-up.
+
+## Acceptance Criteria
+
+- [x] AC1: All 13 `app.config` files that carry a Fizzler `bindingRedirect` read `oldVersion="0.0.0.0-1.3.1.0" newVersion="1.3.1.0"`; the 11 stale files (QuickFiler, QuickFiler.Test, SVGControl.Test, Tags, TaskMaster, TaskTree, TaskVisualization, TaskVisualization.Test, ToDoModel, ToDoModel.Test, UtilitiesCS.Test) each change on that one line only, with the UTF-8 BOM and CRLF line endings preserved.
+- [x] AC2: All 17 `app.config` files still redirect `System.Runtime.CompilerServices.Unsafe` to `6.0.3.0` (already delivered by issue 929; verified, not edited).
+- [x] AC3: A new Pester-tested detector reports a `bindingRedirect` whose `newVersion` equals no csproj `Reference` version for that assembly name, with a negative control (fixture redirect to a version no `Reference` provides yields one finding), a positive control (matching fixture yields none), and an examined-entry count that guards against a vacuous zero-finding pass.
+- [x] AC4: A repository-level Pester test runs the detector over every `app.config` against every csproj `Reference` and asserts that the findings equal exactly the recorded known-debt set (15 assembly and version pairs, none of them Fizzler or Unsafe) and that the unverifiable names equal exactly the recorded set of 3; a regression of any Fizzler redirect, a new mismatch, or a stale known-debt entry fails the test.
+- [x] AC5: The Fizzler regression test fails before the 11 config edits and passes after them (fail-before evidence recorded).
+- [x] AC6: PoshQC format, analyze, and test report no errors, and every exported function of the new module is exercised by at least one Pester test for its positive, negative, and edge paths. The Pester line-coverage figure for the new module is produced by the CI Pester job (workflow floor 80 percent, repository rule 85 percent) and is not measured locally.
 
 ## Next Step
 
