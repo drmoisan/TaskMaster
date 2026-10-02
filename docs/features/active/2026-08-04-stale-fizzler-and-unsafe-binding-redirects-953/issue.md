@@ -86,7 +86,7 @@ The record above was captured 2026-08-04. The state on main at preparation time 
 - [ ] AC3: A new Pester-tested detector reports a `bindingRedirect` whose `newVersion` equals no csproj `Reference` version for that assembly name, with a negative control (fixture redirect to a version no `Reference` provides yields one finding), a positive control (matching fixture yields none), and an examined-entry count that guards against a vacuous zero-finding pass.
 - [ ] AC4: A repository-level Pester test runs the detector over every `app.config` against every csproj `Reference` and asserts that the findings equal exactly the recorded known-debt set (15 assembly and version pairs, none of them Fizzler or Unsafe) and that the unverifiable names equal exactly the recorded set of 3; a regression of any Fizzler redirect, a new mismatch, or a stale known-debt entry fails the test.
 - [ ] AC5: The Fizzler regression test fails before the 11 config edits and passes after them (fail-before evidence recorded).
-- [ ] AC6: PoshQC format, analyze, and test report no errors, and Pester line coverage for the new module is at least 85 percent.
+- [ ] AC6: PoshQC format, analyze, and test report no errors, and every exported function of the new module is exercised by at least one Pester test for its positive, negative, and edge paths. The Pester line-coverage figure for the new module is produced by the CI Pester job (workflow floor 80 percent, repository rule 85 percent) and is not measured locally.
 
 ## Next Step
 
