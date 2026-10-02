@@ -184,3 +184,116 @@ DROPPED [REPLACED]:                     + "report unchecked.",
 ```
 
 Numstat after format: `35	15	TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`; porcelain (TaskMaster/Ribbon): ` M TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`. Every REINDENTED line, trimmed, is on the allow-list (`try`, `{`, `}`, `catch (Exception)`, the sink line, the discarded comment); every REPLACED line is a summary, comment, E3 or E4 line; NET try/catch/finally 0; ADDED-LINE-COUNT 35 is at least 24; OBSERVED-DELTA 20 equals EXPECTED-DELTA. Every P2-T7 clause holds; no repair was needed.
+
+## POST-FORMAT: (P3-T2, after the repository-wide format of P3-T1)
+
+Timestamp: 2026-10-02T00-08. Tokens (TOKENS-PROD and the stripped tokens):
+
+```
+TOKEN [keyed by engine and base-exception type;] = 1
+TOKEN [Never cleared: a cached key never primes.] = 1
+TOKEN [(string EngineName, Type FaultType),] = 1
+TOKEN [unless the same failure kind was already reported for this engine] = 1
+TOKEN [Repeat suppression (issue #948)] = 1
+TOKEN [directly after the sink call, so a sink that throws leaves the report owed.] = 1
+TOKEN [report (if any) has returned] = 1
+TOKEN [deliberately skipped as an already reported kind] = 1
+TOKEN [var reportKey = (EngineName: engineName, FaultType: failure.GetType());] = 1
+TOKEN [if (!_reportedPrimeFaults.ContainsKey(reportKey))] = 1
+TOKEN [_reportedPrimeFaults[reportKey] = 0;] = 1
+TOKEN [_logError(BuildPrimeFailedMessage(engineName), failure);] = 1
+TOKEN [_primeTasks.TryRemove(engineName, out _);] = 1
+TOKEN [+ "report unchecked. Further failures of this kind for this engine are not "] = 1
+TOKEN [+ "logged again.",] = 1
+TOKEN [+ "report unchecked.",] = 0
+TOKEN [deliberately suppressed as a repeat of] = 1
+TOKEN [_reportedPrimeFaults] = 4
+TOKEN [_reportedPrimeFaults.TryAdd(] = 0
+TOKEN [_reportedPrimeFaults.TryRemove(] = 0
+TOKEN [_reportedPrimeFaults.Clear(] = 0
+TOKEN [until the report has] = 0
+TOKEN [lock (] = 1
+TOKEN [Monitor.] = 0
+TOKEN [SemaphoreSlim] = 0
+TOKEN [Mutex] = 0
+TOKEN [ReaderWriterLockSlim] = 0
+TOKEN [#nullable] = 0
+STRIPPED [ConcurrentDictionary<(stringEngineName,TypeFaultType),byte>_reportedPrimeFaults] = 1
+STRIPPED [>_reportedPrimeFaults=newConcurrentDictionary<(string,Type),byte>();] = 1
+```
+
+Shape (CMD-COMPLETEPRIME-SHAPE):
+
+```
+FILE-LINES: 496
+FILE-CATCH-CODE-LINES: 3
+FILE-TRY-CODE-LINES: 4
+FILE-FINALLY-CODE-LINES: 1
+FILE-LOCK-LINES: 1
+SINK-GUARD-TOKEN: 1
+SPAN [CompletePrime] = 405-435
+SPAN-TRY: 1
+SPAN-CATCH: 1
+SPAN-FINALLY: 0
+SPAN-LOCK: 0
+SINK-LINE: 425 count=1
+REMOVE-LINE: 434 count=1
+COMMENT-LINE: 416 count=1
+REPORTKEY-LINE: 420 count=1
+GUARD-LINE: 421 count=1
+RECORD-LINE: 426 count=1
+TRY-LINE: 423
+CATCH-LINE: 428
+CATCH-END-LINE: 431
+FINALLY-LINE: 0
+LAST-STATEMENT-LINE: 434
+REMOVE-IS-LAST: True
+COMMENT-LINES: 4
+SHAPE: S
+E4-ANCHOR-TEXT: /// been attempted or deliberately suppressed as a repeat of a kind already reported.
+```
+
+Added lines (over `git diff -U0 MERGE-BASE`):
+
+```
+ADDED-LINE-COUNT: 35
+DROPPED-LINE-COUNT: 15
+ADDED-CATCH-LINES: 1
+DROPPED-CATCH-LINES: 1
+NET-CATCH-LINES: 0
+ADDED-TRY-LINES: 1
+DROPPED-TRY-LINES: 1
+NET-TRY-LINES: 0
+ADDED-FINALLY-LINES: 0
+DROPPED-FINALLY-LINES: 0
+NET-FINALLY-LINES: 0
+ADDED-TOKEN [lock (] = 0
+ADDED-TOKEN [lock(] = 0
+ADDED-TOKEN [Monitor] = 0
+ADDED-TOKEN [SemaphoreSlim] = 0
+ADDED-TOKEN [Mutex] = 0
+ADDED-TOKEN [ReaderWriterLockSlim] = 0
+ADDED-TOKEN [TimeProvider] = 0
+ADDED-TOKEN [DateTime] = 0
+DROPPED [REPLACED]:         /// been attempted.
+DROPPED [REPLACED]:         /// <c>logError</c>, and only then is the in-flight marker cleared so a later read may
+DROPPED [REPLACED]:         /// re-prime. A failure thrown by the sink itself is contained here, so the marker is
+DROPPED [REPLACED]:         /// cleared whether or not the report succeeded.
+DROPPED [REPLACED]:             // Report-then-clear is load-bearing: the marker stays registered until the report has
+DROPPED [REPLACED]:             // returned or thrown, so a caller that observes the marker absent — including one that
+DROPPED [REPLACED]:             // fetched the prime handle after the fault — is guaranteed the report has already been
+DROPPED [REPLACED]:             // attempted.
+DROPPED [REINDENTED]:             try
+DROPPED [REINDENTED]:             {
+DROPPED [REINDENTED]:                 _logError(BuildPrimeFailedMessage(engineName), failure);
+DROPPED [REINDENTED]:             }
+DROPPED [REINDENTED]:             catch (Exception)
+DROPPED [REINDENTED]:                 // Intentionally discarded: see the remarks on this method.
+DROPPED [REPLACED]:                     + "report unchecked.",
+```
+
+Numstat: `35	15	TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`. Porcelain (TaskMaster/Ribbon): no line printed (the change is committed at c4c4e758586148a011e7526d0e5d466c597edcef; after a commit the porcelain span asserts scope only, D-11).
+
+OBSERVED-DELTA: 20. Every P2-T7 clause holds on the post-format tree: tokens; SHAPE S; REPORTKEY 420 < GUARD 421 < SINK 425; RECORD 426 equals SINK plus 1; REMOVE 434 last; COMMENT-LINES 4 with COMMENT 416 < REPORTKEY 420; span and file keyword counts equal the P0-T6 baseline; GUARD 421 < TRY 423 < SINK 425 < CATCH 428 < CATCH-END 431 < REMOVE 434; NET try/catch/finally 0; every dropped line on its allow-list.
+
+Note: the first P3-T2 attempt combined the shape payload and the span-hash payload into one pwsh invocation; the worktree-removal PreToolUse hook refused it before execution (git together with the TryRemove token and the worktree path, the containment class the plan's Payload channel convention names). The two payloads were then run separately, as the plan writes them.

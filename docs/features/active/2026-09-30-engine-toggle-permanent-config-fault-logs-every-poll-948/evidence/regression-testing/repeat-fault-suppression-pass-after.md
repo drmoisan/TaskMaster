@@ -45,3 +45,35 @@ Timestamp: 2026-10-01T23-52. Sources: evidence/baseline/coordinator-tests-baseli
 - Pass-after failed: 0.
 - BASELINE-FAILED is NONE, so no baseline failure needed re-checking.
 - Every FAILED name of the fail-before run (GetPressed_AfterSuppressedFaults_LaterSuccessfulPrimeCachesStateAndInvalidatesOnce, GetPressed_WhenPrimeFaults_FirstReportStatesRepeatsAreNotLoggedAgain, GetPressed_WhenFailureKindChanges_LogsNewKindOnce, GetPressed_WhenPrimeFaultsRepeatedly_LogsFirstFaultOnly, GetPressed_WhenSpamFaultIsSuppressed_FirstTriageFaultIsStillLogged, HandleToggleClickAsync_AfterSuppressedPrimeFault_StillLogsToggleFault, GetPressed_WhenPrimeIsCanceledRepeatedly_LogsFirstCancellationOnly) appears as Passed in this run. No test is still failing.
+
+## FINAL-FIXTURE-RUN: (P3-T7)
+
+Timestamp: 2026-10-02T00-24
+Command: vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation "/TestCaseFilter:FullyQualifiedName~TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" "/ResultsDirectory:coverage\test-results\948\p3-t7" "/Logger:trx;LogFileName=p3-t7.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" (resolved through vswhere), on the assembly rebuilt by P3-T6
+EXIT_CODE: 0
+
+Pre-run process check: FOREIGN_CANDIDATES: 0; STRAY_TEST_PROCESSES: 0.
+
+```
+VSTEST_EXIT_CODE: 0
+TRX_PRESENT: True
+SEQUENCE_FILES: 0
+COUNTERS total=39 executed=39 passed=39 failed=0
+RESULT_COUNT: 39
+RESULT GetPressed_WhenSpamFaultIsSuppressed_FirstTriageFaultIsStillLogged = Passed
+RESULT GetPressed_WhenPrimeStarts_RegistersPrimeHandleBeforeActivationReadRuns = Passed
+RESULT GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse = Passed
+RESULT GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker = Passed
+RESULT ExecuteToggleAsync_WhenToggleFaults_PropagatesUnchanged = Passed
+RESULT GetPressed_WhenFailureKindChanges_LogsNewKindOnce = Passed
+RESULT GetPressed_WhenPrimeFaults_FirstReportStatesRepeatsAreNotLoggedAgain = Passed
+RESULT GetPressed_AfterSuppressedFaults_LaterSuccessfulPrimeCachesStateAndInvalidatesOnce = Passed
+RESULT HandleToggleClickAsync_AfterSuppressedPrimeFault_StillLogsToggleFault = Passed
+RESULT GetPressed_WhenPrimeFaults_PrimeHandleStaysRegisteredUntilFaultIsLogged = Passed
+RESULT GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime = Passed
+RESULT HandleToggleClickAsync_WhenToggleFaults_LogsErrorDoesNotThrowDoesNotInvalidate = Passed
+RESULT GetPressed_WhenPrimeIsCanceledRepeatedly_LogsFirstCancellationOnly = Passed
+RESULT GetPressed_WhenPrimeFaultsRepeatedly_LogsFirstFaultOnly = Passed
+```
+
+No FAILED line was printed. EXIT_CODE 0; SEQUENCE_FILES 0; COUNTERS failed 0 with total 39 equal to BASELINE-TOTAL (32) plus 7; all fourteen NAMES-948 names Passed.

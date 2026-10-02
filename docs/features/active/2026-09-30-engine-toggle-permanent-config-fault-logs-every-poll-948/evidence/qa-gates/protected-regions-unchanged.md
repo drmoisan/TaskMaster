@@ -70,3 +70,31 @@ PROTECTED-PARTIAL-COUNT: 5
 ```
 
 Every P2-T8 clause holds; no repair was needed.
+
+## POST-FORMAT: (P3-T2, after the repository-wide format of P3-T1)
+
+Timestamp: 2026-10-02T00-08. CMD-PROTECTED-SPANS (both signature lists) and the protected-files payload re-run on the post-format tree (hash fields abbreviated to line ranges; equality is computed on the hashes):
+
+```
+SPAN-HASH [internal EngineToggleStateCoordinator(] left=104-118 work=113-127 equal=True
+SPAN-HASH [internal bool GetPressed(string engineName)] left=137-151 work=146-160 equal=True
+SPAN-HASH [internal async Task HandleToggleClickAsync(string engineName)] left=173-196 work=182-205 equal=True
+SPAN-HASH [internal async Task ExecuteToggleAsync(string engineName)] left=219-246 work=228-255 equal=True
+SPAN-HASH [internal Task GetPrimeTask(string engineName)] left=261-269 work=270-278 equal=True
+SPAN-HASH [private void StartPrimeIfNeeded(string engineName, string controlId)] left=275-300 work=284-309 equal=True
+SPAN-HASH [private void StartObservedPrime(] left=316-340 work=325-349 equal=True
+SPAN-HASH [private async Task ApplyPrimeAsync(] left=347-362 work=356-371 equal=True
+SPAN-HASH [private static string RenderEngineName(string engineName)] left=421-424 work=440-443 equal=True
+SPAN-HASH [private static string BuildUnavailableMessage(string engineName)] left=429-437 work=448-456 equal=True
+SPAN-HASH [private static string BuildToggleFailedMessage(string engineName)] left=442-449 work=461-468 equal=True
+SPAN-HASH [private static string BuildUnmappedKeyMessage(string engineName)] left=467-474 work=487-494 equal=True
+SPAN-HASH [private void CompletePrime(Task completed, string engineName)] left=391-416 work=405-435 equal=False
+SPAN-HASH [private static string BuildPrimeFailedMessage(string engineName)] left=454-462 work=473-482 equal=False
+SPAN-HASH [PRIMETASKS-DECLARATION] left=78-81 work=78-81 equal=True
+PROTECTED-PARTIALS: TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeRegistration.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.ThrowingSink.cs, TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs
+PROTECTED_FILES_DIFF_EXIT=0
+RUNSETTINGS_DIFF_EXIT=0
+PROTECTED-PARTIAL-COUNT: 5
+```
+
+Every P2-T8 clause holds on the post-format tree: all twelve protected spans and the declaration equal; both edited spans differ; PROTECTED-PARTIAL-COUNT 5 equals ANCHOR-PARTIAL-COUNT; PROTECTED_FILES_DIFF_EXIT=0; RUNSETTINGS_DIFF_EXIT=0.
