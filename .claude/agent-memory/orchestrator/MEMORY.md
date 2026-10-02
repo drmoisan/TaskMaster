@@ -1,6 +1,7 @@
 # Orchestrator Memory Index
 
 ## Lifecycle, promotion, checkpoint
+- [Isolated child: wait via git pickaxe; name the item in Agent prompts](isolated-child-liveness-wait-and-delegation-target-lines.md) — no sleep route; `Canonical issue number` + `branch:` lines
 - [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) · [Small-path = minor-audit](small-path-minor-audit-selection.md) — 1-3 prod files = small path
 - [potential_to_issue creates the issue](potential-to-issue-creates-github-issue.md) · [needs an absolute path](potential-to-issue-needs-absolute-path.md) · [maps sections by heading](potential-to-issue-keeps-only-summary-section.md)
 - [Promotion potential .md may not persist](promotion-potential-md-may-not-persist.md) · [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md)
