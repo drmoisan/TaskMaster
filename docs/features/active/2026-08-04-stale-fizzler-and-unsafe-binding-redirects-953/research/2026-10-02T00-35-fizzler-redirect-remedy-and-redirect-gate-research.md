@@ -38,7 +38,7 @@ Grep of `System.Runtime.CompilerServices.Unsafe` -A1 over `**/app.config` return
 - `SVGControl/packages.config:4` and `UtilitiesCS/packages.config:11`: `Fizzler` version `1.3.1`.
 - No other csproj or packages.config mentions Fizzler. The other 11 configs name Fizzler only through the redirect; those projects receive Fizzler.dll transitively by project reference (copy-local) [inference from UtilitiesCS being the common dependency; [U] not built here].
 - `using Fizzler;` appears in `SVGControl/PictureBoxSVG.cs:15`, `UtilitiesCS/.../Triage_OlLogic.cs:9`, `.../BayesianClassifier.cs:14`, `.../MailItemHelper.cs:11`. The #418 research (`docs/features/archive/2026-08-04-svg-renderer-null-document-nre-418/research/2026-08-04T15-05-svg-renderer-null-document-research.md:94,270-276`) records that Svg/ExCSS carry no Fizzler AssemblyRef and the usings are unused, so the redirects are inert today. Not re-verified here (no binaries in the worktree).
-- Packages tree: absent in the worktree (Glob `packages/*` returned nothing). Main checkout (read-only): `C:\Users\DanMoisan\repos\TaskMaster\packages\Fizzler.1.3.1\lib\netstandard2.0\Fizzler.dll` and `netstandard1.0` exist; also `Svg.3.4.8`, `ExCSS.4.3.2`, `System.Runtime.CompilerServices.Unsafe.6.1.2`.
+- Packages tree: absent in the worktree (Glob `packages/*` returned nothing). Main checkout (read-only): `<main-checkout-root>\packages\Fizzler.1.3.1\lib\netstandard2.0\Fizzler.dll` and `netstandard1.0` exist; also `Svg.3.4.8`, `ExCSS.4.3.2`, `System.Runtime.CompilerServices.Unsafe.6.1.2`.
 
 ### 1.4 Binding-redirect autogeneration [V]
 

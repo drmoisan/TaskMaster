@@ -248,7 +248,7 @@ Describe 'Repository binding redirects (issue 953)' {
         $configPath = @(
             Get-ChildItem -LiteralPath $script:RepoRoot -Directory |
                 ForEach-Object { Join-Path $_.FullName 'app.config' } |
-                Where-Object { Test-Path -LiteralPath $_ }
+                    Where-Object { Test-Path -LiteralPath $_ }
         )
         $configPath.Count | Should -BeGreaterThan 9
 
@@ -278,12 +278,12 @@ Describe 'Repository binding redirects (issue 953)' {
         $configPath = @(
             $rootDirectory |
                 ForEach-Object { Join-Path $_.FullName 'app.config' } |
-                Where-Object { Test-Path -LiteralPath $_ }
+                    Where-Object { Test-Path -LiteralPath $_ }
         )
         $projectPath = @(
             $rootDirectory |
                 ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Filter '*.csproj' -File } |
-                ForEach-Object { $_.FullName }
+                    ForEach-Object { $_.FullName }
         )
         $configPath.Count | Should -BeGreaterThan 9
         $projectPath.Count | Should -BeGreaterThan 9

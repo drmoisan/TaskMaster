@@ -110,7 +110,7 @@ function Find-StaleBindingRedirect {
             $examined++
             $deployed = @(& $DeployedVersionProvider $record.Name |
                     Where-Object { -not [string]::IsNullOrEmpty([string]$_) } |
-                    ForEach-Object { [string]$_ })
+                        ForEach-Object { [string]$_ })
             if ($deployed.Count -eq 0) {
                 if (-not $unverifiable.Contains($record.Name)) { $unverifiable.Add($record.Name) }
                 continue
