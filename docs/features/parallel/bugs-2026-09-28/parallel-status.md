@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 7
 - recolor_generation: 7
-- last_updated: 2026-10-02T01-06
-- next_step: 950 and 952 in flight (cohort 7); await PRs then CI confirm and merge
+- last_updated: 2026-10-02T01-24
+- next_step: 950 and 952 in flight; 952 PR 970 open at 147277c9f, CI pending, AC5 check-off to follow; await child DONE then confirm and merge
 
 ## Items
 
@@ -32,7 +32,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/965 | 59cbab04f1c854baa2a03b6cbf755c1df4f961b4 |
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/969 | 34c2ed88cbb009f2f231453db87bc64d45a9bd51 |
 | 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | in_flight | worktree_created |  |  |
-| 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | in_flight | worktree_created |  |  |
+| 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/970 |  |
 
 ## Item Lifecycle Timestamps
 
