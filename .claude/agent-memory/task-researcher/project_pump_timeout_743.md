@@ -56,10 +56,14 @@ names as failing — which falsifies the lead as a dominant cause without any me
   so gate contention is structurally impossible under the #743 command.
 - **MSTest default is NON-cooperative timeout.** `useCooperativeCancellation` defaults to `false`
   (Microsoft Learn "Configure MSTest", `mstest.timeout` table); the repo has no `testconfig.json` and
-  no `CooperativeCancellation` entry in any `.runsettings`. Default `false` means MSTest DOES stop
-  observing a timed-out method, so an `async Task` test's `finally` — where the gate is released —
-  may never run. `#511 spec.md:132-139` recorded this cascade and deliberately left it unfixed; #493
-  did not close it.
+  no `CooperativeCancellation` entry in any `.runsettings`. Default `false` means MSTest stops
+  observing a timed-out method, but the Learn `TimeoutAttribute` page (moniker `mstest-net-4.4`) says
+  the method task "will continue running on background" — so the `finally` that releases the gate
+  DOES still run, just late (H-LEAK-weak), and the parameterless `WaitAsync()` cannot see the
+  cancelled token (H-TOKEN-BLIND). "Never released" (H-LEAK-strong) is NOT established; do not
+  repeat the "finally may never run" wording (corrected 2026-09-28 in #882 research refresh).
+  `#511 spec.md:132-139` recorded the cascade and left it unfixed; #493 did not close it; #743
+  merged only counters + one test, the acquisition at `FX:149` is still unbounded.
 - **A marshalling seam alone cannot make these tests cheap.** `QfcItemController` reaches the viewer
   through 14 `(ItemViewer)_itemViewer` concrete casts plus
   `ResolveControlGroupsAsync(ItemViewer itemViewer)`, and `ViewerSetup.cs:288` calls
