@@ -50,4 +50,5 @@
 - [Compute the complexity floor before choosing a band](feedback_compute_the_complexity_floor_before_choosing_a_band.md) - race/flaky items carry concurrency_or_ordering, a C3 floor that footprint cannot lower; I launched 942 at C2 below it
 - [Verify a removal's stated premise before recording it](feedback_verify_a_removals_stated_premise_before_recording_it.md)
 - [Remediate related defects in-item](feedback_remediate_related_defects_in_item.md) - maintainer directive 2026-10-02: related findings are fixed inside the item, never listed as follow-ups; paste the directive block into every child prompt
+- [Relay a mid-run scope change via issue.md](feedback_relay_midrun_scope_change_through_issue_md.md) - no SendMessage here; commit the change into the child's issue.md plus a superseded-scope banner on its research
 - [Children rephrase edits past hooks](feedback_children_rephrase_edits_past_hooks.md) - "report, don't work around" still let a child retry with a new old_string; forbid rephrasing outright and read the diff yourself
