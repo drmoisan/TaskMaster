@@ -7,6 +7,8 @@ metadata:
 
 # Artifact hygiene and miscellaneous execution gotchas
 
+# Sub-index: Artifact hygiene and miscellaneous execution lessons
+## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) · [Never predict an observation](feedback_never_predict_an_observation_into_an_artifact.md)
 - [<TS> drifts ahead of write time](project_evidence_timestamp_labels_drift_ahead_of_write_time.md) · [Probe literal trips the NEXT sweep](project_selftest_probe_literal_trips_the_next_sweep_pass.md)
 - [TRX sanitisation is case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) · [TRX/msbuild need a sanitisation micro-action](project_vstest_trx_evidence_needs_sanitisation_task.md)

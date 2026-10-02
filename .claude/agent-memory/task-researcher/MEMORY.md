@@ -34,16 +34,20 @@
 - [pump-timeout-743](project_pump_timeout_743.md) — dispatcher-gate lead stale (#493); 9/19 pump tests skip the gate; TRX timestamps as instrument; finally runs LATE not never
 - [transactiongate-parallel-safe-probe-882](project_transactiongate_parallel_safe_probe_882.md) — zero-bound probes assert only failure while holding; success via production entry; no DoNotParallelize; SemaphoreFullException surfaces at holder's Dispose
 - [taskrun-triage-931](project_taskrun_triage_931.md) — 2/22 Task.Run sites thread-dependent; DispatchValue never reads _ownerThreadId; IFileInfo.OpenRead returns FileStream (no MemoryStream)
+- [exemption-audit-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — grep proven techniques + sibling consistency before IRREDUCIBLE
+- [engine-toggle-prime-fault-log-order-942](project_engine_toggle_prime_fault_log_order_942.md) — CompletePrime removes marker BEFORE log; H1 false; probe handle from inside the sink; NB-2 unpromoted
+- [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult on a pool thread INLINES; MSTest 4.4 bodies run inside Task.Run
 - [pump-timeout-743](project_pump_timeout_743.md) — dispatcher-gate lead stale (#493); 9/19 pump tests skip the gate; TRX timestamps as instrument
 - [uithread-dispatcher-restore-scope-493](project_uithread_dispatcher_restore_scope_493.md) — 2-lock split; never one semaphore for helper+fixture; CI runs QuickFiler.Test serially
 - [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — WinFormsPumpHost design; CreateAsync factory-seam gap
-- [onedrive-timeout-test-determinism-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask overload catches TimeoutException not TaskCanceled; DI-seam fix
+- [onedrive-timeout-test-determinism-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask overload catches TimeoutException not TCE; DI-seam fix
 - [unobserved-task-fault-670](project_unobserved_task_fault_670.md) — ViewerSetup.cs 499/500; IItemViewer.UiDispatcher is raw WPF Dispatcher
 - [filerqueue-consumer-unsound-633](project_filerqueue_consumer_unsound_633.md) — Consumer orphaned-item race; BackGroundMove tests vacuous
 - [terminal-hook-barrier-751](project_terminal_hook_barrier_751.md) — notify runs after terminal TrySet; `run.Terminal` is the barrier
 - [gettableinviewasync-null-contract-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts; OCE is not TCE
 - [analyzer-severity-and-runsettings-split](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 only rule above suggestion; no .globalconfig
 - [lock-recursion-coverage-317](project_lock_recursion_coverage_317.md) — deleted LockRecursionTests.cs is a restoration
+- [gettableinviewasync-null-contract-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts; OCE is not TCE
 
 ## Coverage / Cobertura mechanics
 - [cobertura-closure-exemption-457](project_cobertura_closure_exemption_457.md) — exempt members emit NO `<method>`; async `d__` trap
@@ -242,11 +246,14 @@
 - [ribbon-toggle-state-guards-505](project_ribbon_toggle_state_guards_505.md) — toggle vs command guard asymmetry
 - [ribbon-engine-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — 84 callback names (5 dead); ManagerAsyncLazy constructible
 - [fsharp-core-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; Sync-PackageReferences ranks ns2.1>2.0; ToDoModel.Test packages.config gap
+- [fsharp-core-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; Sync-PackageReferences ranks ns2.1>2.0; ToDoModel.Test gap
 - [ci-parallel-split-553](project_ci_parallel_split_553.md) — 4 independent jobs; check names "caller / callee"
 - [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — AGENTS.md externally owned; ~1.2s vs ~17s = vacuity
 - [console-out-and-rs0030-826](project_console_out_and_rs0030_promotion_826.md) — Directory.Build.props exists; CS0169/CS0414 is the hazard
 - [dependabot-net481-340](project_dependabot_net481_340.md) — semver-major ignore, no fabricated ceilings
 - [svgcontrol-test-unwired-418](project_svgcontrol_test_unwired_418.md) — STALE (in .sln since 2026-08-14); redirect topology historical
+- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — PQ setting no var substitution; rg-vs-git deltas; basename gotcha
+- [push-down-claude-dir-149](project_push_down_claude_dir.md) — #149 pushDownClaudeDir research (2026-04-16)
 - [winforms-testability-epic-298](project_winforms_testability_epic_298.md) — #298 depends on #297; inverts #197 exemptions
 - [tagcontroller-refactor-293](project_tagcontroller_refactor_293.md) — ITagViewer/IForm gaps; PrefixItem NotImplemented
 - [swordfish-removal-epic-306](project_swordfish_removal_epic_306.md) — legacy flat JSON round-trips via ScoDictionaryNew

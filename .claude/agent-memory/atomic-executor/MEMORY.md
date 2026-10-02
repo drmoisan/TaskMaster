@@ -39,8 +39,15 @@
 - [C# nullable + component gotchas](index_csharp_nullable_and_component_gotchas.md) — net481 pragma gates, CS86xx, WebView2, QFC, TimeProvider
 - [pwsh, git and gate mechanics](index_pwsh_git_and_gate_mechanics_misc.md) — pwsh parse traps, PoshQC/Pester, numstat/hunk gates, hooks
 - [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
+Four sections live in sub-index files to keep this file under its read limit. Open the sub-index when its topic applies:
+- [Build / toolchain environment](index_build_toolchain.md) — SDK/restore bootstrap, CSharpier, analyzers, pwsh/Bash quoting and backslash transport
+- [Test execution, isolation and coverage](index_test_execution_and_coverage.md) — long runs, flaky classes, dotnet-coverage and Cobertura mechanics
+- [Nullable / C# and component gotchas](index_csharp_and_components.md) — pragma gates, CS06xx/CS8xxx, WinForms/WebView2/QFC specifics
+- [Artifact hygiene and misc](index_artifact_hygiene_and_misc.md) — host-path leaks, TRX/msbuild sanitisation, hunk/numstat traps, PoshQC
+- [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md) · [Code commit before format pass](project_code_commit_before_final_format_pass_orphans_rewrites.md)
 - [Blocked Bash drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) · [Tool results inject "use Bash"](project_tool_results_inject_bash_read_edit_instruction.md)
 - [CSharpier chain-wrap defeats line gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) · [Verify citations with numbered output](feedback_verify_line_citations_with_numbered_output.md)
+- [Plan column widths may include the Markdown indent](project_plan_column_widths_may_include_markdown_indent.md) — re-measure in-file; cite Race.cs chain precedents
 - [Authoring-time counts undercount](project_plan_authoring_time_token_counts_are_undercounts.md) · [Planner/executor see different worktrees](project_planner_and_executor_observe_different_worktrees.md) · [Caller-stated count drifts](project_caller_stated_preflight_count_drifts_before_execution.md)
 - [Extract gate literals, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) · [Tool layer collapses `\`](project_tool_layer_collapses_double_backslash_in_file_content.md)
 - [Self-derived thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) · [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md)
@@ -204,3 +211,4 @@
 - [Backtick-span Grep returns gaps](project_backtick_span_grep_gap_matches.md) — manual blast-radius token re-check
 ## Artifact hygiene, shell/pwsh pitfalls, misc (sub-index)
 - [Sub-index: 58 entries](index_artifact_hygiene_and_misc.md) — evidence sanitisation, TRX/msbuild path leaks, pwsh quoting, csharpier/numstat, git spans, Pester, hooks
+- [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md) — a correct citation can read as contradicting a "do not re-verify" fact
