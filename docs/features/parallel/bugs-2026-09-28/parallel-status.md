@@ -7,10 +7,10 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - parallel_slug: bugs-2026-09-28
 - mode: open
 - max_concurrency: 6
-- current_cohort: 5
+- current_cohort: 6
 - recolor_generation: 6
-- last_updated: 2026-10-01T22-37
-- next_step: 956 PR 965 open at e66a8af15, CI run 36956274475 in progress (4 of 7 green); await child DONE then confirm checks on exact head and merge
+- last_updated: 2026-10-01T22-42
+- next_step: 956 merged as 59cbab04f (PR 965); cohort 5 terminal, current_cohort 6. 948 (cohort 6) scheduled, not launched: awaiting coordinator release. Worktree cleanup deferred.
 
 ## Items
 
@@ -29,7 +29,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 941 | docs/features/active/2026-09-29-breadcrumb-dispatch-message-and-handoff-record-inaccurate-941 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/958 | 6c710a45dd61710658ea8e60588fb4108cf15b6f |
 | 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/960 | 9a3d2dd3e8ec60af65b0d4f9f728eefc0aaaf970 |
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
-| 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/965 |  |
+| 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/965 | 59cbab04f1c854baa2a03b6cbf755c1df4f961b4 |
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
@@ -49,7 +49,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 941 | 2026-10-01T06-28 | 2026-10-01T06-33 | 2026-10-01T11-57 |  |
 | 951 | 2026-10-01T12-05 | 2026-10-01T12-10 | 2026-10-01T12-29 |  |
 | 947 | 2026-10-01T17-26 | 2026-10-01T17-29 | 2026-10-01T18-41 |  |
-| 956 | 2026-10-01T20-28 | 2026-10-01T20-31 |  |  |
+| 956 | 2026-10-01T20-28 | 2026-10-01T20-31 | 2026-10-01T22-42 |  |
 | 948 | 2026-10-01T20-39 |  |  |  |
 
 ## Cohorts
