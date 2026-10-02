@@ -52,6 +52,16 @@ everything does — so neither an all-clear nor an all-conflict result is self-v
    and an accurate value is the useful one. A derived radius carrying a broad `**/…` glob will
    also contend with essentially every item forever — worth reporting when you see one.
 
+5. **A filename glob in the CANDIDATE's radius contends with every other item's feature-folder
+   glob.** Observed 2026-10-01 on `/parallel-add 956`: the plan harvested `**/SortEmail*.cs`, and
+   that single entry conflicted with all 13 items because each carries
+   `docs/features/active/<slug>/**`, and the relation treats two globs with a non-empty language
+   intersection as overlapping (a hypothetical `docs/features/active/<slug>/x/SortEmail1.cs` matches
+   both). 12 of 13 edges had no tracked file in common. Diagnose with a counterfactual run that
+   drops the glob (diagnosis only, never written — narrowing is prohibited) plus a glob-only probe
+   radius. Harmless when every neighbour is merged (placement only), but it serializes the item
+   against any later add, so record it in `blast_radius_note` as a live glob.
+
 **How to apply:** Before trusting a fresh computation, replay it against the edges already
 in `parallel-orchestrator-state.json` and require an exact match on `conflict`, on the
 reason `kind` set, and on each `detail` string. That replay is what proves the convention

@@ -49,6 +49,12 @@ The same hazard bit a large Markdown append: a `cat > file <<'EOF'` heredoc carr
 prose died with ``unexpected EOF while looking for matching `'``. Write the body with the Write tool
 to the scratchpad and `cat` it onto the target instead of embedding prose in a heredoc.
 
+**Not always reproducible (2026-10-01, #956):** a scratch probe written with the Write tool containing
+`$"{olAncestor}\\{destinationOlStem}"` read back with 2 backslashes, and the C# files written the
+same way passed a whitespace-stripped exact-equality gate against the original. The collapse may
+depend on the session/tool version, so probe first (Write a one-line scratch file outside the repo,
+count `[char]92` with pwsh) rather than assuming either behavior; keep a content gate as the verifier.
+
 Related: [[preflight-gate-literal-extract-from-plan-not-retype]] covers the read side (extract gate
 literals programmatically); this note covers the write side. Verify with Python `str.count()` on a
 fixed string rather than `grep -F`, which returned 0 for a literal Python counted as 1.

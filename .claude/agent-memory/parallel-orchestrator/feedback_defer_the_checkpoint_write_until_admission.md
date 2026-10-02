@@ -156,6 +156,14 @@ structural reading (two conflicting items in one cohort, merged or not). Barrier
 prior-cohort neighbours were already merged. Do not filter terminal members out of the set to
 avoid the generation bump.
 
+**All-terminal run + DEFER: pass `current_cohort = max index + 1`, or the engine re-places the
+candidate INTO the conflicting cohort.** With no pinned item `crosses_pinned` is False, so
+`recolor_unstarted` offsets by `current_cohort` alone. Observed 2026-10-01 on `/parallel-add 947`:
+every item merged, checkpoint `current_cohort` 3, candidate conflicting with merged 941 in cohort 3;
+passing 3 returns index 3, a Layer 2 structural violation. Cohorts 0-3 held no non-terminal item,
+so 4 is the correctly re-derived value (and the lowest non-terminal index after the write). Assert
+in the write script that no current-generation row holds both ends of an edge.
+
 **`current_cohort_members` must include `scheduled` members, not just pinned ones.** That is
 exactly what made 656 defer: 646 was never in flight, only admitted and waiting. An admission
 check written against the `in_flight` subset alone would have missed it and admitted 656

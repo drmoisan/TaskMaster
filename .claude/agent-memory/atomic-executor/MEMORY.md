@@ -12,7 +12,7 @@
 - [Supersede residual](project_supersede_clause_leaves_hard_routing_residual.md) · [No dispatch tool](project_plan_delegation_to_typed_engineer_without_dispatch_tool.md) · [Check-off fixpoint](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md)
 - [Tracked agent-memory](project_agent_memory_tracked_breaks_unscoped_git_gates.md) · [Merge-base cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) · [BASELINE_SHA merged base](project_baseline_sha_diff_conflates_merged_base.md)
 - [Epic inherited commits](project_epic_child_branch_anchored_diff_lists_inherited_commits.md) · [Moving-base diff](project_preflight_moving_base_two_dot_diff_inertness_test.md) · [Renumbering](project_plan_task_ids_digit_only_forces_renumbering.md)
-- [Bugfix grows file](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md)
+- [Bugfix grows file](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) · [Write drops BOM](project_write_tool_drops_utf8_bom_edit_prefix_restores_it.md)
 - [AC check-off paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) · [Override is not an AC](project_orchestrator_override_does_not_satisfy_an_ac.md) · [Output Summary count](project_artifact_output_summary_breaks_its_own_exact_count_gate.md)
 - [Scope gate vs later artifacts](project_scope_gate_cannot_list_artifacts_written_after_it.md) · [Sibling-owned zero gate](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) · [Dir-scoped format](project_directory_scoped_format_breaks_ownership_gates.md)
 - [Proportionate bar](feedback_confirmatory_preflight_proportionate_bar.md) · [4 C# defect classes](project_preflight_recurring_csharp_plan_defect_classes.md)
@@ -23,6 +23,9 @@
 - [Research arithmetic](project_plan_literal_assertions_inherit_research_arithmetic.md) · [Fix tasks inherit rules](project_preflight_fix_tasks_inherit_decomposition_rules.md) · [Conditional split](project_conditional_split_three_task_shape.md)
 - [No round diff](project_preflight_round_over_round_diff_unavailable.md) · [Flaky carve-out](project_flaky_test_carveout_added_to_one_task_only.md) · [Bullet negates clause](project_revision_bullet_negates_earlier_clause_left_standing.md)
 - [Mid-run main merge re-anchor](project_midrun_main_merge_reanchor_scope_phrasing.md) (an "in pass 2" scope misses post-loop tasks; restart basis not restated in the conventions)
+- [Multi-line trx MESSAGE; Markdown-indent width](project_trx_message_multiline_and_markdown_indent_width.md) (Moq Verify splits reason and count onto two lines; recount wrap claims without the 4-space indent)
+- [Ambient drainable SyncContext is vacuous](project_ambient_drainable_synccontext_is_vacuous_without_async_continuations.md) (same-thread SetResult inlines; needs RunContinuationsAsynchronously)
+- [Glob blind under .claude/worktrees](project_glob_tool_blind_under_claude_worktrees.md) (empty Glob in an item worktree is not absence; use Read/Grep)
 - [gh/CI-log traps](project_gh_ci_log_and_download_gotchas.md) (createdAt trips pr-author hook; ANSI in Pester log; gh download never overwrites) · [Abbreviated caller facts](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md)
 
 ## Build / toolchain environment

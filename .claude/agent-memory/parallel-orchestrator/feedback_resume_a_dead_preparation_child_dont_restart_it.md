@@ -249,5 +249,20 @@ the text is HTML-escaped, so `&lt;TS&gt;` means `<TS>`). The grandchild's own `.
 Apply the text yourself (Edit is allowed in `docs/features/active/`), commit, push, then delegate
 ONE confirming preflight non-isolated in the same worktree. One child, about 4 minutes.
 
+**Sixth case, 2026-10-01 `/parallel-add 956`: died DURING planning on a quota stop, and the child
+said so in-band.** The last commit subject read `save the incomplete plan draft ... at the quota
+stop` and the plan header carried `INCOMPLETE: stopped for quota`, so diagnosis was two reads. One
+non-isolated child in the existing worktree completed the plan in place (132 to 1803 lines) and
+cleared preflight in 2 rounds, about 90 minutes. Poll the plan file mtime and line count, not only
+HEAD: the tree stayed clean for ~25 minutes while the planner read, which looks like a dead child.
+
+**Sixth case, 2026-10-01 `/parallel-add 948`: the plan was a PARTIAL draft marked `INCOMPLETE: stopped for
+quota` with `SELF-REVIEW: BLOCKED`.** Design, AC table, and delivered source were done; phases were not.
+One non-isolated preparation child finished it in place and cleared preflight in 3 rounds (about 2.5 h).
+Agent-memory directories are absolute paths into the primary checkout, so a non-isolated child's
+subagents write memory into the SESSION tree even when told not to. Expect those files there, not on
+the item branch. Meanwhile the pinned sibling merged and a new add landed, so the verdict stayed DEFER
+but against a different neighbour; recompute, never carry.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].

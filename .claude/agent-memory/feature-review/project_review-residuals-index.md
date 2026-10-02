@@ -134,3 +134,8 @@ not the full record.
   `quality-tiers.yml` still absent. Hook note: a stale session-cwd `pr_context.summary.txt` listing only
   `.csproj`/`.yml`/`.md` disarms the C# check (`^\.cs$` does not match `.csproj`); artifact tokens were
   advertised with the 3-`..` traversal form from [[928-review-residuals]], no mirror written.
+- **#956** (SortEmail six-way partial split + `YesNoToAllPromptSession` seam, parallel run bugs-2026-09-28,
+  full-bug, Bash limited to `git diff`/`git log`): 17/17 AC PASS, 0 blocking, 6 non-blocking. First-party
+  85.33/79.71 -> 85.36/79.75; TrySave class 63/66 with exactly L49/L154/L155 at 0 hits (coordinator-ruled
+  exemptions, reviewer concurred); session 20/20. Details and the Cobertura-Grep attribute-order lesson in
+  [[956-review-residuals]].
