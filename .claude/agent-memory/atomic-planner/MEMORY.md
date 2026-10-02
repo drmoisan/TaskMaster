@@ -2,6 +2,9 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#964 R3](project_964_r3_glob_backslash_and_hit_attribution_seams.md) — Glob paths are backslash (rev-parse HEAD: needs `/`); totals-only sweep can't decide per-file branch
+- [#964 R2](project_964_r2_preparation_record_closed_evidence_set.md) — preparation commits preflight-clearance.*.md before execution; closed evidence sets must admit + blob-pin it
+- [#964 R0-R1](project_964_partial_split_sink_guard_plan_seams.md) — Grep tokens are regex; ordinal multiset split census; pre-existing-failure rule must compare trx FQNs (testName is short); last-task hygiene sweep
 - [#950 R2](project_950_r2_self_matching_process_probe_and_bom_numstat_seams.md) — CommandLine process probe counts itself (exclude $PID); BOM drop adds +1/-1 numstat; failed set hides aborted tests
 - [#950 R1](project_950_r1_inline_continuation_and_reindent_width_seams.md) — default TCS continues inline so Drain() is vacuous (RunContinuationsAsynchronously + delete-Drain control); using() re-indent breaks width
 - [#950 v1.0](project_950_hygiene_blocks_absolute_prefix_and_always_failing_probe_seams.md) — absolute prefix in Command rows breaks hygiene rule B; always-failing probe; commit task's own artifact in porcelain; re-indent vs added-line scans

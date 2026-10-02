@@ -242,3 +242,4 @@
 - [Build-lock: COORDINATOR-HOLD, waiter kill](shared-build-lock-coordinator-hold-and-waiter-kill.md)
 - [COMMIT NOW while executor runs](commit-now-while-executor-runs-docs-only.md) — commit feature-folder Markdown yourself
 - [dotnet-coverage hits are binary](dotnet-coverage-binary-hits-break-hit-count-gates.md) — hit-count comparisons unsatisfiable; use the branch row
+- [Clearance record breaks a closed evidence set](preparation-clearance-record-breaks-closed-evidence-set.md) — tell the planner in round 1 that preflight-clearance.<ts>.md will be committed pre-execution
