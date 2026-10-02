@@ -49,3 +49,30 @@ Feature documents: spec.md (check-off edits only), the plan file (task check-off
 - Inside the production file: GetPressed, HandleToggleClickAsync, ExecuteToggleAsync, StartPrimeIfNeeded, StartObservedPrime, ApplyPrimeAsync, the constructor, the _primeTasks declaration, the GetPrimeTask body, RenderEngineName, BuildUnavailableMessage, BuildToggleFailedMessage and BuildUnmappedKeyMessage are not edited.
 - No raw trx, cobertura, coverage, coveragexml document or msbuild log is copied into the feature folder.
 - No orchestration state file is written or named.
+
+## PHASE0-ARTIFACTS:
+
+Listing of evidence/baseline/ at P0-T18 (2026-10-01T23-33), with the field check (Timestamp, Command, EXIT_CODE, Output Summary present; NONZERO = a non-zero EXIT_CODE; EXPECTED = ExpectedExitCode present):
+
+```
+anchor-merge-base.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+anchor-production-shape.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+anchor-test-side.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+bootstrap-dotnet-coverage.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+bootstrap-nuget-restore.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+bootstrap-sdk.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+bootstrap-tool-restore.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+coordinator-tests-baseline.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+coverage-baseline.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+csharpier-check-baseline.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+file-line-counts-baseline.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+msbuild-analyzer-baseline.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+msbuild-nullable-baseline.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+phase0-instructions-read.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+pre-merge-docs-commit.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+scope-and-anchor.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+stall-probe.md TS=True CMD=True EXIT=True SUM=True NONZERO=True EXPECTED=True
+upstream-cited-files.md TS=True CMD=True EXIT=True SUM=True NONZERO=False EXPECTED=False
+```
+
+Every artifact named by P0-T1 through P0-T18 exists at its exact path (eighteen files); each carries the four fields; the one artifact with a non-zero EXIT_CODE (stall-probe.md, 1) carries ExpectedExitCode with the same value.
