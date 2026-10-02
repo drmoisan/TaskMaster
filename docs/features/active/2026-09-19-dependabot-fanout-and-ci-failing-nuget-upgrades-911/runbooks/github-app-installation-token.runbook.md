@@ -298,7 +298,7 @@ two-axis-model-selection specification's Out of Scope section and is not resolve
 - App registration UI navigation (steps 1–9). GitHub Docs — "Registering a GitHub App."
   https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app
   — captured 2026-09-19.
-- Private key generation and App ID location (steps 10–12), and the private-key security guidance in
+- Private key generation and Client ID location (steps 10–12), and the private-key security guidance in
   the Security Note. GitHub Docs — "Managing private keys for GitHub Apps."
   https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps
   — captured 2026-09-19.
