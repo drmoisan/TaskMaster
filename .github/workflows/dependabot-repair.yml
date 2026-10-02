@@ -11,9 +11,10 @@ name: dependabot-repair
 # restricts it by default from 2026-11-02.
 #
 # Credential: a GitHub App installation token minted from the App's Client ID, stored in
-# DEPENDABOT_REPAIR_APP_ID, and the private key in DEPENDABOT_REPAIR_APP_PRIVATE_KEY. When those secrets are absent the token step fails, the job
-# stops before it can push, and the pull request keeps the behaviour it has today. See
-# .github/workflows/README.md for the degraded mode and the installation runbook.
+# DEPENDABOT_REPAIR_APP_ID, and the private key in DEPENDABOT_REPAIR_APP_PRIVATE_KEY. When those
+# secrets are absent the token step fails, the job stops before it can push, and the pull request
+# keeps the behaviour it has today. See .github/workflows/README.md for the degraded mode and the
+# installation runbook.
 
 on:
   workflow_run:

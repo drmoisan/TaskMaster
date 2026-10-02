@@ -37,10 +37,10 @@ Line 301 reads "Private key generation and App ID location (steps 10-12)". The w
 
 ## Acceptance Criteria
 
-- [ ] Line 301 of `docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911/runbooks/github-app-installation-token.runbook.md` reads "Client ID location (steps 10–12)" in place of "App ID location (steps 10–12)", matching steps 10 and 22 and the YAML sample.
-- [ ] The token `App ID location` appears nowhere in that runbook (a fixed-string search returns zero matches).
-- [ ] The header comment block of `.github/workflows/dependabot-repair.yml` (the `# Credential:` paragraph, originally lines 13 through 16) is rewrapped so that no comment line in the file exceeds 100 characters, the width the other comment lines in the file use; the comment wording is unchanged.
-- [ ] No non-comment YAML content changes: the diff of `.github/workflows/dependabot-repair.yml` against `origin/main` adds and removes comment lines only (every added and removed line begins with `#` after the diff marker), and `scripts/dev-tools/run-actionlint.ps1` or the CI `actionlint` job passes.
+- [x] Line 301 of `docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911/runbooks/github-app-installation-token.runbook.md` reads "Client ID location (steps 10–12)" in place of "App ID location (steps 10–12)", matching steps 10 and 22 and the YAML sample.
+- [x] The token `App ID location` appears nowhere in that runbook (a fixed-string search returns zero matches).
+- [x] The header comment block of `.github/workflows/dependabot-repair.yml` (the `# Credential:` paragraph, originally lines 13 through 16) is rewrapped so that no comment line in the file exceeds 100 characters, the width the other comment lines in the file use; the comment wording is unchanged.
+- [x] No non-comment YAML content changes: the diff of `.github/workflows/dependabot-repair.yml` against `origin/main` adds and removes comment lines only (every added and removed line begins with `#` after the diff marker), and `scripts/dev-tools/run-actionlint.ps1` or the CI `actionlint` job passes.
 - [ ] The modified-workflow-needs-green-run rule (`.claude/skills/feature-review-workflow/SKILL.md`) is satisfied for the changed workflow file: a green run of the CI workflow against the branch head, including its `actionlint` job that lints `.github/workflows/dependabot-repair.yml`, is recorded as evidence. `dependabot-repair.yml` is `workflow_run`-triggered, filtered to `dependabot/` head branches, and defines no `workflow_dispatch` trigger, so no run of that workflow itself can occur against this branch head; that constraint and the comment-only diff are recorded as the disposition for the rule.
 
 ## Logs / Screenshots
