@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 8
 - recolor_generation: 9
-- last_updated: 2026-10-02T03-05
-- next_step: 953 launched (cohort 8), non-isolated, sonnet C2; 961 held; await PR then CI confirm and merge
+- last_updated: 2026-10-02T03-47
+- next_step: 953 PR 974 open at 119888f0e; await child DONE then confirm checks on exact head and merge; 961 held
 
 ## Items
 
@@ -33,7 +33,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/969 | 34c2ed88cbb009f2f231453db87bc64d45a9bd51 |
 | 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/971 | 860d67bf4fddecb929e0d6c166065fd1ee752feb |
 | 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/970 | ab14b126cbf065d446aec703c9581a3869baea05 |
-| 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | in_flight | worktree_created |  |  |
+| 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/974 |  |
 | 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
