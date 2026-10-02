@@ -86,6 +86,30 @@ namespace QuickFiler.Test.Viewers
             errors.Should().ContainSingle().Which.Message.Should().Contain("cannot marshal");
         }
 
+        /// <summary>
+        /// A value-producing dispatch on an owner-only dispatcher (null context) outside any
+        /// executing Dispatch callback must fault even when the caller is the owner thread.
+        /// </summary>
+        [TestMethod]
+        public void DispatchValue_OwnerOnlyOnOwnerThread_FaultsOutsideExecutingCallback()
+        {
+            // Arrange
+            var errors = new List<Exception>();
+            BreadcrumbUiDispatcher dispatcher = CreateOwnerOnlyDispatcher(errors.Add);
+            int executions = 0;
+
+            // Act
+            Task<int> result = dispatcher.DispatchValue(() => executions++);
+
+            // Assert
+            result.IsFaulted.Should().BeTrue("the null-context fault is synchronous");
+            Exception fault = result.Exception.InnerException;
+            fault.Should().BeOfType<InvalidOperationException>();
+            fault.Message.Should().Contain("outside an executing Dispatch callback");
+            executions.Should().Be(0);
+            errors.Should().ContainSingle().Which.Should().BeSameAs(fault);
+        }
+
         [TestMethod]
         public void Dispatcher_PostedFailure_ReportsOnceAndRestoresBoundary()
         {

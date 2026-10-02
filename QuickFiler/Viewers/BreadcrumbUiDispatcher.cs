@@ -180,7 +180,7 @@ namespace QuickFiler.Viewers
             if (_context == null)
             {
                 var failure = new InvalidOperationException(
-                    "The owner-thread-only test dispatcher cannot marshal cross-thread UI work."
+                    "The owner-thread-only test dispatcher cannot run value-producing UI work outside an executing Dispatch callback."
                 );
                 if (reportFailure)
                     Report(failure);

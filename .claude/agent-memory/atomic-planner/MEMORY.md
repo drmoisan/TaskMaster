@@ -2,6 +2,8 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#956 R1](project_956_r1_spec_self_hit_and_raw_doc_name_seams.md) — spec-wording counts self-hit the AC line; `cobertura` substring matches tracked agent-memory .md (anchor `cobertura[^/]*\.xml$`); orchestrator-amended AC needs a P0 literal check
+
 - [#945 R0](project_945_sortemail_trysave_directory_seam_plan_seams.md) — whitespace-stripped token census; compile-red fail-before (runtime-red would create a real dir); uncommitted-fix control via backup copy; no-commit plan, two-dot MERGE-BASE gates
 - [#839](project_839_createcancellationtoken_init_plan_seams.md) — lone dead-comment deletion not CSharpier-stable; post-commit porcelain must admit the plan's own check-off; never record a porcelain COUNT; Phase 0 diff sentences prospective; exempt commit form `-m ... -- path`
 - [#838 R1–R2](project_838_gettableinviewasync_null_contract_plan_seams.md) — timed CTS ctors DO exist (13 lines); porcelain gates assert SCOPE only; folder-wide commit task names NO artifact; repeatable literals at-least-one; ExpectedExitCode = observed value
