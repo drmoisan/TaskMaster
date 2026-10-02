@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 5
 - recolor_generation: 6
-- last_updated: 2026-10-01T21-31
-- next_step: 956 halted at P4-T8 on AC15 (unreachable braces after throw); awaiting coordinator ruling between option a (exempt 3 lines) and option b (restructure, conflicts AC6). Launch nothing until ruled.
+- last_updated: 2026-10-01T22-37
+- next_step: 956 PR 965 open at e66a8af15, CI run 36956274475 in progress (4 of 7 green); await child DONE then confirm checks on exact head and merge
 
 ## Items
 
@@ -29,7 +29,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 941 | docs/features/active/2026-09-29-breadcrumb-dispatch-message-and-handoff-record-inaccurate-941 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/958 | 6c710a45dd61710658ea8e60588fb4108cf15b6f |
 | 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/960 | 9a3d2dd3e8ec60af65b0d4f9f728eefc0aaaf970 |
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
-| 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | in_flight | worktree_created |  |  |
+| 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/965 |  |
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
