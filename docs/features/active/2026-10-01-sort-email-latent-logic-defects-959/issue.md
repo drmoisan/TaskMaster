@@ -27,6 +27,11 @@ The #956 preparation research found four logic defects in `UtilitiesCS/EmailInte
 - **Try-save path:** replace the `Debug.WriteLine` calls with the project logger, and remove the outer rethrow, which has no effect.
 - **Partial files:** remove the unused `using` directives in the `SortEmail` partial files.
 
+Also in scope under the scope rule below (found by the #959 research, same files or same root cause):
+- `EfcDataModel.MoveToFolderAsync` calls `Cleanup_Files` without `try`/`finally`, so an exception leaves sticky prompt answers for the next operation (same root cause as L3).
+- `ToDoModel/Email Utilities/SortItemsToExistingFolder.cs` holds a private duplicate of the L4 CSV helper with the same three defects.
+- The CSV header written by `WriteCSV_StartNewFileIfDoesNotExist` (one column name per line); decide whether it is a defect and fix it if so.
+
 **Scope rule (binding on every agent working this item, and to be passed to every subagent):** any defect a researcher or reviewer finds in the same files or with the same root cause is fixed within this item. Do not list such defects as follow-ups. Only completely unrelated defects may be reported for filing.
 
 ## Environment
