@@ -8,8 +8,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - mode: open
 - max_concurrency: 6
 - current_cohort: 6
-- recolor_generation: 6
-- last_updated: 2026-10-01T22-43
+- recolor_generation: 7
+- last_updated: 2026-10-02T00-12
 - next_step: 948 launched (cohort 6), non-isolated, opus C3; await PR then CI confirm and merge
 
 ## Items
@@ -31,6 +31,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
 | 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/965 | 59cbab04f1c854baa2a03b6cbf755c1df4f961b4 |
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | in_flight | worktree_created |  |  |
+| 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -51,6 +52,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 947 | 2026-10-01T17-26 | 2026-10-01T17-29 | 2026-10-01T18-41 |  |
 | 956 | 2026-10-01T20-28 | 2026-10-01T20-31 | 2026-10-01T22-42 |  |
 | 948 | 2026-10-01T20-39 | 2026-10-01T22-43 |  |  |
+| 950 | 2026-10-02T00-12 |  |  |  |
 
 ## Cohorts
 
@@ -86,6 +88,14 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 4 | 6 | 947 |
 | 5 | 6 | 956 |
 | 6 | 6 | 948 |
+| 0 | 7 | 882, 927, 928, 930, 931 |
+| 1 | 7 | 929, 940, 942 |
+| 2 | 7 | 944, 945 |
+| 3 | 7 | 941, 951 |
+| 4 | 7 | 947 |
+| 5 | 7 | 956 |
+| 6 | 7 | 948 |
+| 7 | 7 | 950 |
 
 ## Conflict Edges
 
@@ -124,6 +134,12 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 941 | 948 | path_overlap | path_overlap:.claude/hooks/validate-planner-output.ps1 |
 | 947 | 948 | path_overlap | path_overlap:.claude/hooks/validate-planner-output.ps1; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeRegistration.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.ThrowingSink.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs; path_overlap:TaskMaster.Test/TaskMaster.Test.csproj; path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs; path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs; path_overlap:TaskMaster/TaskMaster.csproj; path_overlap:docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944/plan.2026-09-30T07-20.md |
 | 948 | 956 | path_overlap | path_overlap:.claude/agent-memory/task-researcher/MEMORY.md; path_overlap:UtilitiesCS.Test/UtilitiesCS.Test.csproj |
+| 882 | 950 | path_overlap | path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs; path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs |
+| 927 | 950 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 930 | 950 | path_overlap | path_overlap:UtilitiesCS/Threading/UiThread.cs |
+| 944 | 950 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 948 | 950 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1; path_overlap:qa-gates/toolchain-final-pass.md (inert bare evidence fragment in both radii) |
+| 950 | 956 | path_overlap | path_overlap:**/SortEmail*.cs ~ docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950/** (956 live glob; glob-on-glob language intersection; no tracked file matches both) |
 
 ## Mutations
 
@@ -138,6 +154,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 947 | 2026-10-01T17-26 |  | scheduled |  | 4 |
 | add | 956 | 2026-10-01T20-28 |  | scheduled |  | 5 |
 | add | 948 | 2026-10-01T20-39 |  | scheduled |  | 6 |
+| add | 950 | 2026-10-02T00-12 |  | scheduled |  | 7 |
 
 ## Drift Events
 
