@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 7
 - recolor_generation: 7
-- last_updated: 2026-10-02T02-07
-- next_step: 950 PR 971 open at d46738a75; child driving CI and AC17 check-off from PR CI; await child DONE then confirm and merge
+- last_updated: 2026-10-02T02-20
+- next_step: 950 merged as 860d67bf4 (PR 971). Non-terminal items: []. Awaiting coordinator: release, /parallel-add, or /parallel-close. Worktree cleanup deferred.
 
 ## Items
 
@@ -31,7 +31,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
 | 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/965 | 59cbab04f1c854baa2a03b6cbf755c1df4f961b4 |
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/969 | 34c2ed88cbb009f2f231453db87bc64d45a9bd51 |
-| 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/971 |  |
+| 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/971 | 860d67bf4fddecb929e0d6c166065fd1ee752feb |
 | 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/970 | ab14b126cbf065d446aec703c9581a3869baea05 |
 
 ## Item Lifecycle Timestamps
@@ -53,7 +53,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 947 | 2026-10-01T17-26 | 2026-10-01T17-29 | 2026-10-01T18-41 |  |
 | 956 | 2026-10-01T20-28 | 2026-10-01T20-31 | 2026-10-01T22-42 |  |
 | 948 | 2026-10-01T20-39 | 2026-10-01T22-43 | 2026-10-02T00-34 |  |
-| 950 | 2026-10-02T00-12 | 2026-10-02T00-35 |  |  |
+| 950 | 2026-10-02T00-12 | 2026-10-02T00-35 | 2026-10-02T02-20 |  |
 | 952 | 2026-10-02T01-04 | 2026-10-02T01-06 | 2026-10-02T01-35 |  |
 
 ## Cohorts
