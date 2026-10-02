@@ -242,3 +242,4 @@
 - [Build-lock: COORDINATOR-HOLD, waiter kill](shared-build-lock-coordinator-hold-and-waiter-kill.md)
 - [Planner prompts need issue + branch lines every round](planner-prompt-needs-issue-and-branch-lines-every-round.md)
 - [Clock via `git var GIT_COMMITTER_IDENT` when pwsh is refused](read-the-clock-with-git-var-when-pwsh-is-refused.md)
+- [Amend the AC text when ratifying a measurement rule](amend-ac-text-when-a-measurement-rule-is-ratified.md) — ratification alone fails preflight; one-line in-place spec edit
