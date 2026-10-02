@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 5
 - recolor_generation: 5
-- last_updated: 2026-10-01T20-28
-- next_step: All admitted items merged; no launches until the coordinator releases the next admitted item
+- last_updated: 2026-10-01T20-31
+- next_step: 956 running (single child under quota pacing); no other launches until released
 
 ## Items
 
@@ -29,7 +29,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 941 | docs/features/active/2026-09-29-breadcrumb-dispatch-message-and-handoff-record-inaccurate-941 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/958 | 6c710a45dd61710658ea8e60588fb4108cf15b6f |
 | 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/960 | 9a3d2dd3e8ec60af65b0d4f9f728eefc0aaaf970 |
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
-| 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | scheduled | not_started |  |  |
+| 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | in_flight | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -48,7 +48,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 941 | 2026-10-01T06-28 | 2026-10-01T06-33 | 2026-10-01T11-57 |  |
 | 951 | 2026-10-01T12-05 | 2026-10-01T12-10 | 2026-10-01T12-29 |  |
 | 947 | 2026-10-01T17-26 | 2026-10-01T17-29 | 2026-10-01T18-41 |  |
-| 956 | 2026-10-01T20-28 |  |  |  |
+| 956 | 2026-10-01T20-28 | 2026-10-01T20-31 |  |  |
 
 ## Cohorts
 
