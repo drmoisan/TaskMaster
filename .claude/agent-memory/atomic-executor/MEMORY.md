@@ -144,6 +144,8 @@
 - [Param named $args makes msbuild gate vacuous](project_pwsh_function_param_named_args_makes_msbuild_gate_vacuous.md)
 - [Nested quotes in "$( )" fail to parse](project_pwsh_nested_quotes_in_subexpression_fail_to_parse.md)
 - [$Log/$log case collision flattens array](project_pwsh_param_name_case_collision_flattens_log_array.md)
+- [pwsh @(a + x, b + y) is ONE string](project_pwsh_array_literal_comma_binds_before_plus.md)
+- [Pre-impl gate reads the SESSION-root checkpoint](project_preimplementation_gate_reads_session_root_checkpoint_not_item_worktree.md)
 - [Invoke-VersionReconciliation rewrites Reference version](project_reference_version_rewrite_when_assemblyversion_omitted.md)
 - [Replaced-span numstat elides identical boundary lines](project_replacement_span_numstat_elides_identical_boundary_lines.md)
 - [Finding's line right, description wrong](project_review_finding_line_number_right_description_wrong.md)
