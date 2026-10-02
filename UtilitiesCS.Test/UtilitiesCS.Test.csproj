@@ -96,6 +96,7 @@
     <Compile Include="EmailIntelligence\Bayesian\BayesianSerializationHelper_Tests.cs" />
     <Compile Include="EmailIntelligence\Triage_OlLogic_Tests.cs" />
     <Compile Include="EmailIntelligence\SortEmail_Tests.cs" />
+    <Compile Include="EmailIntelligence\SortEmail_TrySaveAttachment_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersController_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersControllerInitializationTests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersControllerRefreshDisposalTests.cs" />
@@ -440,6 +441,7 @@
     <Compile Include="HelperClasses\SimpleRegex_Tests.cs" />
     <Compile Include="Dialogs\YesNoToAll_Test.cs" />
     <Compile Include="Dialogs\YesNoToAll_Tests.cs" />
+    <Compile Include="Dialogs\YesNoToAllPromptSession_Tests.cs" />
     <Compile Include="ReusableTypeClasses\AsyncLazy_Tests.cs" />
     <Compile Include="ReusableTypeClasses\DataConverter2d_Tests.cs" />
     <Compile Include="ReusableTypeClasses\DenMatrix_Tests.cs" />
