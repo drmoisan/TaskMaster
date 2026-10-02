@@ -81,6 +81,15 @@ namespace TaskMaster
         >(StringComparer.Ordinal);
 
         /// <summary>
+        /// Prime failures already reported (issue #948), keyed by engine and base-exception type;
+        /// a repeat of a reported kind is not logged again. Never cleared: a cached key never primes.
+        /// </summary>
+        private readonly ConcurrentDictionary<
+            (string EngineName, Type FaultType),
+            byte
+        > _reportedPrimeFaults = new ConcurrentDictionary<(string, Type), byte>();
+
+        /// <summary>
         /// Creates a coordinator over an engines accessor and three injected sinks.
         /// </summary>
         /// <param name="enginesAccessor">
@@ -256,7 +265,7 @@ namespace TaskMaster
         /// itself and reported through <c>logError</c>. For a key whose prime did not run to
         /// completion, the marker is cleared only after that report has returned or thrown, so a
         /// caller that receives <see cref="Task.CompletedTask"/> can rely on the report having
-        /// been attempted.
+        /// been attempted or deliberately suppressed as a repeat of a kind already reported.
         /// </returns>
         internal Task GetPrimeTask(string engineName)
         {
@@ -364,9 +373,8 @@ namespace TaskMaster
         /// <summary>
         /// Observes the outcome of a prime. On any outcome other than ran-to-completion the cache
         /// is left unset — so the key still reports unchecked — the failure is reported through
-        /// <c>logError</c>, and only then is the in-flight marker cleared so a later read may
-        /// re-prime. A failure thrown by the sink itself is contained here, so the marker is
-        /// cleared whether or not the report succeeded.
+        /// <c>logError</c> unless the same failure kind was already reported for this engine, a
+        /// sink failure is contained here, and only then is the marker cleared for a later re-prime.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -387,6 +395,12 @@ namespace TaskMaster
         /// <see cref="StartObservedPrime"/> has no remaining throw source of its own, so it
         /// completes rather than faulting.
         /// </para>
+        /// <para>
+        /// Repeat suppression (issue #948): each pair of engine key and base-exception type is
+        /// reported once, then recorded in <see cref="_reportedPrimeFaults"/> by the statement
+        /// directly after the sink call, so a sink that throws leaves the report owed. Moving
+        /// that record before the sink, or into a catch or finally arm, suppresses it for the session.
+        /// </para>
         /// </remarks>
         private void CompletePrime(Task completed, string engineName)
         {
@@ -399,17 +413,22 @@ namespace TaskMaster
                 (Exception)completed.Exception?.GetBaseException()
                 ?? new TaskCanceledException(completed);
 
-            // Report-then-clear is load-bearing: the marker stays registered until the report has
-            // returned or thrown, so a caller that observes the marker absent — including one that
-            // fetched the prime handle after the fault — is guaranteed the report has already been
-            // attempted.
-            try
+            // Report-then-clear is load-bearing: the marker stays registered until the
+            // report (if any) has returned or thrown, so a caller that observes the marker absent,
+            // including one that fetched the prime handle after the fault, is guaranteed the report
+            // has already been attempted or was deliberately skipped as an already reported kind.
+            var reportKey = (EngineName: engineName, FaultType: failure.GetType());
+            if (!_reportedPrimeFaults.ContainsKey(reportKey))
             {
-                _logError(BuildPrimeFailedMessage(engineName), failure);
-            }
-            catch (Exception)
-            {
-                // Intentionally discarded: see the remarks on this method.
+                try
+                {
+                    _logError(BuildPrimeFailedMessage(engineName), failure);
+                    _reportedPrimeFaults[reportKey] = 0;
+                }
+                catch (Exception)
+                {
+                    // Intentionally discarded: see the remarks on this method.
+                }
             }
 
             _primeTasks.TryRemove(engineName, out _);
@@ -456,7 +475,8 @@ namespace TaskMaster
             return string.Format(
                 CultureInfo.CurrentCulture,
                 "Reading the activation state for engine '{0}' failed; its toggle continues to "
-                    + "report unchecked.",
+                    + "report unchecked. Further failures of this kind for this engine are not "
+                    + "logged again.",
                 RenderEngineName(engineName)
             );
         }
