@@ -1,0 +1,18 @@
+---
+name: project_952_r2_label_counts_helper_enumeration_and_hex_backslash_seams
+description: "#952 R2 preflight seams - recount every 'all N required' label against its list (observations are not conditions); a Pester helper that enumerates a directory (Get-ChildItem -Filter *.yml) is a read site for every file in it, so list the It blocks that call it, not only the by-path reads; a keyed ExpectedExitCode must say when it is OMITTED so the default-0 row records the failure; write a backslash in a plan Grep pattern as \\x5C with a leading (^|[^A-Za-z]) class so https:// is excluded; measure line counts with Grep ^ count, never Read rows"
+metadata:
+  type: project
+---
+
+Round-2 delta for #952 (five defects plus one advisory, all applied in place; 28 tasks / 3 phases unchanged). Round 1 had been clean on structure; every R2 finding was a figure or a label.
+
+- **"all N required" labels drift.** P0-T6 said "all five required" over four conditions because `CRLF=`/`LF=` were declared observations in the same sentence. Rule: after any edit to an acceptance sentence, recount the enumerated conditions and sweep every `all (two|three|four|five|six) required` label in the plan; an observation ("recorded") is a condition only if the label's own list counts it (P1-T6 does, P0-T6 does not).
+- **Helper enumeration is a read site.** DependabotConfig.Tests.ps1 `Get-SetupNuGetStep` (line 116) does `Get-ChildItem -Filter '*.yml'` at 132 and `ReadAllLines` at 133 over every workflow, so the three `It` blocks that call it (268, 279, 323) read dependabot-repair.yml without naming `$script:RepairWorkflowPath`. A "tests that read FILE" list built by grepping the path variable undercounts; also grep for helper functions and follow their callers.
+- **Line counts.** Read-tool trailing-row behaviour is inconsistent (see the R1 memory, corrected). run-actionlint.ps1 is 14 lines (Grep `^` count), not 15; its internal citations (throw 8, `&` 11, `exit` 13) were right, only the total was wrong, so a wrong total does not imply wrong internal lines and vice versa; check both.
+- **Keyed ExpectedExitCode must state its omission branch.** "1 when failures are all baseline, 0 when none" left the newly-failing case undefined. Add: "omitted when `NEWLY-FAILING:` is not `NONE`, so the expectation defaults to 0 and the row records the failure, and the task proceeds under the repair or stop rule". This is consistent with the skill's default-0 rule and with "always equals the observed value it explains" (an omitted field explains nothing).
+- **Backslash in a plan-authored Grep pattern.** `[\\/]` can be collapsed to `[\/]` by a tool layer. Write `(/|\x5C)` (Rust regex hex escape, verified to run through the Grep tool). The bare `[A-Za-z]:(/|\x5C)` matches `https://` (`s:/`); prefix `(^|[^A-Za-z])` and confirm empirically by running the pattern over the plan and issue.md, both of which carry an `https://` and returned zero hits.
+- Ripgrep probe `^artifacts/$` on .gitignore returned nothing although line 57 is `artifacts/` (CRLF file); use an unanchored probe or `\r?$` before concluding a citation is wrong.
+
+**Why:** each was a preflight finding on a plan whose structure had already cleared; the label miscount and the omission branch would have been a spurious executor stop, the helper undercount a mis-scoped repair rule.
+**How to apply:** every revision round: recount labels, re-measure totals with Grep `^` count, follow Pester helpers to their callers, and run any new regex over the plan itself. Related: [[project_952_r1_read_phantom_row_and_frozen_clause_a_seams]], [[project_952_runbook_and_workflow_comment_plan_seams]], [[verify-line-spans-and-computed-literals]].
