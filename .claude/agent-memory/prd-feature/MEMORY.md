@@ -32,4 +32,5 @@
 - [500-line ceiling counts TOTAL lines](feature_line_ceiling_counts_total_lines.md)
 - [Negative control must isolate the code fix](feedback_negative_control_must_isolate_the_code_fix.md)
 - [Outcome AC when the mechanism is unverified](feedback_outcome_ac_when_mechanism_unverified.md)
+- [IFileInfo seam: FileStream sentinel, not MemoryStream](reference_ifileinfo_seam_filestream_sentinel_not_memorystream.md) — stream members return concrete FileStream; use a read-only FileShare.ReadWrite FileStream over the test's own Assembly.Location, never a temp file; handle-free options fail Length
 - [Issue 671: projections-only evidence](project_671_projections_only_evidence.md) — no new raw TRX/coverage XML in the repo (effective 2026-09-12); name fixed-filename Markdown projections in full feature-relative backticked paths, never bare `evidence/...`
