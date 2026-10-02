@@ -70,6 +70,8 @@
 - [Conditional split = three tasks](project_conditional_split_three_task_shape.md) · [Round-over-round plan diff unavailable](project_preflight_round_over_round_diff_unavailable.md)
 - [Flaky carve-out added to one task only](project_flaky_test_carveout_added_to_one_task_only.md) · [Revision bullet negates an earlier clause](project_revision_bullet_negates_earlier_clause_left_standing.md)
 - [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md) · [Hygiene scan: comma precedence + d:\s hits](project_hygiene_pattern_array_comma_precedence_and_regex_token_hits.md)
+- [Loop re-runs vs one-artifact glob + hash anchors](project_loop_iteration_vs_single_artifact_glob_and_hash_anchor.md)
+- [Route-keyed branches miss derived-flag cases](project_outcome_branch_sets_keyed_on_route_miss_derived_flag_cases.md) · [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md)
 
 ## Build / toolchain environment
 - [pwsh/git/gh gotchas](project_pwsh_git_gh_cli_gotchas.md) · [Build/Test env](project_build_test_env.md) · [VS18 paths](project_vs18_build_toolchain_paths.md) · [SDK + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md)
@@ -200,3 +202,5 @@
 - [-WhatIf does not reach module ShouldProcess](project_whatif_does_not_reach_module_session_state.md)
 - [WinForms control field installs SyncContext, deadlocks await](project_winforms_control_field_installs_synccontext_and_deadlocks_await.md)
 - [Backtick-span Grep returns gaps](project_backtick_span_grep_gap_matches.md) — manual blast-radius token re-check
+## Artifact hygiene, shell/pwsh pitfalls, misc (sub-index)
+- [Sub-index: 58 entries](index_artifact_hygiene_and_misc.md) — evidence sanitisation, TRX/msbuild path leaks, pwsh quoting, csharpier/numstat, git spans, Pester, hooks
