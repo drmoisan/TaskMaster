@@ -194,11 +194,17 @@ namespace QuickFiler.Controllers.Tests
         /// observes the pre-install value on acquisition, never the first transaction's installed
         /// value, because restore strictly precedes gate release.
         /// <para>
-        /// Issue #823 (R5): this test fails intermittently. Observations of its outcomes are
-        /// collected in the append-only log at
-        /// docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/evidence/other/flake-watch-uithread-dispatcher-transaction.2026-09-09T00-15.md.
-        /// Append an observation there rather than stabilising the test with a sleep, a retry or a
-        /// timing tolerance, none of which this repository permits.
+        /// Issue #950: the earlier intermittent failure was a race on the shared static, not a
+        /// timing defect. The gate-free fixture method EnsureDispatcher seeds the parked dispatcher
+        /// whenever the field is null, so a concurrently running class that calls it could write
+        /// between the baseline read and the install, or between the restore and the second
+        /// caller's read. The test therefore pins a non-null baseline with an ensure scope that it
+        /// opens only after transaction A has acquired the gate and holds through both assertions.
+        /// Taking the pin inside the gate means that a gated transaction from another class (W3/W4)
+        /// cannot restore a null previous value between the pin and this test's acquisition.
+        /// Invariant for future editors: no other class may dispose an ensure scope holding the
+        /// parked dispatcher (W2), and UiThread.Initialize (W5) must not latch during this test;
+        /// either would change the value the second caller observes.
         /// </para>
         /// </summary>
         [TestMethod]
@@ -212,49 +218,54 @@ namespace QuickFiler.Controllers.Tests
                 UiThreadDispatcherTransaction transactionA = await UiThreadDispatcherFixture
                     .BeginTransactionAsync()
                     .ConfigureAwait(false);
-                Dispatcher original = UiThreadDispatcherFixture.Current;
-                transactionA.Install(liveA);
-
-                using (var secondCallerStarted = new ManualResetEventSlim(false))
+                using (
+                    IDisposable baseline = QfcItemControllerTestSupport.EnsureUiThreadDispatcher()
+                )
                 {
-                    Dispatcher observedByB = null;
+                    Dispatcher original = UiThreadDispatcherFixture.Current;
+                    transactionA.Install(liveA);
 
-                    Task waiter = Task.Run(async () =>
+                    using (var secondCallerStarted = new ManualResetEventSlim(false))
                     {
-                        secondCallerStarted.Set();
-                        UiThreadDispatcherTransaction transactionB = await UiThreadDispatcherFixture
-                            .BeginTransactionAsync()
-                            .ConfigureAwait(false);
-                        try
-                        {
-                            observedByB = UiThreadDispatcherFixture.Current;
-                        }
-                        finally
-                        {
-                            transactionB.Dispose();
-                        }
-                    });
+                        Dispatcher observedByB = null;
 
-                    // Act
-                    secondCallerStarted.Wait();
-                    transactionA.Dispose();
-                    await waiter.ConfigureAwait(false);
+                        Task waiter = Task.Run(async () =>
+                        {
+                            secondCallerStarted.Set();
+                            UiThreadDispatcherTransaction transactionB = await UiThreadDispatcherFixture
+                                .BeginTransactionAsync()
+                                .ConfigureAwait(false);
+                            try
+                            {
+                                observedByB = UiThreadDispatcherFixture.Current;
+                            }
+                            finally
+                            {
+                                transactionB.Dispose();
+                            }
+                        });
 
-                    // Assert
-                    observedByB
-                        .Should()
-                        .BeSameAs(
-                            original,
-                            because: "the first transaction restores before it releases the gate, so "
-                                + "the waiter cannot observe the pre-restore value"
-                        );
-                    observedByB
-                        .Should()
-                        .NotBeSameAs(
-                            liveA,
-                            because: "observing the first transaction's installed value would be the "
-                                + "issue #230 lost update"
-                        );
+                        // Act
+                        secondCallerStarted.Wait();
+                        transactionA.Dispose();
+                        await waiter.ConfigureAwait(false);
+
+                        // Assert
+                        observedByB
+                            .Should()
+                            .BeSameAs(
+                                original,
+                                because: "the first transaction restores before it releases the gate, so "
+                                    + "the waiter cannot observe the pre-restore value"
+                            );
+                        observedByB
+                            .Should()
+                            .NotBeSameAs(
+                                liveA,
+                                because: "observing the first transaction's installed value would be the "
+                                    + "issue #230 lost update"
+                            );
+                    }
                 }
             }
             finally

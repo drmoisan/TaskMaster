@@ -57,14 +57,20 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Bounded, event-driven wait for a state transition. This is not a fixed sleep: it returns
-        /// as soon as the condition holds and fails the test with a clear message if it never does.
-        /// Required because <c>Worker_DoWork</c> is <c>async void</c> and runs on the
-        /// <see cref="BackgroundWorker"/> thread, so the field assignment it performs is not
-        /// observable synchronously from the calling thread.
+        /// Test-side worker whose <see cref="RaiseDoWork"/> raises <c>DoWork</c> synchronously on
+        /// the calling thread through the protected <c>OnDoWork</c>, so the privately subscribed
+        /// <c>Worker_DoWork</c> runs to its first incomplete await before <c>InitEmailQueue</c>
+        /// returns (issue #950). Duplicated per file, following the convention documented on
+        /// <c>QfcDatamodelLivenessTests</c>.
         /// </summary>
-        private static void WaitForState(Func<bool> condition, string because) =>
-            SpinWait.SpinUntil(condition, TimeSpan.FromSeconds(5)).Should().BeTrue(because);
+        private sealed class SynchronousBackgroundWorker : BackgroundWorker
+        {
+            public void RaiseDoWork() => OnDoWork(new DoWorkEventArgs(null));
+        }
+
+        /// <summary>The synchronous starter assigned to <c>QfcDatamodel.WorkerStarter</c>.</summary>
+        private static void StartSynchronously(BackgroundWorker worker) =>
+            ((SynchronousBackgroundWorker)worker).RaiseDoWork();
 
         /// <summary>
         /// AC2, the reported crash. Once <c>Cleanup()</c> has nulled <c>_masterQueue</c> and
@@ -211,22 +217,25 @@ namespace QuickFiler.Controllers.Tests
                 return await loaderRelease.Task;
             };
 
-            using (var worker = new BackgroundWorker())
+            using (var worker = new SynchronousBackgroundWorker())
             {
-                // Act — the issue #244 zero-batch short-circuit is COM-free and still starts the
-                // worker, which is the only path that reaches Worker_DoWork without live Outlook.
+                model.WorkerStarter = StartSynchronously;
+
+                // Act — the issue #244 zero-batch short-circuit is COM-free and starts the worker
+                // through the issue #950 seam, which raises DoWork on this thread, so
+                // Worker_DoWork has captured the loader task before InitEmailQueue returns.
                 model.InitEmailQueue(0, worker);
-                loaderEntered
-                    .Task.Wait(TimeSpan.FromSeconds(5))
-                    .Should()
-                    .BeTrue("the started worker must reach the injected RemainingEmailLoader");
 
                 // Assert
-                WaitForState(
-                    () => GetPrivateField(model, "_remainingLoadTask") != null,
-                    "the loader task must be captured before it is awaited, so the Cancel path has "
-                        + "a handle to quiesce"
-                );
+                loaderEntered
+                    .Task.IsCompleted.Should()
+                    .BeTrue("the synchronous starter must reach the injected RemainingEmailLoader");
+                GetPrivateField(model, "_remainingLoadTask")
+                    .Should()
+                    .NotBeNull(
+                        "the loader task must be captured before it is awaited, so the Cancel path has "
+                            + "a handle to quiesce"
+                    );
 
                 loaderRelease.TrySetResult(true);
             }

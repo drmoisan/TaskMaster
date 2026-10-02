@@ -45,15 +45,45 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Bounded, event-driven wait for a state transition. This is not a fixed sleep: it returns
-        /// as soon as the condition holds, and fails the test with a clear message if it never does.
-        /// Required because <c>BackgroundWorker</c> clears <c>isRunning</c> from an asynchronously
-        /// posted completion, so the transition is not observable synchronously (the same race the
-        /// remarks on <see cref="QfcInitEmailQueueZeroBatchTests"/> document).
+        /// Test-side worker whose <see cref="RaiseDoWork"/> raises <c>DoWork</c> synchronously on
+        /// the calling thread through the protected <c>OnDoWork</c>, so the privately subscribed
+        /// <c>Worker_DoWork</c> runs to its first incomplete await before <c>InitEmailQueue</c>
+        /// returns. Issue #950: this replaces the bounded waits on a thread-pool worker.
         /// </summary>
-        private static void WaitForState(Func<bool> condition, string because)
+        private sealed class SynchronousBackgroundWorker : BackgroundWorker
         {
-            SpinWait.SpinUntil(condition, TimeSpan.FromSeconds(5)).Should().BeTrue(because);
+            public void RaiseDoWork() => OnDoWork(new DoWorkEventArgs(null));
+        }
+
+        /// <summary>The synchronous starter assigned to <c>QfcDatamodel.WorkerStarter</c>.</summary>
+        private static void StartSynchronously(BackgroundWorker worker) =>
+            ((SynchronousBackgroundWorker)worker).RaiseDoWork();
+
+        /// <summary>
+        /// Queues posted continuations and runs them only on an explicit <see cref="Drain"/> call,
+        /// on the creating thread. Drain runs only work already queued, plus work that work queues,
+        /// and never blocks. Installed around <c>InitEmailQueue</c> by the tests that observe the
+        /// loader's continuation, and restored in a <c>finally</c>.
+        /// </summary>
+        private sealed class DrainableSynchronizationContext : SynchronizationContext
+        {
+            private readonly Queue<Tuple<SendOrPostCallback, object>> _callbacks =
+                new Queue<Tuple<SendOrPostCallback, object>>();
+            private readonly int _creatorThreadId = Environment.CurrentManagedThreadId;
+
+            public override void Post(SendOrPostCallback d, object state) =>
+                _callbacks.Enqueue(Tuple.Create(d, state));
+
+            /// <summary>Runs every queued callback, including work queued while draining.</summary>
+            internal void Drain()
+            {
+                Environment.CurrentManagedThreadId.Should().Be(_creatorThreadId);
+                while (_callbacks.Count > 0)
+                {
+                    Tuple<SendOrPostCallback, object> callback = _callbacks.Dequeue();
+                    callback.Item1(callback.Item2);
+                }
+            }
         }
 
         /// <summary>Globals wired for the high-confidence dequeue path.</summary>
@@ -94,20 +124,16 @@ namespace QuickFiler.Controllers.Tests
                 return await loaderRelease.Task;
             };
 
-            var worker = new BackgroundWorker();
+            var worker = new SynchronousBackgroundWorker();
+            model.WorkerStarter = StartSynchronously;
 
-            // Act — the issue #244 zero-batch short-circuit is COM-free and still starts the worker.
+            // Act — the issue #244 zero-batch short-circuit is COM-free and starts the worker
+            // through the issue #950 seam, which raises DoWork on this thread.
             model.InitEmailQueue(0, worker);
 
             loaderEntered
-                .Task.Wait(TimeSpan.FromSeconds(5))
-                .Should()
-                .BeTrue("the started worker must reach the injected RemainingEmailLoader");
-            WaitForState(
-                () => !worker.IsBusy,
-                "the async void Worker_DoWork returns at its first await, so IsBusy goes false "
-                    + "while the loader is still producing"
-            );
+                .Task.IsCompleted.Should()
+                .BeTrue("the synchronous starter must reach the injected RemainingEmailLoader");
 
             Task<IList<MailItem>> pending = model.DequeueNextItemGroupAsync(1, 200);
             fake.Advance(TimeSpan.FromMilliseconds(200));
@@ -147,8 +173,12 @@ namespace QuickFiler.Controllers.Tests
 
         /// <summary>
         /// Starts the worker with a <c>RemainingEmailLoader</c> held open by
-        /// <paramref name="release"/>, and returns once the worker has entered the loader and
-        /// <c>BackgroundWorker.IsBusy</c> has gone false at the async-void first-await boundary.
+        /// <paramref name="release"/>. The issue #950 synchronous starter raises <c>DoWork</c> on
+        /// this thread, so by the time <c>InitEmailQueue</c> returns the async void
+        /// <c>Worker_DoWork</c> has entered the loader and returned at its first incomplete await.
+        /// <paramref name="release"/> runs its continuations asynchronously, so a test that has
+        /// installed <c>DrainableSynchronizationContext</c> observes the resumed loader only
+        /// through <c>Drain</c>, never inline inside <c>SetResult</c>.
         /// </summary>
         private static QfcDatamodel StartHeldOpenLoader(
             Func<TaskCompletionSource<bool>, Task<bool>> loaderBody,
@@ -157,7 +187,9 @@ namespace QuickFiler.Controllers.Tests
         {
             var model = CreateUninitializedDatamodel();
             var entered = new TaskCompletionSource<bool>();
-            var localRelease = new TaskCompletionSource<bool>();
+            var localRelease = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
             release = localRelease;
 
             model.RemainingEmailLoader = _ =>
@@ -166,24 +198,21 @@ namespace QuickFiler.Controllers.Tests
                 return loaderBody(localRelease);
             };
 
-            var worker = new BackgroundWorker();
+            var worker = new SynchronousBackgroundWorker();
+            model.WorkerStarter = StartSynchronously;
             model.InitEmailQueue(0, worker);
 
             entered
-                .Task.Wait(TimeSpan.FromSeconds(5))
-                .Should()
-                .BeTrue("the started worker must reach the injected loader");
-            WaitForState(
-                () => !worker.IsBusy,
-                "async void Worker_DoWork returns at its first await"
-            );
+                .Task.IsCompleted.Should()
+                .BeTrue("the synchronous starter must reach the injected loader before returning");
             return model;
         }
 
         /// <summary>
         /// AC 7: the flag stays true across the <c>async void</c> first-await boundary while the
-        /// loader is still producing — precisely where <c>BackgroundWorker.IsBusy</c> has already
-        /// gone false.
+        /// loader is still producing. Issue #950: the synchronous starter has already run
+        /// <c>Worker_DoWork</c> to that boundary when <c>InitEmailQueue</c> returns, so the flag
+        /// is read with no wait.
         /// </summary>
         [TestMethod]
         public void RemainingLoadActive_AcrossAsyncVoidFirstAwait_StaysTrueWhileLoaderProduces()
@@ -205,51 +234,79 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// AC 7: the flag becomes false only after the loader completes — never before.
+        /// AC 7: the flag becomes false only after the loader completes — never before. Issue
+        /// #950: the continuation that clears the flag is drained from a test-owned context.
         /// </summary>
         [TestMethod]
         public void RemainingLoadActive_AfterLoaderCompletes_BecomesFalse()
         {
-            // Arrange / Act
-            QfcDatamodel model = StartHeldOpenLoader(
-                signal => signal.Task,
-                out TaskCompletionSource<bool> release
-            );
-            ReadLivenessFlag(model).Should().BeTrue("the loader has not completed yet");
+            // Arrange
+            SynchronizationContext previous = SynchronizationContext.Current;
+            var pump = new DrainableSynchronizationContext();
+            SynchronizationContext.SetSynchronizationContext(pump);
+            try
+            {
+                QfcDatamodel model = StartHeldOpenLoader(
+                    signal => signal.Task,
+                    out TaskCompletionSource<bool> release
+                );
+                ReadLivenessFlag(model).Should().BeTrue("the loader has not completed yet");
 
-            release.SetResult(true);
+                // Act
+                release.SetResult(true);
+                pump.Drain();
 
-            // Assert
-            WaitForState(
-                () => !ReadLivenessFlag(model),
-                "the finally around the awaited loader must clear the flag once it completes"
-            );
+                // Assert
+                ReadLivenessFlag(model)
+                    .Should()
+                    .BeFalse(
+                        "the finally around the awaited loader must clear the flag once it completes"
+                    );
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
         }
 
         /// <summary>
-        /// AC 7: the <c>finally</c> clears the flag even when the loader throws.
+        /// AC 7: the <c>finally</c> clears the flag even when the loader throws. Issue #950: the
+        /// faulted loader's continuation is drained from a test-owned context.
         /// </summary>
         [TestMethod]
         public void RemainingLoadActive_WhenLoaderThrows_IsStillClearedByFinally()
         {
-            // Arrange / Act
-            QfcDatamodel model = StartHeldOpenLoader(
-                async signal =>
-                {
-                    await signal.Task;
-                    throw new InvalidOperationException("loader failed");
-                },
-                out TaskCompletionSource<bool> release
-            );
-            ReadLivenessFlag(model).Should().BeTrue("the loader has not failed yet");
+            // Arrange
+            SynchronizationContext previous = SynchronizationContext.Current;
+            var pump = new DrainableSynchronizationContext();
+            SynchronizationContext.SetSynchronizationContext(pump);
+            try
+            {
+                QfcDatamodel model = StartHeldOpenLoader(
+                    async signal =>
+                    {
+                        await signal.Task;
+                        throw new InvalidOperationException("loader failed");
+                    },
+                    out TaskCompletionSource<bool> release
+                );
+                ReadLivenessFlag(model).Should().BeTrue("the loader has not failed yet");
 
-            release.SetResult(true);
+                // Act
+                release.SetResult(true);
+                pump.Drain();
 
-            // Assert
-            WaitForState(
-                () => !ReadLivenessFlag(model),
-                "the finally must clear the flag on the throwing path too, or the gate would poll forever"
-            );
+                // Assert
+                ReadLivenessFlag(model)
+                    .Should()
+                    .BeFalse(
+                        "the finally must clear the flag on the throwing path too, or the gate would poll forever"
+                    );
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
         }
     }
 }
