@@ -38,6 +38,7 @@ namespace QuickFiler.Controllers
             _activeExplorer = _olApp.ActiveExplorer();
             _globals.Ol.App.NewMailEx += Application_NewMailEx;
             RemainingEmailLoader = LoadRemainingEmailsToQueueAsync;
+            WorkerStarter = worker => worker.RunWorkerAsync();
         }
 
         public QfcDatamodel(IApplicationGlobals appGlobals, CancellationToken token)
@@ -49,6 +50,7 @@ namespace QuickFiler.Controllers
             _frame = InitDf(_activeExplorer);
             _globals.Ol.App.NewMailEx += Application_NewMailEx;
             RemainingEmailLoader = LoadRemainingEmailsToQueueAsync;
+            WorkerStarter = worker => worker.RunWorkerAsync();
         }
 
         public static async Task<QfcDatamodel> LoadAsync(
@@ -138,6 +140,16 @@ namespace QuickFiler.Controllers
         /// behaved.
         /// </summary>
         internal Func<CancellationToken, Task<bool>> RemainingEmailLoader { get; set; }
+
+        /// <summary>
+        /// Injectable worker-start seam for <see cref="InitEmailQueue(int, BackgroundWorker)"/>
+        /// (issue #950). Both instance constructors assign a starter that calls
+        /// <see cref="BackgroundWorker.RunWorkerAsync()"/>, so production behavior is unchanged;
+        /// tests assign a starter that raises DoWork synchronously on the calling thread. The
+        /// property stays null on instances built by GetUninitializedObject, so InitEmailQueue
+        /// fails fast with a NullReferenceException there instead of starting a thread.
+        /// </summary>
+        internal Action<BackgroundWorker> WorkerStarter { get; set; }
 
         #endregion Private Variables
 
@@ -270,7 +282,7 @@ namespace QuickFiler.Controllers
                 // Issue #424: mark the producer live before starting it, so a dequeue that runs
                 // before Worker_DoWork's first await cannot mistake an empty queue for exhaustion.
                 _remainingLoadActive = true;
-                worker.RunWorkerAsync();
+                WorkerStarter(worker);
                 return new List<MailItem>();
             }
 
@@ -297,7 +309,7 @@ namespace QuickFiler.Controllers
             // Issue #424: see the zero-batch path above — the flag is the honest producer-liveness
             // signal and must be set before the worker starts.
             _remainingLoadActive = true;
-            worker.RunWorkerAsync();
+            WorkerStarter(worker);
 
             return emailList;
         }
