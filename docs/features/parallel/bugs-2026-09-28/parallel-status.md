@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 6
 - recolor_generation: 6
-- last_updated: 2026-10-01T22-42
-- next_step: 956 merged as 59cbab04f (PR 965); cohort 5 terminal, current_cohort 6. 948 (cohort 6) scheduled, not launched: awaiting coordinator release. Worktree cleanup deferred.
+- last_updated: 2026-10-01T22-43
+- next_step: 948 launched (cohort 6), non-isolated, opus C3; await PR then CI confirm and merge
 
 ## Items
 
@@ -30,7 +30,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/960 | 9a3d2dd3e8ec60af65b0d4f9f728eefc0aaaf970 |
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
 | 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/965 | 59cbab04f1c854baa2a03b6cbf755c1df4f961b4 |
-| 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | scheduled | not_started |  |  |
+| 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | in_flight | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -50,7 +50,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 951 | 2026-10-01T12-05 | 2026-10-01T12-10 | 2026-10-01T12-29 |  |
 | 947 | 2026-10-01T17-26 | 2026-10-01T17-29 | 2026-10-01T18-41 |  |
 | 956 | 2026-10-01T20-28 | 2026-10-01T20-31 | 2026-10-01T22-42 |  |
-| 948 | 2026-10-01T20-39 |  |  |  |
+| 948 | 2026-10-01T20-39 | 2026-10-01T22-43 |  |  |
 
 ## Cohorts
 
