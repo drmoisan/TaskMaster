@@ -67,6 +67,7 @@
 - [Remediation loop strict handoff](remediation-loop-strict-handoff.md) · [Remediation-plan em-dash required](remediation-plan-em-dash-required.md)
 - [Get-BlastRadius over-includes citations, omits gitignored writes](get-blastradius-overincludes-citations-omits-gitignored-writes.md)
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) · [use the portable PS modules](model-routing-scripts-absent-on-epic-integration-base.md) · [feature-review is fable only under `preferred`](model-routing-feature-review-is-always-fable.md)
+- [Delegation prompts need canonical-issue + branch: lines](delegation-prompt-needs-canonical-issue-and-branch-lines.md) — else TARGET_WORKTREE_NOT_DERIVABLE; no "- [P#-T#]" prose bullets
 - [Forward the planner's handoff records to preflight](forward-planner-handoff-records-to-preflight.md) — or they're reported missing
 - [Reading-only preflight cannot clear a plan](preflight-without-build-access-cannot-clear-a-plan.md) — 7 rounds missed a missing NuGet restore
 - [A session may have NO Agent tool](orchestrator-session-may-lack-agent-tool.md) — block, never implement the plan yourself
