@@ -7,9 +7,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - parallel_slug: bugs-2026-09-28
 - mode: open
 - max_concurrency: 6
-- current_cohort: 7
-- recolor_generation: 7
-- last_updated: 2026-10-02T02-20
+- current_cohort: 8
+- recolor_generation: 8
+- last_updated: 2026-10-02T02-22
 - next_step: 950 merged as 860d67bf4 (PR 971). Non-terminal items: []. Awaiting coordinator: release, /parallel-add, or /parallel-close. Worktree cleanup deferred.
 
 ## Items
@@ -33,6 +33,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/969 | 34c2ed88cbb009f2f231453db87bc64d45a9bd51 |
 | 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/971 | 860d67bf4fddecb929e0d6c166065fd1ee752feb |
 | 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/970 | ab14b126cbf065d446aec703c9581a3869baea05 |
+| 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -55,6 +56,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 948 | 2026-10-01T20-39 | 2026-10-01T22-43 | 2026-10-02T00-34 |  |
 | 950 | 2026-10-02T00-12 | 2026-10-02T00-35 | 2026-10-02T02-20 |  |
 | 952 | 2026-10-02T01-04 | 2026-10-02T01-06 | 2026-10-02T01-35 |  |
+| 953 | 2026-10-02T02-22 |  |  |  |
 
 ## Cohorts
 
@@ -98,6 +100,15 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 5 | 7 | 956 |
 | 6 | 7 | 948 |
 | 7 | 7 | 950, 952 |
+| 0 | 8 | 882, 927, 928, 930, 931 |
+| 1 | 8 | 929, 940, 942 |
+| 2 | 8 | 944, 945 |
+| 3 | 8 | 941, 951 |
+| 4 | 8 | 947 |
+| 5 | 8 | 956 |
+| 6 | 8 | 948 |
+| 7 | 8 | 950, 952 |
+| 8 | 8 | 953 |
 
 ## Conflict Edges
 
@@ -147,6 +158,23 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 941 | 952 | path_overlap | path_overlap:FEATURE/issue.md (inert placeholder fragment in both radii) |
 | 945 | 952 | path_overlap | path_overlap:FEATURE/issue.md (inert placeholder fragment in both radii); path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (added by branch-diff reconciliation) |
 | 952 | 956 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (added by branch-diff reconciliation); path_overlap:956 live glob **/SortEmail*.cs ~ 952 folder glob (glob-on-glob language intersection; no tracked file matches both) |
+| 882 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 927 | 953 | path_overlap | path_overlap:.github/workflows/_pester.yml; path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 928 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 929 | 953 | path_overlap | path_overlap:scripts/dependencies/ConsistencyVerifier.psm1; path_overlap:tests/scripts/dependencies/RepositoryTreeConsistency.Tests.ps1; path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 930 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 931 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 940 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 941 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 942 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 944 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 945 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 947 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 948 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 950 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 951 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 952 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
+| 953 | 956 | path_overlap | path_overlap:**/SortEmail*.cs ~ */*.csproj (glob-on-glob language intersection; no tracked file matches both) |
 
 ## Mutations
 
@@ -163,6 +191,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 948 | 2026-10-01T20-39 |  | scheduled |  | 6 |
 | add | 950 | 2026-10-02T00-12 |  | scheduled |  | 7 |
 | add | 952 | 2026-10-02T01-04 |  | scheduled |  | 7 |
+| add | 953 | 2026-10-02T02-22 |  | scheduled |  | 8 |
 
 ## Drift Events
 
