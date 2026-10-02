@@ -2,11 +2,11 @@
 
 Timestamp: 2026-05-07T20:07:54.6108866-04:00
 Work Mode: full-bug
-Exact Plan Path: c:\Users\DanMoisan\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\plan.2026-05-07T19-34.md
+Exact Plan Path: <user-profile>\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\plan.2026-05-07T19-34.md
 Requirements Sources:
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\issue.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\spec.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-05-07-13-34\artifacts\research\20260507-outlook-startup-ui-lockup-followup-148-research.md
+- <user-profile>\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\issue.md
+- <user-profile>\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\spec.md
+- <user-profile>\repos\TaskMaster-wt-2026-05-07-13-34\artifacts\research\20260507-outlook-startup-ui-lockup-followup-148-research.md
 Branch: bug/outlook-startup-ui-lockup-followup-148
 Feature Folder: docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148
 SearchScope: docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/

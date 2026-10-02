@@ -43,7 +43,7 @@ outside the worktree entirely) and neither is copied under `evidence/`.
 | # | Pattern | Purpose |
 | ---: | --- | --- |
 | 1 | `[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+` | any address-shaped string |
-| 2 | `DanMoisan\|DANMOI` | the machine account name, long and 8.3 forms |
+| 2 | `<user>\|DANMOI` | the machine account name, long and 8.3 forms |
 | 3 | `C:\Users\[A-Za-z]` | any user-profile path |
 | 4 | `megalodon` (case-insensitive) | the host name |
 | 5 | `Contoso\|example\.com` | confirm placeholders are the approved fabricated ones |
@@ -57,10 +57,10 @@ outside the worktree entirely) and neither is copied under `evidence/`.
 | ---: | --- | --- |
 | 1 | Changed source: `mailbox@example.com`, `other-mailbox@example.com`. Evidence: the same two. Nothing else. | PASS — both are fabricated `example.com` placeholders |
 | 2 | none in changed source; none in the 20 evidence files | PASS |
-| 3 | only `C:\Users\testuser\OneDrive - Contoso` (the fabricated test placeholder) and `C:\Users\<user>\OneDrive - <Org>` (a redacted shape quoted from spec AC17 text) | PASS — no real account name |
+| 3 | only `<user-profile>\OneDrive - Contoso` (the fabricated test placeholder) and `C:\Users\<user>\OneDrive - <Org>` (a redacted shape quoted from spec AC17 text) | PASS — no real account name |
 | 4 | none anywhere in `<FEATURE>/evidence/` or in the changed source | PASS |
 | 5 | `example.com` and `Contoso` only, both approved fabricated placeholders | PASS |
-| 6 | `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe`; `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe`; `C:\Users\testuser\OneDrive - Contoso` | PASS — the two tool paths are machine-independent install locations carrying no user or host identifier, and are the exact command text the approved plan specifies |
+| 6 | `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe`; `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe`; `<user-profile>\OneDrive - Contoso` | PASS — the two tool paths are machine-independent install locations carrying no user or host identifier, and are the exact command text the approved plan specifies |
 | 7 | none — every file under `<FEATURE>/evidence/` is a `.md` artifact | PASS — no `.ps1` or other script file, no raw TRX, no coverage XML |
 | 8 | none — no path under `artifacts/` was created or modified | PASS |
 

@@ -180,7 +180,7 @@ Spot-checked independently:
 
 | Check | Scope | Result |
 |---|---|---|
-| Account / host path tokens | `grep -rlI "DanMoisan\|danmoisan\|C:\\Users\\\|/c/Users/"` across the entire feature folder | **No match** |
+| Account / host path tokens | `grep -rlI "<user>\|<user>\|C:\\Users\\\|/c/Users/"` across the entire feature folder | **No match** |
 | TRX machine name | `evidence/qa-gates/p4-t3/p4-t3.trx` | `computerName="REDACTED-MACHINE"` |
 | TRX run user | same file | `runUser="REDACTED-MACHINE\REDACTED-ACCOUNT"` |
 | Cobertura source root | `coverage-final...cobertura.xml` lines 3-5 | `<source>.</source>` — relative, no host path |

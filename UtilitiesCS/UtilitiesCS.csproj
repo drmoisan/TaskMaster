@@ -572,6 +572,7 @@
     </Compile>
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
+    <Compile Include="Dialogs\YesNoToAllPromptSession.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
@@ -815,6 +816,11 @@
     <Compile Include="Interfaces\IEmailIntelligence\IAttachment.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MovedMailInfo.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.AttachmentSaving.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.LegacyAttachmentSaving.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.MailItemSort.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.TrySaveAttachment.cs" />
+    <Compile Include="EmailIntelligence\EmailParsingSorting\SortEmail.UndoAndMoveLog.cs" />
     <Compile Include="OutlookObjects\Folder\FolderPredictor.cs" />
     <Compile Include="OutlookObjects\Folder\FolderRow.cs" />
     <Compile Include="OutlookObjects\Folder\FolderScore.cs" />
@@ -1313,7 +1319,7 @@
   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
   <ItemGroup>
     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.235\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.290\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.0\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.0\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.0\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />

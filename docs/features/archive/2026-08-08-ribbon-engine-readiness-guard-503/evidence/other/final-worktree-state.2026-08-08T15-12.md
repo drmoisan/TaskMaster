@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T15-12
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git add -A; git commit -m 'docs(#503): Phase 5-7 verification evidence and acceptance-criteria check-offs'; git status --porcelain"
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git add -A; git commit -m 'docs(#503): Phase 5-7 verification evidence and acceptance-criteria check-offs'; git status --porcelain"
 ```
 
 EXIT_CODE: 0

@@ -10,11 +10,11 @@ Policy Order:
 5. .claude/rules/csharp.md (C#-specific toolchain and coding standards)
 
 Files Read (explicit list):
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a198a222a991ea783\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\quality-tiers.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\csharp.md
+- <repo-root>\.claude\worktrees\agent-a198a222a991ea783\CLAUDE.md
+- <repo-root>\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\general-code-change.md
+- <repo-root>\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\quality-tiers.md
+- <repo-root>\.claude\worktrees\agent-a198a222a991ea783\.claude\rules\csharp.md
 
 Supporting skills read: policy-compliance-order, atomic-plan-contract, evidence-and-timestamp-conventions, acceptance-criteria-tracking (provided via command context).
 

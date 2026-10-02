@@ -1,7 +1,7 @@
 # D4 — `using`-Directive Removal Is HYGIENE, Not a Gate Fix (Issue #449, [P4-T3])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command: see the per-claim `Command:` lines below.
 EXIT_CODE: 0

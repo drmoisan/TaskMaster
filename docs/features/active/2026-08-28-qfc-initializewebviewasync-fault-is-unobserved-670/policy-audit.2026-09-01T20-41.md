@@ -173,7 +173,7 @@ The plan's sanitisation tasks (P3-T14, P4-T28) mandate angle-bracket placeholder
 runner writes into XML attribute values. An absence assertion and a validity assertion fail on
 disjoint inputs, so both were run independently.
 
-**Assertion 1 — absence.** Case-insensitive `grep` for `danmoisan`, `megalodon4`, `C:\Users` and
+**Assertion 1 — absence.** Case-insensitive `grep` for `<user>`, `<host>`, `C:\Users` and
 `C:/Users` across the entire feature folder returned **exit 1, zero matches**. The same sweep across
 the ten changed `.claude/agent-memory/**` paths also returned **zero matches**. (Pre-existing,
 unchanged agent-memory files elsewhere in that tree do contain such tokens; none are modified by this

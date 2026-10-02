@@ -13,7 +13,7 @@ Skipped: 2
 
 Line coverage: 78.21%
 
-Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster\coverage\coverage.cobertura.xml
+Coverage artifact: <repo-root>\coverage\coverage.cobertura.xml
 Total time: 50.3534 Seconds
 
 Notes:

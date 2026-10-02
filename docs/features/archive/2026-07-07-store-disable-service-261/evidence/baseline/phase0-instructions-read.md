@@ -9,14 +9,14 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and coding standards, position 4)
 
 Files read (start-to-end):
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\csharp.md
+- <repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\CLAUDE.md
+- <repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-code-change.md
+- <repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\worktrees\agent-a957d835cc071fcf9\.claude\rules\csharp.md
 
 Path-correction note:
 The plan tasks P0-T1..T4 named policy paths under a stale worktree root
-`C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-07-13-21\`. Per the executor's
+`<user-profile>\repos\TaskMaster-wt-2026-07-07-13-21\`. Per the executor's
 orchestration directive, the equivalent policy files were read from THIS active
 worktree root instead. The C#-specific policy read for P0-T4 is
 `.claude\rules\csharp.md` (the C# rule file), consistent with the plan's stated

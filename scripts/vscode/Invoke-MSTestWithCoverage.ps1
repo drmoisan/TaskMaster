@@ -275,6 +275,20 @@ function Invoke-MSTestWithCoverageMain {
     <#
     .SYNOPSIS
         Discovers test assemblies and collects a Cobertura coverage report.
+    .DESCRIPTION
+        Collects coverage over the test assemblies found beneath the search root, post-processes
+        the Cobertura document, and enforces the 80 percent line and 75 percent branch floors on
+        an unscoped run. A scoped run skips those two document-level assertions, because they
+        compare a rate taken across every instrumented assembly against floors set for the whole
+        solution; the run then exits on the outcome of the tests it executed.
+    .PARAMETER SearchRoot
+        The directory, relative to the repository root, searched for test assemblies. A run is
+        scoped when the full path of the resolved search root differs from the full path of the
+        repository root, compared ordinal case-insensitive with trailing directory separators
+        ignored. An omitted value, a dot, and a dot followed by a backslash are unscoped. A scoped
+        run skips the coverage threshold assertions and writes exactly one warning naming the
+        search root; they are skipped only on a scoped run. An unscoped run keeps enforcing the
+        80 percent line and 75 percent branch floors unchanged.
     #>
     param(
         [string]$SearchRoot,
@@ -293,6 +307,10 @@ function Invoke-MSTestWithCoverageMain {
     # Get-TrxRunSummary is unresolvable here and every summary attempt would take the
     # non-fatal warning branch below, so no summary would ever be written.
     . (Join-Path $ScriptRoot 'Invoke-MSTest.TrxSummary.ps1')
+
+    # The scope part file is dot-sourced here rather than through the helpers chain because this
+    # entry point is its only consumer: it calls the gate once, after post-processing.
+    . (Join-Path $ScriptRoot 'Invoke-MSTestWithCoverage.Scope.ps1')
 
     if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
         $SearchRoot = '.'
@@ -383,8 +401,12 @@ function Invoke-MSTestWithCoverageMain {
     $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
     Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
 
-    Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
-    Assert-CoberturaBranchCoverageThreshold -CoberturaXml $processedXmlContent
+    # The scoped-run gate lives in the path-loaded Scope part file rather than here, so that every
+    # test file credits its lines under breakpoint coverage and this entry point stays thin wiring.
+    Assert-CoberturaCoverageThresholdForRun `
+        -CoberturaXml $processedXmlContent `
+        -RepoRoot $repoRoot `
+        -ResolvedSearchRoot $resolvedSearchRoot
     Write-Output (Get-CoberturaFirstPartyCoverageReport -CoberturaXml $processedXmlContent)
 
     # The projection is built from the post-processed content, never from the raw collector

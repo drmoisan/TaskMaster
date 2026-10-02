@@ -1,0 +1,6 @@
+Timestamp: 2026-10-02T05-18
+Command: git -C <worktree-root> diff --name-status <BASE-SHA> -- . ":(exclude)docs/features" ":(exclude).claude/agent-memory"
+EXIT_CODE: 0
+Output Summary: Exactly nine paths. D: TaskMaster.sln.bak, TaskTree/TaskTree.vbproj.bak, TaskVisualization/TaskVisualization.vbproj.bak. M: .gitignore, .github/workflows/README.md, scripts/hygiene/Test-RepositoryHygiene.ps1, scripts/hygiene/Test-RepositoryHygiene.Rules.ps1, tests/scripts/hygiene/Test-RepositoryHygiene.Tests.ps1, tests/scripts/hygiene/Test-RepositoryHygiene.Rules.Tests.ps1. The Git adapter scripts/hygiene/Test-RepositoryHygiene.Git.ps1 and its test file do not appear.
+Companion Command: git -C <worktree-root> status --porcelain -- . ":(exclude)docs/features" ":(exclude).claude/agent-memory"
+Companion Output: empty. No `??` entry and no other entry. Deviation from the plan wording ("the same nine entries"): the nine changes were committed and pushed at the Phase 1 boundary (commit cadence binding on the executor), so porcelain status, which lists only uncommitted changes, is empty. The anchored diff above is the authoritative nine-path listing; the empty porcelain output establishes that no untracked or uncommitted path exists outside the footprint.

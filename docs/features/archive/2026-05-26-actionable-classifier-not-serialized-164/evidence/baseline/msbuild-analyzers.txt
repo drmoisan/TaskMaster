@@ -11,38 +11,38 @@ Sync-PackageReferences: All HintPaths are up to date
 MSBuild version 18.5.4+cb4e32d21 for .NET Framework
 Build started 5/26/2026 8:40:31 PM.
 
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" on node 1 (Build target(s)).
+     1>Project "<repo-root>\TaskMaster.sln" on node 1 (Build target(s)).
      1>ValidateSolutionConfiguration:
          Building solution configuration "Debug|Any CPU".
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\VBFunctions\VBFunctions.csproj" (5) on node 13 (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\VBFunctions\VBFunctions.csproj" (5) on node 13 (default targets).
      5>GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
        Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj" (8) on node 6 (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj" (8) on node 6 (default targets).
      8>GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
        Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
      5>CopyFilesToOutputDirectory:
-         VBFunctions -> C:\Users\DanMoisan\repos\TaskMaster\VBFunctions\bin\Debug\VBFunctions.dll
+         VBFunctions -> <repo-root>\VBFunctions\bin\Debug\VBFunctions.dll
      8>CopyFilesToOutputDirectory:
-         UtilitiesSwordfish.NET.General -> C:\Users\DanMoisan\repos\TaskMaster\UtilitiesSwordfish\bin\Debug\Swordfish.NET.General.dll
-     8>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SVGControl.csproj" (7) on node 15 (default targets).
+         UtilitiesSwordfish.NET.General -> <repo-root>\UtilitiesSwordfish\bin\Debug\Swordfish.NET.General.dll
+     8>Done Building Project "<repo-root>\UtilitiesSwordfish\UtilitiesSwordfish.NET.General.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\SVGControl\SVGControl.csproj" (7) on node 15 (default targets).
      7>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
        Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-     5>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\VBFunctions\VBFunctions.csproj" (default targets).
+     5>Done Building Project "<repo-root>\VBFunctions\VBFunctions.csproj" (default targets).
      7>_CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         SVGControl -> C:\Users\DanMoisan\repos\TaskMaster\SVGControl\bin\Debug\SVGControl.dll
-     7>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SVGControl.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesSwordfish.Test\UtilitiesSwordfish.NET.Test.csproj" (3) on node 16 (default targets).
+         SVGControl -> <repo-root>\SVGControl\bin\Debug\SVGControl.dll
+     7>Done Building Project "<repo-root>\SVGControl\SVGControl.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\UtilitiesSwordfish.Test\UtilitiesSwordfish.NET.Test.csproj" (3) on node 16 (default targets).
      3>MainResourcesGeneration:
        Skipping target "MainResourcesGeneration" because all output files are up-to-date with respect to the input files.
        CoreResGen:
@@ -54,9 +54,9 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         UtilitiesSwordfish.NET.Test -> C:\Users\DanMoisan\repos\TaskMaster\UtilitiesSwordfish.Test\bin\Debug\Swordfish.NET.Test.exe
-     3>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesSwordfish.Test\UtilitiesSwordfish.NET.Test.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\UtilitiesCS.csproj" (18) on node 10 (default targets).
+         UtilitiesSwordfish.NET.Test -> <repo-root>\UtilitiesSwordfish.Test\bin\Debug\Swordfish.NET.Test.exe
+     3>Done Building Project "<repo-root>\UtilitiesSwordfish.Test\UtilitiesSwordfish.NET.Test.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\UtilitiesCS\UtilitiesCS.csproj" (18) on node 10 (default targets).
     18>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
@@ -68,9 +68,9 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         UtilitiesCS -> C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\bin\Debug\UtilitiesCS.dll
-    18>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS\UtilitiesCS.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\Tags\Tags.csproj" (4) on node 2 (default targets).
+         UtilitiesCS -> <repo-root>\UtilitiesCS\bin\Debug\UtilitiesCS.dll
+    18>Done Building Project "<repo-root>\UtilitiesCS\UtilitiesCS.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\Tags\Tags.csproj" (4) on node 2 (default targets).
      4>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
@@ -82,16 +82,16 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         Tags -> C:\Users\DanMoisan\repos\TaskMaster\Tags\bin\Debug\Tags.dll
-     4>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\Tags\Tags.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\ToDoModel\ToDoModel.csproj" (11) on node 5 (default targets).
+         Tags -> <repo-root>\Tags\bin\Debug\Tags.dll
+     4>Done Building Project "<repo-root>\Tags\Tags.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\ToDoModel\ToDoModel.csproj" (11) on node 5 (default targets).
     11>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
        Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\VBFunctions.Test\VBFunctions.Test.csproj" (12) on node 14 (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\VBFunctions.Test\VBFunctions.Test.csproj" (12) on node 14 (default targets).
     12>GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
@@ -101,23 +101,23 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         ToDoModel -> C:\Users\DanMoisan\repos\TaskMaster\ToDoModel\bin\Debug\ToDoModel.dll
-    11>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\ToDoModel\ToDoModel.csproj" (default targets).
+         ToDoModel -> <repo-root>\ToDoModel\bin\Debug\ToDoModel.dll
+    11>Done Building Project "<repo-root>\ToDoModel\ToDoModel.csproj" (default targets).
     12>_CopyOutOfDateSourceItemsToOutputDirectory:
        Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         VBFunctions.Test -> C:\Users\DanMoisan\repos\TaskMaster\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll
-    12>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\VBFunctions.Test\VBFunctions.Test.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\TaskTree\TaskTree.csproj" (10) on node 17 (default targets).
+         VBFunctions.Test -> <repo-root>\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll
+    12>Done Building Project "<repo-root>\VBFunctions.Test\VBFunctions.Test.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\TaskTree\TaskTree.csproj" (10) on node 17 (default targets).
     10>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
        Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\TaskVisualization\TaskVisualization.csproj" (6) on node 18 (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\TaskVisualization\TaskVisualization.csproj" (6) on node 18 (default targets).
      6>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
@@ -129,16 +129,16 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         TaskVisualization -> C:\Users\DanMoisan\repos\TaskMaster\TaskVisualization\bin\Debug\TaskVisualization.dll
-     6>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\TaskVisualization\TaskVisualization.csproj" (default targets).
+         TaskVisualization -> <repo-root>\TaskVisualization\bin\Debug\TaskVisualization.dll
+     6>Done Building Project "<repo-root>\TaskVisualization\TaskVisualization.csproj" (default targets).
     10>_CopyOutOfDateSourceItemsToOutputDirectory:
        Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         TaskTree -> C:\Users\DanMoisan\repos\TaskMaster\TaskTree\bin\Debug\TaskTree.dll
-    10>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\TaskTree\TaskTree.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\ToDoModel.Test\ToDoModel.Test.csproj" (13) on node 7 (default targets).
+         TaskTree -> <repo-root>\TaskTree\bin\Debug\TaskTree.dll
+    10>Done Building Project "<repo-root>\TaskTree\TaskTree.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\ToDoModel.Test\ToDoModel.Test.csproj" (13) on node 7 (default targets).
     13>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
@@ -150,23 +150,23 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         ToDoModel.Test -> C:\Users\DanMoisan\repos\TaskMaster\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\Tags.Test\Tags.Test.csproj.metaproj" (2) on node 1 (default targets).
-     2>Project "C:\Users\DanMoisan\repos\TaskMaster\Tags.Test\Tags.Test.csproj.metaproj" (2) is building "C:\Users\DanMoisan\repos\TaskMaster\Tags.Test\Tags.Test.csproj" (20) on node 1 (default targets).
+         ToDoModel.Test -> <repo-root>\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\Tags.Test\Tags.Test.csproj.metaproj" (2) on node 1 (default targets).
+     2>Project "<repo-root>\Tags.Test\Tags.Test.csproj.metaproj" (2) is building "<repo-root>\Tags.Test\Tags.Test.csproj" (20) on node 1 (default targets).
     20>GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
        Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-    13>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\ToDoModel.Test\ToDoModel.Test.csproj" (default targets).
+    13>Done Building Project "<repo-root>\ToDoModel.Test\ToDoModel.Test.csproj" (default targets).
     20>_CopyOutOfDateSourceItemsToOutputDirectory:
        Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         Tags.Test -> C:\Users\DanMoisan\repos\TaskMaster\Tags.Test\bin\Debug\Tags.Test.dll
-    20>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\Tags.Test\Tags.Test.csproj" (default targets).
-     2>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\Tags.Test\Tags.Test.csproj.metaproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\QuickFiler.csproj" (17) on node 9 (default targets).
+         Tags.Test -> <repo-root>\Tags.Test\bin\Debug\Tags.Test.dll
+    20>Done Building Project "<repo-root>\Tags.Test\Tags.Test.csproj" (default targets).
+     2>Done Building Project "<repo-root>\Tags.Test\Tags.Test.csproj.metaproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\QuickFiler\QuickFiler.csproj" (17) on node 9 (default targets).
     17>MainResourcesGeneration:
        Skipping target "MainResourcesGeneration" because all output files are up-to-date with respect to the input files.
        CoreResGen:
@@ -180,9 +180,9 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         QuickFiler -> C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\bin\Debug\QuickFiler.dll
-    17>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\QuickFiler\QuickFiler.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\TaskVisualization.Test\TaskVisualization.Test.csproj" (16) on node 8 (default targets).
+         QuickFiler -> <repo-root>\QuickFiler\bin\Debug\QuickFiler.dll
+    17>Done Building Project "<repo-root>\QuickFiler\QuickFiler.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\TaskVisualization.Test\TaskVisualization.Test.csproj" (16) on node 8 (default targets).
     16>GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
@@ -192,9 +192,9 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         TaskVisualization.Test -> C:\Users\DanMoisan\repos\TaskMaster\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll
-    16>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\TaskVisualization.Test\TaskVisualization.Test.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\TaskMaster.csproj" (9) on node 11 (default targets).
+         TaskVisualization.Test -> <repo-root>\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll
+    16>Done Building Project "<repo-root>\TaskVisualization.Test\TaskVisualization.Test.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\TaskMaster\TaskMaster.csproj" (9) on node 11 (default targets).
      9>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
@@ -204,13 +204,13 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyOutOfDateSourceItemsToOutputDirectory:
        Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
        _CopyOutOfDateSourceItemsToOutputDirectoryAlways:
-         Copying file from "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\log4net.config" to "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\bin\Debug\log4net.config".
+         Copying file from "<repo-root>\TaskMaster\log4net.config" to "<repo-root>\TaskMaster\bin\Debug\log4net.config".
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         TaskMaster -> C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\bin\Debug\TaskMaster.dll
-     9>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\TaskMaster.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\QuickFiler.Test\QuickFiler.Test.csproj" (15) on node 12 (default targets).
+         TaskMaster -> <repo-root>\TaskMaster\bin\Debug\TaskMaster.dll
+     9>Done Building Project "<repo-root>\TaskMaster\TaskMaster.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\QuickFiler.Test\QuickFiler.Test.csproj" (15) on node 12 (default targets).
     15>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
@@ -222,14 +222,14 @@ Build started 5/26/2026 8:40:31 PM.
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         QuickFiler.Test -> C:\Users\DanMoisan\repos\TaskMaster\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
-    15>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\QuickFiler.Test\QuickFiler.Test.csproj" (default targets).
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.Test\TaskMaster.Test.csproj" (14) on node 3 (default targets).
+         QuickFiler.Test -> <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
+    15>Done Building Project "<repo-root>\QuickFiler.Test\QuickFiler.Test.csproj" (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\TaskMaster.Test\TaskMaster.Test.csproj" (14) on node 3 (default targets).
     14>GenerateTargetFrameworkMonikerAttribute:
        Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
        CoreCompile:
        Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-     1>Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (1) is building "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\UtilitiesCS.Test.csproj" (19) on node 4 (default targets).
+     1>Project "<repo-root>\TaskMaster.sln" (1) is building "<repo-root>\UtilitiesCS.Test\UtilitiesCS.Test.csproj" (19) on node 4 (default targets).
     19>CoreResGen:
          No resources are out of date with respect to their source files. Skipping resource generation.
        GenerateTargetFrameworkMonikerAttribute:
@@ -241,22 +241,22 @@ Build started 5/26/2026 8:40:31 PM.
     14>_CopyOutOfDateSourceItemsToOutputDirectory:
        Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
     19>_CopyOutOfDateSourceItemsToOutputDirectoryAlways:
-         Copying file from "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\log4net.config" to "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\bin\Debug\log4net.config".
+         Copying file from "<repo-root>\TaskMaster\log4net.config" to "<repo-root>\UtilitiesCS.Test\bin\Debug\log4net.config".
     14>_CopyOutOfDateSourceItemsToOutputDirectoryAlways:
-         Copying file from "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster\log4net.config" to "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.Test\bin\Debug\log4net.config".
+         Copying file from "<repo-root>\TaskMaster\log4net.config" to "<repo-root>\TaskMaster.Test\bin\Debug\log4net.config".
     19>_CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         UtilitiesCS.Test -> C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll
+         UtilitiesCS.Test -> <repo-root>\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll
     14>_CopyOutOfDateSourceItemsToOutputDirectoryAlways:
-         Copying file from "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.Test\log4net.config" to "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.Test\bin\Debug\log4net.config".
+         Copying file from "<repo-root>\TaskMaster.Test\log4net.config" to "<repo-root>\TaskMaster.Test\bin\Debug\log4net.config".
        _CopyAppConfigFile:
        Skipping target "_CopyAppConfigFile" because all output files are up-to-date with respect to the input files.
        CopyFilesToOutputDirectory:
-         TaskMaster.Test -> C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll
-    14>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.Test\TaskMaster.Test.csproj" (default targets).
-    19>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\UtilitiesCS.Test.csproj" (default targets).
-     1>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.sln" (Build target(s)).
+         TaskMaster.Test -> <repo-root>\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll
+    14>Done Building Project "<repo-root>\TaskMaster.Test\TaskMaster.Test.csproj" (default targets).
+    19>Done Building Project "<repo-root>\UtilitiesCS.Test\UtilitiesCS.Test.csproj" (default targets).
+     1>Done Building Project "<repo-root>\TaskMaster.sln" (Build target(s)).
 
 Build succeeded.
     0 Warning(s)

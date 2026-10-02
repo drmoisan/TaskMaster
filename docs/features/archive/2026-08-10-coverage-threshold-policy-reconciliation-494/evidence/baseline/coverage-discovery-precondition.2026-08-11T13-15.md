@@ -4,15 +4,15 @@ EXIT_CODE: 0
 
 Concurrent Test Processes: none
 Discovered Candidate Count: 9
-- `C:\Users\DanMoisan\repos\TaskMaster\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\bin\Debug\SVGControl.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\Tags.Test\bin\Debug\Tags.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\TaskTree.Test\bin\Debug\TaskTree.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll`
-- `C:\Users\DanMoisan\repos\TaskMaster\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll`
+- `<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`
+- `<repo-root>\SVGControl.Test\bin\Debug\SVGControl.Test.dll`
+- `<repo-root>\Tags.Test\bin\Debug\Tags.Test.dll`
+- `<repo-root>\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll`
+- `<repo-root>\TaskTree.Test\bin\Debug\TaskTree.Test.dll`
+- `<repo-root>\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll`
+- `<repo-root>\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll`
+- `<repo-root>\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll`
+- `<repo-root>\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll`
 
 Validation: Every candidate begins with the workspace-root path and none includes `\.claude\worktrees\` after that prefix.
 

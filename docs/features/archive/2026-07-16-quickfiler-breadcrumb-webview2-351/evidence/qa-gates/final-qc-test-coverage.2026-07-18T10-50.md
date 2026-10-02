@@ -7,7 +7,7 @@ EXIT_CODE: 0
 Output Summary:
 - Test Run Successful (definitive single-pass loop). Total tests: 4952; Passed: 4952; Failed: 0. (Baseline P0-T7: 4838/4838; this feature added 114 new tests, all passing.)
 - Command deviation note: `/InIsolation` was appended to the plan's exact command as a mechanical necessity — the new coordinator tests use `Moq.Mock.Raise`, which under the default in-process vstest host fails with the known `System.Threading.Tasks.Extensions 4.2.0.1` FileNotFoundException; `/InIsolation` hosts tests in testhost.exe where the projects' existing app.config binding redirects apply. No test or assertion was altered for this; the same 4945 tests run.
-- Coverage attachment: `TestResults\a3ec0285-f5f3-4a93-afc9-4318f50189e6\DanMoisan_MEGALODON4_2026-07-18.09_56_29.coverage`, converted via `dotnet-coverage merge -f cobertura -o final-coverage.cobertura.xml` (EXIT_CODE 0).
+- Coverage attachment: `TestResults\a3ec0285-f5f3-4a93-afc9-4318f50189e6\<user>_<host>_2026-07-18.09_56_29.coverage`, converted via `dotnet-coverage merge -f cobertura -o final-coverage.cobertura.xml` (EXIT_CODE 0).
 - Numeric post-change line-coverage headline (Cobertura line-rate):
   - Overall (all instrumented assemblies incl. third-party, same basis as baseline): 66.40% (117,975 / 177,674 lines) — baseline 65.96%.
   - `QuickFiler.dll`: 72.67% line — baseline 72.28%.

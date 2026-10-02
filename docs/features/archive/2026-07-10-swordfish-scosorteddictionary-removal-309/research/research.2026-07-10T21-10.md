@@ -24,7 +24,7 @@ Explicitly out of scope (belongs to other epic children F1/F2/F4/F5): deleting
 
 ### Scope searched
 
-Repo root: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a94d2dd606e76374e`
+Repo root: `<repo-root>\.claude\worktrees\agent-a94d2dd606e76374e`
 (full working tree — no directory exclusions applied by the search tool other than the glob
 filters listed per command).
 

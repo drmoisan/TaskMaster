@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T12:58:08Z
 
-Command: `TOOL="/c/Users/DanMoisan/.dotnet/tools/csharpier.exe"; F1="QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs"; F2="QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.Part2.cs"; "$TOOL" format "$F1" "$F2"; "$TOOL" format "$F1" "$F2"; "$TOOL" check "$F1" "$F2"; wc -l "$F1" "$F2"`
+Command: `TOOL="/c/Users/<user>/.dotnet/tools/csharpier.exe"; F1="QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs"; F2="QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.Part2.cs"; "$TOOL" format "$F1" "$F2"; "$TOOL" format "$F1" "$F2"; "$TOOL" check "$F1" "$F2"; wc -l "$F1" "$F2"`
 
 EXIT_CODE: 0
 

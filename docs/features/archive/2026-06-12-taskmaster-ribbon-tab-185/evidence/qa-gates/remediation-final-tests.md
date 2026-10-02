@@ -33,4 +33,4 @@ Output Summary:
   - `TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs`: 168/170 lines = 98.82% (the 2 uncovered lines are in the compiler-generated lambda display class `<>c`, not authored source).
   - `TaskMaster/Ribbon/RibbonExplorer.xml`: not present in coverage (non-compiled XML resource, no instrumentable IL); no changed-line coverage regression possible.
 
-Coverage attachment (P2-T4 run): `coverage-out-final/2a0e4c04-9b52-4195-8c18-d0d352dffdcf/DanMoisan_MEGALODON4_2026-06-12.11_30_08.coverage`
+Coverage attachment (P2-T4 run): `coverage-out-final/2a0e4c04-9b52-4195-8c18-d0d352dffdcf/<user>_<host>_2026-06-12.11_30_08.coverage`

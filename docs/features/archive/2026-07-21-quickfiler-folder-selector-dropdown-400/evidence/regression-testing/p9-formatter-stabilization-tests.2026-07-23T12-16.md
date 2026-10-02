@@ -1,7 +1,7 @@
 # Phase 9 Formatter-Stabilization Focused Tests
 
 - Timestamp: `2026-07-23T12:16:42Z`
-- Command: `& 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' /InIsolation '/TestCaseFilter:FullyQualifiedName~BreadcrumbPopupControlDispatchTests' '/Logger:console;Verbosity=normal'`
+- Command: `& 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' /InIsolation '/TestCaseFilter:FullyQualifiedName~BreadcrumbPopupControlDispatchTests' '/Logger:console;Verbosity=normal'`
 - EXIT_CODE: `0`
 - Output Summary: `Test Run Successful; total=13 passed=13 failed=0 skipped=0 elapsed=1.3455s; workspace_vstest_after=0 workspace_testhost_after=0`
 

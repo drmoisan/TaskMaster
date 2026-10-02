@@ -5,7 +5,7 @@ Timestamp: 2026-07-11T03-04
 Policy Order: CLAUDE.md → .claude/rules/general-code-change.md → .claude/rules/general-unit-test.md → .claude/rules/csharp.md
 
 Files read (all confirmed present in this feature worktree
-`C:/Users/DanMoisan/repos/TaskMaster-wt/swordfish-collection-stack-lineage-307`):
+`<user-profile>/repos/TaskMaster-wt/swordfish-collection-stack-lineage-307`):
 
 1. `CLAUDE.md` — present. Standing instructions: policy-compliance order, general + C# code-change
    and unit-test policy, C# toolchain (csharpier → msbuild analyzers → msbuild nullable → vstest

@@ -9,7 +9,7 @@ Policy Order:
 4. `.claude/rules/csharp.md` (C#-specific toolchain and coding standards)
 
 Files read (start-to-end, no section skipped):
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\CLAUDE.md`
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-code-change.md`
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-unit-test.md`
-- `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\csharp.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\CLAUDE.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-code-change.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\general-unit-test.md`
+- `<user-profile>\repos\TaskMaster-wt-2026-07-06-06-35\.claude\rules\csharp.md`

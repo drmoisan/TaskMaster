@@ -336,7 +336,7 @@ except where noted:
    `TaskMaster.Application` — name projects that do not exist in `TaskMaster.sln`.
 
 5. **Persisted agent memory records the decision that these were rejected [documentary, not
-   git-verified].** `C:\Users\DanMoisan\.claude\projects\C--Users-DanMoisan-repos-TaskMaster\memory\project_claude_governance_sync_178.md`
+   git-verified].** `<user-profile>\.claude\projects\C--Users-<user>-repos-TaskMaster\memory\project_claude_governance_sync_178.md`
    (written ~63 days before this session) records: in 2026-06, issue #178 / PR #179 into `main`,
    branch `chore/sync-claude-hardening`, `.claude/` was synced from a hardened reference repo under
    the directive **"keep current policy, adapt mechanism."** It lists as **Kept**: "80% line / 90%

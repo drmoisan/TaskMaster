@@ -5,7 +5,7 @@
 - **Integration branch:** `epic/quickfiler-per-file-coverage-integration`
 - **Branch:** `feature/quickfiler-per-file-coverage-capstone-r2`
 - **Work Mode:** `full-feature` — `spec.md` **and** `user-story.md` are together the authoritative acceptance-criteria source (AC1-AC12 in each, checked off together), plus `spec.md` § Definition of Done
-- **Worktree:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a24c84de174a27784`
+- **Worktree:** `<repo-root>\.claude\worktrees\agent-a24c84de174a27784`
 - **Plan file (updated in place):** `<FEATURE>/plan.2026-08-08T00-34.md`
 - **Upstream dependencies:** all fourteen sibling children merged to the integration branch; F1's ledger and harness — consumed at **execution time**, never at planning or preflight time
 - `EVIDENCE_LOCATION_OVERRIDE_REJECTED:` none — the delegation supplied only canonical `<FEATURE>/evidence/<kind>/` paths.

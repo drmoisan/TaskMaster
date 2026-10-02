@@ -9,8 +9,18 @@
 - [#950 R1](project_950_r1_inline_continuation_and_reindent_width_seams.md) — default TCS continues inline so Drain() is vacuous (RunContinuationsAsynchronously + delete-Drain control); using() re-indent breaks width
 - [#950 v1.0](project_950_hygiene_blocks_absolute_prefix_and_always_failing_probe_seams.md) — absolute prefix in Command rows breaks hygiene rule B; always-failing probe; commit task's own artifact in porcelain; re-indent vs added-line scans
 - [#956 R1.2](project_956_r12_rethrow_brace_exemptions_and_indent_keyed_catch_rule.md) — lifting ExcludeFromCodeCoverage exposes braces after `throw;`; construct-identified exemptions; catch rule keyed to indent; recount control; ITERATION 1 + RERUN
+- [#956 R1](project_956_r1_spec_self_hit_and_raw_doc_name_seams.md) — spec-wording counts self-hit the AC line; anchor `cobertura[^/]*\.xml$`; amended AC needs a P0 literal check
+- [#953 R3](project_953_r3_grep_gitignore_directory_path_and_measured_line_lengths.md) — Grep honours .gitignore for a DIRECTORY path (pass the file path), Glob does not; measure line lengths with `^.{N,}`
+- [#953 R2](project_953_r2_grep_long_line_omission_and_cr_anchor_seams.md) — Grep omits lines over ~500 chars; ripgrep `$` fails before CR (`\r?$`); expect-fail needs a wrong-reason branch
+- [#953 R1](project_953_r1_pwsh_refused_and_count_recheck_seams.md) — Bash guard refuses pwsh (`git -C <root>`, absolute operands); re-count blocks per file; `-Force` count-0 self-hits
+- [#953 R0](project_953_fizzler_redirect_sweep_and_ratchet_plan_seams.md) — ripgrep strips the BOM; text=auto hides CRLF loss (gate `git ls-files --eol`); shared attribute needs a two-line Edit
+- [#952 R3](project_952_r3_shared_origin_main_ancestry_gate_seam.md) — origin/main is shared by all worktrees: a no-fetch plan still needs a P0 `merge-base == BASE-SHA` gate
+- [#952 R2](project_952_r2_label_counts_helper_enumeration_and_hex_backslash_seams.md) — recount `all N required` labels; a directory-enumerating helper reads every file; backslash as `\x5C`
+- [#952 R1](project_952_r1_read_phantom_row_and_frozen_clause_a_seams.md) — Read trailing empty row is inconsistent (count with Grep `^`); freeze footprint Clause A from P0
+- [#952 R0](project_952_runbook_and_workflow_comment_plan_seams.md) — `.yml` edits are pre-impl-gated; CRLF adds 1 to line length; removed bullet diffs as `-- `; actionlint silent on success
 - [#948 v0.3](project_948_sibling_first_shape_reconciliation_seams.md) — sibling lands first: named shapes with content anchors, baseline-relative try/catch gate, re-budget the 500-line ceiling, hit-count guards, dynamic census
 - [#947 pass A](project_947_passA_second_call_site_consolidation_seams.md) — mid-plan second call site: nested catch end keyed to the header's indent; re-derive "N catch clauses"; drop promotion handoff
+- [#945 R0](project_945_sortemail_trysave_directory_seam_plan_seams.md) — whitespace-stripped token census; compile-red fail-before; uncommitted-fix control via backup copy; two-dot MERGE-BASE gates
 - [#940 R3](project_940_r3_per_file_coverage_rule_and_post_merge_reanchor_seams.md) — aggregate not-lower gates trip on variance; per-file lines+branches rule with in-memory control; ANCHOR-SHA-2 = `<merge>^2`
 - [#929 R5](project_929_r5_text_auto_terminator_only_formatter_rewrite_seam.md) — `* text=auto` makes a terminator-only rewrite uncommittable; key the commit on numstat non-empty
 - [#929 R4](project_929_r4_wrapper_led_hook_containment_and_actions_log_seams.md) — pr-author hook matches gh+pr+create substrings in any pwsh payload; strip SGR from Actions logs; wrap msbuild in Set-Location

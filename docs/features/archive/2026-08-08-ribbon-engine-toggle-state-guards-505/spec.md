@@ -15,7 +15,7 @@
 > **Authority order for this document.** The research artifact `research/2026-08-08T19-30-ribbon-engine-toggle-state-guards-research.md` is authoritative over `issue.md` wherever the two conflict. No conflict was found during authoring; the `## Correction Log` at the end of this document records that finding and remains the place to log any correction discovered later.
 
 All file paths are relative to the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f`. Line numbers were verified against the branch head in this worktree.
+`<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f`. Line numbers were verified against the branch head in this worktree.
 
 ---
 

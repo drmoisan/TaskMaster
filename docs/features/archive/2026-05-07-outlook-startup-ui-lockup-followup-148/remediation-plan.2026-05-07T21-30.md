@@ -6,7 +6,7 @@
 - **Last Updated:** 2026-05-07T21-30
 - **Status:** Drafted from review-triggered remediation inputs
 - **Work Mode:** `full-bug`
-- **Plan Path:** `c:\Users\DanMoisan\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\remediation-plan.2026-05-07T21-30.md`
+- **Plan Path:** `<user-profile>\repos\TaskMaster-wt-2026-05-07-13-34\docs\features\active\2026-05-07-outlook-startup-ui-lockup-followup-148\remediation-plan.2026-05-07T21-30.md`
 - **Requirements Sources:** `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/spec.md`
 - **Supporting Context:** `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/remediation-inputs.2026-05-07T21-30.md`, `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/policy-audit.2026-05-07T21-30.md`, `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/code-review.2026-05-07T21-30.md`, `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/feature-audit.2026-05-07T21-30.md`, `docs/features/active/2026-05-07-outlook-startup-ui-lockup-followup-148/plan.2026-05-07T19-34.md`, `artifacts/pr_context.summary.txt`, `artifacts/pr_context.appendix.txt`
 

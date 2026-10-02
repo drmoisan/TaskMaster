@@ -9,9 +9,9 @@ Policy Order: policy-compliance-order required order, applied for a PowerShell/c
 4. .claude/rules/powershell.md (PowerShell-specific policy)
 
 Files read:
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-12-10-29\CLAUDE.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-12-10-29\.claude\rules\general-code-change.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-12-10-29\.claude\rules\general-unit-test.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-12-10-29\.claude\rules\powershell.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-12-10-29\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-12-10-29\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-12-10-29\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-12-10-29\.claude\rules\powershell.md
 
 Notes: PowerShell toolchain order is format -> analyze -> test via PoshQC MCP tools. No type-check stage for PowerShell. This change is a single config-field revert in global.json validated by an existing Pester suite; no production PowerShell source changes.

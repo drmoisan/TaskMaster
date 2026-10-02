@@ -6,15 +6,15 @@ Pairs with `FEATURE/evidence/regression-testing/red-pester-run.2026-08-10T23-20.
 
 ## Channel 1 — the MCP function (the recorded channel)
 
-Command: `mcp__drm-copilot__run_poshqc_test` with `workspace_root = "C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["tests/scripts/vscode"]`
+Command: `mcp__drm-copilot__run_poshqc_test` with `workspace_root = "<repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["tests/scripts/vscode"]`
 EXIT_CODE: 0
 
 ```json
 {
   "ok": true,
   "tool": "run_poshqc_test",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
-  "summary": "Ran bundled PoshQC test against 'C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-ac1a08c3569adb7eb' with 1 selected scan folder(s)."
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
+  "summary": "Ran bundled PoshQC test against '<repo-root>\\.claude\\worktrees\\agent-ac1a08c3569adb7eb' with 1 selected scan folder(s)."
 }
 ```
 

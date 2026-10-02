@@ -4,7 +4,7 @@
 - **Epic:** `quickfiler-per-file-coverage` (parent issue #136), child **F7**, wave 1, band C3
 - **Integration branch:** `epic/quickfiler-per-file-coverage-integration`
 - **Work Mode:** `full-feature` — `spec.md` **and** `user-story.md` are together the authoritative acceptance-criteria source
-- **Worktree:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-afcf27830d48e5590`
+- **Worktree:** `<repo-root>\.claude\worktrees\agent-afcf27830d48e5590`
 - **Plan timestamp:** 2026-08-07T20-41
 - **Upstream dependency:** F1 `quickfiler-coverage-ledger` (wave 0) — consumed at execution time, not at planning or preflight time
 

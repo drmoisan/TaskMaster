@@ -1,7 +1,7 @@
 # Fail-Before Exception Dossier — Defect 3, Dead-Region Deletion (Issue #449, [P4-T7])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 Merge-base SHA: `c551eabab0aa0a6b1a284252811a2e1de819634e`
 
 Command:

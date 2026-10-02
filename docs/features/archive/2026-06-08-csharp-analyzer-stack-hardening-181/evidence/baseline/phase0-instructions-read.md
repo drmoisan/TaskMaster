@@ -11,16 +11,16 @@ Policy Order:
 6. .claude/skills/policy-compliance-order/SKILL.md (policy precedence)
 
 Files Read (explicit list):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\ci-workflows.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\tonality.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\policy-compliance-order\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\atomic-plan-contract\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\acceptance-criteria-tracking\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\ci-workflows.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\rules\tonality.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\policy-compliance-order\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\atomic-plan-contract\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\evidence-and-timestamp-conventions\SKILL.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\.claude\skills\acceptance-criteria-tracking\SKILL.md
 
 Supporting context read:
 - docs/features/active/2026-06-08-csharp-analyzer-stack-hardening-181/plan.2026-06-08T12-12.md (authoritative plan)
@@ -29,7 +29,7 @@ Supporting context read:
 
 Toolchain availability verified for execution:
 - dotnet SDK 10.0.300
-- csharpier 1.2.6 via dotnet tool manifest (C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-10\dotnet-tools.json)
+- csharpier 1.2.6 via dotnet tool manifest (<user-profile>\repos\TaskMaster-wt-2026-06-08-12-10\dotnet-tools.json)
 - MSBuild at C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe
 - vstest.console.exe at C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe
-- nuget.exe (standalone NuGet 7.6.0) at C:\Users\DanMoisan\AppData\Local\Temp\nuget.exe (required for packages.config restore; dotnet nuget cannot restore packages.config)
+- nuget.exe (standalone NuGet 7.6.0) at <user-profile>\AppData\Local\Temp\nuget.exe (required for packages.config restore; dotnet nuget cannot restore packages.config)

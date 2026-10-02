@@ -10,11 +10,11 @@ Policy Order:
 5. .claude/rules/ci-workflows.md (GitHub Actions pwsh exit-code rule — read for completeness per plan P0-T1)
 
 Files read (explicit list):
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\CLAUDE.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-code-change.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-unit-test.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\csharp.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\ci-workflows.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\ci-workflows.md
 
 Work Mode: full-bug (large path). AC source: spec.md `## Acceptance Criteria` (AC1-AC13).
 

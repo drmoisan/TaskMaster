@@ -1,8 +1,8 @@
 # Coverage Summary
 
 Timestamp: 2026-04-14T08:05:27.6558282-04:00
-Baseline Coverage Artifact: `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-mstest-coverage.2026-04-14T07-28-45-04-00.md`
-Final Coverage Artifact: `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-mstest-coverage.2026-04-14T08-05.md`
+Baseline Coverage Artifact: `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-mstest-coverage.2026-04-14T07-28-45-04-00.md`
+Final Coverage Artifact: `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-mstest-coverage.2026-04-14T08-05.md`
 
 ## Overall Coverage
 

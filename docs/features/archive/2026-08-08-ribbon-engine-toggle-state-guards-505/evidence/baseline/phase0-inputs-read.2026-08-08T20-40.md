@@ -4,9 +4,9 @@ Timestamp: 2026-08-08T20-40
 
 Absolute paths read:
 
-1. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\spec.md`
-2. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\issue.md`
-3. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\research\2026-08-08T19-30-ribbon-engine-toggle-state-guards-research.md`
+1. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\spec.md`
+2. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\issue.md`
+3. `<repo-root>\.claude\worktrees\agent-a406ae4b7a2ce151f\docs\features\active\2026-08-08-ribbon-engine-toggle-state-guards-505\research\2026-08-08T19-30-ribbon-engine-toggle-state-guards-research.md`
 
 ## Resolved work mode and AC source
 

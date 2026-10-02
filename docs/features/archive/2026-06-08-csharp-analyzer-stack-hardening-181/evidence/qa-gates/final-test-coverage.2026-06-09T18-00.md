@@ -19,7 +19,7 @@ Numeric post-change coverage (from merged coverage XML):
   line_coverage = 85.43% (lines_covered=35097, partial=888, not_covered=5098)
   Baseline (P0-T9) was 85.46% — a -0.03pp run-to-run variance, far above the 80% floor.
 
-Coverage source: TestResults/f785e6a3-b3b3-4ec6-a708-b3c556a906c7/DanMoisan_MEGALODON4_2026-06-09.18_53_28.coverage
+Coverage source: TestResults/f785e6a3-b3b3-4ec6-a708-b3c556a906c7/<user>_<host>_2026-06-09.18_53_28.coverage
 Merged to: evidence/qa-gates/final-coverage.2026-06-09T18-00.xml
 
 ## Pre-existing flaky test (NOT a regression)

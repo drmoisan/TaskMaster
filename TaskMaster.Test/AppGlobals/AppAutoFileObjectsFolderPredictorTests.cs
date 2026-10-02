@@ -36,7 +36,7 @@ namespace TaskMaster.Test.AppGlobals
         private static Mock<IApplicationGlobals> CreateMockGlobalsWithAppData()
         {
             var specialFolders = new ConcurrentDictionary<string, string>();
-            specialFolders[@"AppData"] = @"C:\Users\test\AppData";
+            specialFolders[@"AppData"] = @"C:\Fixtures\test\AppData";
             var mockFs = new Mock<IFileSystemFolderPaths>();
             mockFs.SetupGet(x => x.SpecialFolders).Returns(specialFolders);
             var mockGlobals = new Mock<IApplicationGlobals>();

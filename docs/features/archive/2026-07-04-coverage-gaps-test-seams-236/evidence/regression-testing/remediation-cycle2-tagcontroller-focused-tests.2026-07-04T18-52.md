@@ -21,7 +21,7 @@ Output Summary:
 - Total tests: 12.
 - Passed: 12.
 
-Command: & 'C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe' collect --output 'docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\regression-testing\remediation-cycle2-tagcontroller-focused-coverage.cobertura.xml' --output-format cobertura -- 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' Tags.Test\bin\Debug\Tags.Test.dll /TestCaseFilter:"FullyQualifiedName~TagControllerCoverageExpansionTests" /InIsolation
+Command: & '<user-profile>\.dotnet\tools\dotnet-coverage.exe' collect --output 'docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\regression-testing\remediation-cycle2-tagcontroller-focused-coverage.cobertura.xml' --output-format cobertura -- 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' Tags.Test\bin\Debug\Tags.Test.dll /TestCaseFilter:"FullyQualifiedName~TagControllerCoverageExpansionTests" /InIsolation
 EXIT_CODE: 0
 Output Summary:
 - Test Run Successful.

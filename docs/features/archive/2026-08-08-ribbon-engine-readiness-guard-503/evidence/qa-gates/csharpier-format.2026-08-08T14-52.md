@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P3-T1]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' format TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; & '<user-profile>\.dotnet\tools\csharpier.exe' format TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs"`
 EXIT_CODE: 0
 
 ## Phase 3 restart disclosure

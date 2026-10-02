@@ -5,7 +5,6 @@
   <Import Project="..\packages\Microsoft.Testing.Extensions.Telemetry.2.4.1\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props" Condition="Exists('..\packages\Microsoft.Testing.Extensions.Telemetry.2.4.1\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props')" />
   <Import Project="..\packages\Microsoft.Testing.Platform.2.4.1\build\netstandard2.0\Microsoft.Testing.Platform.props" Condition="Exists('..\packages\Microsoft.Testing.Platform.2.4.1\build\netstandard2.0\Microsoft.Testing.Platform.props')" />
   <Import Project="..\packages\Meziantou.Analyzer.3.0.290\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.290\build\Meziantou.Analyzer.props')" />
-  <Import Project="..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.props" Condition="Exists('..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -96,6 +95,7 @@
     <Compile Include="Viewers\ItemViewerSearchDismissalContractTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbThreadAffinityTests.cs" />
+    <Compile Include="Viewers\ItemViewerBreadcrumbThreadAffinityTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs" />
@@ -225,6 +225,7 @@
     <Compile Include="Viewers\WebView2EnvironmentContractTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
+    <Compile Include="TestSupport\DedicatedWorkerThread.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Helper Classes\ConversationResolverTests.cs" />
@@ -526,13 +527,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\MSTest.Analyzers.4.4.0\analyzers\dotnet\cs\MSTest.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\packages\MSTest.Analyzers.4.4.0\analyzers\dotnet\cs\MSTest.Analyzers.dll" />
+    <Analyzer Include="..\packages\MSTest.Analyzers.4.4.1\analyzers\dotnet\cs\MSTest.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\MSTest.Analyzers.4.4.1\analyzers\dotnet\cs\MSTest.Analyzers.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.10.34.0.3385\analyzers\SonarAnalyzer.CSharp.dll" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.targets" Condition="Exists('..\packages\altcover.8.6.45\build\netstandard2.0\AltCover.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
@@ -551,7 +551,7 @@
   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
   <ItemGroup>
     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.235\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.290\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.0\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.0\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.0\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />

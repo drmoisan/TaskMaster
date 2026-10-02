@@ -9,7 +9,7 @@ Output Summary:
 - Failed: 0.
 - Skipped: 0.
 - Total time: 45.1845 seconds.
-- Produced coverage attachment: C:\Users\DanMoisan\repos\TaskMaster\TestResults\issue218-baseline\66001d66-6732-4adf-8cf3-a0c2f7574488\DanMoisan_MEGALODON4_2026-06-26.20_42_21.coverage.
+- Produced coverage attachment: <repo-root>\TestResults\issue218-baseline\66001d66-6732-4adf-8cf3-a0c2f7574488\<user>_<host>_2026-06-26.20_42_21.coverage.
 - Numeric baseline line coverage from converted Cobertura XML: 62.03% (100491 / 162006 lines).
 - QuickFiler\Controllers\QfcDatamodel.cs baseline line coverage: 0.00% (0 / 49 lines).
 - QuickFiler\Controllers\QfcHomeController.cs baseline line coverage: 55.89% (242 / 433 lines).

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-06-13T11-22
 
-Command: Read repo-root global.json (c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-12-10-29\global.json)
+Command: Read repo-root global.json (<user-profile>\repos\TaskMaster-wt-2026-06-12-10-29\global.json)
 EXIT_CODE: 0
 
 Output Summary:

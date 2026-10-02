@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md
 
 Files Read (in order, full content):
-1. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a56dcba40416f18d6\CLAUDE.md`
-2. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a56dcba40416f18d6\.claude\rules\general-code-change.md`
-3. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a56dcba40416f18d6\.claude\rules\general-unit-test.md`
-4. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a56dcba40416f18d6\.claude\rules\csharp.md`
+1. `<repo-root>\.claude\worktrees\agent-a56dcba40416f18d6\CLAUDE.md`
+2. `<repo-root>\.claude\worktrees\agent-a56dcba40416f18d6\.claude\rules\general-code-change.md`
+3. `<repo-root>\.claude\worktrees\agent-a56dcba40416f18d6\.claude\rules\general-unit-test.md`
+4. `<repo-root>\.claude\worktrees\agent-a56dcba40416f18d6\.claude\rules\csharp.md`
 
 Notes:
 - Also read `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/issue.md` and the plan

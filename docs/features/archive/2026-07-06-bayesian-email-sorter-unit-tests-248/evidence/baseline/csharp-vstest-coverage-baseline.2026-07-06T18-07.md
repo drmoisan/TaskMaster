@@ -11,11 +11,11 @@ Output Summary:
 - Numeric coverage headline values from converted coverage XML: overall line coverage 18.54%; overall block coverage 18.66%.
 - Coverage counts: 21,970 lines covered; 837 lines partially covered; 95,707 lines not covered; 32,148 blocks covered; 140,123 blocks not covered.
 - Module headline values: QuickFiler.dll line coverage 63.17%, block coverage 64.18%; QuickFiler.Test.dll line coverage 93.56%, block coverage 95.92%.
-- Coverage attachment: TestResults\c35a5cc4-2a98-43ea-a968-1d31d8000114\DanMoisan_MEGALODON4_2026-07-06.18_20_57.coverage.
+- Coverage attachment: TestResults\c35a5cc4-2a98-43ea-a968-1d31d8000114\<user>_<host>_2026-07-06.18_20_57.coverage.
 - Converted coverage XML: docs\features\active\2026-07-06-bayesian-email-sorter-unit-tests-248\evidence\baseline\csharp-vstest-coverage-baseline.2026-07-06T18-07.coveragexml.
 
 Output Excerpt:
-- Attachments: TestResults\c35a5cc4-2a98-43ea-a968-1d31d8000114\DanMoisan_MEGALODON4_2026-07-06.18_20_57.coverage.
+- Attachments: TestResults\c35a5cc4-2a98-43ea-a968-1d31d8000114\<user>_<host>_2026-07-06.18_20_57.coverage.
 - Test Run Successful.
 - Total tests: 472.
 - Passed: 472.

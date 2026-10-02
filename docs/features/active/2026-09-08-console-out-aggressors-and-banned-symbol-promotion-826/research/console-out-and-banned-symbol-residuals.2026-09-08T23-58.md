@@ -755,7 +755,7 @@ Required before any numeric claim is proposed for a `spec.md` acceptance criteri
   via `System.Console.SetOut`, in any syntactic form (inline `new`, field-held, `this.`-qualified,
   fully-qualified `System.Console.SetOut`), across all `*.cs` files.
 - **Exhaustive Search Scope:** all `*.cs` files in the worktree root
-  `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a176c8956f6e15150`, all projects, no
+  `<repo-root>/.claude/worktrees/agent-a176c8956f6e15150`, all projects, no
   directory filter. `Console.SetOut` has exactly one overload
   (`public static void SetOut(TextWriter newOut)`), so a single method name covers the whole family;
   the form variation is in the *receiver expression and argument*, which both queries below capture

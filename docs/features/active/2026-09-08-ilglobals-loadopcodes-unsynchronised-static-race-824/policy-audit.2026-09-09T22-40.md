@@ -53,7 +53,7 @@ checked and found to be correct rather than narrowing:
 ## Evidence Location Compliance
 
 `validate_evidence_locations.py` was not run (Bash banned). A `Glob` over
-`C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-824/artifacts/**/*` returned six paths, all
+`<user-profile>/repos/TaskMaster-wt/rr0908-824/artifacts/**/*` returned six paths, all
 pre-existing PR-body artifacts from unrelated issues (`pr_body_564`, `pr_body_565`, `pr_body_735`
 and their receipts). **Zero** files exist under `artifacts/baselines/`, `artifacts/qa/`,
 `artifacts/evidence/`, or `artifacts/coverage/`.
@@ -383,7 +383,7 @@ Four non-blocking findings. None blocks merge.
   `LoadOpCodes()`'s `RunClassConstructor` call redundant for correctness rather than load-bearing,
   since any static member access now triggers the serialised initializer. Correctly recorded.
 - **One host token in a committed artifact.** `evidence/baseline/base-inertness.2026-09-09T15-19.md:195`
-  reproduces the path `.../DanMoisan_MEGALODON4_2026-09-09_10_10_13_net481.trx` inside the verbatim
+  reproduces the path `.../<user>_<host>_2026-09-09_10_10_13_net481.trx` inside the verbatim
   inherited listing. It carries an account name and a machine name. Mitigating: it is a **sibling's**
   already-committed path being reproduced in a listing the task required verbatim, so the token is
   already in the repository independently of this artifact, and this feature's own command strings are

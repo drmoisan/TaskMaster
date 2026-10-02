@@ -1,7 +1,7 @@
 Timestamp: 2026-04-13T22-58
 Work Mode: minor-audit
 Acceptance Criteria Section Present: yes
-Plan Path: c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-13-outlook-com-sta-materialization-128\plan.2026-04-13T22-47.md
+Plan Path: <repo-root>\docs\features\active\2026-04-13-outlook-com-sta-materialization-128\plan.2026-04-13T22-47.md
 SearchScope: docs/features/active/2026-04-13-outlook-com-sta-materialization-128/
 SearchPatterns: spec.md, user-story.md, research.md
 SearchResult: none

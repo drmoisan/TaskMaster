@@ -7,7 +7,7 @@ Command: `"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Ext
 EXIT_CODE: 0
 
 Output Summary: Total tests: 4211. Passed: 4211. Failed: 0. Total time: 45.27s. Coverage file
-`TestResults/f0a708af-968f-48cc-80e8-a5bf762f7527/DanMoisan_MEGALODON4_2026-07-11.19_47_40.coverage`
+`TestResults/f0a708af-968f-48cc-80e8-a5bf762f7527/<user>_<host>_2026-07-11.19_47_40.coverage`
 converted to Cobertura via `dotnet-coverage merge -f cobertura`. Numeric baseline coverage:
 `UtilitiesCS` package line-rate = 88.34%. Repo-wide (all Cobertura packages, including vendored
 Swordfish/SVGControl assemblies) line-rate = 60.68% (97230/160234 lines covered/valid). These are the

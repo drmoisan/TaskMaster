@@ -11,7 +11,7 @@ Output Summary:
 - Passed: 385.
 - Failed: 0.
 - Total time: 6.6715 seconds.
-- Coverage attachment: docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\remediation-11-30-vstest-results\86840cb2-fc6e-47f3-aad0-3575d095041a\DanMoisan_MEGALODON4_2026-07-04.11_55_46.coverage
+- Coverage attachment: docs\features\active\2026-07-03-quickfiler-high-confidence-dequeue-streaming-233\evidence\qa-gates\remediation-11-30-vstest-results\86840cb2-fc6e-47f3-aad0-3575d095041a\<user>_<host>_2026-07-04.11_55_46.coverage
 
 Initial Planned Command Failure:
 - Error: The term 'vstest.console.exe' is not recognized as a name of a cmdlet, function, script file, or executable program.

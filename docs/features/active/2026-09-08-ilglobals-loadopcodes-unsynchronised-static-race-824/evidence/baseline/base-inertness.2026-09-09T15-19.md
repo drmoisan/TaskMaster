@@ -192,7 +192,7 @@ docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-r
 docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/qa-gates/phase5-nullable-rebuild.2026-09-09T10-17.md
 docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/qa-gates/phase6-catch-type-check.2026-09-09T10-27.md
 docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/qa-gates/phase6-scope-boundary-check.2026-09-09T10-29.md
-docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/regression-testing/DanMoisan_MEGALODON4_2026-09-09_10_10_13_net481.trx
+docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/regression-testing/<user>_<host>_2026-09-09_10_10_13_net481.trx
 docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/regression-testing/p2-t2-expect-fail.trx
 docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/regression-testing/p4-t1-post-fix-confirm.trx
 docs/features/active/2026-09-08-assignfoldercombobox-unguarded-archiverootpath-read-813/evidence/regression-testing/phase2-expect-fail-run.2026-09-09T10-04.md

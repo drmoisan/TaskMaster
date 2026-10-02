@@ -2,9 +2,9 @@
 Timestamp: 2026-08-07T20-50
 Feature: quickfiler-qfc-home-controller-coverage (epic child F7, issue #433)
 Epic: quickfiler-per-file-coverage (issue #136)
-Target file: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-afcf27830d48e5590\QuickFiler\Controllers\QfcHomeController.Iteration.cs
+Target file: <repo-root>\.claude\worktrees\agent-afcf27830d48e5590\QuickFiler\Controllers\QfcHomeController.Iteration.cs
 Line count: 86
-Worktree: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-afcf27830d48e5590
+Worktree: <repo-root>\.claude\worktrees\agent-afcf27830d48e5590
 Coverage classification authority: docs/features/epics/quickfiler-per-file-coverage/coverage-ledger.md (delivered by child F1, wave 0; not present on disk at research time)
 Coverage evidence mechanism: F1's per-file line-coverage harness derived from the Cobertura output of scripts/vscode/Invoke-MSTestWithCoverage.ps1
 Research method: static per-member cross-reference. No msbuild, no vstest, no coverage run performed.

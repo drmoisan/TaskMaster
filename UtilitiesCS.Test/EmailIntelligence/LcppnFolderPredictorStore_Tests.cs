@@ -16,7 +16,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
     [TestClass]
     public class LcppnFolderPredictorStore_Tests
     {
-        private const string AppData = @"C:\Users\test\AppData";
+        private const string AppData = @"C:\Fixtures\test\AppData";
 
         // AC23: the dedicated file name is a single named constant distinct from Folder.json.
         [TestMethod]

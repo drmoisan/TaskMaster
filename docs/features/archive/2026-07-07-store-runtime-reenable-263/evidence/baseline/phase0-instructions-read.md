@@ -9,9 +9,9 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific toolchain and coding standards) — position 4
 
 Files Read (start-to-end):
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1d77ebfe30694ef4\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1d77ebfe30694ef4\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1d77ebfe30694ef4\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1d77ebfe30694ef4\.claude\rules\csharp.md
+- <repo-root>\.claude\worktrees\agent-a1d77ebfe30694ef4\CLAUDE.md
+- <repo-root>\.claude\worktrees\agent-a1d77ebfe30694ef4\.claude\rules\general-code-change.md
+- <repo-root>\.claude\worktrees\agent-a1d77ebfe30694ef4\.claude\rules\general-unit-test.md
+- <repo-root>\.claude\worktrees\agent-a1d77ebfe30694ef4\.claude\rules\csharp.md
 
 Output Summary: All four policy files read start-to-end in the required order. No section skipped. Coverage gate applied per delegation prompt and CLAUDE.md: new/changed decision logic >= 90%, repository testable-denominator line coverage >= 80%.

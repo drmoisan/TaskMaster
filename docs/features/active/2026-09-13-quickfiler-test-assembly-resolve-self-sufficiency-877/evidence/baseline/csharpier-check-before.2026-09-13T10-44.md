@@ -1,7 +1,7 @@
 # Baseline: csharpier check — issue #877
 
 Timestamp: 2026-09-13T10-44
-Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "C:/Users/DanMoisan/repos/TaskMaster-wt/bug-877-test-isolation"; dotnet tool run csharpier check . 2>&1 | Tee-Object -Variable out | Out-Null; Write-Host "EXIT_CODE=$LASTEXITCODE"; $out | Select-Object -Last 40'`
+Command: `pwsh -NoProfile -Command 'Set-Location -LiteralPath "<user-profile>/repos/TaskMaster-wt/bug-877-test-isolation"; dotnet tool run csharpier check . 2>&1 | Tee-Object -Variable out | Out-Null; Write-Host "EXIT_CODE=$LASTEXITCODE"; $out | Select-Object -Last 40'`
 EXIT_CODE: 0
 Output Summary: Observed exit code 0. Tool summary line: `Checked 1626 files in 4835ms.` Zero lines of the captured output contain the token `Was not formatted`. Class (b) list: EMPTY. Run under an acquired build lock, released immediately after the command returned.
 

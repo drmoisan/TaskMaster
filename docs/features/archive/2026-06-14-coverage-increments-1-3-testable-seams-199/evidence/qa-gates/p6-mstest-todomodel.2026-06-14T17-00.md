@@ -1,6 +1,6 @@
 ---
 Timestamp: 2026-06-14T17-00
-Command: vstest.console.exe C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-12-10-29\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /EnableCodeCoverage /InIsolation
+Command: vstest.console.exe <user-profile>\repos\TaskMaster-wt-2026-06-12-10-29\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll /EnableCodeCoverage /InIsolation
 EXIT_CODE: 0
 Output Summary:
   Total tests: 98 (up from 94 at Phase 0 baseline; 4 new change-confirmation tests added)
@@ -23,6 +23,6 @@ Output Summary:
   Coverage >= Phase 0 baseline: YES (54.35% vs 44.20%).
   New/changed-line target >= 90%: change-confirmation branch fully covered by new tests.
 
-  Coverage binary: TestResults/0961e8e9-fa96-462a-9966-c6553b0c79bf/DanMoisan_MEGALODON4_2026-06-15.08_21_59.coverage
+  Coverage binary: TestResults/0961e8e9-fa96-462a-9966-c6553b0c79bf/<user>_<host>_2026-06-15.08_21_59.coverage
   Merged XML: artifacts/csharp/p6-phase3-coverage.xml
 ---

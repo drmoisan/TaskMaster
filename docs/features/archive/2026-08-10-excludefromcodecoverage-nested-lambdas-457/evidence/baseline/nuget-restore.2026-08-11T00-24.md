@@ -24,7 +24,7 @@ Restore tail (verbatim):
 ```
          Installed:
              171 package(s) to packages.config projects
-     1>Done Building Project "C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a\TaskMaster.sln" (Restore target(s)).
+     1>Done Building Project "<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a\TaskMaster.sln" (Restore target(s)).
 
 Build succeeded.
     0 Warning(s)

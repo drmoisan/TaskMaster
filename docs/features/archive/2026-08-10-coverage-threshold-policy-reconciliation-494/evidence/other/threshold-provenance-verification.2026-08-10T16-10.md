@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-10T16-10
 Captured by: orchestrator (preparation mode)
-Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-abe56d74550beb67c`
+Worktree: `<repo-root>\.claude\worktrees\agent-abe56d74550beb67c`
 Branch: `bug/coverage-threshold-policy-reconciliation-494` (HEAD `edf3d34c`)
 
 ## Purpose

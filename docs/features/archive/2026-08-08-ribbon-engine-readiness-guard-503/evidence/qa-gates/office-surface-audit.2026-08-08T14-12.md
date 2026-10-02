@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-12
 
-Commands (run from `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55`; `<FOUR>` denotes the four new decision files `TaskMaster/Ribbon/EngineCommandCatalog.cs`, `TaskMaster/Ribbon/EngineReadinessGate.cs`, `TaskMaster/Ribbon/EngineGatedCommandRunner.cs`, `TaskMaster/Ribbon/EngineCommandRefreshPlanner.cs`):
+Commands (run from `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55`; `<FOUR>` denotes the four new decision files `TaskMaster/Ribbon/EngineCommandCatalog.cs`, `TaskMaster/Ribbon/EngineReadinessGate.cs`, `TaskMaster/Ribbon/EngineGatedCommandRunner.cs`, `TaskMaster/Ribbon/EngineCommandRefreshPlanner.cs`):
 
 ```
 grep -n "Microsoft\.Office\." <FOUR>

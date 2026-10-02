@@ -1,7 +1,7 @@
 Timestamp: 2026-07-04T11:19:03.6126245-04:00
 
 Command:
-`mcp__drm_copilot.collect_pr_context` with `base: "main"` and `workspace_root: "C:\Users\DanMoisan\repos\TaskMaster"`.
+`mcp__drm_copilot.collect_pr_context` with `base: "main"` and `workspace_root: "<repo-root>"`.
 
 Result:
 - `ok: true`.

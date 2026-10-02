@@ -9,7 +9,7 @@ Timestamp: 2026-07-10T20-45
 3. `.claude/rules/general-unit-test.md`
 4. `.claude/rules/csharp.md`
 
-## Files Read (verbatim, resolved against this worktree root: `C:\Users\DanMoisan\repos\TaskMaster-wt\swordfish-raw-usage-cleanup-310`)
+## Files Read (verbatim, resolved against this worktree root: `<user-profile>\repos\TaskMaster-wt\swordfish-raw-usage-cleanup-310`)
 
 - `CLAUDE.md`
 - `.claude/rules/general-code-change.md`

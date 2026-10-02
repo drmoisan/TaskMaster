@@ -1,7 +1,7 @@
 # Baseline — PoshQC analyze at this HEAD ([P0-T15])
 
 Timestamp: 2026-08-10T23-02
-Command: `mcp__drm-copilot__run_poshqc_analyze` with `workspace_root = "C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`
+Command: `mcp__drm-copilot__run_poshqc_analyze` with `workspace_root = "<repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb"` and `scan_folders = ["scripts/vscode", "tests/scripts/vscode"]`
 EXIT_CODE: 1
 
 ## MCP return payload (verbatim)
@@ -10,7 +10,7 @@ EXIT_CODE: 1
 {
   "ok": false,
   "tool": "run_poshqc_analyze",
-  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
+  "workspace_root": "<repo-root>\\.claude\\worktrees\\agent-ac1a08c3569adb7eb",
   "summary": "Command exited with code 1.",
   "stderr_excerpt": "Exception: PSScriptAnalyzer reported 16 issue(s)."
 }

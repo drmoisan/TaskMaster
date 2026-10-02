@@ -291,7 +291,7 @@
 - [ ] [P5-T1] Add `QuickFileMetricsWrite_WithNonEmptyMovedList_ForwardsStopwatchElapsedSeconds` (T1)
   - File `<TEST>/EfcHomeControllerMetricsTests.cs`. Reuse the existing `CreateController(specialFolders, writer)` (fixed `metricsNowFactory`, recording `metricsLineWriter`), then set the private `_stopWatch` field to `new Stopwatch()` via `EfcHomeControllerTestSupport.SetPrivateField` — the helper passes `mail: null`, so the field is otherwise null
   - Act: `controller.QuickFileMetrics_WRITE("metrics.csv", "Archive", moved)` with a single-element `List<MailItemHelper>`
-  - Assert: the writer received exactly one call; `Filename == "metrics.csv"`; `FolderRoot == "C:/Users/Test/Documents"`; the emitted line contains `",0,0.00,"`, proving the value flowed through line 23 rather than the early return
+  - Assert: the writer received exactly one call; `Filename == "metrics.csv"`; `FolderRoot == "<user-profile>/Documents"`; the emitted line contains `",0,0.00,"`, proving the value flowed through line 23 rather than the early return
   - Determinism: a never-started `Stopwatch` returns `TimeSpan.Zero` unconditionally — no timer, sleep, delay, or wall-clock read (AC5)
 - [ ] [P5-T2] Add `BuildQuickFileMetricLines_WithThreeMovedItems_PreservesOrderAndSharedPrefix` (T2)
   - File `<TEST>/EfcHomeControllerMetricsTests.cs`. Call the `internal static` builder directly with a fixed `DateTime`, `elapsedSeconds: 120`, and three helpers with distinct subjects

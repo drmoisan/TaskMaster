@@ -1,7 +1,7 @@
 # Research — QuickFiler Coverage Ledger (F1 / issue #432, epic #136)
 
 - Date: 2026-08-07T22-15
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a344bd2214b6bf290`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a344bd2214b6bf290`
 - Repo HEAD at time of research: `74be1964`
 - Scope: research only. No production file, rule file, or configuration was modified.
 
@@ -718,7 +718,7 @@ files), `Glob scripts/powershell/PoshQC/**` (no files), `Glob scripts/**/*.psd1`
 entries in `.claude/settings.json:12`–`15`.
 
 PoshQC is supplied by the MCP server declared in `.mcp.json`
-(`npx -y @danmoisan/drm-copilot-mcp`); `.claude/rules/powershell.md:18` references
+(`npx -y @<user>/drm-copilot-mcp`); `.claude/rules/powershell.md:18` references
 `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, **which does not exist in this
 repository**. There is therefore no repo-local scan-folder allowlist that a new file could fall
 outside of.
@@ -1007,7 +1007,7 @@ Two cautions for the capstone F16:
 ## 9. Items explicitly not verified
 
 - The PoshQC MCP server's default scan root and Pester discovery glob (server is external:
-  `@danmoisan/drm-copilot-mcp`). The repo contains no scan configuration to read.
+  `@<user>/drm-copilot-mcp`). The repo contains no scan configuration to read.
 - `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, referenced by
   `.claude/rules/powershell.md:18`, does not exist in this worktree.
 - No C# test suite was executed for this research. All coverage figures are read from the

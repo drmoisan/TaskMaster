@@ -516,7 +516,7 @@ replacement, bridge, and CSS fix apply to `ItemViewer` only.
 
 ## 11. Key Evidence Index (absolute paths)
 
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1d165d3cb6c7c026\QuickFiler\Helper Classes\ItemViewerQueue.cs` (:105 liveness)
+- `<repo-root>\.claude\worktrees\agent-a1d165d3cb6c7c026\QuickFiler\Helper Classes\ItemViewerQueue.cs` (:105 liveness)
 - `...\QuickFiler\Viewers\ItemViewer.Designer.cs` (:189–204 CboFolders; :231–251 WebView2)
 - `...\QuickFiler\Viewers\ItemViewer.FolderSearch.cs` (whole file: seam members, owner-draw, hit-test)
 - `...\QuickFiler\Viewers\IItemViewer.cs` (:80–100 folder seam; :107–108 WebView members)

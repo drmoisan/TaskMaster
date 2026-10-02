@@ -1,7 +1,7 @@
 # Acceptance-Criteria Status Summary (Issue #449, [P7-T32])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 Work mode: `full-bug` — under `full-bug`, `spec.md` is the **sole** acceptance-criteria source
 (`.claude/skills/acceptance-criteria-tracking/SKILL.md`). `user-story.md` is absent by default and is
 not required; `issue.md`'s early-draft list is superseded by `spec.md`.

@@ -117,6 +117,6 @@ The local evidence-only boundary is respected and the reviewed diff has no white
 
 ```powershell
 git diff --check c7d398c2aa0da6963de239ff6719b4b23a7d3f45..HEAD
-mcp__drm-copilot__run_poshqc_analyze(workspace_root: "C:\\Users\\DanMoisan\\repos\\TaskMaster")
-mcp__drm-copilot__run_poshqc_test(workspace_root: "C:\\Users\\DanMoisan\\repos\\TaskMaster")
+mcp__drm-copilot__run_poshqc_analyze(workspace_root: "<repo-root>")
+mcp__drm-copilot__run_poshqc_test(workspace_root: "<repo-root>")
 ```

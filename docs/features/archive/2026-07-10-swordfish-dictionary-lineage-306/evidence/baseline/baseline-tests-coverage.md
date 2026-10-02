@@ -19,7 +19,7 @@ Single baseline failure (pre-existing, out of F1 scope):
 - This is a known timing/timeout flake that surfaces under coverage instrumentation combined with default full-suite parallelism (24 workers): the async operation exceeds its internal cancellation window when the host is under coverage-instrumented load. The test targets `DictionaryExtensions.TryAddValuesAsync`, which is not a `ScoDictionary` / `ScoDictionaryNew` consumer and is not in the F1 scope-lock. The failure is unrelated to the lineage migration this feature performs. It is recorded here as the authoritative baseline state so the Phase 9 (P9-T4/P9-T5) no-regression comparison uses an apples-to-apples reference.
 
 Coverage (baseline, from the emitted `.coverage` attachment converted to Cobertura via `dotnet-coverage merge ... -f cobertura`):
-- Coverage attachment: `TestResults\9c3ba962-2070-4c0b-bbd1-6c3390bbeb47\DanMoisan_MEGALODON4_2026-07-10.23_16_06.coverage`
+- Coverage attachment: `TestResults\9c3ba962-2070-4c0b-bbd1-6c3390bbeb47\<user>_<host>_2026-07-10.23_16_06.coverage`
 - Repo-wide line coverage (merged, includes all instrumented assemblies including vendored packages): 63.18% (lines-covered 107,113 / lines-valid 169,538).
 - Per scope-lock production file (line coverage; interface-only files map no executable regions):
   - `TaskMaster\AppGlobals\AppToDoObjects.cs`: 200/315 = 63.5%

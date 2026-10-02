@@ -3,7 +3,7 @@
 ## 1. Header
 
 - **Timestamp:** `2026-08-07T22-00`
-- **Production file:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.SetupDisposal.cs`
+- **Production file:** `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\QuickFiler\Controllers\QfcFormController.SetupDisposal.cs`
 - **Exact line count:** 232 lines (verified by full read; line 232 is the closing namespace brace)
 - **`[ExcludeFromCodeCoverage]`:** **NO.** No attribute anywhere in the file. The type is declared `internal partial class QfcFormController` (line 18) with no attribute list.
 - **Epic child:** F6 (`quickfiler-qfc-form-explorer-controller-coverage`, issue #435), wave 1, band C3.
@@ -407,8 +407,8 @@ F1 (`quickfiler-coverage-denominator-and-exemption-ledger`, wave 0, C3) is F6's 
 
 1. **The ratified exemption ledger** at `docs/features/epics/quickfiler-per-file-coverage/coverage-ledger.md` is the **authority** on whether `QuickFiler/Controllers/QfcFormController.SetupDisposal.cs` is `testable` or `ratified-exempt`. This research expects `testable`: the file carries no `[ExcludeFromCodeCoverage]`, has no direct dependency on `Microsoft.Office.Interop.Outlook.Application`/`MailItem`/`Store`/`MAPIFolder` (the `using Microsoft.Office.Interop.Outlook;` at line 9 is inherited boilerplate shared by all four partials and is unused in this file's body), and section 4 shows every line reachable behind existing interfaces. **The ledger does not exist on disk yet; its absence is expected and is not a gap or a blocker.**
 2. **The per-file coverage harness**, derived from the Cobertura output of `Invoke-MSTestWithCoverage.ps1`. Both scripts exist today and were read:
-   - `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.ps1` (349 lines)
-   - `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1`
+   - `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.ps1` (349 lines)
+   - `<repo-root>\.claude\worktrees\agent-a8220048ded06d508\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1`
 
 ### Concrete command and output path the plan will cite
 

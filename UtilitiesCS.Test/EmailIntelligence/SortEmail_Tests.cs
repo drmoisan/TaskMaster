@@ -233,19 +233,59 @@ namespace UtilitiesCS.Test.EmailIntelligence
             attachments[0].AttachmentInfo.IsImage.Should().BeFalse();
         }
 
+        // Rooted literal directory used only as an in-memory path value. The injected delegate
+        // records the directory instead of creating it, so nothing is created on disk.
+        private const string AttachmentSandboxDirectory = @"C:\Sortemail945Sandbox\attachments";
+
+        /// <summary>
+        /// Scenario: the attachment save succeeds. Expected: the directory-creation delegate
+        /// receives the destination directory before the attachment is saved, the result is true,
+        /// and the attachment is saved exactly once.
+        /// </summary>
         [TestMethod]
         public async Task TrySaveAttachmentAsync_WhenSaveSucceeds_ReturnsTrueAndCallsSaveAsFile()
         {
             // Arrange
+            var events = new List<string>();
             var attachment = CreateAttachmentMock("saved.txt", OlAttachmentType.olByValue);
-            var destinationPath = Path.Combine(GetRepositoryRoot().FullName, "saved.txt");
+            var destinationPath = Path.Combine(AttachmentSandboxDirectory, "saved.txt");
+            attachment
+                .Setup(x => x.SaveAsFile(destinationPath))
+                .Callback<string>(p => events.Add("save:" + p));
 
             // Act
-            bool saved = await attachment.Object.TrySaveAttachmentAsync(destinationPath);
+            bool saved = await attachment.Object.TrySaveAttachmentAsync(
+                destinationPath,
+                path => events.Add("mkdir:" + path)
+            );
 
             // Assert
             saved.Should().BeTrue();
+            events.Should().Equal("mkdir:" + AttachmentSandboxDirectory, "save:" + destinationPath);
             attachment.Verify(x => x.SaveAsFile(destinationPath), Times.Once);
+        }
+
+        /// <summary>
+        /// Scenario: the injected directory-creation delegate throws an IOException. Expected:
+        /// the exception propagates to the caller and the attachment is never saved.
+        /// </summary>
+        [TestMethod]
+        public async Task TrySaveAttachmentAsync_WhenDirectoryCreationThrowsIOException_PropagatesAndDoesNotSave()
+        {
+            // Arrange
+            var attachment = CreateAttachmentMock("saved.txt", OlAttachmentType.olByValue);
+            var destinationPath = Path.Combine(AttachmentSandboxDirectory, "saved.txt");
+
+            // Act
+            Func<Task> act = () =>
+                attachment.Object.TrySaveAttachmentAsync(
+                    destinationPath,
+                    path => throw new IOException("disk failure")
+                );
+
+            // Assert
+            await act.Should().ThrowAsync<IOException>();
+            attachment.Verify(x => x.SaveAsFile(It.IsAny<string>()), Times.Never);
         }
 
         [TestMethod]

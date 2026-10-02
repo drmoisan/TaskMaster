@@ -1,5 +1,5 @@
 Timestamp: 2026-06-24T20-32
-Command: C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe collect --output docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\baseline\baseline-coverage.xml --output-format xml -- $vstest TaskMaster.Test\bin\Debug\TaskMaster.Test.dll UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"TestCategory!=LiveOutlook" /ResultsDirectory:docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\baseline\coverage-results
+Command: <user-profile>\.dotnet\tools\dotnet-coverage.exe collect --output docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\baseline\baseline-coverage.xml --output-format xml -- $vstest TaskMaster.Test\bin\Debug\TaskMaster.Test.dll UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"TestCategory!=LiveOutlook" /ResultsDirectory:docs\features\active\2026-06-24-folder-tree-cache-and-refresh-214\evidence\baseline\coverage-results
 EXIT_CODE: 0
 Output Summary:
 MSTest total tests: 4033

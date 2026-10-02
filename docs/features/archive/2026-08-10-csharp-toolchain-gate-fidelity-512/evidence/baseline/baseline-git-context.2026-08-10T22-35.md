@@ -12,7 +12,7 @@ EXIT_CODE: 0
 | `git rev-parse HEAD` | `a5e336e5ae3443d4197caf5f87036fae1d538f89` |
 | HEAD subject | `docs(epic): seed epic-status.md projection for build-ci-coverage-gate-fidelity` |
 | HEAD commit timestamp | `2026-08-10T22:24:11-04:00` |
-| Worktree | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac1a08c3569adb7eb` |
+| Worktree | `<repo-root>\.claude\worktrees\agent-ac1a08c3569adb7eb` |
 
 ## `MERGE_BASE` resolution (per the `pr-base-branch-merge-base` procedure)
 

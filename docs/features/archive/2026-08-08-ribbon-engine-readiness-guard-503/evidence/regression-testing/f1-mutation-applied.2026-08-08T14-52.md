@@ -5,7 +5,7 @@ Task: [P1-T5]
 
 Edit: deleted exactly line 103 of `TaskMaster\Ribbon\RibbonExplorer.xml` — the `getEnabled="EngineCommand_GetEnabled"` attribute line inside the `<button id="TrainSpam" ...>` element that spans lines 99-105. Nothing else was changed.
 
-Command (verification): `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; (Select-String -Path 'TaskMaster\Ribbon\RibbonExplorer.xml' -Pattern 'getEnabled=\"EngineCommand_GetEnabled\"' -AllMatches | Measure-Object).Count; (Get-Content 'TaskMaster\Ribbon\RibbonExplorer.xml' | Measure-Object -Line).Lines; git diff --numstat -- TaskMaster/Ribbon/RibbonExplorer.xml"`
+Command (verification): `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; (Select-String -Path 'TaskMaster\Ribbon\RibbonExplorer.xml' -Pattern 'getEnabled=\"EngineCommand_GetEnabled\"' -AllMatches | Measure-Object).Count; (Get-Content 'TaskMaster\Ribbon\RibbonExplorer.xml' | Measure-Object -Line).Lines; git diff --numstat -- TaskMaster/Ribbon/RibbonExplorer.xml"`
 EXIT_CODE: 0
 
 ## THIS MUTATION IS TEMPORARY AND MUST NEVER BE COMMITTED

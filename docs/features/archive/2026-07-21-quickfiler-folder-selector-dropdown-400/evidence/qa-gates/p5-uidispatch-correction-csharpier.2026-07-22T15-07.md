@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T15-07Z
 
-Command: `cd "C:/Users/DanMoisan/repos/TaskMaster-wt/2026-07-21T10-25" && TOOL="/c/Users/DanMoisan/.dotnet/tools/csharpier.exe"; "$TOOL" --version; F=QuickFiler/Viewers/BreadcrumbUiDispatcher.cs; "$TOOL" format "$F"; echo "FORMAT_EXIT=$?"; "$TOOL" format "$F"; echo "FORMAT2_EXIT=$?"; "$TOOL" check "$F"; echo "CHECK_EXIT=$?"; wc -l "$F"; sha256sum "$F"; git diff --stat`
+Command: `cd "<user-profile>/repos/TaskMaster-wt/2026-07-21T10-25" && TOOL="/c/Users/<user>/.dotnet/tools/csharpier.exe"; "$TOOL" --version; F=QuickFiler/Viewers/BreadcrumbUiDispatcher.cs; "$TOOL" format "$F"; echo "FORMAT_EXIT=$?"; "$TOOL" format "$F"; echo "FORMAT2_EXIT=$?"; "$TOOL" check "$F"; echo "CHECK_EXIT=$?"; wc -l "$F"; sha256sum "$F"; git diff --stat`
 
 EXIT_CODE: 0
 

@@ -11,10 +11,10 @@ Policy Order:
 Files Read (actual paths in the current worktree; the plan's planning-time
 `TaskMaster-wt-2026-07-07-13-21` paths do not exist and were superseded per the
 orchestrator path correction):
-1. C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aa788d7e018d8924e\CLAUDE.md
-2. C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aa788d7e018d8924e\.claude\rules\general-code-change.md
-3. C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aa788d7e018d8924e\.claude\rules\general-unit-test.md
-4. C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aa788d7e018d8924e\.claude\rules\csharp.md
+1. <repo-root>\.claude\worktrees\agent-aa788d7e018d8924e\CLAUDE.md
+2. <repo-root>\.claude\worktrees\agent-aa788d7e018d8924e\.claude\rules\general-code-change.md
+3. <repo-root>\.claude\worktrees\agent-aa788d7e018d8924e\.claude\rules\general-unit-test.md
+4. <repo-root>\.claude\worktrees\agent-aa788d7e018d8924e\.claude\rules\csharp.md
 
 Output Summary: All four policy documents read start-to-end, no section skipped.
 Key constraints captured: csharpier -> analyzers -> nullable/TreatWarningsAsErrors ->

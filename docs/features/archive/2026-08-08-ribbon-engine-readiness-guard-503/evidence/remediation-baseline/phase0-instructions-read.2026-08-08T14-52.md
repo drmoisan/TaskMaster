@@ -5,17 +5,17 @@ Task: [P0-T1]
 Command: Read tool invocations against each absolute path listed below (read-only inspection; no command executed)
 EXIT_CODE: 0
 
-Policy Order: The order defined by `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\.claude\skills\policy-compliance-order\SKILL.md` — standing instructions first (`CLAUDE.md`), then the cross-language code-change policy, then the cross-language unit-test policy, then the language- and domain-specific rules for the files in scope (C#), followed by the architecture-boundary, quality-tier, and tonality rules.
+Policy Order: The order defined by `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\.claude\skills\policy-compliance-order\SKILL.md` — standing instructions first (`CLAUDE.md`), then the cross-language code-change policy, then the cross-language unit-test policy, then the language- and domain-specific rules for the files in scope (C#), followed by the architecture-boundary, quality-tier, and tonality rules.
 
 ## Files read, in order
 
-1. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\CLAUDE.md` (441 lines)
-2. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\general-code-change.md` (80 lines)
-3. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\general-unit-test.md` (105 lines)
-4. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\csharp.md` (96 lines)
-5. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\architecture-boundaries.md` (46 lines)
-6. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\quality-tiers.md` (51 lines)
-7. `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\tonality.md` (80 lines)
+1. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\CLAUDE.md` (441 lines)
+2. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\general-code-change.md` (80 lines)
+3. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\general-unit-test.md` (105 lines)
+4. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\csharp.md` (96 lines)
+5. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\architecture-boundaries.md` (46 lines)
+6. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\quality-tiers.md` (51 lines)
+7. `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\.claude\rules\tonality.md` (80 lines)
 
 All seven paths were confirmed present on disk with the line counts shown.
 

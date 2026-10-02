@@ -5,7 +5,7 @@ Timestamp: 2026-08-11T01-51
 Task: [P0-T1]
 Feature: 2026-08-10-coverage-threshold-policy-reconciliation-494 (issue #494)
 Branch: bug/coverage-threshold-policy-reconciliation-494
-Workspace root: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-abfcaf9319a44bae2
+Workspace root: <repo-root>\.claude\worktrees\agent-abfcaf9319a44bae2
 
 ## Policy Order
 

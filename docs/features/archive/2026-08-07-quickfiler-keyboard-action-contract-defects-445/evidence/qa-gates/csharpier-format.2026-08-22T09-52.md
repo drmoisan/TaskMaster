@@ -6,7 +6,7 @@ Command:
 ```
 & $DOTNET tool run csharpier format QuickFiler\Controllers\KaStringAsync.cs QuickFiler\Controllers\KaChar.cs QuickFiler\Controllers\KaKey.cs QuickFiler\Interfaces\IKbdAction.cs QuickFiler.Test\Controllers\KaStringAsyncTests.cs
 ```
-with `DOTNET` = `C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk\dotnet.exe`. Run from `WS`.
+with `DOTNET` = `<repo-root>\.dotnet-sdk\dotnet.exe`. Run from `WS`.
 
 EXIT_CODE: 0
 

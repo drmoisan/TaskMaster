@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,9 @@ namespace QuickFiler.Controllers.Tests
     /// the static atomic and is held only for a straight-line region with no wait, no thread creation,
     /// and no await inside it. <c>TransactionGate</c> provides mutual exclusion between long
     /// install-to-restore transactions and is held from transaction start until
-    /// <see cref="UiThreadDispatcherTransaction.Dispose"/>. Lock ordering is <c>TransactionGate</c>
+    /// <see cref="UiThreadDispatcherTransaction.Dispose"/>; acquisition is bounded by
+    /// <see cref="TransactionGateAcquireTimeoutMs"/> and throws <see cref="TimeoutException"/> on
+    /// expiry. Lock ordering is <c>TransactionGate</c>
     /// then <c>FieldLock</c>, never the reverse, so no cycle and therefore no deadlock exists.
     /// </para>
     /// <para>
@@ -135,18 +138,53 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Acquires <c>TransactionGate</c> and returns a transaction that has not installed anything
-        /// yet. The two-phase shape is deliberate: consumers acquire the gate at fixture-build start,
-        /// well before the install, which preserves the issue #230 hold window.
+        /// Upper bound on a <c>TransactionGate</c> acquisition through the parameterless
+        /// <see cref="BeginTransactionAsync()"/> overload (issue #882): twice the 60000 ms MSTest
+        /// timeout that bounds the longest legitimate hold, and half the four-minute runner hang
+        /// guard, so an expired bound is reported as a named failure rather than as a hang dump.
         /// </summary>
-        internal static async Task<UiThreadDispatcherTransaction> BeginTransactionAsync()
+        internal const int TransactionGateAcquireTimeoutMs = 120000;
+
+        /// <summary>
+        /// Acquires <c>TransactionGate</c> with the production bound and returns a transaction that
+        /// has not installed anything yet. The two-phase shape is deliberate: consumers acquire the
+        /// gate at fixture-build start, well before the install, which preserves the issue #230 hold
+        /// window. Throws <see cref="TimeoutException"/> when the permit is not obtained within
+        /// <see cref="TransactionGateAcquireTimeoutMs"/>; no transaction exists on that path.
+        /// </summary>
+        internal static Task<UiThreadDispatcherTransaction> BeginTransactionAsync()
+        {
+            return BeginTransactionAsync(
+                TimeSpan.FromMilliseconds(TransactionGateAcquireTimeoutMs)
+            );
+        }
+
+        /// <summary>
+        /// Bounded acquisition (issue #882). Tests supply <see cref="TimeSpan.Zero"/> to observe the
+        /// failure branch deterministically while they hold the permit. On failure the method throws
+        /// before any <see cref="UiThreadDispatcherTransaction"/> exists and without touching the
+        /// acquisitions or releases counter, so there is no release to omit; the contended pre-check
+        /// stays before the wait because a failed probe did observe a held permit.
+        /// </summary>
+        internal static async Task<UiThreadDispatcherTransaction> BeginTransactionAsync(
+            TimeSpan bound
+        )
         {
             if (TransactionGate.CurrentCount == 0)
             {
                 Interlocked.Increment(ref _contendedAcquisitions);
             }
 
-            await TransactionGate.WaitAsync().ConfigureAwait(false);
+            bool acquired = await TransactionGate.WaitAsync(bound).ConfigureAwait(false);
+            if (!acquired)
+            {
+                throw new TimeoutException(
+                    "TRANSACTIONGATE_ACQUIRE_TIMEOUT: UiThreadDispatcherFixture.TransactionGate was not acquired within "
+                        + bound.TotalMilliseconds.ToString("0", CultureInfo.InvariantCulture)
+                        + " ms. The probable cause is a permit held by a test the runner has already reported as finished (issue #882)."
+                );
+            }
+
             Interlocked.Increment(ref _transactionAcquisitions);
             return new UiThreadDispatcherTransaction();
         }
@@ -239,7 +277,7 @@ namespace QuickFiler.Controllers.Tests
     /// <summary>
     /// A single install-to-restore transaction over the process-wide static
     /// <c>UtilitiesCS.UiThread._dispatcher</c>, holding <c>TransactionGate</c> for its whole lifetime.
-    /// Obtained from <see cref="UiThreadDispatcherFixture.BeginTransactionAsync"/> and released by
+    /// Obtained from <see cref="UiThreadDispatcherFixture.BeginTransactionAsync()"/> and released by
     /// <see cref="Dispose"/>, which restores strictly before it releases the gate so a waiter can
     /// never observe the pre-restore value.
     /// </summary>

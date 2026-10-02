@@ -58,7 +58,7 @@ write evidence to any `artifacts/...` path. Every command-step artifact must inc
   list of files read. Acceptance: the artifact exists with all three required fields populated.
 
 - [x] [P0-T2] Run baseline command `csharpier .` from the repo root (workspace
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7e887d12b262219`). Write
+  `<repo-root>\.claude\worktrees\agent-ad7e887d12b262219`). Write
   `docs/features/active/2026-08-08-ribbon-controller-engines-null-unsafe-507/evidence/baseline/phase0-baseline-csharpier.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` (state whether any file was
   reformatted). Acceptance: the artifact exists with all four required fields populated.

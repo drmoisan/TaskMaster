@@ -4,7 +4,7 @@ Timestamp: 2026-05-07T20:09:30.9510193-04:00
 Command: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug
 EXIT_CODE: 1
 Output Summary:
-- Test discovery/build state: No test assemblies found under `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-05-07-13-34\.` for configuration `Debug`. Build first.
+- Test discovery/build state: No test assemblies found under `<user-profile>\repos\TaskMaster-wt-2026-05-07-13-34\.` for configuration `Debug`. Build first.
 - Total tests: 0
 - Passed tests: 0
 - Failed tests: 0

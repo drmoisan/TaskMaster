@@ -5,7 +5,7 @@ Command: Get-Command dotnet-coverage; vswhere.exe -latest -find Common7\IDE\Exte
 EXIT_CODE: 0
 
 ## Tool availability
-- dotnet-coverage: PRESENT — `C:\Users\DanMoisan\.dotnet\tools\dotnet-coverage.exe`
+- dotnet-coverage: PRESENT — `<user-profile>\.dotnet\tools\dotnet-coverage.exe`
 - vstest.console.exe: PRESENT — `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe` (resolved via vswhere)
 
 ## Prior-cycle numeric coverage headline baseline (carried from cycle 2026-06-28T20-52)

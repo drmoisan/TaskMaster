@@ -16,13 +16,13 @@ The parallel-orchestrator's PR-merge gate extracts the PR number by scanning the
 ## Environment
 
 - OS/version: Windows, PowerShell
-- Command/flags used: `cd C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-29T00-11 && gh pr merge --merge 688`
+- Command/flags used: `cd <user-profile>\repos\TaskMaster-wt\2026-08-29T00-11 && gh pr merge --merge 688`
 - Data source or fixture: parallel-orchestrator final report for run `bugs-635-440`, section "Corrections to things I told you earlier"
 
 ## Steps to Reproduce
 
 1. Work from a worktree whose path contains a standalone digit run (e.g. `...\TaskMaster-wt\2026-08-29T00-11`).
-2. Run a PR-merge command prefixed with a `cd` into that path, e.g. `cd C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-29T00-11 && gh pr merge --merge 688`.
+2. Run a PR-merge command prefixed with a `cd` into that path, e.g. `cd <user-profile>\repos\TaskMaster-wt\2026-08-29T00-11 && gh pr merge --merge 688`.
 3. Observe the merge gate parses the PR number as `2026` (the first standalone digit run in the full command text) rather than `688`.
 4. The gate denies the command because PR `2026` is not the expected/pinned PR for the run.
 

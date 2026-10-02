@@ -317,7 +317,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // fabricated placeholders (#602 redaction).
             const string olAncestor = @"\\mailbox@example.com\Archive";
             const string storeRootStem = @"\\mailbox@example.com";
-            const string fsAncestor = @"C:\Users\testuser\OneDrive - Contoso";
+            const string fsAncestor = @"C:\Fixtures\testuser\OneDrive - Contoso";
             var config = new EmailFilerConfig
             {
                 Globals = null,
@@ -371,7 +371,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 Globals = mockGlobals.Object,
                 OlAncestor = @"\\mailbox@example.com\Archive",
                 DestinationOlStem = @"\\mailbox@example.com",
-                FsAncestorEquivalent = @"C:\Users\testuser\OneDrive - Contoso",
+                FsAncestorEquivalent = @"C:\Fixtures\testuser\OneDrive - Contoso",
             };
 
             // Act

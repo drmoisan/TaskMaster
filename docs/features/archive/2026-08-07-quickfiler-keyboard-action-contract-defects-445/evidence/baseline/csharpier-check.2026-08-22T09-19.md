@@ -6,7 +6,7 @@ Command:
 ```
 & $DOTNET tool run csharpier check .
 ```
-with `DOTNET` = `C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk\dotnet.exe` as resolved in P0-T8. Run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d`.
+with `DOTNET` = `<repo-root>\.dotnet-sdk\dotnet.exe` as resolved in P0-T8. Run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d`.
 
 This is the read-only `check` subcommand. No file was modified by this task.
 

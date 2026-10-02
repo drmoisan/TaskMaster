@@ -2,7 +2,7 @@ VSTest version 18.8.0 (x64)
 
 Starting test execution, please wait...
 A total of 1 test files matched the specified pattern.
-C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
+<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
   Passed SurfaceFactory_WorkerCompletion_DispatchesEveryStageAndCleanup [177 ms]
   Standard Output Messages:
       Warning:
@@ -48,4 +48,4 @@ Test Run Successful.
 Total tests: 10
      Passed: 10
  Total time: 3.2914 Seconds
-Results File: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing\nonnumeric-adapter-fixture-eight-failure-pass-after.2026-07-27T09-56.trx
+Results File: <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing\nonnumeric-adapter-fixture-eight-failure-pass-after.2026-07-27T09-56.trx

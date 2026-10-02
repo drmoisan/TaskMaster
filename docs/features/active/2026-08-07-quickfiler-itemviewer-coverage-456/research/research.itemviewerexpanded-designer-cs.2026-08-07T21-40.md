@@ -1,7 +1,7 @@
 # Research — `QuickFiler/Viewers/ItemViewerExpanded.Designer.cs`
 
 - Feature: `quickfiler-itemviewer-coverage` (issue #456), epic child F14 of `quickfiler-per-file-coverage` (#136)
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5e4b635834feedd7`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a5e4b635834feedd7`
 - Produced: 2026-08-07T21-40
 - Scope: one production file — `QuickFiler/Viewers/ItemViewerExpanded.Designer.cs` (821 lines, generated)
 

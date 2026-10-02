@@ -1,0 +1,36 @@
+# P3-T12 Negative control restored
+
+Timestamp: 2026-10-01T21-14
+Command: one Edit on UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.TrySaveAttachment.cs replacing `// NEGATIVE-CONTROL-956` with `clearReadOnly(directory);`; then CMD-HASH on that file; then CMD-CENSUS with PATHS-TRYSAVE and TOKENS-TRYSAVE (single-file census printed as TOTAL lines labelled A1 to A24). CMD-RESTORE was not run because the Edit restore already reproduced FIX-HASH-TRYSAVE.
+EXIT_CODE: 0
+Output Summary:
+FIX-HASH-TRYSAVE (P3-T10): B1E3570AF37D4EBCB0118C39DE283F485D4AFF6401F04BFDDC2A50CBD798719E
+RESTORED-HASH-TRYSAVE: B1E3570AF37D4EBCB0118C39DE283F485D4AFF6401F04BFDDC2A50CBD798719E
+RESTORE-ROUTE: EDIT
+TOKEN A1 @ TOTAL = 1
+TOKEN A2 @ TOTAL = 1
+TOKEN A3 @ TOTAL = 1
+TOKEN A4 @ TOTAL = 1
+TOKEN A5 @ TOTAL = 1
+TOKEN A6 @ TOTAL = 1
+TOKEN A7 @ TOTAL = 1
+TOKEN A8 @ TOTAL = 1
+TOKEN A9 @ TOTAL = 1
+TOKEN A10 @ TOTAL = 1
+TOKEN A11 @ TOTAL = 1
+TOKEN A12 @ TOTAL = 1
+TOKEN A13 @ TOTAL = 1
+TOKEN A14 @ TOTAL = 1
+TOKEN A15 @ TOTAL = 1
+TOKEN A16 @ TOTAL = 3
+TOKEN A17 @ TOTAL = 2
+TOKEN A18 @ TOTAL = 1
+TOKEN A19 @ TOTAL = 0
+TOKEN A20 @ TOTAL = 2
+TOKEN A21 @ TOTAL = 2
+TOKEN A22 @ TOTAL = 1
+TOKEN A23 @ TOTAL = 3
+TOKEN A24 @ TOTAL = 0
+LINES UtilitiesCS\EmailIntelligence\EmailParsingSorting\SortEmail.TrySaveAttachment.cs = 172
+SHA256 UtilitiesCS\EmailIntelligence\EmailParsingSorting\SortEmail.TrySaveAttachment.cs = B1E3570AF37D4EBCB0118C39DE283F485D4AFF6401F04BFDDC2A50CBD798719E
+Acceptance: the final RESTORED-HASH-TRYSAVE equals FIX-HASH-TRYSAVE; every TOKENS-TRYSAVE total equals the SEAM column (both hold).

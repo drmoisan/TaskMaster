@@ -1,7 +1,7 @@
 # Coverage wrapper PoshQC test baseline
 
 - Timestamp: `2026-07-23T14-15Z`
-- Command: `mcp__drm-copilot__run_poshqc_test workspace_root=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[tests/scripts/vscode]`
+- Command: `mcp__drm-copilot__run_poshqc_test workspace_root=<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25 scan_folders=[tests/scripts/vscode]`
 - EXIT_CODE: `4294967295`
 - Output Summary: `The PoshQC wrapper returned -1 without test diagnostics. A supplementary focused Pester 5.6.1 run discovered 11 existing cases and passed 11/11 with zero failures or skips.`
 

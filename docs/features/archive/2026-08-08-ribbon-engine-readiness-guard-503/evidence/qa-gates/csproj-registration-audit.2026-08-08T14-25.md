@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-25
 
-Commands (run from `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55` through `pwsh -NoProfile -File`):
+Commands (run from `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55` through `pwsh -NoProfile -File`):
 
 ```powershell
 # 1. enumerate the added entries

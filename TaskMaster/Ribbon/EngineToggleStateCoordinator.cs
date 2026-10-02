@@ -56,8 +56,8 @@ namespace TaskMaster
         private readonly Action<string, Exception> _logError;
 
         /// <summary>
-        /// Serializes the at-most-one-prime decision. Held only across a dictionary probe and a
-        /// task start; no await occurs inside it.
+        /// Serializes the at-most-one-prime decision. Held only across a dictionary probe, the
+        /// marker registration, and the start of the prime; no await occurs inside it.
         /// </summary>
         private readonly object _primeGate = new object();
 
@@ -70,14 +70,24 @@ namespace TaskMaster
             new EngineTogglePressedStateCache();
 
         /// <summary>
-        /// The in-flight — or most recently completed — prime per engine key. Its presence is the
-        /// at-most-one-prime guard; its value is the test-observable handle returned by
-        /// <see cref="GetPrimeTask"/>.
+        /// The registration marker per engine key: registered before the prime starts, removed by
+        /// <see cref="CompletePrime"/> when the prime faults or is canceled, and retained after a
+        /// successful prime. Its presence is the at-most-one-prime guard; its value is the
+        /// test-observable handle returned by <see cref="GetPrimeTask"/>.
         /// </summary>
         private readonly ConcurrentDictionary<string, Task> _primeTasks = new ConcurrentDictionary<
             string,
             Task
         >(StringComparer.Ordinal);
+
+        /// <summary>
+        /// Prime failures already reported (issue #948), keyed by engine and base-exception type;
+        /// a repeat of a reported kind is not logged again. Never cleared: a cached key never primes.
+        /// </summary>
+        private readonly ConcurrentDictionary<
+            (string EngineName, Type FaultType),
+            byte
+        > _reportedPrimeFaults = new ConcurrentDictionary<(string, Type), byte>();
 
         /// <summary>
         /// Creates a coordinator over an engines accessor and three injected sinks.
@@ -150,8 +160,8 @@ namespace TaskMaster
         }
 
         /// <summary>
-        /// The toggle-click boundary: the only place in this type that observes a fault with a
-        /// <c>catch</c> clause.
+        /// The toggle-click boundary: the only <c>catch</c> clause in this type that observes an
+        /// engine fault. The other two are sink guards, here and in <see cref="CompletePrime"/>.
         /// </summary>
         /// <param name="engineName">The engine key whose activation setting is being flipped.</param>
         /// <returns>
@@ -163,8 +173,11 @@ namespace TaskMaster
         /// <c>notifyUnavailable</c> message and nothing else is invoked. Otherwise
         /// <see cref="ExecuteToggleAsync"/> runs inside a single boundary <c>try</c>/<c>catch</c>:
         /// a fault is reported through <c>logError</c>, is not rethrown, and does not invalidate.
-        /// This method never throws, because its caller is an <c>async void</c> Office handler
-        /// whose faults would otherwise become unobserved.
+        /// The sink call is itself guarded (issue #947): the sink is the last reporting channel,
+        /// so a failure inside it has nowhere else to go and is discarded deliberately, following
+        /// <c>RibbonCommandBoundary.SafeLog</c>. This method therefore never throws, even when the
+        /// sink throws, because its caller is an <c>async void</c> Office handler whose faults
+        /// would otherwise become unobserved.
         /// </remarks>
         internal async Task HandleToggleClickAsync(string engineName)
         {
@@ -180,7 +193,14 @@ namespace TaskMaster
             }
             catch (Exception ex)
             {
-                _logError(BuildToggleFailedMessage(engineName), ex);
+                try
+                {
+                    _logError(BuildToggleFailedMessage(engineName), ex);
+                }
+                catch (Exception)
+                {
+                    // Intentionally discarded: see the remarks on this method.
+                }
             }
         }
 
@@ -242,7 +262,10 @@ namespace TaskMaster
         /// <returns>
         /// The prime task, or <see cref="Task.CompletedTask"/> when no prime has been started for
         /// the key. The returned task never faults: a prime fault is observed inside the prime
-        /// itself and reported through <c>logError</c>.
+        /// itself and reported through <c>logError</c>. For a key whose prime did not run to
+        /// completion, the marker is cleared only after that report has returned or thrown, so a
+        /// caller that receives <see cref="Task.CompletedTask"/> can rely on the report having
+        /// been attempted or deliberately suppressed as a repeat of a kind already reported.
         /// </returns>
         internal Task GetPrimeTask(string engineName)
         {
@@ -273,7 +296,15 @@ namespace TaskMaster
                     return;
                 }
 
-                _primeTasks[engineName] = StartObservedPrime(engines, engineName, controlId);
+                // Registration precedes the start (issue #944): a prime can complete on any
+                // thread, including before StartObservedPrime returns, and it must always find
+                // its own marker to remove; registering afterwards let a finished prime's
+                // removal run first and leave a stale marker that blocked every later re-prime.
+                var marker = new TaskCompletionSource<bool>(
+                    TaskCreationOptions.RunContinuationsAsynchronously
+                );
+                _primeTasks[engineName] = marker.Task;
+                StartObservedPrime(engines, engineName, controlId, marker);
             }
         }
 
@@ -281,21 +312,36 @@ namespace TaskMaster
         /// Runs <see cref="ApplyPrimeAsync"/> and attaches the fault observer.
         /// </summary>
         /// <remarks>
-        /// The observer is a continuation rather than a <c>catch</c> clause, so this type keeps
-        /// exactly one <c>catch</c> — the click boundary. Reading
+        /// The observer is a continuation rather than a <c>catch</c> clause. The three
+        /// <c>catch</c> clauses in this type all sit in <see cref="HandleToggleClickAsync"/> and
+        /// <see cref="CompletePrime"/>: the click boundary and the two sink guards. Reading
         /// <see cref="Task.Exception"/> inside <see cref="CompletePrime"/> marks the fault
-        /// observed, so no unobserved task remains. The returned continuation task always
-        /// completes successfully, which is what makes it safe for a test to await.
+        /// observed, so no unobserved task remains. The continuation task itself is discarded;
+        /// the value a test awaits is the marker, which the continuation completes only through
+        /// <c>SetResult</c> in a <c>finally</c> after <see cref="CompletePrime"/> exits, so it
+        /// never faults or cancels. Because <see cref="CompletePrime"/> also contains a failure
+        /// of the sink, the discarded continuation has no remaining throw source of its own.
         /// </remarks>
-        private Task StartObservedPrime(
+        private void StartObservedPrime(
             IAppItemEngines engines,
             string engineName,
-            string controlId
+            string controlId,
+            TaskCompletionSource<bool> marker
         )
         {
-            return ApplyPrimeAsync(engines, engineName, controlId)
+            _ = ApplyPrimeAsync(engines, engineName, controlId)
                 .ContinueWith(
-                    completed => CompletePrime(completed, engineName),
+                    completed =>
+                    {
+                        try
+                        {
+                            CompletePrime(completed, engineName);
+                        }
+                        finally
+                        {
+                            marker.SetResult(true);
+                        }
+                    },
                     CancellationToken.None,
                     TaskContinuationOptions.None,
                     TaskScheduler.Default
@@ -326,10 +372,12 @@ namespace TaskMaster
 
         /// <summary>
         /// Observes the outcome of a prime. On any outcome other than ran-to-completion the cache
-        /// is left unset — so the key still reports unchecked — the in-flight marker is cleared so
-        /// a later read may re-prime, and the failure is reported through <c>logError</c>.
+        /// is left unset — so the key still reports unchecked — the failure is reported through
+        /// <c>logError</c> unless the same failure kind was already reported for this engine, a
+        /// sink failure is contained here, and only then is the marker cleared for a later re-prime.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The status is tested rather than the exception. A CANCELED task carries a null
         /// <see cref="Task.Exception"/>, so a handler keyed on the exception returned early for a
         /// cancellation: nothing was logged, the cache stayed unset, and the in-flight marker stayed
@@ -337,6 +385,22 @@ namespace TaskMaster
         /// exception to unwrap a <see cref="TaskCanceledException"/> is synthesized so the sink
         /// always receives one. The faulted path is unchanged and still reports the unwrapped base
         /// exception.
+        /// </para>
+        /// <para>
+        /// The sink call is guarded (issue #947). The sink is the last reporting channel of this
+        /// type, so a failure inside it has nowhere else to go; letting it escape skipped the clear
+        /// below, which left a stale marker that blocked every later re-prime, and faulted the
+        /// discarded continuation unobserved. The guard follows
+        /// <c>RibbonCommandBoundary.SafeLog</c>. With the sink contained, the continuation in
+        /// <see cref="StartObservedPrime"/> has no remaining throw source of its own, so it
+        /// completes rather than faulting.
+        /// </para>
+        /// <para>
+        /// Repeat suppression (issue #948): each pair of engine key and base-exception type is
+        /// reported once, then recorded in <see cref="_reportedPrimeFaults"/> by the statement
+        /// directly after the sink call, so a sink that throws leaves the report owed. Moving
+        /// that record before the sink, or into a catch or finally arm, suppresses it for the session.
+        /// </para>
         /// </remarks>
         private void CompletePrime(Task completed, string engineName)
         {
@@ -345,13 +409,29 @@ namespace TaskMaster
                 return;
             }
 
-            _primeTasks.TryRemove(engineName, out _);
-
             var failure =
                 (Exception)completed.Exception?.GetBaseException()
                 ?? new TaskCanceledException(completed);
 
-            _logError(BuildPrimeFailedMessage(engineName), failure);
+            // Report-then-clear is load-bearing: the marker stays registered until the
+            // report (if any) has returned or thrown, so a caller that observes the marker absent,
+            // including one that fetched the prime handle after the fault, is guaranteed the report
+            // has already been attempted or was deliberately skipped as an already reported kind.
+            var reportKey = (EngineName: engineName, FaultType: failure.GetType());
+            if (!_reportedPrimeFaults.ContainsKey(reportKey))
+            {
+                try
+                {
+                    _logError(BuildPrimeFailedMessage(engineName), failure);
+                    _reportedPrimeFaults[reportKey] = 0;
+                }
+                catch (Exception)
+                {
+                    // Intentionally discarded: see the remarks on this method.
+                }
+            }
+
+            _primeTasks.TryRemove(engineName, out _);
         }
 
         /// <summary>
@@ -395,7 +475,8 @@ namespace TaskMaster
             return string.Format(
                 CultureInfo.CurrentCulture,
                 "Reading the activation state for engine '{0}' failed; its toggle continues to "
-                    + "report unchecked.",
+                    + "report unchecked. Further failures of this kind for this engine are not "
+                    + "logged again.",
                 RenderEngineName(engineName)
             );
         }

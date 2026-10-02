@@ -1,7 +1,7 @@
 # Cherry-Pick Batch 3 — Issue #87 Clean Branch
 
 - **Timestamp:** 2026-03-27T01:30 UTC
-- **Command:** `git -C c:\Users\DanMoisan\repos\TaskMaster-issue87-clean cherry-pick 5afe10d ee9e4d9 4009d1c 5661a47`
+- **Command:** `git -C <user-profile>\repos\TaskMaster-issue87-clean cherry-pick 5afe10d ee9e4d9 4009d1c 5661a47`
 - **EXIT_CODE:** 0 (after conflict resolution)
 - **Conflicts Resolved:**
   - `5afe10d`: `UtilitiesCS.Test.csproj` — accepted theirs

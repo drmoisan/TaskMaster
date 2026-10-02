@@ -2,14 +2,14 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P0-T4]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; Test-Path 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe'; Test-Path 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe'; Test-Path 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe'; Test-Path 'TaskMaster.runsettings'; nuget restore TaskMaster.sln"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; Test-Path '<user-profile>\.dotnet\tools\csharpier.exe'; Test-Path 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe'; Test-Path 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe'; Test-Path 'TaskMaster.runsettings'; nuget restore TaskMaster.sln"`
 EXIT_CODE: 0
 
 ## Output Summary
 
 | Probed path | Result |
 |---|---|
-| `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe` | `True` |
+| `<user-profile>\.dotnet\tools\csharpier.exe` | `True` |
 | `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe` | `True` |
 | `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe` | `True` |
 | `TaskMaster.runsettings` (repo-relative) | `True` |

@@ -1,7 +1,7 @@
 # Final Toolchain Pass — Issue #169
 
 Timestamp (UTC): 2026-06-01T17-12-39Z
-Working directory: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+Working directory: <user-profile>\repos\TaskMaster-wt-2026-06-01-08-21
 
 The four-step C# toolchain was run in order. Steps restart from step 1 on any failure or
 auto-fix; the run below is the final clean pass.

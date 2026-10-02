@@ -83,8 +83,8 @@ The TRX was produced by `vstest.console.exe` under its default name, which embed
 machine identifiers. It was renamed to the task-ID form used throughout this feature folder and
 its contents were scrubbed before it was committed: `<repo-root>` absolute prefixes were replaced
 with `REDACTED-REPO-ROOT`, the user-profile prefix with `REDACTED-USER-PROFILE`, the combined
-`<account>_<HOST>` token with `REDACTED-USER_REDACTED-HOST`, the bare machine name with
-`REDACTED-HOST` and the bare account name with `REDACTED-USER`. Only plain tokens were used, since
+`<account>_<HOST>` token with `REDACTED-USER_<host>`, the bare machine name with
+`<host>` and the bare account name with `REDACTED-USER`. Only plain tokens were used, since
 `<` is not legal in an XML attribute value and is not an entity inside CDATA. Replacement counts:
 13,020 repository-root prefixes, 1 bare machine name, 2 `<account>_<HOST>` tokens and 2 bare
 account names. A case-insensitive search of the scrubbed TRX for the account and machine names
