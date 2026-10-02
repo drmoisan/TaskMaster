@@ -8,8 +8,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - mode: open
 - max_concurrency: 6
 - current_cohort: 5
-- recolor_generation: 5
-- last_updated: 2026-10-01T20-31
+- recolor_generation: 6
+- last_updated: 2026-10-01T20-39
 - next_step: 956 running (single child under quota pacing); no other launches until released
 
 ## Items
@@ -30,6 +30,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/960 | 9a3d2dd3e8ec60af65b0d4f9f728eefc0aaaf970 |
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
 | 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | in_flight | worktree_created |  |  |
+| 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -49,6 +50,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 951 | 2026-10-01T12-05 | 2026-10-01T12-10 | 2026-10-01T12-29 |  |
 | 947 | 2026-10-01T17-26 | 2026-10-01T17-29 | 2026-10-01T18-41 |  |
 | 956 | 2026-10-01T20-28 | 2026-10-01T20-31 |  |  |
+| 948 | 2026-10-01T20-39 |  |  |  |
 
 ## Cohorts
 
@@ -77,6 +79,13 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 3 | 5 | 941, 951 |
 | 4 | 5 | 947 |
 | 5 | 5 | 956 |
+| 0 | 6 | 882, 927, 928, 930, 931 |
+| 1 | 6 | 929, 940, 942 |
+| 2 | 6 | 944, 945 |
+| 3 | 6 | 941, 951 |
+| 4 | 6 | 947 |
+| 5 | 6 | 956 |
+| 6 | 6 | 948 |
 
 ## Conflict Edges
 
@@ -109,6 +118,12 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 945 | 956 | path_overlap | path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs; path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md; path_overlap:.claude/agent-memory/orchestrator/MEMORY.md; path_overlap:**/SortEmail*.cs ~ docs/features/active/2026-09-30-sort-email-attachment-test-creates-directory-at-repository-root-945/** (glob-on-glob language intersection; no tracked file matches both) |
 | 947 | 956 | path_overlap | path_overlap:**/SortEmail*.cs ~ docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947/** (glob-on-glob language intersection; no tracked file matches both) |
 | 951 | 956 | path_overlap | path_overlap:**/SortEmail*.cs ~ docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951/** (glob-on-glob language intersection; no tracked file matches both) |
+| 927 | 948 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 942 | 948 | path_overlap | path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs; path_overlap:TaskMaster.Test/TaskMaster.Test.csproj; path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs; path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs |
+| 944 | 948 | path_overlap | path_overlap:.claude/hooks/validate-planner-output.ps1; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeRegistration.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs; path_overlap:TaskMaster.Test/TaskMaster.Test.csproj; path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs; path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs; path_overlap:TaskMaster/TaskMaster.csproj; path_overlap:docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944/plan.2026-09-30T07-20.md; path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 941 | 948 | path_overlap | path_overlap:.claude/hooks/validate-planner-output.ps1 |
+| 947 | 948 | path_overlap | path_overlap:.claude/hooks/validate-planner-output.ps1; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeFaultOrdering.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.PrimeRegistration.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.ThrowingSink.cs; path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs; path_overlap:TaskMaster.Test/TaskMaster.Test.csproj; path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs; path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs; path_overlap:TaskMaster/TaskMaster.csproj; path_overlap:docs/features/active/2026-09-30-engine-toggle-prime-marker-registration-races-removal-944/plan.2026-09-30T07-20.md |
+| 948 | 956 | path_overlap | path_overlap:.claude/agent-memory/task-researcher/MEMORY.md; path_overlap:UtilitiesCS.Test/UtilitiesCS.Test.csproj |
 
 ## Mutations
 
@@ -122,6 +137,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 951 | 2026-10-01T12-05 |  | scheduled |  | 3 |
 | add | 947 | 2026-10-01T17-26 |  | scheduled |  | 4 |
 | add | 956 | 2026-10-01T20-28 |  | scheduled |  | 5 |
+| add | 948 | 2026-10-01T20-39 |  | scheduled |  | 6 |
 
 ## Drift Events
 
