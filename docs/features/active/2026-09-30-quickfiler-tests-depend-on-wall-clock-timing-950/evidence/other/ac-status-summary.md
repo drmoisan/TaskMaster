@@ -44,3 +44,14 @@ Diff: one hunk at spec.md lines 263 to 284. The sixteen deleted lines are `- [ ]
 porcelain:  M docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950/spec.md
 
 Added and deleted counts are equal (16) and equal the checked-off count (16). spec.md changed only in its checkbox lines.
+
+## Addendum 2026-10-02: AC17 closed from pull request CI
+
+The table above records the state at the end of plan execution. Under the coordinator ruling (AC17 option (a), recorded in spec.md under AC17), AC17 was checked off from pull request 971's own CI run: run 36971702087 on head d46738a75, mstest-coverage 7384 passed of 7384, lines 85.96%, branches 80.11%. Evidence: evidence/qa-gates/ac17-ci-evidence.md.
+
+### Acceptance Criteria Status
+- Source: docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950/spec.md
+- Total AC items: 17
+- Checked off (delivered): 17
+- Remaining (unchecked): 0
+- Items remaining: none
