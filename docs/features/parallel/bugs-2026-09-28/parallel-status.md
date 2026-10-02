@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 9
 - recolor_generation: 9
-- last_updated: 2026-10-02T05-51
-- next_step: 961 remediation relaunch for related findings CR-1, CR-2, CR-3 before merge
+- last_updated: 2026-10-02T07-11
+- next_step: PAUSED by maintainer directive (both accounts near five-hour limit). 961 merged as 993fdd015 (PR 975). Non-terminal items: []. On resume: launch admitted items up to max_concurrency 16 as barriers clear; related-defect directive applies to every child prompt; 961 child may still push a CI-evidence commit to its merged branch (not on main). Worktree cleanup deferred.
 
 ## Items
 
@@ -34,7 +34,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/971 | 860d67bf4fddecb929e0d6c166065fd1ee752feb |
 | 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/970 | ab14b126cbf065d446aec703c9581a3869baea05 |
 | 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/974 | 94287369908cc920b21b0e3256314f988ad7d2f5 |
-| 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/975 |  |
+| 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/975 | 993fdd01566dee82e5f37acb761a600feaaa1454 |
 
 ## Item Lifecycle Timestamps
 
@@ -58,7 +58,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 950 | 2026-10-02T00-12 | 2026-10-02T00-35 | 2026-10-02T02-20 |  |
 | 952 | 2026-10-02T01-04 | 2026-10-02T01-06 | 2026-10-02T01-35 |  |
 | 953 | 2026-10-02T02-22 | 2026-10-02T03-05 | 2026-10-02T04-01 |  |
-| 961 | 2026-10-02T03-02 | 2026-10-02T05-05 |  |  |
+| 961 | 2026-10-02T03-02 | 2026-10-02T05-05 | 2026-10-02T07-11 |  |
 
 ## Cohorts
 
