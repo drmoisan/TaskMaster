@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 6
 - recolor_generation: 7
-- last_updated: 2026-10-02T00-12
-- next_step: 948 launched (cohort 6), non-isolated, opus C3; await PR then CI confirm and merge
+- last_updated: 2026-10-02T00-25
+- next_step: 948 PR 969 open at 1408c4f16 (7/7 checks green at observation); await child DONE then confirm checks on exact head and merge
 
 ## Items
 
@@ -30,7 +30,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 951 | docs/features/active/2026-09-30-tracked-csproj-bak-files-carry-stale-project-content-951 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/960 | 9a3d2dd3e8ec60af65b0d4f9f728eefc0aaaf970 |
 | 947 | docs/features/active/2026-09-30-engine-toggle-throwing-log-sink-leaves-stale-prime-marker-947 | 4 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/963 | f5b46df637de81a0f4a856152095544f859718cc |
 | 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/965 | 59cbab04f1c854baa2a03b6cbf755c1df4f961b4 |
-| 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | in_flight | worktree_created |  |  |
+| 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/969 |  |
 | 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
