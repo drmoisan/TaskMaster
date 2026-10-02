@@ -20,6 +20,7 @@
 - [analyzer-severity-runsettings](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 only rule above suggestion
 - [lock-recursion-317](project_lock_recursion_coverage_317.md) — deleted LockRecursionTests.cs is a restoration
 - [gettableinviewasync-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts; OCE is not TCE
+- [engine-toggle-fault-suppression-948](project_engine_toggle_fault_suppression_948.md) — pressed cache never clears; first fault can be NRE
 
 ## Coverage / Cobertura mechanics
 - [cobertura-closure-exemption-457](project_cobertura_closure_exemption_457.md) — exempt members emit NO `<method>`; async `d__` trap
