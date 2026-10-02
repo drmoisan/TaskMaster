@@ -8,8 +8,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - mode: open
 - max_concurrency: 6
 - current_cohort: 8
-- recolor_generation: 8
-- last_updated: 2026-10-02T02-22
+- recolor_generation: 9
+- last_updated: 2026-10-02T03-02
 - next_step: 950 merged as 860d67bf4 (PR 971). Non-terminal items: []. Awaiting coordinator: release, /parallel-add, or /parallel-close. Worktree cleanup deferred.
 
 ## Items
@@ -34,6 +34,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/971 | 860d67bf4fddecb929e0d6c166065fd1ee752feb |
 | 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/970 | ab14b126cbf065d446aec703c9581a3869baea05 |
 | 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | scheduled | not_started |  |  |
+| 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -57,6 +58,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 950 | 2026-10-02T00-12 | 2026-10-02T00-35 | 2026-10-02T02-20 |  |
 | 952 | 2026-10-02T01-04 | 2026-10-02T01-06 | 2026-10-02T01-35 |  |
 | 953 | 2026-10-02T02-22 |  |  |  |
+| 961 | 2026-10-02T03-02 |  |  |  |
 
 ## Cohorts
 
@@ -109,6 +111,16 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 6 | 8 | 948 |
 | 7 | 8 | 950, 952 |
 | 8 | 8 | 953 |
+| 0 | 9 | 882, 927, 928, 930, 931 |
+| 1 | 9 | 929, 940, 942 |
+| 2 | 9 | 944, 945 |
+| 3 | 9 | 941, 951 |
+| 4 | 9 | 947 |
+| 5 | 9 | 956 |
+| 6 | 9 | 948 |
+| 7 | 9 | 950, 952 |
+| 8 | 9 | 953 |
+| 9 | 9 | 961 |
 
 ## Conflict Edges
 
@@ -175,6 +187,17 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 951 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
 | 952 | 953 | path_overlap | path_overlap:*/*.csproj (953 live glob harvested from the plan census citation; language intersection with this radius; csproj concrete paths are mergeable and contribute nothing) |
 | 953 | 956 | path_overlap | path_overlap:**/SortEmail*.cs ~ */*.csproj (glob-on-glob language intersection; no tracked file matches both) |
+| 927 | 961 | path_overlap | path_overlap:.github/workflows/README.md; path_overlap:.github/workflows/_pester.yml; path_overlap:scripts/hygiene/Test-RepositoryHygiene.ps1; path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1; path_overlap:scripts/hygiene/Test-RepositoryHygiene.Git.ps1; path_overlap:tests/scripts/hygiene/Test-RepositoryHygiene.Tests.ps1; path_overlap:tests/scripts/hygiene/Test-RepositoryHygiene.Rules.Tests.ps1; path_overlap:tests/scripts/hygiene/Test-RepositoryHygiene.Git.Tests.ps1 |
+| 929 | 961 | path_overlap | path_overlap:.github/workflows/README.md |
+| 940 | 961 | path_overlap | path_overlap:UtilitiesCS.Test/HelperClasses/PhysicalFileSystemAdapters_Tests.cs (961 read citation) |
+| 944 | 961 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 945 | 961 | path_overlap | path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (961 reconciliation-added agent-memory path) |
+| 948 | 961 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 950 | 961 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
+| 951 | 961 | path_overlap | path_overlap:.gitignore; path_overlap:scripts/hygiene/Test-RepositoryHygiene.ps1; path_overlap:UtilitiesCS.Test/HelperClasses/PhysicalFileSystemAdapters_Tests.cs |
+| 952 | 961 | path_overlap | path_overlap:.github/workflows/*.yml ~ .github/workflows/README.md (952 glob; exact shared .github/workflows/README.md) |
+| 953 | 961 | path_overlap | path_overlap:.github/workflows/_pester.yml (exact; read citation on both sides); path_overlap:*/*.csproj (953 live glob; language intersection with this radius) |
+| 956 | 961 | path_overlap | path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:**/SortEmail*.cs (956 live glob; language intersection with this radius) |
 
 ## Mutations
 
@@ -192,6 +215,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 950 | 2026-10-02T00-12 |  | scheduled |  | 7 |
 | add | 952 | 2026-10-02T01-04 |  | scheduled |  | 7 |
 | add | 953 | 2026-10-02T02-22 |  | scheduled |  | 8 |
+| add | 961 | 2026-10-02T03-02 |  | scheduled |  | 9 |
 
 ## Drift Events
 
