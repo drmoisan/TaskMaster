@@ -40,6 +40,23 @@ Output Summary:
 
 ## Final-head confirmation
 
-The commit that adds this file and checks off AC17 creates a new head whose diff against d46738a75 is documentation-only (this file, the AC17 checkbox in spec.md, and an addendum to evidence/other/ac-status-summary.md). The CI run on that final head, and its mstest-coverage figures, are recorded in the section below once available.
+The commit that adds this file and checks off AC17 creates a new head whose diff against d46738a75 is documentation-only (this file, the AC17 checkbox in spec.md, and an addendum to evidence/other/ac-status-summary.md). The CI run on that head and its mstest-coverage figures are recorded below.
 
-Final head: pending
+Timestamp: 2026-10-02T06-25
+Command: gh run view 36972215199 --repo drmoisan/TaskMaster --log --job 110728374213
+EXIT_CODE: 0
+
+- Head SHA: e591b11b72bf1c4682ee43171008935887f8c7e6 (adds this file and the AC17 check-off; no code change against d46738a75)
+- Workflow run ID: 36972215199 (event pull_request), conclusion success; all seven jobs success
+- mstest-coverage job ID: 110728374213
+
+Output Summary:
+
+- Test Run Successful.
+- Total tests: 7384
+- Passed: 7384
+- Failed: 0 (no Failed line printed)
+- First-party coverage: lines 56612/65855 (85.96%), branches 13682/17078 (80.11%)
+- GetFileIcon_WithUseFileType_ShouldReturnIconsForDirectoryAndFileExtension passed (two rows); R4 passed; both theme tests passed.
+
+Recording this run creates one further documentation-only commit (this section). That commit cannot name its own run; its CI result is confirmed on the pull request and reported in the orchestration final report. Because every commit after d46738a75 changes only files under this feature folder, the test and coverage figures above apply to the code on the final head unchanged.
