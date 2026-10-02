@@ -32,7 +32,7 @@ namespace UtilitiesCS
             _responseSaveFile = YesNoToAllResponse.Empty;
             _attachmentsOverwrite = YesNoToAllResponse.Empty;
             _picturesOverwrite = YesNoToAllResponse.Empty;
-            _removeReadOnly = YesNoToAllResponse.Empty;
+            RemoveReadOnlyPrompt.Reset();
         }
 
         [ExcludeFromCodeCoverage]

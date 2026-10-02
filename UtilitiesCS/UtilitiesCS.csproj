@@ -572,6 +572,7 @@
     </Compile>
     <Compile Include="Dialogs\NotImplementedDialog.cs" />
     <Compile Include="Dialogs\YesNoToAll.cs" />
+    <Compile Include="Dialogs\YesNoToAllPromptSession.cs" />
     <Compile Include="EmailIntelligence\Bayesian\Obsolete\BayesianClassifier.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierExtensions.cs" />
     <Compile Include="EmailIntelligence\Bayesian\BayesianClassifierGroup.cs" />
