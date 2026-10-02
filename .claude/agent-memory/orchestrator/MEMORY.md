@@ -20,6 +20,8 @@
 - [Measure your hook exposure, don't assume it](parallel-child-hook-exposure-measured-not-assumed.md) — a non-isolated child committed + delegated with NO shared-file sync; prd-feature gates only atomic-planner
 - [Parallel item PR create: split resolution + title word](parallel-item-pr-create-split-resolution-and-title-word.md) — checkpoint via --head, body/receipt via session root; "issue" in title trips promotion hook
 
+- [Executor spawn needs issue + branch lines](target-worktree-hook-needs-issue-and-branch-lines.md) — TARGET_WORKTREE_NOT_DERIVABLE without "Canonical issue number for this feature is N." and "branch:"
+
 ## PR authoring and CI gate
 - [Item-scoped hooks read the ITEM worktree checkpoint](item-scoped-hooks-read-item-worktree-checkpoint.md) — mirror receipts there; an inherited override there is a policy hold
 - [pr-author is a skill, not an agent](pr-author-hook-blocks-gh-in-this-repo.md) · [exact checkpoint schema](pr-author-hook-exact-checkpoint-schema.md) — agents must be a LIST; `relativeFile` required
