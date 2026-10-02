@@ -9,7 +9,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 7
 - recolor_generation: 7
-- last_updated: 2026-10-02T00-35
+- last_updated: 2026-10-02T01-04
 - next_step: 950 launched (cohort 7), non-isolated, opus C3; await PR then CI confirm and merge
 
 ## Items
@@ -32,6 +32,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 956 | docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956 | 5 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/965 | 59cbab04f1c854baa2a03b6cbf755c1df4f961b4 |
 | 948 | docs/features/active/2026-09-30-engine-toggle-permanent-config-fault-logs-every-poll-948 | 6 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/969 | 34c2ed88cbb009f2f231453db87bc64d45a9bd51 |
 | 950 | docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950 | 7 | in_flight | worktree_created |  |  |
+| 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | scheduled | not_started |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -53,6 +54,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 956 | 2026-10-01T20-28 | 2026-10-01T20-31 | 2026-10-01T22-42 |  |
 | 948 | 2026-10-01T20-39 | 2026-10-01T22-43 | 2026-10-02T00-34 |  |
 | 950 | 2026-10-02T00-12 | 2026-10-02T00-35 |  |  |
+| 952 | 2026-10-02T01-04 |  |  |  |
 
 ## Cohorts
 
@@ -95,7 +97,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 4 | 7 | 947 |
 | 5 | 7 | 956 |
 | 6 | 7 | 948 |
-| 7 | 7 | 950 |
+| 7 | 7 | 950, 952 |
 
 ## Conflict Edges
 
@@ -140,6 +142,11 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 944 | 950 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 |
 | 948 | 950 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1; path_overlap:qa-gates/toolchain-final-pass.md (inert bare evidence fragment in both radii) |
 | 950 | 956 | path_overlap | path_overlap:**/SortEmail*.cs ~ docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950/** (956 live glob; glob-on-glob language intersection; no tracked file matches both) |
+| 927 | 952 | path_overlap | path_overlap:.github/workflows/ci.yml; path_overlap:.github/workflows/README.md |
+| 929 | 952 | path_overlap | path_overlap:.github/workflows/dependabot-repair.yml; path_overlap:.github/workflows/README.md; path_overlap:docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911/runbooks/github-app-installation-token.runbook.md |
+| 941 | 952 | path_overlap | path_overlap:FEATURE/issue.md (inert placeholder fragment in both radii) |
+| 945 | 952 | path_overlap | path_overlap:FEATURE/issue.md (inert placeholder fragment in both radii); path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (added by branch-diff reconciliation) |
+| 952 | 956 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (added by branch-diff reconciliation); path_overlap:956 live glob **/SortEmail*.cs ~ 952 folder glob (glob-on-glob language intersection; no tracked file matches both) |
 
 ## Mutations
 
@@ -155,6 +162,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 956 | 2026-10-01T20-28 |  | scheduled |  | 5 |
 | add | 948 | 2026-10-01T20-39 |  | scheduled |  | 6 |
 | add | 950 | 2026-10-02T00-12 |  | scheduled |  | 7 |
+| add | 952 | 2026-10-02T01-04 |  | scheduled |  | 7 |
 
 ## Drift Events
 
