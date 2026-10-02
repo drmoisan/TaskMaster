@@ -1,11 +1,11 @@
 # Research: QuickFiler.Test wall-clock waits and the R4 transaction flake (Issue #950)
 
-> **INCOMPLETE: stopped for quota.** The coordinator ended the session before every item in the delegation was closed. Findings below are verified by reading the named files in the item worktree unless marked `[UNVERIFIED]`. The "Not completed" section at the end lists what remains.
+> **Status: complete.** The first pass stopped for quota with the items in section 7 open; the orchestrator closed them on 2026-10-01 by direct reads in the item worktree. Section 7 now records how each item was closed. Findings are verified by reading the named files unless marked `[UNVERIFIED]` or recorded as an execution-time assumption.
 
 - Issue: #950 — Bug: quickfiler-tests-depend-on-wall-clock-timing
 - Branch: `bug/quickfiler-tests-depend-on-wall-clock-timing-950` (based on origin/main `9b3eea58`)
 - Date: 2026-10-01
-- Tooling note: the Bash tool was disabled in this session, so `git show`/`git diff` against CI head `b9692658` could not be run. The CI failure text quoted in the delegation matches the current file verbatim (assertion at `QfcItemController.UiThreadDispatcherFixtureTests.cs:244-250`, test declared at `:206`), so the current worktree copy is treated as the text under analysis.
+- Tooling note: the Bash tool was disabled in this session, so `git show`/`git diff` against CI head `b9692658` could not be run. The CI failure text quoted in the delegation matches the current file verbatim (assertion at `QfcItemController.UiThreadDispatcherFixtureTests.cs:244-250`, test declared at `:206`), so the current worktree copy is treated as the text under analysis. Closure (section 7, item 1): `git diff --stat b9692658 HEAD -- QuickFiler.Test/Controllers QuickFiler.Test/TestSupport QuickFiler/Controllers/QfcDatamodel.cs UtilitiesCS/Threading/UiThread.cs` printed nothing, so every target file is byte-identical between CI head `b9692658` and the branch head.
 
 ---
 
@@ -59,20 +59,48 @@ How to invoke `Worker_DoWork` synchronously (two sub-options; pick one in the pl
 
 Pump helper reuse: QuickFiler.Test already contains several private nested drainable contexts — `DrainableSynchronizationContext` (`Viewers/ItemViewerBreadcrumbThreadAffinityTests.cs:246-265` and `Viewers/ItemViewerBreadcrumbLifecycleRegressionTests.cs:339`), `PumpSynchronizationContext` (`Viewers/BreadcrumbPopupBoundaryCoverageTests.cs:299-358`, `Viewers/BreadcrumbDropDownReadinessTests.cs:420`), `QueuedCreatorThreadSynchronizationContext` (two files). None is shared; the assembly's shared folder is `QuickFiler.Test/TestSupport/` (`DedicatedWorkerThread.cs`, `WinFormsPumpHost.cs`). The `DrainableSynchronizationContext` shape (queue on `Post`, `Drain()` loops until empty, asserts creator thread) is the right one here: it never blocks. Either duplicate it privately in `QfcDatamodelLivenessTests.cs` (the file's own doc comment at `:19-23` records a duplication convention) or promote one copy to `TestSupport/` (new file requires a `<Compile Include>` in `QuickFiler.Test.csproj`, which lists every file explicitly, e.g. `:157`, `:201`, `:203`). `FakeTimeProvider` (`Microsoft.Extensions.TimeProvider.Testing 10.10.0`, `packages.config:31`) is already referenced and already used by test 1; no new package.
 
-`[UNVERIFIED]` assumption to confirm during execution: that the MSTest 4.4.1 worker thread has no ambient `SynchronizationContext` that would intercept the continuation. The pump design is robust either way because the test installs its own context around the invocation and restores the previous one (precedent: `ViewerScope` at `ItemViewerBreadcrumbThreadAffinityTests.cs:271-292`).
+Execution-time assumption (section 7, item 4; not statically decidable from the repository): the MSTest 4.4.1 worker thread has no ambient `SynchronizationContext` that would intercept the continuation. The plan must record the observed `SynchronizationContext.Current` value on the test thread once during execution. The pump design is robust either way because the test installs its own context around the invocation and restores the previous one (precedent: `ViewerScope` at `ItemViewerBreadcrumbThreadAffinityTests.cs:271-292`).
 
-### 2.4 Out-of-scope residual wall-clock waits elsewhere in QuickFiler.Test (candidates, not in #950's two files)
+### 2.4 Other wall-clock waits in QuickFiler.Test
+
+The first three rows are now IN SCOPE by maintainer decision (same root cause, same seam); section 2.5 analyses them. The remaining rows stay out of scope.
 
 | File:line | Call | Note |
 |---|---|---|
-| `Controllers/QfcDatamodelTeardownTests.cs:67` | `SpinWait.SpinUntil(..., 5 s)` (`WaitForState`, used at `:225`) | same mechanism as A1; same D1 fix applies |
-| `Controllers/QfcDatamodelTeardownTests.cs:220` | `loaderEntered.Task.Wait(5 s)` | same as A2 |
-| `Controllers/QfcInitEmailQueueZeroBatchTests.cs:161` | `loaderInvokedTcs.Task.Wait(5 s)` | same as A2 |
+| `Controllers/QfcDatamodelTeardownTests.cs:67` | `SpinWait.SpinUntil(..., 5 s)` (`WaitForState`, used at `:225`) | IN SCOPE (T1 in 2.5) |
+| `Controllers/QfcDatamodelTeardownTests.cs:220` | `loaderEntered.Task.Wait(5 s)` | IN SCOPE (T2 in 2.5) |
+| `Controllers/QfcInitEmailQueueZeroBatchTests.cs:161` | `loaderInvokedTcs.Task.Wait(5 s)` | IN SCOPE (Z1 in 2.5) |
 | `Viewers/BreadcrumbSelectorToggleUiBoundaryTests.cs:397` | `_available.AvailableWaitHandle.WaitOne()` (unbounded) | not timed, but an unbounded block; hang risk rather than wall-clock bound |
 | `Viewers/BreadcrumbPopupBoundaryCoverageTests.cs:345`, `BreadcrumbSelectorToggleUiBoundaryTests.cs:419`, `BreadcrumbUiThreadDispatchTests.cs:410`, `BreadcrumbCoordinatorLifecycleTests.cs:57` | `Wait(0)` / `WaitOne(0)` | zero-bound probes; non-blocking, not wall-clock |
 | `Controllers/QfcFormControllerCleanupTests.cs:380` | string literals in a banned-literal scan | not a wait |
 
 No `Thread.Sleep` or `Task.Delay` call exists in QuickFiler.Test (only comment mentions at `KaKeyTests.cs:104`, `KaCharTests.cs:113`, `QfcCollectionControllerDefects468Tests.cs:349-350`, `QfcDatamodelTests.cs:215`).
+
+### 2.5 In-scope extension: `QfcDatamodelTeardownTests.cs` (235 lines) and `QfcInitEmailQueueZeroBatchTests.cs` (212 lines)
+
+Both files start a real `BackgroundWorker` through `QfcDatamodel.InitEmailQueue`, so they share the section 2.2 cause and take the same D1 seam.
+
+Complete caller inventory of `QfcDatamodel.InitEmailQueue` on a real (non-mock) instance, from `Grep` over `QuickFiler.Test` and `QuickFiler`:
+
+| Caller | Line | Batch | Worker start reached | Wall-clock wait |
+|---|---|---|---|---|
+| `QfcDatamodelLivenessTests` test 1 | `:100` | 0 | `QfcDatamodel.cs:273` | A1 (`:106`), A2 (`:103`) |
+| `QfcDatamodelLivenessTests.StartHeldOpenLoader` | `:170` | 0 | `:273` | A1 (`:176`), A3 (`:173`) |
+| `QfcDatamodelTeardownTests.Worker_DoWork_CapturesRemainingLoadTask` | `:218` | 0 | `:273` | T1 (`:225` via `WaitForState` `:67`), T2 (`:220`) |
+| `QfcInitEmailQueueZeroBatchTests.InitEmailQueue_ZeroBatchSize_ReturnsEmptyListWithoutThrowing` | `:127` | 0 | `:273` | none, but starts an unobserved thread-pool worker |
+| `QfcInitEmailQueueZeroBatchTests.InitEmailQueue_ZeroBatchSize_StillStartsBackgroundWorker` | `:156` | 0 | `:273` | Z1 (`:161`) |
+| `QfcInitEmailQueueZeroBatchTests.InitEmailQueue_PositiveBatchSize_RetainsExistingProjectionAndFrameDrop` | `:201` | 2 | `:300` | none, but starts an unobserved thread-pool worker |
+| `QfcHomeController.cs:252` (production) | — | — | via `IQfcDatamodel` | n/a |
+
+`QfcHomeControllerRunAsyncTests.cs:123,191,218` call `InitEmailQueue` on a `Mock<IQfcDatamodel>`, which never reaches `QfcDatamodel`; they are unaffected. No other test file reaches either `worker.RunWorkerAsync()` site. Therefore, after the three in-scope files assign the seam, no QuickFiler.Test test starts a `QfcDatamodel` worker on the thread pool.
+
+Per-test replacement under D1 (test assigns `model.WorkerStarter` to a synchronous starter that raises `DoWork` on the calling thread through a `BackgroundWorker` subclass exposing `OnDoWork`):
+
+- **T1/T2 (`Worker_DoWork_CapturesRemainingLoadTask`).** `Worker_DoWork` assigns `_remainingLoadTask` at `QfcDatamodel.cs:206`, before its first await at `:207`. Under the synchronous starter, `InitEmailQueue` returns only after that line ran, so `loaderEntered.Task.IsCompleted.Should().BeTrue()` and `GetPrivateField(model, "_remainingLoadTask").Should().NotBeNull()` are both synchronous reads. The file's own doc comment (`:24-25`) already claims "no wall-clock waits"; the rewrite makes that claim true. Negative control: a starter that does not raise `DoWork` leaves both values unset and the assertions fail at once.
+- **Z1 (`InitEmailQueue_ZeroBatchSize_StillStartsBackgroundWorker`).** The inert loader (`:97-108`) completes its TCS synchronously when invoked, so under the synchronous starter `loaderInvokedTcs.Task.IsCompleted.Should().BeTrue()` holds as soon as `InitEmailQueue` returns. The doc comment at `:136-145` that justifies the bounded wait must be rewritten. Negative control: a no-op starter leaves the TCS incomplete and the assertion fails at once.
+- **Z0/Z2 (`..._ReturnsEmptyListWithoutThrowing`, `..._PositiveBatchSize_...`).** No wait, but each currently starts a real thread-pool worker whose body runs after the test returns. They must assign the same synchronous starter (or a recording starter) so no worker escapes the test. Under D1 a test that leaves `WorkerStarter` unassigned on an uninitialized instance receives `null` and `InitEmailQueue` raises `NullReferenceException` at the start site; this is the same convention `RemainingEmailLoader` already has (`QfcDatamodel.cs:135-140`) and it fails fast rather than silently starting a thread.
+
+Inline-continuation note for Z1/Z0/Z2 and T1/T2: the inert loader returns `Task.FromResult(true)` (Z-tests), so `await loaderTask` at `:207` completes synchronously and the `finally` at `:209-216` runs before `InitEmailQueue` returns; no pump is needed for those. The T-test loader awaits a test-owned TCS, so its continuation follows the same rules as section 2.3 point 2: the test either drains a test-owned context after `loaderRelease.TrySetResult(true)` or, if it asserts nothing after release, leaves the continuation to run inline on the releasing thread.
 
 ---
 
@@ -96,9 +124,9 @@ FluentAssertions message: "Expected observedByB to refer to `<null>` … but fou
 | W2 | `EnsureScope.Dispose()` — fixture `:271` via `CompareExchange(_installed, null)` | `null`, only when the field still holds the parked instance that scope installed | No | Only same-class R2/R3 dispose scopes today; no other class disposes one. |
 | W3 | `UiThreadDispatcherTransaction.Install` — fixture `:316` (`Exchange`) | arbitrary | Yes (holder of `TransactionGate`) | callers: FixtureTests `:56,116,165,216,282,331`; `WpfUiDispatcherTests.cs:63`; `QfcFormControllerUndoHandoffTests.cs:236,287,343`; `QfcItemController.InitializationTests.Part2.cs:132`; `QfcHomeControllerRunAsyncTests.cs:355` — all gated. |
 | W4 | `UiThreadDispatcherTransaction.Dispose` — fixture `:336` (`CompareExchange(_installedValue, _previous)`) | captured previous | Yes | gated |
-| W5 | `UiThread.Initialize()` — `UiThread.cs:82` (`Dispatcher = _syncContextForm.UiDispatcher`), reached from `UiThread.Init()` `:57`, which the lazy getters `UiSyncContext` (`:224`) and `AutoScaleFactor` (`:298`) call when their fields are null; requires an STA caller (`:30-34`) | the `SyncContextForm`'s dispatcher (thread name differs from "ParkedDispatcher") | No | Not observed in this failure (wrong thread name). No QuickFiler.Test call to `UiThread.Init(` was found (only a commented one at `QfcHomeControllerTests.cs:240`); production reads of `UiThread.Dispatcher` (e.g. `ItemViewerQueue.cs:21,27`, `EfcViewerQueue.cs:20`) go through the throwing getter at `:266-284`, which never writes. `[UNVERIFIED]` whether any QuickFiler.Test path reads `UiThread.UiSyncContext`/`AutoScaleFactor` on an STA thread with `_initialized == false`. |
+| W5 | `UiThread.Initialize()` — `UiThread.cs:82` (`Dispatcher = _syncContextForm.UiDispatcher`), reached from `UiThread.Init()` `:57`, which the lazy getters `UiSyncContext` (`:224`) and `AutoScaleFactor` (`:298`) call when their fields are null; requires an STA caller (`:30-34`) | the `SyncContextForm`'s dispatcher (thread name differs from "ParkedDispatcher") | No | Not observed in this failure (wrong thread name). No QuickFiler.Test call to `UiThread.Init(` was found (only a commented one at `QfcHomeControllerTests.cs:240`); production reads of `UiThread.Dispatcher` (e.g. `ItemViewerQueue.cs:21,27`, `EfcViewerQueue.cs:20`) go through the throwing getter at `:266-284`, which never writes. Closure (section 7, item 3): QuickFiler.Test contains no call to `UiThread.Init(`, `UiThread.UiSyncContext` or `UiThread.AutoScaleFactor` (only comment mentions at `QfcCollectionControllerDefects468Tests.cs:106`, `QfcHomeControllerRunAsyncTests.cs:328`, `QfcHomeControllerTests.cs:240`), while 23 QuickFiler production files reference `UiSyncContext`/`AutoScaleFactor`, so static reachability through production code cannot be ruled out. W5 is nevertheless excluded as the producer of this failure by value identity: `Init()` throws before `Initialize()` on a non-STA caller (`UiThread.cs:30-34`), and when it does run it writes the `SyncContextForm`'s dispatcher, never the parked singleton. W5 remains a residual writer for the pinned-baseline fix: it is latched once per process (`:51-59`), and a W5 write during R4 would make B observe a value other than `original`. Recorded as a residual risk, not a cause. |
 | W6 | `UiThread.ResetForTesting()` — `UiThread.cs:126` | `null` | No | Called only from `UtilitiesCS.Test/TestHelpers/UiThreadStateScope.cs:89` (different assembly). |
-| W7 | `UtilitiesCS.Test/TestHelpers/UiThreadDispatcherScope.cs:78,109` and `UiThreadStateScope.cs:162,183` | their own values | No | Different assembly; those install `Dispatcher.CurrentDispatcher` of their own threads, never the QuickFiler.Test parked instance. `[UNVERIFIED]` whether vstest hosts UtilitiesCS.Test and QuickFiler.Test in the same process concurrently under the CI command. |
+| W7 | `UtilitiesCS.Test/TestHelpers/UiThreadDispatcherScope.cs:78,109` and `UiThreadStateScope.cs:162,183` | their own values | No | Different assembly; those install `Dispatcher.CurrentDispatcher` of their own threads, never the QuickFiler.Test parked instance. Closure (section 7, item 3): `Invoke-MSTestWithCoverage.ps1` passes every `*.Test.dll` to one vstest invocation (`:117`, `:348`) with `/InIsolation` (`:90`), and neither runsettings file sets `DisableAppDomain`, so on .NET Framework the MSTest adapter loads each test assembly in its own AppDomain and the `UiThread` statics are per-AppDomain. Whether vstest uses one or several testhost processes is therefore not load-bearing. Independently of hosting, W7 is excluded by value identity: it never writes the QuickFiler.Test parked singleton. |
 
 Observed value = parked singleton, prior value = `null`. Only **W1** writes the parked instance, and only into a `null` field. W1 is reachable concurrently from exactly one other class: `QfcItemController_FocusAndThemeTests`.
 
@@ -130,10 +158,11 @@ Alternatives rejected: (i) making `EnsureDispatcher` take the gate — rejected 
 | File | Kind | Lines now | csproj | Change |
 |---|---|---|---|---|
 | `QuickFiler.Test/Controllers/QfcDatamodelLivenessTests.cs` | test | 255 | `QuickFiler.Test.csproj:157` (explicit `<Compile Include>`) | remove A1-A3; synchronous driving via D1; pump helper (private or shared) |
-| `QuickFiler/Controllers/QfcDatamodel.cs` | production (COM-bound, `[ExcludeFromCodeCoverage]` at `:25`) | 483 | `QuickFiler.csproj` (explicit items, not re-verified here `[UNVERIFIED]`) | D1 seam: `WorkerStarter` property + 2 ctor assignments + 2 call sites (`:273`, `:300`) |
+| `QuickFiler/Controllers/QfcDatamodel.cs` | production (COM-bound, `[ExcludeFromCodeCoverage]` at `:25`) | 483 | `QuickFiler.csproj:325` (explicit `<Compile Include="Controllers\QfcDatamodel.cs" />`; legacy csproj, explicit items, verified) | D1 seam: `WorkerStarter` property + 2 ctor assignments + 2 call sites (`:273`, `:300`) |
 | `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs` | test | 458 | `QuickFiler.Test.csproj:203` | R4 baseline scope + doc comment |
 | optional `QuickFiler.Test/TestSupport/<DrainableSynchronizationContext>.cs` | test support (new) | — | needs a new `<Compile Include>` in `QuickFiler.Test.csproj` | only if the pump is shared rather than duplicated |
-| optional `QuickFiler.Test/Controllers/QfcDatamodelTeardownTests.cs`, `QfcInitEmailQueueZeroBatchTests.cs` | test | not counted | existing | same D1 rewrite if the plan widens scope to the residuals in §2.4 |
+| `QuickFiler.Test/Controllers/QfcDatamodelTeardownTests.cs` | test | 235 | existing | IN SCOPE: remove T1/T2; assign the D1 starter (section 2.5) |
+| `QuickFiler.Test/Controllers/QfcInitEmailQueueZeroBatchTests.cs` | test | 212 | existing | IN SCOPE: remove Z1; assign the D1 starter in all three tests (section 2.5) |
 
 Acceptance-gate test names (fully qualified):
 - `QuickFiler.Controllers.Tests.QfcDatamodelLivenessTests.DequeueNextItemGroupAsync_WhileLoaderStillProducing_KeepsPollingAfterWorkerIdle`
@@ -154,10 +183,11 @@ Acceptance-gate test names (fully qualified):
 
 No human interaction is required. All steps (edit test/production files, run the four-step toolchain, run the named tests by fully qualified name with `/Settings:scripts/vscode/TaskMaster.cli.runsettings`) are scriptable. No live Outlook, no UI pump host, no manual gate.
 
-## 7. Not completed (stopped for quota)
+## 7. Items left open by the first pass, and how each was closed
 
-1. `git show`/`git diff` of CI head `b9692658` vs `origin/main` for the four fixture/test files (Bash disabled; assumed unchanged at the assertion site from the verbatim message match).
-2. Confirmation that `QuickFiler.csproj` uses explicit `<Compile Include>` items (expected, legacy csproj).
-3. Verification of W5 reachability (`UiThread.UiSyncContext`/`AutoScaleFactor` getters from QuickFiler.Test on an STA thread) and of whether UtilitiesCS.Test shares the test host process under the CI command (W7).
-4. Confirmation that the MSTest 4.4.1 worker thread has no ambient SynchronizationContext (pump design is robust regardless).
-5. Numeric derivation evidence section: no numeric acceptance criterion is proposed, so none is required.
+1. CI head `b9692658` versus the branch for the target files — CLOSED. The diff is empty (see the tooling note at the top). Main has not changed any target file since merge-base `9b3eea584` either, so citations against the branch tree are current.
+2. `QuickFiler.csproj` compile-item style — CLOSED. Explicit legacy items; `QfcDatamodel.cs` is listed at `QuickFiler.csproj:325`. Editing an existing file needs no csproj change.
+3. W5 reachability and W7 process sharing — CLOSED (section 3.3 rows W5 and W7). Neither can write the parked singleton, so neither changes the established cause. W5 is recorded as a residual writer for the pinned-baseline fix.
+4. Ambient `SynchronizationContext` on the MSTest worker thread — RECORDED AS AN EXECUTION-TIME ASSUMPTION (section 2.3). The test-installed context makes the design independent of the answer; the plan records the observed value once.
+5. Section 2 extended to `QfcDatamodelTeardownTests.cs` and `QfcInitEmailQueueZeroBatchTests.cs` — CLOSED (section 2.5), including the complete caller inventory of `InitEmailQueue`.
+6. Numeric derivation evidence: no numeric acceptance criterion is proposed, so none is required.
