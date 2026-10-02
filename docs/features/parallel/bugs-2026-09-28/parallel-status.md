@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 9
 - recolor_generation: 9
-- last_updated: 2026-10-02T05-41
-- next_step: 961 PR 975 open at b00fd1f19; await child DONE; apply related-defects directive before merge. max_concurrency 16 (maintainer directive) governs; launch admitted items as their barrier clears (none admitted besides 961).
+- last_updated: 2026-10-02T05-51
+- next_step: 961 remediation relaunch for related findings CR-1, CR-2, CR-3 before merge
 
 ## Items
 
