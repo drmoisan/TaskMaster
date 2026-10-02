@@ -59,7 +59,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $findings = @($result.Lines | Where-Object { $_ -like 'HYGIENE profile-path *' })
         $findings.Count | Should -Be 1 -Because 'the governance-directory record is dropped before any rule runs'
-        $findings[0] | Should -BeExactly ('HYGIENE profile-path ' + $reported + ':2')
+        $findings[0] | Should -BeExactly ('HYGIENE profile-path ' + $reported + ':2') -Because 'the reported record carries its profile path on line 2'
         $result.FindingCount | Should -Be 1 -Because 'only the docs Markdown record is a violation'
     }
 
@@ -70,7 +70,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
 
-        @($result.Lines) | Should -Contain ('HYGIENE raw-document ' + $raw)
+        @($result.Lines) | Should -Contain ('HYGIENE raw-document ' + $raw) -Because 'a raw document is reported by path'
         $result.FindingCount | Should -Be 1 -Because 'a raw document produces exactly one finding'
         $result.ExitCode | Should -Be 1 -Because 'a raw document fails the guard'
     }
@@ -83,7 +83,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
         $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
 
         $result.FindingCount | Should -Be 0 -Because 'a package-level projection is a permitted evidence form'
-        @($result.Lines) | Should -Be @('HYGIENE Findings=0')
+        @($result.Lines) | Should -Be @('HYGIENE Findings=0') -Because 'a retained projection yields only the zero-findings total'
     }
 
     It 'returns a non-zero exit decision when findings exist' {
@@ -102,7 +102,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
         $result.FindingCount | Should -Be 5 -Because 'one profile-path line and four raw documents are reported'
         @($result.Lines | Where-Object { $_ -like 'HYGIENE raw-document *' }).Count | Should -Be 4 -Because 'TestRun and CoverageSession roots and both collector extensions are raw documents'
         $result.ExitCode | Should -Be 1 -Because 'the exit decision is one when the findings total is non-zero'
-        @($result.Lines)[-1] | Should -BeExactly 'HYGIENE Findings=5'
+        @($result.Lines)[-1] | Should -BeExactly 'HYGIENE Findings=5' -Because 'the last line is the findings total of 5'
     }
 
     It 'returns a zero exit decision over clean content' {
@@ -131,7 +131,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $result.FindingCount | Should -Be 0 -Because 'placeholders in any encoding, empty text, null text and non-raw XML carry no violation'
         $result.ExitCode | Should -Be 0 -Because 'the exit decision is zero when the findings total is zero'
-        @($result.Lines) | Should -Be @('HYGIENE Findings=0')
+        @($result.Lines) | Should -Be @('HYGIENE Findings=0') -Because 'clean content yields only the zero-findings total'
     }
 
     It 'prints path and line only and never the matched text' {
@@ -141,7 +141,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
 
-        @($result.Lines) | Should -Be @(('HYGIENE profile-path ' + $leaking + ':3'), 'HYGIENE Findings=1')
+        @($result.Lines) | Should -Be @(('HYGIENE profile-path ' + $leaking + ':3'), 'HYGIENE Findings=1') -Because 'the output names the path and the line number and then the findings total'
         @($result.Lines | Where-Object { $_ -like ('*' + $script:Segment + '*') }).Count | Should -Be 0 -Because 'no output line may echo the matched text'
     }
 
@@ -152,9 +152,9 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $result = Invoke-RepositoryHygieneMain -ReadContent $throwingReader
 
-        @($result.Lines | Where-Object { $_ -like 'HYGIENE unreadable *' }) | Should -Be @('HYGIENE unreadable ' + $broken)
+        @($result.Lines | Where-Object { $_ -like 'HYGIENE unreadable *' }) | Should -Be @('HYGIENE unreadable ' + $broken) -Because 'a record whose reader throws is reported as unreadable by path'
         $result.FindingCount | Should -Be 1 -Because 'an unreadable record is a finding, never skipped silently'
-        $result.ExitCode | Should -Be 1
+        $result.ExitCode | Should -Be 1 -Because 'an unreadable record fails the guard'
     }
 
     It 'reports a tracked backup file as a finding and fails the guard' {
@@ -164,20 +164,25 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
 
-        @($result.Lines) | Should -Be @('HYGIENE backup-file TaskMaster.sln.bak', 'HYGIENE Findings=1')
+        @($result.Lines) | Should -Be @('HYGIENE backup-file TaskMaster.sln.bak', 'HYGIENE Findings=1') -Because 'one tracked backup file yields one backup-file line followed by a findings total of 1'
         $result.ExitCode | Should -Be 1 -Because 'a tracked backup file fails the guard'
     }
 
-    It 'reports zero findings for backup-lookalike names' {
-        $lookalikes = @('docs/bak/notes.md', 'notes.bakery', 'notes.bak.md', 'backup', 'docs/features/x/Makefile')
-        $script:Listing = ConvertTo-EolListing -Path $lookalikes
-        foreach ($item in $lookalikes) { $script:Content[$item] = 'plain text' }
+    It 'reports zero findings for the backup-lookalike name <Name>' -ForEach @(
+        @{ Name = 'docs/bak/notes.md' }
+        @{ Name = 'notes.bakery' }
+        @{ Name = 'notes.bak.md' }
+        @{ Name = 'backup' }
+        @{ Name = 'docs/features/x/Makefile' }
+    ) {
+        $script:Listing = ConvertTo-EolListing -Path @($Name)
+        $script:Content[$Name] = 'plain text'
 
         $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
 
-        @($result.Lines) | Should -Be @('HYGIENE Findings=0')
-        $result.FindingCount | Should -Be 0 -Because 'none of the lookalike names has a final .bak extension'
-        $result.ExitCode | Should -Be 0
+        @($result.Lines) | Should -Be @('HYGIENE Findings=0') -Because "the lookalike name $Name has no final .bak extension, so only the findings total is printed"
+        $result.FindingCount | Should -Be 0 -Because "the lookalike name $Name has no final .bak extension"
+        $result.ExitCode | Should -Be 0 -Because "the lookalike name $Name yields no finding, so the guard passes"
     }
 
     It 'drops a governance-directory backup record before the backup rule runs' {
@@ -187,7 +192,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
 
-        @($result.Lines) | Should -Be @('HYGIENE Findings=0')
+        @($result.Lines) | Should -Be @('HYGIENE Findings=0') -Because 'the governance-directory backup record is dropped, so only the zero-findings total is printed'
         $result.ExitCode | Should -Be 0 -Because 'the governance skip runs ahead of the backup rule'
     }
 
@@ -198,7 +203,7 @@ Describe 'Invoke-RepositoryHygieneMain' {
 
         $result = Invoke-RepositoryHygieneMain -ReadContent $script:Reader
 
-        @($result.Lines) | Should -Be @('HYGIENE backup-file docs/features/x/old.bak', 'HYGIENE profile-path docs/features/x/old.bak:1', 'HYGIENE Findings=2')
+        @($result.Lines) | Should -Be @('HYGIENE backup-file docs/features/x/old.bak', 'HYGIENE profile-path docs/features/x/old.bak:1', 'HYGIENE Findings=2') -Because 'a backup file that also carries a profile path yields the backup-file line, the profile-path line and a findings total of 2'
         $result.ExitCode | Should -Be 1 -Because 'both the backup-file rule and the profile-path rule fire'
     }
 }
