@@ -1,0 +1,24 @@
+---
+name: project-927-r15-pull-request-merge-ref-and-ledger-recount-seams
+description: Round-15 seams on #927 (revision 1.18): a CI baseline anchored at the merge base is only comparable to a pull_request run if main's tip still equals the merge base (checkout takes the merge ref), so every CI-vs-CI gate needs a MAIN-TIP-NOW/MAIN-MOVED guard read after a fetch; a ledger phrase can match two lines (Items-remaining and per-criterion) so say which is removed and which replaced; recount every derived count line, not only TOTAL
+metadata:
+  type: project
+---
+
+Facts learned applying confirming preflight round 14's eight findings (F1 to F8) to the #927 plan in place (revision 1.18, 2026-09-30).
+
+**A pull_request CI run measures the merge ref, not the head.** ci.yml triggers push only on main/development and pull_request on main/development, so a feature branch's CI runs only as pull_request; a callee whose checkout step names no `ref:` (the mstest-coverage and pester callees) checks out the default pull-request ref, which is the PR head merged with main's tip at run time. A baseline read from main's push run at the merge base therefore describes the PR run only while main's tip equals the merge base. Guard shape that survived C2 (single-quoted payload): `$tip = (git rev-parse origin/main); "MAIN-TIP-NOW=" + $tip; "MAIN-MOVED=" + $(if ($tip -eq $mb) { 0 } else { 1 })`. Rationale sentence the reviewer wanted stated: main only advances, so equality at task time implies equality when the run started. A reading of 1 is a recorded NOT MET with a scope reason (`BASELINE-SCOPE: MAIN MOVED`), never a stop and never a new C12 token.
+**Why:** the round-14 reviewer found that P6-T39 compared main-at-merge-base CI against PR CI with no check that main had not advanced between the merge and the PR run.
+**How to apply:** any plan that compares a CI baseline run against a PR run must print both the merge base and the remote tip in the same payload, after a `git fetch origin` (an unfetched remote-tracking ref can read equal while main has advanced). When the coordinator says "add the same two lines" to a sibling task that has no fetch, add the fetch too and record it as an addition for confirmation.
+
+**A ledger phrase can match two lines.** The #927 ledger carries each pending criterion twice: an `Items remaining` entry in the status block and a per-criterion line. A task text saying "replace the `AC4: PENDING P6-T38` line" is ambiguous. State explicitly: remove the Items-remaining entry, replace only the per-criterion line, remove the ID from the `UNMET:` line, then recount and set every derived count line (`TOTAL:`, `The count command printed`, `Checked off (delivered):`, `Remaining (unchecked):`), not only `TOTAL:`. Cite ledger line numbers as they stood at a named commit and say the executor matches by content because earlier tasks edit the same file first.
+
+**Job conclusion is a check-off condition, not a stop.** When a task records a PR job's conclusion, say whether `success` gates the tick; an absent job line stays a stop, a non-success conclusion is NOT MET.
+
+**Confirming guard runs must be named on every post-commit task.** P6-T37 and P6-T38 each re-ran GATE6 after the preceding commit; the appended P6-T39 did not, and the P6-T16 sentence enumerating the repeaters had to be amended. When appending a post-commit task, add the confirming run as step (0) and update the enumerating sentence.
+
+**Attribute main's movement CI-to-CI, in prose, without inline spans.** The reviewer replaced "sibling items added tests" with "main changed UtilitiesCS and QuickFiler production and test files", named the files in plain prose (no backticks, because the Write Set extractor harvests inline single-token paths), cited main's CI run at the old merge base as the evidence, and limited "same denominators" to the one pair actually measured (local run vs main CI at the new merge base). An executor artifact's inaccurate statement (projection line 36 said the merge added only test files) is corrected by a labelled line in the new artifact, never by editing the executed artifact.
+
+**Small wording facts:** "not yet committed" about a tick already in the plan-revision commit is a defect; read the worktree reflog (`.git/worktrees/<leaf>/logs/HEAD`, entry N = line N) to confirm which commit carries a working-copy change. Count list positions from the plan's own list (mstest-coverage is the fifth of six pre-existing contexts). Never quote a retired phrase verbatim in the record (an absence grep finds it); paraphrase it. Pre-compute the line count only after the edits: 1182 plus 2 bullets, 4 record lines and 3 citations was 1191, not the 1204 estimated from a longer draft.
+
+Related: [[project-927-r14-premerge-local-baseline-reanchored-to-merge-base-ci-seams]], [[project-927-r13-delta-text-violates-own-check-and-quoted-phrase-residue]].

@@ -164,3 +164,4 @@
 - [Write-Verbose remedy is inert](feedback_write-verbose-remedy-is-inert-without-a-verbose-call-site.md) — needs -Verbose at the deployed call site
 - [bash heredoc backslash + /tmp traps](project_bash-heredoc-backslash-and-tmp-traps.md) — Windows python3 can't see /tmp
 - [re-audit cycle playbook](project_re-audit-cycle-review-playbook.md) — split remediable blockers from PR-time gates; re-anchor a moved merge base
+- [927-review-residuals](project_927-review-residuals.md) — PASS/0, 17/20 + 3 PENDING-CI; -0.01pp C# noise with zero prod change; `*cobertura*.xml` ignores the default projection stem; bundled PoshQC artifact lacks scripts/hygiene; 7-cell trap applies to every table
