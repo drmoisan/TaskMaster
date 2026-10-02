@@ -264,5 +264,15 @@ subagents write memory into the SESSION tree even when told not to. Expect those
 the item branch. Meanwhile the pinned sibling merged and a new add landed, so the verdict stayed DEFER
 but against a different neighbour; recompute, never carry.
 
+**Seventh case, 2026-10-02 `/parallel-add 950`: died at S3b_research on a quota hold**, research
+committed but `INCOMPLETE` with a section-7 to-do list, spec stale, plan a 44-line scaffold. One
+non-isolated child (opus, `fable_policy: disabled` per the C3 floor) closed research, rewrote spec,
+planned in place and cleared preflight in 3 rounds (7, 5, 0 defects), about 2 h 15 m. The child
+reported two delegation mechanics: its subagent prompts needed `Canonical issue number for this
+feature is <N>.` plus a `branch:` line, and a `Parallel mode: true` marker made the
+pre-implementation gate deny its atomic-executor PREFLIGHT call, so omit that marker from
+preparation-phase subagent prompts. Meanwhile 956 merged and 948 launched, so the verdict was
+re-derived against a pinned set that did not exist when the add started.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].

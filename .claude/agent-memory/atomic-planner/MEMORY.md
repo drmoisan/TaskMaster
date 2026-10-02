@@ -2,6 +2,8 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#950 R2](project_950_r2_self_matching_process_probe_and_bom_numstat_seams.md) — CommandLine process probe counts itself (exclude $PID); BOM drop adds +1/-1 numstat; failed set hides aborted tests
+- [#950 R1](project_950_r1_inline_continuation_and_reindent_width_seams.md) — default TCS continues inline so Drain() is vacuous (RunContinuationsAsynchronously + delete-Drain control); using() re-indent breaks width
 - [#950 v1.0](project_950_hygiene_blocks_absolute_prefix_and_always_failing_probe_seams.md) — absolute prefix in Command rows breaks hygiene rule B; always-failing probe; commit task's own artifact in porcelain; re-indent vs added-line scans
 - [#956 R1.2](project_956_r12_rethrow_brace_exemptions_and_indent_keyed_catch_rule.md) — lifting ExcludeFromCodeCoverage exposes braces after `throw;`; construct-identified exemptions; catch rule keyed to indent; recount control; ITERATION 1 + RERUN
 - [#948 v0.3](project_948_sibling_first_shape_reconciliation_seams.md) — sibling lands first: named shapes with content anchors, baseline-relative try/catch gate, re-budget the 500-line ceiling, hit-count guards, dynamic census

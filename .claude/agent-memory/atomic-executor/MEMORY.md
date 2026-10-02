@@ -16,6 +16,7 @@
 - [AC check-off paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) · [Override is not an AC](project_orchestrator_override_does_not_satisfy_an_ac.md) · [Output Summary count](project_artifact_output_summary_breaks_its_own_exact_count_gate.md)
 - [Scope gate vs later artifacts](project_scope_gate_cannot_list_artifacts_written_after_it.md) · [Sibling-owned zero gate](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) · [Dir-scoped format](project_directory_scoped_format_breaks_ownership_gates.md)
 - [Proportionate bar](feedback_confirmatory_preflight_proportionate_bar.md) · [4 C# defect classes](project_preflight_recurring_csharp_plan_defect_classes.md)
+- [Scratch reconstruction + cached CSharpier](project_preflight_scratch_reconstruction_with_cached_csharpier.md) (verify census rows post-format; FailedTestName blind to aborted; stray gate misses pwsh runner)
 - [msbuild log csc line](project_msbuild_log_token_search_matches_csc_command_line.md) · [Epic base line counts](project_epic_integration_base_invalidates_research_line_counts.md) · [Citation-match false fact](project_preflight_citation_match_propagates_false_fact.md)
 - [Cites LATER artifact](project_preflight_checkoff_cites_later_task_artifact.md) · [Pre-edit vs post-edit table](project_preedit_gate_cites_postedit_replacement_table.md) · [Conjunctive criteria](project_preflight_conjunctive_criterion_citation_gap.md)
 - [Unrecorded baseline count](project_gate_cites_a_baseline_count_the_baseline_task_never_records.md) · [Blanket + forward deps](project_preflight_blanket_assertion_and_forward_dependency.md) · [pwsh quoting boundary](project_pwsh_command_quoting_boundary.md)
@@ -54,6 +55,7 @@
 ## Coverage measurement
 - C# coverage mechanics (Cobertura, Koverage, denominators): see the sub-index at the top
 - [Package-rate not-lower gate vs variance](project_package_rate_not_lower_gate_trips_on_unrelated_file_variance.md) — unrelated-file variance fails package/repo not-lower gates on small-delta items
+- [Cobertura hits are binary](project_dotnet_coverage_cobertura_hits_are_binary.md) — dotnet-coverage hits are 0/1; "guard hits > record hits" can never hold; use the guard line's condition-coverage
 
 ## Nullable / C# language
 - [Pragma gate](project_nullable_pragma_gate_mechanics.md) · [net481 pragma](project_nullable_pragma_gate_net481_mechanics.md) · [Epic pragma](project_nullable_epic_pragma_gate_and_analyzer_restore.md)
