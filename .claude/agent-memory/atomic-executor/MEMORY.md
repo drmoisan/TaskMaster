@@ -212,3 +212,4 @@ Four sections live in sub-index files to keep this file under its read limit. Op
 ## Artifact hygiene, shell/pwsh pitfalls, misc (sub-index)
 - [Sub-index: 58 entries](index_artifact_hygiene_and_misc.md) — evidence sanitisation, TRX/msbuild path leaks, pwsh quoting, csharpier/numstat, git spans, Pester, hooks
 - [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md) — a correct citation can read as contradicting a "do not re-verify" fact
+- [git grep -I skips UTF-16 evidence](project_git_grep_binary_flag_skips_utf16_evidence.md)

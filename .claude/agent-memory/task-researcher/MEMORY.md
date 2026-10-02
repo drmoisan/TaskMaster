@@ -37,11 +37,16 @@
 - [taskrun-triage-931](project_taskrun_triage_931.md) — 2/22 Task.Run sites thread-dependent; DispatchValue never reads _ownerThreadId; IFileInfo.OpenRead returns FileStream (no MemoryStream)
 - [exemption-audit-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — grep proven techniques + sibling consistency before IRREDUCIBLE
 - [engine-toggle-prime-fault-log-order-942](project_engine_toggle_prime_fault_log_order_942.md) — CompletePrime removes marker BEFORE log; H1 false; probe handle from inside the sink; NB-2 unpromoted
+- [measure-item-worktree](feedback_measure_item_worktree_not_session_worktree.md) — read facts from the ITEM worktree; uniform off-by-N = stale tree
+- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — rg-vs-git one-file deltas; `basename $USERPROFILE` wrong in Git Bash; PQ setting no var substitution
+- [evidence-identity-hygiene-sweep-927](project_evidence_identity_hygiene_sweep_927.md) — classify raw evidence by XML root (243/23/27/18); _pester.yml paths explicit; `<drive>:` placeholders
+- [push-down-claude-dir-149](project_push_down_claude_dir.md) — #149 pushDownClaudeDir research (2026-04-16)
 - [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult on a pool thread INLINES; MSTest 4.4 bodies run inside Task.Run
 - [pump-timeout-743](project_pump_timeout_743.md) — dispatcher-gate lead stale (#493); 9/19 pump tests skip the gate; TRX timestamps as instrument
 - [uithread-dispatcher-restore-scope-493](project_uithread_dispatcher_restore_scope_493.md) — 2-lock split; never one semaphore for helper+fixture; CI runs QuickFiler.Test serially
 - [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — WinFormsPumpHost design; CreateAsync factory-seam gap
 - [onedrive-timeout-test-determinism-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask overload catches TimeoutException not TCE; DI-seam fix
+- [onedrive-timeout-test-determinism-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask overload catches TimeoutException not TaskCanceled
 - [unobserved-task-fault-670](project_unobserved_task_fault_670.md) — ViewerSetup.cs 499/500; IItemViewer.UiDispatcher is raw WPF Dispatcher
 - [filerqueue-consumer-unsound-633](project_filerqueue_consumer_unsound_633.md) — Consumer orphaned-item race; BackGroundMove tests vacuous
 - [terminal-hook-barrier-751](project_terminal_hook_barrier_751.md) — notify runs after terminal TrySet; `run.Terminal` is the barrier
