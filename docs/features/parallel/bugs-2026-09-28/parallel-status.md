@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 5
 - recolor_generation: 6
-- last_updated: 2026-10-01T20-39
-- next_step: 956 running (single child under quota pacing); no other launches until released
+- last_updated: 2026-10-01T21-31
+- next_step: 956 halted at P4-T8 on AC15 (unreachable braces after throw); awaiting coordinator ruling between option a (exempt 3 lines) and option b (restructure, conflicts AC6). Launch nothing until ruled.
 
 ## Items
 
