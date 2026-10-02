@@ -150,3 +150,4 @@
 - [Splatting frees lines in ceiling-bound test files](project_splatting_is_the_line_budget_lever_for_ceiling_bound_test_files.md)
 - [-WhatIf does not reach module ShouldProcess](project_whatif_does_not_reach_module_session_state.md)
 - [WinForms control field installs SyncContext, deadlocks await](project_winforms_control_field_installs_synccontext_and_deadlocks_await.md)
+- [git grep -I skips UTF-16 evidence](project_git_grep_binary_flag_skips_utf16_evidence.md)
