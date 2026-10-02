@@ -19,6 +19,16 @@ The #956 preparation research found four logic defects in `UtilitiesCS/EmailInte
 - **L3:** `Cleanup_Files` never resets `_attachmentsAltName`.
 - **L4:** `WriteCSV_StartNewFileIfDoesNotExist` passes its `Path.Combine` arguments in reverse order, and its condition is inverted.
 
+**Consolidated scope: issue #966 is folded into this item (maintainer directive, 2026-10-02).** #966 (SortEmail review residuals from #956 / PR #965) covers the same files and component, so it is remediated here rather than tracked as a follow-up. The pull request for this item closes both #959 and #966. In-scope #966 items:
+- **F1:** route the overwrite prompt and the alternate-name prompt through `YesNoToAllPromptSession`; they still call the dialog directly.
+- **F2:** delete the unused `SaveAttachmentsOld` and `IsPicture`, after confirming they have no callers.
+- **F3:** remove `[ExcludeFromCodeCoverage]` from members that already have tests.
+- **CR-1:** correct the #956 spec wording about the `DirectoryInfo` boundary so it matches where `new DirectoryInfo` now runs.
+- **Try-save path:** replace the `Debug.WriteLine` calls with the project logger, and remove the outer rethrow, which has no effect.
+- **Partial files:** remove the unused `using` directives in the `SortEmail` partial files.
+
+**Scope rule (binding on every agent working this item, and to be passed to every subagent):** any defect a researcher or reviewer finds in the same files or with the same root cause is fixed within this item. Do not list such defects as follow-ups. Only completely unrelated defects may be reported for filing.
+
 ## Environment
 
 - OS/version: Windows 11 (Outlook VSTO add-in)
