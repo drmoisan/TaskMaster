@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 6
 - current_cohort: 7
 - recolor_generation: 7
-- last_updated: 2026-10-02T01-36
-- next_step: 952 merged (PR 970, ab14b126c). 950 halted before feature review on AC17 NOT MET (environmental); awaiting coordinator ruling.
+- last_updated: 2026-10-02T01-37
+- next_step: 950 relaunched with AC17 option (a): feature review, PR, CI green, AC17 check-off from PR CI; then parent verify and merge
 
 ## Items
 
