@@ -115,6 +115,7 @@
 - [TimeoutAfter IsCompleted loses to the Task.Run race](project_timeoutafter_iscompleted_shortcircuit_loses_to_taskrun_race.md) · [One Cobertura filename, several class nodes](project_cobertura_filename_maps_to_several_class_nodes.md)
 - [msbuild file logger double-counts warnings](project_msbuild_filelogger_double_counts_each_warning.md) · [Reconciliation merge already tracks the feature docs](project_orchestrator_reconciliation_merge_tracks_feature_docs.md)
 - [Seam sentences outlive a removed member](project_preflight_seam_sentences_outlive_a_removed_member.md) — after a decision removes an interface member, grep the spec for "Moq double of the .* interface"/"injectable"; keyword sweeps miss them
+- [Worktree-gate hook: git + "remove" in any identifier](project_worktree_removal_hook_matches_git_plus_remove_in_variable_names.md) — read-only payloads with `$removed` halt the run; flag at preflight
 - [Explicit Compile items decide membership, not file presence](project_explicit_compile_items_decide_membership_not_file_presence.md) — a grep hit can be uncompiled
 - [`git add -N -- .` defeats a "do not stage X" invariant](project_intent_to_add_span_defeats_do_not_stage_invariant.md) — it reads as diff plumbing, so a staging audit skips it
 - [Hunk-header literal slides past a blank line](project_git_hunk_header_literal_slides_past_blank_line.md) — measured; assert numstat deleted=0, never `@@ -N,0 +M,`
