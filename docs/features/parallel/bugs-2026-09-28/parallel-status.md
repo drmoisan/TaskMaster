@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 10
 - recolor_generation: 10
-- last_updated: 2026-10-02T22-18
-- next_step: 964 in flight (execution child, opus, non-isolated in agent-a3fb26aa2afc7c52c). On child DONE: confirm PR state, headRefOid equals the reported ci_gate.head_sha, all required checks green on that head and head contains current main, then merge and regenerate parallel-status.md. Remaining unadmitted: 959, 968 (concurrent /parallel-add session), 973, 967 (tier decision).
+- last_updated: 2026-10-02T22-50
+- next_step: 964 HALTED at P0-T4 awaiting maintainer decision (promotion-hook false positive on the phrase-count pwsh payload; see items[964].execution_halt). On a decision, relaunch the 964 execution child into agent-a3fb26aa2afc7c52c to resume from P0-T4. Remaining unadmitted: 959, 968 (concurrent /parallel-add session), 973, 967 (tier decision).
 
 ## Items
 
