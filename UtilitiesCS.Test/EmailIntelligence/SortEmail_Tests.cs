@@ -179,8 +179,30 @@ namespace UtilitiesCS.Test.EmailIntelligence
             act.Should().NotThrow();
         }
 
-        [TestMethod]
-        public void GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments()
+        [DataTestMethod]
+        [DataRow(
+            false,
+            true,
+            "photo.jpg",
+            DisplayName = "GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments [saveAttachments false, savePictures true]"
+        )]
+        [DataRow(
+            true,
+            true,
+            "photo.jpg,report.pdf",
+            DisplayName = "GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments [saveAttachments true, savePictures true]"
+        )]
+        [DataRow(
+            true,
+            false,
+            "report.pdf",
+            DisplayName = "GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments [saveAttachments true, savePictures false]"
+        )]
+        public void GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments(
+            bool saveAttachments,
+            bool savePictures,
+            string expectedFileNames
+        )
         {
             // Arrange
             var mailItem = CreateMailItemWithAttachments(
@@ -195,19 +217,45 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     mailItem.Object,
                     GetRepositoryRoot().FullName,
                     null,
-                    saveAttachments: false,
-                    savePictures: true
+                    saveAttachments: saveAttachments,
+                    savePictures: savePictures
                 )
                 .ToList();
 
             // Assert
-            attachments.Should().ContainSingle();
-            attachments[0].AttachmentInfo.FileName.Should().Be("photo.jpg");
-            attachments[0].AttachmentInfo.IsImage.Should().BeTrue();
+            attachments
+                .Select(x => x.AttachmentInfo.FileName)
+                .Should()
+                .Equal(expectedFileNames.Split(','));
+            attachments
+                .Should()
+                .OnlyContain(x => x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg"));
         }
 
-        [TestMethod]
-        public async Task GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments()
+        [DataTestMethod]
+        [DataRow(
+            true,
+            false,
+            "report.pdf",
+            DisplayName = "GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments [saveAttachments true, savePictures false]"
+        )]
+        [DataRow(
+            true,
+            true,
+            "photo.jpg,report.pdf",
+            DisplayName = "GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments [saveAttachments true, savePictures true]"
+        )]
+        [DataRow(
+            false,
+            true,
+            "photo.jpg",
+            DisplayName = "GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments [saveAttachments false, savePictures true]"
+        )]
+        public async Task GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments(
+            bool saveAttachments,
+            bool savePictures,
+            string expectedFileNames
+        )
         {
             // Arrange
             var mailItem = CreateMailItemWithAttachments(
@@ -222,15 +270,19 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     mailItem.Object,
                     GetRepositoryRoot().FullName,
                     null,
-                    saveAttachments: true,
-                    savePictures: false
+                    saveAttachments: saveAttachments,
+                    savePictures: savePictures
                 )
             );
 
             // Assert
-            attachments.Should().ContainSingle();
-            attachments[0].AttachmentInfo.FileName.Should().Be("report.pdf");
-            attachments[0].AttachmentInfo.IsImage.Should().BeFalse();
+            attachments
+                .Select(x => x.AttachmentInfo.FileName)
+                .Should()
+                .Equal(expectedFileNames.Split(','));
+            attachments
+                .Should()
+                .OnlyContain(x => x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg"));
         }
 
         // Rooted literal directory used only as an in-memory path value. The injected delegate
