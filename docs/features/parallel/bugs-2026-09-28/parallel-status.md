@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 10
 - recolor_generation: 12
-- last_updated: 2026-10-03T08-04
-- next_step: 964 HALTED before P1-T22 awaiting a separate maintainer approval for the P1-T22 CMD-PHRASE-COUNT command (see items[964].execution_halt.p1_t22_halt); on approval, relaunch the child at P1-T22. 959 (cohort 11) launches when 964 is merged; 973 (cohort 12) launches when 959 and 964 are merged (968 merged). 967 rejected for this run.
+- last_updated: 2026-10-03T08-19
+- next_step: 964 in flight (coordinator-relaunched child; past P1-T22, final QC evidence committed): on its reported ready state, confirm PR and CI durably and merge first. 959 in flight (launched 2026-10-03T08-19): merge second, after merging origin/main at PR time and green CI on the merged head. 973 (cohort 12) launches only after its re-preparation commits and pushes a clearance newer than 2026-10-03T00-41; merges third. 967 rejected for this run.
 
 ## Items
 
@@ -37,7 +37,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/975 | 993fdd01566dee82e5f37acb761a600feaaa1454 |
 | 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | in_flight | worktree_created |  |  |
 | 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | scheduled | not_started |  |  |
-| 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | scheduled | not_started |  |  |
+| 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | in_flight | worktree_created |  |  |
 | 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/976 | 5d87e5b8e246869b598fcb2e6101d70eaa8ab8e6 |
 
 ## Item Lifecycle Timestamps
@@ -65,7 +65,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 961 | 2026-10-02T03-02 | 2026-10-02T05-05 | 2026-10-02T07-11 |  |
 | 964 | 2026-10-02T21-45 | 2026-10-02T22-18 |  |  |
 | 973 | 2026-10-03T00-46 |  |  |  |
-| 959 | 2026-10-03T00-53 |  |  |  |
+| 959 | 2026-10-03T00-53 | 2026-10-03T08-19 |  |  |
 | 968 | 2026-10-03T02-34 | 2026-10-03T02-37 | 2026-10-03T07-47 |  |
 
 ## Cohorts
@@ -270,7 +270,6 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 953 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.github/workflows/_pester.yml (exact); path_overlap:scripts/dependencies/BindingRedirectVerification.psm1 (exact); path_overlap:scripts/dependencies/PackageGraph.psm1 (exact); path_overlap:tests/scripts/dependencies/BindingRedirectVerification.Tests.ps1 (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
 | 956 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
 | 961 | 973 | path_overlap | path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:.github/workflows/_pester.yml (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
-| 964 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
 | 940 | 959 | path_overlap | path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_Tests.cs (exact) |
 | 941 | 959 | path_overlap | path_overlap:QuickFiler/Properties/AssemblyInfo.cs (exact) |
 | 945 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_Tests.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs (exact) |
@@ -278,8 +277,6 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 952 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact) |
 | 953 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:*/*.csproj (953 live glob; language intersection with this radius) |
 | 956 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:.claude/agent-memory/task-researcher/project_sortemail_split_and_prompt_seam_956.md (exact); path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_TrySaveAttachment_Tests.cs (exact); path_overlap:UtilitiesCS/Dialogs/YesNoToAllPromptSession.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.AttachmentSaving.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.LegacyAttachmentSaving.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.MailItemSort.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.TrySaveAttachment.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.UndoAndMoveLog.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs (exact); path_overlap:docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956/spec.md (exact); path_overlap:**/SortEmail*.cs (956 live glob; language intersection with this radius) |
-| 959 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact) |
-| 959 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/prd-feature/MEMORY.md (exact); path_overlap:.claude/agent-memory/prd-feature/feedback_ac_gates_verify_satisfiability.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
 | 882 | 968 | path_overlap | path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs (exact); path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs (exact) |
 | 927 | 968 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 (exact) |
 | 930 | 968 | path_overlap | path_overlap:UtilitiesCS/Threading/UiThread.cs (exact) |
@@ -291,6 +288,14 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 956 | 968 | path_overlap | path_overlap: glob-only (no shared tracked path; live glob in one radius) |
 | 961 | 968 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 (exact) |
 | 968 | 973 | path_overlap | path_overlap: glob-only (no shared tracked path; live glob in one radius) |
+
+## Tolerated Overlaps
+
+| a | b | reasons | authorized_by | authorized_on | merge_order_rule |
+| --- | --- | --- | --- | --- | --- |
+| 959 | 964 | shared_path:.claude/agent-memory/atomic-planner/MEMORY.md (append-only agent-memory index) | maintainer | 2026-10-03 | Fixed merge order 964, then 959, then 973. Each later item merges origin/main into its branch at PR time and re-runs CI on the merged head before merging; csproj list conflicts go through .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1; append-only agent-memory index lines are unioned; any conflict in a non-index source file halts and is reported. |
+| 959 | 973 | shared_path:.claude/agent-memory/atomic-planner/MEMORY.md (append-only agent-memory index); shared_path:.claude/agent-memory/prd-feature/MEMORY.md (append-only agent-memory index); shared_path:.claude/agent-memory/task-researcher/MEMORY.md (append-only agent-memory index); shared_path:.claude/agent-memory/prd-feature/feedback_ac_gates_verify_satisfiability.md (agent-memory note); shared_path:UtilitiesCS/UtilitiesCS.csproj (separate entries; mergeable project file); shared_path:UtilitiesCS.Test/UtilitiesCS.Test.csproj (separate entries; mergeable project file); glob_only:*/**/*.cs (973 live glob; 973 only reads the .cs files it covers) | maintainer | 2026-10-03 | Fixed merge order 964, then 959, then 973. Each later item merges origin/main into its branch at PR time and re-runs CI on the merged head before merging; csproj list conflicts go through .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1; append-only agent-memory index lines are unioned; any conflict in a non-index source file halts and is reported. |
+| 964 | 973 | shared_path:.claude/agent-memory/atomic-planner/MEMORY.md (append-only agent-memory index); shared_path:.claude/agent-memory/orchestrator/MEMORY.md (append-only agent-memory index); shared_path:TaskMaster/TaskMaster.csproj (separate Compile/Reference entries; mergeable project file); glob_only:*/**/*.cs (973 live glob; 973 only reads the .cs files it covers) | maintainer | 2026-10-03 | Fixed merge order 964, then 959, then 973. Each later item merges origin/main into its branch at PR time and re-runs CI on the merged head before merging; csproj list conflicts go through .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1; append-only agent-memory index lines are unioned; any conflict in a non-index source file halts and is reported. |
 
 ## Mutations
 
