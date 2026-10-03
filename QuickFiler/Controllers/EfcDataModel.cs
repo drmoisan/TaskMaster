@@ -305,8 +305,18 @@ namespace QuickFiler.Controllers
                 FsAncestorEquivalent = folderRoot,
             };
 
-            var result = await InvokeFilerAsync(config, mailHelpers);
-            ResetFilerPromptState();
+            bool result;
+            try
+            {
+                result = await InvokeFilerAsync(config, mailHelpers);
+            }
+            finally
+            {
+                // Sticky "to all" prompt answers must not survive into the next filing operation
+                // when the filer throws (issue #959; the same root cause as the missing
+                // alternate-name reset in the SortEmail cleanup).
+                ResetFilerPromptState();
+            }
             return result;
         }
 
