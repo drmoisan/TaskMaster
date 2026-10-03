@@ -96,9 +96,6 @@ namespace QuickFiler.Controllers
             _globals = null;
             _frame = null;
             _masterQueue = null;
-            //_blockingQueue = null;
-            //_priorityQueue = null;
-            //_queues = null;
             _worker = null;
         }
 
@@ -106,9 +103,6 @@ namespace QuickFiler.Controllers
 
         #region Private Variables
 
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
-        );
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
         private LockingLinkedList<MailItem> _masterQueue = [];
@@ -191,7 +185,6 @@ namespace QuickFiler.Controllers
 
             _token.Register(() => worker.CancelAsync());
             worker.DoWork += new System.ComponentModel.DoWorkEventHandler(Worker_DoWork);
-            //worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
         }
 
         private async void Worker_DoWork(object sender, DoWorkEventArgs e)
@@ -206,8 +199,6 @@ namespace QuickFiler.Controllers
                 //zxxint arg = (int)e.Argument;
 
                 // Start the time-consuming operation.
-                //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
-                //e.Result = LoadRemainingEmailsToQueue(bw, _token);
                 try
                 {
                     // Issue #791: capture the loader task before awaiting it. This method is
@@ -237,30 +228,6 @@ namespace QuickFiler.Controllers
             catch (System.Exception ex)
             {
                 logger.Error($"Error in Worker_DoWork {ex.Message}", ex);
-            }
-        }
-
-        // This event handler demonstrates how to interpret
-        // the outcome of the asynchronous operation implemented
-        // in the DoWork event handler.
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled)
-            {
-                // The user canceled the operation.
-                MessageBox.Show("Operation was canceled");
-            }
-            else if (e.Error != null)
-            {
-                // There was an error during the operation.
-                string msg = String.Format("An error occurred: {0}", e.Error.Message);
-                MessageBox.Show(msg);
-            }
-            else
-            {
-                // The operation completed normally.
-                //string msg = String.Format("Result = {0}", e.Result);
-                //MessageBox.Show(msg);
             }
         }
 
@@ -360,13 +327,12 @@ namespace QuickFiler.Controllers
                 }
                 catch (OperationCanceledException)
                 {
-                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
                     return false;
                 }
                 catch (System.Exception e)
                 {
                     logger.Error(
-                        $"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}"
+                        $"{nameof(LoadRemainingEmailsToQueueAsync)} Error. \n {e.Message}\n{e.StackTrace}"
                     );
                     throw;
                 }
@@ -375,101 +341,7 @@ namespace QuickFiler.Controllers
             return true;
         }
 
-        private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
-        {
-            if ((_frame is null) || (_frame.RowCount == 0))
-            {
-                MessageBox.Show("Email Frame is empty");
-                return false;
-            }
-
-            // Cast Frame to array of IEmailInfo
-            var rows = _frame.GetRowsAs<IEmailSortInfo>().Values.ToArray();
-
-            foreach (var row in rows)
-            {
-                try
-                {
-                    token.ThrowIfCancellationRequested();
-                    //var item = (MailItem)_olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
-                    var item = _olApp.GetNamespace("MAPI").GetItemFromID(row.EntryId, row.StoreId);
-                    if (item is not null && item is MailItem mailItem)
-                    {
-                        _masterQueue.AddLast(mailItem);
-                        _moveMonitor.HookItem(mailItem, (x) => _masterQueue.Remove(x));
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    //logger.Debug($"{nameof(LoadRemainingEmailsToQueue)} Task cancelled");
-                    return false;
-                }
-                catch (System.Exception e)
-                {
-                    logger.Error(
-                        $"{nameof(LoadRemainingEmailsToQueue)} Error. \n {e.Message}\n{e.StackTrace}"
-                    );
-                    throw;
-                }
-            }
-            return true;
-        }
-
-        private async Task<bool> LoadRemainingEmailsToQueueAsync(
-            BackgroundWorker bw,
-            CancellationToken token
-        )
-        {
-            if ((_frame is null) || (_frame.RowCount == 0))
-            {
-                MessageBox.Show("Email Frame is empty");
-                return false;
-            }
-
-            try
-            {
-                // ForEachAwaitWithCancellationAsync (System.Linq.Async) is obsolete (CS0618) per
-                // the framework's migration guidance ("Use the language support for async foreach
-                // instead"), but replacing it with `await foreach` here is a control-flow change
-                // to a production async method, not an annotation-only edit. Suppressing narrowly
-                // preserves the exact pre-existing behavior (no behavior change per AC7).
-#pragma warning disable CS0618
-                await _frame
-                    .GetRowsAs<IEmailSortInfo>()
-                    .Values.ToAsyncEnumerable()
-                    .ForEachAwaitWithCancellationAsync(
-                        async (row, token) =>
-                            await Task.Run(
-                                () =>
-                                {
-                                    token.ThrowIfCancellationRequested();
-                                    var item = (MailItem)
-                                        _olApp
-                                            .GetNamespace("MAPI")
-                                            .GetItemFromID(row.EntryId, row.StoreId);
-                                    _masterQueue.AddLast(item);
-                                    _moveMonitor.HookItem(item, (x) => _masterQueue.Remove(x));
-                                },
-                                token
-                            ),
-                        token
-                    );
-#pragma warning restore CS0618
-                return true;
-            }
-            catch (TaskCanceledException)
-            {
-                //logger.Debug($"{nameof(LoadRemainingEmailsToQueueAsync)} Task cancelled");
-                return false;
-            }
-        }
-
         #endregion Email Queue Initial Setup
-
-        #region Linked List Locking
-
-
-        #endregion Linked List Locking
 
         #region Event Handlers
 

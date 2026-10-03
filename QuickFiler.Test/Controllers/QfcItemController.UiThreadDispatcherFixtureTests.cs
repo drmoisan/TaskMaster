@@ -194,17 +194,17 @@ namespace QuickFiler.Controllers.Tests
         /// observes the pre-install value on acquisition, never the first transaction's installed
         /// value, because restore strictly precedes gate release.
         /// <para>
-        /// Issue #950: the earlier intermittent failure was a race on the shared static, not a
-        /// timing defect. The gate-free fixture method EnsureDispatcher seeds the parked dispatcher
-        /// whenever the field is null, so a concurrently running class that calls it could write
-        /// between the baseline read and the install, or between the restore and the second
-        /// caller's read. The test therefore pins a non-null baseline with an ensure scope that it
-        /// opens only after transaction A has acquired the gate and holds through both assertions.
-        /// Taking the pin inside the gate means that a gated transaction from another class (W3/W4)
-        /// cannot restore a null previous value between the pin and this test's acquisition.
-        /// Invariant for future editors: no other class may dispose an ensure scope holding the
-        /// parked dispatcher (W2), and UiThread.Initialize (W5) must not latch during this test;
-        /// either would change the value the second caller observes.
+        /// Issue #950 traced the earlier intermittent failure to a race on the shared static, not to
+        /// a timing defect: a gate-free ensure call in another class could seed the parked dispatcher
+        /// between the baseline read and the install, or between the restore and the second caller's
+        /// read, and the test pinned a non-null baseline inside the gate to fence it. Issue #968
+        /// removed that pin: the fixture now counts pins, so only the last release can revert the
+        /// fixture's own seeding, and every remaining ensure call is acquired and released while its
+        /// caller holds a transaction, so no class can write the field while transaction A holds the
+        /// gate and every other transaction restores before it releases (W3/W4). Invariant for future
+        /// editors: a pin must stay nested inside its caller's transaction, and UiThread.Initialize
+        /// (W5) must not latch during this test; either would change the value the second caller
+        /// observes.
         /// </para>
         /// </summary>
         [TestMethod]
@@ -218,9 +218,7 @@ namespace QuickFiler.Controllers.Tests
                 UiThreadDispatcherTransaction transactionA = await UiThreadDispatcherFixture
                     .BeginTransactionAsync()
                     .ConfigureAwait(false);
-                using (
-                    IDisposable baseline = QfcItemControllerTestSupport.EnsureUiThreadDispatcher()
-                )
+                try
                 {
                     Dispatcher original = UiThreadDispatcherFixture.Current;
                     transactionA.Install(liveA);
@@ -267,6 +265,10 @@ namespace QuickFiler.Controllers.Tests
                                     + "issue #230 lost update"
                             );
                     }
+                }
+                finally
+                {
+                    transactionA.Dispose();
                 }
             }
             finally
