@@ -45,6 +45,19 @@ namespace TaskMaster
         }
 
         /// <summary>
+        /// The message logged when the notification for a refused toggle click throws.
+        /// </summary>
+        private static string BuildNotifyFailedMessage(string engineName)
+        {
+            return string.Format(
+                CultureInfo.CurrentCulture,
+                "Notifying that the engine '{0}' is not available failed, so the refused toggle "
+                    + "click was not surfaced to the user.",
+                RenderEngineName(engineName)
+            );
+        }
+
+        /// <summary>
         /// The message logged when the state prime faults.
         /// </summary>
         private static string BuildPrimeFailedMessage(string engineName)

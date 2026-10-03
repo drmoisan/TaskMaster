@@ -8,17 +8,21 @@ namespace TaskMaster
     internal sealed partial class EngineToggleStateCoordinator
     {
         /// <summary>
-        /// The in-flight — or most recently completed — prime for an engine key, exposed so tests
-        /// can await the prime deterministically instead of polling or sleeping.
+        /// The registration marker for an engine key, exposed so tests can await the outcome of
+        /// its prime deterministically instead of polling or sleeping. The marker is not the
+        /// prime task itself: it is registered before the prime starts and is completed only after
+        /// the prime outcome has been observed and, on a fault or cancellation, reported.
         /// </summary>
         /// <param name="engineName">The engine key; ordinal, case-sensitive.</param>
         /// <returns>
-        /// The prime task, or <see cref="Task.CompletedTask"/> when no prime has been started for
-        /// the key. The returned task never faults: a prime fault is observed inside the prime
-        /// itself and reported through <c>logError</c>. For a key whose prime did not run to
-        /// completion, the marker is cleared only after that report has returned or thrown, so a
-        /// caller that receives <see cref="Task.CompletedTask"/> can rely on the report having
-        /// been attempted or deliberately suppressed as a repeat of a kind already reported.
+        /// The registered marker, or <see cref="Task.CompletedTask"/> when no marker is registered
+        /// for the key. The marker never faults or cancels: a prime fault is observed by
+        /// <see cref="CompletePrime"/> and reported through <c>logError</c>, and the marker is
+        /// completed in a <c>finally</c> after that observation. For a key whose prime did not
+        /// run to completion, the marker is cleared only after that report has returned or
+        /// thrown, so a caller that receives <see cref="Task.CompletedTask"/> can rely on the
+        /// report having been attempted or deliberately suppressed as a repeat of a kind already
+        /// reported.
         /// </returns>
         internal Task GetPrimeTask(string engineName)
         {
@@ -65,15 +69,16 @@ namespace TaskMaster
         /// Runs <see cref="ApplyPrimeAsync"/> and attaches the fault observer.
         /// </summary>
         /// <remarks>
-        /// The observer is a continuation rather than a <c>catch</c> clause. The three
-        /// <c>catch</c> clauses in this type all sit in <see cref="HandleToggleClickAsync"/> and
-        /// <see cref="CompletePrime"/>: the click boundary and the two sink guards. Reading
-        /// <see cref="Task.Exception"/> inside <see cref="CompletePrime"/> marks the fault
-        /// observed, so no unobserved task remains. The continuation task itself is discarded;
-        /// the value a test awaits is the marker, which the continuation completes only through
-        /// <c>SetResult</c> in a <c>finally</c> after <see cref="CompletePrime"/> exits, so it
-        /// never faults or cancels. Because <see cref="CompletePrime"/> also contains a failure
-        /// of the sink, the discarded continuation has no remaining throw source of its own.
+        /// The observer is a continuation rather than a <c>catch</c> clause. The two
+        /// <c>catch</c> clauses in this type are the click boundary in
+        /// <see cref="HandleToggleClickAsync"/> and the single sink guard in
+        /// <see cref="TryInvokeSink"/>. Reading <see cref="Task.Exception"/> inside
+        /// <see cref="CompletePrime"/> marks the fault observed, so no unobserved task remains.
+        /// The continuation task itself is discarded; the value a test awaits is the marker,
+        /// which the continuation completes only through <c>SetResult</c> in a <c>finally</c>
+        /// after <see cref="CompletePrime"/> exits, so it never faults or cancels. Because
+        /// <see cref="CompletePrime"/> routes its sink call through <see cref="TryInvokeSink"/>,
+        /// the discarded continuation has no remaining throw source of its own.
         /// </remarks>
         private void StartObservedPrime(
             IAppItemEngines engines,
@@ -127,7 +132,8 @@ namespace TaskMaster
         /// Observes the outcome of a prime. On any outcome other than ran-to-completion the cache
         /// is left unset — so the key still reports unchecked — the failure is reported through
         /// <c>logError</c> unless the same failure kind was already reported for this engine, a
-        /// sink failure is contained here, and only then is the marker cleared for a later re-prime.
+        /// sink failure is contained by <see cref="TryInvokeSink"/>, and only then is the marker
+        /// cleared for a later re-prime.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -140,19 +146,20 @@ namespace TaskMaster
         /// exception.
         /// </para>
         /// <para>
-        /// The sink call is guarded (issue #947). The sink is the last reporting channel of this
-        /// type, so a failure inside it has nowhere else to go; letting it escape skipped the clear
-        /// below, which left a stale marker that blocked every later re-prime, and faulted the
-        /// discarded continuation unobserved. The guard follows
-        /// <c>RibbonCommandBoundary.SafeLog</c>. With the sink contained, the continuation in
-        /// <see cref="StartObservedPrime"/> has no remaining throw source of its own, so it
-        /// completes rather than faulting.
+        /// The sink call is guarded (issue #947) through <see cref="TryInvokeSink"/>, the guard
+        /// this type uses at every sink call site (issue #964). The sink is the last reporting
+        /// channel of this type, so a failure inside it has nowhere else to go; letting it escape
+        /// skipped the clear below, which left a stale marker that blocked every later re-prime,
+        /// and faulted the discarded continuation unobserved. With the sink contained, the
+        /// continuation in <see cref="StartObservedPrime"/> has no remaining throw source of its
+        /// own, so it completes rather than faulting.
         /// </para>
         /// <para>
         /// Repeat suppression (issue #948): each pair of engine key and base-exception type is
-        /// reported once, then recorded in <see cref="_reportedPrimeFaults"/> by the statement
-        /// directly after the sink call, so a sink that throws leaves the report owed. Moving
-        /// that record before the sink, or into a catch or finally arm, suppresses it for the session.
+        /// reported once, then recorded in <see cref="_reportedPrimeFaults"/> by the only
+        /// statement of the branch taken when <see cref="TryInvokeSink"/> reports that the sink
+        /// returned normally, so a sink that throws leaves the report owed. Moving that record
+        /// before the sink call, or out of that branch, suppresses it for the session.
         /// </para>
         /// </remarks>
         private void CompletePrime(Task completed, string engineName)
@@ -173,14 +180,14 @@ namespace TaskMaster
             var reportKey = (EngineName: engineName, FaultType: failure.GetType());
             if (!_reportedPrimeFaults.ContainsKey(reportKey))
             {
-                try
+                if (
+                    TryInvokeSink(
+                        () => _logError(BuildPrimeFailedMessage(engineName), failure),
+                        out _
+                    )
+                )
                 {
-                    _logError(BuildPrimeFailedMessage(engineName), failure);
                     _reportedPrimeFaults[reportKey] = 0;
-                }
-                catch (Exception)
-                {
-                    // Intentionally discarded: see the remarks on this method.
                 }
             }
 

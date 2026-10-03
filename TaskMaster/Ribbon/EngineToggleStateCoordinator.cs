@@ -85,9 +85,11 @@ namespace TaskMaster
         /// Creates a coordinator over an engines accessor and three injected sinks.
         /// </summary>
         /// <param name="enginesAccessor">
-        /// Supplies the current engines container. Must not be null, but is expected to return
-        /// null before the ribbon controller has been given its globals, which this type treats as
-        /// "state unknown" rather than as an error.
+        /// Supplies the current engines container. Must not be null, and must not throw: its
+        /// result is read outside any guard by <see cref="GetPressed"/> and by the refusal check
+        /// of <see cref="HandleToggleClickAsync"/>, so an exception it raised would escape both.
+        /// It is expected to return null before the ribbon controller has been given its globals,
+        /// which this type treats as "state unknown" rather than as an error.
         /// </param>
         /// <param name="invalidateControl">
         /// Receives a ribbon control id whenever the cached state behind that control changes, so
@@ -95,11 +97,14 @@ namespace TaskMaster
         /// </param>
         /// <param name="notifyUnavailable">
         /// Receives exactly one message per toggle click refused because the engines are not
-        /// available. Presentation is the sink's concern. Must not be null.
+        /// available. Presentation is the sink's concern. Must not be null. The call is guarded
+        /// (issue #964): an exception it throws is reported once through
+        /// <paramref name="logError"/> and is not rethrown.
         /// </param>
         /// <param name="logError">
-        /// Receives an observed prime or toggle fault as a message plus the exception. Must not be
-        /// null.
+        /// Receives an observed prime fault, toggle fault or notification failure as a message
+        /// plus the exception. Must not be null. The call is guarded: an exception it throws is
+        /// discarded, because no further reporting channel remains.
         /// </param>
         /// <exception cref="ArgumentNullException">Any argument is null.</exception>
         internal EngineToggleStateCoordinator(
@@ -126,7 +131,8 @@ namespace TaskMaster
         /// <returns>
         /// The cached activation state, or <see langword="false"/> when the key is null,
         /// whitespace, unmapped, or has never been primed. This method performs a dictionary read
-        /// only: it never awaits, never blocks, and never throws.
+        /// only: it never awaits, never blocks, and never throws while the engines accessor
+        /// honours its non-throwing precondition.
         /// </returns>
         /// <remarks>
         /// On a cache miss with the engines available, at most one prime per key is started; a
@@ -153,7 +159,8 @@ namespace TaskMaster
 
         /// <summary>
         /// The toggle-click boundary: the only <c>catch</c> clause in this type that observes an
-        /// engine fault. The other two are sink guards, here and in <see cref="CompletePrime"/>.
+        /// engine fault. Every sink call on this path goes through <see cref="TryInvokeSink"/>,
+        /// which holds the only other <c>catch</c> clause.
         /// </summary>
         /// <param name="engineName">The engine key whose activation setting is being flipped.</param>
         /// <returns>
@@ -162,20 +169,35 @@ namespace TaskMaster
         /// </returns>
         /// <remarks>
         /// When the engines are not available the click is refused with exactly one
-        /// <c>notifyUnavailable</c> message and nothing else is invoked. Otherwise
-        /// <see cref="ExecuteToggleAsync"/> runs inside a single boundary <c>try</c>/<c>catch</c>:
-        /// a fault is reported through <c>logError</c>, is not rethrown, and does not invalidate.
-        /// The sink call is itself guarded (issue #947): the sink is the last reporting channel,
-        /// so a failure inside it has nowhere else to go and is discarded deliberately, following
-        /// <c>RibbonCommandBoundary.SafeLog</c>. This method therefore never throws, even when the
-        /// sink throws, because its caller is an <c>async void</c> Office handler whose faults
-        /// would otherwise become unobserved.
+        /// <c>notifyUnavailable</c> message and no engine member is invoked. That notification is
+        /// guarded (issue #964): if the sink throws, its exception is reported once through
+        /// <c>logError</c>. Otherwise <see cref="ExecuteToggleAsync"/> runs inside a single
+        /// boundary <c>try</c>/<c>catch</c>: a fault is reported through <c>logError</c>, is not
+        /// rethrown, and does not invalidate. Every <c>logError</c> call is itself guarded
+        /// (issue #947): it is the last reporting channel, so a failure inside it has nowhere
+        /// else to go and is discarded deliberately, following
+        /// <c>RibbonCommandBoundary.SafeLog</c>. This method therefore never throws on either
+        /// path, even when both sinks throw, provided the engines accessor honours its
+        /// non-throwing precondition, because its caller is an <c>async void</c> Office handler
+        /// whose faults would otherwise become unobserved.
         /// </remarks>
         internal async Task HandleToggleClickAsync(string engineName)
         {
             if (_enginesAccessor() is null)
             {
-                _notifyUnavailable(BuildUnavailableMessage(engineName));
+                if (
+                    !TryInvokeSink(
+                        () => _notifyUnavailable(BuildUnavailableMessage(engineName)),
+                        out var notifyFailure
+                    )
+                )
+                {
+                    _ = TryInvokeSink(
+                        () => _logError(BuildNotifyFailedMessage(engineName), notifyFailure),
+                        out _
+                    );
+                }
+
                 return;
             }
 
@@ -185,14 +207,7 @@ namespace TaskMaster
             }
             catch (Exception ex)
             {
-                try
-                {
-                    _logError(BuildToggleFailedMessage(engineName), ex);
-                }
-                catch (Exception)
-                {
-                    // Intentionally discarded: see the remarks on this method.
-                }
+                _ = TryInvokeSink(() => _logError(BuildToggleFailedMessage(engineName), ex), out _);
             }
         }
 
@@ -243,6 +258,44 @@ namespace TaskMaster
             if (_pressedState.TryApplyState(engineName, active, sequence))
             {
                 _invalidateControl(controlId);
+            }
+        }
+
+        /// <summary>
+        /// Invokes one injected sink and contains any exception it throws (issues #947 and #964).
+        /// This holds the only <c>catch</c> clause in this type that intercepts a sink failure;
+        /// every <c>notifyUnavailable</c> and <c>logError</c> call goes through it.
+        /// </summary>
+        /// <param name="sinkCall">The sink invocation, with its arguments already bound.</param>
+        /// <param name="sinkFailure">
+        /// The exception the sink threw, or <see langword="null"/> when the sink returned
+        /// normally.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when the sink returned normally; <see langword="false"/> when
+        /// it threw. The exception is never rethrown.
+        /// </returns>
+        /// <remarks>
+        /// The caller decides what happens to a contained failure, following
+        /// <c>RibbonCommandBoundary.ReportFailure</c>: the refusal path of
+        /// <see cref="HandleToggleClickAsync"/> forwards a notification failure to the log sink,
+        /// and every log-sink caller discards a log failure because no further channel remains.
+        /// <see cref="CompletePrime"/> records a reported fault kind only when this method
+        /// returns <see langword="true"/>, so a sink that throws leaves the report owed
+        /// (issue #948).
+        /// </remarks>
+        private static bool TryInvokeSink(Action sinkCall, out Exception sinkFailure)
+        {
+            try
+            {
+                sinkCall();
+                sinkFailure = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                sinkFailure = ex;
+                return false;
             }
         }
     }
