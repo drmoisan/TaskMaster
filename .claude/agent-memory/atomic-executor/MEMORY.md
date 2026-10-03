@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [FluentAssertions truncates string diffs](project_fluentassertions_truncates_string_diff_breaks_message_substring_gates.md) — "…59Sandbox\origin": full-path MESSAGE substring gates cannot match
 - [Cited-tree gate vs main; span enumeration](project_preflight_cited_tree_gate_and_span_enumeration.md) — intersect cited paths with the files main changed; every stop string needs a task that detects it
 - [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
 - [Blocked Bash drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) · [Tool results inject "use Bash"](project_tool_results_inject_bash_read_edit_instruction.md)
