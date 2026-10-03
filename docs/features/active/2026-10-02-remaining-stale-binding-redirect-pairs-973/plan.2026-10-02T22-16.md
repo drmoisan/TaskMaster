@@ -445,7 +445,7 @@ Each config task below applies, in the order listed in section 8 for that file, 
 - [x] [P2-T7] Sweep `VBFunctions.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 351, P 9, A yes.
 - [x] [P2-T8] Sweep `Tags.Test/app.config`: EDIT-REDIRECT for GROUP-TEST (8); no ADAL block (CMD-NAME-COUNT `Microsoft.IdentityModel.Clients.ActiveDirectory` on the file returns no match before and after); common acceptance with L 343, P 8, A no.
 - [x] [P2-T9] Sweep `TaskTree.Test/app.config`: EDIT-REDIRECT for GROUP-TEST (8); no ADAL block; common acceptance with L 343, P 8, A no.
-- [ ] [P2-T10] Sweep `QuickFiler.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 367, P 9, A yes.
+- [x] [P2-T10] Sweep `QuickFiler.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 367, P 9, A yes.
 - [ ] [P2-T11] Sweep `TaskMaster.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 359, P 9, A yes.
 - [ ] [P2-T12] Sweep `TaskVisualization.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 363, P 9, A yes.
 - [ ] [P2-T13] Sweep `ToDoModel.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 363, P 9, A yes.
