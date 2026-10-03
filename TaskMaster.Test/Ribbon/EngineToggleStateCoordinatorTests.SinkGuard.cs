@@ -109,9 +109,50 @@ namespace TaskMaster.Test.Ribbon
                     notifyFailure,
                     "the log sink receives the notification failure unchanged"
                 );
+            harness.Engines.VerifyNoOtherCalls();
+            harness.Invalidations.Should().BeEmpty("a refused click changes no state to display");
         }
 
         #endregion Issue #964 — a throwing notification sink on the refusal path
+
+        #region Issue #964 — the refusal path with a null or empty engine key
+
+        /// <summary>
+        /// Refusal path for an unusable engine key: with the engines unavailable, a null or empty
+        /// key is rendered as the <c>(null)</c> token in the one notification, the click does not
+        /// throw, nothing is logged, no engine member is invoked and no control is invalidated.
+        /// Exercises the null-or-empty arm of the engine-name renderer through the notification
+        /// message builder.
+        /// </summary>
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        public async Task HandleToggleClickAsync_WithNullOrEmptyKeyAndNullEngines_NotifiesOnceWithNullTokenAndInvokesNothing(
+            string engineName
+        )
+        {
+            // Arrange: the pre-SetGlobals window, with sinks that record and do not throw.
+            var harness = new Harness { EnginesAvailable = false };
+
+            // Act
+            Func<Task> act = () => harness.Coordinator.HandleToggleClickAsync(engineName);
+
+            // Assert
+            await act.Should()
+                .NotThrowAsync("a refused click with an unusable key must degrade quietly");
+            harness
+                .Notifications.Should()
+                .ContainSingle("exactly one notice per refused toggle click");
+            harness
+                .Notifications[0]
+                .Should()
+                .Contain("(null)", "an unusable key is rendered as the null-engine-name token");
+            harness.Errors.Should().BeEmpty("a refused click is not a fault");
+            harness.Engines.VerifyNoOtherCalls();
+            harness.Invalidations.Should().BeEmpty("a refused click changes no state to display");
+        }
+
+        #endregion Issue #964 — the refusal path with a null or empty engine key
 
         #region Issue #964 — the issue #948 record placement under the shared guard
 
