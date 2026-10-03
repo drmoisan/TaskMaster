@@ -7,6 +7,7 @@
 - [committed-cobertura-baselines](reference_committed_cobertura_baselines.md) — per-line coverage in docs/features/*/evidence
 - [net481-timeprovider](reference_net481_timeprovider_available.md) — FakeTimeProvider usable on net481
 - [github-issue-search-without-gh](reference_github_issue_search_without_gh.md) — WebFetch issues?q=...; mark [V-web]
+- [nuget-flatcontainer-nuspec-webfetch](reference_nuget_flatcontainer_nuspec_webfetch.md) — packages/ has no .nuspec; fetch api.nuget.org flat-container nuspec
 
 ## Threading / test determinism
 - [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult INLINES on pool thread
@@ -134,6 +135,9 @@
 - [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — ~1.2s vs ~17s = vacuity
 - [console-out-rs0030-826](project_console_out_and_rs0030_promotion_826.md) — no GenerateDocumentationFile: IDE0005 silent
 - [fsharp-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; packages.config gap
+- [binding-redirect-drift-973](project_binding_redirect_drift_and_missing_asyncenumerable_973.md) — NuGet rewrites only installer's config; AsyncEnumerable install ruled in scope (aliased)
+- [graph-usings-removable-973](project_graph_usings_removable_and_models_name_collisions_973.md) — all 6 Graph usings removable; Models exports List/Application/OutlookItem; reflog = clock fallback
+- [ixnet-v7-lib-ref-clash](project_ixnet_v7_lib_ref_clash_packages_config.md) — lib/net48 keeps public AsyncEnumerable; global BCL ref = CS0121; use `<Aliases>`; Directory.Build.props exists
 - [dependabot-net481-340](project_dependabot_net481_340.md) — semver-major ignore, no ceilings
 - [svgcontrol-test-418](project_svgcontrol_test_unwired_418.md) — STALE; in .sln since 2026-08-14
 - [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — PQ setting no var substitution
