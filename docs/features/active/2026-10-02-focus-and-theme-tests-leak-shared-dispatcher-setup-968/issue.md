@@ -61,3 +61,17 @@ This is the same family as #950 and #882: raced static test-fixture state. It mu
 
 - [x] Promote to GitHub issue (bug-report template)
 - [ ] Move to active fix folder / branch
+
+## Coordinator Scope Amendment (2026-10-02T22-15, binding)
+
+Recorded by the parent parallel-orchestrator (run `bugs-2026-09-28`, `/parallel-add 968` resume). This amendment supersedes the scope statements in the research record, `spec.md` and the plan wherever they conflict.
+
+1. Issue #972 ("Bug: qfc-datamodel-950-review-residuals", promoted record `docs/features/potential/promoted/2026-10-02-qfc-datamodel-950-review-residuals.md`) is FOLDED INTO this item by maintainer direction. This item delivers all five #972 items, and its pull request must close both issues (`Closes #968` and `Closes #972` in the PR body):
+   1. Consolidate the three duplicated `SynchronousBackgroundWorker` test helpers (`QfcDatamodelLivenessTests.cs`, `QfcDatamodelTeardownTests.cs`, `QfcInitEmailQueueZeroBatchTests.cs`) into one shared test-support helper.
+   2. Reword the `_remainingLoadActive` comment to match the post-#950 behaviour.
+   3. `QuickFiler/Controllers/QfcDatamodel.cs` is at 495 of 500 lines: confirm the apparently unused legacy members have no callers, then remove them (or move them) so the file sits well under the limit. Changed-line coverage must not drop.
+   4. Dispose the `SynchronousBackgroundWorker` instances in the liveness and zero-batch tests.
+   5. Wrap `transactionA` in test R4 in `try`/`finally` (already delivered here as D4; the spec must now record it as closing #972 item 5, not as an overlap for the coordinator to reconcile).
+2. The 2026-10-02T05:37Z comment on #968 is also in scope: liveness test 1 in `QfcDatamodelLivenessTests` uses `fake.Advance` plus `Task.Yield` loops, which depend on scheduling. Replace them with a deterministic completion signal.
+3. Consequence: this item now changes production code (`QuickFiler/Controllers/QfcDatamodel.cs` and the file declaring `_remainingLoadActive`). AC20 ("No production code change") must be amended to name exactly the production paths this scope requires and nothing else. This is a maintainer-directed widening, not a weakening.
+4. All constraints stand: tests stay parallel (Workers=0, ClassLevel); no `[DoNotParallelize]`, Workers=1, retries, `Thread.Sleep`, `Task.Delay`, temporary files or timeout increases; MSTest, Moq, FluentAssertions; failing regression test first for any behaviour defect.
