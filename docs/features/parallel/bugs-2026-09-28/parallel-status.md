@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 10
 - recolor_generation: 12
-- last_updated: 2026-10-03T09-08
-- next_step: 964 in flight (coordinator-relaunched child; remediation cycle 1 after review; no PR): on its reported ready state, confirm PR and CI durably and merge first. 959 HALTED at P4-T5 awaiting a maintainer decision on the CMD-DELETE hook block (see items[959].execution_halt); on decision, relaunch the child at P4-T5; merges second. 973 (cohort 12) launches only after its re-preparation commits and pushes a clearance newer than 2026-10-03T00-41; merges third.
+- last_updated: 2026-10-03T09-52
+- next_step: 964 awaiting a decision on related findings CR-5 and O-6 (see items[964].execution_halt.review_decision_pending): remediation cycle 2 then PR, or PR with an explicit exception; on ready state, confirm PR and CI durably and merge first. 959 HALTED at P4-T5 awaiting a maintainer decision on the CMD-DELETE hook block (see items[959].execution_halt); on decision, relaunch the child at P4-T5; merges second. 973 (cohort 12) launches only after its re-preparation commits and pushes a clearance newer than 2026-10-03T00-41; merges third. 967 rejected for this run.
 
 ## Items
 
