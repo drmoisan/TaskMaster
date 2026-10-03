@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 10
 - recolor_generation: 12
-- last_updated: 2026-10-03T07-48
-- next_step: 964 child executing (resumed at P0-T4); it halts before P1-T22 for a separate maintainer approval. 959 (cohort 11) launches when 964 is merged; 973 (cohort 12) launches when 959 and 964 are merged (968 merged). 967 rejected for this run.
+- last_updated: 2026-10-03T08-04
+- next_step: 964 HALTED before P1-T22 awaiting a separate maintainer approval for the P1-T22 CMD-PHRASE-COUNT command (see items[964].execution_halt.p1_t22_halt); on approval, relaunch the child at P1-T22. 959 (cohort 11) launches when 964 is merged; 973 (cohort 12) launches when 959 and 964 are merged (968 merged). 967 rejected for this run.
 
 ## Items
 
