@@ -10,8 +10,10 @@ namespace TaskMaster.Test.Ribbon
     /// Regression tests for issue #964: on the refusal path of <c>HandleToggleClickAsync</c>,
     /// taken when the engines accessor yields null, a <c>notifyUnavailable</c> sink that throws
     /// must not escape into the <c>async void</c> Office handler, and its exception must be
-    /// reported once through <c>logError</c>; plus a guard for the issue #948 record placement
-    /// now that every sink call goes through one shared guard. A further partial of the
+    /// reported once through <c>logError</c>; a data-driven refusal-path test for a null or
+    /// empty engine key, which must render the null-name token in the single notification; plus
+    /// a guard for the issue #948 record placement now that every sink call goes through one
+    /// shared guard. A further partial of the
     /// coordinator fixture, so the private <c>Harness</c> and <c>LoggedError</c> types and the
     /// fixture constants are reused. The harness invokes <c>OnNotify</c> and <c>OnLogError</c>
     /// after it has recorded the call, so a throwing hook both records the attempt and models a
