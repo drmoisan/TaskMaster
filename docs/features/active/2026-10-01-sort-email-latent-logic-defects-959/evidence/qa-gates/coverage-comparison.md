@@ -57,3 +57,41 @@ Reading: Under PD-8 the comparison aggregates every Cobertura class whose filena
 7. The PACKAGE rows for UtilitiesCS and QuickFiler are recorded as observations with no MISSING: met.
 8. The artifact lists every EXEMPT-*-LINES value and every NONEXEMPT-UNCOVERED row: met.
 9. The artifact contains no absolute path: met.
+
+## Per-member coverage (P6-T9)
+
+Timestamp: 2026-10-03T12-48
+ITERATION: 1
+Command: CMD-MEMBER-COVERAGE over coverage\final-959.cobertura.xml, run as pwsh -NoProfile -Command with Set-Location to the item worktree
+EXIT_CODE: 0
+
+```
+CLASS-NODES T = 1
+CLASS-NODES E = 1
+CLASS-NODES A = 1
+CLASS-NODES U = 1
+MEMBER SaveAttachmentAsyncCore span=194-224 valid=21 covered=21 percent=100 uncovered=
+MEMBER SaveAttachmentCore span=130-156 valid=19 covered=19 percent=100 uncovered=
+MEMBER SaveCaseAsync span=253-287 valid=20 covered=20 percent=100 uncovered=
+MEMBER SaveCase span=289-309 valid=8 covered=8 percent=100 uncovered=
+MEMBER RedirectSaveFolder span=244-251 valid=4 covered=4 percent=100 uncovered=
+MEMBER Cleanup_Files span=40-46 valid=6 covered=6 percent=100 uncovered=
+MEMBER TrySaveAttachmentCoreAsync span=98-192 valid=70 covered=67 percent=95.71 uncovered=133,190,191
+MEMBER WriteCsvCore span=171-188 valid=10 covered=10 percent=100 uncovered=
+MEMBER ResetFilerPromptState span=344-347 valid=3 covered=3 percent=100 uncovered=
+E-CHANGED-LINE result = await InvokeFilerAsync(config, mailHelpers); matches=1 line=311 hits=1
+E-CHANGED-LINE ResetFilerPromptState(); matches=1 line=318 hits=1
+E-CHANGED-LINE return result; matches=1 line=320 hits=1
+E-CHANGED-LINES-COVERED: 3
+MEMBERS-AMBIGUOUS: 0
+MEMBERS-UNMEASURED: 0
+MEMBERS-BELOW-90: 0
+```
+
+### Acceptance (P6-T9, all five required)
+
+1. Every CLASS-NODES value at least 1 (1, 1, 1, 1): met.
+2. MEMBERS-AMBIGUOUS: 0 and MEMBERS-UNMEASURED: 0: met.
+3. Every MEMBER row shows percent at least 90 (lowest 95.71) and MEMBERS-BELOW-90: 0: met.
+4. Each E-CHANGED-LINE row shows matches=1 and hits greater than 0, and E-CHANGED-LINES-COVERED: 3: met.
+5. The TrySaveAttachmentCoreAsync uncovered value 133,190,191 is a subset of the P6-T8 EXEMPT-LINES 36,133,190,191 (the guard brace, the else brace and the catch brace, as predicted): met.
