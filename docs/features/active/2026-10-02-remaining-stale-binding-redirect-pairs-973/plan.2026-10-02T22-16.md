@@ -460,7 +460,7 @@ Each config task below applies, in the order listed in section 8 for that file, 
 Each EDIT-PACKAGE and EDIT-CSPROJ task records before-values of CMD-LINECOUNT and CMD-CRCOUNT first and writes `docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973/evidence/qa-gates/<task>-<project>-<kind>.<timestamp>.md`. P3-T16 to P3-T27 apply the 2026-10-03 scope fold (spec Parts F, G and H; D14 to D17) after commit B; each of them records before-values of CMD-LINECOUNT and CMD-CRCOUNT for every file it edits, and every `.cs` or `CLAUDE.md` edit in this plan happens inside that block.
 
 - [x] [P3-T1] EDIT-PACKAGE `UtilitiesCS/packages.config` (after line 97); acceptance: the EDIT-PACKAGE gates, LINECOUNT 147, CRCOUNT 146.
-- [ ] [P3-T2] EDIT-PACKAGE `QuickFiler/packages.config` (after line 47); acceptance: the EDIT-PACKAGE gates, LINECOUNT 83, CRCOUNT 82.
+- [x] [P3-T2] EDIT-PACKAGE `QuickFiler/packages.config` (after line 47); acceptance: the EDIT-PACKAGE gates, LINECOUNT 83, CRCOUNT 82.
 - [ ] [P3-T3] EDIT-PACKAGE `ToDoModel/packages.config` (after line 20); acceptance: the EDIT-PACKAGE gates, LINECOUNT 28, CRCOUNT 27.
 - [ ] [P3-T4] EDIT-PACKAGE `TaskMaster/packages.config` (after line 43); acceptance: the EDIT-PACKAGE gates, LINECOUNT 79, CRCOUNT 78.
 - [ ] [P3-T5] EDIT-PACKAGE `UtilitiesCS.Test/packages.config` (after line 91); acceptance: the EDIT-PACKAGE gates, LINECOUNT 110, CRCOUNT 109; additionally Grep `id="System.Linq.AsyncEnumerable"` over glob `*/packages.config` returns exactly the five Write Set manifests, count 1 each.
