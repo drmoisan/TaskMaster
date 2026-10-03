@@ -31,6 +31,15 @@ conflicting neighbour was merged, and the item was genuinely eligible. Two mecha
 The identical hazard exists on the drift gate, which the skill documents as resolving the target the
 same way, and on any future hook that scans a prompt for a feature-folder token.
 
+**Second shape (2026-10-03, item 959):** a NESTED file token defeats the strip even without punctuation.
+Naming the clearance record as `docs/features/active/<folder>/evidence/other/preflight-clearance.<ts>.md`
+made it the longest token; the strip removes only the last `/<name>.md`, so the basename became `other`
+and the probe denied. Cite any file below the folder root relative to the folder ("evidence/other/...
+inside the feature folder"), so the only full tokens are the folder and the root-level plan path.
+It RECURRED on item 973 the same day, because the coordinator handed the clearance over as a full path
+and I pasted it straight in. The probe caught it. Rewrite any full path the coordinator hands you before
+it goes into the prompt.
+
 **How to apply:**
 
 - Write `... from the committed plan at <path> and begin at the first unchecked P#-T# task`, never
