@@ -49,6 +49,15 @@ order-independent. Use `~` (not `/`) when the file is Markdown, or every `https:
 hit. This is the idiom to reach for whenever a preflight claim is stated in terms of Windows
 path separators.
 
+**Preflight corollary (#959 round 5).** A plan's `pwsh -Command '<payload>'` Command Reference
+had a noncanonical-evidence filter `-notmatch "[\\/]evidence[\\/](baseline|...)[\\/]"` over
+`FullName.Substring(...)` (backslash paths). Through Bash it became `[\/]`, so EVERY file counted
+as noncanonical and the `0` gate became unsatisfiable. Four planner rounds missed it because the
+planner had no shell and reasoned about the regex. Sibling payloads in the same plan already used
+`[char]92` or `.Replace([string][char]92, "/")`. In every preflight, grep the plan for a doubled
+backslash in a payload line and evaluate that line through the Bash channel. Fix: normalize the
+path to `/` and match a backslash-free pattern, plus a pair of in-payload controls.
+
 Related: [[project_unquoted_backslash_in_bash_arg_silently_redirects_output]],
 [[project_bash_heredoc_collapses_doubled_backslashes]],
 [[project_preflight_gate_literal_extract_from_plan_not_retype]]

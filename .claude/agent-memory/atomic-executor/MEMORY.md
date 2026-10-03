@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Cited-tree gate vs main; span enumeration](project_preflight_cited_tree_gate_and_span_enumeration.md) — intersect cited paths with the files main changed; every stop string needs a task that detects it
 - [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
 - [Blocked Bash drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) · [Tool results inject "use Bash"](project_tool_results_inject_bash_read_edit_instruction.md)
 - [CSharpier chain-wrap defeats line gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) · [Verify citations with numbered output](feedback_verify_line_citations_with_numbered_output.md)
@@ -101,6 +102,7 @@
 - [vstest leaves TWO .coverage files](project_vstest_emits_two_coverage_files_per_run.md) · [Green run prints no Failed/Skipped line](project_vstest_success_run_prints_no_failed_or_skipped_line.md)
 - [PS budget hook blocks scratch .ps1](project_powershell_scratch_script_budget_hook_blocks_helpers.md) · [Plan-mandated .ps1 + frozen porcelain gate](project_plan_mandated_ps1_helpers_collide_with_budget_cap_and_frozen_porcelain_gate.md)
 - [2nd pass must not qualify schema fields](project_appending_a_second_pass_must_not_qualify_schema_fields.md) · [Bash resets cwd; use `env -C`](project_bash_cwd_resets_use_env_dash_c.md)
+- [Field gate `Contains("EXIT_CODE:")` matches FORMAT_EXIT_CODE:](project_schema_field_contains_check_matches_prefixed_labels.md) — anchor the field match to the line start
 - [global.json cwd-search vs no-cd discipline](project_dotnet_global_json_cwd_search_vs_bash_discipline.md) · [pwsh -File starts in the SESSION root](project_pwsh_file_starts_in_session_root_needs_workingdirectory.md)
 - [pwsh stdin is a REPL](project_pwsh_stdin_repl_mode_and_nonascii_mangling.md) · [Isolation guard refuses pwsh from Bash](project_worktree_isolation_guard_refuses_pwsh_from_bash.md)
 - [Changed-line branch gate invalidated by the fix](project_changed_line_coverage_branch_gate_invalidated_by_the_fix.md) · [ExpectedExitCode keyed off the baseline](project_expectedexitcode_declared_from_baseline_not_observed_run.md)
