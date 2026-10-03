@@ -13,13 +13,13 @@ namespace QuickFiler.Controllers
     public partial class QfcDatamodel
     {
         /// <summary>
-        /// Issue #424: honest producer-liveness signal. Set <see langword="true"/> immediately before
-        /// each <c>RunWorkerAsync()</c> call and cleared in a <c>finally</c> once the awaited
-        /// <c>RemainingEmailLoader</c> completes. <c>BackgroundWorker.IsBusy</c> cannot serve this
-        /// role: <c>Worker_DoWork</c> is <c>async void</c>, so it returns at its first yielding await
-        /// and reports idle while the loader is still producing. Both the dequeue gate's
-        /// <c>sourceActive</c> signal and <see cref="WaitForQueue"/> consume this flag. Declared
-        /// <c>volatile</c> because it is written on the worker thread and read by dequeue callers.
+        /// Issue #424 producer-liveness signal, read by the dequeue gate's <c>sourceActive</c>
+        /// delegate and by <see cref="WaitForQueue"/>. <c>InitEmailQueue</c> sets it just before
+        /// handing the worker to <see cref="WorkerStarter"/>, and <c>Worker_DoWork</c> clears it in
+        /// a <c>finally</c> when the awaited <see cref="RemainingEmailLoader"/> task completes,
+        /// because <c>BackgroundWorker.IsBusy</c> already reads idle at that handler's first
+        /// incomplete await (issue #950 made the start synchronous in tests, so no particular thread
+        /// owns either write). Volatile: the writers and the readers share no other fence.
         /// </summary>
         private volatile bool _remainingLoadActive;
 
@@ -282,7 +282,7 @@ namespace QuickFiler.Controllers
         /// <see cref="QfcDequeueBatch.Items"/> is taken from the same accepted set as
         /// <see cref="QfcDequeueBatch.PreScored"/>, after <see cref="UnhookDequeuedNodes"/> has run
         /// over it. #678 R1: that correspondence holds on the happy path only. On the
-        /// <c>UnhookItem</c> throw path <see cref="TryUnhookOrReplace"/> (:31-66) removes the failed
+        /// <c>UnhookItem</c> throw path <see cref="TryUnhookOrReplace"/> removes the failed
         /// item and inserts a substitute pulled from the master queue, so <c>PreScored</c> can name
         /// an item absent from <c>Items</c> and <c>Items</c> can name an item absent from
         /// <c>PreScored</c>. Leg A reconciles the two at the load boundary through
