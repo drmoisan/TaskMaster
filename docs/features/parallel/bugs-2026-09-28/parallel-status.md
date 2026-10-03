@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 10
 - recolor_generation: 12
-- last_updated: 2026-10-03T07-34
-- next_step: 968 child at S8 to DONE, then parent confirms headRefOid equals ci_gate.head_sha, records ci_green and merges. 964 child at P0-T4, halts before P1-T22 for a separate maintainer approval. 959 (cohort 11) launches when 964 is merged; 973 (cohort 12) launches when 959, 964 and 968 are merged. 967 rejected for this run.
+- last_updated: 2026-10-03T07-48
+- next_step: 964 child executing (resumed at P0-T4); it halts before P1-T22 for a separate maintainer approval. 959 (cohort 11) launches when 964 is merged; 973 (cohort 12) launches when 959 and 964 are merged (968 merged). 967 rejected for this run.
 
 ## Items
 
@@ -38,7 +38,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | in_flight | worktree_created |  |  |
 | 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | scheduled | not_started |  |  |
 | 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | scheduled | not_started |  |  |
-| 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/976 |  |
+| 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/976 | 5d87e5b8e246869b598fcb2e6101d70eaa8ab8e6 |
 
 ## Item Lifecycle Timestamps
 
@@ -66,7 +66,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 964 | 2026-10-02T21-45 | 2026-10-02T22-18 |  |  |
 | 973 | 2026-10-03T00-46 |  |  |  |
 | 959 | 2026-10-03T00-53 |  |  |  |
-| 968 | 2026-10-03T02-34 | 2026-10-03T02-37 |  |  |
+| 968 | 2026-10-03T02-34 | 2026-10-03T02-37 | 2026-10-03T07-47 |  |
 
 ## Cohorts
 
