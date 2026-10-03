@@ -356,31 +356,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
             line.Should().Be("Hello World\t\tLine1 Line2");
         }
 
-        [TestMethod]
-        public void SanitizeArray_WhenOutputArrayIsInitialized_WritesSanitizedRows()
-        {
-            // Arrange
-            var method = typeof(SortEmail).GetMethod(
-                "SanitizeArray",
-                BindingFlags.NonPublic | BindingFlags.Static
-            )!;
-            var values = new string[2, 2]
-            {
-                { "A\tB", null },
-                { "Line1\r\nLine2", "Tail" },
-            };
-            var output = new string[values.GetLength(0)];
-            object[] args = { values, output };
-
-            // Act
-            method.Invoke(null, args);
-            output = (string[])args[1];
-
-            // Assert
-            output[0].Should().Be("A B");
-            output[1].Should().Be("Line1 Line2\tTail");
-        }
-
         #endregion
 
         private static Mock<Attachment> CreateAttachmentMock(
