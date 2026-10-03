@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 10
 - recolor_generation: 12
-- last_updated: 2026-10-03T04-10
-- next_step: 968 HALTED before PR creation awaiting maintainer decision on the S4b_spec_amendment local_execution_overrides entry (see items[968].execution_halt); on authorization, resume the child at S8_pr_authoring. 964 HALTED at P0-T4 awaiting maintainer decision (promotion-hook false positive; see items[964].execution_halt). Remaining unstarted: 959 (cohort 11), 973 (cohort 12); 967 unadmitted (tier decision).
+- last_updated: 2026-10-03T07-34
+- next_step: 968 child at S8 to DONE, then parent confirms headRefOid equals ci_gate.head_sha, records ci_green and merges. 964 child at P0-T4, halts before P1-T22 for a separate maintainer approval. 959 (cohort 11) launches when 964 is merged; 973 (cohort 12) launches when 959, 964 and 968 are merged. 967 rejected for this run.
 
 ## Items
 
@@ -38,7 +38,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | in_flight | worktree_created |  |  |
 | 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | scheduled | not_started |  |  |
 | 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | scheduled | not_started |  |  |
-| 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | in_flight | worktree_created |  |  |
+| 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/976 |  |
 
 ## Item Lifecycle Timestamps
 
