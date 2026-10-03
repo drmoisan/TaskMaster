@@ -220,3 +220,69 @@ $fixture = @"
         $kind | Should -Be 'none' -Because 'the extension gate keeps non-XML files out of rule A'
     }
 }
+
+Describe 'Test-BackupFilePath' {
+    BeforeAll {
+        . (Join-Path -Path $PSScriptRoot -ChildPath '../../../scripts/hygiene/Test-RepositoryHygiene.ps1')
+    }
+
+    It 'returns true for a root-level solution backup' {
+        $result = Test-BackupFilePath -RelativePath 'TaskMaster.sln.bak'
+
+        $result | Should -BeTrue -Because 'a final .bak extension marks a backup file'
+    }
+
+    It 'returns true for a nested project backup' {
+        $result = Test-BackupFilePath -RelativePath 'TaskTree/TaskTree.vbproj.bak'
+
+        $result | Should -BeTrue -Because 'the directory depth does not change the final extension'
+    }
+
+    It 'returns true for an upper-case extension' {
+        $result = Test-BackupFilePath -RelativePath 'Notes.BAK'
+
+        $result | Should -BeTrue -Because 'the extension comparison is case-insensitive'
+    }
+
+    It 'returns true for a bare dot-bak file name' {
+        $result = Test-BackupFilePath -RelativePath '.bak'
+
+        $result | Should -BeTrue -Because 'a file named .bak has the final extension .bak'
+    }
+
+    It 'returns false for a directory named bak' {
+        $result = Test-BackupFilePath -RelativePath 'docs/bak/notes.md'
+
+        $result | Should -BeFalse -Because 'only the final extension of the path is compared, not a directory segment'
+    }
+
+    It 'returns false for a longer extension that begins with bak' {
+        $result = Test-BackupFilePath -RelativePath 'notes.bakery'
+
+        $result | Should -BeFalse -Because 'the extension must equal .bak exactly'
+    }
+
+    It 'returns false when bak is not the final extension' {
+        $result = Test-BackupFilePath -RelativePath 'notes.bak.md'
+
+        $result | Should -BeFalse -Because 'the final extension is .md'
+    }
+
+    It 'returns false for the word backup' {
+        $result = Test-BackupFilePath -RelativePath 'backup'
+
+        $result | Should -BeFalse -Because 'a name without a dot has no extension'
+    }
+
+    It 'returns false for a path with no extension' {
+        $result = Test-BackupFilePath -RelativePath 'docs/features/x/Makefile'
+
+        $result | Should -BeFalse -Because 'a path with no extension is not a backup file'
+    }
+
+    It 'returns false for the bare word bak' {
+        $result = Test-BackupFilePath -RelativePath 'bak'
+
+        $result | Should -BeFalse -Because 'the word bak without a leading dot is not an extension'
+    }
+}
