@@ -307,7 +307,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         /// Returns a try-save delegate that records the requested path and reports success
         /// without touching any file.
         /// </summary>
-        private static Func<Attachment, string, Task<bool>> RecordingSave(List<string> saves)
+        private static SortEmail.TrySaveAttachmentDelegate RecordingSave(List<string> saves)
         {
             return (attachment, path) =>
             {

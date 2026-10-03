@@ -172,6 +172,19 @@ namespace UtilitiesCS
         }
 
         /// <summary>
+        /// The try-save seam of the asynchronous attachment-saving cores: saves the attachment to
+        /// the given path and reports whether the save succeeded. A named non-generic delegate
+        /// rather than a generic one: <c>Attachment</c> is an embedded interop type in this
+        /// assembly, and a generic instantiation over an embedded interop type cannot be used
+        /// from the test assembly (compiler error CS1769), whereas a non-generic delegate
+        /// signature over the same type can.
+        /// </summary>
+        internal delegate Task<bool> TrySaveAttachmentDelegate(
+            Attachment attachment,
+            string filePath
+        );
+
+        /// <summary>
         /// Saves the attachment through injected seams. When the primary save path exists, the
         /// overwrite prompt that matches the attachment kind is asked, the answer is applied by
         /// the asynchronous save switch with the alternate-name session, and a single answer is
@@ -184,7 +197,7 @@ namespace UtilitiesCS
             YesNoToAllPromptSession picturesOverwritePrompt,
             YesNoToAllPromptSession attachmentsOverwritePrompt,
             YesNoToAllPromptSession altNamePrompt,
-            Func<Attachment, string, Task<bool>> trySave
+            TrySaveAttachmentDelegate trySave
         )
         {
             if (!fileExists(attachmentHelper.FilePathSave))
@@ -242,7 +255,7 @@ namespace UtilitiesCS
             string filePathSave,
             string filePathSaveAlt,
             YesNoToAllPromptSession altNamePrompt,
-            Func<Attachment, string, Task<bool>> trySave
+            TrySaveAttachmentDelegate trySave
         )
         {
             switch (response)
