@@ -247,6 +247,7 @@ namespace UtilitiesCS
         )
         {
             attachmentHelper.FolderPathSave = destinationPath;
+            attachmentHelper.FilePathHelperSaveAlt.FolderPath = destinationPath;
         }
 
         internal static async Task SaveCaseAsync(
