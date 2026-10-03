@@ -157,8 +157,8 @@ CONVERGENCE: FURTHER ROUNDS LIKELY (all four defects have mechanical deltas, but
 
 ## Agent memory
 
-- I updated `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-02T21-24\.claude\agent-memory\atomic-executor\project_phrase_count_payload_trips_promotion_gh_issue_hook.md` with the hook mechanism found in this round.
-- I added a pointer line for it in `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-02T21-24\.claude\agent-memory\atomic-executor\MEMORY.md`.
+- I updated `REDACTED-PATH\.claude\agent-memory\atomic-executor\project_phrase_count_payload_trips_promotion_gh_issue_hook.md` with the hook mechanism found in this round.
+- I added a pointer line for it in `REDACTED-PATH\.claude\agent-memory\atomic-executor\MEMORY.md`.
 - Both files are in the session tree. I wrote nothing in the item worktree.
 
 **Defect count:** 4.

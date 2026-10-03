@@ -113,6 +113,6 @@ I read the header, revision record, Write Set, AC table, facts 1 to 22, D-1 to D
 - **Carried from round 5:** a restart correction that changes a gated token value, or the QfcDatamodel.cs or project-file numstat row, still fails P6-T2. That is consistent with those values being acceptance evidence, so such a correction goes back for re-planning under the fail-closed rule.
 
 ## Agent memory written (session tree only)
-- `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-02T21-24\.claude\agent-memory\atomic-executor\project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md` (one item added: check reachability before calling a format-restart gap blocking). `MEMORY.md` is unchanged.
+- `REDACTED-PATH\.claude\agent-memory\atomic-executor\project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md` (one item added: check reachability before calling a format-restart gap blocking). `MEMORY.md` is unchanged.
 
 **Plan state:** nothing executed and no box checked. The current phase is Phase 0, and the next five tasks are [P0-T1] to [P0-T5]. Acceptance criteria in `spec.md`: 32 total, 0 checked, 32 remaining.

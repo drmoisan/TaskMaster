@@ -117,8 +117,8 @@ All of these are consistent. The defects are below.
 - **Optional delta:** after `P5-T12 for QQP)` insert ``, with the P1-T3 PROJ token `Controllers\QfcItemController.UiThreadDispatcherFixtureTests.cs` still 1``.
 
 ## Agent memory written (session tree only)
-- `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-02T21-24\.claude\agent-memory\atomic-executor\project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md` (new)
-- `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-02T21-24\.claude\agent-memory\atomic-executor\MEMORY.md` (one index line added)
+- `REDACTED-PATH\.claude\agent-memory\atomic-executor\project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md` (new)
+- `REDACTED-PATH\.claude\agent-memory\atomic-executor\MEMORY.md` (one index line added)
 
 **Defect count:** 3. **Plan blob reviewed:** `d7a5defaeceeaeefd69647580a2af882d4111cfb`.
 

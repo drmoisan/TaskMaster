@@ -16,7 +16,7 @@ CONVERGENCE: NO FURTHER ROUNDS EXPECTED. If the deltas below are applied as writ
 - **No build or test access.** I ran no build, test or formatter. I made no edits and wrote no memory. Every count below was re-derived by reading the files and by Grep against this worktree.
 - **Read-only git commands run:** `log`, `status --porcelain`, `rev-parse HEAD origin/main`. HEAD, BASE and origin/main are all `94287369908cc920b21b0e3256314f988ad7d2f5`.
 - **The pwsh channel is refused for this agent.** One trivial read-only probe was denied by a hook, and I did not retry it (hook discipline). The exact deny text:
-  `This agent is isolated in the worktree C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a291a7fbabf9d0229, but this command runs pwsh in a plain command; what it reads or is handed as shell text cannot be shown not to run git. Refusing to run it — a worktree-isolated agent's git operations must target its own worktree. Run the plain command from C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a291a7fbabf9d0229.`
+  `This agent is isolated in the worktree WORKTREE, but this command runs pwsh in a plain command; what it reads or is handed as shell text cannot be shown not to run git. Refusing to run it — a worktree-isolated agent's git operations must target its own worktree. Run the plain command from WORKTREE.`
 - **Validator not run.** `mcp__drm-copilot__validate_orchestration_artifacts` is not available in this session, so the G1 to G9 output was not observed.
 
 ## Defects
@@ -201,5 +201,5 @@ CONVERGENCE: NO FURTHER ROUNDS EXPECTED. If the deltas below are applied as writ
 - Acceptance criteria in `spec.md`: 24 total, 0 checked off.
 
 Files reviewed:
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a291a7fbabf9d0229\docs\features\active\2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968\plan.2026-10-02T05-42.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a291a7fbabf9d0229\docs\features\active\2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968\spec.md`
+- `WORKTREE\docs\features\active\2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968\plan.2026-10-02T05-42.md`
+- `WORKTREE\docs\features\active\2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968\spec.md`

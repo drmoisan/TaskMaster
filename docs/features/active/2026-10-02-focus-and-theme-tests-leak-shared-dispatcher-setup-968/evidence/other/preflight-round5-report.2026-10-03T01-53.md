@@ -108,8 +108,8 @@ I re-read the conventions, the command reference and all of Phases 0 to 8 for ga
 - A restart correction that changes a gated **token** count still fails P6-T2. I believe that is intended: token counts are the acceptance evidence, so such a correction should go back for re-planning.
 
 ## Agent memory written (session tree only)
-- `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-02T21-24\.claude\agent-memory\atomic-executor\project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md` (updated: a third defect class and the second-pass check)
-- `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-02T21-24\.claude\agent-memory\atomic-executor\MEMORY.md` (one index line edited)
+- `REDACTED-PATH\.claude\agent-memory\atomic-executor\project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md` (updated: a third defect class and the second-pass check)
+- `REDACTED-PATH\.claude\agent-memory\atomic-executor\MEMORY.md` (one index line edited)
 
 **Defect count:** 1 (two edits). **Plan blob reviewed:** `2457e1df7582e5a02282a9c147a63843b55dcd3a`.
 
