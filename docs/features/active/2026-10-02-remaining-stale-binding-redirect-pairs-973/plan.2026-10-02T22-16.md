@@ -447,7 +447,7 @@ Each config task below applies, in the order listed in section 8 for that file, 
 - [x] [P2-T9] Sweep `TaskTree.Test/app.config`: EDIT-REDIRECT for GROUP-TEST (8); no ADAL block; common acceptance with L 343, P 8, A no.
 - [x] [P2-T10] Sweep `QuickFiler.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 367, P 9, A yes.
 - [x] [P2-T11] Sweep `TaskMaster.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 359, P 9, A yes.
-- [ ] [P2-T12] Sweep `TaskVisualization.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 363, P 9, A yes.
+- [x] [P2-T12] Sweep `TaskVisualization.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 363, P 9, A yes.
 - [ ] [P2-T13] Sweep `ToDoModel.Test/app.config`: EDIT-REDIRECT for GROUP-TEST plus Microsoft.Bcl.Numerics (9), then EDIT-ADAL; common acceptance with L 363, P 9, A yes.
 - [ ] [P2-T14] Sweep `UtilitiesCS.Test/app.config`: EDIT-REDIRECT for Microsoft.Bcl.Numerics (1), then EDIT-ADAL; common acceptance with L 383, P 1, A yes.
 - [ ] [P2-T15] Sweep `UtilitiesCS/app.config`: EDIT-ADAL only; common acceptance with L 293, P 0, A yes (CMD-NUMSTAT `0<TAB>4<TAB>UtilitiesCS/app.config`); additionally Grep `newVersion="(1\.62\.0\.0|10\.0\.0\.5|4\.89\.0\.0|8\.22\.0\.0|1\.3\.0\.0)"` on the file returns no match before and after (the file carries none of the 15 pairs).
