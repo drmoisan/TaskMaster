@@ -20,10 +20,15 @@
     opens its own pull request against main, so a removed worktree is unrecoverable work
     unless that item's own merge has been durably confirmed.
 
+    Issue #690: each checkpoint is read beneath the live worktree whose run checkpoint
+    records the removal target under worktree_path. An ambiguous target denies before any
+    allow; when neither kind resolves, the deny names TARGET_WORKTREE_NOT_DERIVABLE.
+
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies. Filesystem reads go
-    through an injectable wrapper function so tests can mock the boundary without writing
-    temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690),
+    imported inside a guard: a failed import is recorded and the decision denies naming
+    the module. Filesystem reads go through injectable wrapper functions so tests can
+    mock the boundary without writing temporary files.
 #>
 [CmdletBinding()]
 param()
@@ -39,17 +44,19 @@ Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeM
 # concern now has one implementation.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
-$script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
+
+# Import guard (issue #690): a failed import denies instead of failing open.
+$script:ParallelWorktreeGateResolutionImportFailure = $null
+try {
+    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
+}
+catch {
+    $script:ParallelWorktreeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+}
+
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
-# Epic checkpoint location (issue #688). An epic run records per-child state in
-# features[] and never writes the parallel checkpoint, so without this read every
-# merged epic child worktree reached the deny below even though
-# enforce-epic-worktree-removal-gate.ps1 authorized the same call. Both gates run on
-# the same Bash call, so that deny won and epic worktrees could never be removed.
-$script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
-# Sanctioned-removal manifest location. Recorded here beside the checkpoint path so
-# every hook-read document this gate consults is named in one place; the module owns
-# the read itself.
+# Sanctioned-removal manifest location. Recorded here so every hook-read document this
+# gate consults is named; the module owns the read itself.
 $script:CleanupWorktreeManifestPath = 'artifacts/orchestration/cleanup-worktrees-manifest.json'
 
 function Get-ParallelWorktreeRemovalGateCheckpointContent {
@@ -57,17 +64,19 @@ function Get-ParallelWorktreeRemovalGateCheckpointContent {
     .SYNOPSIS
         Read the raw JSON text of the parallel checkpoint. Tests mock this function
         (read seam).
+    .PARAMETER Path
+        The absolute checkpoint path composed beneath the resolved worktree root.
     .OUTPUTS
         System.String or $null
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
 
-    if (-not (Test-Path -LiteralPath $script:ParallelCheckpointPath -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return $null
     }
-    return (Get-Content -LiteralPath $script:ParallelCheckpointPath -Raw)
+    return (Get-Content -LiteralPath $Path -Raw)
 }
 
 function Get-ParallelWorktreeRemovalGateEpicCheckpointContent {
@@ -78,18 +87,81 @@ function Get-ParallelWorktreeRemovalGateEpicCheckpointContent {
     .DESCRIPTION
         A separate seam from the parallel checkpoint reader so a test can drive the
         two documents independently: the epic branch must be exercised with the
-        parallel checkpoint absent, present-but-not-covering, and covering.
+        parallel checkpoint absent, present-but-not-covering, and covering. An epic run
+        records per-child state in features[] and never writes the parallel checkpoint,
+        so without this read every merged epic child worktree reached the deny below.
+    .PARAMETER Path
+        The absolute checkpoint path composed beneath the resolved worktree root.
     .OUTPUTS
         System.String or $null
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
 
-    if (-not (Test-Path -LiteralPath $script:EpicCheckpointPath -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return $null
     }
-    return (Get-Content -LiteralPath $script:EpicCheckpointPath -Raw)
+    return (Get-Content -LiteralPath $Path -Raw)
+}
+
+function Resolve-ParallelWorktreeGateRunTarget {
+    <#
+    .SYNOPSIS
+        Resolve the worktree whose run checkpoint records a worktree path (issue #690 seam).
+    .PARAMETER Kind
+        epic or parallel.
+    .PARAMETER WorktreePath
+        The removal target the command names.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject (the worktree-resolution target result).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][ValidateSet('epic', 'parallel')][string] $Kind,
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+    )
+
+    return Resolve-WorktreeRunTargetByRecord -Kind $Kind -RecordField worktree_path -Value $WorktreePath -SessionRoot (Get-Location).Path
+}
+
+function Read-ParallelWorktreeGateRunCheckpoint {
+    <#
+    .SYNOPSIS
+        Resolve one run kind and read its checkpoint beneath the resolved root.
+    .PARAMETER Kind
+        epic or parallel.
+    .PARAMETER WorktreePath
+        The removal target the command names.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject with Target and Checkpoint ($null when
+        unresolved, absent, or unparseable).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][ValidateSet('epic', 'parallel')][string] $Kind,
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+    )
+
+    $target = Resolve-ParallelWorktreeGateRunTarget -Kind $Kind -WorktreePath $WorktreePath
+    $checkpoint = $null
+    if ($target.Status -eq 'SessionRoot' -or $target.Status -eq 'OtherWorktree') {
+        $path = Get-WorktreeRunCheckpointPath -Kind $Kind -WorktreeRoot $target.WorktreeRoot
+        $raw = if ($Kind -eq 'parallel') { Get-ParallelWorktreeRemovalGateCheckpointContent -Path $path } else { Get-ParallelWorktreeRemovalGateEpicCheckpointContent -Path $path }
+        if (-not [string]::IsNullOrWhiteSpace($raw)) {
+            try {
+                $checkpoint = $raw | ConvertFrom-Json -ErrorAction Stop
+            } catch {
+                $checkpoint = $null
+            }
+        }
+    }
+    return [pscustomobject]@{
+        Target     = $target
+        Checkpoint = $checkpoint
+    }
 }
 
 function Get-ParallelWorktreeRemovalCommandPath {
@@ -263,6 +335,13 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
         [string] $ToolInputRaw
     )
 
+    # A failed worktree-resolution import denies before any other logic (issue #690).
+    if ($script:ParallelWorktreeGateResolutionImportFailure) {
+        return Get-ParallelWorktreeGateBlockDecision -Reason (
+            "PARALLEL_WORKTREE_REMOVAL_BLOCKED: the worktree-resolution module '$($script:ParallelWorktreeGateResolutionImportFailure)' " +
+            'failed to import, so the run checkpoint that governs this removal cannot be located; the gate fails closed.')
+    }
+
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
         return Get-ParallelWorktreeGateBlockDecision -Reason (
@@ -285,15 +364,16 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
 
     $worktreePath = Get-ParallelWorktreeRemovalCommandPath -CommandText $commandText
 
-    $checkpointRaw = Get-ParallelWorktreeRemovalGateCheckpointContent
-    $checkpoint = $null
-    if (-not [string]::IsNullOrWhiteSpace($checkpointRaw)) {
-        try {
-            $checkpoint = $checkpointRaw | ConvertFrom-Json -ErrorAction Stop
-        } catch {
-            $checkpoint = $null
+    # Each run checkpoint is read beneath the worktree that records this path (issue #690),
+    # parallel kind first; an ambiguous target denies before any allow or manifest check.
+    $parallelRead = Read-ParallelWorktreeGateRunCheckpoint -Kind parallel -WorktreePath $worktreePath
+    $epicRead = Read-ParallelWorktreeGateRunCheckpoint -Kind epic -WorktreePath $worktreePath
+    foreach ($read in @($parallelRead, $epicRead)) {
+        if ($read.Target.Status -eq 'Ambiguous') {
+            return Get-ParallelWorktreeGateBlockDecision -Reason "PARALLEL_WORKTREE_REMOVAL_BLOCKED: $($read.Target.ReasonCode): $($read.Target.Detail)"
         }
     }
+    $checkpoint = $parallelRead.Checkpoint
 
     $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $itemRecord) {
@@ -310,15 +390,7 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
     #
     # Fail-closed is preserved: an absent, unreadable, or malformed epic checkpoint parses to
     # $null, which yields no record, which is not allowed.
-    $epicCheckpointRaw = Get-ParallelWorktreeRemovalGateEpicCheckpointContent
-    $epicCheckpoint = $null
-    if (-not [string]::IsNullOrWhiteSpace($epicCheckpointRaw)) {
-        try {
-            $epicCheckpoint = $epicCheckpointRaw | ConvertFrom-Json -ErrorAction Stop
-        } catch {
-            $epicCheckpoint = $null
-        }
-    }
+    $epicCheckpoint = $epicRead.Checkpoint
 
     $featureRecord = Find-ParallelWorktreeItemRecord -Checkpoint $epicCheckpoint -WorktreePath $worktreePath -RecordArrayName 'features'
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $featureRecord) {
@@ -340,7 +412,12 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
         return Get-ParallelWorktreeGateAllowDecision
     }
 
-    return Get-ParallelWorktreeGateBlockDecision -Reason "PARALLEL_WORKTREE_REMOVAL_BLOCKED: git worktree remove for '$worktreePath' requires a matching parallel checkpoint items[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal."
+    # When neither kind resolved, the deny names the resolution reason first (issue #690).
+    $prefix = ''
+    if ($parallelRead.Target.Status -eq 'NoTarget' -and $epicRead.Target.Status -eq 'NoTarget') {
+        $prefix = "PARALLEL_WORKTREE_REMOVAL_BLOCKED: $($parallelRead.Target.ReasonCode): $($parallelRead.Target.Detail). "
+    }
+    return Get-ParallelWorktreeGateBlockDecision -Reason ($prefix + "PARALLEL_WORKTREE_REMOVAL_BLOCKED: git worktree remove for '$worktreePath' requires a matching parallel checkpoint items[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal.")
 }
 
 function Invoke-ParallelWorktreeRemovalGateEntryPoint {

@@ -54,6 +54,8 @@ Trigger remediation when any of these are true:
 - Acceptance criteria are not met.
 - A required CI check fails after the PR is open (workflow-file changes specifically must enter the loop and trigger the `modified-workflow-needs-green-run` rule defined in `.claude/skills/feature-review-workflow/SKILL.md`).
 
+Remediation triggers only on blocking findings classified `autonomous`. Each blocking finding carries one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). When no blocking finding is `autonomous`, the review verdict is `HALT_NON_REMEDIABLE` or `AWAITING_CI`: the orchestrator halts or waits, and no cycle, remediation plan, or `atomic-planner` handoff is created.
+
 ## Required Remediation Inputs
 
 The orchestrator authors `remediation/<entry-ts>/remediation-inputs.md` with:
@@ -118,11 +120,13 @@ Iteration ceiling. When a cycle's `iterations` would exceed 2, the orchestrator 
 
 When preflight is clear, `atomic-executor` executes the plan task-by-task. The executor invokes workers (`python-typed-engineer`, `typescript-engineer`, `csharp-typed-engineer`, `powershell-typed-engineer`) internally as needed. The orchestrator does not call workers.
 
+Before the reaudit, the orchestrator records `candidate_applied` on the current cycle: `true` only when execution finished with `execution_status: "complete"` and the pre-reaudit commit recorded a non-empty change set, and `false` otherwise (execution not started, execution failed, or an empty staged change set). `remediation_loop.completed_attempts` equals the number of cycles whose `candidate_applied` is `true`, and a cycle with `candidate_applied: false` consumes no attempt number.
+
 When execution is complete, the orchestrator delegates to `feature-review`. `feature-review` produces the three reaudit artifacts under `docs/features/active/<slug>/audit/<exit-ts>/` using the exit timestamp.
 
 ## Exit Gate
 
-The orchestrator reads the latest cycle's three reaudit artifacts and computes `blocking_count` as the total number of FAIL findings plus material PARTIAL findings flagged as blocking. Only when `blocking_count == 0` does the orchestrator set `exit_condition_met = true` on the current cycle and mark the remediation loop complete. Otherwise, the orchestrator opens cycle N+1 with a new `remediation/<new-ts>/remediation-inputs.md` and runs the full chain again.
+The orchestrator reads the latest cycle's three reaudit artifacts and computes `blocking_count` as the total number of FAIL findings plus material PARTIAL findings flagged as blocking. Only when `blocking_count == 0` does the orchestrator set `exit_condition_met = true` on the current cycle and mark the remediation loop complete. Otherwise, when at least one remaining blocking finding is `autonomous`, the orchestrator opens cycle N+1 with a new `remediation/<new-ts>/remediation-inputs.md` and runs the full chain again. When the remaining blocking findings are all non-remediable, the orchestrator does not open the next cycle: it halts on `HALT_NON_REMEDIABLE` or waits on `AWAITING_CI`.
 
 ## Context Package (When Required)
 

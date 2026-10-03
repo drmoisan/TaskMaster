@@ -12,8 +12,11 @@
          docs/features/active/<token> path, mirroring
          enforce-prd-feature-before-planner.ps1's Find-PrdFeatureFolderFromPrompt
          technique (longest match wins; a .md-suffixed match uses its parent directory).
-      2. Read artifacts/orchestration/epic-orchestrator-state.json and locate the
-         features[] record whose feature_folder equals the resolved basename.
+      2. Resolve the worktree whose epic checkpoint records the prompt's
+         integration_branch: value (issue #690), deny an unresolved or ambiguous target,
+         then read artifacts/orchestration/epic-orchestrator-state.json beneath that
+         worktree and locate the features[] record whose feature_folder equals the
+         resolved basename.
       3. Look up that feature's depends_on list, and for every dependency, locate its own
          features[] record.
       4. Deny with reason EPIC_WAVE_BARRIER_BLOCKED unless every dependency's merge_status
@@ -26,16 +29,26 @@
     SubagentStop time.
 
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies. Filesystem reads go
-    through an injectable wrapper function so tests can mock the boundary without writing
-    temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690),
+    imported inside a guard: a failed import is recorded and the decision denies naming
+    the module. Filesystem reads go through an injectable wrapper function so tests can
+    mock the boundary without writing temporary files.
 #>
 [CmdletBinding()]
 param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
-$script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
+
+# Import guard (issue #690): a failed import denies instead of failing open.
+$script:EpicWaveBarrierResolutionImportFailure = $null
+try {
+    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
+}
+catch {
+    $script:EpicWaveBarrierResolutionImportFailure = 'WorktreeRunResolution.psm1'
+}
+
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 $script:EpicModeMarker = 'Epic mode: true'
 
@@ -44,17 +57,39 @@ function Get-EpicWaveBarrierCheckpointContent {
     .SYNOPSIS
         Read the raw JSON text of the epic checkpoint. Tests mock this function
         (read seam).
+    .PARAMETER Path
+        The absolute checkpoint path composed beneath the resolved worktree root.
     .OUTPUTS
         System.String or $null
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
 
-    if (-not (Test-Path -LiteralPath $script:EpicCheckpointPath -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return $null
     }
-    return (Get-Content -LiteralPath $script:EpicCheckpointPath -Raw)
+    return (Get-Content -LiteralPath $Path -Raw)
+}
+
+function Resolve-EpicWaveBarrierTarget {
+    <#
+    .SYNOPSIS
+        Resolve the worktree whose epic checkpoint governs a kickoff (issue #690 seam).
+    .DESCRIPTION
+        Keyed on the prompt's integration_branch: value, with epic_feature_folder: as a
+        cross-check; never on a feature-folder path or the payload cwd.
+    .PARAMETER Prompt
+        The delegation prompt text.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject (the worktree-resolution target result).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Prompt)
+
+    $signal = Find-WorktreeRunIdentitySignal -Text $Prompt
+    return Resolve-WorktreeEpicTarget -IntegrationBranch $signal.IntegrationBranch -EpicSlug $signal.EpicSlug -SessionRoot (Get-Location).Path
 }
 
 function Find-EpicWaveBarrierFeatureFolderFromPrompt {
@@ -246,6 +281,13 @@ function Invoke-EpicWaveBarrierDecision {
         [string] $ToolInputRaw
     )
 
+    # A failed worktree-resolution import denies before any other logic (issue #690).
+    if ($script:EpicWaveBarrierResolutionImportFailure) {
+        return Get-EpicWaveBarrierBlockDecision -Reason (
+            "EPIC_WAVE_BARRIER_BLOCKED: the worktree-resolution module '$($script:EpicWaveBarrierResolutionImportFailure)' " +
+            'failed to import, so the epic checkpoint that governs this delegation cannot be located; the gate fails closed.')
+    }
+
     $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $envelope.IsValid) {
         return Get-EpicWaveBarrierBlockDecision -Reason (
@@ -264,12 +306,18 @@ function Invoke-EpicWaveBarrierDecision {
         return Get-EpicWaveBarrierAllowDecision
     }
 
+    # The epic checkpoint is located by the kickoff's integration branch (issue #690).
+    $target = Resolve-EpicWaveBarrierTarget -Prompt $prompt
+    if ($target.Status -eq 'NoTarget' -or $target.Status -eq 'Ambiguous') {
+        return Get-EpicWaveBarrierBlockDecision -Reason "EPIC_WAVE_BARRIER_BLOCKED: $($target.ReasonCode): $($target.Detail)"
+    }
+
     $featureFolder = Find-EpicWaveBarrierFeatureFolderFromPrompt -Prompt $prompt
     if (-not $featureFolder) {
         return Get-EpicWaveBarrierBlockDecision -Reason 'EPIC_WAVE_BARRIER_BLOCKED: an epic-mode orchestrator delegation must reference the target feature folder in the prompt so its dependency edges can be verified.'
     }
 
-    $checkpointRaw = Get-EpicWaveBarrierCheckpointContent
+    $checkpointRaw = Get-EpicWaveBarrierCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind epic -WorktreeRoot $target.WorktreeRoot)
     $checkpoint = $null
     if (-not [string]::IsNullOrWhiteSpace($checkpointRaw)) {
         try {

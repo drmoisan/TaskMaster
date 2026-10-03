@@ -5,7 +5,7 @@ description: Budget-first routing contract for PowerShell work: estimate product
 
 # PowerShell Change Budget Router
 
-Canonical guidance for deciding whether work should execute directly in `powershell-typed-engineer` or be escalated to `powershell-orchestrator`.
+Canonical guidance for deciding whether work should execute directly in `powershell-typed-engineer` or be escalated to the orchestrated large path through `/orchestrate` (the `orchestrator` agent).
 
 ## When to Use This Skill
 
@@ -18,12 +18,12 @@ Use this skill when:
 
 1) Estimate rough change budget first based on likely **production PowerShell files** touched.
 2) Route:
-- `1-2` production files (+ corresponding tests) → **small path** (`powershell-typed-engineer` direct mode).
-- `>2` production files → **large path** (`powershell-orchestrator`).
+- `1-3` production files (+ corresponding tests) → **small path** (`powershell-typed-engineer` direct mode).
+- More than 3 production files → **large path** (`/orchestrate`, the `orchestrator` agent). The large path has no production-file cap.
 
 ## Orchestrated Small-Path Requirements
 
-When routed through `powershell-orchestrator`, small path still requires lifecycle scaffolding before implementation:
+When routed through `/orchestrate`, small path still requires lifecycle scaffolding before implementation:
 - invoke promotion/folder lifecycle steps through `vscode/runCommand` + extension access per `feature-promotion-lifecycle` when available; use script/CLI fallback only when direct extension command execution is unavailable,
 - promote potential item to GitHub issue with `--work-mode minor-audit`,
 - create active feature folder with `--work-mode minor-audit`,
@@ -36,9 +36,9 @@ Direct invocation of `powershell-typed-engineer` remains implementation-focused 
 
 ## Direct-Mode Rejection Rule
 
-If `powershell-typed-engineer` is invoked directly and estimated scope is `>2` production files:
+If `powershell-typed-engineer` is invoked directly and estimated scope is more than 3 production files:
 - Stop before implementation.
-- Return explicit routing instruction to invoke `powershell-orchestrator`.
+- Return explicit routing instruction to invoke `/orchestrate`.
 
 ## Documentation Expectations
 

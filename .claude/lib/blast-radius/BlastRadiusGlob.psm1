@@ -31,6 +31,9 @@
         newline in .NET.
       - Comparisons and ordering use [StringComparer]::Ordinal and
         [string]::CompareOrdinal so results do not vary with the current culture.
+      - Test-GlobMatch memoizes each translated pattern in a script-scoped,
+        ordinally keyed regex cache (issue #776). The translation is pure, so
+        the cache changes speed only; Python recompiles through re's own cache.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -40,7 +43,12 @@ $ErrorActionPreference = 'Stop'
 # Wildcards that make a path entry a pattern rather than a file. The question
 # mark is included because the subsumption helper treats it as a pattern;
 # admitting it here keeps every comparison in the fail-closed direction.
-$script:GlobWildcard = @('*', '?')
+$script:GlobWildcardCharacter = [char[]]@('*', '?')
+
+# Compiled whole-string regex per glob pattern (issue #776). Keys compare
+# ordinally so patterns differing only by case stay distinct. The cache lives
+# per module instance and is bounded by the number of distinct patterns seen.
+$script:GlobRegexCache = [System.Collections.Generic.Dictionary[string, regex]]::new([StringComparer]::Ordinal)
 
 
 function Test-GlobEntry {
@@ -49,8 +57,8 @@ function Test-GlobEntry {
         Report whether a path entry is a wildcard pattern rather than a file.
 
     .DESCRIPTION
-        Port of is_glob_entry. Used both to classify radius path entries and, one
-        character at a time, by the literal-prefix helper.
+        Port of is_glob_entry. Used to classify radius path entries; a single
+        ordinal IndexOfAny scan over the wildcard set decides the answer.
 
     .PARAMETER Entry
         A paths entry from a radius or an extraction, or a single character.
@@ -66,13 +74,7 @@ function Test-GlobEntry {
         [string] $Entry
     )
 
-    foreach ($wildcard in $script:GlobWildcard) {
-        if ($Entry.IndexOf($wildcard, [System.StringComparison]::Ordinal) -ge 0) {
-            return $true
-        }
-    }
-
-    return $false
+    return $Entry.IndexOfAny($script:GlobWildcardCharacter) -ge 0
 }
 
 function Get-ConcreteEntry {
@@ -147,6 +149,23 @@ function ConvertTo-GlobRegexText {
     return $part.ToString()
 }
 
+# Return the cached anchored regex for a glob pattern, building it on a miss.
+# Declared as a simple function, without [CmdletBinding()], because it runs once
+# per Test-GlobMatch call and advanced-function parameter binding is the
+# per-call cost issue #776 removes from the pairwise overlap hot path.
+function Get-GlobRegex {
+    param([string] $Pattern)
+
+    $cached = $null
+    if ($script:GlobRegexCache.TryGetValue($Pattern, [ref]$cached)) {
+        return $cached
+    }
+
+    $compiled = [regex]::new('\A(?:' + (ConvertTo-GlobRegexText -Pattern $Pattern) + ')\z')
+    $script:GlobRegexCache[$Pattern] = $compiled
+    return $compiled
+}
+
 function Test-GlobMatch {
     <#
     .SYNOPSIS
@@ -176,8 +195,7 @@ function Test-GlobMatch {
         [string] $Candidate
     )
 
-    $regexText = '\A(?:' + (ConvertTo-GlobRegexText -Pattern $Pattern) + ')\z'
-    return [regex]::IsMatch($Candidate, $regexText)
+    return (Get-GlobRegex -Pattern $Pattern).IsMatch($Candidate)
 }
 
 function Test-PathSubsumed {
@@ -261,10 +279,9 @@ function Get-LiteralPrefix {
         [string] $Entry
     )
 
-    for ($index = 0; $index -lt $Entry.Length; $index++) {
-        if (Test-GlobEntry -Entry ([string]$Entry[$index])) {
-            return $Entry.Substring(0, $index)
-        }
+    $index = $Entry.IndexOfAny($script:GlobWildcardCharacter)
+    if ($index -ge 0) {
+        return $Entry.Substring(0, $index)
     }
 
     return $Entry
@@ -308,8 +325,12 @@ function Test-EntryOverlap {
         [string] $EntryB
     )
 
-    $aIsGlob = Test-GlobEntry -Entry $EntryA
-    $bIsGlob = Test-GlobEntry -Entry $EntryB
+    # One ordinal scan per entry yields both the glob flag and the literal prefix,
+    # so this hot path makes no advanced-function call for either (issue #776).
+    $indexA = $EntryA.IndexOfAny($script:GlobWildcardCharacter)
+    $indexB = $EntryB.IndexOfAny($script:GlobWildcardCharacter)
+    $aIsGlob = $indexA -ge 0
+    $bIsGlob = $indexB -ge 0
 
     if (-not $aIsGlob -and -not $bIsGlob) {
         # Anchoring each entry with a trailing separator before the prefix test is
@@ -326,23 +347,25 @@ function Test-EntryOverlap {
     # entry's directory prefix nest. The nest is tested in both directions because
     # the glob may be rooted above the directory (scripts/ above
     # scripts/dev_tools/) or below it, and either arrangement admits a common file.
+    # The two literal nest tests run before the pattern match: all three terms are
+    # pure, so the order of the OR changes cost only, never the verdict.
     if ($aIsGlob -and -not $bIsGlob) {
-        $prefixGlob = Get-LiteralPrefix -Entry $EntryA
+        $prefixGlob = $EntryA.Substring(0, $indexA)
         $directoryConcrete = $EntryB.TrimEnd('/') + '/'
-        return ((Test-GlobMatch -Pattern $EntryA -Candidate $EntryB) -or
-            $prefixGlob.StartsWith($directoryConcrete, [System.StringComparison]::Ordinal) -or
-            $directoryConcrete.StartsWith($prefixGlob, [System.StringComparison]::Ordinal))
+        return ($prefixGlob.StartsWith($directoryConcrete, [System.StringComparison]::Ordinal) -or
+            $directoryConcrete.StartsWith($prefixGlob, [System.StringComparison]::Ordinal) -or
+            (Test-GlobMatch -Pattern $EntryA -Candidate $EntryB))
     }
     if ($bIsGlob -and -not $aIsGlob) {
-        $prefixGlob = Get-LiteralPrefix -Entry $EntryB
+        $prefixGlob = $EntryB.Substring(0, $indexB)
         $directoryConcrete = $EntryA.TrimEnd('/') + '/'
-        return ((Test-GlobMatch -Pattern $EntryB -Candidate $EntryA) -or
-            $prefixGlob.StartsWith($directoryConcrete, [System.StringComparison]::Ordinal) -or
-            $directoryConcrete.StartsWith($prefixGlob, [System.StringComparison]::Ordinal))
+        return ($prefixGlob.StartsWith($directoryConcrete, [System.StringComparison]::Ordinal) -or
+            $directoryConcrete.StartsWith($prefixGlob, [System.StringComparison]::Ordinal) -or
+            (Test-GlobMatch -Pattern $EntryB -Candidate $EntryA))
     }
 
-    $prefixA = Get-LiteralPrefix -Entry $EntryA
-    $prefixB = Get-LiteralPrefix -Entry $EntryB
+    $prefixA = $EntryA.Substring(0, $indexA)
+    $prefixB = $EntryB.Substring(0, $indexB)
     return ($prefixA.StartsWith($prefixB, [System.StringComparison]::Ordinal) -or
         $prefixB.StartsWith($prefixA, [System.StringComparison]::Ordinal))
 }

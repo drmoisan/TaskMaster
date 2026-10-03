@@ -82,8 +82,10 @@ pla_parse_edges() {
 	PLA_EDGES=()
 	local -a tokens=()
 	# read -ra rather than an unquoted expansion, so a token carrying a glob
-	# character is never subjected to pathname expansion.
-	read -ra tokens <<<"$text"
+	# character is never subjected to pathname expansion. Newline, CR, VT, and FF
+	# become spaces first: read consumes one newline-terminated record and splits
+	# it on IFS only, so the Python str.split() whitespace set would otherwise differ.
+	read -ra tokens <<<"${text//[$'\n\r\v\f']/ }"
 	for token in "${tokens[@]}"; do
 		# Partition on the FIRST colon, matching str.partition: a token with two
 		# colons yields a second endpoint that still carries one, which the lexis

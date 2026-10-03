@@ -6,7 +6,7 @@ description: Module rigor tier system and uniform coverage thresholds.
 
 # Module Rigor Tiers
 
-This rule defines the T1–T4 module rigor tier system used by all CI gates in this repository. The tier system source of truth is `docs/ci.research.md` section 1; the file `quality-tiers.yml` at the repository root maps every project to a tier. Adding a project without a tier classification fails CI.
+This rule defines the T1–T4 module rigor tier system used by all CI gates in this repository. The tier definitions and gate matrix in this document are the tier system's source of truth; the file `quality-tiers.yml` at the repository root maps every project to a tier. Adding a project without a tier classification fails CI.
 
 ## Tiers
 

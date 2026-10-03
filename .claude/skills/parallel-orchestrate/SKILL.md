@@ -277,6 +277,8 @@ Negative obligations on the prompt:
 Excluded from the prompt as parent-side concerns: the item's declared blast radius,
 `max_concurrency`, and `mode`. Keeping the prompt minimal preserves the child contract unchanged.
 
+The run gates `enforce-orchestration-preimplementation-gate.ps1`, `enforce-parallel-cohort-barrier.ps1`, and `enforce-parallel-drift-gate.ps1` locate the parallel checkpoint by the `parallel_slug:` value of the marker line. They select the single live worktree whose `artifacts/orchestration/parallel-orchestrator-state.json` records `route_id` `parallel` and that slug, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one matches. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
+
 ## Model Selection
 
 When `parallel-orchestrator` delegates an item to `Agent(orchestrator)`, the prompt appends the
@@ -311,6 +313,12 @@ unchanged: `.claude/skills/orchestrate/SKILL.md` is **not modified by this featu
 `parallel_mode` clause in its step 9, no `parallel_merge` object in the child checkpoint, and no
 additional condition on the child's PR Creation Gate.
 
+Issue #744 later amended two parts of that child contract for CI-dependent acceptance criteria,
+whose verification requires the result of CI on the item's pull-request head: PR Creation Gate
+condition 2 and step S9 of `.claude/skills/orchestrate/SKILL.md`. The child checks those criteria
+off in its own worktree, pushes the check-off commit to its pull-request branch, and re-runs S9
+before DONE. The parent never commits acceptance-criteria check-offs from the coordinator root.
+
 Procedure, per item:
 
 1. The item's child orchestration runs unmodified, with `epic_mode` `false` or absent, and finishes
@@ -321,6 +329,11 @@ Procedure, per item:
    `gh pr view --json state,mergedAt,headRefOid`, and with `gh pr checks` when the check conclusion
    must be re-read — never from an in-memory completion notification — then record
    `merge_status: ci_green`.
+   Before recording `merge_status: ci_green`, confirm that the `headRefOid` value equals the
+   `ci_gate.head_sha` the child reported at DONE and that the child reported no pending
+   CI-dependent acceptance criteria. When either check fails, do not record
+   `merge_status: ci_green` and do not run `gh pr merge`; the item waits until its child pushes
+   the check-off and re-runs S9, and the parent does not commit the check-off itself.
 3. Execute `gh pr merge --merge <PR>` for that item's pull request, whose base is `main`.
 4. On success, record `merge_commit_sha`, `merged_at`, and `merge_status: merged`, then regenerate
    `docs/features/parallel/<slug>/parallel-status.md`.
@@ -415,8 +428,10 @@ the escalation path.
 2. The parent re-delegates that item's child orchestration. The child processes the finding through
    its unmodified R1 through R5 remediation loop exactly as it processes any local Blocking
    finding. No new remediation loop is introduced by this procedure.
-3. The child's `remediation_pass` counter is shared with its local-finding and CI-failure passes,
-   with the cap of 3, unmodified.
+3. Drift cycles share the child's `remediation_loop.completed_attempts` count with its
+   local-finding and CI-failure cycles, and the child halts after three completed attempts. The
+   active cycle number is `completed_attempts + 1`, and a cycle without an applied candidate
+   consumes no number.
 4. Each remediated pass ends again at child DONE with the pull request open and CI green, after
    which the parent retries the merge per `## Per-Item Merge to Main (Merge-on-Green)`. During
    remediation the item's `merge_status` legitimately remains `pr_open` or `ci_green`: the
@@ -565,6 +580,8 @@ hold:
    `artifact_type: "parallel-orchestrator-state"`.
 4. Each item's acceptance criteria have been checked off in that item's own acceptance-criteria
    source files by that item's own run, per the `acceptance-criteria-tracking` skill.
+   A CI-dependent criterion is checked off and pushed by that item's own run before its DONE, so
+   the head the parent merges already contains the check-off; the parent never commits it.
 
 In `open` mode there is no automatic completion. The run is a standing queue and terminates only via
 `/parallel-close`, which is owned by F6 and is neither specified nor shipped by this feature. Do not
@@ -729,8 +746,8 @@ a detached item.
 ### Abandon confirmation-marker contract
 
 The `abandon` disposition is destructive: it closes the item's pull request and removes its
-worktree. Both side effects run through ONE deterministic CLI invocation of
-`scripts/dev_tools/parallel_mutation_abandon_cli.py`, documented in full in
+worktree. Both side effects run through ONE deterministic invocation of the bundled bash entry
+point `.claude/lib/bash/abandon-parallel-item.sh`, documented in full in
 `.claude/skills/parallel-remove/SKILL.md`. Executing the abandon disposition through ad hoc `gh` or
 `git` commands is prohibited, because an ad hoc command is not matchable and would bypass the
 confirmation contract.
@@ -875,25 +892,35 @@ carries no such marker, evaluates no drift, and is unaffected.
 
 #### CLI Invocation
 
-Detection logic is pure and lives in `scripts/dev_tools/parallel_drift_detection.py` (escape
-detection, `drift_events[]` construction, the derived quiesce predicate, and conflict recomputation)
-and `scripts/dev_tools/parallel_drift_halt.py` (halt selection and the requeue seam). All I/O is
-confined to the thin wrapper `scripts/dev_tools/parallel_drift_detection_cli.py`, invoked as:
+Detection logic is pure and lives in `.claude/lib/parallel-drift/ParallelDrift.psm1` (escape
+detection, `drift_events[]` construction, and conflict recomputation) and
+`.claude/lib/parallel-drift/ParallelDriftHalt.psm1` (halt selection). The first calls the bundled
+blast-radius library under `.claude/lib/blast-radius/` rather than re-deriving it. All I/O is confined
+to the destination-runtime entry point `.claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1`,
+which needs PowerShell 7 and no Python interpreter, invoked as:
 
 ```
-poetry run python -m scripts.dev_tools.parallel_drift_detection_cli \
-  --item-key <issue_num> \
-  [--checkpoint artifacts/orchestration/parallel-orchestrator-state.json] \
-  [--config config/blast-radius.json] \
-  [--at <yyyy-MM-ddTHH-mm>] [--computed-at <yyyy-MM-ddTHH-mm>] \
+pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1 \
+  -ItemKey <issue_num> \
+  [-CheckpointPath artifacts/orchestration/parallel-orchestrator-state.json] \
+  [-ConfigPath config/blast-radius.json] \
+  [-At <yyyy-MM-ddTHH-mm>] [-ComputedAt <yyyy-MM-ddTHH-mm>] \
   <CHANGED_PATH>...
 ```
 
-Argument surface: `--item-key` is the only required argument and is the item's `issue_num`;
-`--checkpoint` and `--config` default to the two paths shown; `--at` is the timestamp recorded on
-the `drift_events[]` entry and `--computed-at` the timestamp recorded on the observed radius, each
-defaulting at the I/O boundary so the pure functions never read a clock; and the changed paths are
-positional and variadic. An empty changed-path list is legal and yields `no_escape`.
+The Python modules `scripts/dev_tools/parallel_drift_detection.py` and
+`scripts/dev_tools/parallel_drift_halt.py`, with their thin wrapper
+`scripts/dev_tools/parallel_drift_detection_cli.py`, remain the repository authority and the parity
+reference; the shared corpus under `tests/fixtures/parallel_drift/` binds the two, and the Python
+modules are not invoked on the destination-runtime path.
+
+Argument surface: `-ItemKey` is the only required argument and is the item's `issue_num`;
+`-CheckpointPath` and `-ConfigPath` default to the two paths shown and resolve against the caller's
+working directory; `-At` is the timestamp recorded on the `drift_events[]` entry and `-ComputedAt` the
+timestamp recorded on the observed radius, each defaulting at the I/O boundary so the pure functions
+never read a clock; and the changed paths are positional and variadic. No parameter is mandatory, so
+a missing `-ItemKey` exits `2` instead of prompting. An empty changed-path list is legal and yields
+`no_escape`.
 
 The changed-path list is an argument, not something the module derives: the caller produces it with
 `git diff --name-only <merge-base(origin/main, HEAD)> HEAD` at the child's pre-review commit, and
@@ -930,7 +957,8 @@ escaped paths is not a drift event. `observed_radius` is the serialized observed
 parent writes back in step 7 of `#### Seven-Step Procedure`: it carries the six invariant-9 keys with
 `source: observed`, is built by F1's library rather than by hand, and is `null` exactly when `result`
 is `no_escape`, on the same precondition as `drift_event`. Exit status is `0` on success, `1` on
-missing or malformed input, and argparse's `2` on a usage error.
+missing or malformed input (one stderr line prefixed "parallel drift detection failed: "), and `2`
+on a usage error, such as a missing or non-integer `-ItemKey` or an unrecognized parameter.
 
 #### Synthetic Blocking Finding
 
@@ -958,7 +986,8 @@ on its own R1 through R5 loop for the drift finding, so halting it would deadloc
 that resolves the drift.
 
 The exclusion is applied **at the call site, before the later-started comparator runs**:
-`halted_item_keys` in `scripts/dev_tools/parallel_drift_detection_cli.py` drops the drifting key from
+`Get-ParallelDriftHaltedItemKey` in `.claude/lib/parallel-drift/ParallelDriftHalt.psm1` (the port of
+`halted_item_keys` in `scripts/dev_tools/parallel_drift_detection_cli.py`) drops the drifting key from
 each pair's candidate list, then halts the single remaining candidate, or applies the comparator when
 two remain. Because a recomputed pair holds two distinct canonical keys, the candidate list is always
 one or two entries and can never be empty. It remains true, and remains a real structural guarantee,
@@ -1099,7 +1128,7 @@ R5 loop that drives the remediation preceding either write is **reused
 unmodified**: `atomic-planner` plans the resolution, `atomic-executor` performs preflight then
 resolves, `feature-review` re-audits, and the loop exits on zero blocking findings. No new
 remediation loop is authored, no line of the existing loop is modified, and the shared
-`remediation_pass` cap of 3 applies. `.claude/skills/orchestrate/SKILL.md` is not modified by this
+`remediation_loop.completed_attempts` count applies, with the halt after three completed attempts. `.claude/skills/orchestrate/SKILL.md` is not modified by this
 feature.
 
 #### Layer-1 Narrowing — a Documented Limitation

@@ -72,7 +72,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
 - The rule provides a second, independent line of defense for CI-gate-modifying features, separate from and prior to the orchestrator's S9 CI green gate.
 - "Green workflow run against the branch head" means a workflow run whose head SHA matches the current branch head and whose conclusion is success for the affected workflow.
 - A green `workflow_dispatch` run against the branch head also satisfies the rule, not only a PR-context run. This mitigates the chicken-and-egg case where a feature must land its CI gate before the gate can run in PR context (see spec.md Risks & Mitigations).
-- When the rule fires and no qualifying green-run evidence is present, record a Blocking finding and route it through the standard remediation handoff. The supporting validator `scripts/feature-review/Test-ModifiedWorkflowNeedsGreenRun.ps1` implements the trigger-path and evidence-presence logic.
+- When the rule fires and no qualifying green-run evidence is present, record a Blocking finding classified `awaiting_ci` (the remediation inputs carry `Remediability: awaiting_ci` and a `Remediability-Evidence:` line naming the awaited workflow) and route it to the wait path (`AWAITING_CI` when no other class is present) instead of the remediation handoff.
 
 ## Ordered Procedure
 
@@ -147,6 +147,8 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - required acceptance criteria are FAIL or PARTIAL
      - coverage regression below policy threshold (< 80% repo-wide per language, < 80% or regression for modified files, or < 90% for new files)
      - coverage artifact absent for any language that has changed files
+   - Classify each blocking finding before triggering remediation: each receives one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). A published MCP runtime that lags the repository contract is classified `external_dependency`.
+   - Trigger the remediation handoff only when at least one blocking finding is `autonomous`. When every blocking finding is non-remediable, write the remediation inputs with the `HALT_NON_REMEDIABLE` or `AWAITING_CI` verdict and create no remediation plan target.
    - Create `remediation-inputs.<timestamp>.md` first.
    - Create the target remediation plan file from the canonical plan template.
    - Hand off plan creation through `remediation-handoff-atomic-planner`.

@@ -8,22 +8,26 @@
     for one gated call, whether the call is an operation of that epic and, if so, returns
     the absolute path and parsed content of the governing epic checkpoint.
 
-    A call is epic scope only when the session root's epic checkpoint parses, carries
-    route_id "epic" and a non-empty integration_branch, and that branch equals either the
-    call's branch signal (--head, --branch, or a branch: label) or, for a command or path
-    leg, the HEAD branch of the effective worktree (the -C selector worktree when present,
-    otherwise the session root). A command or path leg ignores any text branch signal, so
-    its merge probe inspects the worktree it operates on. Anything else is not epic scope,
-    so the caller's existing per-feature resolution runs unchanged.
+    A call is epic scope only when the epic checkpoint governing the matched branch parses,
+    carries route_id "epic" and a non-empty integration_branch, and that branch equals the
+    matched branch. The matched branch is the call's branch signal (--head, --branch, or a
+    branch: label) or, for a command or path leg, the HEAD branch of the effective worktree
+    (the -C selector worktree when present, otherwise the session root). A command or path
+    leg ignores any text branch signal, so its merge probe inspects the worktree it operates
+    on. Anything else is not epic scope, so the caller's existing per-feature resolution
+    runs unchanged.
 
-    The checkpoint path is always composed from the resolved session root and is never
-    read from command or prompt text (the issue #554 posture and the issue #673
-    invariant). Exactly one checkpoint read happens per resolution.
+    The checkpoint is located by Resolve-WorktreeEpicTarget (WorktreeRunResolution.psm1,
+    issue #690) keyed on the matched branch: the live worktree whose epic checkpoint records
+    that integration branch. Its path is never composed from the session root and never read
+    from command or prompt text (the issue #554 posture and the issue #673 invariant). An
+    unresolved target is not epic scope; an ambiguous one is not epic scope with reason
+    target-worktree-ambiguous. Exactly one checkpoint read happens per resolution.
 
 .NOTES
     PowerShell 7+. Every filesystem contact passes through the exported seams of the
-    sibling WorktreeResolution.psm1, so tests model any topology by mocking those seams
-    inside this module and create no file. No subprocess, no network, no clock read, and
+    sibling WorktreeResolution.psm1 and WorktreeRunResolution.psm1, so tests model any
+    topology by mocking those seams inside this module and create no file. No subprocess, no network, no clock read, and
     no environment read. Mirrored byte-identically under
     extensions/drm-copilot/resources/claude-customizations/.
     AUTHORITY: PowerShell-authoritative. The epic readiness predicates have no Python reference implementation, and no enforcement hook invokes Python (issue #663, D5).
@@ -35,6 +39,7 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path $PSScriptRoot 'WorktreeResolution.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'WorktreeTargetResolution.psm1') -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'WorktreeRunResolution.psm1') -ErrorAction Stop
 
 # The one definition of the epic checkpoint location relative to a worktree root.
 $script:EpicCheckpointRelativePath = 'artifacts/orchestration/epic-orchestrator-state.json'
@@ -278,10 +283,13 @@ function Resolve-EpicScopeCheckpoint {
         Returns an object with IsEpicScope, CheckpointPath, Checkpoint, WorktreeRoot,
         Branch, MergeInProgress, and Reason. The first matching step decides: no branch
         signal without head matching (no-branch-signal, and no checkpoint read); an
-        unresolvable session root (session-root-unresolved); an absent or unparseable epic
-        checkpoint (epic-checkpoint-absent-or-unparseable); a route_id other than epic
-        (route_id); an empty integration_branch (integration_branch); an unresolvable
-        selector (selector-unresolved); a branch that does not match (branch-mismatch).
+        unresolvable session root (session-root-unresolved); an unresolvable selector
+        (selector-unresolved); no candidate branch (branch-mismatch); no worktree whose epic
+        checkpoint records the candidate branch (epic-checkpoint-absent-or-unparseable); more
+        than one such worktree (target-worktree-ambiguous); an absent or unparseable epic
+        checkpoint at the resolved root (epic-checkpoint-absent-or-unparseable); a route_id
+        other than epic (route_id); an empty integration_branch (integration_branch); a
+        branch that does not match (branch-mismatch).
     .PARAMETER Text
         The command or prompt text; only its branch signal is read.
     .PARAMETER SessionRoot
@@ -319,20 +327,8 @@ function Resolve-EpicScopeCheckpoint {
     if ($null -eq $root) {
         return (New-EpicScopeResult -IsEpicScope $false -Reason 'session-root-unresolved')
     }
-    $path = Join-WorktreeResolutionPath -WorktreeRoot $root -RepoRelativePath (Get-EpicScopeCheckpointRelativePath)
-    $checkpoint = ConvertFrom-EpicScopeCheckpointText -Text (Get-EpicScopeCheckpointText -Path $path)
-    if ($null -eq $checkpoint) {
-        return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'epic-checkpoint-absent-or-unparseable')
-    }
-    if ([string](Get-EpicScopePropertyValue -InputObject $checkpoint -Name 'route_id') -cne $script:EpicRouteId) {
-        return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'route_id')
-    }
-    $integrationBranch = [string](Get-EpicScopePropertyValue -InputObject $checkpoint -Name 'integration_branch')
-    if ([string]::IsNullOrWhiteSpace($integrationBranch)) {
-        return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'integration_branch')
-    }
 
-    # Decide the matched branch. A command or path leg (-MatchWorktreeHead) matches the
+    # Decide the candidate branch. A command or path leg (-MatchWorktreeHead) matches the
     # effective worktree's HEAD, the selector worktree taking precedence, and ignores any
     # text branch signal so the merge probe inspects the worktree the call operates on
     # (issue #663 remediation CR-2); otherwise the explicit branch signal decides.
@@ -344,11 +340,36 @@ function Resolve-EpicScopeCheckpoint {
             $effectiveRoot = Find-WorktreeResolutionRoot -Path $WorktreeSelector
         }
         if ($null -eq $effectiveRoot) {
-            return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'selector-unresolved')
+            return (New-EpicScopeResult -IsEpicScope $false -Reason 'selector-unresolved')
         }
         $candidate = Get-EpicScopeWorktreeHeadBranch -WorktreeRoot $effectiveRoot
     }
-    if ($null -eq $candidate -or $candidate -cne $integrationBranch) {
+    if ($null -eq $candidate) {
+        return (New-EpicScopeResult -IsEpicScope $false -Reason 'branch-mismatch')
+    }
+
+    # Locate the governing checkpoint by the candidate branch (issue #690), never by
+    # composing it from the session root.
+    $target = Resolve-WorktreeEpicTarget -IntegrationBranch $candidate -SessionRoot $root
+    if ($target.Status -eq 'NoTarget') {
+        return (New-EpicScopeResult -IsEpicScope $false -Reason 'epic-checkpoint-absent-or-unparseable')
+    }
+    if ($target.Status -eq 'Ambiguous') {
+        return (New-EpicScopeResult -IsEpicScope $false -Reason 'target-worktree-ambiguous')
+    }
+    $path = Join-WorktreeResolutionPath -WorktreeRoot $target.WorktreeRoot -RepoRelativePath (Get-EpicScopeCheckpointRelativePath)
+    $checkpoint = ConvertFrom-EpicScopeCheckpointText -Text (Get-EpicScopeCheckpointText -Path $path)
+    if ($null -eq $checkpoint) {
+        return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'epic-checkpoint-absent-or-unparseable')
+    }
+    if ([string](Get-EpicScopePropertyValue -InputObject $checkpoint -Name 'route_id') -cne $script:EpicRouteId) {
+        return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'route_id')
+    }
+    $integrationBranch = [string](Get-EpicScopePropertyValue -InputObject $checkpoint -Name 'integration_branch')
+    if ([string]::IsNullOrWhiteSpace($integrationBranch)) {
+        return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'integration_branch')
+    }
+    if ($candidate -cne $integrationBranch) {
         return (New-EpicScopeResult -IsEpicScope $false -CheckpointPath $path -Reason 'branch-mismatch')
     }
 

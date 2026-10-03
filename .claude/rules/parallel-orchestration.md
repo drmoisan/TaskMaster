@@ -209,6 +209,8 @@ All nine enums of the parallel surface are owned by the schema-and-validator fea
 
 The wave-4 features — F6 (mutation protocol), F7 (enforcement hooks), and F8 (drift detection) — CONSUME these member sets and NEVER extend them. A wave-4 feature that needs a new member must amend this rule file and the validators at spec review, not add the member at implementation time. This constraint exists because the wave-4 features are prepared concurrently and would otherwise add fields to the same files at the same time.
 
+Integration-cost scheduling (issue #722) adds no `conflict_edges[].reason` member; the four members above are unchanged. The scheduling data travels in tolerated-not-validated fields: an edge may carry the extra fields `hard`, `cost`, and `benefit`, and the planner and orchestrator checkpoints may carry a `tolerated_overlaps` list. No validator reads these fields, and the Python validators and the TypeScript validator port accept them with zero errors.
+
 ## F7 Seam
 
 The retrospective cohort-ordering invariant `PARALLEL_COHORT_BARRIER_VIOLATION` (design section 9, Layer 2) is F7's explicitly assigned addition to the orchestrator validator. It is NOT implemented here. The entry point of `scripts/dev_tools/validate_parallel_orchestrator_state.py` contains a clearly delimited, appendable helper-invocation block, marked with explicit begin and end comments that name F7 and the invariant token, so that F7's edit is one appended helper call with no reflow of existing code. The TypeScript core `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-core.ts` carries the matching comment-delimited seam. Existing helper calls sit outside the block.
@@ -240,6 +242,11 @@ before resolving modules and shared surfaces, and `validate_blast_radius` remove
 plan-side extraction so V1 and V2 stay self-consistent against a radius derived from the same plan.
 The key is optional and fail-closed: a truth table that omits it excludes nothing and reproduces
 pre-change behaviour exactly.
+
+The Copilot instructions file `.github/copilot-instructions.md` is a mandate read as well (issue
+#722): the policy reading order begins with it, so a plan that cites copilot-instructions.md is
+reporting that it read the tone and communication policy. Both committed copies of
+`config/blast-radius.json` list it in `mandate_reads`.
 
 Three constraints bound the mandate-read exclusion:
 
@@ -391,6 +398,144 @@ weakens the relation below the path level: two items editing the same file still
 A candidate module belongs in the map when it names a subsystem an item could plausibly not touch.
 A candidate that matches the majority of work items belongs nowhere.
 
+### Integration-cost scheduling (issue #722)
+
+Detection and scheduling are separate steps. The detection relation (`conflicts` in Python,
+`Test-BlastRadiusConflict` in PowerShell) is unchanged and still answers one question: do two radii
+contend? Scheduling decides whether a detected contention must serialize the two items. The entry
+points are `schedule_conflict_edges` in `scripts/dev_tools/_blast_radius_scheduling.py` and
+Get-BlastRadiusConflictEdge in `.claude/lib/blast-radius/BlastRadiusScheduling.psm1`; both return
+the edges and the tolerated overlaps of a set of items. Planners call the entry point instead of
+applying the detection relation to every pair by hand.
+
+This is an operator-directed configured policy change (issue #722, 2026-09-27), not ad hoc
+narrowing. The only sanctioned mechanisms for relaxing contention are the configured
+`conflict_tolerance` key and configured write-intent extraction. Planners still never hand-narrow a
+radius: editing a declared radius to suppress an edge remains prohibited.
+
+**Configuration.** `config/blast-radius.json` carries an optional `conflict_tolerance` object with
+tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only, and
+module, each an integer of at least 1), `band_durations` (C1 through C4, each an integer of at least
+1), `default_band` (one of C1 through C4), and append_only_paths (a list of exact entries and `**`
+globs). The reader fails fast with an error naming the key for any other shape; booleans are
+rejected wherever an integer is required. An absent key means strict scheduling, identical to
+tolerance_percent 0.
+
+**Edge rule.** For each unordered pair of items:
+
+1. Run the unchanged detection relation. No conflict means no edge and no tolerated overlap.
+2. **Hard classes.** A reason list containing `shared_surface_overlap` or `contract_dependency`
+   makes the pair an edge at every tolerance.
+3. **Cost** (integer, computed only for a detected conflict). Re-enumerate the overlapping entry
+   pairs with the same mergeable-path exclusion and the same entry-overlap primitive the relation
+   uses, then sum the append_only weight for a concrete overlapping path that matches an
+   append_only_paths entry, the same_file weight for two equal concrete entries, the
+   possible_overlap weight for a glob or directory-prefix overlap, and the module weight times the
+   number of shared modules. The append_only_paths check runs before the same_file check (append-only
+   precedence), so an append-only file stays low cost even when both items name it. Mergeable paths
+   contribute 0 because they are excluded before enumeration.
+4. **Benefit** (integer, pairwise). The smaller of the two items' band durations; a missing band uses
+   `default_band`. Running the pair concurrently saves at most one cohort step of the shorter item.
+5. **Rule.** The pair is an edge if and only if it conflicts and either it is hard or
+   `cost * 100 > benefit * tolerance_percent`.
+6. **Recorded reason.** The first member of the relation's reason list in canonical kind order.
+
+**Strict-identity proof.** Every weight and every band duration is validated as an integer of at
+least 1. A detected conflict that is not hard therefore has a cost of at least 1, so at
+tolerance_percent 0 the inequality `cost * 100 > 0` always holds and the edge set equals the
+detected-conflict set exactly; cohort coloring of that set is identical to strict scheduling. At
+every tolerance an edge requires a conflict, so every edge implies a conflict and the edge set is
+always a subset of the detected-conflict set. Raising tolerance_percent never adds an edge, and the
+decision for (a, b) equals the decision for (b, a).
+
+**Soft-overlap handling.** A detected, non-hard pair within tolerance is a tolerated overlap, not an
+edge. The planner records it in a tolerated_overlaps list on the planner checkpoint (and the
+orchestrator carries it), each entry holding `a`, `b`, `reasons`, `cost`, and `benefit`. Tolerated
+pairs run in the same or adjacent cohorts without a barrier. The later-merging item of a tolerated
+pair merges `origin/main` under the existing per-item merge-conflict handling and re-passes CI before
+it merges.
+
+**Drift behaviour.** When an item's observed radius replaces its declared radius, drift detection
+evaluates each in-flight peer pair through the same edge rule, using the items' complexity bands from
+the checkpoint (`default_band` when absent), through the helper module
+`scripts/dev_tools/_parallel_drift_scheduling.py`. A pair is newly conflicting only when the rule
+yields an edge and the pair is not already a recorded edge. A tolerated pair whose observed overlap
+stays within tolerance halts neither item; one whose observed overlap exceeds tolerance, or becomes
+hard, is reported. An unevaluable peer radius still counts as an edge (fail closed). At
+tolerance_percent 0 the drift output equals strict drift output.
+
+### Write-intent extraction (issue #722)
+
+The extractor harvests every inline-code token of a plan and spec, so a path an item only reads,
+mentions as a glob, or quotes inside a command becomes a radius path and can create a false edge.
+Write-intent extraction keeps only tokens that state a write. It is the second sanctioned mechanism,
+beside `conflict_tolerance`, for relaxing contention; like it, it is an operator-directed configured
+policy change, and planners still never hand-narrow a radius.
+
+**Configuration.** `config/blast-radius.json` carries two optional keys. `write_intent_extraction`
+is a boolean; when it is true, rules W1 through W6 below apply. `path_roots` is a list of non-empty
+first path segments that enables rule W4. Both readers fail fast with an error naming the key for any
+other shape. An absent or false `write_intent_extraction` reproduces pre-change extraction exactly
+(fail closed), and an empty or absent `path_roots` disables W4. The self-hosted copy sets
+`path_roots` to this repository's tracked top-level directories. The implementations are
+`scripts/dev_tools/_blast_radius_write_intent.py` and
+`.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`.
+
+**Rules.** Each rule is a pure, statically decidable function of the text and the truth table.
+
+- **W1 glob mention.** Drop any harvested token containing a wildcard character. The feature-folder
+  glob is added after filtering and is never dropped.
+- **W2 command span.** Drop every token of an inline span whose whitespace split yields more than
+  one word.
+- **W3 read task.** Drop the tokens of a task attribution window (a task line plus the following
+  non-task lines up to the next ATX heading, as defined in `.claude/rules/plan-acceptance-gates.md`)
+  whose title's first word, after an optional bold label, is in the read-verb set (Read, Verify,
+  Confirm, Inspect, Review, Baseline) and whose title contains no member of the write-verb set (Fix,
+  Write, Update, Edit, Add, Create, Delete, Remove, Rename, Author, Append, Replace). A write verb
+  anywhere in the title overrides the read verb.
+- **W4 root anchoring.** Drop a concrete token whose first segment, after stripping a leading `./`,
+  is not in `path_roots` and is not a configured root surface.
+- **W5 spec paths.** The spec contributes contracts only, not paths. Contract harvesting from the
+  spec applies W1 and W2.
+- **W6 placeholder stem.** Drop a concrete token whose final-component stem is in the placeholder
+  set (the single ASCII letters, and foo, bar, baz, example, sample, placeholder), compared
+  case-insensitively.
+
+The read-verb, write-verb, and placeholder-stem sets are code constants pinned equal across Python
+and PowerShell by a parity test. Shared surfaces are still resolved from the surviving concrete
+paths, so a shared surface cited only in a read task, a command span, or the spec produces no hard
+edge, while a shared surface an item writes in a write task survives and stays hard.
+
+**One extractor for derivation and validation.** W1, W4, and W6 are token-level and also apply when
+`normalize_declared_radius` and Get-NormalizedDeclaredRadius re-filter a recorded radius; an entry
+that starts with `docs/features/`, ends with `/**`, and carries no other wildcard (the feature-folder
+glob) is always kept. W2, W3, and W5 need line context and apply only to derivation and to the
+plan-side extraction of validation. `derive_blast_radius` and `validate_blast_radius` (and their
+PowerShell ports) select the same extractor from the same flag, so a derived radius still passes V1
+and V2 against its own plan in both modes.
+
+#### Known false negatives
+
+Write-intent extraction can drop a genuine write in these cases:
+
+1. a genuine write stated only as a glob (W1);
+2. a genuine write stated only inside a command span (W2);
+3. a write named only in spec prose (W5);
+4. a read-verb task that also writes without a write verb in its title (W3);
+5. a new top-level directory not yet in `path_roots` (W4);
+6. a genuine file whose stem is in the placeholder set (W6).
+
+Three mitigations bound these cases:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** When an item's plan will
+   write a path that one of the rules drops, the planner appends that exact path to the declared
+   radius after normalization, as for the mandate-read exclusion.
+2. **Execution-time escaped-path detection.** `detect_escaped_paths` compares the declared radius
+   against the paths a diff actually touched, so a dropped write is caught against observed evidence
+   rather than against prose.
+3. **The fail-closed absent key.** A truth table without `write_intent_extraction`, or with it set
+   to false, reproduces pre-change extraction exactly, so an operator can disable the rules at once.
+
 ### The published truth table is not a copy of this one (issue #500)
 
 The push-down publishes a second truth table into a destination workspace at
@@ -430,8 +575,11 @@ non-vacuous input.
 subset, not a copy of the self-hosted sets.** They were authored narrow when the bundled copy was
 created and were never a copy that fell behind, so the correct gate is portable-set equality against
 a declared constant plus a subset relation against the self-hosted list — never byte-equality with
-the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, and `mergeable_paths`
-are byte-equal across the two copies.
+the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, `mergeable_paths`,
+`conflict_tolerance`, and `write_intent_extraction` are byte-equal across the two copies.
+`path_roots` is a Class 2 key: its self-hosted value is this repository's tracked top-level
+directory list, and its bundled value is an empty list, because the bundle cannot know a
+destination's top-level directories and an empty list disables root anchoring there.
 
 The reason the two key groups take different relations is an asymmetry between surfaces and modules.
 An over-matching MODULE glob costs concurrency on every pair of items it touches, because a module
@@ -462,6 +610,27 @@ in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
 `tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap: the
 union of both copies' top-level keys is exhaustively covered by the three declared classes, and
 an unclassified key or a key present in only one copy fails loudly and names itself.
+
+**A destination records its own entries in `config/blast-radius.local.json` (issue #508).** The
+push-down regenerates a destination's `config/blast-radius.json` on every push, so an entry
+hand-added to that file does not survive the next push. The supported extension point is the
+destination-owned overlay `config/blast-radius.local.json`. No payload contains it, and the
+push-down never writes or publishes it: both implementations list it in `EXCLUDED_RELATIVE_PATHS`.
+At push time the overlay is composed onto the freshly generated base document (the derived document
+in TypeScript, the published document in Python), and the composed result is written to
+`config/blast-radius.json`, so consumers continue to read one file. Per-key semantics: the
+string-list keys `shared_surfaces`, `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, and
+`path_roots` take an ordered union (base entries first, then overlay-only entries, duplicates
+removed); an overlay module absent from the base is added and an overlay module with the same name
+replaces that module's glob list, with module names emitted in ordinal order; `conflict_tolerance`
+merges recursively (nested lists by union, nested objects per member, nested scalars overlay-wins);
+the scalars `over_breadth_fraction` and `write_intent_extraction` take the overlay value; overlay-only
+keys are appended after the base keys. An overlay `version` must equal the base `version`, and the
+forbidden-glob guard (`**`, `docs/**`, `tests/**`) applies to the composed module map, including
+overlay-authored modules. A malformed overlay, a `version` mismatch, or a forbidden glob raises an
+error before any write, so `config/blast-radius.json` keeps its prior bytes. With no overlay
+present, the written file is byte-identical to the base document. The overlay cannot remove a
+shipped surface or a derived module.
 
 ## Enforcement
 

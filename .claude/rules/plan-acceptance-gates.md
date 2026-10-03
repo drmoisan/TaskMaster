@@ -85,7 +85,7 @@ The window size is fixed at four adjacent non-blank lines. Blank lines are remov
 
 ### The shared measurement behind G7, G8, G8b, and G9
 
-The four severities below were fixed by one corpus measurement recorded in `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`. The pre-declared decision rule was written and committed **before** the driver existed and before any count was taken, so the ordering is verifiable from git history rather than only asserted in prose. Its form matches the G5 precedent: the shipped severity is Blocking if and only if the total finding count for that rule is greater than zero **and** the recorded false-positive count for that rule is zero; otherwise Warning.
+The four severities below were fixed by one corpus measurement recorded in `docs/features/completed/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`. The pre-declared decision rule was written and committed **before** the driver existed and before any count was taken, so the ordering is verifiable from git history rather than only asserted in prose. Its form matches the G5 precedent: the shipped severity is Blocking if and only if the total finding count for that rule is greater than zero **and** the recorded false-positive count for that rule is zero; otherwise Warning.
 
 The false-positive definition the rule consumes is likewise pre-declared: a finding is a false positive when the acceptance condition it reports is in fact falsifiable — when the plan states an observation sufficient to distinguish a passing run from a failing one, by a mechanism the rule's predicate does not recognise. A finding is a true positive when the acceptance condition it reports genuinely cannot fail, or can only be satisfied vacuously.
 
@@ -108,7 +108,7 @@ G7's finding count of 466 satisfies the first conjunct, so the rule was not deci
 
 Both classes are addressable by a later feature — Class 1 by adding a check-flag exclusion to the `prettier-write` entry, Class 2 by admitting a tree-observation span as an alternative to a marker — but neither was changed here, because narrowing a predicate after reading its measurement would invalidate the measurement that decided its severity. A later feature that narrows either class must re-take the measurement the same way.
 
-Counts, and every one of the 22 false positives named by plan path, task identifier, and offending span: `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
+Counts, and every one of the 22 false positives named by plan path, task identifier, and offending span: `docs/features/completed/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
 
 ### G8 — ships as a Warning because the measurement recorded 7 false positives
 
@@ -118,7 +118,7 @@ G8's finding count of 82 satisfies the first conjunct. It fails the second: 7 fi
 
 **Class 2, one finding — the unmerged-path filter.** `--diff-filter=U` selects conflicted paths during a merge or rebase. In that state the worktree-against-index comparison is the correct one and does not become vacuous on commit, because the conflict is precisely what is not yet committed.
 
-Counts, and every one of the 7 false positives named by plan path, task identifier, and offending span: `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
+Counts, and every one of the 7 false positives named by plan path, task identifier, and offending span: `docs/features/completed/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
 
 ### G8b — ships as a Warning unconditionally, by the pre-declared rule
 
@@ -126,7 +126,7 @@ G8b is exempt from the two-conjunct rule and **cannot reach the Blocking channel
 
 The reason is that G8b carries the highest false-positive surface of the set, and a false-positive count taken over one corpus does not bound the false-positive surface of a predicate. Promoting a rule on the strength of a clean run over one corpus would convert an accident of that corpus into a gate. The 19 findings were nonetheless examined individually and all 19 were retained as true positives, across three sub-classes: a placeholder ref operand, which resolves to a real ref at run time and still cannot make the diff see an untracked path; an artifact-field label inside the span, which is cosmetic and leaves the underlying acceptance condition as the finding describes it; and a pathspec written without the `--` separator, where the predicate reads the pathspec as a ref operand. That last sub-class is a true positive for G8b and is simultaneously recorded in the measurement as a **G8 false negative**: the same span should also have been reported by G8, and was not.
 
-Counts, the zero false-positive record, and the three sub-classes with their plan paths and offending spans: `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
+Counts, the zero false-positive record, and the three sub-classes with their plan paths and offending spans: `docs/features/completed/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
 
 ### G9 — ships as a Warning because the measurement recorded 4 false positives
 
@@ -134,7 +134,7 @@ G9's finding count of 8 satisfies the first conjunct. It fails the second: 4 of 
 
 The remaining 4 findings are true positives, and each is the exact defect the rule was written for: the acceptance condition demands a numeric coverage percentage, the command supplies no terminal reporter, the project `addopts` supplies only an LCOV reporter, and the number the acceptance demands is therefore never printed.
 
-Counts, and every one of the 4 false positives named by plan path, task identifier, offending span, and the reason its acceptance condition is falsifiable: `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
+Counts, and every one of the 4 false positives named by plan path, task identifier, offending span, and the reason its acceptance condition is falsifiable: `docs/features/completed/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
 
 ## The Write-Mode Register
 

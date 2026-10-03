@@ -5,7 +5,8 @@
 .DESCRIPTION
     Destination-runtime PowerShell port of `validate_routing_contract` in
     `scripts/dev_tools/_orchestrator_state_routing.py`, covering parity-inventory
-    rows C6.1 through C6.14:
+    rows C6.1 through C6.15. The C6.15 adoption waiver affects only receipt
+    presence (C6.9); the declared-list equality checks are unchanged:
 
       C6.1   routing matrix carries no routes object          (returns)
       C6.2   no route selected                                (returns)
@@ -21,6 +22,7 @@
       C6.12  lifecycle_operations must be a list when present
       C6.13  per non-object lifecycle operation
       C6.14  per lifecycle operation that did not use the MCP surface
+      C6.15  issue_adoption field and waiver rules (OrchestratorStateIssueAdoption.psm1)
 
     The routing matrix is read from `OrchestratorStateRoutingMatrix.psm1`, which
     implements deviation PD-1: the constants are pinned and no disk read occurs at
@@ -56,6 +58,7 @@ $ErrorActionPreference = 'Stop'
 # pushed-down pack regardless of the working directory.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateRoutingMatrix.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateIssueAdoption.psm1') -Force -ErrorAction Stop
 
 # The promotion-entry MCP tools and the promotion type that triggers substitution.
 $script:FEATURE_PROMOTION_ENTRY_TOOL = 'new_potential_entry'
@@ -410,11 +413,16 @@ function Get-OrchestratorStateRoutingContractError {
     }
 
     $actualTools = @(Get-CheckpointAcknowledgedName -State $State -ArrayKey 'mcp_call_receipts' -NameKey 'tool' -FlagKey 'ok')
+    # C6.15: a valid issue_adoption record waives the receipt requirement for the
+    # tools it lists; any adoption error waives nothing.
+    $adoption = Get-OrchestratorStateIssueAdoptionResult -State $State -RouteId $routeId -RequiredMcpTool ([string[]]$requiredMcpTools) -SuccessfulTool ([string[]]$actualTools)
     foreach ($tool in $requiredMcpTools) {
+        if (@($adoption.WaivedTools) -ccontains $tool) { continue }
         if ($actualTools -cnotcontains $tool) {
             $errors.Add("Checkpoint missing successful MCP receipt: $tool.")
         }
     }
+    $errors.AddRange([string[]]@($adoption.Errors))
 
     # C6.10 to C6.14: the two empty-list fields and the lifecycle operations.
     foreach ($key in $script:COMPLETION_EMPTY_LIST_KEYS) {

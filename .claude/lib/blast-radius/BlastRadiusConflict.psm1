@@ -190,6 +190,182 @@ function Get-NonMergeablePathEntry {
     return @(Get-OrdinalSortedEntry -Entry $survivor.ToArray())
 }
 
+function ConvertTo-PathOverlapRecord {
+    <#
+    .SYNOPSIS
+        Precompute the per-entry facts the pairwise overlap decision reads.
+
+    .DESCRIPTION
+        Called once per path collection by Get-OverlappingPathPair (issue #776),
+        so the advanced-function calls made here are linear in the collection
+        size rather than quadratic in the number of pairs.
+
+    .PARAMETER Entry
+        Radius path entries. An empty collection and empty strings are accepted.
+
+    .OUTPUTS
+        System.Object[]. One hashtable record per entry, in input order, with
+        keys Entry, IsGlob, Prefix (the literal prefix of a glob entry, $null for
+        a concrete entry), and Directory (the entry anchored with one trailing
+        separator).
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [string[]] $Entry
+    )
+
+    $record = [System.Collections.Generic.List[hashtable]]::new()
+    foreach ($single in $Entry) {
+        $isGlob = Test-GlobEntry -Entry $single
+        $prefix = if ($isGlob) { Get-LiteralPrefix -Entry $single } else { $null }
+        $record.Add(@{
+                Entry     = $single
+                IsGlob    = $isGlob
+                Prefix    = $prefix
+                Directory = $single.TrimEnd('/') + '/'
+            })
+    }
+
+    return @($record.ToArray())
+}
+
+# The one record-form overlap decision (issue #776); its four cases reproduce
+# Test-EntryOverlap exactly (parity guard: BlastRadiusConflict.PathOverlap.Tests.ps1).
+# A simple function because it runs per candidate pair (see Get-GlobRegex).
+function Test-PathOverlapRecordPair {
+    param([hashtable] $Left, [hashtable] $Right)
+
+    $ordinal = [System.StringComparison]::Ordinal
+    if (-not $Left.IsGlob -and -not $Right.IsGlob) {
+        # Two concrete entries: equality or either anchored directory prefix.
+        return ([string]::Equals($Left.Entry, $Right.Entry, $ordinal) -or
+            $Left.Entry.StartsWith($Right.Directory, $ordinal) -or
+            $Right.Entry.StartsWith($Left.Directory, $ordinal))
+    }
+    if ($Left.IsGlob -and -not $Right.IsGlob) {
+        # Glob and concrete: the two literal nest tests, then the pattern match.
+        return ($Left.Prefix.StartsWith($Right.Directory, $ordinal) -or
+            $Right.Directory.StartsWith($Left.Prefix, $ordinal) -or
+            (Test-GlobMatch -Pattern $Left.Entry -Candidate $Right.Entry))
+    }
+    if ($Right.IsGlob -and -not $Left.IsGlob) {
+        return ($Right.Prefix.StartsWith($Left.Directory, $ordinal) -or
+            $Left.Directory.StartsWith($Right.Prefix, $ordinal) -or
+            (Test-GlobMatch -Pattern $Right.Entry -Candidate $Left.Entry))
+    }
+    # Two globs: either literal prefix nests the other.
+    return ($Left.Prefix.StartsWith($Right.Prefix, $ordinal) -or
+        $Right.Prefix.StartsWith($Left.Prefix, $ordinal))
+}
+
+function Get-OverlappingPathPair {
+    <#
+    .SYNOPSIS
+        Return every overlapping path pair of two collections, in nested-loop order.
+
+    .DESCRIPTION
+        Yields exactly the pairs for which Test-EntryOverlap holds without
+        evaluating all |PathA| x |PathB| pairs (issue #776). Concrete pairs, almost
+        all pairs in practice, are found by dictionary lookup: equality against
+        the concrete entries of the other side, and anchored-directory
+        containment, because X.StartsWith(Y.TrimEnd('/') + '/') holds exactly
+        when X[k] is '/' and X.Substring(0, k) equals Y.TrimEnd('/') for some k
+        over the positions of '/' in X, so one lookup per separator position of X
+        decides it (probed in both directions). Every glob-involving pair is
+        decided by Test-PathOverlapRecordPair against the other collection.
+
+        Ordering contract: each pair is recorded once under the key
+        i * |PathB| + j and emitted in ascending key order, which is nested-loop
+        order (outer over PathA, inner over PathB, both in input order). Pairs are
+        never reordered by value; a repeated entry yields one pair per occurrence.
+
+    .PARAMETER PathA
+        First path collection. An empty collection and empty strings are accepted.
+
+    .PARAMETER PathB
+        Second path collection. An empty collection and empty strings are accepted.
+
+    .OUTPUTS
+        System.Object[]. One hashtable per overlapping pair with keys EntryA (from
+        PathA) and EntryB (from PathB); an empty array when nothing overlaps.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [string[]] $PathA,
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [string[]] $PathB
+    )
+
+    $recordA = @(ConvertTo-PathOverlapRecord -Entry $PathA)
+    $recordB = @(ConvertTo-PathOverlapRecord -Entry $PathB)
+    $countB = [long]$recordB.Count
+    $pairKey = [System.Collections.Generic.HashSet[long]]::new()
+    $hit = $null
+
+    # Concrete entries keyed verbatim (equality) and trimmed of trailing separators
+    # (containment); each key lists every index carrying it, one per occurrence.
+    $exactB, $trimmedB, $trimmedA = @(1..3 | ForEach-Object { [System.Collections.Generic.Dictionary[string, System.Collections.Generic.List[int]]]::new([StringComparer]::Ordinal) })
+    for ($j = 0; $j -lt $recordB.Count; $j++) {
+        if ($recordB[$j].IsGlob) { continue }
+        foreach ($target in @(@($exactB, $recordB[$j].Entry), @($trimmedB, $recordB[$j].Entry.TrimEnd('/')))) {
+            if (-not $target[0].ContainsKey($target[1])) { $target[0][$target[1]] = [System.Collections.Generic.List[int]]::new() }
+            $target[0][$target[1]].Add($j)
+        }
+    }
+
+    for ($i = 0; $i -lt $recordA.Count; $i++) {
+        $entry = $recordA[$i].Entry
+        if ($recordA[$i].IsGlob) {
+            # A PathA glob is decided against every PathB record.
+            for ($j = 0; $j -lt $recordB.Count; $j++) {
+                if (Test-PathOverlapRecordPair -Left $recordA[$i] -Right $recordB[$j]) { [void]$pairKey.Add($i * $countB + $j) }
+            }
+            continue
+        }
+        if (-not $trimmedA.ContainsKey($entry.TrimEnd('/'))) { $trimmedA[$entry.TrimEnd('/')] = [System.Collections.Generic.List[int]]::new() }
+        $trimmedA[$entry.TrimEnd('/')].Add($i)
+        # Equality, then containment at each separator (the PathB pass probes the reverse).
+        if ($exactB.TryGetValue($entry, [ref]$hit)) { foreach ($j in $hit) { [void]$pairKey.Add($i * $countB + $j) } }
+        for ($slash = $entry.IndexOf('/'); $slash -ge 0; $slash = $entry.IndexOf('/', $slash + 1)) {
+            if ($trimmedB.TryGetValue($entry.Substring(0, $slash), [ref]$hit)) { foreach ($j in $hit) { [void]$pairKey.Add($i * $countB + $j) } }
+        }
+    }
+
+    for ($j = 0; $j -lt $recordB.Count; $j++) {
+        $entry = $recordB[$j].Entry
+        if ($recordB[$j].IsGlob) {
+            # Against concrete PathA records only; glob pairs were decided above.
+            for ($i = 0; $i -lt $recordA.Count; $i++) {
+                if (-not $recordA[$i].IsGlob -and (Test-PathOverlapRecordPair -Left $recordA[$i] -Right $recordB[$j])) { [void]$pairKey.Add($i * $countB + $j) }
+            }
+            continue
+        }
+        for ($slash = $entry.IndexOf('/'); $slash -ge 0; $slash = $entry.IndexOf('/', $slash + 1)) {
+            if ($trimmedA.TryGetValue($entry.Substring(0, $slash), [ref]$hit)) { foreach ($i in $hit) { [void]$pairKey.Add($i * $countB + $j) } }
+        }
+    }
+
+    $sortedKey = [long[]]@($pairKey)
+    [System.Array]::Sort($sortedKey)
+    $pair = [System.Collections.Generic.List[hashtable]]::new()
+    foreach ($key in $sortedKey) {
+        $i = [int][System.Math]::Floor($key / $countB)
+        $pair.Add(@{ EntryA = $recordA[$i].Entry; EntryB = $recordB[[int]($key - $i * $countB)].Entry })
+    }
+
+    return @($pair.ToArray())
+}
+
 function Get-SmallestPathOverlap {
     <#
     .SYNOPSIS
@@ -222,22 +398,24 @@ function Get-SmallestPathOverlap {
         [string[]] $PathB
     )
 
-    $detail = [System.Collections.Generic.List[string]]::new()
-    foreach ($entryA in $PathA) {
-        foreach ($entryB in $PathB) {
-            if (-not (Test-EntryOverlap -EntryA $entryA -EntryB $entryB)) {
-                continue
-            }
-            $ordered = if ([string]::CompareOrdinal($entryA, $entryB) -le 0) {
-                @($entryA, $entryB)
-            } else {
-                @($entryB, $entryA)
-            }
-            $detail.Add($ordered -join $script:PairDetailSeparator)
+    # The overlapping pairs come from the shared enumeration, so the record-form
+    # decision exists once (issue #776). The minimum over the ordered details does
+    # not depend on the order in which the pairs are enumerated.
+    $smallest = $null
+    foreach ($pair in @(Get-OverlappingPathPair -PathA $PathA -PathB $PathB)) {
+        # Order the pair ordinally so the detail is identical in both argument
+        # orders, then keep it only when it is the new ordinal minimum.
+        $pairDetail = if ([string]::CompareOrdinal($pair['EntryA'], $pair['EntryB']) -le 0) {
+            $pair['EntryA'] + $script:PairDetailSeparator + $pair['EntryB']
+        } else {
+            $pair['EntryB'] + $script:PairDetailSeparator + $pair['EntryA']
+        }
+        if ($null -eq $smallest -or [string]::CompareOrdinal($pairDetail, $smallest) -lt 0) {
+            $smallest = $pairDetail
         }
     }
 
-    return (Get-OrdinalSmallestEntry -Entry $detail.ToArray())
+    return $smallest
 }
 
 function Get-SmallestCommonEntry {
@@ -287,4 +465,5 @@ Export-ModuleMember -Function `
     Test-MergeablePath, `
     Get-NonMergeablePathEntry, `
     Get-SmallestPathOverlap, `
-    Get-SmallestCommonEntry
+    Get-SmallestCommonEntry, `
+    Get-OverlappingPathPair

@@ -108,8 +108,8 @@ Do not record a partial removal, and do not record the rejection itself in `muta
    removing the worktree — through the single deterministic CLI invocation below and through nothing
    else:
 
-   ```bash
-   poetry run python scripts/dev_tools/parallel_mutation_abandon_cli.py --item <key> --disposition abandon --confirm-abandon --pr <pr-number> --worktree <worktree-path>
+   ```shell
+   bash .claude/lib/bash/abandon-parallel-item.sh --item <key> --disposition abandon --confirm-abandon --pr <pr-number> --worktree <worktree-path>
    ```
 
    Executing the abandon disposition through ad hoc `gh pr close` or `git worktree remove` commands
@@ -146,14 +146,14 @@ The abandon path is guarded by the PreToolUse hook
 - A command carrying both tokens is allowed.
 - A command carrying neither is out of scope and is allowed unchanged.
 
-The two token values are declared once each in
-`scripts/dev_tools/parallel_mutation_abandon_cli.py` (the producer) and once each in the hook (the
-consumer), and the seam test
-`tests/scripts/dev_tools/test_parallel_abandon_token_seam.py` parses all three artifacts — the CLI,
-the hook, and the invocation line in step 5 above — at run time to prove they still agree. Renaming
-a token in one artifact without the identical rename in the other two fails that test. The
-invocation in step 5 is the file's only executable abandon command line, and the seam test parses
-that one line; do not add a second one.
+The two token values are declared once each in `.claude/lib/bash/abandon-parallel-item.sh` (the
+pushed-down producer), once each in `scripts/dev_tools/parallel_mutation_abandon_cli.py` (the retained
+Python parity reference), and once each in the hook (the consumer). The seam test
+`tests/scripts/dev_tools/test_parallel_abandon_token_seam.py` parses all four artifacts — the bundled
+entry point, the Python reference, the hook, and the invocation line in step 5 above — at run time
+to prove they still agree. Renaming a token in one artifact without the identical rename in the
+others fails that test. The invocation in step 5 is the file's only executable abandon command
+line, and the seam test parses that one line; do not add a second one.
 
 When the gate denies a command, the correct response is to add the confirmation marker
 deliberately, not to reformulate the command to evade the match. Reformulating to evade the gate

@@ -1,18 +1,35 @@
 <#
 .SYNOPSIS
-    Pre-tool-use hook that enforces the PowerShell per-batch change budget.
+    Pre-tool-use hook that routes PowerShell changes of more than three production files to the orchestrated large path.
 
 .DESCRIPTION
     This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
     operation. When the target file is a PowerShell source file (.ps1, .psm1, .psd1),
-    it classifies the file as either production or test and checks the running count
-    against the per-batch cap:
-      - 3 production PowerShell files per batch
-      - 3 test PowerShell files per batch
+    it decides whether the change may proceed in direct mode.
 
-    A "batch" is scoped to the current Claude Code session. The running count is
-    persisted under .claude/state/powershell-batch-budget.<session_id>.json. Only
-    distinct file paths are counted; repeated edits to the same file consume one slot.
+    Direct mode counts distinct production PowerShell paths per Claude Code session.
+    The running set is persisted under .claude/state/powershell-batch-budget.<session_id>.json,
+    and repeated edits to the same file are counted once. The 4th distinct production
+    path is denied with a POWERSHELL_LARGE_PATH_REQUIRED reason that instructs the
+    caller to route the change through /orchestrate.
+
+    The orchestrated large path is detected from
+    <root>/artifacts/orchestration/orchestrator-state.json. The selected route is the
+    route_id value when that key is present, otherwise the path_selected value, and it
+    is usable only as a non-blank string. When the selected route is large,
+    remediation, or preparation and the checkpoint is not terminal (next_step is not
+    complete and completed_steps does not contain S12_complete), no path is denied for
+    count and no state is written. Every other checkpoint outcome, including an absent,
+    unreadable, or malformed checkpoint, enforces direct mode.
+
+    Test files are never counted. They are those matching:
+      - tests/**/*.ps1
+      - *.Tests.ps1
+
+    All other .ps1/.psm1/.psd1 files are production files. Non-PowerShell paths pass
+    through. The threshold of three production files is a routing constant and is not
+    configurable at runtime. Legacy prodCap, testCap, and testFiles keys in a persisted
+    state file are ignored when the state is loaded.
 
     The session id is resolved from the first non-empty of: the CLAUDE_SESSION_ID
     environment variable; the contents of <root>/.claude/state/current-session-id;
@@ -27,22 +44,13 @@
     dropped when state is rehydrated, so a state file carried between worktrees
     cannot spend this worktree's budget.
 
-    Test files are those matching:
-      - tests/**/*.ps1
-      - *.Tests.ps1
+    When a production path is denied, the script emits a PreToolUse JSON response with
+    hookSpecificOutput.permissionDecision = 'deny' and exits 0. Files already counted
+    are always allowed through.
 
-    All other .ps1/.psm1/.psd1 files are treated as production files. Non-PowerShell
-    paths pass through.
-
-    The cap may be overridden per session by setting the environment variable
-    CLAUDE_POWERSHELL_BUDGET_PROD or CLAUDE_POWERSHELL_BUDGET_TEST to a positive integer
-    before the session starts, or by writing {"prodCap": N, "testCap": M} into the
-    state file.
-
-    When the cap would be exceeded by a new file, the script emits a PreToolUse JSON
-    response with hookSpecificOutput.permissionDecision = 'deny' and exits 0. The session
-    must explicitly reset the counter by deleting the state file before starting a new
-    batch. Files already counted are always allowed through.
+    Known limitation: a stale non-terminal large-path checkpoint left at the root
+    exempts a later direct-mode session at that root. Orchestrator checkpoint hygiene
+    (issue #673) moves foreign checkpoints aside before a new run.
 
 .NOTES
     Compatible with PowerShell 7+.
@@ -52,6 +60,7 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+. (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1')
 
 function Test-PowerShellBatchBudgetPathInRoot {
     <#
@@ -174,25 +183,24 @@ function Get-PowerShellBatchBudgetSessionId {
 }
 
 function Get-PowerShellBatchBudgetState {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory)]
         [int] $ProdCap,
 
-        [Parameter(Mandatory)]
-        [int] $TestCap
+        [int] $TestCap = 0
     )
 
     [ordered]@{
         prodCap   = $ProdCap
-        testCap   = $TestCap
         prodFiles = @()
-        testFiles = @()
     }
 }
 
 function ConvertTo-PowerShellBatchBudgetState {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -202,26 +210,22 @@ function ConvertTo-PowerShellBatchBudgetState {
         [Parameter(Mandatory)]
         [int] $ProdCap,
 
-        [Parameter(Mandatory)]
-        [int] $TestCap,
+        [int] $TestCap = 0,
 
         [AllowNull()]
         [AllowEmptyString()]
         [string] $Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
     )
 
-    $state = Get-PowerShellBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
-    if ($null -ne $InputObject.prodCap) { $state.prodCap = [int]$InputObject.prodCap }
-    if ($null -ne $InputObject.testCap) { $state.testCap = [int]$InputObject.testCap }
+    # Only prodFiles is carried over. Persisted prodCap, testCap, and testFiles keys
+    # come from the removed test-file cap and runtime overrides and are ignored.
+    $state = Get-PowerShellBatchBudgetState -ProdCap $ProdCap
 
     # Persisted entries that resolve outside this root belong to another worktree
     # and are dropped, so a state file carried across worktrees cannot spend this
     # worktree's budget.
     if ($null -ne $InputObject.prodFiles) {
         $state.prodFiles = @(@($InputObject.prodFiles) | Where-Object { Test-PowerShellBatchBudgetPathInRoot -Path $_ -Root $Root })
-    }
-    if ($null -ne $InputObject.testFiles) {
-        $state.testFiles = @(@($InputObject.testFiles) | Where-Object { Test-PowerShellBatchBudgetPathInRoot -Path $_ -Root $Root })
     }
 
     return $state
@@ -261,12 +265,17 @@ function Invoke-PowerShellBatchBudgetDecision {
         [Parameter(Mandatory)]
         [System.Collections.IDictionary] $State,
 
-        [Parameter(Mandatory)]
-        [string] $StateFile,
+        [AllowEmptyString()]
+        [string] $StateFile = '',
 
         [AllowNull()]
         [AllowEmptyString()]
-        [string] $Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
+        [string] $Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
+
+        [switch] $LargePathRoute,
+
+        [AllowEmptyString()]
+        [string] $ObservedRoute = ''
     )
 
     $normalized = $FilePath -replace '\\', '/'
@@ -281,27 +290,32 @@ function Invoke-PowerShellBatchBudgetDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
     }
 
-    $isTestFile = ($normalized -match '(^|/)tests/.*\.ps1$') -or ($normalized -match '\.Tests\.ps1$')
-    $targetList = if ($isTestFile) { @($State.testFiles) } else { @($State.prodFiles) }
-    $cap = if ($isTestFile) { [int]$State.testCap } else { [int]$State.prodCap }
-    $kind = if ($isTestFile) { 'test' } else { 'production' }
-
-    if ($targetList -contains $normalized) {
+    # The orchestrated large path has no production-file cap, so nothing is counted.
+    if ($LargePathRoute) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
     }
 
-    if ($targetList.Count -ge $cap) {
-        $currentFiles = ($targetList -join ', ')
-        $kindUpper = $kind.ToUpperInvariant()
-        $reason = "PowerShell per-batch budget exceeded: $kind file cap is $cap and is already full ($currentFiles). Requested new file: $normalized. Split the work into a new batch, raise the cap via CLAUDE_POWERSHELL_BUDGET_$kindUpper environment variable with approved scope, or reset the batch by deleting $StateFile."
+    # Test files never count toward the routing threshold.
+    $isTestFile = ($normalized -match '(^|/)tests/.*\.ps1$') -or ($normalized -match '\.Tests\.ps1$')
+    if ($isTestFile) {
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
+    }
+
+    $countedFiles = @($State.prodFiles)
+    if ($countedFiles -contains $normalized) {
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
+    }
+
+    $cap = [int]$State.prodCap
+    if ($countedFiles.Count -ge $cap) {
+        Write-Verbose "Denying production PowerShell path '$normalized' in direct mode; counted paths are recorded in '$StateFile'."
+        $counted = $countedFiles -join ', '
+        $route = if ([string]::IsNullOrWhiteSpace($ObservedRoute)) { 'none' } else { $ObservedRoute }
+        $reason = "POWERSHELL_LARGE_PATH_REQUIRED: this change touches more than $cap production PowerShell files (already counted: $counted; requested: $normalized). A change of this size belongs on the orchestrated large path, which has no production-file cap. Route the change through /orchestrate. Checkpoint route observed: $route."
         return Get-PowerShellBatchBudgetBlockDecision -Reason $reason -State $State
     }
 
-    if ($isTestFile) {
-        $State.testFiles = @($State.testFiles) + @($normalized)
-    } else {
-        $State.prodFiles = @($State.prodFiles) + @($normalized)
-    }
+    $State.prodFiles = $countedFiles + @($normalized)
 
     return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $true }
 }
@@ -314,8 +328,14 @@ function Invoke-PowerShellBatchBudgetHook {
         [string] $SessionId = '',
         [string] $Root = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
         [int] $ProdCap = 3,
-        [int] $TestCap = 3,
         [scriptblock] $ReadSessionIdFile = {
+            param([string] $Path)
+            if (Test-Path -LiteralPath $Path -PathType Leaf) {
+                return (Get-Content -LiteralPath $Path -Raw)
+            }
+            return ''
+        },
+        [scriptblock] $ReadCheckpoint = {
             param([string] $Path)
             if (Test-Path -LiteralPath $Path -PathType Leaf) {
                 return (Get-Content -LiteralPath $Path -Raw)
@@ -359,23 +379,41 @@ function Invoke-PowerShellBatchBudgetHook {
         -SessionIdFilePath (Join-Path -Path $stateDir -ChildPath 'current-session-id') `
         -ReadSessionIdFile $ReadSessionIdFile
 
+    $stateFile = Join-Path -Path $stateDir -ChildPath ("powershell-batch-budget.$resolvedSessionId.json")
+
+    # The checkpoint is read before any state operation, so the large path neither
+    # creates the state directory nor reads or writes the state file.
+    $checkpointPath = Join-Path -Path $Root -ChildPath 'artifacts/orchestration/orchestrator-state.json'
+    $checkpointText = ''
+    try {
+        $checkpointText = [string](& $ReadCheckpoint $checkpointPath)
+    } catch {
+        Write-Verbose "Treating unreadable orchestrator checkpoint '$checkpointPath' as direct mode: $($_.Exception.Message)"
+        $checkpointText = ''
+    }
+
+    $isLargePath = Test-BatchBudgetLargePathRoute -CheckpointText $checkpointText
+    $observedRoute = Get-BatchBudgetSelectedRoute -CheckpointText $checkpointText
+    if ($isLargePath) {
+        return Invoke-PowerShellBatchBudgetDecision -FilePath $filePath -State (Get-PowerShellBatchBudgetState -ProdCap $ProdCap) -StateFile $stateFile -Root $Root -LargePathRoute
+    }
+
     if (-not (& $TestPathExists $stateDir)) {
         & $EnsureDirectory $stateDir
     }
 
-    $stateFile = Join-Path -Path $stateDir -ChildPath ("powershell-batch-budget.$resolvedSessionId.json")
-    $state = Get-PowerShellBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
+    $state = Get-PowerShellBatchBudgetState -ProdCap $ProdCap
 
     if (& $TestPathExists $stateFile) {
         try {
             $loaded = & $ReadState $stateFile | ConvertFrom-Json -ErrorAction Stop
-            $state = ConvertTo-PowerShellBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -TestCap $TestCap -Root $Root
+            $state = ConvertTo-PowerShellBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -Root $Root
         } catch {
             Write-Verbose "Ignoring unreadable PowerShell batch-budget state file '$stateFile': $($_.Exception.Message)"
         }
     }
 
-    $decision = Invoke-PowerShellBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile -Root $Root
+    $decision = Invoke-PowerShellBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile -Root $Root -ObservedRoute $observedRoute
     if ($decision.shouldWriteState) {
         try {
             & $WriteState $stateFile $decision.state
@@ -423,16 +461,7 @@ function Invoke-PowerShellBatchBudgetEntryPoint {
     # worktree-derived identifier.
     $sessionId = [string]$env:CLAUDE_SESSION_ID
 
-    $prodCap = 3
-    $testCap = 3
-    if ($env:CLAUDE_POWERSHELL_BUDGET_PROD -match '^\d+$') {
-        $prodCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_PROD
-    }
-    if ($env:CLAUDE_POWERSHELL_BUDGET_TEST -match '^\d+$') {
-        $testCap = [int]$env:CLAUDE_POWERSHELL_BUDGET_TEST
-    }
-
-    $decision = Invoke-PowerShellBatchBudgetHook -ToolInputRaw $ToolInputRaw -SessionId $sessionId -ProdCap $prodCap -TestCap $testCap
+    $decision = Invoke-PowerShellBatchBudgetHook -ToolInputRaw $ToolInputRaw -SessionId $sessionId
     if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
         $decision.Remove('state')
         $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output

@@ -29,9 +29,13 @@
     completion is not asserted, the write is allowed via
     hookSpecificOutput.permissionDecision='allow' (backward compatibility).
 
-    Edit tool calls supply only old_string/new_string (a partial patch) and
-    cannot be reliably validated without the full target file content, so they
-    are allowed by this hook, matching enforce-checkpoint-monotonic.ps1. For
+    Edit tool calls supply only old_string/new_string (a partial patch). An Edit
+    call is validated by reading the checkpoint at the Edit's
+    targeted file_path through the injectable CheckpointReader seam and
+    applying the old_string -> new_string replacement in memory; the resulting
+    content is then evaluated like a Write. When the patch cannot be resolved
+    (the targeted file is missing or empty, the Edit has no old_string, or the
+    old_string is absent from the targeted content), the call is allowed. For
     Write calls whose content is not valid JSON, the hook allows the operation
     and defers to downstream tools to surface the error.
 
@@ -266,10 +270,11 @@ function Resolve-EditedCheckpointContent {
         when the patch cannot be applied against the on-disk checkpoint.
     .DESCRIPTION
         Implements the read-then-validate Edit path. When the tool input carries
-        an old_string (an Edit patch), the on-disk checkpoint is read through the
+        an old_string (an Edit patch), the checkpoint at the caller-supplied
+        CheckpointPath (the Edit's targeted file_path) is read through the
         injectable CheckpointReader seam and the old_string -> new_string
         replacement is applied in memory (no on-disk mutation). Returns $null
-        when there is no old_string, the on-disk file does not exist, or the
+        when there is no old_string, the targeted file does not exist or is empty, or the
         old_string is not present in the on-disk content, signalling the caller
         to allow (defer).
     #>
@@ -281,7 +286,10 @@ function Resolve-EditedCheckpointContent {
         $ToolInput,
 
         [Parameter(Mandatory)]
-        [scriptblock] $CheckpointReader
+        [scriptblock] $CheckpointReader,
+
+        [Parameter(Mandatory)]
+        [string] $CheckpointPath
     )
 
     $oldString = $null
@@ -297,7 +305,7 @@ function Resolve-EditedCheckpointContent {
         $newString = [string]$ToolInput.new_string
     }
 
-    $onDisk = & $CheckpointReader 'artifacts/orchestration/orchestrator-state.json'
+    $onDisk = & $CheckpointReader $CheckpointPath
     if ([string]::IsNullOrEmpty([string]$onDisk)) {
         # The on-disk checkpoint does not exist (or is empty); cannot patch.
         return $null
@@ -363,7 +371,7 @@ function Invoke-CompletionConsistencyDecision {
     # apply the old_string -> new_string patch in memory (read-then-validate).
     $content = Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'content'
     if (-not $content) {
-        $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader
+        $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader -CheckpointPath $filePath
         if (-not $content) {
             # No content, and the Edit could not be resolved against on-disk
             # state (missing file or non-matching patch): defer and allow.
