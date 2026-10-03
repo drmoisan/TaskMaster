@@ -322,10 +322,10 @@ Repository sources (primary for the mechanism, scope, paths and evidence contrac
 - Base runbook adapted for Part A:
   `docs/features/archive/2026-08-04-svg-renderer-null-document-nre-418/runbooks/verify-winforms-designer-load.runbook.md`.
 - Automation feasibility, designer insensitivity, Outlook-host smoke and the latent-bind analysis:
-  `docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973/research/2026-10-02T22-50-stale-binding-redirect-pairs-research.md`
+  `docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973/research/2026-10-02T22-35-stale-binding-redirect-pairs-research.md`
   (sections 4, 5.4, 6 and 8).
 - `System.Linq.AsyncEnumerable` install, restore route, expected output locations and the add-in log
-  check: `docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973/research/2026-10-02T23-40-system-linq-asyncenumerable-install-research.md`
+  check: `docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973/research/2026-10-02T22-53-system-linq-asyncenumerable-install-research.md`
   (sections 8, 11 and Automation Feasibility).
 - Acceptance criterion text: `docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973/issue.md`
   and `spec.md` (Test Strategy).

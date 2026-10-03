@@ -2,7 +2,7 @@
 
 - Date: 2026-10-02
 - Branch: `bug/remaining-stale-binding-redirect-pairs-973`
-- Supplements: `research/2026-10-02T22-50-stale-binding-redirect-pairs-research.md` (section 6, row 2). That file is not edited.
+- Supplements: `research/2026-10-02T22-35-stale-binding-redirect-pairs-research.md` (section 6, row 2). That file is not edited.
 - Scope: research only; no file outside this research directory was modified; nothing staged or committed. Paths are repository-relative to the item worktree unless marked `<main-checkout-root>` (the primary checkout, read only, which carries a restored `packages/` tree; the item worktree has none).
 - Evidence tags: `[V]` verified by Read/Grep/Glob in this session; `[V-web]` verified from api.nuget.org flat-container nuspec, nuget.org, GitHub or learn.microsoft.com in this session; `[I]` inference from verified facts; `[U]` not verified.
 - Tooling note: the Bash tool was disabled in this session, so no `git log`, no DLL metadata read and no restore was performed. Assembly-version facts come from tracked text and from the shipped package XML documentation files in `<main-checkout-root>\packages`.
