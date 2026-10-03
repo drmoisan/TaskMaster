@@ -229,7 +229,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .Equal(expectedFileNames.Split(','));
             attachments
                 .Should()
-                .OnlyContain(x => x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg"));
+                .OnlyContain(x =>
+                    x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg")
+                );
         }
 
         [DataTestMethod]
@@ -282,7 +284,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 .Equal(expectedFileNames.Split(','));
             attachments
                 .Should()
-                .OnlyContain(x => x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg"));
+                .OnlyContain(x =>
+                    x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg")
+                );
         }
 
         // Rooted literal directory used only as an in-memory path value. The injected delegate

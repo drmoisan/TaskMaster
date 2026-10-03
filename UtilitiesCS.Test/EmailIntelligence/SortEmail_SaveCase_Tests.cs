@@ -63,7 +63,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
             YesNoToAllResponse.YesToAll,
             DisplayName = "SaveCase_WhenAnswerIsYesOrYesToAll_SavesToRequestedPath [YesToAll]"
         )]
-        public void SaveCase_WhenAnswerIsYesOrYesToAll_SavesToRequestedPath(YesNoToAllResponse answer)
+        public void SaveCase_WhenAnswerIsYesOrYesToAll_SavesToRequestedPath(
+            YesNoToAllResponse answer
+        )
         {
             // Arrange
             var attachment = new Mock<Attachment>(MockBehavior.Loose);
