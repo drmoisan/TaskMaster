@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 10
 - recolor_generation: 12
-- last_updated: 2026-10-03T02-37
-- next_step: 968 IN FLIGHT (launched 2026-10-03T02-37): poll its worktree for commits and PR; on child DONE confirm headRefOid equals ci_gate.head_sha and no pending CI-dependent ACs, then record ci_green and merge. 964 HALTED at P0-T4 awaiting maintainer decision (promotion-hook false positive; see items[964].execution_halt); do not relaunch without the decision. Remaining unadmitted or unstarted: 959 (cohort 11), 973 (cohort 12), 967 (tier decision).
+- last_updated: 2026-10-03T04-10
+- next_step: 968 HALTED before PR creation awaiting maintainer decision on the S4b_spec_amendment local_execution_overrides entry (see items[968].execution_halt); on authorization, resume the child at S8_pr_authoring. 964 HALTED at P0-T4 awaiting maintainer decision (promotion-hook false positive; see items[964].execution_halt). Remaining unstarted: 959 (cohort 11), 973 (cohort 12); 967 unadmitted (tier decision).
 
 ## Items
 
