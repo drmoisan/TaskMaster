@@ -7,10 +7,10 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - parallel_slug: bugs-2026-09-28
 - mode: open
 - max_concurrency: 16
-- current_cohort: 10
+- current_cohort: 11
 - recolor_generation: 12
-- last_updated: 2026-10-03T09-52
-- next_step: 964 awaiting a decision on related findings CR-5 and O-6 (see items[964].execution_halt.review_decision_pending): remediation cycle 2 then PR, or PR with an explicit exception; on ready state, confirm PR and CI durably and merge first. 959 HALTED at P4-T5 awaiting a maintainer decision on the CMD-DELETE hook block (see items[959].execution_halt); on decision, relaunch the child at P4-T5; merges second. 973 (cohort 12) launches only after its re-preparation commits and pushes a clearance newer than 2026-10-03T00-41; merges third. 967 rejected for this run.
+- last_updated: 2026-10-03T10-08
+- next_step: 959 HALTED at P4-T5 awaiting a maintainer decision (see items[959].execution_halt); 973 (cohort 12) held at plan rev 1.5 for budget. Neither is to be launched, relaunched or resumed without coordinator instruction. 964 worktree cleanup deferred (untracked agent-memory notes).
 
 ## Items
 
@@ -35,7 +35,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/970 | ab14b126cbf065d446aec703c9581a3869baea05 |
 | 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/974 | 94287369908cc920b21b0e3256314f988ad7d2f5 |
 | 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/975 | 993fdd01566dee82e5f37acb761a600feaaa1454 |
-| 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | in_flight | worktree_created |  |  |
+| 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/977 | f8ea1b5dcc6514bc0088bc80965c188bfd717557 |
 | 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | scheduled | not_started |  |  |
 | 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | in_flight | worktree_created |  |  |
 | 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/976 | 5d87e5b8e246869b598fcb2e6101d70eaa8ab8e6 |
@@ -63,7 +63,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 952 | 2026-10-02T01-04 | 2026-10-02T01-06 | 2026-10-02T01-35 |  |
 | 953 | 2026-10-02T02-22 | 2026-10-02T03-05 | 2026-10-02T04-01 |  |
 | 961 | 2026-10-02T03-02 | 2026-10-02T05-05 | 2026-10-02T07-11 |  |
-| 964 | 2026-10-02T21-45 | 2026-10-02T22-18 |  |  |
+| 964 | 2026-10-02T21-45 | 2026-10-02T22-18 | 2026-10-03T10-08 |  |
 | 973 | 2026-10-03T00-46 |  |  |  |
 | 959 | 2026-10-03T00-53 | 2026-10-03T08-19 |  |  |
 | 968 | 2026-10-03T02-34 | 2026-10-03T02-37 | 2026-10-03T07-47 |  |
