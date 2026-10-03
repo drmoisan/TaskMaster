@@ -8,9 +8,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - mode: open
 - max_concurrency: 16
 - current_cohort: 10
-- recolor_generation: 10
-- last_updated: 2026-10-02T22-50
-- next_step: 964 HALTED at P0-T4 awaiting maintainer decision (promotion-hook false positive on the phrase-count pwsh payload; see items[964].execution_halt). On a decision, relaunch the 964 execution child into agent-a3fb26aa2afc7c52c to resume from P0-T4. Remaining unadmitted: 959, 968 (concurrent /parallel-add session), 973, 967 (tier decision).
+- recolor_generation: 12
+- last_updated: 2026-10-03T02-37
+- next_step: 968 IN FLIGHT (launched 2026-10-03T02-37): poll its worktree for commits and PR; on child DONE confirm headRefOid equals ci_gate.head_sha and no pending CI-dependent ACs, then record ci_green and merge. 964 HALTED at P0-T4 awaiting maintainer decision (promotion-hook false positive; see items[964].execution_halt); do not relaunch without the decision. Remaining unadmitted or unstarted: 959 (cohort 11), 973 (cohort 12), 967 (tier decision).
 
 ## Items
 
@@ -36,6 +36,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/974 | 94287369908cc920b21b0e3256314f988ad7d2f5 |
 | 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/975 | 993fdd01566dee82e5f37acb761a600feaaa1454 |
 | 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | in_flight | worktree_created |  |  |
+| 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | scheduled | not_started |  |  |
+| 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | scheduled | not_started |  |  |
+| 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | in_flight | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -61,6 +64,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 953 | 2026-10-02T02-22 | 2026-10-02T03-05 | 2026-10-02T04-01 |  |
 | 961 | 2026-10-02T03-02 | 2026-10-02T05-05 | 2026-10-02T07-11 |  |
 | 964 | 2026-10-02T21-45 | 2026-10-02T22-18 |  |  |
+| 973 | 2026-10-03T00-46 |  |  |  |
+| 959 | 2026-10-03T00-53 |  |  |  |
+| 968 | 2026-10-03T02-34 | 2026-10-03T02-37 |  |  |
 
 ## Cohorts
 
@@ -134,6 +140,31 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 8 | 10 | 953 |
 | 9 | 10 | 961 |
 | 10 | 10 | 964 |
+| 0 | 11 | 882, 927, 928, 930, 931 |
+| 1 | 11 | 929, 940, 942 |
+| 2 | 11 | 944, 945 |
+| 3 | 11 | 941, 951 |
+| 4 | 11 | 947 |
+| 5 | 11 | 956 |
+| 6 | 11 | 948 |
+| 7 | 11 | 950, 952 |
+| 8 | 11 | 953 |
+| 9 | 11 | 961 |
+| 10 | 11 | 964 |
+| 11 | 11 | 973 |
+| 0 | 12 | 882, 927, 928, 930, 931 |
+| 1 | 12 | 929, 940, 942 |
+| 2 | 12 | 944, 945 |
+| 3 | 12 | 941, 951 |
+| 4 | 12 | 947 |
+| 5 | 12 | 956 |
+| 6 | 12 | 948 |
+| 7 | 12 | 950, 952 |
+| 8 | 12 | 953 |
+| 9 | 12 | 961 |
+| 10 | 12 | 964, 968 |
+| 11 | 12 | 959 |
+| 12 | 12 | 973 |
 
 ## Conflict Edges
 
@@ -220,6 +251,46 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 953 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:*/*.csproj (953 live glob; language intersection with this radius) |
 | 956 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:**/SortEmail*.cs (956 live glob; language intersection with this radius) |
 | 961 | 964 | path_overlap | path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact) |
+| 882 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 927 | 973 | path_overlap | path_overlap:.github/workflows/_pester.yml (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 928 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 929 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 930 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 931 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 940 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 941 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 942 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 944 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 945 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 947 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 948 | 973 | path_overlap | path_overlap:.claude/agent-memory/prd-feature/feedback_ac_gates_verify_satisfiability.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 950 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 951 | 973 | path_overlap | path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 952 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 953 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.github/workflows/_pester.yml (exact); path_overlap:scripts/dependencies/BindingRedirectVerification.psm1 (exact); path_overlap:scripts/dependencies/PackageGraph.psm1 (exact); path_overlap:tests/scripts/dependencies/BindingRedirectVerification.Tests.ps1 (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 956 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 961 | 973 | path_overlap | path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:.github/workflows/_pester.yml (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 964 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 940 | 959 | path_overlap | path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_Tests.cs (exact) |
+| 941 | 959 | path_overlap | path_overlap:QuickFiler/Properties/AssemblyInfo.cs (exact) |
+| 945 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_Tests.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs (exact) |
+| 948 | 959 | path_overlap | path_overlap:.claude/agent-memory/prd-feature/feedback_ac_gates_verify_satisfiability.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:UtilitiesCS.Test/EmailIntelligence/OSBrowser_Tests.cs (exact); path_overlap:UtilitiesCS.Test/HelperClasses/ShellUtilities_Tests.cs (exact) |
+| 952 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact) |
+| 953 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:*/*.csproj (953 live glob; language intersection with this radius) |
+| 956 | 959 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:.claude/agent-memory/task-researcher/project_sortemail_split_and_prompt_seam_956.md (exact); path_overlap:UtilitiesCS.Test/EmailIntelligence/SortEmail_TrySaveAttachment_Tests.cs (exact); path_overlap:UtilitiesCS/Dialogs/YesNoToAllPromptSession.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.AttachmentSaving.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.LegacyAttachmentSaving.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.MailItemSort.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.TrySaveAttachment.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.UndoAndMoveLog.cs (exact); path_overlap:UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs (exact); path_overlap:docs/features/active/2026-10-01-sort-email-oversized-with-untestable-io-and-dialog-paths-956/spec.md (exact); path_overlap:**/SortEmail*.cs (956 live glob; language intersection with this radius) |
+| 959 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact) |
+| 959 | 973 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/prd-feature/MEMORY.md (exact); path_overlap:.claude/agent-memory/prd-feature/feedback_ac_gates_verify_satisfiability.md (exact); path_overlap:.claude/agent-memory/task-researcher/MEMORY.md (exact); path_overlap:*/**/*.cs (973 live glob from the main-config union; language intersection with this radius) |
+| 882 | 968 | path_overlap | path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs (exact); path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs (exact) |
+| 927 | 968 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 (exact) |
+| 930 | 968 | path_overlap | path_overlap:UtilitiesCS/Threading/UiThread.cs (exact) |
+| 941 | 968 | path_overlap | path_overlap:FEATURE/spec.md (exact); path_overlap:QuickFiler.Test/QuickFiler.Test.csproj (exact) |
+| 944 | 968 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 (exact) |
+| 948 | 968 | path_overlap | path_overlap:qa-gates/file-line-counts.md (exact); path_overlap:qa-gates/footprint-scope.md (exact); path_overlap:qa-gates/msbuild-analyzer-final.md (exact); path_overlap:qa-gates/msbuild-nullable-final.md (exact); path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 (exact) |
+| 950 | 968 | path_overlap | path_overlap:FEATURE/evidence/other/ac-status-summary.md (exact); path_overlap:QuickFiler.Test/Controllers/QfcDatamodelLivenessTests.cs (exact); path_overlap:QuickFiler.Test/Controllers/QfcDatamodelTeardownTests.cs (exact); path_overlap:QuickFiler.Test/Controllers/QfcInitEmailQueueZeroBatchTests.cs (exact); path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs (exact); path_overlap:QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs (exact); path_overlap:QuickFiler.Test/QuickFiler.Test.csproj (exact); path_overlap:QuickFiler.Test/SetupAssemblyInitializer.cs (exact); path_overlap:QuickFiler/Controllers/QfcDatamodel.cs (exact); path_overlap:QuickFiler/Interfaces/IQfcDatamodel.cs (exact); path_overlap:UtilitiesCS/Threading/UiThread.cs (exact); path_overlap:docs/features/active/2026-09-30-quickfiler-tests-depend-on-wall-clock-timing-950/plan.2026-10-01T07-11.md (exact); path_overlap:qa-gates/post-format-census.md (exact); path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 (exact) |
+| 953 | 968 | path_overlap | path_overlap: glob-only (no shared tracked path; live glob in one radius) |
+| 956 | 968 | path_overlap | path_overlap: glob-only (no shared tracked path; live glob in one radius) |
+| 961 | 968 | path_overlap | path_overlap:scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 (exact) |
+| 968 | 973 | path_overlap | path_overlap: glob-only (no shared tracked path; live glob in one radius) |
 
 ## Mutations
 
@@ -239,6 +310,9 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 953 | 2026-10-02T02-22 |  | scheduled |  | 8 |
 | add | 961 | 2026-10-02T03-02 |  | scheduled |  | 9 |
 | add | 964 | 2026-10-02T21-45 |  | scheduled |  | 10 |
+| add | 973 | 2026-10-03T00-46 |  | scheduled |  | 11 |
+| add | 959 | 2026-10-03T00-53 |  | scheduled |  | 12 |
+| add | 968 | 2026-10-03T02-34 |  | scheduled |  | 12 |
 
 ## Drift Events
 
