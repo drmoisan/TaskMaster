@@ -118,3 +118,120 @@ UNRESOLVED-GAPS: NONE
 DIRECTIVE: PREFLIGHT VALIDATION ONLY
 Executor preflight for this revision has not yet run; the signal below is the planner's request line for the confirming round, not a self-approval and not a discovered defect.
 PREFLIGHT: REVISIONS REQUIRED
+
+## Round-2 delta application (2026-10-02T23-56 deltas)
+
+- Timestamp: 2026-10-03 (session context date; this planning session has no shell clock, so no minute stamp is composed)
+- Plan: plan.2026-10-02T05-42.md (revised in place; version 1.2)
+- Scope of this pass: the eight round-2 deltas of `preflight-round2-report.2026-10-02T23-56.md` applied in place (the "Orchestration action" bullet of defect 8 is not a plan edit and was not applied), followed by the adversarial re-derivation of every line the deltas touched and of its sibling occurrences across the plan.
+- Tooling in this session: Read, Grep, Glob, Edit, Write. No shell; every file and line citation below was re-read from the item worktree.
+- Correction to the report: the defect 5 delta states the post-change `QfcDatamodelTests.cs` `FakeTimeProvider` count as 7 ("five untouched lines plus the same 2"). Re-derivation shows the file carries the token on five lines at baseline (99, 216, 224, 249, 258), not six: line 9 is `using Microsoft.Extensions.Time.Testing;`, which does not contain the substring. One of the five (99) lies inside the replaced sibling test, so four untouched lines plus the two `ArmingFakeTimeProvider` lines give 6. The same directive error made the `QfcDatamodelLivenessTests.cs` baseline 2 in fact 17, P0-T13 and P4-T6; the true value is 1 (line 114). The plan now carries 6, 1 and 5 respectively. Each is a stricter, correct observation; no acceptance criterion is weakened.
+
+SELF-REVIEW: RE-DERIVED THIS PASS
+
+Citations re-derived in this pass (file and line, test or identifier):
+
+1. Plan Delivered Source F-SCOPE — plan lines 227 to 269 inclusive, 43 lines; 342 + 5 (F-FIELDS) + 13 (F-CLASSDOC) + 3 (F-ENSURE-DOC) + 1 (F-ENSURE-BODY) + 11 (F-SCOPE) = 375 (defect 1; F-SCOPE prose, P2-T6, P3-T9).
+2. QuickFiler.Test/Controllers/QfcDatamodelLivenessTests.cs — test 1 declaration 110; `(await pending).Should().BeEmpty();` 163; `/// <summary>Reads the issue #424 producer-liveness flag by reflection.</summary>` 166; `private static QfcDatamodel StartHeldOpenLoader(` 183; test 2 declaration 218. CMD-SPAN-TOKEN-COUNT prints `SPAN: <START line>-<END index>`, and the END index is the END line minus one (R4SPAN `212-284` with END at 285), so the baselines are `110-165` and `183-217`, and `(await pending)` is 1 inside T1-LIVE (defects 2 and 3). `await` inside the span 124, 140, 142, 157, 163 (5); whole-file substring 10 lines (50, 102, 178, 263, 288 added), so fact 17 now says "inside test 1". `[TestMethod]` 109, 217, 240, 276 (4). `FakeTimeProvider` on one line (114); line 9 is `using Microsoft.Extensions.Time.Testing;`.
+3. QuickFiler.Test/Controllers/QfcDatamodelTests.cs — sibling declaration 96; `public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_AddsBelowThresholdCandidate()` 134, so T-SIB prints `96-133`; `FakeTimeProvider` 99, 216, 224, 249, 258 (5; line 9 is the using directive); `fake.Advance` 118, 127, 241, 280 (4); `[TestMethod]` 9; `Task.Yield` 119 only. Post-change: 258 lies before the M3 edit at 261 and 249 before the WaitForQueue test, so 216, 224, 249, 258 are untouched (4) and M-T adds the doc cref and `new ArmingFakeTimeProvider()` (2): 6.
+4. QuickFiler/Controllers/QfcDatamodel.QueueProcessing.cs — `var gate = new QfcStreamingDequeueConfidenceGate(` 299; `QfcGateBatch batch = await gate.DequeueAsync(quantity, timeOut, _token);` 311; GATE-LAMBDA prints `299-310`.
+5. QuickFiler/Controllers/QfcDatamodel.cs — `ForEachAwaitWithCancellationAsync` 431 (comment) and 440 (call), both inside the deleted block 417 to 465, so the baseline is 2 and the post-change value stays 0 (defect 4); `#region` 7 and `#endregion` 7 (32, 105, 107, 154, 156, 184, 186, 267, 269, 467, 469, 472, 474, 493), confirming the P0-T13 values 7, 7 and the post-change 6, 6.
+6. Plan Delivered Source L-T1 and M-T after defect 7 — the doc lines now read `a scheduler yield.` and `a scheduler yield,`; `Task.Yield` substring 0 in each block; `ArmingFakeTimeProvider` lines in L-T1: the doc cref (same line, unchanged by the edit) and `new ArmingFakeTimeProvider()` (2); in M-T: the doc cref on the preceding line and `new ArmingFakeTimeProvider()` (2). `worker,` in the post-change Liveness file: three callers plus the `SynchronousBackgroundWorker worker,` parameter line (4; prose only, not gated).
+7. Plan numstat convention — P1-T3 writes the project-file row as `1<TAB>0` with a literal tab (Grep `reads \`1\t0\``), so the P4-T9 row `1<TAB>129` is written with a literal tab; 128 deleted lines plus the replaced line 369 give 129 deletions and 1 addition, and `--numstat` is independent of hunk grouping (defect 6). P6-T2 restates P4-T9 by reference and its holds-after-formatting clause now names numstat.
+8. Plan occurrence sweep (Grep, before and after editing) — `374` at 271, 1469, 1494 only (all three replaced; none remain); `forty-two` once (replaced); `110-166`, `183-218`, `96-134`, `299-311` at the span-anchor list and P0-T13 only (replaced; the CITATION line `QfcDatamodel.QueueProcessing.cs | ... 299-311` is a line-range citation and is unchanged); `HUNK_COUNT` at the CMD-HUNKS definition, P3-T9 and P8-T27 (TestSupport 2), P5-T12 and P8-T36 (QueueProcessing 2) and P4-T9 (replaced); `FakeTimeProvider` 0 or 5 at 887, 1014, 1528, 1530 only (all replaced); `Task.Yield` 1 at fact 20 (baseline, unchanged), 1014 and 1528 (replaced); `<c>Task.Yield</c>` at 742 and 960 only (replaced); `PRE-IMPLEMENTATION GATE BLOCKED` at D-10 only; `worker,` 3 at 887 only; `no longer names` at 726 only (tightened).
+9. D-10 and the payload-channel convention — re-read; the `PWSH CHANNEL REFUSED` rule is distinct and unchanged; the D-10 sentence now names evidence-file Write and pwsh payload refusals and the `PREIMPLEMENTATION_GATE_BLOCKED` prefix (defect 8).
+10. Plan structure — `\r$` 0 lines before and after editing (LF preserved); nine `### Phase N — ` headings (0 to 8); task IDs unchanged and sequential per phase.
+
+Sibling-region re-checks: P4-T8 and P8-T37 keep `ForEachAwaitWithCancellationAsync` 0 after the change (both lines are in the deleted block). P5-T1 keeps T1-LIVE `Task.Yield` 3, `fake.Advance` 3, `for (int i` 1 and T-SIB `await Task.Yield();` 1 (baseline, unchanged). P4-T6's interim LIV `FakeTimeProvider` is the baseline value and is now 1. The L1 sentence "the file no longer names `FakeTimeProvider`" is now stated as the type, because the substring count is 2 after L3. CMD-ADDED-SCAN gates `await Task.Yield();` and is unaffected by the doc-line edits. The L-T1 gate-token line already read `Task.Yield` 0 and is now accurate for the whole block. P6-T2's "token, span, hunk and numstat value holds after formatting" inherits the P4-T9 numstat row; the TestSupport and QueueProcessing hunk gates are unchanged. The AC31 wording ("contain no `Task.Yield`") is now met by a whole-file count of 0 in both files, not only by the span gates. No acceptance criterion is weakened: the fixture total, the four spans, the `(await pending)` and `ForEachAwaitWithCancellationAsync` baselines and the `FakeTimeProvider` values are corrected observations, and the numstat row replaces an unsatisfiable hunk count with a check that fails on any extra added or removed line.
+
+PLANNER-INTERNAL-REVIEW: PASS
+CITATION-TO-TREE: PASS
+AC-TRACEABILITY: PASS
+SCOPE-BOUNDARY: PASS
+CITATION: QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs | lines 12-31, 34-46, 92-104, 116-138, 146, 231, 243-274, 284-341
+CITATION: QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs | lines 33, 44-98, 107-149, 157-190, 192-276, 285
+CITATION: QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs | lines 27, 98-117, 181-186, 193, 213, 235, 254, 314, 331, 367, 447-478
+CITATION: QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs | lines 85-96, 161-181, 216-239, 251-280, 282-305
+CITATION: QuickFiler.Test/QuickFiler.Test.csproj | lines 17, 35, 155, 157, 161, 183, 196-215, 226-230
+CITATION: QuickFiler.Test/SetupAssemblyInitializer.cs | lines 14-25
+CITATION: QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part2.cs | line 124
+CITATION: QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs | line 203
+CITATION: QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs | line 13
+CITATION: QuickFiler.Test/TestSupport/DedicatedWorkerThread.cs | lines 4, 21
+CITATION: QuickFiler.Test/Controllers/QfcDatamodelLivenessTests.cs | lines 1-14, 18-24, 47-61, 62-87, 100-166, 166-172, 174-209, 211-234, 236-270, 272-310
+CITATION: QuickFiler.Test/Controllers/QfcDatamodelTeardownTests.cs | lines 12, 18-27, 59-74, 180, 220-222
+CITATION: QuickFiler.Test/Controllers/QfcInitEmailQueueZeroBatchTests.cs | lines 12, 23-35, 93-100, 114-128, 136-154, 165-183, 195-230
+CITATION: QuickFiler.Test/Controllers/QfcDatamodelTests.cs | lines 1-14, 95-134, 201-211, 216, 224, 241, 249, 253-283
+CITATION: QuickFiler.Test/Controllers/QfcFormControllerSeamTests.cs | lines 357-367
+CITATION: QuickFiler.Test/Controllers/QfcHomeControllerRunAsyncTests.cs | lines 325, 370-380
+CITATION: QuickFiler/Controllers/QfcDatamodel.cs | lines 25-26, 32, 34-54, 77-105, 107-112, 128-152, 154-156, 184-195, 197-241, 242-269, 271-315, 335-376, 377-416, 417-465, 467-474, 476-493
+CITATION: QuickFiler/Controllers/QfcDatamodel.QueueProcessing.cs | lines 15-24, 37-43, 48-66, 146, 280-291, 299-311, 364, 404-411
+CITATION: QuickFiler/Controllers/QfcDatamodel.FrameBuilding.cs | line 11
+CITATION: QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs | lines 190-301
+CITATION: QuickFiler/Controllers/QfcHomeController.cs | lines 92, 132, 344, 379
+CITATION: QuickFiler/Interfaces/IQfcDatamodel.cs | lines 103, 117, 131, 138-148, 164, 166
+CITATION: QuickFiler/Properties/AssemblyInfo.cs | line 5
+CITATION: QuickFiler/Legacy/IAcceleratorCallbacks.cs | line 5
+CITATION: QuickFiler/Controllers/QfcHighConfidencePreFilter.cs | line 11
+CITATION: QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs | lines 274-286
+CITATION: UtilitiesCS/HelperClasses/ThemeHelpers/Theme.cs | lines 427-445
+CITATION: UtilitiesCS/Threading/UiThread.cs | lines 266-285
+CITATION: UtilitiesCS.Test/TestHelpers/ArmingBarrierTimeProvider.cs | lines 19-54
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.ps1 | lines 89-93, 97-134, 262, 297-298, 348-355, 399-423, 430-453, 459-461
+CITATION: scripts/vscode/Invoke-MSTestWithCoverage.FirstParty.ps1 | lines 117-123
+CITATION: scripts/vscode/TaskMaster.cli.runsettings | lines 4-7
+CITATION: scripts/hygiene/Test-RepositoryHygiene.Rules.ps1 | line 21
+CITATION: scripts/vscode/Install-RepoDotNetSdk.ps1 | line 3
+CITATION: scripts/vscode/Invoke-Restore.ps1 | lines 1-10
+CITATION: .gitignore | lines 26, 140, 141, 146, 150, 151
+CITATION: .gitattributes | line 4
+CITATION: .csharpierignore | lines 4, 12
+CITATION: global.json | lines 2-9
+CITATION: dotnet-tools.json | line 6
+CITATION: docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968/spec.md | lines 6-13, 56-79, 94-108, 138-171, 173-186, 237-270, 274-306, 308-318
+CITATION: docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968/issue.md | lines 12, 65-77
+CITATION: docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968/research/2026-10-02T05-50-dispatcher-pin-call-sites-research.md | sections 1.1, 2.1, 2.2, 3, 4, 5, 6, 7
+CITATION: docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968/research/2026-10-02T22-20-qfc-datamodel-972-fold-research.md | sections 1 to 8 and Numeric Derivation Evidence
+CITATION: docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968/evidence/other/preflight-round1-report.2026-10-02T08-40.md | defects 1 to 10
+CITATION: docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968/evidence/other/preflight-round2-report.2026-10-02T23-56.md | defects 1 to 8
+CITATION: docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968/plan.2026-10-02T05-42.md | lines 7-9, 18-22, 129, 132, 135, 150, 225-271, 726, 732-817, 887, 956-1014, 1293-1296, 1372, 1425, 1448, 1469, 1494, 1509, 1515, 1528-1530, 1554, 1683-1687, 1737-1738 (pre-edit numbering)
+CITATION: docs/features/potential/promoted/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup.md | exists (Glob)
+CITATION: docs/features/potential/promoted/2026-10-02-qfc-datamodel-950-review-residuals.md | exists (Glob)
+AC-INVENTORY: AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC8, AC9, AC10, AC11, AC12, AC13, AC14, AC15, AC16, AC17, AC18, AC19, AC20, AC21, AC22, AC23, AC24, AC25, AC26, AC27, AC28, AC29, AC30, AC31, AC32
+AC-MAPPING: AC1 | IMPLEMENTATION: P1-T1, P2-T1 to P2-T5 | TESTS: P1-T5, P2-T8, P8-T5 | EVIDENCE: FEATURE/evidence/regression-testing/pass-after-pin-count.md
+AC-MAPPING: AC2 | IMPLEMENTATION: P1-T1, P2-T4, P2-T5 | TESTS: P2-T8, P8-T5 | EVIDENCE: FEATURE/evidence/regression-testing/pass-after-pin-count.md
+AC-MAPPING: AC3 | IMPLEMENTATION: P1-T1, P2-T5 | TESTS: P1-T6, P2-T8, P6-T5, P6-T2 | EVIDENCE: FEATURE/evidence/regression-testing/pass-after-pin-count.md
+AC-MAPPING: AC4 | IMPLEMENTATION: P1-T1, P2-T5 | TESTS: P1-T6, P2-T8, P8-T5 | EVIDENCE: FEATURE/evidence/regression-testing/pass-after-pin-count.md
+AC-MAPPING: AC5 | IMPLEMENTATION: P1-T1, P1-T2, P2-T1 to P2-T5 | TESTS: P1-T5, P2-T8 | EVIDENCE: FEATURE/evidence/regression-testing/fail-before-pin-count.md
+AC-MAPPING: AC6 | IMPLEMENTATION: P1-T1 | TESTS: P1-T6, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC7 | IMPLEMENTATION: P3-T3, P3-T4 | TESTS: P6-T6, P6-T2 | EVIDENCE: FEATURE/evidence/regression-testing/focus-and-theme-class-pass-after.md
+AC-MAPPING: AC8 | IMPLEMENTATION: P3-T3, P3-T4, P3-T8 | TESTS: P7-T1, P7-T2 | EVIDENCE: FEATURE/evidence/qa-gates/call-site-census.md
+AC-MAPPING: AC9 | IMPLEMENTATION: P2-T1, P2-T4, P2-T5 | TESTS: P2-T6, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC10 | IMPLEMENTATION: P3-T7, P3-T8 | TESTS: P6-T5, P6-T2 | EVIDENCE: FEATURE/evidence/regression-testing/fixture-class-pass-after.md
+AC-MAPPING: AC11 | IMPLEMENTATION: P2-T2, P2-T3, P2-T5 | TESTS: P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC12 | IMPLEMENTATION: P3-T5 | TESTS: P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC13 | IMPLEMENTATION: P3-T7 | TESTS: P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC14 | IMPLEMENTATION: P3-T8 | TESTS: P6-T5, P6-T2 | EVIDENCE: FEATURE/evidence/regression-testing/fixture-class-pass-after.md
+AC-MAPPING: AC15 | IMPLEMENTATION: P3-T1, P3-T2, P3-T6 | TESTS: P6-T6, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC16 | IMPLEMENTATION: P3-T3, P3-T4 | TESTS: P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC17 | IMPLEMENTATION: P3-T5, P3-T6 | TESTS: P3-T9, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC18 | IMPLEMENTATION: P1-T1 to P5-T11, P6-T1 | TESTS: P8-T8 | EVIDENCE: FEATURE/evidence/qa-gates/file-line-counts.md
+AC-MAPPING: AC19 | IMPLEMENTATION: P1-T1 to P5-T11 | TESTS: P7-T3 | EVIDENCE: FEATURE/evidence/qa-gates/prohibited-constructs-grep.md
+AC-MAPPING: AC20 | IMPLEMENTATION: P6-T9 | TESTS: P8-T9 | EVIDENCE: FEATURE/evidence/qa-gates/footprint-scope.md
+AC-MAPPING: AC21 | IMPLEMENTATION: P1-T2 | TESTS: P1-T4, P8-T5 | EVIDENCE: FEATURE/evidence/qa-gates/coverage-summary.md
+AC-MAPPING: AC22 | IMPLEMENTATION: P8-T1 to P8-T5 | TESTS: P8-T5 | EVIDENCE: FEATURE/evidence/qa-gates/toolchain-final.md
+AC-MAPPING: AC23 | IMPLEMENTATION: P0-T17, P8-T5 | TESTS: P8-T6 | EVIDENCE: FEATURE/evidence/qa-gates/coverage-comparison.md
+AC-MAPPING: AC24 | IMPLEMENTATION: P1-T1 to P3-T8 | TESTS: P6-T7 | EVIDENCE: FEATURE/evidence/regression-testing/concurrent-set-test-summary.md
+AC-MAPPING: AC25 | IMPLEMENTATION: P4-T2 to P4-T6 | TESTS: P4-T11, P6-T8, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC26 | IMPLEMENTATION: P5-T11 | TESTS: P5-T12, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/queue-processing-comment-census.md
+AC-MAPPING: AC27 | IMPLEMENTATION: P4-T1, P4-T8 | TESTS: P4-T10, P8-T3, P8-T4, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/qfc-datamodel-legacy-callers.md
+AC-MAPPING: AC28 | IMPLEMENTATION: P4-T8 | TESTS: P8-T8 | EVIDENCE: FEATURE/evidence/qa-gates/file-line-counts.md
+AC-MAPPING: AC29 | IMPLEMENTATION: P4-T8 | TESTS: P6-T2, P8-T6 | EVIDENCE: FEATURE/evidence/qa-gates/coverage-comparison.md
+AC-MAPPING: AC30 | IMPLEMENTATION: P4-T5, P4-T6, P4-T7, P5-T3, P5-T4 | TESTS: P6-T8, P6-T2 | EVIDENCE: FEATURE/evidence/qa-gates/post-format-census.md
+AC-MAPPING: AC31 | IMPLEMENTATION: P5-T2, P5-T3, P5-T4 | TESTS: P5-T1, P5-T7, P5-T8, P5-T10, P6-T2 | EVIDENCE: FEATURE/evidence/regression-testing/liveness-sensitivity-check.md
+AC-MAPPING: AC32 | IMPLEMENTATION: P4-T2 to P5-T11 | TESTS: P6-T8 | EVIDENCE: FEATURE/evidence/regression-testing/datamodel-set-test-summary.md
+UNRESOLVED-GAPS: NONE
+
+DIRECTIVE: PREFLIGHT VALIDATION ONLY
+Executor preflight for this revision has not yet run; the signal below is the planner's request line for the confirming round, not a self-approval and not a discovered defect.
+PREFLIGHT: REVISIONS REQUIRED
