@@ -7,10 +7,10 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - parallel_slug: bugs-2026-09-28
 - mode: open
 - max_concurrency: 16
-- current_cohort: 9
-- recolor_generation: 9
-- last_updated: 2026-10-02T07-11
-- next_step: PAUSED by maintainer directive (both accounts near five-hour limit). 961 merged as 993fdd015 (PR 975). Non-terminal items: []. On resume: launch admitted items up to max_concurrency 16 as barriers clear; related-defect directive applies to every child prompt; 961 child may still push a CI-evidence commit to its merged branch (not on main). Worktree cleanup deferred.
+- current_cohort: 10
+- recolor_generation: 10
+- last_updated: 2026-10-02T22-18
+- next_step: 964 in flight (execution child, opus, non-isolated in agent-a3fb26aa2afc7c52c). On child DONE: confirm PR state, headRefOid equals the reported ci_gate.head_sha, all required checks green on that head and head contains current main, then merge and regenerate parallel-status.md. Remaining unadmitted: 959, 968 (concurrent /parallel-add session), 973, 967 (tier decision).
 
 ## Items
 
@@ -35,6 +35,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 952 | docs/features/active/2026-09-30-dependabot-repair-runbook-and-workflow-comment-wording-952 | 7 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/970 | ab14b126cbf065d446aec703c9581a3869baea05 |
 | 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/974 | 94287369908cc920b21b0e3256314f988ad7d2f5 |
 | 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/975 | 993fdd01566dee82e5f37acb761a600feaaa1454 |
+| 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | in_flight | worktree_created |  |  |
 
 ## Item Lifecycle Timestamps
 
@@ -59,6 +60,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 952 | 2026-10-02T01-04 | 2026-10-02T01-06 | 2026-10-02T01-35 |  |
 | 953 | 2026-10-02T02-22 | 2026-10-02T03-05 | 2026-10-02T04-01 |  |
 | 961 | 2026-10-02T03-02 | 2026-10-02T05-05 | 2026-10-02T07-11 |  |
+| 964 | 2026-10-02T21-45 | 2026-10-02T22-18 |  |  |
 
 ## Cohorts
 
@@ -121,6 +123,17 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 7 | 9 | 950, 952 |
 | 8 | 9 | 953 |
 | 9 | 9 | 961 |
+| 0 | 10 | 882, 927, 928, 930, 931 |
+| 1 | 10 | 929, 940, 942 |
+| 2 | 10 | 944, 945 |
+| 3 | 10 | 941, 951 |
+| 4 | 10 | 947 |
+| 5 | 10 | 956 |
+| 6 | 10 | 948 |
+| 7 | 10 | 950, 952 |
+| 8 | 10 | 953 |
+| 9 | 10 | 961 |
+| 10 | 10 | 964 |
 
 ## Conflict Edges
 
@@ -198,6 +211,15 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 952 | 961 | path_overlap | path_overlap:.github/workflows/*.yml ~ .github/workflows/README.md (952 glob; exact shared .github/workflows/README.md) |
 | 953 | 961 | path_overlap | path_overlap:.github/workflows/_pester.yml (exact; read citation on both sides); path_overlap:*/*.csproj (953 live glob; language intersection with this radius) |
 | 956 | 961 | path_overlap | path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:**/SortEmail*.cs (956 live glob; language intersection with this radius) |
+| 942 | 964 | path_overlap | path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs (exact); path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs (exact); path_overlap:TaskMaster.Test/TaskMaster.Test.csproj (exact); path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs (exact); path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs (exact) |
+| 944 | 964 | path_overlap | path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs (exact); path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs (exact); path_overlap:TaskMaster.Test/TaskMaster.Test.csproj (exact); path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs (exact); path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs (exact); path_overlap:TaskMaster/TaskMaster.csproj (exact) |
+| 945 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact) |
+| 947 | 964 | path_overlap | path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs (exact); path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs (exact); path_overlap:TaskMaster.Test/TaskMaster.Test.csproj (exact); path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs (exact); path_overlap:TaskMaster/Ribbon/RibbonCommandBoundary.cs (exact); path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs (exact); path_overlap:TaskMaster/TaskMaster.csproj (exact) |
+| 948 | 964 | path_overlap | path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs (exact); path_overlap:TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs (exact); path_overlap:TaskMaster.Test/TaskMaster.Test.csproj (exact); path_overlap:TaskMaster/Ribbon/EngineTogglePressedStateCache.cs (exact); path_overlap:TaskMaster/Ribbon/EngineToggleStateCoordinator.cs (exact); path_overlap:TaskMaster/Ribbon/RibbonController.EngineCommands.cs (exact); path_overlap:TaskMaster/TaskMaster.csproj (exact) |
+| 952 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact) |
+| 953 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:*/*.csproj (953 live glob; language intersection with this radius) |
+| 956 | 964 | path_overlap | path_overlap:.claude/agent-memory/atomic-planner/MEMORY.md (exact); path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact); path_overlap:**/SortEmail*.cs (956 live glob; language intersection with this radius) |
+| 961 | 964 | path_overlap | path_overlap:.claude/agent-memory/orchestrator/MEMORY.md (exact) |
 
 ## Mutations
 
@@ -216,6 +238,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 952 | 2026-10-02T01-04 |  | scheduled |  | 7 |
 | add | 953 | 2026-10-02T02-22 |  | scheduled |  | 8 |
 | add | 961 | 2026-10-02T03-02 |  | scheduled |  | 9 |
+| add | 964 | 2026-10-02T21-45 |  | scheduled |  | 10 |
 
 ## Drift Events
 
