@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 11
 - recolor_generation: 12
-- last_updated: 2026-10-03T10-08
-- next_step: 959 HALTED at P4-T5 awaiting a maintainer decision (see items[959].execution_halt); 973 (cohort 12) held at plan rev 1.5 for budget. Neither is to be launched, relaunched or resumed without coordinator instruction. 964 worktree cleanup deferred (untracked agent-memory notes).
+- last_updated: 2026-10-03T10-36
+- next_step: Drive 959 and 973 to merge in fixed order 959 then 973: on each PR record pr_number, update the branch if BEHIND, confirm CI green on the exact head, merge with the merge-commit method and head match, confirm issue closure (959 also closes 966). 959 executes under its own orchestrator (observe only). 964 worktree cleanup deferred (untracked agent-memory notes).
 
 ## Items
 
@@ -36,7 +36,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 953 | docs/features/active/2026-08-04-stale-fizzler-and-unsafe-binding-redirects-953 | 8 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/974 | 94287369908cc920b21b0e3256314f988ad7d2f5 |
 | 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/975 | 993fdd01566dee82e5f37acb761a600feaaa1454 |
 | 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/977 | f8ea1b5dcc6514bc0088bc80965c188bfd717557 |
-| 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | scheduled | not_started |  |  |
+| 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | in_flight | worktree_created |  |  |
 | 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | in_flight | worktree_created |  |  |
 | 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/976 | 5d87e5b8e246869b598fcb2e6101d70eaa8ab8e6 |
 
@@ -64,7 +64,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 953 | 2026-10-02T02-22 | 2026-10-02T03-05 | 2026-10-02T04-01 |  |
 | 961 | 2026-10-02T03-02 | 2026-10-02T05-05 | 2026-10-02T07-11 |  |
 | 964 | 2026-10-02T21-45 | 2026-10-02T22-18 | 2026-10-03T10-08 |  |
-| 973 | 2026-10-03T00-46 |  |  |  |
+| 973 | 2026-10-03T00-46 | 2026-10-03T10-36 |  |  |
 | 959 | 2026-10-03T00-53 | 2026-10-03T08-19 |  |  |
 | 968 | 2026-10-03T02-34 | 2026-10-03T02-37 | 2026-10-03T07-47 |  |
 
