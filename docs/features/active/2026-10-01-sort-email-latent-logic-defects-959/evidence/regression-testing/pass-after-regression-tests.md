@@ -83,3 +83,66 @@ RESULT SaveCaseAsync_WhenAnswerIsNoAndAltNameAnswerIsYes_SavesToAlternatePathAnd
 3. The fifty-five RESULT rows are exactly the union of NAMES-TST1-FINAL, NAMES-T12, NAMES-TSC-FINAL, NAMES-TAS-FINAL and NAMES-TUL, each = Passed (the same 55 names as the P4-T12 run, which was verified against the union): met.
 4. RUNSETTINGS-HASH-NOW equals RUNSETTINGS-HASH (98EF03A8D3B0EBB2ED7A765E3B5E1B58E774D20202DF2F294C03A7260B9CEF57, P0-T4): met.
 5. Every SANDBOX- value is False and SEQUENCE_FILES: 0: met.
+
+## QuickFiler.Test (P6-T6)
+
+Timestamp: 2026-10-03T12-40
+ITERATION: 1
+Command: CMD-VSTEST (ASSEMBLY-QFT QuickFiler.Test\bin\Debug\QuickFiler.Test.dll, FILTER-EFC-CLEANUP, TASKID p6-t6) and CMD-VSTEST (ASSEMBLY-QFT, FILTER-EFC-ARCHIVE, TASKID p6-t6-archive), each vstest.console.exe with "/Settings:scripts\vscode\TaskMaster.cli.runsettings" /InIsolation and the trx logger, resolved through vswhere
+
+- CLEANUP-VSTEST_EXIT_CODE: 0
+- ARCHIVE-VSTEST_EXIT_CODE: 0
+
+Cleanup run (p6-t6):
+
+```
+RUNSETTINGS-HASH-NOW: 98EF03A8D3B0EBB2ED7A765E3B5E1B58E774D20202DF2F294C03A7260B9CEF57
+SANDBOX-959-EXISTS-BEFORE: False
+SANDBOX-956-EXISTS-BEFORE: False
+SANDBOX-945-EXISTS-BEFORE: False
+VSTEST_EXIT_CODE: 0
+SANDBOX-959-EXISTS-AFTER: False
+SANDBOX-956-EXISTS-AFTER: False
+SANDBOX-945-EXISTS-AFTER: False
+TRX_PRESENT: True
+SEQUENCE_FILES: 0
+COUNTERS total=3 executed=3 passed=3 failed=0
+RESULT_COUNT: 3
+RESULT MoveToFolderAsync_WhenFilerThrows_ResetsPromptStateAndPropagates = Passed
+RESULT MoveToFolderAsync_WhenAGuardReturnsFalse_DoesNotResetPromptState = Passed
+RESULT MoveToFolderAsync_WhenFilerSucceeds_ResetsPromptStateOnce = Passed
+```
+
+Archive run (p6-t6-archive):
+
+```
+RUNSETTINGS-HASH-NOW: 98EF03A8D3B0EBB2ED7A765E3B5E1B58E774D20202DF2F294C03A7260B9CEF57
+SANDBOX-959-EXISTS-BEFORE: False
+SANDBOX-956-EXISTS-BEFORE: False
+SANDBOX-945-EXISTS-BEFORE: False
+VSTEST_EXIT_CODE: 0
+SANDBOX-959-EXISTS-AFTER: False
+SANDBOX-956-EXISTS-AFTER: False
+SANDBOX-945-EXISTS-AFTER: False
+TRX_PRESENT: True
+SEQUENCE_FILES: 0
+COUNTERS total=11 executed=11 passed=11 failed=0
+RESULT_COUNT: 11
+RESULT MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates = Passed
+RESULT MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing = Passed
+RESULT OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns = Passed
+RESULT MoveToFolderAsync_WhenArchiveRootIsCrossStoreUnresolvable_ReturnsFalseInsteadOfThrowing = Passed
+RESULT OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns = Passed
+RESULT MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot = Passed
+RESULT ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress = Passed
+RESULT OpenFsFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot = Passed
+RESULT MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot = Passed
+RESULT MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce = Passed
+RESULT OpenOlFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot = Passed
+```
+
+### Acceptance (P6-T6, all three required)
+
+1. CLEANUP-VSTEST_EXIT_CODE: 0 with COUNTERS total=3 executed=3 passed=3 failed=0 and the rows exactly NAMES-TEF, each = Passed: met.
+2. ARCHIVE-VSTEST_EXIT_CODE: 0 with COUNTERS total=11 executed=11 passed=11 failed=0 and the rows exactly NAMES-EFC-ARCHIVE, each = Passed: met.
+3. Every SANDBOX- value is False: met.
