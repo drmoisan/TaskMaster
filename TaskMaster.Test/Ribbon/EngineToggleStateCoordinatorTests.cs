@@ -411,7 +411,11 @@ namespace TaskMaster.Test.Ribbon
                         Invalidations.Add(controlId);
                         OnInvalidate?.Invoke(controlId);
                     },
-                    message => Notifications.Add(message),
+                    message =>
+                    {
+                        Notifications.Add(message);
+                        OnNotify?.Invoke(message);
+                    },
                     (message, exception) =>
                     {
                         Errors.Add(new LoggedError(message, exception));
@@ -443,6 +447,13 @@ namespace TaskMaster.Test.Ribbon
             /// state at the exact moment a fault is reported.
             /// </summary>
             internal Action<string, Exception> OnLogError { get; set; }
+
+            /// <summary>
+            /// An optional extra observer invoked from inside the notification sink, immediately
+            /// after the message has been appended to <see cref="Notifications"/>, so a throwing
+            /// hook both records the attempt and models a throwing notification sink.
+            /// </summary>
+            internal Action<string> OnNotify { get; set; }
 
             internal List<string> Invalidations { get; } = new List<string>();
 

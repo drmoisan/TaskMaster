@@ -361,6 +361,7 @@
     <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.PrimeRegistration.cs" />
     <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.ThrowingSink.cs" />
     <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.RepeatFaultSuppression.cs" />
+    <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.SinkGuard.cs" />
     <Compile Include="Ribbon\EngineTogglePressedStateCacheTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
