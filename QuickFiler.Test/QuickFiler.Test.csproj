@@ -125,6 +125,7 @@
     <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />
+    <Compile Include="Controllers\EfcDataModelFilerCleanupTests.cs" />
     <Compile Include="Controllers\EfcDataModelIssue792CarryTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.Part2.cs" />
