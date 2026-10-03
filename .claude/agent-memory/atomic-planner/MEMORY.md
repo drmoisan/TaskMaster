@@ -2,6 +2,7 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#959 R6](project_959_r6_cs1769_embedded_interop_generic_seam_and_per_task_commit_gates.md) — CS1769: `Func<Attachment,...>` cannot cross UtilitiesCS (EmbedInteropTypes True) to its test project; use a nested non-generic delegate, add a census state column instead of editing executed columns; per-task commits: own-edit gates keep the working-tree `MERGE-BASE` form, earlier-task gates use `MERGE-BASE HEAD`, porcelain is pre-commit only
 - [#959 R5](project_959_r5_bash_dedoubles_backslashes_in_pwsh_command_payloads.md) — Bash de-doubles `\\` in a pwsh -Command payload (`[\\/]` becomes `[\/]`, zero-count gate over backslash paths unsatisfiable); normalize with `[char]92` + forward-slash pattern, add True/False controls, whole-plan `\\` sweep classifying payload vs Listing vs prose
 - [#959 R4](project_959_r4_shared_anchor_controls_native_exit_labels_and_schema_rows_first_seams.md) — a control must share the predicate's `$anchor` variable and have a positive twin; every native call needs its own `$LASTEXITCODE` label (not-found leaves 0); schema rows first (first occurrence wins); loop-rule "edit only spec.md" must name the repair branch
 - [#959 R3](project_959_r3_checkoff_evidence_precedes_edit_and_line_anchored_field_check_seams.md) — a check-off must run its gate before the Edit and forward-record it; `Contains("EXIT_CODE:")` matches `FORMAT_EXIT_CODE:` (anchor `(?m)^[^\w\r\n]*` + printed False control); task row enumerations drop the plain `EXIT_CODE:` row
