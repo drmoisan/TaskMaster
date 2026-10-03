@@ -6,10 +6,10 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler.Test.TestSupport;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -43,21 +43,6 @@ namespace QuickFiler.Controllers.Tests
                 .NotBeNull($"private field '{name}' should exist on {target.GetType().Name}");
             field.SetValue(target, value);
         }
-
-        /// <summary>
-        /// Test-side worker whose <see cref="RaiseDoWork"/> raises <c>DoWork</c> synchronously on
-        /// the calling thread through the protected <c>OnDoWork</c>, so the privately subscribed
-        /// <c>Worker_DoWork</c> runs to its first incomplete await before <c>InitEmailQueue</c>
-        /// returns. Issue #950: this replaces the bounded waits on a thread-pool worker.
-        /// </summary>
-        private sealed class SynchronousBackgroundWorker : BackgroundWorker
-        {
-            public void RaiseDoWork() => OnDoWork(new DoWorkEventArgs(null));
-        }
-
-        /// <summary>The synchronous starter assigned to <c>QfcDatamodel.WorkerStarter</c>.</summary>
-        private static void StartSynchronously(BackgroundWorker worker) =>
-            ((SynchronousBackgroundWorker)worker).RaiseDoWork();
 
         /// <summary>
         /// Queues posted continuations and runs them only on an explicit <see cref="Drain"/> call,
@@ -105,14 +90,21 @@ namespace QuickFiler.Controllers.Tests
         /// <c>sourceActive</c> signal consumed that dishonest value, so an empty queue was mistaken
         /// for an exhausted one and the gate returned an early partial batch. The datamodel-owned
         /// <c>volatile bool</c> flag makes the signal truthful.
+        /// <para>
+        /// Issue #968: every step waits on an explicit signal instead of a clock advance followed by
+        /// a scheduler yield. <see cref="ArmingFakeTimeProvider.Armed"/> proves the gate armed its
+        /// next wait; the dequeue task itself is the completion signal; the production awaits are
+        /// registered with no synchronization context installed, so the loader's completion clears
+        /// the flag inline and is read back before the final advance. No retry loop remains.
+        /// </para>
         /// </summary>
         [TestMethod]
         public async Task DequeueNextItemGroupAsync_WhileLoaderStillProducing_KeepsPollingAfterWorkerIdle()
         {
             // Arrange
             var model = CreateUninitializedDatamodel();
-            var fake = new FakeTimeProvider();
-            model.TimeProvider = fake;
+            var clock = new ArmingFakeTimeProvider();
+            model.TimeProvider = clock;
             SetPrivateField(model, "_globals", CreateHighConfidenceGlobals());
             SetPrivateField(model, "_masterQueue", new LockingLinkedList<MailItem>());
 
@@ -124,43 +116,59 @@ namespace QuickFiler.Controllers.Tests
                 return await loaderRelease.Task;
             };
 
-            var worker = new SynchronousBackgroundWorker();
-            model.WorkerStarter = StartSynchronously;
-
-            // Act — the issue #244 zero-batch short-circuit is COM-free and starts the worker
-            // through the issue #950 seam, which raises DoWork on this thread.
-            model.InitEmailQueue(0, worker);
-
-            loaderEntered
-                .Task.IsCompleted.Should()
-                .BeTrue("the synchronous starter must reach the injected RemainingEmailLoader");
-
-            Task<IList<MailItem>> pending = model.DequeueNextItemGroupAsync(1, 200);
-            fake.Advance(TimeSpan.FromMilliseconds(200));
-            await Task.Yield();
-            fake.Advance(TimeSpan.FromMilliseconds(200));
-            await Task.Yield();
-
-            // Assert
-            pending
-                .IsCompleted.Should()
-                .BeFalse(
-                    "the loader is still producing, so the gate must keep polling rather than treat "
-                        + "an empty queue as an exhausted source and return an early partial batch"
-                );
-
-            // Cleanup — release the loader and let the dequeue drain on the honest signal.
-            loaderRelease.SetResult(true);
-            for (int i = 0; i < 20 && !pending.IsCompleted; i++)
+            using (var worker = new SynchronousBackgroundWorker())
             {
-                fake.Advance(TimeSpan.FromMilliseconds(200));
-                await Task.Yield();
-            }
+                model.WorkerStarter = SynchronousBackgroundWorker.StartSynchronously;
+                Task<IList<MailItem>> pending;
+                using (NoSynchronizationContext())
+                {
+                    // The issue #244 zero-batch short-circuit is COM-free and starts the worker
+                    // through the issue #950 seam, which raises DoWork on this thread.
+                    model.InitEmailQueue(0, worker);
+                    loaderEntered
+                        .Task.IsCompleted.Should()
+                        .BeTrue(
+                            "the synchronous starter must reach the injected RemainingEmailLoader"
+                        );
+                    pending = model.DequeueNextItemGroupAsync(1, 200);
+                }
 
-            pending
-                .IsCompleted.Should()
-                .BeTrue("once the loader completes, the gate exits on genuine exhaustion");
-            (await pending).Should().BeEmpty();
+                clock
+                    .Armed.IsCompleted.Should()
+                    .BeTrue(
+                        "the gate arms its first empty-queue wait before the dequeue call returns"
+                    );
+                clock.ReArm();
+
+                // Act — the first wait expires while the loader is still producing.
+                clock.Advance(TimeSpan.FromMilliseconds(200));
+                Task first = await Task.WhenAny(clock.Armed, pending);
+
+                // Assert
+                first
+                    .Should()
+                    .BeSameAs(
+                        clock.Armed,
+                        "the loader is still producing, so the gate must arm a second wait rather than "
+                            + "treat an empty queue as an exhausted source and return an early partial batch"
+                    );
+                pending.IsCompleted.Should().BeFalse("the gate re-armed instead of returning");
+
+                // Cleanup — complete the loader; with no captured context its continuations run
+                // inline and clear the flag before this call returns.
+                using (NoSynchronizationContext())
+                {
+                    loaderRelease.SetResult(true);
+                }
+
+                ReadLivenessFlag(model)
+                    .Should()
+                    .BeFalse("the loader's completion must clear the flag before the next poll");
+                clock.Advance(TimeSpan.FromMilliseconds(200));
+                (await pending)
+                    .Should()
+                    .BeEmpty("once the loader completes, the gate exits on genuine exhaustion");
+            }
         }
 
         /// <summary>Reads the issue #424 producer-liveness flag by reflection.</summary>
@@ -172,15 +180,36 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Starts the worker with a <c>RemainingEmailLoader</c> held open by
+        /// Issue #968. Clears <see cref="SynchronizationContext.Current"/> on the calling thread for the
+        /// lifetime of the returned scope and restores the previous value on dispose, so every
+        /// production await registered inside the scope captures no context and its continuation runs
+        /// inline on the completing thread. The scope body must contain no <c>await</c>: the restore
+        /// has to run on the same thread that took the scope.
+        /// </summary>
+        private static IDisposable NoSynchronizationContext() => new SynchronizationContextScope();
+
+        private sealed class SynchronizationContextScope : IDisposable
+        {
+            private readonly SynchronizationContext _previous = SynchronizationContext.Current;
+
+            internal SynchronizationContextScope() =>
+                SynchronizationContext.SetSynchronizationContext(null);
+
+            public void Dispose() => SynchronizationContext.SetSynchronizationContext(_previous);
+        }
+
+        /// <summary>
+        /// Starts <paramref name="worker"/> with a <c>RemainingEmailLoader</c> held open by
         /// <paramref name="release"/>. The issue #950 synchronous starter raises <c>DoWork</c> on
         /// this thread, so by the time <c>InitEmailQueue</c> returns the async void
         /// <c>Worker_DoWork</c> has entered the loader and returned at its first incomplete await.
         /// <paramref name="release"/> runs its continuations asynchronously, so a test that has
         /// installed <c>DrainableSynchronizationContext</c> observes the resumed loader only
-        /// through <c>Drain</c>, never inline inside <c>SetResult</c>.
+        /// through <c>Drain</c>, never inline inside <c>SetResult</c>. The caller owns and disposes
+        /// the worker (issue #968, folding issue #972 item 4).
         /// </summary>
         private static QfcDatamodel StartHeldOpenLoader(
+            SynchronousBackgroundWorker worker,
             Func<TaskCompletionSource<bool>, Task<bool>> loaderBody,
             out TaskCompletionSource<bool> release
         )
@@ -198,8 +227,7 @@ namespace QuickFiler.Controllers.Tests
                 return loaderBody(localRelease);
             };
 
-            var worker = new SynchronousBackgroundWorker();
-            model.WorkerStarter = StartSynchronously;
+            model.WorkerStarter = SynchronousBackgroundWorker.StartSynchronously;
             model.InitEmailQueue(0, worker);
 
             entered
@@ -217,20 +245,24 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public void RemainingLoadActive_AcrossAsyncVoidFirstAwait_StaysTrueWhileLoaderProduces()
         {
-            // Arrange / Act
-            QfcDatamodel model = StartHeldOpenLoader(
-                signal => signal.Task,
-                out TaskCompletionSource<bool> release
-            );
-
-            // Assert
-            ReadLivenessFlag(model)
-                .Should()
-                .BeTrue(
-                    "the producer is still live even though the async void handler already returned"
+            using (var worker = new SynchronousBackgroundWorker())
+            {
+                // Arrange / Act
+                QfcDatamodel model = StartHeldOpenLoader(
+                    worker,
+                    signal => signal.Task,
+                    out TaskCompletionSource<bool> release
                 );
 
-            release.SetResult(true);
+                // Assert
+                ReadLivenessFlag(model)
+                    .Should()
+                    .BeTrue(
+                        "the producer is still live even though the async void handler already returned"
+                    );
+
+                release.SetResult(true);
+            }
         }
 
         /// <summary>
@@ -246,22 +278,26 @@ namespace QuickFiler.Controllers.Tests
             SynchronizationContext.SetSynchronizationContext(pump);
             try
             {
-                QfcDatamodel model = StartHeldOpenLoader(
-                    signal => signal.Task,
-                    out TaskCompletionSource<bool> release
-                );
-                ReadLivenessFlag(model).Should().BeTrue("the loader has not completed yet");
-
-                // Act
-                release.SetResult(true);
-                pump.Drain();
-
-                // Assert
-                ReadLivenessFlag(model)
-                    .Should()
-                    .BeFalse(
-                        "the finally around the awaited loader must clear the flag once it completes"
+                using (var worker = new SynchronousBackgroundWorker())
+                {
+                    QfcDatamodel model = StartHeldOpenLoader(
+                        worker,
+                        signal => signal.Task,
+                        out TaskCompletionSource<bool> release
                     );
+                    ReadLivenessFlag(model).Should().BeTrue("the loader has not completed yet");
+
+                    // Act
+                    release.SetResult(true);
+                    pump.Drain();
+
+                    // Assert
+                    ReadLivenessFlag(model)
+                        .Should()
+                        .BeFalse(
+                            "the finally around the awaited loader must clear the flag once it completes"
+                        );
+                }
             }
             finally
             {
@@ -282,26 +318,30 @@ namespace QuickFiler.Controllers.Tests
             SynchronizationContext.SetSynchronizationContext(pump);
             try
             {
-                QfcDatamodel model = StartHeldOpenLoader(
-                    async signal =>
-                    {
-                        await signal.Task;
-                        throw new InvalidOperationException("loader failed");
-                    },
-                    out TaskCompletionSource<bool> release
-                );
-                ReadLivenessFlag(model).Should().BeTrue("the loader has not failed yet");
-
-                // Act
-                release.SetResult(true);
-                pump.Drain();
-
-                // Assert
-                ReadLivenessFlag(model)
-                    .Should()
-                    .BeFalse(
-                        "the finally must clear the flag on the throwing path too, or the gate would poll forever"
+                using (var worker = new SynchronousBackgroundWorker())
+                {
+                    QfcDatamodel model = StartHeldOpenLoader(
+                        worker,
+                        async signal =>
+                        {
+                            await signal.Task;
+                            throw new InvalidOperationException("loader failed");
+                        },
+                        out TaskCompletionSource<bool> release
                     );
+                    ReadLivenessFlag(model).Should().BeTrue("the loader has not failed yet");
+
+                    // Act
+                    release.SetResult(true);
+                    pump.Drain();
+
+                    // Assert
+                    ReadLivenessFlag(model)
+                        .Should()
+                        .BeFalse(
+                            "the finally must clear the flag on the throwing path too, or the gate would poll forever"
+                        );
+                }
             }
             finally
             {

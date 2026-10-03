@@ -96,24 +96,6 @@ namespace QuickFiler.Controllers.Tests
             return controller;
         }
 
-        private static Mock<IItemViewer> BuildExecutingViewer()
-        {
-            var viewer = new Mock<IItemViewer>();
-            viewer
-                .Setup(v => v.Invoke(It.IsAny<Delegate>()))
-                .Returns((Delegate d) => d.DynamicInvoke());
-            viewer
-                .Setup(v => v.BeginInvoke(It.IsAny<Delegate>()))
-                .Returns(
-                    (Delegate d) =>
-                    {
-                        d.DynamicInvoke();
-                        return Mock.Of<IAsyncResult>();
-                    }
-                );
-            return viewer;
-        }
-
         /// <summary>
         /// Cycle-4 remediation (R1): reflection-injects handle-less doubles for every private field
         /// touched by <see cref="Theme.SetQfcTheme(bool)"/> (<c>Theme.cs:414-432</c>) and the recursive
@@ -179,18 +161,19 @@ namespace QuickFiler.Controllers.Tests
 
         // ------------------------- ToggleFocus / ToggleFocus(ToggleState) -------------------------
         // Cycle-3 P9-T5/P9-T6 (members #33/#35, de-exempted); cycle-4 remediation R1: the entire body
-        // runs inside a single _itemViewer.Invoke(...) delegate. BuildExecutingViewer() executes the
-        // delegate synchronously and EnableHandlelessThemeInvoke() populates the terminal
-        // _themes[_activeTheme].SetQfcTheme(async: false) call's dependencies with handle-less doubles,
-        // so these tests exercise the full method body (the _activeUI/_activeTheme state machine) and
-        // assert the resulting state transitions, not merely the Invoke marshal.
+        // runs inside a single _itemViewer.Invoke(...) delegate. The shared
+        // QfcItemControllerTestSupport.BuildExecutingViewer() executes the delegate synchronously
+        // (issue #968 removed this file's private copy) and EnableHandlelessThemeInvoke() populates
+        // the terminal _themes[_activeTheme].SetQfcTheme(async: false) call's dependencies with
+        // handle-less doubles, so these tests exercise the full method body (the _activeUI/_activeTheme
+        // state machine) and assert the resulting state transitions, not merely the Invoke marshal.
 
         [TestMethod]
         public void ToggleFocus_StateOverload_MarshalsThroughItemViewerInvoke()
         {
             // Arrange — _tableLayoutPanels (QfcItemController's own field, distinct from Theme's field
             // of the same name) is dereferenced by ToggleTips inside the executed delegate body.
-            var viewer = BuildExecutingViewer();
+            var viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
             var controller = BuildFocusController();
             SetField(controller, "_itemViewer", viewer.Object);
             SetField(controller, "_tableLayoutPanels", new List<TableLayoutPanel>());
@@ -210,7 +193,7 @@ namespace QuickFiler.Controllers.Tests
         public void ToggleFocus_StateOverload_Off_FromActive_DeactivatesUiAndSwitchesToNormalTheme()
         {
             // Arrange
-            var viewer = BuildExecutingViewer();
+            var viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
             var controller = BuildFocusController();
             SetField(controller, "_itemViewer", viewer.Object);
             SetField(controller, "_activeUI", true);
@@ -232,7 +215,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange — BuildFocusController() leaves _activeUI at its default false, so this reaches
             // the inactive->active branch.
-            var viewer = BuildExecutingViewer();
+            var viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
             var controller = BuildFocusController();
             SetField(controller, "_itemViewer", viewer.Object);
             SetField(controller, "_tableLayoutPanels", new List<TableLayoutPanel>());
@@ -251,7 +234,7 @@ namespace QuickFiler.Controllers.Tests
         public void ToggleFocus_ParameterlessOverload_FromActive_DeactivatesUiAndSwitchesToNormalTheme()
         {
             // Arrange
-            var viewer = BuildExecutingViewer();
+            var viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
             var controller = BuildFocusController();
             SetField(controller, "_itemViewer", viewer.Object);
             SetField(controller, "_activeUI", true);
@@ -311,7 +294,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             var tips = new Mock<IQfcTipsDetails>();
-            var viewer = BuildExecutingViewer();
+            var viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
             var controller = new FocusController();
             SetField(controller, "_itemPositionTips", tips.Object);
             SetField(controller, "_itemViewer", viewer.Object);
@@ -328,7 +311,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             var tips = new Mock<IQfcTipsDetails>();
-            var viewer = BuildExecutingViewer();
+            var viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
             var controller = new FocusController();
             SetField(controller, "_itemPositionTips", tips.Object);
             SetField(controller, "_itemViewer", viewer.Object);
@@ -364,7 +347,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange — an executing viewer runs the dispatched delegate; empty tips/panels collections
             // keep the executed body free of live-control work so the tips-toggle logic is exercised.
-            var viewer = BuildExecutingViewer();
+            var viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
             var controller = new FocusController();
             SetField(controller, "_itemViewer", viewer.Object);
             SetField(controller, "_listTipsDetails", new List<IQfcTipsDetails>());
@@ -447,9 +430,11 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public void SetThemeDark_FromNormal_SelectsDarkNormalTheme()
         {
-            // Arrange — async:true queues the theme application on the dispatcher without executing it,
-            // so no handle-less control is touched; the observable effect is the active-theme switch.
-            QfcItemControllerTestSupport.EnsureUiThreadDispatcher();
+            // Arrange — async:true queues the theme application through the theme's injected
+            // IUiDispatcher mock (see BuildColorTheme), which absorbs the delegate without running it,
+            // so no handle-less control is touched and the shared UiThread static is irrelevant to this
+            // path (issue #968 deleted the former ensure call); the observable effect is the
+            // active-theme switch.
             var controller = new FocusController();
             SetField(controller, "_themes", BuildAllThemes());
             SetField(controller, "_activeTheme", null);
@@ -464,8 +449,8 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public void SetThemeLight_FromNormal_SelectsLightNormalTheme()
         {
-            // Arrange
-            QfcItemControllerTestSupport.EnsureUiThreadDispatcher();
+            // Arrange — same injected-mock arrangement as SetThemeDark_FromNormal_SelectsDarkNormalTheme:
+            // the theme's IUiDispatcher mock absorbs the queued application (issue #968).
             var controller = new FocusController();
             SetField(controller, "_themes", BuildAllThemes());
             SetField(controller, "_activeTheme", null);
