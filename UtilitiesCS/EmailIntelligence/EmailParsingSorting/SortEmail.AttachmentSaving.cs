@@ -32,6 +32,7 @@ namespace UtilitiesCS
             _responseSaveFile = YesNoToAllResponse.Empty;
             _attachmentsOverwrite = YesNoToAllResponse.Empty;
             _picturesOverwrite = YesNoToAllResponse.Empty;
+            _attachmentsAltName = YesNoToAllResponse.Empty;
             RemoveReadOnlyPrompt.Reset();
         }
 
@@ -287,7 +288,6 @@ namespace UtilitiesCS
             }
         }
 
-        [ExcludeFromCodeCoverage]
         internal static void SaveCase(
             YesNoToAllResponse response,
             Attachment attachment,
@@ -297,10 +297,12 @@ namespace UtilitiesCS
         {
             switch (response)
             {
-                case (YesNoToAllResponse.NoToAll | YesNoToAllResponse.No):
+                case YesNoToAllResponse.NoToAll:
+                case YesNoToAllResponse.No:
                     attachment.SaveAsFile(filePathSaveAlt);
                     break;
-                case (YesNoToAllResponse.Yes | YesNoToAllResponse.YesToAll):
+                case YesNoToAllResponse.Yes:
+                case YesNoToAllResponse.YesToAll:
                     attachment.SaveAsFile(filePathSave);
                     break;
                 default:

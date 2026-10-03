@@ -97,6 +97,8 @@
     <Compile Include="EmailIntelligence\Triage_OlLogic_Tests.cs" />
     <Compile Include="EmailIntelligence\SortEmail_Tests.cs" />
     <Compile Include="EmailIntelligence\SortEmail_TrySaveAttachment_Tests.cs" />
+    <Compile Include="EmailIntelligence\SortEmail_SaveCase_Tests.cs" />
+    <Compile Include="EmailIntelligence\SortEmail_AttachmentSaving_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersController_Tests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersControllerInitializationTests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersControllerRefreshDisposalTests.cs" />
