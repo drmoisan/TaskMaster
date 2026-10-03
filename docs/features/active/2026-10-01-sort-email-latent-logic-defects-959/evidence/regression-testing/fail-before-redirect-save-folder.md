@@ -48,3 +48,31 @@ The MESSAGE above is transcribed as the payload printed it. The console encoding
 5. Every `SANDBOX-` value is `False`: met.
 
 Result: FAIL-BEFORE OBSERVED for the expected reason. P4-T9 is checked off.
+
+## Pass-after (P4-T11)
+
+Run: vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll "/Settings:scripts\vscode\TaskMaster.cli.runsettings" /InIsolation "/TestCaseFilter:FullyQualifiedName~EmailIntelligence.SortEmail_AttachmentSaving_Tests" "/ResultsDirectory:coverage\test-results\959\p4-t11" "/Logger:trx;LogFileName=p4-t11.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" (resolved through vswhere), after Edit E-A-RR-SECOND (P4-T10).
+
+```
+PASS-AFTER-VSTEST_EXIT_CODE: 0
+SANDBOX-959-EXISTS-BEFORE: False
+SANDBOX-956-EXISTS-BEFORE: False
+SANDBOX-945-EXISTS-BEFORE: False
+SANDBOX-959-EXISTS-AFTER: False
+SANDBOX-956-EXISTS-AFTER: False
+SANDBOX-945-EXISTS-AFTER: False
+COUNTERS total=11 executed=11 passed=11 failed=0
+RESULT SaveAttachment_WhenFileDoesNotExist_SavesDirectly = Passed
+RESULT SaveAttachmentAsync_WhenFileExistsAndAttachmentIsImage_AsksPicturesPromptOnly = Passed
+RESULT SaveAttachmentAsync_WhenFileExistsAndAttachmentIsDocument_AsksAttachmentsPromptOnly = Passed
+RESULT SaveAttachmentAsync_WhenFileDoesNotExist_SavesWithoutPrompting = Passed
+RESULT SaveAttachmentAsync_WhenOverwriteAnswerIsNoAndAltNameAnswerIsYes_SavesToAlternatePath = Passed
+RESULT SaveAttachment_WhenFileExistsAndAnswerIsYes_OverwritesAndReleasesAnswer = Passed
+RESULT Cleanup_Files_ResetsEveryPromptSession = Passed
+RESULT SaveAttachmentAsync_WhenOverwriteAnswerIsYes_ReleasesAnswerAfterSave = Passed
+RESULT RedirectSaveFolder_RerootsPrimaryAndAlternateSavePaths = Passed
+RESULT SaveAttachment_WhenFileExistsAndAnswerIsNoToAll_SavesToAlternatePathAndKeepsAnswer = Passed
+RESULT SaveAttachmentAsync_WhenOverwriteAnswerIsYesToAll_KeepsAnswerAndDoesNotAskAgain = Passed
+```
+
+Acceptance (P4-T11, all three required): `PASS-AFTER-VSTEST_EXIT_CODE: 0`: met; `COUNTERS total=11 executed=11 passed=11 failed=0` with the eleven `RESULT` rows exactly `NAMES-TAS-FINAL`, each `= Passed`: met; every `SANDBOX-` value is `False`: met.
