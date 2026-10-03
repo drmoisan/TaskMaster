@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 11
 - recolor_generation: 12
-- last_updated: 2026-10-03T10-36
-- next_step: Drive 959 and 973 to merge in fixed order 959 then 973: on each PR record pr_number, update the branch if BEHIND, confirm CI green on the exact head, merge with the merge-commit method and head match, confirm issue closure (959 also closes 966). 959 executes under its own orchestrator (observe only). 964 worktree cleanup deferred (untracked agent-memory notes).
+- last_updated: 2026-10-03T11-54
+- next_step: 973 HALTED at P3-T24 awaiting a coordinator decision (see items[973].execution_halt); do not relaunch without instruction. 959 executing under its own orchestrator (observe only). Merge order 959 then 973: on each PR record pr_number, update the branch if BEHIND, confirm CI green on the exact head, merge with the merge-commit method and head match, confirm issue closure (959 also closes 966). 964 worktree cleanup deferred.
 
 ## Items
 
