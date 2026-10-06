@@ -168,8 +168,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         /// <summary>
-        /// Verifies that Cleanup_Files resets all static YesNoToAllResponse tracking fields
-        /// without throwing, covering the state-reset method used between sort sessions.
+        /// Verifies that Cleanup_Files, which resets every prompt session in AllPromptSessions,
+        /// completes without throwing, covering the state-reset method used between sort sessions.
         /// </summary>
         [TestMethod]
         public void Cleanup_Files_DoesNotThrow()
