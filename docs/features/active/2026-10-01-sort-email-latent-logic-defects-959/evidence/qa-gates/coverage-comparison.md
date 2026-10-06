@@ -63,3 +63,55 @@ Reading: Under PD-8 the comparison aggregates every Cobertura class whose filena
 8. Every EXEMPT-*-LINES value and the NONEXEMPT-UNCOVERED row listed: met.
 9. No absolute path in this artifact: met.
 10. SortEmail family no-regression: SORTEMAIL-AGG reads valid=286 covered=281 uncovered=5 and the five SORTEMAIL-CLASS rows carry the Phase 6 values (SortEmail.cs 5/5, SortEmail.AttachmentSaving.cs 142/142, SortEmail.TrySaveAttachment.cs 93/89, SortEmail.UndoAndMoveLog.cs 45/45, SortEmail.MailItemSort.cs 1/0), with PHASE6-LINE-NOT-LOWER and PHASE6-BRANCH-NOT-LOWER recorded as observations (both True): met.
+
+## Per-member coverage and the CR-1 arm (P7-T13)
+
+Timestamp: 2026-10-06T17-22
+ITERATION: 1
+Command: (1) CMD-MEMBER-COVERAGE over coverage\final-959.cobertura.xml (the Phase 7 document); (2) CMD-LINE-CONDITION over coverage\final-959.cobertura.xml; each run as pwsh -NoProfile -Command with Set-Location to the item worktree
+EXIT_CODE: 0 (scoped to the CMD-LINE-CONDITION payload, the last invocation, its process exit code)
+
+CMD-MEMBER-COVERAGE:
+
+```
+CLASS-NODES U = 1
+CLASS-NODES A = 1
+CLASS-NODES T = 1
+CLASS-NODES E = 1
+MEMBER SaveAttachmentAsyncCore span=194-224 valid=21 covered=21 percent=100 uncovered=
+MEMBER SaveAttachmentCore span=130-156 valid=19 covered=19 percent=100 uncovered=
+MEMBER SaveCaseAsync span=253-287 valid=20 covered=20 percent=100 uncovered=
+MEMBER SaveCase span=289-309 valid=8 covered=8 percent=100 uncovered=
+MEMBER RedirectSaveFolder span=244-251 valid=4 covered=4 percent=100 uncovered=
+MEMBER Cleanup_Files span=40-46 valid=6 covered=6 percent=100 uncovered=
+MEMBER TrySaveAttachmentCoreAsync span=98-192 valid=70 covered=67 percent=95.71 uncovered=133,190,191
+MEMBER WriteCsvCore span=171-188 valid=10 covered=10 percent=100 uncovered=
+MEMBER ResetFilerPromptState span=344-347 valid=3 covered=3 percent=100 uncovered=
+E-CHANGED-LINE result = await InvokeFilerAsync(config, mailHelpers); matches=1 line=311 hits=1
+E-CHANGED-LINE ResetFilerPromptState(); matches=1 line=318 hits=1
+E-CHANGED-LINE return result; matches=1 line=320 hits=1
+E-CHANGED-LINES-COVERED: 3
+MEMBERS-AMBIGUOUS: 0
+MEMBERS-UNMEASURED: 0
+MEMBERS-BELOW-90: 0
+```
+
+CMD-LINE-CONDITION (Phase 7 document; the P7-T1 reading of the Phase 6 document was `A-LINE-143-CONDITION: 50% (1/2)` with `A-SAVEATTACHMENT-BRANCH-RATE: 0.75`):
+
+```
+A-CLASS-NODES: 1
+A-LINE-143-COUNT: 1
+A-LINE-143-BRANCH: True
+A-LINE-143-CONDITION: 100% (2/2)
+A-SAVEATTACHMENT-BRANCH-RATE: 1
+```
+
+### Acceptance (P7-T13, all seven required)
+
+1. Every CLASS-NODES value at least 1 (1, 1, 1, 1): met.
+2. MEMBERS-AMBIGUOUS: 0 and MEMBERS-UNMEASURED: 0: met.
+3. Every MEMBER row shows percent at least 90 (lowest 95.71) and MEMBERS-BELOW-90: 0, with MEMBER SaveAttachmentCore span=130-156 valid=19 covered=19 percent=100: met.
+4. Each E-CHANGED-LINE row shows matches=1 and hits greater than 0, and E-CHANGED-LINES-COVERED: 3: met.
+5. The TrySaveAttachmentCoreAsync uncovered value 133,190,191 is a subset of the P7-T12 EXEMPT-LINES 36,133,190,191: met.
+6. A-CLASS-NODES: 1, A-LINE-143-COUNT: 1 and A-LINE-143-BRANCH: True: met.
+7. A-LINE-143-CONDITION: 100% (2/2) with A-SAVEATTACHMENT-BRANCH-RATE: 1 (50% (1/2) and 0.75 at P7-T1, the false-before state): met.
