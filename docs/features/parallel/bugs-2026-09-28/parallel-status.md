@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 11
 - recolor_generation: 12
-- last_updated: 2026-10-03T11-54
-- next_step: 973 HALTED at P3-T24 awaiting a coordinator decision (see items[973].execution_halt); do not relaunch without instruction. 959 executing under its own orchestrator (observe only). Merge order 959 then 973: on each PR record pr_number, update the branch if BEHIND, confirm CI green on the exact head, merge with the merge-commit method and head match, confirm issue closure (959 also closes 966). 964 worktree cleanup deferred.
+- last_updated: 2026-10-06T18-18
+- next_step: 959 PR 978 open; await child S9 DONE, then confirm headRefOid equals the child ci_gate.head_sha, update the branch if BEHIND, confirm CI green on the exact head, merge with the merge-commit method and head match, confirm issues 959 and 966 closed. 973 executing from P3-T24. Merge order 959 then 973.
 
 ## Items
 
@@ -37,7 +37,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | 961 | docs/features/active/2026-10-01-remaining-tracked-backup-files-and-hygiene-guard-rule-961 | 9 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/975 | 993fdd01566dee82e5f37acb761a600feaaa1454 |
 | 964 | docs/features/active/2026-10-01-engine-toggle-coordinator-947-review-residuals-964 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/977 | f8ea1b5dcc6514bc0088bc80965c188bfd717557 |
 | 973 | docs/features/active/2026-10-02-remaining-stale-binding-redirect-pairs-973 | 12 | in_flight | worktree_created |  |  |
-| 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | in_flight | worktree_created |  |  |
+| 959 | docs/features/active/2026-10-01-sort-email-latent-logic-defects-959 | 11 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/978 |  |
 | 968 | docs/features/active/2026-10-02-focus-and-theme-tests-leak-shared-dispatcher-setup-968 | 10 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/976 | 5d87e5b8e246869b598fcb2e6101d70eaa8ab8e6 |
 
 ## Item Lifecycle Timestamps
