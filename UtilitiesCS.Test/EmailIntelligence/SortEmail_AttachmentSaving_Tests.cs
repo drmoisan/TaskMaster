@@ -297,6 +297,38 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         /// <summary>
+        /// SS4. Scenario: the synchronous core is called, the file exists and the attachment is
+        /// an image. Expected: only the pictures session is asked, with the overwrite text, the
+        /// Yes answer gives one SaveAsFile to the primary path and none to the alternate path,
+        /// and the answer is released (CR-1 of the 2026-10-06 code review: the image arm of the
+        /// synchronous session selection; the asynchronous arm is pinned by AS2).
+        /// </summary>
+        [TestMethod]
+        public void SaveAttachment_WhenFileExistsAndAttachmentIsImage_AsksPicturesPromptOnly()
+        {
+            // Arrange
+            var attachment = CreateAttachmentMock("photo.jpg");
+            var helper = CreateHelper(attachment, SandboxFolder);
+            var pictures = new ScriptedPrompt(YesNoToAllResponse.Yes);
+            var attachments = new ScriptedPrompt();
+
+            // Act
+            SortEmail.SaveAttachment(
+                helper,
+                Exists(true, new List<string>()),
+                pictures.Session,
+                attachments.Session
+            );
+
+            // Assert
+            pictures.Messages.Should().Equal(OverwritePrompt(helper));
+            attachments.Messages.Should().BeEmpty();
+            attachment.Verify(x => x.SaveAsFile(helper.FilePathSave), Times.Once);
+            attachment.Verify(x => x.SaveAsFile(helper.FilePathSaveAlt), Times.Never);
+            pictures.Session.Response.Should().Be(YesNoToAllResponse.Empty);
+        }
+
+        /// <summary>
         /// RR. Scenario: a helper built under an origin folder is redirected to a destination
         /// folder. Expected: both the primary and the alternate save path move to the
         /// destination and both file names are unchanged (the re-rooting defect).
