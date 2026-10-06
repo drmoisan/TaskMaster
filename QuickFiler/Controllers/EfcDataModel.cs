@@ -305,8 +305,18 @@ namespace QuickFiler.Controllers
                 FsAncestorEquivalent = folderRoot,
             };
 
-            var result = await InvokeFilerAsync(config, mailHelpers);
-            SortEmail.Cleanup_Files();
+            bool result;
+            try
+            {
+                result = await InvokeFilerAsync(config, mailHelpers);
+            }
+            finally
+            {
+                // Sticky "to all" prompt answers must not survive into the next filing operation
+                // when the filer throws (issue #959; the same root cause as the missing
+                // alternate-name reset in the SortEmail cleanup).
+                ResetFilerPromptState();
+            }
             return result;
         }
 
@@ -323,6 +333,17 @@ namespace QuickFiler.Controllers
         )
         {
             return new EmailFiler(config).SortAsync(mailHelpers);
+        }
+
+        /// <summary>
+        /// Releases the sticky prompt answers held by <see cref="SortEmail"/> after a filing
+        /// operation. Virtual for the same reason as <see cref="InvokeFilerAsync"/>: a test
+        /// override records the call, because the answers live in internal state that
+        /// QuickFiler.Test cannot observe (issue #959).
+        /// </summary>
+        protected internal virtual void ResetFilerPromptState()
+        {
+            SortEmail.Cleanup_Files();
         }
 
         internal async Task OpenOlFolderAsync(string folderpath)

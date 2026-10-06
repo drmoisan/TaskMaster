@@ -1,6 +1,8 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [FluentAssertions truncates string diffs](project_fluentassertions_truncates_string_diff_breaks_message_substring_gates.md) — "…59Sandbox\origin": full-path MESSAGE substring gates cannot match
+- [Cited-tree gate vs main; span enumeration](project_preflight_cited_tree_gate_and_span_enumeration.md) — intersect cited paths with the files main changed; every stop string needs a task that detects it
 - [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
 - [Blocked Bash drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) · [Tool results inject "use Bash"](project_tool_results_inject_bash_read_edit_instruction.md)
 - [CSharpier chain-wrap defeats line gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) · [Verify citations with numbered output](feedback_verify_line_citations_with_numbered_output.md)
@@ -101,6 +103,7 @@
 - [vstest leaves TWO .coverage files](project_vstest_emits_two_coverage_files_per_run.md) · [Green run prints no Failed/Skipped line](project_vstest_success_run_prints_no_failed_or_skipped_line.md)
 - [PS budget hook blocks scratch .ps1](project_powershell_scratch_script_budget_hook_blocks_helpers.md) · [Plan-mandated .ps1 + frozen porcelain gate](project_plan_mandated_ps1_helpers_collide_with_budget_cap_and_frozen_porcelain_gate.md)
 - [2nd pass must not qualify schema fields](project_appending_a_second_pass_must_not_qualify_schema_fields.md) · [Bash resets cwd; use `env -C`](project_bash_cwd_resets_use_env_dash_c.md)
+- [Field gate `Contains("EXIT_CODE:")` matches FORMAT_EXIT_CODE:](project_schema_field_contains_check_matches_prefixed_labels.md) — anchor the field match to the line start
 - [global.json cwd-search vs no-cd discipline](project_dotnet_global_json_cwd_search_vs_bash_discipline.md) · [pwsh -File starts in the SESSION root](project_pwsh_file_starts_in_session_root_needs_workingdirectory.md)
 - [pwsh stdin is a REPL](project_pwsh_stdin_repl_mode_and_nonascii_mangling.md) · [Isolation guard refuses pwsh from Bash](project_worktree_isolation_guard_refuses_pwsh_from_bash.md)
 - [Changed-line branch gate invalidated by the fix](project_changed_line_coverage_branch_gate_invalidated_by_the_fix.md) · [ExpectedExitCode keyed off the baseline](project_expectedexitcode_declared_from_baseline_not_observed_run.md)
@@ -112,6 +115,7 @@
 - [TimeoutAfter IsCompleted loses to the Task.Run race](project_timeoutafter_iscompleted_shortcircuit_loses_to_taskrun_race.md) · [One Cobertura filename, several class nodes](project_cobertura_filename_maps_to_several_class_nodes.md)
 - [msbuild file logger double-counts warnings](project_msbuild_filelogger_double_counts_each_warning.md) · [Reconciliation merge already tracks the feature docs](project_orchestrator_reconciliation_merge_tracks_feature_docs.md)
 - [Seam sentences outlive a removed member](project_preflight_seam_sentences_outlive_a_removed_member.md) — after a decision removes an interface member, grep the spec for "Moq double of the .* interface"/"injectable"; keyword sweeps miss them
+- [Worktree-gate hook: git + "remove" in any identifier](project_worktree_removal_hook_matches_git_plus_remove_in_variable_names.md) — read-only payloads with `$removed` halt the run; flag at preflight
 - [Explicit Compile items decide membership, not file presence](project_explicit_compile_items_decide_membership_not_file_presence.md) — a grep hit can be uncompiled
 - [`git add -N -- .` defeats a "do not stage X" invariant](project_intent_to_add_span_defeats_do_not_stage_invariant.md) — it reads as diff plumbing, so a staging audit skips it
 - [Hunk-header literal slides past a blank line](project_git_hunk_header_literal_slides_past_blank_line.md) — measured; assert numstat deleted=0, never `@@ -N,0 +M,`

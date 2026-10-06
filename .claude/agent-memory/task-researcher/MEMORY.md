@@ -82,6 +82,8 @@
 
 ## QuickFiler / EFC / SortEmail defects and behaviour
 - [sortemail-split-prompt-seam-956](project_sortemail_split_and_prompt_seam_956.md) — per-call prompt session; AsyncLocal breaks stickiness
+- [sortemail-966-consolidation-959](project_sortemail_966_consolidation_959.md) — live path builds helpers with FOLDER NAME; A 235 re-roots one path; ToDoModel copy uncompiled
+- [sortemail-latent-defects-959](project_sortemail_latent_defects_959.md) — callers discard the bool: only rethrow surfaces; L4 has a 3rd (null-array) defect
 - [qfc-high-confidence-pipelines](project_qfc_high_confidence_dual_pipeline.md) — THREE pipelines; #233 gate LIVE
 - [qfc424-startup-stall](project_qfc424_high_confidence_startup_stall.md) — serial scoring; async-void worker
 - [qfc678-predictor-carry](project_qfc678_predictor_carry.md) — named producer DORMANT

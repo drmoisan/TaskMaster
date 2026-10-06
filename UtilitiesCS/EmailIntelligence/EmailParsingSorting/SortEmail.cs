@@ -1,22 +1,13 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using Deedle;
 using Microsoft.Office.Interop.Outlook;
-using SDILReader;
-using UtilitiesCS;
-using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
 using UtilitiesCS.OutlookExtensions;
-using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
-using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
