@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using log4net.Repository.Hierarchy;
-using Microsoft.Graph.Security.AttackSimulation.Trainings.Item.LanguageDetails;
 using Newtonsoft.Json;
 using UtilitiesCS.EmailIntelligence.Bayesian;
 using UtilitiesCS.Extensions;

@@ -617,6 +617,7 @@
     </Compile>
     <Compile Include="EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.ConditionalEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\LcppnFolderPredictorStore.cs" />
