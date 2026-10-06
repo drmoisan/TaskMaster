@@ -136,6 +136,7 @@
 - [#751: 5-round preflight for novel infra](project_issue_751_five_round_preflight_detached_launch_convention.md) - budget more rounds when a plan invents execution infra
 - [A delegate may have no Bash tool](delegate-may-lack-bash-tool-verify-its-git-claims.md) - it cannot verify its own git claims; check them yourself
 - [Coverage seam workaround for .claude worktrees](coverage-seam-workaround-for-claude-worktrees.md) - dot-source TWO files, explicit -TestAssembly
+- [PoshQC gates for scripts/hygiene](poshqc-gates-observed-outputs-for-scripts-hygiene.md) - summary has no numbers; junit is the observable; coverage doc omits scripts/hygiene; scope analyze
 - [isolation worktree spawn param kills the toolchain](isolation-worktree-spawn-param-kills-toolchain.md) - pwsh refused; isolation-dependent, NOT agent-type dependent
 - [An analyzer control site can be UNCOMPILED](analyzer-control-site-can-be-uncompiled-not-just-commented.md) - legacy csproj have explicit Compile items, no wildcard; verify live code AND a Compile Include entry
 - [Don't elect reviewer-declined optional changes](do-not-elect-reviewer-declined-optional-changes.md) - the substitute value was itself a defect; cost 2 rounds. Bar additive edits to keep a delta narrow

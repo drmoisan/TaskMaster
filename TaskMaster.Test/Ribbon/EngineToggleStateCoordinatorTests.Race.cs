@@ -195,10 +195,10 @@ namespace TaskMaster.Test.Ribbon
         /// <remarks>
         /// Assertion order is load-bearing. The harness engines mock is strict and this test
         /// supplies one setup, so the re-prime triggered by the second read re-enters that same
-        /// canceled task and logs a second error. An error-count assertion taken after the re-prime
-        /// would therefore be unsatisfiable by construction. The single-error assertion is made
-        /// first, and the marker-cleared conclusion is drawn from prime-handle identity, which is
-        /// deterministic.
+        /// canceled task. Since issue #948 that second cancellation is a repeat of a kind already
+        /// reported and is not logged, but the single-error assertion is still made before the
+        /// re-prime so the test does not depend on the suppression rule. The marker-cleared
+        /// conclusion is drawn from prime-handle identity, which is deterministic.
         /// </remarks>
         [TestMethod]
         public async Task GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker()
