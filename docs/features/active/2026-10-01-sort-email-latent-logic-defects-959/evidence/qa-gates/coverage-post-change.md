@@ -1,15 +1,18 @@
-# Coverage Post-Change (P7-T11)
+# Coverage Post-Change (P8-T9)
 
-Timestamp: 2026-10-06T17-19
-ITERATION: 2
-SUPERSEDES: 3425f5b02f798d5dc68e7328ffe04e68db4f2b25
-WRITTEN-BY: P7-T11
-Command: CMD-COVERAGE-DIRECT (STAGE final): dotnet-coverage collect --output coverage\final-959.cobertura.xml --output-format cobertura --settings coverage\effective-coverage-959.config -- vstest.console.exe <9 test assemblies> "/Settings:scripts\vscode\TaskMaster.cli.runsettings" /InIsolation "/TestCaseFilter:TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/ResultsDirectory:coverage\test-results\959\final" "/Logger:trx;LogFileName=final-959.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" (background invocation polled until its final TRX_PRESENT: line); then CMD-COVERAGE-POST (STAGE final); route DIRECT; filter as shown (the same P0-T9 exclusion as P0-T11); the Phase 6 document of the same name was overwritten after P7-T1 recorded its line-143 reading
+Timestamp: 2026-10-06T18-04
+ITERATION: 3
+SUPERSEDES: 1ac8f075ac6c3f1b4908a71ef6dbd77ca4b7432d
+WRITTEN-BY: P8-T9
+Command: CMD-COVERAGE-DIRECT (STAGE final): dotnet-coverage collect --output coverage\final-959.cobertura.xml --output-format cobertura --settings coverage\effective-coverage-959.config -- vstest.console.exe <9 test assemblies> "/Settings:scripts\vscode\TaskMaster.cli.runsettings" /InIsolation "/TestCaseFilter:TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests" "/ResultsDirectory:coverage\test-results\959\final" "/Logger:trx;LogFileName=final-959.trx" "/Blame:CollectHangDump;TestTimeout=4min;HangDumpType=None" (background invocation polled until its final TRX_PRESENT: line); then CMD-COVERAGE-POST (STAGE final); route DIRECT; filter as shown (the same P0-T9 exclusion as P0-T11); the Phase 7 document of the same name was overwritten
 EXIT_CODE: 0 (the printed COLLECT_EXIT_CODE)
-Output Summary: branch (a) on the Phase 7 tree: exit 0, both floors met, empty FAILED-SET; 7394 of 7394 tests passed (7393 plus SS4 under the unchanged exclusion); first-party coverage lines 85.39 percent, branches 79.81 percent (Phase 6: 85.39 and 79.81; baseline 85.36 and 79.75); no newly failing test. Observation: the first-party branch numerator is 13680 against 13681 at Phase 6 (UtilitiesCS BRANCH covered 9494 against 9495) while the two-decimal percentage is unchanged; P7-T12 records the Phase 6 comparison rows and P7-T13 reads the SortEmail.AttachmentSaving.cs line-143 condition directly.
+Output Summary: branch (a) on the merged tree (merge commit 9163994569e24c5c539a285724f9c8f9f6fd8a0e of origin/main f8ea1b5dcc6514bc0088bc80965c188bfd717557): exit 0, both floors met, empty FAILED-SET; 7404 of 7404 tests passed (the Phase 7 total 7394 plus the 10 tests main brought, under the unchanged exclusion); first-party coverage lines 85.40 percent, branches 79.83 percent (Phase 7: 85.39 and 79.81); no newly failing test.
+
+Execution note: the collector's console stream was written to coverage\logs\final-959.collect.log by Tee-Object and then discarded with Out-Null to limit tool output; every line below is printed by the payloads.
 
 - COVERAGE-ROUTE: DIRECT
 - EXCLUSION: &FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests
+- MERGE-HEAD-SHA: 9163994569e24c5c539a285724f9c8f9f6fd8a0e
 - SANDBOX-959-EXISTS-BEFORE: False
 - SANDBOX-956-EXISTS-BEFORE: False
 - SANDBOX-945-EXISTS-BEFORE: False
@@ -31,24 +34,25 @@ Output Summary: branch (a) on the Phase 7 tree: exit 0, both floors met, empty F
 - TRX_PRESENT: True
 - LINE-FLOOR: MET
 - BRANCH-FLOOR: MET
-- First-party coverage: lines 56410/66058 (85.39%), branches 13680/17141 (79.81%)
-- FIRST-PARTY-LINE-PERCENT: 85.39
-- FIRST-PARTY-BRANCH-PERCENT: 79.81
-- FINAL-FIRST-PARTY-LINE-PERCENT: 85.39
-- FINAL-FIRST-PARTY-BRANCH-PERCENT: 79.81
+- First-party coverage: lines 56439/66084 (85.40%), branches 13687/17145 (79.83%)
+- FIRST-PARTY-LINE-PERCENT: 85.40
+- FIRST-PARTY-BRANCH-PERCENT: 79.83
+- FINAL-FIRST-PARTY-LINE-PERCENT: 85.40
+- FINAL-FIRST-PARTY-BRANCH-PERCENT: 79.83
 - FAILED-SET: (empty)
-- NEWLY-FAILING: NONE
-- FINAL-UCS-LINE: 39100/43704
-- FINAL-UCS-BRANCH: 9494/11356
-- FINAL-QF-LINE: 10468/12761
+- NEWLY-FAILING: NONE (against coverage-baseline.md FAILED-SET; the final set is empty)
+- FINAL-UCS-LINE: 39104/43704
+- FINAL-UCS-BRANCH: 9496/11356
+- FINAL-QF-LINE: 10467/12761
 - FINAL-QF-BRANCH: 2518/3217
-- PHASE6-FIRST-PARTY-LINE-PERCENT: 85.39
-- PHASE6-FIRST-PARTY-BRANCH-PERCENT: 79.81
-- PHASE6-TOTAL: 7393
+- PHASE7-FIRST-PARTY-LINE-PERCENT: 85.39
+- PHASE7-FIRST-PARTY-BRANCH-PERCENT: 79.81
+- PHASE7-TOTAL: 7394
+- TOTAL: 7404 (recorded, not predicted; equals PHASE7-TOTAL 7394 plus the 10 tests main brought)
 
 SUMMARY-BEGIN
 Test run outcome: Completed
-Total 7394, executed 7394, passed 7394, failed 0.
+Total 7404, executed 7404, passed 7404, failed 0.
 Skipped 0, derived as total minus executed rather than reported by the test platform.
 Figures reported verbatim by the test platform: error 0, timeout 0, aborted 0, notExecuted 0, inconclusive 0.
 Failed tests: none
@@ -58,12 +62,12 @@ PROJECTION-BEGIN
 ```xml
 <report name="TaskMaster">
   <package name="QuickFiler">
-    <counter type="LINE" missed="2293" covered="10468" />
+    <counter type="LINE" missed="2294" covered="10467" />
     <counter type="BRANCH" missed="699" covered="2518" />
   </package>
   <package name="UtilitiesCS">
-    <counter type="LINE" missed="4604" covered="39100" />
-    <counter type="BRANCH" missed="1862" covered="9494" />
+    <counter type="LINE" missed="4600" covered="39104" />
+    <counter type="BRANCH" missed="1860" covered="9496" />
   </package>
   <package name="TaskVisualization">
     <counter type="LINE" missed="143" covered="1426" />
@@ -82,8 +86,8 @@ PROJECTION-BEGIN
     <counter type="BRANCH" missed="16" covered="174" />
   </package>
   <package name="TaskMaster">
-    <counter type="LINE" missed="802" covered="2477" />
-    <counter type="BRANCH" missed="211" covered="519" />
+    <counter type="LINE" missed="802" covered="2503" />
+    <counter type="BRANCH" missed="210" covered="524" />
   </package>
   <package name="TaskTree">
     <counter type="LINE" missed="11" covered="295" />
@@ -97,15 +101,14 @@ PROJECTION-BEGIN
 ```
 PROJECTION-END
 
-## Acceptance (P7-T11, all eight required)
+## Acceptance (P8-T9, all seven required)
 
 1. The projection holds UtilitiesCS and QuickFiler packages with LINE and BRANCH counters: met.
-2. FIRST-PARTY-LINE-PERCENT 85.39 (at least 80) and FIRST-PARTY-BRANCH-PERCENT 79.81 (at least 75), with LINE-FLOOR: MET and BRANCH-FLOOR: MET: met.
+2. FIRST-PARTY-LINE-PERCENT 85.40 (at least 80) and FIRST-PARTY-BRANCH-PERCENT 79.83 (at least 75), with LINE-FLOOR: MET and BRANCH-FLOOR: MET: met.
 3. FAILED-SET contains none of the names of NAMES-TST1-FINAL, NAMES-T12, NAMES-TSC-FINAL, NAMES-TAS-FINAL2, NAMES-TUL, NAMES-TEF or NAMES-EFC-ARCHIVE (the set is empty): met.
 4. NEWLY-FAILING: NONE: met.
-5. The summary reads Total 7394, executed 7394 with passed 7394, failed 0 under branch (a): met.
+5. The summary's Total is recorded (7404, not predicted) with failed 0 under branch (a): met.
 6. EXIT_CODE 0 equals its declared expectation (default 0, branch (a)): met.
-7. Every SANDBOX- value is False: met.
-8. The artifact contains no absolute path (assembly paths are repository-relative): met.
+7. Every SANDBOX- value is False and the artifact contains no absolute path (assembly paths are repository-relative): met.
 
-coverage\final-959.cobertura.xml and coverage\final-959.jacoco.xml remain on disk, git-ignored, for P7-T12 and P7-T13.
+coverage\final-959.cobertura.xml and coverage\final-959.jacoco.xml remain on disk, git-ignored, for P8-T10.
