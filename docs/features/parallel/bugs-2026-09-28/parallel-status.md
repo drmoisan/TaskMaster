@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 12
 - recolor_generation: 12
-- last_updated: 2026-10-07T06-29
-- next_step: All non-withdrawn items merged. Open-mode run: close via /parallel-close is handled by the coordinator. Worktree cleanup for 959, 964 and 973 deferred.
+- last_updated: 2026-10-07T06-32
+- next_step: Run closed via /parallel-close at 2026-10-07T06-32. No further admissions. Worktree cleanup for 959, 964 and 973 remains deferred.
 
 ## Items
 
@@ -318,6 +318,7 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | add | 973 | 2026-10-03T00-46 |  | scheduled |  | 11 |
 | add | 959 | 2026-10-03T00-53 |  | scheduled |  | 12 |
 | add | 968 | 2026-10-03T02-34 |  | scheduled |  | 12 |
+| close |  | 2026-10-07T06-32 |  |  |  | 12 |
 
 ## Drift Events
 
