@@ -30,8 +30,10 @@
 - [Local C# gate for a non-C# change](local-csharp-gate-for-a-non-csharp-change.md) — mirror the 2.1GB bootstrap from a sibling worktree; evidence XML already ignored
 - [Executor-blocked AC may be orchestrator-dischargeable](executor-blocked-ac-may-be-orchestrator-dischargeable.md) — check your own tool surface; integration-base PRs don't auto-close
 - [`gh issue create` is hook-blocked](gh-issue-create-blocked-by-promotion-mcp-hook.md) — no file-free promotion route; settle the commit target BEFORE the PR merges
+- [--body-file must be relative to the session root](pr-body-file-must-be-relative-session-root.md) — absolute path denied PR_BODY_PATH_NONCANONICAL; parallel items write gitignored PR files at session root
 
 ## Verification discipline
+- [Deployment premise: check compiled references](deployment-premise-check-compiled-references.md) — csc drops unused refs, so "deployed beside the host" can be false; scan metadata with a positive control
 - [My own negative claims need a scoped search](my-own-negative-claims-need-a-scoped-search.md) — I overturned a correct spec on a grep of the wrong file
 - [My relayed delta needs the same satisfiability check](my-relayed-delta-must-pass-the-same-satisfiability-check.md) — a `docs/`-scoped grep matches the plan's own prose; trust an evidenced refusal
 - [A subagent's correction can be FALSE](subagent-self-reported-correction-can-be-false.md) · [cites the wrong checkout's gitStatus](subagent-cites-harness-gitstatus-of-wrong-checkout.md) · [Verify capability claims](feedback_verify_subagent_capability_claims.md)
