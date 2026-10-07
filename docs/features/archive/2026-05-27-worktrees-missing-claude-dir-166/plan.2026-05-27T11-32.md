@@ -46,13 +46,13 @@
 ### Phase 0 — Baseline Capture
 
 - [x] [P0-T1] Confirm the active branch is `bug/worktrees-missing-claude-dir-166` (base `development`) by running `git rev-parse --abbrev-ref HEAD` and `git merge-base HEAD development`; write both values (branch name, current HEAD commit SHA, merge-base SHA) to `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-branch-commit-baseline.txt`.
-- [x] [P0-T2] Read the repository policy files that govern this change and record their paths and the governing clauses in `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-policy-baseline.txt`: `c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md` (General Code Change Policy, General Unit Test Policy §UT4), `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-code-change.md`, `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-unit-test.md`.
+- [x] [P0-T2] Read the repository policy files that govern this change and record their paths and the governing clauses in `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-policy-baseline.txt`: `<repo-root>\CLAUDE.md` (General Code Change Policy, General Unit Test Policy §UT4), `<repo-root>\.claude\rules\general-code-change.md`, `<repo-root>\.claude\rules\general-unit-test.md`.
 - [x] [P0-T3] Capture the C# toolchain N/A determination: run `git diff --name-only development...HEAD` (and inspect the staged change set) to confirm no `*.cs`, `*.csproj`, `*.props`, or `*.targets` files are in scope; write the file list and the explicit "C# toolchain N/A — no C# build/test artifacts change" statement to `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-csharp-toolchain-na.txt`.
 
 ### Phase 1 — Scope Lock
 
-- [x] [P1-T1] Confirm the only production file to be edited is `c:\Users\DanMoisan\repos\TaskMaster\.gitignore` and that no `.claude/` files will be edited by this plan; record the locked scope statement in `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-scope-lock.txt`.
-- [x] [P1-T2] Read the current `c:\Users\DanMoisan\repos\TaskMaster\.gitignore` and confirm line 351 is the bare `.claude` entry to be replaced; record the exact current final-line text in `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-scope-lock.txt`.
+- [x] [P1-T1] Confirm the only production file to be edited is `<repo-root>\.gitignore` and that no `.claude/` files will be edited by this plan; record the locked scope statement in `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-scope-lock.txt`.
+- [x] [P1-T2] Read the current `<repo-root>\.gitignore` and confirm line 351 is the bare `.claude` entry to be replaced; record the exact current final-line text in `docs/features/active/2026-05-27-worktrees-missing-claude-dir-166/evidence/baselines/166-scope-lock.txt`.
 
 ### Phase 2 — Defect Verification (must fail first)
 
@@ -61,7 +61,7 @@
 
 ### Phase 3 — Minimal Fix
 
-- [x] [P3-T1] In `c:\Users\DanMoisan\repos\TaskMaster\.gitignore`, replace the bare final-line `.claude` entry with the targeted block below; make no other edits to the file:
+- [x] [P3-T1] In `<repo-root>\.gitignore`, replace the bare final-line `.claude` entry with the targeted block below; make no other edits to the file:
 
   ```gitignore
   # .claude/ agentic environment is tracked so it materializes in git worktrees (Issue #166).

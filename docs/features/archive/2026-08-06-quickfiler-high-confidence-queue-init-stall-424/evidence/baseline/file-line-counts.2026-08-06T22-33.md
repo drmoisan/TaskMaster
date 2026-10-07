@@ -6,7 +6,7 @@
 
 Timestamp: 2026-08-06T22-33
 
-Command: `for f in <8 paths>; do wc -l < "$f"; done` (run from repo root `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-04T18-38`)
+Command: `for f in <8 paths>; do wc -l < "$f"; done` (run from repo root `<user-profile>\repos\TaskMaster-wt\2026-08-04T18-38`)
 
 EXIT_CODE: 0
 

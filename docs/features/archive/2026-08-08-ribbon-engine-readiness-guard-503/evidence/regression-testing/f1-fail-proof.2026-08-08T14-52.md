@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P1-T7] **[expect-fail]**
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'TaskMaster.Test\bin\Debug\TaskMaster.Test.dll' /InIsolation /Settings:TaskMaster.runsettings /TestCaseFilter:'FullyQualifiedName~TaskMaster.Test.Ribbon.RibbonExplorerXmlTests'"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'TaskMaster.Test\bin\Debug\TaskMaster.Test.dll' /InIsolation /Settings:TaskMaster.runsettings /TestCaseFilter:'FullyQualifiedName~TaskMaster.Test.Ribbon.RibbonExplorerXmlTests'"`
 EXIT_CODE: **1**
 
 A **non-zero** exit code is the expected and required outcome of this task, and of this task only. It is the executable half of the F1 proof: it demonstrates that the corrected assertion genuinely fails on the condition it names, rather than merely appearing to assert it.
@@ -40,7 +40,7 @@ Total tests: 8
      at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277
    at FluentAssertions.Primitives.ReferenceTypeAssertions`2.NotBeNull(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/ReferenceTypeAssertions.cs:line 71
-   at TaskMaster.Test.Ribbon.RibbonExplorerXmlTests.RibbonExplorerXml_EveryEngineBackedControlDeclaresGetEnabledCallback() in C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs:line 202
+   at TaskMaster.Test.Ribbon.RibbonExplorerXmlTests.RibbonExplorerXml_EveryEngineBackedControlDeclaresGetEnabledCallback() in <user-profile>\repos\TaskMaster-wt\2026-08-08T11-55\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs:line 202
 ```
 
 The stack frame names `ReferenceTypeAssertions.NotBeNull` at `RibbonExplorerXmlTests.cs:line 202` — the exact assertion introduced by P1-T1. The failure message carries the `because` reason naming the specific control (`TrainSpam`), so the diagnostic identifies which of the eight controls regressed.

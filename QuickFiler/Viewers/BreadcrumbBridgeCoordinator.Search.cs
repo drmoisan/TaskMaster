@@ -8,7 +8,7 @@ namespace QuickFiler.Viewers
     /// <summary>
     /// Issue #438: the folder-search presentation composite.
     /// <para>
-    /// Held on a second partial-class part so <c>BreadcrumbBridgeCoordinator.cs</c> (487 lines)
+    /// Held on a second partial-class part so <c>BreadcrumbBridgeCoordinator.cs</c>
     /// stays clear of the repository's 500-line ceiling.
     /// </para>
     /// </summary>

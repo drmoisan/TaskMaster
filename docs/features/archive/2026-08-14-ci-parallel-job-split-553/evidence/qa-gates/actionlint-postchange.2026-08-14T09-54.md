@@ -24,7 +24,7 @@ To prove the file set was actually processed rather than silently skipped, the
 same binary was run with `-verbose`:
 
 ```
-verbose: Linting all workflow files in repository: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-14T09-01
+verbose: Linting all workflow files in repository: <user-profile>\repos\TaskMaster-wt\2026-08-14T09-01
 verbose: Collected 7 YAML files
 verbose: Linting 7 files
 verbose: Linting .github\workflows\codex-web-setup-test.yml

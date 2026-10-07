@@ -7,14 +7,14 @@ Coverage Run Summary:
 ```text
 Using vstest.console: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
 Discovered 7 test assemblies.
-Coverage output: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\baseline\baseline-coverage.cobertura.xml
+Coverage output: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\baseline\baseline-coverage.cobertura.xml
 dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.9]
 VSTest version 18.7.0 (x64)
 Test Run Successful.
 Total tests: 4759
 Passed: 4759
 Total time: 54.5513 Seconds
-Code coverage results: C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\baseline\baseline-coverage.cobertura.xml.
+Code coverage results: <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\docs\features\active\2026-07-04-coverage-gaps-test-seams-236\evidence\baseline\baseline-coverage.cobertura.xml.
 ```
 
 Numeric Coverage:

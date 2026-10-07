@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T15-07Z
 
-Command: `cd "C:/Users/DanMoisan/repos/TaskMaster-wt/2026-07-21T10-25" && sha256sum QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs QuickFiler/Viewers/BreadcrumbUiDispatcher.cs && wc -l QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs QuickFiler/Viewers/BreadcrumbUiDispatcher.cs`
+Command: `cd "<user-profile>/repos/TaskMaster-wt/2026-07-21T10-25" && sha256sum QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs QuickFiler/Viewers/BreadcrumbUiDispatcher.cs && wc -l QuickFiler.Test/Viewers/BreadcrumbUiThreadDispatchTests.cs QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs QuickFiler/Viewers/BreadcrumbUiDispatcher.cs`
 
 EXIT_CODE: 0
 

@@ -4,7 +4,7 @@ Timestamp: 2026-08-11T00-14
 Command: `git rev-parse --abbrev-ref HEAD`; `git rev-parse HEAD`; `git status --porcelain`
 EXIT_CODE: 0
 
-Working directory: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`
+Working directory: `<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`
 
 ## Branch
 

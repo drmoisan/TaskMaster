@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T16-48
 
 Task: [P2-T2] — final QC loop, pass 4
 
-Command: `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe check UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs`
+Command: `<user-profile>\.dotnet\tools\csharpier.exe check UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs`
 
 EXIT_CODE: 0
 

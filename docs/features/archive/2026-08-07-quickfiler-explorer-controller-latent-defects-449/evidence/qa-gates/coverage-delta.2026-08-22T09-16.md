@@ -1,7 +1,7 @@
 # Coverage Delta and Threshold Report (Issue #449, [P7-T9], [P7-T10])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command: coverage figures read from the two Cobertura reports produced by the identical
 `dotnet-coverage collect --settings coverage.config -- vstest.console.exe ... /InIsolation` invocation

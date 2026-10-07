@@ -411,8 +411,16 @@ namespace TaskMaster.Test.Ribbon
                         Invalidations.Add(controlId);
                         OnInvalidate?.Invoke(controlId);
                     },
-                    message => Notifications.Add(message),
-                    (message, exception) => Errors.Add(new LoggedError(message, exception))
+                    message =>
+                    {
+                        Notifications.Add(message);
+                        OnNotify?.Invoke(message);
+                    },
+                    (message, exception) =>
+                    {
+                        Errors.Add(new LoggedError(message, exception));
+                        OnLogError?.Invoke(message, exception);
+                    }
                 );
             }
 
@@ -432,6 +440,20 @@ namespace TaskMaster.Test.Ribbon
             /// ordering test to probe the cache at the exact moment Office would re-query.
             /// </summary>
             internal Action<string> OnInvalidate { get; set; }
+
+            /// <summary>
+            /// An optional extra observer invoked from inside the error-log sink, immediately after
+            /// the error has been appended to <see cref="Errors"/>, so a test can probe coordinator
+            /// state at the exact moment a fault is reported.
+            /// </summary>
+            internal Action<string, Exception> OnLogError { get; set; }
+
+            /// <summary>
+            /// An optional extra observer invoked from inside the notification sink, immediately
+            /// after the message has been appended to <see cref="Notifications"/>, so a throwing
+            /// hook both records the attempt and models a throwing notification sink.
+            /// </summary>
+            internal Action<string> OnNotify { get; set; }
 
             internal List<string> Invalidations { get; } = new List<string>();
 

@@ -7,4 +7,4 @@ Total tests: 199.
 Passed: 199.
 Failed: 0.
 Total time: 4.8786 seconds.
-Coverage attachment: `TestResults\e558b3e1-4d92-4ef6-8e01-a2946b8516ec\DanMoisan_MEGALODON4_2026-07-06.11_59_47.coverage`.
+Coverage attachment: `TestResults\e558b3e1-4d92-4ef6-8e01-a2946b8516ec\<user>_<host>_2026-07-06.11_59_47.coverage`.

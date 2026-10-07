@@ -11,12 +11,12 @@ Policy Order:
 6. .claude/rules/tonality.md (tonality policy)
 
 Files Read (in order):
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\ci-workflows.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\tonality.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\ci-workflows.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-08-12-06\.claude\rules\tonality.md
 
 Output Summary: All six policy files read in the required order. Key constraints noted for this
 cycle: CSharpier formatting; .NET analyzer build; nullable / TreatWarningsAsErrors build; MSTest +

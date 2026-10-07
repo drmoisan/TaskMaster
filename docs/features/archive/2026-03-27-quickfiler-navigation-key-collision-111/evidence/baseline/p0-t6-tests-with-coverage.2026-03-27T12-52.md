@@ -5,6 +5,6 @@ Output Summary:
 - Test run successful.
 - Total tests: 2874; Passed: 2872; Skipped: 2.
 - Total time: 22.5087 seconds.
-- Coverage artifact: c:\Users\DanMoisan\repos\TaskMaster\coverage\coverage.cobertura.xml.
+- Coverage artifact: <repo-root>\coverage\coverage.cobertura.xml.
 - Overall line coverage: 61.54%.
 - QuickFiler line coverage: 22.18%.

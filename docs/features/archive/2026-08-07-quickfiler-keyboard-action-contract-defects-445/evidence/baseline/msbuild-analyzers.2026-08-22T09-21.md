@@ -8,7 +8,7 @@ Command:
 (Select-String -SimpleMatch -Pattern 'Skipping target "CoreCompile"' -Path msbuild-analyzer-baseline.log | Measure-Object).Count
 (Select-String -SimpleMatch -Pattern 'CoreCompile:' -Path msbuild-analyzer-baseline.log | Measure-Object).Count
 ```
-Run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`. `/t:Rebuild` is used, never `/t:Build`, per Non-negotiable Command Constraint 1. No `/p:Nullable=enable` was added.
+Run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`. `/t:Rebuild` is used, never `/t:Build`, per Non-negotiable Command Constraint 1. No `/p:Nullable=enable` was added.
 
 EXIT_CODE: 0
 

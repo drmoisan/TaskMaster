@@ -16,8 +16,8 @@ Branch: `bug/svg-renderer-null-document-nre-418`
 
 ```
 dotnet tool run csharpier format .
-pwsh -NoProfile -Command "(Get-Content 'C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SvgRenderer.cs').Count"
-pwsh -NoProfile -Command "(Get-Content 'C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SvgAssemblyProbe.cs').Count"
+pwsh -NoProfile -Command "(Get-Content '<repo-root>\SVGControl\SvgRenderer.cs').Count"
+pwsh -NoProfile -Command "(Get-Content '<repo-root>\SVGControl\SvgAssemblyProbe.cs').Count"
 ```
 
 EXIT_CODE: 0

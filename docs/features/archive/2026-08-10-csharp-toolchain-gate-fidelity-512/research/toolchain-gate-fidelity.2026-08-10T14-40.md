@@ -3,7 +3,7 @@
 - Timestamp: 2026-08-10T14-40
 - Feature: `docs/features/active/2026-08-10-csharp-toolchain-gate-fidelity-512`
 - Epic: `docs/features/epics/build-ci-coverage-gate-fidelity/epic.md` (Lane A, Wave 0)
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af19fe9c37ece6a65`
+- Worktree: `<repo-root>\.claude\worktrees\agent-af19fe9c37ece6a65`
 - Method: file reads and greps only. This agent has no Bash tool and executed nothing. Every line
   number below was read in this session. Claims sourced from prior evidence artifacts or agent
   memory are attributed inline and marked as such.

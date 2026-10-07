@@ -168,8 +168,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         /// <summary>
-        /// Verifies that Cleanup_Files resets all static YesNoToAllResponse tracking fields
-        /// without throwing, covering the state-reset method used between sort sessions.
+        /// Verifies that Cleanup_Files, which resets every prompt session in AllPromptSessions,
+        /// completes without throwing, covering the state-reset method used between sort sessions.
         /// </summary>
         [TestMethod]
         public void Cleanup_Files_DoesNotThrow()
@@ -179,8 +179,30 @@ namespace UtilitiesCS.Test.EmailIntelligence
             act.Should().NotThrow();
         }
 
-        [TestMethod]
-        public void GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments()
+        [DataTestMethod]
+        [DataRow(
+            false,
+            true,
+            "photo.jpg",
+            DisplayName = "GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments [saveAttachments false, savePictures true]"
+        )]
+        [DataRow(
+            true,
+            true,
+            "photo.jpg,report.pdf",
+            DisplayName = "GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments [saveAttachments true, savePictures true]"
+        )]
+        [DataRow(
+            true,
+            false,
+            "report.pdf",
+            DisplayName = "GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments [saveAttachments true, savePictures false]"
+        )]
+        public void GetAttachmentsInfo_WhenSavingPicturesOnly_FiltersOutDocumentsAndOleAttachments(
+            bool saveAttachments,
+            bool savePictures,
+            string expectedFileNames
+        )
         {
             // Arrange
             var mailItem = CreateMailItemWithAttachments(
@@ -195,19 +217,47 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     mailItem.Object,
                     GetRepositoryRoot().FullName,
                     null,
-                    saveAttachments: false,
-                    savePictures: true
+                    saveAttachments: saveAttachments,
+                    savePictures: savePictures
                 )
                 .ToList();
 
             // Assert
-            attachments.Should().ContainSingle();
-            attachments[0].AttachmentInfo.FileName.Should().Be("photo.jpg");
-            attachments[0].AttachmentInfo.IsImage.Should().BeTrue();
+            attachments
+                .Select(x => x.AttachmentInfo.FileName)
+                .Should()
+                .Equal(expectedFileNames.Split(','));
+            attachments
+                .Should()
+                .OnlyContain(x =>
+                    x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg")
+                );
         }
 
-        [TestMethod]
-        public async Task GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments()
+        [DataTestMethod]
+        [DataRow(
+            true,
+            false,
+            "report.pdf",
+            DisplayName = "GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments [saveAttachments true, savePictures false]"
+        )]
+        [DataRow(
+            true,
+            true,
+            "photo.jpg,report.pdf",
+            DisplayName = "GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments [saveAttachments true, savePictures true]"
+        )]
+        [DataRow(
+            false,
+            true,
+            "photo.jpg",
+            DisplayName = "GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments [saveAttachments false, savePictures true]"
+        )]
+        public async Task GetAttachmentsInfoAsync_WhenSavingAttachmentsOnly_FiltersOutPicturesAndOleAttachments(
+            bool saveAttachments,
+            bool savePictures,
+            string expectedFileNames
+        )
         {
             // Arrange
             var mailItem = CreateMailItemWithAttachments(
@@ -222,30 +272,76 @@ namespace UtilitiesCS.Test.EmailIntelligence
                     mailItem.Object,
                     GetRepositoryRoot().FullName,
                     null,
-                    saveAttachments: true,
-                    savePictures: false
+                    saveAttachments: saveAttachments,
+                    savePictures: savePictures
                 )
             );
 
             // Assert
-            attachments.Should().ContainSingle();
-            attachments[0].AttachmentInfo.FileName.Should().Be("report.pdf");
-            attachments[0].AttachmentInfo.IsImage.Should().BeFalse();
+            attachments
+                .Select(x => x.AttachmentInfo.FileName)
+                .Should()
+                .Equal(expectedFileNames.Split(','));
+            attachments
+                .Should()
+                .OnlyContain(x =>
+                    x.AttachmentInfo.IsImage == (x.AttachmentInfo.FileName == "photo.jpg")
+                );
         }
 
+        // Rooted literal directory used only as an in-memory path value. The injected delegate
+        // records the directory instead of creating it, so nothing is created on disk.
+        private const string AttachmentSandboxDirectory = @"C:\Sortemail945Sandbox\attachments";
+
+        /// <summary>
+        /// Scenario: the attachment save succeeds. Expected: the directory-creation delegate
+        /// receives the destination directory before the attachment is saved, the result is true,
+        /// and the attachment is saved exactly once.
+        /// </summary>
         [TestMethod]
         public async Task TrySaveAttachmentAsync_WhenSaveSucceeds_ReturnsTrueAndCallsSaveAsFile()
         {
             // Arrange
+            var events = new List<string>();
             var attachment = CreateAttachmentMock("saved.txt", OlAttachmentType.olByValue);
-            var destinationPath = Path.Combine(GetRepositoryRoot().FullName, "saved.txt");
+            var destinationPath = Path.Combine(AttachmentSandboxDirectory, "saved.txt");
+            attachment
+                .Setup(x => x.SaveAsFile(destinationPath))
+                .Callback<string>(p => events.Add("save:" + p));
 
             // Act
-            bool saved = await attachment.Object.TrySaveAttachmentAsync(destinationPath);
+            bool saved = await attachment.Object.TrySaveAttachmentAsync(
+                destinationPath,
+                path => events.Add("mkdir:" + path)
+            );
 
             // Assert
             saved.Should().BeTrue();
+            events.Should().Equal("mkdir:" + AttachmentSandboxDirectory, "save:" + destinationPath);
             attachment.Verify(x => x.SaveAsFile(destinationPath), Times.Once);
+        }
+
+        /// <summary>
+        /// Scenario: the injected directory-creation delegate throws an IOException. Expected:
+        /// the exception propagates to the caller and the attachment is never saved.
+        /// </summary>
+        [TestMethod]
+        public async Task TrySaveAttachmentAsync_WhenDirectoryCreationThrowsIOException_PropagatesAndDoesNotSave()
+        {
+            // Arrange
+            var attachment = CreateAttachmentMock("saved.txt", OlAttachmentType.olByValue);
+            var destinationPath = Path.Combine(AttachmentSandboxDirectory, "saved.txt");
+
+            // Act
+            Func<Task> act = () =>
+                attachment.Object.TrySaveAttachmentAsync(
+                    destinationPath,
+                    path => throw new IOException("disk failure")
+                );
+
+            // Assert
+            await act.Should().ThrowAsync<IOException>();
+            attachment.Verify(x => x.SaveAsFile(It.IsAny<string>()), Times.Never);
         }
 
         [TestMethod]
@@ -314,31 +410,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             line.Should().Be("Hello World\t\tLine1 Line2");
-        }
-
-        [TestMethod]
-        public void SanitizeArray_WhenOutputArrayIsInitialized_WritesSanitizedRows()
-        {
-            // Arrange
-            var method = typeof(SortEmail).GetMethod(
-                "SanitizeArray",
-                BindingFlags.NonPublic | BindingFlags.Static
-            )!;
-            var values = new string[2, 2]
-            {
-                { "A\tB", null },
-                { "Line1\r\nLine2", "Tail" },
-            };
-            var output = new string[values.GetLength(0)];
-            object[] args = { values, output };
-
-            // Act
-            method.Invoke(null, args);
-            output = (string[])args[1];
-
-            // Assert
-            output[0].Should().Be("A B");
-            output[1].Should().Be("Line1 Line2\tTail");
         }
 
         #endregion

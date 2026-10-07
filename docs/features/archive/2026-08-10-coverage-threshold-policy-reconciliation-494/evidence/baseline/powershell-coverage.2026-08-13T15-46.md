@@ -1,5 +1,5 @@
 Timestamp: 2026-08-13T15-46
-Command: `mcp__drm-copilot__run_poshqc_test(workspace_root: "C:\\Users\\DanMoisan\\repos\\TaskMaster", scan_folders: ["tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1", "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"])`
+Command: `mcp__drm-copilot__run_poshqc_test(workspace_root: "<repo-root>", scan_folders: ["tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1", "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"])`
 EXIT_CODE: 0
 MCP Result: Ran bundled PoshQC test against the TaskMaster workspace with two selected scan folders.
 

@@ -44,5 +44,5 @@ different worktree, so the relative path would resolve against the wrong checkou
 command was therefore run as a `pwsh -NoProfile -Command` payload whose first statement is
 `Set-Location -LiteralPath` on this item worktree, and the resolved working directory was
 printed and confirmed as
-`C:\Users\DanMoisan\repos\TaskMaster-wt\bugs-2026-09-11-item-879` before the script ran.
+`<user-profile>\repos\TaskMaster-wt\bugs-2026-09-11-item-879` before the script ran.
 The script executed is the same file the plan names.

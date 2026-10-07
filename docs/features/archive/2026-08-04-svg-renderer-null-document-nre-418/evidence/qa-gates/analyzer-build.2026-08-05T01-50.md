@@ -38,7 +38,7 @@ Time Elapsed 00:00:11.43
 | 1 | warning | (no code) | `QuickFiler/QuickFiler.csproj` | same |
 | 1 | warning | (no code) | `TaskMaster/TaskMaster.csproj` | same |
 | 1 | warning | (no code) | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | same |
-| 1 | warning | `CS2002` | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | `Source file 'C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times` |
+| 1 | warning | `CS2002` | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | `Source file '<repo-root>\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times` |
 | **0** | **error** | — | — | — |
 
 `SVGControl`, `SVGControl.Test`, and every other project emitted zero warnings and zero errors. Zero

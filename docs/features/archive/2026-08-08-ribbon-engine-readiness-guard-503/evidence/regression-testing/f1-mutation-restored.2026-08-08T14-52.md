@@ -2,7 +2,7 @@
 
 Timestamp: 2026-08-08T14-52
 Task: [P1-T8]
-Command: `pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git checkout -- TaskMaster/Ribbon/RibbonExplorer.xml; git status --porcelain -- TaskMaster/Ribbon/RibbonExplorer.xml; (Get-Content 'TaskMaster\Ribbon\RibbonExplorer.xml' | Measure-Object -Line).Lines; (Select-String -Path 'TaskMaster\Ribbon\RibbonExplorer.xml' -Pattern 'getEnabled=\"EngineCommand_GetEnabled\"' -AllMatches | Measure-Object).Count"`
+Command: `pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git checkout -- TaskMaster/Ribbon/RibbonExplorer.xml; git status --porcelain -- TaskMaster/Ribbon/RibbonExplorer.xml; (Get-Content 'TaskMaster\Ribbon\RibbonExplorer.xml' | Measure-Object -Line).Lines; (Select-String -Path 'TaskMaster\Ribbon\RibbonExplorer.xml' -Pattern 'getEnabled=\"EngineCommand_GetEnabled\"' -AllMatches | Measure-Object).Count"`
 EXIT_CODE: 0
 
 ## Why `git checkout --` is the restoration mechanism

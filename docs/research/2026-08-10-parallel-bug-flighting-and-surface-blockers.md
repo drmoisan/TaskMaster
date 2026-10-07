@@ -47,7 +47,7 @@ Each finding below was verified directly in this worktree on 2026-08-10.
 
 - It is absent from TaskMaster. `scripts/dev_tools/` does not exist at all.
 - It is absent from the upstream governance repository. `git grep -in "compute_cohorts|welsh"`
-  across all tracked files in `C:\Users\DanMoisan\repos\drm-copilot` returns nothing.
+  across all tracked files in `<user-profile>\repos\drm-copilot` returns nothing.
 - The upstream branch `feature/parallel-cohort-scheduler-445` and its feature folder exist, but no
   code landed. The upstream parallel epic merged F7/F8 (hooks, drift detection, schemas, validators)
   without F2.
@@ -63,7 +63,7 @@ parity check compare an implementation against itself, certifying nothing.
 `config/` in this repository contains only `orchestration-routing.json`. The blast-radius truth table
 is a required argument to both `Get-BlastRadius` and `Test-BlastRadiusConflict`.
 
-The upstream copy at `C:\Users\DanMoisan\repos\drm-copilot\config\blast-radius.json` enumerates
+The upstream copy at `<user-profile>\repos\drm-copilot\config\blast-radius.json` enumerates
 modules `scripts/dev_tools`, `packages/mcp-server`, `extensions/drm-copilot` and shared surfaces
 `poetry.lock`, `package-lock.json`. None of those exist in a C#/VSTO repository. Applied here it
 would attribute zero modules and miss every real TaskMaster shared surface.
@@ -389,5 +389,5 @@ Lane B is a reasonable second epic on the same rationale.
 - Agent-scoped findings recorded at `.claude/agent-memory/parallel-planner/`:
   - `project_parallel_surface_partial_port.md`
   - `reference_drm_copilot_upstream.md`
-- Upstream governance repository: `C:\Users\DanMoisan\repos\drm-copilot`.
+- Upstream governance repository: `<user-profile>\repos\drm-copilot`.
 - No manifest, checkpoint, kickoff artifact, feature folder, or branch was created by the halted run.

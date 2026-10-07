@@ -1,6 +1,6 @@
 Timestamp: 2026-08-31T10:02:00-04:00
 
-Command: `git worktree add --detach C:\Users\DanMoisan\AppData\Local\Temp\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200 be9bedb48bd96460392712b33e96aeed34d475ba`; `pwsh -File ./scripts/vscode/Install-RepoDotNetSdk.ps1`; `dotnet tool restore`; `dotnet tool run csharpier --version`; `dotnet tool run csharpier check .`
+Command: `git worktree add --detach <user-profile>\AppData\Local\Temp\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200 be9bedb48bd96460392712b33e96aeed34d475ba`; `pwsh -File ./scripts/vscode/Install-RepoDotNetSdk.ps1`; `dotnet tool restore`; `dotnet tool run csharpier --version`; `dotnet tool run csharpier check .`
 
 EXIT_CODE: 1
 
@@ -10,7 +10,7 @@ Output Summary: The isolated detached baseline worktree resolved to the requeste
 
 BaselineCommit: be9bedb48bd96460392712b33e96aeed34d475ba
 
-IsolatedWorktree: `C:\Users\DanMoisan\AppData\Local\Temp\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200`
+IsolatedWorktree: `<user-profile>\AppData\Local\Temp\taskmaster-469-csharpier-baseline-be9bedb48bd9-20260831T100200`
 
 CSharpierVersion: 1.2.6
 

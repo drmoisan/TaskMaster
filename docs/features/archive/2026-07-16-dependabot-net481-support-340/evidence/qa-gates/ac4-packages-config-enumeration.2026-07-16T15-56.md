@@ -7,7 +7,7 @@
 
 ## Output Summary
 
-Full set of returned `FullName` values (repository root: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-16T15-49\`):
+Full set of returned `FullName` values (repository root: `<user-profile>\repos\TaskMaster-wt\2026-07-16T15-49\`):
 
 1. `QuickFiler\packages.config`
 2. `QuickFiler.Test\packages.config`

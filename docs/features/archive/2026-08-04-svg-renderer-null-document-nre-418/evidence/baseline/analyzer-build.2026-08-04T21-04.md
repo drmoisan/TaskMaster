@@ -50,7 +50,7 @@ action was taken or required.
 Distinct diagnostic codes: `CS2002`, plus one code-less MSBuild warning from
 `System.Reactive.PackagesConfigCheck.targets`. Zero errors of any code.
 
-`CS2002` text: `Source file 'C:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times`.
+`CS2002` text: `Source file '<repo-root>\UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs' specified multiple times`.
 This is a pre-existing duplicate `<Compile>` include in `UtilitiesCS.Test.csproj`, out of scope for
 issue #418.
 

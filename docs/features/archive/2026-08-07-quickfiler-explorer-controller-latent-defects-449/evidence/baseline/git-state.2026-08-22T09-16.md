@@ -1,7 +1,7 @@
 # Baseline — Git State (Issue #449, [P0-T7])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 Branch: `bug/quickfiler-explorer-controller-latent-defects-449-exec`
 
 Command: `git rev-parse --abbrev-ref HEAD` ; `git branch -a --list "*integration*"` ;

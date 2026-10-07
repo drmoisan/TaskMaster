@@ -1,7 +1,7 @@
 # Phase 4 — Analyzer Build After Dead-Region Deletion and Using Hygiene (Issue #449, [P4-T4])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command:
 ```

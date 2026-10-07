@@ -1,6 +1,6 @@
 Using vstest.console: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
 Discovered 8 test assemblies.
-Coverage output: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml
+Coverage output: <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml
 dotnet-coverage v18.5.2.0 [win-x64 - .NET 10.0.10]
 
 SessionId: 09bc9cc4-6b4d-4dda-b01d-32bc563238ab
@@ -8,7 +8,7 @@ VSTest version 18.8.0 (x64)
 
 Starting test execution, please wait...
 A total of 8 test files matched the specified pattern.
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed GetMoveDiagnostics_WhenAppointmentIsNull_DoesNotThrow [304 ms]
   Passed GetMoveDiagnostics_WhenAppointmentIsNull_ReturnsStringArray [1 ms]
   Passed RemoveBelowThresholdAsync_WhenAllGroupsAboveThreshold_RemovesNone [51 ms]
@@ -819,7 +819,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EfcViewerQueue_BuildQueue_DelegatesToInjectedCore [2 ms]
   Passed EfcViewerQueue_Dequeue_UsesInjectedCoreAndRestoresReplacementCount [< 1 ms]
   Passed ItemViewerQueue_BuildMethods_DelegateToInjectedCore [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ItemViewerQueue_DequeueAndChunk_DelegateToInjectedCore [< 1 ms]
   Passed EfcViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
   Passed ItemViewerQueue_CreateProductionCore_UsesProvidedDelegates [< 1 ms]
@@ -887,7 +887,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed SelectPageDown_WhenNoRowBelowViewport_SelectsLastControl [2 ms]
   Passed SelectPageDown_WhenRowBelowViewport_ScrollsToIt [3 ms]
   Passed SelectPageUp_WhenRowAboveViewport_ScrollsToIt [1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed SelectPageUp_WhenNoRowAboveViewport_SelectsFirstControl [< 1 ms]
   Passed HideArchive_WhenToggled_ReloadsFilteredAndOriginalOptions [65 ms]
   Passed AutoAssignAction_WhenExistingAndNewAssignmentsReturned_UpdatesSelections [3 ms]
@@ -1132,7 +1132,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EmitPerStoreInboxAttribution_SetsCurrentStoreContext_DuringGetDefaultFolder_ThenReverts [< 1 ms]
   Passed EmitPerStoreInboxAttribution_ExcludedStore_NeverOpensContext_AndReturnsNull [< 1 ms]
   Passed EmitPerStoreInboxAttribution_RevertsContext_EvenWhenGetDefaultFolderThrows [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed LoadAsync_AssignsStoresWrapperFromConfigAndCompletes [2 ms]
   Passed LoadStoresAsync_WhenConfigMissing_BuildsFreshStoresWrapper [1 ms]
   Passed LoadStoresAsync_WhenConfigDeserializesToNull_BuildsFreshStoresWrapper [1 ms]
@@ -1189,7 +1189,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed HandleModelCanDrop_ReorderAboveItem_SetsMoveEffect [< 1 ms]
   Passed HandleModelCanDrop_BackgroundAllRoots_SaysAlreadyRoots [< 1 ms]
   Passed HandleModelCanDrop_DropOnDescendant_SaysParadox [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed HandleModelDropped_DefaultLocation_ReturnsEarly [1 ms]
   Passed TreeLvActivateItem_WhenUnsupportedType_FiresMessageSeam [58 ms]
   Passed TreeLvActivateItemAsync_WhenNoSelection_IsNoOp [< 1 ms]
@@ -1356,7 +1356,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed CaptureDuration_Negative_InvokesNotifierAndLeavesTotalWorkUnchanged [11 ms]
   Passed CaptureDuration_NonInteger_PropagatesFormatException [7 ms]
   Passed OK_Action_NoCategorySelected_DoesNotApplyOrSetDialogResult [20 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed Cancel_Action_HidesSetsCancelAndDisposes [7 ms]
   Passed Disabled_InitializeSortToExisting_StateUnderTest_ExpectedBehavior [17 ms]
   Passed ToBase10_StateUnderTest_ExpectedBehavior_10 [28 ms]
@@ -1471,7 +1471,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ForceSave_WhenReadOnlyPersistsCachedState_RestoresReadOnlyState [26 ms]
   Passed WriteFlagsBatch_WithTranslatorValues_UpdatesUserDefinedFields [65 ms]
   Passed AutoCodeIdAsync_WithNullAndEmptyInputs_ReturnsWithoutIdListAccess [25 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed SetProjectId_MalformedId_ShowsErrorDialogAndReturnsFalse [779 ms]
   Passed SetProjectId_ChangeConfirmedYes_UpdatesProjectId [13 ms]
   Passed AutoCodeIdAsync_WithEmptyAndExistingIds_UsesBranchSpecificTransitions [38 ms]
@@ -6080,7 +6080,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ToFormattedText_WithHeadersAndAggregatorRow_FormatsTitleHeadersAndDivider [< 1 ms]
   Passed ToFormattedText_ForGenericDictionary_UsesConvertersAndTitle [4 ms]
   Passed ToFormattedText_ForNumericDictionaries_FormatsExpectedDecimalPlaces [3 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed ArrayToDatatable_WithHeadersAndNestedValues_BuildsExpectedTable [< 1 ms]
   Passed ArrayToDatatable_WithHeaderLengthMismatch_ThrowsArgumentException [< 1 ms]
   Passed ToFormattedTextAndMarkdown_ForTwoDimensionalArray_RenderAllPrimitiveCells [< 1 ms]
@@ -6096,6 +6096,6 @@ Test Run Successful.
 Total tests: 6075
      Passed: 6075
  Total time: 56.1652 Seconds
-Code coverage results: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml.
+Code coverage results: <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml.
 Post-processing coverage XML for Koverage compatibility...
-Done. Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml
+Done. Coverage artifact: <user-profile>\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml

@@ -13,10 +13,10 @@ Policy Order: The reading order defined by `.claude/skills/policy-compliance-ord
 
 ## Files Read (explicit list)
 
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0\CLAUDE.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0\.claude\rules\general-code-change.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0\.claude\rules\general-unit-test.md`
-- `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad7090ae544fd0fb0\.claude\rules\csharp.md`
+- `<repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0\CLAUDE.md`
+- `<repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0\.claude\rules\general-code-change.md`
+- `<repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0\.claude\rules\general-unit-test.md`
+- `<repo-root>\.claude\worktrees\agent-ad7090ae544fd0fb0\.claude\rules\csharp.md`
 
 Supporting skills read for this execution:
 

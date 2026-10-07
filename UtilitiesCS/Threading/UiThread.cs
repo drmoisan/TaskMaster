@@ -194,7 +194,9 @@ namespace UtilitiesCS
                     // UI dispatcher. The spelling is fully qualified because inside this nested
                     // struct the simple name Dispatcher also names the enclosing type's static
                     // property of the same name.
+                    // The null test mirrors the captured-context exit: null must never match null.
                     return _context is DispatcherSynchronizationContext
+                        && _dispatcher is not null
                         && ReferenceEquals(
                             System.Windows.Threading.Dispatcher.FromThread(Thread.CurrentThread),
                             _dispatcher

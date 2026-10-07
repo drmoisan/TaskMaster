@@ -6,7 +6,7 @@ Command:
 ```
 & $DOTNET tool run csharpier check .
 ```
-with `DOTNET` = `C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk\dotnet.exe`. Run from `WS`. Read-only; no file was modified.
+with `DOTNET` = `<repo-root>\.dotnet-sdk\dotnet.exe`. Run from `WS`. Read-only; no file was modified.
 
 EXIT_CODE: 0
 

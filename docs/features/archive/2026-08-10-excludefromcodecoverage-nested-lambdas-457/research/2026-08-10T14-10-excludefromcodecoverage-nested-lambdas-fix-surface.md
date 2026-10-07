@@ -3,7 +3,7 @@
 Timestamp: 2026-08-10T14-10
 Issue: #457
 Feature folder: `docs/features/active/2026-08-10-excludefromcodecoverage-nested-lambdas-457`
-Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-af6843b0a129fc575`
+Worktree: `<repo-root>\.claude\worktrees\agent-af6843b0a129fc575`
 
 ---
 

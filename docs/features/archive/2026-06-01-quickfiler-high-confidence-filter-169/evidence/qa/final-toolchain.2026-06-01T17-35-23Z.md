@@ -1,7 +1,7 @@
 # Final C# Toolchain Loop — Issue #169 Remediation (P5-T1 / P5-T2)
 
 - **Timestamp (UTC):** 2026-06-01T17-35-23Z
-- **Working directory:** C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-01-08-21
+- **Working directory:** <user-profile>\repos\TaskMaster-wt-2026-06-01-08-21
 
 All four steps were run in order. No step changed files, and no restart was required: the
 final pass completed cleanly in a single pass (subject to the pre-existing flaky-test
@@ -71,12 +71,12 @@ Total 16, **Passed 16, Failed 0** (EXIT 0), including the two new R1 regression 
 ## P5-T2 — Final-pass coverage artifact
 
 The final Step 4 instrumented run produced
-`TestResults/6c08859b-cc45-4b32-9b16-9124dcbd0cd5/DanMoisan_MEGALODON4_2026-06-01.13_49_14.coverage`.
+`TestResults/6c08859b-cc45-4b32-9b16-9124dcbd0cd5/<user>_<host>_2026-06-01.13_49_14.coverage`.
 
 `artifacts/csharp/coverage.xml` was re-emitted from this final `.coverage`:
 
 ```
-dotnet-coverage merge TestResults\6c08859b-cc45-4b32-9b16-9124dcbd0cd5\DanMoisan_MEGALODON4_2026-06-01.13_49_14.coverage -f cobertura -o artifacts\csharp\coverage.xml
+dotnet-coverage merge TestResults\6c08859b-cc45-4b32-9b16-9124dcbd0cd5\<user>_<host>_2026-06-01.13_49_14.coverage -f cobertura -o artifacts\csharp\coverage.xml
 ```
 
 The artifact therefore reflects the final code state (no production code changed between

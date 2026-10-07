@@ -6,7 +6,7 @@
 - Feature folder: `docs/features/active/2026-09-06-quickfiler-folder-dropdown-closes-on-open-and-click-does-not-select-796`
 - Base ref: `a6b259160f9ac1fbe251708d897fd4721486259e` (origin/main, ancestry verified by the executor at P9-T10)
 - Branch head reported by the caller: `8e427fe1`
-- Reviewed worktree: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-af8210acca019debc`
+- Reviewed worktree: `<repo-root>/.claude/worktrees/agent-af8210acca019debc`
 - Policies applied, in order: `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`
 
 ## Template Provenance
@@ -23,7 +23,7 @@ The caller imposed a binding tooling constraint: the Bash tool must not be used 
 because an unattended `git` invocation from a review agent hangs indefinitely. All evidence below
 was therefore gathered with read-only file inspection (Read, Grep, Glob) plus the pre-materialised
 diff the caller supplied at
-`C:/Users/DANMOI~1/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-TaskMaster-wt-2026-09-06T17-16/b3e58737-6e95-4aae-b188-50cc8e7cf80a/scratchpad/796-code-diff.patch`,
+`<user-profile>/AppData/Local/Temp/claude/C--Users-<user>-repos-TaskMaster-wt-2026-09-06T17-16/b3e58737-6e95-4aae-b188-50cc8e7cf80a/scratchpad/796-code-diff.patch`,
 which is `git diff a6b25916..HEAD -- QuickFiler QuickFiler.Test`.
 
 Consequences, stated so no reader over-reads this audit:

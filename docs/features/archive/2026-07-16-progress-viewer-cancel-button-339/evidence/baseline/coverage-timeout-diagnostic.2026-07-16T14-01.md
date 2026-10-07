@@ -1,6 +1,6 @@
 Timestamp: 2026-07-16T14-01
 
-Command: `vstest.console.exe "<assembly>" "/Settings:C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-16T12-27\scripts\vscode\TaskMaster.cli.runsettings" "/InIsolation" "/TestCaseFilter:TestCategory!=LiveOutlook"` executed once per discovered assembly with an external `WaitForExit(180000)` timeout.
+Command: `vstest.console.exe "<assembly>" "/Settings:<user-profile>\repos\TaskMaster-wt\2026-07-16T12-27\scripts\vscode\TaskMaster.cli.runsettings" "/InIsolation" "/TestCaseFilter:TestCategory!=LiveOutlook"` executed once per discovered assembly with an external `WaitForExit(180000)` timeout.
 
 EXIT_CODE: 0
 
@@ -65,7 +65,7 @@ The retry did not update `csharp-coverage-baseline.2026-07-16T12-39.cobertura.xm
 
 Timestamp: 2026-07-16T14-36
 
-Command: `vstest.console.exe "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" "/Settings:C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-16T12-27\scripts\vscode\TaskMaster.cli.runsettings" "/InIsolation" "/TestCaseFilter:TestCategory!=LiveOutlook" "/Blame" "/BlameHangTimeout:60s" "/Logger:trx;LogFileName=coverage-timeout-pair.2026-07-16T14-36.trx" "/Diag:coverage-timeout-pair.2026-07-16T14-36.diag.log"`
+Command: `vstest.console.exe "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" "/Settings:<user-profile>\repos\TaskMaster-wt\2026-07-16T12-27\scripts\vscode\TaskMaster.cli.runsettings" "/InIsolation" "/TestCaseFilter:TestCategory!=LiveOutlook" "/Blame" "/BlameHangTimeout:60s" "/Logger:trx;LogFileName=coverage-timeout-pair.2026-07-16T14-36.trx" "/Diag:coverage-timeout-pair.2026-07-16T14-36.diag.log"`
 
 EXIT_CODE: 1
 
@@ -81,7 +81,7 @@ VSTest 18.7 help lists `/Blame:[CollectDump];[CollectAlways]=...;[DumpType]=...`
 
 Timestamp: 2026-07-16T14-37
 
-Command: `vstest.console.exe "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" "/Settings:C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-16T12-27\scripts\vscode\TaskMaster.cli.runsettings" "/InIsolation" "/TestCaseFilter:TestCategory!=LiveOutlook" "/Blame" "/Logger:trx;LogFileName=coverage-timeout-pair.2026-07-16T14-37.trx" "/Diag:coverage-timeout-pair.2026-07-16T14-37.diag.log"`, bounded by an external 60-second process timeout.
+Command: `vstest.console.exe "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" "/Settings:<user-profile>\repos\TaskMaster-wt\2026-07-16T12-27\scripts\vscode\TaskMaster.cli.runsettings" "/InIsolation" "/TestCaseFilter:TestCategory!=LiveOutlook" "/Blame" "/Logger:trx;LogFileName=coverage-timeout-pair.2026-07-16T14-37.trx" "/Diag:coverage-timeout-pair.2026-07-16T14-37.diag.log"`, bounded by an external 60-second process timeout.
 
 EXIT_CODE: 0
 

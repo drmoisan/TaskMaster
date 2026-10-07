@@ -15,7 +15,7 @@ Measured with `coverage.runsettings` (TaskVisualization.dll only, Cobertura,
 honoring `[ExcludeFromCodeCoverageAttribute]`).
 
 Captured on the pre-#298 baseline ref `epic/winforms-testability-refactor-integration`
-(`949dddd2`) in worktree `C:\Users\DanMoisan\repos\TaskMaster-wt\winforms-integration`
+(`949dddd2`) in worktree `<user-profile>\repos\TaskMaster-wt\winforms-integration`
 after `Invoke-Restore.ps1`.
 
 ## Interpretation

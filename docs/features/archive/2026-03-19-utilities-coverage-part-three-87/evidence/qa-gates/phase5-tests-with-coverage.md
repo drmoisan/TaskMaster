@@ -8,5 +8,5 @@ Output Summary:
 - Passed Tests: 3637
 - Skipped Tests: 2
 - Failed Tests: 0
-- Coverage Artifact: C:\Users\DanMoisan\repos\TaskMaster-issue87-clean\coverage\coverage.cobertura.xml
+- Coverage Artifact: <user-profile>\repos\TaskMaster-issue87-clean\coverage\coverage.cobertura.xml
 - UtilitiesCS Line Rate: 0.7562679176439927

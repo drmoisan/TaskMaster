@@ -84,7 +84,7 @@ or a machine name**. Two corrections were therefore applied:
 2. **All 19 TRX files under the feature evidence tree were scrubbed.** The TRX format records
    `computerName="<host>"` on every `UnitTestResult` element and embeds the absolute worktree path, so
    the leak was systemic across every phase's TRX rather than specific to this one. The substitutions
-   were: the machine name to `REDACTED-HOST`, the absolute worktree root to `<worktree-root>`, and any
+   were: the machine name to `<host>`, the absolute worktree root to `<worktree-root>`, and any
    residual account name to `REDACTED-USER`.
 
 Verification after the scrub: a recursive search of the entire feature evidence tree returns **0** files

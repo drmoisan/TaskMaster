@@ -54,7 +54,7 @@ The uncovered lines carry no branch logic beyond fail-fast guards; the pure argu
 
 ## (d) Maintainer ratification
 
-The project maintainer (dan@danmoisan.org) authorized this coverage exemption as part of the Issue #283 full-lifecycle delivery. The exemption covers only the host-bound script-body line ranges enumerated in (a); it does not lower the coverage floor for any other file and does not exempt the pure logic, which remains fully tested.
+The project maintainer (dan@<user>.org) authorized this coverage exemption as part of the Issue #283 full-lifecycle delivery. The exemption covers only the host-bound script-body line ranges enumerated in (a); it does not lower the coverage floor for any other file and does not exempt the pure logic, which remains fully tested.
 
 ## (e) Policy references
 

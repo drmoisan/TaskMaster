@@ -7,7 +7,7 @@ Timestamp: 2026-08-04T14-58
 
 Command: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild`
 
-Working directory: repository root (`c:\Users\DanMoisan\source\repos\drmoisan\TaskMaster`)
+Working directory: repository root (`<user-profile>\source\repos\drmoisan\TaskMaster`)
 
 EXIT_CODE: 1
 

@@ -330,7 +330,7 @@ patterns to reuse:
   Outlook, no filesystem, no globals (`Globals = null`, parameterless `ResolvePaths()`).
 - **Exact input**: `OlAncestor = @"\\mailbox@example.com\Archive"`,
   `DestinationOlStem = @"\\mailbox@example.com"`,
-  `FsAncestorEquivalent = @"C:\Users\testuser\OneDrive - Contoso"` (a realistic fs ancestor with
+  `FsAncestorEquivalent = @"<user-profile>\OneDrive - Contoso"` (a realistic fs ancestor with
   no characters from the current illegal set, so the `.` in the mailbox domain is the sole
   trigger — matching the field report).
 - **Pre-fix behavior (verified by §1.3 algebra)**: `ResolvePaths()` reaches

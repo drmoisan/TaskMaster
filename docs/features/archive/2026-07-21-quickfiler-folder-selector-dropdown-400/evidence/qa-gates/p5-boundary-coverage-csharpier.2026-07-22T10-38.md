@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T10:38:00Z
 
-Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs').Path; $tool='C:\Users\DanMoisan\.dotnet\tools\csharpier.exe'; @($file) | & $tool pipe-files`
+Command: `$file=(Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbPopupBoundaryCoverageTests.cs').Path; $tool='<user-profile>\.dotnet\tools\csharpier.exe'; @($file) | & $tool pipe-files`
 
 EXIT_CODE: 0
 

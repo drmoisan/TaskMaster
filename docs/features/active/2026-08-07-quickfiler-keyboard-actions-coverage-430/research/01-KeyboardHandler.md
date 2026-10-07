@@ -11,7 +11,7 @@ Branch: `feature/quickfiler-keyboard-actions-coverage`
 
 | Attribute | Value |
 | --- | --- |
-| Path | `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Controllers\KeyboardHandler.cs` |
+| Path | `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\QuickFiler\Controllers\KeyboardHandler.cs` |
 | Line count | 414 (file ends at line 415 including trailing newline; last code line 414) |
 | Type | `internal class KeyboardHandler : IQfcKeyboardHandler` (line 23) |
 | Compiled | Yes — `QuickFiler/QuickFiler.csproj:339` `<Compile Include="Controllers\KeyboardHandler.cs" />` |
@@ -500,7 +500,7 @@ Coverage projection: 73 cases reach every member except R1 (lines 35–39). Even
 
 ## 11. Sources
 
-All paths relative to `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aafcc2531072ca96b\`.
+All paths relative to `<repo-root>\.claude\worktrees\agent-aafcc2531072ca96b\`.
 
 **Policy**
 - `CLAUDE.md` — § UT2 (COM/VSTO/WinForms coverage exemption, "testable denominator", `KbdActions<>` named as NOT exempt), § CUT1–CUT3 (MSTest/Moq/FluentAssertions, toolchain order)

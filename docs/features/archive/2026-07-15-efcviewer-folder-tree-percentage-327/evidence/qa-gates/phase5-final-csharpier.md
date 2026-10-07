@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-16T02-25
 
-Command: csharpier check . (global tool C:\Users\DanMoisan\.dotnet\tools\csharpier.exe v1.3.0, run from worktree root)
+Command: csharpier check . (global tool <user-profile>\.dotnet\tools\csharpier.exe v1.3.0, run from worktree root)
 
 EXIT_CODE: 0
 

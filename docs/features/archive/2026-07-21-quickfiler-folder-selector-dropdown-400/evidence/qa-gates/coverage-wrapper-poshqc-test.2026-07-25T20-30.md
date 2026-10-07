@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-25T20-30Z
 
-Command: `mcp__drm-copilot__run_poshqc_test(workspace_root="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25", scan_folders=["tests/scripts/vscode"])`
+Command: `mcp__drm-copilot__run_poshqc_test(workspace_root="<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25", scan_folders=["tests/scripts/vscode"])`
 
 EXIT_CODE: 0
 
@@ -11,7 +11,7 @@ Output Summary: The mandatory MCP Pester gate completed successfully. The genera
 ## Required MCP result
 
 - MCP `ok`: `true`
-- MCP summary: `Ran bundled PoshQC test against 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25' with 1 selected scan folder(s).`
+- MCP summary: `Ran bundled PoshQC test against '<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25' with 1 selected scan folder(s).`
 - Scan folder: `tests/scripts/vscode`
 
 ## Test results

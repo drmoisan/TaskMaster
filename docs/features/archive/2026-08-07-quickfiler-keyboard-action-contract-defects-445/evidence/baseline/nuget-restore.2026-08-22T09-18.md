@@ -6,7 +6,7 @@ Command:
 ```powershell
 (Get-ChildItem -Path packages -Directory).Count
 ```
-Run from `WS` = `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`.
+Run from `WS` = `<repo-root>/.claude/worktrees/agent-a6e508cbcd1e0a79d` via `pwsh -NoProfile`.
 
 EXIT_CODE: 0
 
@@ -23,7 +23,7 @@ EXIT_CODE: 0
 `packages` in `WS` is a Windows directory junction to the main checkout:
 
 ```
-packages -> /c/Users/DanMoisan/repos/TaskMaster/packages/
+packages -> /c/Users/<user>/repos/TaskMaster/packages/
 ```
 
 The junction is gitignored (`.gitignore` pattern `**/[Pp]ackages/*`) and is confirmed absent from the P0-T7 `git status --porcelain` capture.

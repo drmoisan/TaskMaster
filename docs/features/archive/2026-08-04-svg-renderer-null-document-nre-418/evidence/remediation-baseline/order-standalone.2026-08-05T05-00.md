@@ -76,11 +76,11 @@ System.InvalidOperationException: SvgRenderer could not parse the SVG payload: S
   Stack Trace:
      at Svg.SvgDocument.Create[T](XmlReader reader, String css)
    at Svg.SvgDocument.Open[T](Stream stream, SvgOptions svgOptions)
-   at SVGControl.SvgRenderer.OpenFromBytes(Byte[] file) in C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SvgRenderer.cs:line 270
-   at SVGControl.SvgRenderer.TryGetSvgDocument(Byte[] file, Func`2 parse, SvgDocument& document, Exception& error) in C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SvgRenderer.cs:line 290
+   at SVGControl.SvgRenderer.OpenFromBytes(Byte[] file) in <repo-root>\SVGControl\SvgRenderer.cs:line 270
+   at SVGControl.SvgRenderer.TryGetSvgDocument(Byte[] file, Func`2 parse, SvgDocument& document, Exception& error) in <repo-root>\SVGControl\SvgRenderer.cs:line 290
 --- End of inner exception stack trace ---
-   at SVGControl.SvgRenderer.GetSvgDocumentOrThrow(Byte[] file) in C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SvgRenderer.cs:line 339
-   at SVGControl.Test.SvgRendererParseContractTests.GetSvgDocumentOrThrow_WithTheBuiltInDefaultImage_ReturnsADocument() in C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\SvgRendererParseContractTests.cs:line 318
+   at SVGControl.SvgRenderer.GetSvgDocumentOrThrow(Byte[] file) in <repo-root>\SVGControl\SvgRenderer.cs:line 339
+   at SVGControl.Test.SvgRendererParseContractTests.GetSvgDocumentOrThrow_WithTheBuiltInDefaultImage_ReturnsADocument() in <repo-root>\SVGControl.Test\SvgRendererParseContractTests.cs:line 318
 ```
 
 **Requested assembly identity, verbatim:**

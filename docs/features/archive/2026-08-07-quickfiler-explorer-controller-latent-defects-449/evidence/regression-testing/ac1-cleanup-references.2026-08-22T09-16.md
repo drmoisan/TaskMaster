@@ -1,7 +1,7 @@
 # AC-1 — Residual `ExplConvView_Cleanup` References (Issue #449, [P3-T6])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 Command:
 ```

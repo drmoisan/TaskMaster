@@ -14,9 +14,9 @@ namespace TaskMaster.Test.AppGlobals
     [TestClass]
     public class AppFileSystemFolderPathsOneDriveResolutionTests
     {
-        private const string Commercial = @"C:\Users\testuser\OneDrive - Contoso";
-        private const string Consumer = @"C:\Users\testuser\OneDrive";
-        private const string Personal = @"C:\Users\testuser\OneDrive - Personal";
+        private const string Commercial = @"C:\Fixtures\testuser\OneDrive - Contoso";
+        private const string Consumer = @"C:\Fixtures\testuser\OneDrive";
+        private const string Personal = @"C:\Fixtures\testuser\OneDrive - Personal";
 
         [TestMethod]
         public void ResolveOneDriveRoot_AllThreeVariablesSet_PicksTheHighestPriority()

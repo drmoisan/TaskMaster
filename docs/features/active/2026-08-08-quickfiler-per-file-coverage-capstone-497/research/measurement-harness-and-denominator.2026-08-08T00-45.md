@@ -23,7 +23,7 @@ pattern-matching files in the checkout. Nothing was executed. Consequently:
 ### Current count on this branch: **121**
 
 Verified by literal pattern count against
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a8b4d64f3ad6053b3\QuickFiler\QuickFiler.csproj`:
+`<repo-root>\.claude\worktrees\agent-a8b4d64f3ad6053b3\QuickFiler\QuickFiler.csproj`:
 
 | Pattern | Count |
 | --- | --- |
@@ -99,7 +99,7 @@ decision D11. Two caveats:
 
 1. In a **raw** (un-post-processed) report the `filename` is an **absolute path** rooted at the
    capturing worktree, e.g.
-   `filename="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-04T18-38\QuickFiler\Controllers\EfcHomeController.cs"`
+   `filename="<user-profile>\repos\TaskMaster-wt\2026-08-04T18-38\QuickFiler\Controllers\EfcHomeController.cs"`
    (verified at `evidence/baseline/coverage-baseline.cobertura.xml:6`). The prefix rewrite is done by
    `ConvertTo-KoverageRelativePath` during post-processing only.
 2. The separator is `[System.IO.Path]::DirectorySeparatorChar` by default
@@ -330,7 +330,7 @@ The `Where-Object` filter has **no** exclusion for `.claude`. However:
   worktree** (verified: a glob for `.claude/worktrees/*` returns no files). Recursion is therefore
   self-contained and this specific hazard does not fire when the runner is invoked from a worktree.
 - The hazard is real when the runner is invoked from the **canonical repo root**
-  `C:\Users\DanMoisan\repos\TaskMaster`, where `.claude\worktrees\` holds agent worktrees with their
+  `<repo-root>`, where `.claude\worktrees\` holds agent worktrees with their
   own `*/bin/Debug/*.Test.dll`.
 
 If manual discovery is used instead of the runner, the exclusion to add is a third

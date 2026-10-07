@@ -269,8 +269,8 @@ The pre-cycle-3 serialized `Config.Disk` block in the document (default Newtonso
 ```json
 "Config": {
   "Disk": {
-    "FilePath": "C:\\Users\\...\\AppData\\Bayesian\\LcppnFolder.json",
-    "FolderPath": "C:\\Users\\...\\AppData\\Bayesian",
+    "FilePath": "<user-profile>\\AppData\\Bayesian\\LcppnFolder.json",
+    "FolderPath": "<user-profile>\\AppData\\Bayesian",
     "FileName": "LcppnFolder.json",
     "FileStemSeed": null,
     "FileStemSuffix": null,

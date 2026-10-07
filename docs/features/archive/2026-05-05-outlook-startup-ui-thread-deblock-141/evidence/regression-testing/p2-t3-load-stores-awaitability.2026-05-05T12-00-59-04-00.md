@@ -12,4 +12,4 @@ Relevant Stack Frames:
 - TaskMaster.Test.AppGlobals.AppOlObjectsTests.<LoadStoresAsync_DoesNotCompleteBeforeStoreRewireTaskFinishes>d__9.MoveNext()
 - FluentAssertions.Primitives.BooleanAssertions`1.BeFalse(String because, Object[] becauseArgs)
 Evidence Source Logs:
-- c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_jG9Z8mWSs7RAPFAjWRF8RBWR__vscode-1777946811237\content.txt
+- <user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\653bf1e67920176c5d60164d7e4a0163\GitHub.copilot-chat\chat-session-resources\b0deb795-3f48-4148-99bd-e12833985b71\call_jG9Z8mWSs7RAPFAjWRF8RBWR__vscode-1777946811237\content.txt

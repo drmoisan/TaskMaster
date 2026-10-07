@@ -3,7 +3,7 @@
 - Date: 2026-07-19
 - Scope: Wave-2 capstone of epic `utilitiescs-nullable-remediation` (issue #376). Research only;
   no production file, workflow YAML, csproj, or `.claude/rules/*` file was modified.
-- Worktree examined: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d`,
+- Worktree examined: `<repo-root>/.claude/worktrees/agent-ac3a98310ffd36d6d`,
   branch `feature/utilitiescs-nullable-ci-capstone` (based on
   `origin/epic/utilitiescs-nullable-remediation-integration`, tip `dd17719a`).
 

@@ -121,7 +121,7 @@ required — no caller instruction specified a non-canonical evidence path.
 
 ## 6. Hygiene
 
-- Host-path and account-name leak scan of all tracked files in the feature folder and the code diff (`DanMoisan`, `C:\Users`, `C:/Users`): zero matches.
+- Host-path and account-name leak scan of all tracked files in the feature folder and the code diff (`<user>`, `C:\Users`, `C:/Users`): zero matches.
 - Working tree at review time: clean (`git status --porcelain` empty).
 - Plan: 132/132 tasks checked. Spec: 50/50 criteria checked, zero text edits (verified).
 - Tonality of committed artifacts: professional, evidence-first; no violations observed.

@@ -35,13 +35,13 @@ namespace TaskMaster.Test.AppGlobals
             // Arrange
             var folders = new Dictionary<string, string>
             {
-                ["AppData"] = @"C:\Users\Test\AppData\Local",
+                ["AppData"] = @"C:\Fixtures\Test\AppData\Local",
             };
 
             // Act
             var result = AppFileSystemFolderPaths.MatchBestSpecialFolder(
                 folders,
-                @"C:\Users\Test\AppData\Local\TaskMaster\file.txt"
+                @"C:\Fixtures\Test\AppData\Local\TaskMaster\file.txt"
             );
 
             // Assert
@@ -56,14 +56,14 @@ namespace TaskMaster.Test.AppGlobals
             // Arrange: both values are contained in the path; the longer value's key must win.
             var folders = new Dictionary<string, string>
             {
-                ["Root"] = @"C:\Users",
-                ["AppData"] = @"C:\Users\Test\AppData",
+                ["Root"] = @"C:\Fixtures",
+                ["AppData"] = @"C:\Fixtures\Test\AppData",
             };
 
             // Act
             var result = AppFileSystemFolderPaths.MatchBestSpecialFolder(
                 folders,
-                @"C:\Users\Test\AppData\Local\file.txt"
+                @"C:\Fixtures\Test\AppData\Local\file.txt"
             );
 
             // Assert
@@ -78,12 +78,12 @@ namespace TaskMaster.Test.AppGlobals
         public void MatchBestSpecialFolder_CaseMismatch_DoesNotMatch_ReturnsNull()
         {
             // Arrange: string.Contains is ordinal/case-sensitive, so a case mismatch is not a match.
-            var folders = new Dictionary<string, string> { ["AppData"] = @"C:\USERS\TEST" };
+            var folders = new Dictionary<string, string> { ["AppData"] = @"C:\FIXTURES\TEST" };
 
             // Act
             var result = AppFileSystemFolderPaths.MatchBestSpecialFolder(
                 folders,
-                @"C:\users\test\file.txt"
+                @"c:\fixtures\test\file.txt"
             );
 
             // Assert
@@ -120,7 +120,10 @@ namespace TaskMaster.Test.AppGlobals
         public void MatchBestSpecialFolder_NoValueContained_ReturnsNull()
         {
             // Arrange
-            var folders = new Dictionary<string, string> { ["AppData"] = @"C:\Users\Test\AppData" };
+            var folders = new Dictionary<string, string>
+            {
+                ["AppData"] = @"C:\Fixtures\Test\AppData",
+            };
 
             // Act
             var result = AppFileSystemFolderPaths.MatchBestSpecialFolder(
@@ -159,7 +162,10 @@ namespace TaskMaster.Test.AppGlobals
         public void MatchBestSpecialFolder_EmptyPath_NoValueContained_ReturnsNull()
         {
             // Arrange: an empty path cannot contain any non-empty folder value.
-            var folders = new Dictionary<string, string> { ["AppData"] = @"C:\Users\Test\AppData" };
+            var folders = new Dictionary<string, string>
+            {
+                ["AppData"] = @"C:\Fixtures\Test\AppData",
+            };
 
             // Act
             var result = AppFileSystemFolderPaths.MatchBestSpecialFolder(folders, string.Empty);
@@ -173,7 +179,10 @@ namespace TaskMaster.Test.AppGlobals
         {
             // Arrange: the method invokes path.Contains, so a null path throws (documented
             // behavior preserved exactly from the original instance method).
-            var folders = new Dictionary<string, string> { ["AppData"] = @"C:\Users\Test\AppData" };
+            var folders = new Dictionary<string, string>
+            {
+                ["AppData"] = @"C:\Fixtures\Test\AppData",
+            };
 
             // Act
             Action act = () => AppFileSystemFolderPaths.MatchBestSpecialFolder(folders, null);

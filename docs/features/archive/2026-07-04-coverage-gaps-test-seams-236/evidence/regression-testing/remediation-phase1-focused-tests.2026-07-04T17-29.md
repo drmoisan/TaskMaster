@@ -26,7 +26,7 @@ A total of 2 test files matched the specified pattern.
   Passed GetFullPath_WhenRelativePathIsDriveRooted_UsesBaseDrive [< 1 ms]
   Passed GetFullPath_WhenBasePathIsNotFullyQualified_ThrowsArgumentException [43 ms]
   Passed PublicPathMethods_WhenRequiredInputsAreEmpty_ThrowArgumentNullException [< 1 ms]
-Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
+Test Parallelization enabled for <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed GetFullPath_WhenPathIsAlreadyFullyQualified_ReturnsNormalizedPath [< 1 ms]
   Passed TimeoutAfter_WithCompletedGenericTask_ReturnsCompletedResult [32 ms]
   Passed ToStringArray_WhenOneDimensionalValuesContainNull_UsesReplacement [35 ms]

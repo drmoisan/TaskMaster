@@ -3,12 +3,12 @@
 Timestamp: 2026-07-18T15-05
 
 Policy Order:
-1. `c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md`
-2. `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-code-change.md`
-3. `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-unit-test.md`
-4. `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\python.md`
-5. `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\python-suppressions.md`
-6. `c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\self-explanatory-code-commenting.md`
+1. `<repo-root>\CLAUDE.md`
+2. `<repo-root>\.claude\rules\general-code-change.md`
+3. `<repo-root>\.claude\rules\general-unit-test.md`
+4. `<repo-root>\.claude\rules\python.md`
+5. `<repo-root>\.claude\rules\python-suppressions.md`
+6. `<repo-root>\.claude\rules\self-explanatory-code-commenting.md`
 7. `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/remediation-inputs.2026-07-18T14-45.md`
 8. `docs/features/active/2026-07-18-stale-app-config-binding-redirects-354/scripts/fix_binding_redirects.py`
 

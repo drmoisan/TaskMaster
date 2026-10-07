@@ -9,7 +9,7 @@ Command:
 ```
 # (1) MCP call
 mcp__drm-copilot__run_poshqc_analyze
-    workspace_root = 'C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a1cc35d4011888c2a'
+    workspace_root = '<repo-root>\.claude\worktrees\agent-a1cc35d4011888c2a'
     scan_folders   = ['scripts/vscode', 'tests/scripts/vscode']
 
 # (2) per-file breakdown (the actual gate)

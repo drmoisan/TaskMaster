@@ -53,7 +53,7 @@ argument list that the wrapper's own pure `Get-VsTestArgumentList` function cons
 `/TestCaseFilter:TestCategory!=LiveOutlook`.
 
 ```
-vstest.console.exe C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\bin\Debug\SVGControl.Test.dll /Settings:C:\Users\DanMoisan\repos\TaskMaster\scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook
+vstest.console.exe <repo-root>\SVGControl.Test\bin\Debug\SVGControl.Test.dll /Settings:<repo-root>\scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook
 ```
 
 EXIT_CODE: 1 (non-zero, as required by this `[expect-fail]` task)
@@ -89,8 +89,8 @@ Error Message:
  Did not expect any exception because issue #418 requires the byte-array constructor to degrade
  rather than throw when the payload cannot be parsed, but found
  System.NullReferenceException: Object reference not set to an instance of an object.
- at SVGControl.SvgRenderer..ctor(Byte[] doc, Size size, AutoSize autoSize) in C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SvgRenderer.cs:line 133
- at SVGControl.Test.SvgRendererParseContractTests.<>c__DisplayClass2_0.<Constructor_WithMalformedBytesAndNoMargin_DoesNotThrowAndLeavesDocumentNull>b__0() in C:\Users\DanMoisan\repos\TaskMaster\SVGControl.Test\SvgRendererParseContractTests.cs:line 35
+ at SVGControl.SvgRenderer..ctor(Byte[] doc, Size size, AutoSize autoSize) in <repo-root>\SVGControl\SvgRenderer.cs:line 133
+ at SVGControl.Test.SvgRendererParseContractTests.<>c__DisplayClass2_0.<Constructor_WithMalformedBytesAndNoMargin_DoesNotThrowAndLeavesDocumentNull>b__0() in <repo-root>\SVGControl.Test\SvgRendererParseContractTests.cs:line 35
 ```
 
 The required `SVGControl.SvgRenderer..ctor` stack frame is present, and it points at
@@ -107,7 +107,7 @@ Failed Constructor_WithEmptyBytesAndNoMargin_DoesNotThrowAndLeavesDocumentNull [
 Error Message:
  Did not expect any exception because an element-free payload must not surface as a constructor
  exception, but found System.NullReferenceException: Object reference not set to an instance of an object.
- at SVGControl.SvgRenderer..ctor(Byte[] doc, Size size, AutoSize autoSize) in C:\Users\DanMoisan\repos\TaskMaster\SVGControl\SvgRenderer.cs:line 133
+ at SVGControl.SvgRenderer..ctor(Byte[] doc, Size size, AutoSize autoSize) in <repo-root>\SVGControl\SvgRenderer.cs:line 133
 ```
 
 Same NRE at the same line, reached by the distinct exception-free path: `SvgDocument.Open` returns

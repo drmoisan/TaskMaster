@@ -1,7 +1,7 @@
 # Reduced-Audit Handoff
 
 Timestamp: 2026-04-14T08:05:27.6558282-04:00
-Plan Path: `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
+Plan Path: `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\plan.2026-04-14T07-16.md`
 
 ## Changed Files
 
@@ -19,26 +19,26 @@ Plan Path: `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-
 
 ## Baseline Artifacts
 
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\phase0-instructions-read.2026-04-14T07-28-45-04-00.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\other\change-plan-review.2026-04-14T07-28-45-04-00.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\other\minor-audit-inputs.2026-04-14T07-28-45-04-00.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-format.2026-04-14T07-28-45-04-00.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-analyzers-build.2026-04-14T07-28-45-04-00.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-nullable-build.2026-04-14T07-28-45-04-00.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-mstest-coverage.2026-04-14T07-28-45-04-00.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\phase0-instructions-read.2026-04-14T07-28-45-04-00.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\other\change-plan-review.2026-04-14T07-28-45-04-00.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\other\minor-audit-inputs.2026-04-14T07-28-45-04-00.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-format.2026-04-14T07-28-45-04-00.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-analyzers-build.2026-04-14T07-28-45-04-00.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-nullable-build.2026-04-14T07-28-45-04-00.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\baseline\csharp-mstest-coverage.2026-04-14T07-28-45-04-00.md`
 
 ## Targeted Verification Artifact
 
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\targeted-regression.2026-04-14T08-05.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\targeted-regression.2026-04-14T08-05.md`
 
 ## Final QC Artifacts
 
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-format.2026-04-14T08-05.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-analyzers-build.2026-04-14T08-05.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-nullable-build.2026-04-14T08-05.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-mstest-coverage.2026-04-14T08-05.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\targeted-regression.2026-04-14T08-05.md`
-- `c:\Users\DanMoisan\repos\TaskMaster\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-coverage-summary.2026-04-14T08-05.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-format.2026-04-14T08-05.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-analyzers-build.2026-04-14T08-05.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-nullable-build.2026-04-14T08-05.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-mstest-coverage.2026-04-14T08-05.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\targeted-regression.2026-04-14T08-05.md`
+- `<repo-root>\docs\features\active\2026-04-14-bayesian-staging-asynclazy-null-guard-131\evidence\qa-gates\csharp-coverage-summary.2026-04-14T08-05.md`
 
 ## Acceptance Criteria Coverage
 

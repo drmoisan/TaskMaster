@@ -2,7 +2,7 @@
 
 - **Exception ID:** 222-COV-001
 - **Date:** 2026-06-28
-- **Authority:** Dan Moisan (repo owner / maintainer, drmoisan; dan@danmoisan.org)
+- **Authority:** Dan Moisan (repo owner / maintainer, drmoisan; dan@<user>.org)
 - **Scope:** Issue #222 — QuickFiler banned-API time/delay seam refactor
 - **Resolves:** Feature-review finding R1 (Major) in `remediation-inputs.2026-06-28T19-57.md`
 - **Modifies policy documents:** none

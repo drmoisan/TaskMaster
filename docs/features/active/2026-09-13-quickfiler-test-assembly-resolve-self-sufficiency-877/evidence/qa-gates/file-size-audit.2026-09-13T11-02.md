@@ -1,7 +1,7 @@
 # Gate: file-size limit holds for the write set — issue #877
 
 Timestamp: 2026-09-13T11-02
-Command: `pwsh -NoProfile -Command 'foreach ($p in "TestSupport/TestAssemblyResolver.cs","QuickFiler.Test/SetupAssemblyInitializer.cs","UtilitiesCS.Test/TestAssemblyInitializer.cs") { $full = Join-Path "C:/Users/DanMoisan/repos/TaskMaster-wt/bug-877-test-isolation" $p; Write-Host "$p => $((Get-Content -LiteralPath $full).Count)" }'`
+Command: `pwsh -NoProfile -Command 'foreach ($p in "TestSupport/TestAssemblyResolver.cs","QuickFiler.Test/SetupAssemblyInitializer.cs","UtilitiesCS.Test/TestAssemblyInitializer.cs") { $full = Join-Path "<user-profile>/repos/TaskMaster-wt/bug-877-test-isolation" $p; Write-Host "$p => $((Get-Content -LiteralPath $full).Count)" }'`
 EXIT_CODE: 0
 Output Summary: All three source files in the write set are strictly under the 500-line limit set by `.claude/rules/general-code-change.md`. Counts were measured after the CSharpier pass at [P2-T2].
 

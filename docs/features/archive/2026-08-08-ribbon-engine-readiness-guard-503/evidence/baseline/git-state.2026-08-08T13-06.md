@@ -4,7 +4,7 @@ Timestamp: 2026-08-08T13-06
 
 Command:
 ```
-pwsh -NoProfile -Command "Set-Location 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55'; git rev-parse HEAD; git status --porcelain; git rev-parse 003c5715055d7d1933db68a742531332756e30b2"
+pwsh -NoProfile -Command "Set-Location '<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55'; git rev-parse HEAD; git status --porcelain; git rev-parse 003c5715055d7d1933db68a742531332756e30b2"
 ```
 
 EXIT_CODE: 0

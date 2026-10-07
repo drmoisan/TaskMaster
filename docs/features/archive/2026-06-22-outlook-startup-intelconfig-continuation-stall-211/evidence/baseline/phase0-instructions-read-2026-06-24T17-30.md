@@ -9,10 +9,10 @@ Policy Order:
 4. .claude/rules/csharp.md (C#-specific code + unit test standards)
 
 Files Read (explicit list):
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\CLAUDE.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-code-change.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-unit-test.md
-- c:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-18-10-03\.claude\rules\csharp.md
 
 Supporting skills also read for this execution:
 - .claude\skills\policy-compliance-order\SKILL.md

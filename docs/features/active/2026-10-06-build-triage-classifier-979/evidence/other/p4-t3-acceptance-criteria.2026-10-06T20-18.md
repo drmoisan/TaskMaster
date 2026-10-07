@@ -1,0 +1,4 @@
+Timestamp: 2026-10-06T20-18
+Command: Acceptance-criteria source review against focused regression evidence
+EXIT_CODE: 0
+Output Summary: All Issue #979 acceptance criteria in issue.md, spec.md, and user-story.md are verified and checked. Field preservation is evidenced by `evidence/regression-testing/p1-t4-mined-triage-pass-after.2026-10-06T20-03.md` and `evidence/regression-testing/p4-t1-focused-utilities.2026-10-06T20-17.md`. Filtering, aggregate initialization, persistence, and manager replacement are evidenced by `evidence/regression-testing/p2-t4-rebuild-pass-after.2026-10-06T20-11.md` and `evidence/regression-testing/p4-t1-focused-utilities.2026-10-06T20-17.md`. Ribbon placement and command routing are evidenced by `evidence/regression-testing/p3-t4-ribbon-pass-after.2026-10-06T20-16.md` and `evidence/regression-testing/p4-t2-focused-ribbon.2026-10-06T20-17.md`. Definition-of-Done final-toolchain items remain unchecked pending Phase 5.

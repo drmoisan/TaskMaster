@@ -13,6 +13,18 @@ namespace UtilitiesCS.Test.HelperClasses
     [TestClass]
     public class DirectoryInfoWrapper_Tests
     {
+        // Issue #940 fixtures. The rooted literal below is not expected to exist and does not point
+        // into the repository: the two metadata tests assert only path computations mirrored against
+        // the BCL object, so the outcome does not depend on the machine. The owned entries are the
+        // running host's own loaded assembly image and its directory, which exist for the whole run;
+        // the two enumeration tests only read them.
+        private const string RootedFixturePath = @"C:\Repo\fixture";
+
+        private static FileInfo OwnedAssemblyFile =>
+            new FileInfo(typeof(DirectoryInfoWrapper_Tests).Assembly.Location);
+
+        private static DirectoryInfo OwnedAssemblyDirectory => OwnedAssemblyFile.Directory;
+
         [TestMethod]
         public void Constructor_WhenDirectoryInfoIsNull_ThrowsArgumentNullException()
         {
@@ -27,7 +39,7 @@ namespace UtilitiesCS.Test.HelperClasses
         public void Properties_ShouldMirrorWrappedDirectoryInfo()
         {
             // Arrange
-            var directory = GetRepositoryRoot();
+            var directory = new DirectoryInfo(RootedFixturePath);
             var wrapper = new DirectoryInfoWrapper(directory);
 
             // Assert
@@ -43,47 +55,54 @@ namespace UtilitiesCS.Test.HelperClasses
         public void GetDirectoriesAndGetFiles_ShouldReturnWrappedEntries()
         {
             // Arrange
-            var directory = GetRepositoryRoot();
+            var directory = OwnedAssemblyDirectory;
             var wrapper = new DirectoryInfoWrapper(directory);
+            var parentWrapper = new DirectoryInfoWrapper(directory.Parent);
 
             // Act
-            var directories = wrapper.GetDirectories();
             var files = wrapper.GetFiles();
+            var directories = parentWrapper.GetDirectories();
 
             // Assert
-            directories.Should().NotBeEmpty();
-            directories.Should().OnlyContain(item => item is DirectoryInfoWrapper);
-            directories.Select(item => item.Name).Should().Contain("UtilitiesCS");
-
             files.Should().NotBeEmpty();
             files.Should().OnlyContain(item => item is FileInfoWrapper);
-            files.Select(item => item.Name).Should().Contain("TaskMaster.sln");
+            files.Select(item => item.Name).Should().Contain(OwnedAssemblyFile.Name);
+
+            directories.Should().NotBeEmpty();
+            directories.Should().OnlyContain(item => item is DirectoryInfoWrapper);
+            directories.Select(item => item.Name).Should().Contain(directory.Name);
         }
 
         [TestMethod]
         public void EnumerateFileSystemInfos_ShouldWrapDirectoriesAndFiles()
         {
             // Arrange
-            var directory = GetRepositoryRoot();
+            var directory = OwnedAssemblyDirectory;
             var wrapper = new DirectoryInfoWrapper(directory);
+            var parentWrapper = new DirectoryInfoWrapper(directory.Parent);
 
             // Act
             var fileSystemInfos = wrapper.EnumerateFileSystemInfos().ToArray();
+            var parentFileSystemInfos = parentWrapper.EnumerateFileSystemInfos().ToArray();
 
             // Assert
             fileSystemInfos
+                .OfType<FileInfoWrapper>()
+                .Select(item => item.Name)
                 .Should()
-                .Contain(item => item is DirectoryInfoWrapper && item.Name == "UtilitiesCS");
-            fileSystemInfos
+                .Contain(OwnedAssemblyFile.Name);
+            parentFileSystemInfos
+                .OfType<DirectoryInfoWrapper>()
+                .Select(item => item.Name)
                 .Should()
-                .Contain(item => item is FileInfoWrapper && item.Name == "TaskMaster.sln");
+                .Contain(directory.Name);
         }
 
         [TestMethod]
         public void ToString_ShouldDelegateToWrappedDirectoryInfo()
         {
             // Arrange
-            var directory = GetRepositoryRoot();
+            var directory = new DirectoryInfo(RootedFixturePath);
             var wrapper = new DirectoryInfoWrapper(directory);
 
             // Act
@@ -370,24 +389,6 @@ namespace UtilitiesCS.Test.HelperClasses
             wrapper.Refresh();
             wrapper.SetAccessControl(directorySecurity);
             wrapper.ToString().Should().Be("wrapped-directory");
-        }
-
-        private static DirectoryInfo GetRepositoryRoot()
-        {
-            var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-
-            while (
-                current is not null
-                && !File.Exists(Path.Combine(current.FullName, "TaskMaster.sln"))
-            )
-            {
-                current = current.Parent;
-            }
-
-            current
-                .Should()
-                .NotBeNull("the test assembly should run inside the TaskMaster repository");
-            return current;
         }
     }
 }

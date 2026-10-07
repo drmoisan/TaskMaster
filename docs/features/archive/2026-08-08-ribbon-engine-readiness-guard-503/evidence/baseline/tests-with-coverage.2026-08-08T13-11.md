@@ -6,7 +6,7 @@ Command:
 ```
 pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -Configuration Debug -CoverageOutput docs\features\active\2026-08-08-ribbon-engine-readiness-guard-503\evidence\baseline\coverage-baseline.cobertura.xml
 ```
-(run from `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-08T11-55`)
+(run from `<user-profile>\repos\TaskMaster-wt\2026-08-08T11-55`)
 
 EXIT_CODE: 0
 

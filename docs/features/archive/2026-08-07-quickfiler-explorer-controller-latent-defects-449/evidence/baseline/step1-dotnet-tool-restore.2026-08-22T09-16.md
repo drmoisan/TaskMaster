@@ -1,7 +1,7 @@
 # Baseline Toolchain Step 1 — Worktree Bootstrap and `dotnet tool restore` (Issue #449, [P0-T8])
 
 Timestamp: 2026-08-22T09-16
-WORKTREE: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5600546d71e73061`
+WORKTREE: `<repo-root>\.claude\worktrees\agent-a5600546d71e73061`
 
 [P0-T8] specifies three commands, (a) SDK install, (b) `nuget restore`, (c) `dotnet tool restore`,
 each conditioned on the absence of a directory. (a) and (b) were performed as part of the

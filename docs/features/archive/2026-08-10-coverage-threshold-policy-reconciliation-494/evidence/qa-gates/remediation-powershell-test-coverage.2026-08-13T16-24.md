@@ -3,11 +3,11 @@ Output Summary: The targeted PoshQC MCP test and the literal coverage-enabled Pe
 
 ## MCP Invocation
 
-`mcp__drm-copilot__run_poshqc_test { workspace_root: "C:\\Users\\DanMoisan\\repos\\TaskMaster", scan_folders: ["tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1", "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"] }`
+`mcp__drm-copilot__run_poshqc_test { workspace_root: "<repo-root>", scan_folders: ["tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1", "tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1"] }`
 
 EXIT_CODE: 0
 
-MCP Result: `{ "ok": true, "summary": "Ran bundled PoshQC test against 'C:\\Users\\DanMoisan\\repos\\TaskMaster' with 2 selected scan folder(s)." }`
+MCP Result: `{ "ok": true, "summary": "Ran bundled PoshQC test against '<repo-root>' with 2 selected scan folder(s)." }`
 
 ## Pester Invocation
 

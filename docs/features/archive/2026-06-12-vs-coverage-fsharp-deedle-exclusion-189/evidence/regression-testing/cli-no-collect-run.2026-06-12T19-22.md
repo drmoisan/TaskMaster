@@ -5,9 +5,9 @@ Timestamp: 2026-06-12T19-22
 Command:
 ```
 "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" ^
-  "c:\Users\DanMoisan\repos\TaskMaster\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" ^
+  "<repo-root>\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" ^
   /Tests:Deedle ^
-  /Settings:"c:\Users\DanMoisan\repos\TaskMaster\scripts\vscode\TaskMaster.cli.runsettings" ^
+  /Settings:"<repo-root>\scripts\vscode\TaskMaster.cli.runsettings" ^
   /InIsolation ^
   /ResultsDirectory:"...\TestResults_p2t2"
 ```

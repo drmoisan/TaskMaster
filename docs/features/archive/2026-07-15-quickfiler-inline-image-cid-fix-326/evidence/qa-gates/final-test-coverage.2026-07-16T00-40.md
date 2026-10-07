@@ -18,7 +18,7 @@
 ## Coverage conversion
 
 Converted the `.coverage` output
-(`TestResults/7c9c72aa-643c-43aa-9701-2f07730bcdc3/DanMoisan_MEGALODON4_2026-07-15.23_49_29.coverage`)
+(`TestResults/7c9c72aa-643c-43aa-9701-2f07730bcdc3/<user>_<host>_2026-07-15.23_49_29.coverage`)
 to Cobertura XML via `Microsoft.CodeCoverage.Console.exe merge` (same tool/version as P0-T10).
 
 Per-package line-rates:

@@ -1,8 +1,8 @@
 # P9-T16 nonnumeric adapter final CSharpier
 
 Timestamp: 2026-07-27T08-31
-Command: C:\Users\DanMoisan\.dotnet\tools\csharpier.exe format QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs
-Command: C:\Users\DanMoisan\.dotnet\tools\csharpier.exe check QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs
+Command: <user-profile>\.dotnet\tools\csharpier.exe format QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs
+Command: <user-profile>\.dotnet\tools\csharpier.exe check QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs QuickFiler/Viewers/ItemViewer.Breadcrumb.cs QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs
 EXIT_CODE: 0
 
 ## Output Summary

@@ -4,7 +4,7 @@
 - Timestamp: 2026-08-04T23-21
 - Feature: `docs/features/active/2026-08-04-svg-renderer-null-document-nre-418`
 - Evidence series: `2026-08-05T05-00`
-- Repository root: `c:\Users\DanMoisan\repos\TaskMaster`
+- Repository root: `<repo-root>`
 
 ## Precondition check
 

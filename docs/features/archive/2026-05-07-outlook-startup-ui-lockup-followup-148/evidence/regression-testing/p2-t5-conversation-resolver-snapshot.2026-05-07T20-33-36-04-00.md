@@ -10,4 +10,4 @@
 - Failure:
   - Expected `Regex.IsMatch(source,@"LoadDfAsync[\s\S]*conversation snapshots[\s\S]*repeated ui publishes")` to be `True` because `LoadDfAsync` should consume conversation snapshots before background transforms and avoid repeated UI publishes while that work completes, but found `False`.
 - Source Transcript:
-  - `c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_KYVlzDpcxQxX6s14VDFu6GxF__vscode-1778175287364\content.txt`
+  - `<user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_KYVlzDpcxQxX6s14VDFu6GxF__vscode-1778175287364\content.txt`

@@ -194,11 +194,17 @@ namespace QuickFiler.Controllers.Tests
         /// observes the pre-install value on acquisition, never the first transaction's installed
         /// value, because restore strictly precedes gate release.
         /// <para>
-        /// Issue #823 (R5): this test fails intermittently. Observations of its outcomes are
-        /// collected in the append-only log at
-        /// docs/features/active/2026-09-08-quickfiler-teardown-review-residuals-823/evidence/other/flake-watch-uithread-dispatcher-transaction.2026-09-09T00-15.md.
-        /// Append an observation there rather than stabilising the test with a sleep, a retry or a
-        /// timing tolerance, none of which this repository permits.
+        /// Issue #950 traced the earlier intermittent failure to a race on the shared static, not to
+        /// a timing defect: a gate-free ensure call in another class could seed the parked dispatcher
+        /// between the baseline read and the install, or between the restore and the second caller's
+        /// read, and the test pinned a non-null baseline inside the gate to fence it. Issue #968
+        /// removed that pin: the fixture now counts pins, so only the last release can revert the
+        /// fixture's own seeding, and every remaining ensure call is acquired and released while its
+        /// caller holds a transaction, so no class can write the field while transaction A holds the
+        /// gate and every other transaction restores before it releases (W3/W4). Invariant for future
+        /// editors: a pin must stay nested inside its caller's transaction, and UiThread.Initialize
+        /// (W5) must not latch during this test; either would change the value the second caller
+        /// observes.
         /// </para>
         /// </summary>
         [TestMethod]
@@ -212,49 +218,57 @@ namespace QuickFiler.Controllers.Tests
                 UiThreadDispatcherTransaction transactionA = await UiThreadDispatcherFixture
                     .BeginTransactionAsync()
                     .ConfigureAwait(false);
-                Dispatcher original = UiThreadDispatcherFixture.Current;
-                transactionA.Install(liveA);
-
-                using (var secondCallerStarted = new ManualResetEventSlim(false))
+                try
                 {
-                    Dispatcher observedByB = null;
+                    Dispatcher original = UiThreadDispatcherFixture.Current;
+                    transactionA.Install(liveA);
 
-                    Task waiter = Task.Run(async () =>
+                    using (var secondCallerStarted = new ManualResetEventSlim(false))
                     {
-                        secondCallerStarted.Set();
-                        UiThreadDispatcherTransaction transactionB = await UiThreadDispatcherFixture
-                            .BeginTransactionAsync()
-                            .ConfigureAwait(false);
-                        try
-                        {
-                            observedByB = UiThreadDispatcherFixture.Current;
-                        }
-                        finally
-                        {
-                            transactionB.Dispose();
-                        }
-                    });
+                        Dispatcher observedByB = null;
 
-                    // Act
-                    secondCallerStarted.Wait();
+                        Task waiter = Task.Run(async () =>
+                        {
+                            secondCallerStarted.Set();
+                            UiThreadDispatcherTransaction transactionB =
+                                await UiThreadDispatcherFixture
+                                    .BeginTransactionAsync()
+                                    .ConfigureAwait(false);
+                            try
+                            {
+                                observedByB = UiThreadDispatcherFixture.Current;
+                            }
+                            finally
+                            {
+                                transactionB.Dispose();
+                            }
+                        });
+
+                        // Act
+                        secondCallerStarted.Wait();
+                        transactionA.Dispose();
+                        await waiter.ConfigureAwait(false);
+
+                        // Assert
+                        observedByB
+                            .Should()
+                            .BeSameAs(
+                                original,
+                                because: "the first transaction restores before it releases the gate, so "
+                                    + "the waiter cannot observe the pre-restore value"
+                            );
+                        observedByB
+                            .Should()
+                            .NotBeSameAs(
+                                liveA,
+                                because: "observing the first transaction's installed value would be the "
+                                    + "issue #230 lost update"
+                            );
+                    }
+                }
+                finally
+                {
                     transactionA.Dispose();
-                    await waiter.ConfigureAwait(false);
-
-                    // Assert
-                    observedByB
-                        .Should()
-                        .BeSameAs(
-                            original,
-                            because: "the first transaction restores before it releases the gate, so "
-                                + "the waiter cannot observe the pre-restore value"
-                        );
-                    observedByB
-                        .Should()
-                        .NotBeSameAs(
-                            liveA,
-                            because: "observing the first transaction's installed value would be the "
-                                + "issue #230 lost update"
-                        );
                 }
             }
             finally
@@ -391,6 +405,68 @@ namespace QuickFiler.Controllers.Tests
             {
                 transaction.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Issue #882 — a bounded acquisition that cannot obtain the permit fails promptly by name
+        /// instead of waiting without bound. While this test holds the sole permit, a zero-bound probe
+        /// through the internal overload must throw <c>TimeoutException</c> carrying the token
+        /// TRANSACTIONGATE_ACQUIRE_TIMEOUT, must not be counted as an acquisition, and must not
+        /// release the permit it never obtained. A zero bound returns immediately by contract, so the
+        /// test consumes no wall-clock time on any path; the gate's continued usability is asserted
+        /// only through the production entry point, which waits rather than fails under contention.
+        /// </summary>
+        [TestMethod]
+        [Timeout(GateTimeoutMs)]
+        public async Task BeginTransactionAsync_ZeroBoundWhileThisTestHoldsThePermit_ThrowsTimeoutExceptionAndReleasesNothing()
+        {
+            // Arrange
+            UiThreadDispatcherTransaction transaction = await UiThreadDispatcherFixture
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
+            try
+            {
+                int contendedBefore = UiThreadDispatcherFixture.ContendedAcquisitions;
+
+                // Act
+                Func<Task> probe = () =>
+                    UiThreadDispatcherFixture.BeginTransactionAsync(TimeSpan.Zero);
+
+                // Assert
+                await probe
+                    .Should()
+                    .ThrowAsync<TimeoutException>(
+                        because: "a zero bound cannot obtain the permit this test already holds"
+                    )
+                    .WithMessage("*TRANSACTIONGATE_ACQUIRE_TIMEOUT*");
+                (
+                    UiThreadDispatcherFixture.TransactionAcquisitions
+                    - UiThreadDispatcherFixture.TransactionReleases
+                )
+                    .Should()
+                    .Be(1, because: "the failed probe must not be counted as an acquisition");
+                UiThreadDispatcherFixture
+                    .ContendedAcquisitions.Should()
+                    .BeGreaterThanOrEqualTo(
+                        contendedBefore + 1,
+                        because: "the probe observed a held permit, and other classes can only add to the counter"
+                    );
+                Action dispose = () => transaction.Dispose();
+                dispose
+                    .Should()
+                    .NotThrow<SemaphoreFullException>(
+                        because: "the failed probe released nothing, so the holder's own release is the first"
+                    );
+            }
+            finally
+            {
+                transaction.Dispose();
+            }
+
+            UiThreadDispatcherTransaction roundTrip = await UiThreadDispatcherFixture
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
+            roundTrip.Dispose();
         }
     }
 }

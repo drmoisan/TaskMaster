@@ -300,6 +300,12 @@
                 label="Build Category Classifier"
               />
               <button
+                id="BuildTriageClassifier"
+                imageMso="ProtectedActualsSynchronize"
+                onAction="BuildTriageClassifier_Click"
+                label="Build Triage Classifier"
+              />
+              <button
                 id="BuildActionableClassifier"
                 imageMso="ActionInsert"
                 onAction="BuildActionableClassifier_Click"

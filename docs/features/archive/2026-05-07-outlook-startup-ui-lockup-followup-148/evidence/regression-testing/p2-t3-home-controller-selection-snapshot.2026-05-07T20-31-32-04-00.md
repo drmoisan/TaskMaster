@@ -10,4 +10,4 @@
 - Failure:
   - Expected `Regex.IsMatch(source,@"HandleSelectionChangedAsync[\s\S]*selection snapshot[\s\S]*EfcDataModel\.CreateAsync")` to be `True` because first-selection handling should capture a selection snapshot before background model loading begins, behind an explicit `HandleSelectionChangedAsync` stage boundary, but found `False`.
 - Source Transcript:
-  - `c:\Users\DanMoisan\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_dgKL28MIcbkshJHMR4PvlK6w__vscode-1778175287335\content.txt`
+  - `<user-profile>\AppData\Roaming\Code - Insiders\User\workspaceStorage\a8da1f0c9dae597edcdc167a5b8b2c63\GitHub.copilot-chat\chat-session-resources\d9a71451-4603-4e69-8bbf-7ccf9627280e\call_dgKL28MIcbkshJHMR4PvlK6w__vscode-1778175287335\content.txt`

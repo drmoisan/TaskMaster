@@ -4,7 +4,7 @@ Timestamp: 2026-09-03T07-30
 
 - Feature folder: `docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/`
 - Work mode marker (from `issue.md`): `full-bug` — `spec.md` is the sole acceptance-criteria source; no `user-story.md` is expected or present.
-- Item worktree audited: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a7abf41824d58a80f`
+- Item worktree audited: `<repo-root>/.claude/worktrees/agent-a7abf41824d58a80f`
 - Head SHA: `e6c488bf46cec739bddcf4ee07ba070c45b85668`
 - Base anchor supplied: `8be5a6aac3b5a82c86241fbbf989fd9118602c56`
 - Base anchor independently re-derived: `git merge-base origin/main HEAD` -> `8be5a6aac3b5a82c86241fbbf989fd9118602c56`. The supplied anchor is current, not stale.
@@ -227,7 +227,7 @@ All 31 evidence artifacts sit under the canonical `<FEATURE>/evidence/<kind>/` l
 Host-path hygiene was checked across the whole feature folder rather than against a file list, because a sanitization step scoped to an explicit file list has previously missed a path in an earlier-phase document:
 
 ```
-grep -rniE "DANMOI|DESKTOP-|\\Users\\[A-Za-z]|DanMoisan" <feature folder> --include=*.md
+grep -rniE "DANMOI|DESKTOP-|\\Users\\[A-Za-z]|<user>" <feature folder> --include=*.md
 ```
 
 Output: empty. Zero absolute host paths, account names, or machine names in any feature-folder markdown.

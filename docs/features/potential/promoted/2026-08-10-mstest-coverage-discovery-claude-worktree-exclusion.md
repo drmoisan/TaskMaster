@@ -18,7 +18,7 @@
 - OS/version: Windows 11 Pro 10.0.26200
 - Python version: n/a (PowerShell)
 - Command/flags used: `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .`
-- Data source or fixture: main checkout `C:\Users\DanMoisan\repos\TaskMaster` containing `.claude\worktrees\agent-*\`
+- Data source or fixture: main checkout `<repo-root>` containing `.claude\worktrees\agent-*\`
 
 ## Steps to Reproduce
 

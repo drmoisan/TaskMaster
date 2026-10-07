@@ -1,7 +1,7 @@
 [P4-T4] QA Toolchain Determination — Issue #166
 Captured: 2026-05-27T11:32 (local)
 
-Change set: single edit to c:\Users\DanMoisan\repos\TaskMaster\.gitignore
+Change set: single edit to <repo-root>\.gitignore
 (remove bare `.claude` entry; add targeted ignores for .claude/settings.local.json
 and .claude/agent-memory/). No source files changed.
 

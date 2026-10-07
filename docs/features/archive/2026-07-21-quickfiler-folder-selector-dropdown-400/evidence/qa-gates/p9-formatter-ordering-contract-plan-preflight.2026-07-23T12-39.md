@@ -1,7 +1,7 @@
 # Phase 9 Formatter Ordering-Contract Plan Preflight
 
 - Timestamp: `2026-07-23T12:39:12Z`
-- Command: `delegate /root/p8_order_contract_repreflight with DIRECTIVE: PREFLIGHT VALIDATION ONLY for remediation-plan.2026-07-21T21-37.md; then run mcp__drm-copilot__validate_orchestration_artifacts(artifact_type=plan, artifact_path=docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md, workspace_root=C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25)`
+- Command: `delegate /root/p8_order_contract_repreflight with DIRECTIVE: PREFLIGHT VALIDATION ONLY for remediation-plan.2026-07-21T21-37.md; then run mcp__drm-copilot__validate_orchestration_artifacts(artifact_type=plan, artifact_path=docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md, workspace_root=<user-profile>\repos\TaskMaster-wt\2026-07-21T10-25)`
 - EXIT_CODE: `0`
 - Output Summary: `PREFLIGHT: ALL CLEAR; canonical plan validation ok=true; first_unchecked=P8-T26; comparer=StringComparer.OrdinalIgnoreCase; authorized=62; path_hash=E2439D9F8A28D97A05EA3EEFB3201587904CC784FCB9EF7200632F6BEED3EBCD`
 

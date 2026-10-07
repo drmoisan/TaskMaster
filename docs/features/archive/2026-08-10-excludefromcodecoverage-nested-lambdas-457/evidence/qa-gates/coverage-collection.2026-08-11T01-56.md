@@ -4,7 +4,7 @@ Timestamp: 2026-08-11T01-56
 Command: identical to `[P0-T11]` —
 `pwsh -NoProfile -Command '& { & "<repo-root>\scripts\vscode\Invoke-MSTestWithCoverage.ps1" -SearchRoot . -Configuration Debug -CoverageOutput "coverage\coverage.cobertura.xml" } | ForEach-Object { "{0:o} {1}" -f [datetime]::UtcNow, $_ }'`
 `<repo-root>` resolved at run time (`git rev-parse --show-toplevel`) =
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`. Not hard-coded. The
+`<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`. Not hard-coded. The
 single-quoted-outer / double-quoted-inner quoting is mandatory and was used verbatim; the timestamped
 stdout form is mandatory because the runner emits its two post-processing markers with no timestamps
 and overwrites the raw Cobertura file in place.
@@ -90,7 +90,7 @@ Verbatim source timestamps from the timestamped stdout:
 
 ```
 2026-08-11T05:06:14.2192468Z Post-processing coverage XML for Koverage compatibility...
-2026-08-11T05:06:33.3568363Z Done. Coverage artifact: C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a\coverage\coverage.cobertura.xml
+2026-08-11T05:06:33.3568363Z Done. Coverage artifact: <repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a\coverage\coverage.cobertura.xml
 ```
 
 Derived duration: **19.1376 seconds** (05:06:33.3568363 − 05:06:14.2192468).
@@ -104,7 +104,7 @@ cost is immaterial against the roughly 60-second C# test run that produces the r
 
 - Runner's printed count (verbatim): `Discovered 9 test assemblies.`
 - Executing repository root resolved at run time:
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a3f0c78078ca2265a`
+  `<repo-root>\.claude\worktrees\agent-a3f0c78078ca2265a`
 - Independently reproduced count using
   `Get-ChildItem -Path <resolvedSearchRoot> -Recurse -Filter '*.Test.dll'` filtered to `\bin\Debug\`
   and excluding `\obj\` and `\ref\`: **9**

@@ -96,7 +96,7 @@ Verified by direct read of all three test files, corroborated by `p5-t35`/`p5-t3
 
 ## 11. Artifact and Path Hygiene
 
-The feature folder was scanned for the account name, the machine name, and absolute user-profile paths: the only matches are the sanitized placeholders `C:\Users\<user>` (one baseline artifact) and `C:\Users\USER` (TRX files); no real account or host name appears. PASS.
+The feature folder was scanned for the account name, the machine name, and absolute user-profile paths: the only matches are the sanitized placeholders `C:\Users\<user>` (one baseline artifact) and `<user-profile>` (TRX files); no real account or host name appears. PASS.
 
 ## 12. Findings Summary
 

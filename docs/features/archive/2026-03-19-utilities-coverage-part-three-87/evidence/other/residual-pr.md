@@ -1,7 +1,7 @@
 # Evidence: Residual PR
 
 - **Timestamp:** 2026-03-27T08:24 UTC
-- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location 'c:\Users\DanMoisan\repos\TaskMaster-residual-clean'; gh pr create --repo drmoisan/TaskMaster --base development --head chore/mixed-branch-excluded-work-clean --fill"`
+- **Command:** `pwsh -NoProfile -ExecutionPolicy Bypass -Command "Set-Location '<user-profile>\repos\TaskMaster-residual-clean'; gh pr create --repo drmoisan/TaskMaster --base development --head chore/mixed-branch-excluded-work-clean --fill"`
 - **EXIT_CODE:** 0
 - **Branch:** chore/mixed-branch-excluded-work-clean
 - **Base Branch:** development

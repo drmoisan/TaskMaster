@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Globalization;
-using System.Threading;
 using System.Threading.Tasks;
 using UtilitiesCS;
 
@@ -42,22 +40,16 @@ namespace TaskMaster
     /// <c>UtilitiesCS.UiThread.Dispatcher</c>.
     /// </para>
     /// </remarks>
-    internal sealed class EngineToggleStateCoordinator
+    internal sealed partial class EngineToggleStateCoordinator
     {
-        /// <summary>
-        /// Rendered in place of an engine key when the caller supplied null or empty, so a message
-        /// is never ambiguous about which key was seen.
-        /// </summary>
-        private const string NullEngineNameToken = "(null)";
-
         private readonly Func<IAppItemEngines> _enginesAccessor;
         private readonly Action<string> _invalidateControl;
         private readonly Action<string> _notifyUnavailable;
         private readonly Action<string, Exception> _logError;
 
         /// <summary>
-        /// Serializes the at-most-one-prime decision. Held only across a dictionary probe and a
-        /// task start; no await occurs inside it.
+        /// Serializes the at-most-one-prime decision. Held only across a dictionary probe, the
+        /// marker registration, and the start of the prime; no await occurs inside it.
         /// </summary>
         private readonly object _primeGate = new object();
 
@@ -70,9 +62,10 @@ namespace TaskMaster
             new EngineTogglePressedStateCache();
 
         /// <summary>
-        /// The in-flight — or most recently completed — prime per engine key. Its presence is the
-        /// at-most-one-prime guard; its value is the test-observable handle returned by
-        /// <see cref="GetPrimeTask"/>.
+        /// The registration marker per engine key: registered before the prime starts, removed by
+        /// <see cref="CompletePrime"/> when the prime faults or is canceled, and retained after a
+        /// successful prime. Its presence is the at-most-one-prime guard; its value is the
+        /// test-observable handle returned by <see cref="GetPrimeTask"/>.
         /// </summary>
         private readonly ConcurrentDictionary<string, Task> _primeTasks = new ConcurrentDictionary<
             string,
@@ -80,12 +73,23 @@ namespace TaskMaster
         >(StringComparer.Ordinal);
 
         /// <summary>
+        /// Prime failures already reported (issue #948), keyed by engine and base-exception type;
+        /// a repeat of a reported kind is not logged again. Never cleared: a cached key never primes.
+        /// </summary>
+        private readonly ConcurrentDictionary<
+            (string EngineName, Type FaultType),
+            byte
+        > _reportedPrimeFaults = new ConcurrentDictionary<(string, Type), byte>();
+
+        /// <summary>
         /// Creates a coordinator over an engines accessor and three injected sinks.
         /// </summary>
         /// <param name="enginesAccessor">
-        /// Supplies the current engines container. Must not be null, but is expected to return
-        /// null before the ribbon controller has been given its globals, which this type treats as
-        /// "state unknown" rather than as an error.
+        /// Supplies the current engines container. Must not be null, and must not throw: its
+        /// result is read outside any guard by <see cref="GetPressed"/> and by the refusal check
+        /// of <see cref="HandleToggleClickAsync"/>, so an exception it raised would escape both.
+        /// It is expected to return null before the ribbon controller has been given its globals,
+        /// which this type treats as "state unknown" rather than as an error.
         /// </param>
         /// <param name="invalidateControl">
         /// Receives a ribbon control id whenever the cached state behind that control changes, so
@@ -93,11 +97,14 @@ namespace TaskMaster
         /// </param>
         /// <param name="notifyUnavailable">
         /// Receives exactly one message per toggle click refused because the engines are not
-        /// available. Presentation is the sink's concern. Must not be null.
+        /// available. Presentation is the sink's concern. Must not be null. The call is guarded
+        /// (issue #964): an exception it throws is reported once through
+        /// <paramref name="logError"/> and is not rethrown.
         /// </param>
         /// <param name="logError">
-        /// Receives an observed prime or toggle fault as a message plus the exception. Must not be
-        /// null.
+        /// Receives an observed prime fault, toggle fault or notification failure as a message
+        /// plus the exception. Must not be null. The call is guarded: an exception it throws is
+        /// discarded, because no further reporting channel remains.
         /// </param>
         /// <exception cref="ArgumentNullException">Any argument is null.</exception>
         internal EngineToggleStateCoordinator(
@@ -124,7 +131,8 @@ namespace TaskMaster
         /// <returns>
         /// The cached activation state, or <see langword="false"/> when the key is null,
         /// whitespace, unmapped, or has never been primed. This method performs a dictionary read
-        /// only: it never awaits, never blocks, and never throws.
+        /// only: it never awaits, never blocks, and never throws while the engines accessor
+        /// honours its non-throwing precondition.
         /// </returns>
         /// <remarks>
         /// On a cache miss with the engines available, at most one prime per key is started; a
@@ -150,8 +158,9 @@ namespace TaskMaster
         }
 
         /// <summary>
-        /// The toggle-click boundary: the only place in this type that observes a fault with a
-        /// <c>catch</c> clause.
+        /// The toggle-click boundary: the only <c>catch</c> clause in this type that observes an
+        /// engine fault. Every sink call on this path goes through <see cref="TryInvokeSink"/>,
+        /// which holds the only other <c>catch</c> clause.
         /// </summary>
         /// <param name="engineName">The engine key whose activation setting is being flipped.</param>
         /// <returns>
@@ -160,17 +169,35 @@ namespace TaskMaster
         /// </returns>
         /// <remarks>
         /// When the engines are not available the click is refused with exactly one
-        /// <c>notifyUnavailable</c> message and nothing else is invoked. Otherwise
-        /// <see cref="ExecuteToggleAsync"/> runs inside a single boundary <c>try</c>/<c>catch</c>:
-        /// a fault is reported through <c>logError</c>, is not rethrown, and does not invalidate.
-        /// This method never throws, because its caller is an <c>async void</c> Office handler
+        /// <c>notifyUnavailable</c> message and no engine member is invoked. That notification is
+        /// guarded (issue #964): if the sink throws, its exception is reported once through
+        /// <c>logError</c>. Otherwise <see cref="ExecuteToggleAsync"/> runs inside a single
+        /// boundary <c>try</c>/<c>catch</c>: a fault is reported through <c>logError</c>, is not
+        /// rethrown, and does not invalidate. Every <c>logError</c> call is itself guarded
+        /// (issue #947): it is the last reporting channel, so a failure inside it has nowhere
+        /// else to go and is discarded deliberately, following
+        /// <c>RibbonCommandBoundary.SafeLog</c>. This method therefore never throws on either
+        /// path, even when both sinks throw, provided the engines accessor honours its
+        /// non-throwing precondition, because its caller is an <c>async void</c> Office handler
         /// whose faults would otherwise become unobserved.
         /// </remarks>
         internal async Task HandleToggleClickAsync(string engineName)
         {
             if (_enginesAccessor() is null)
             {
-                _notifyUnavailable(BuildUnavailableMessage(engineName));
+                if (
+                    !TryInvokeSink(
+                        () => _notifyUnavailable(BuildUnavailableMessage(engineName)),
+                        out var notifyFailure
+                    )
+                )
+                {
+                    _ = TryInvokeSink(
+                        () => _logError(BuildNotifyFailedMessage(engineName), notifyFailure),
+                        out _
+                    );
+                }
+
                 return;
             }
 
@@ -180,7 +207,7 @@ namespace TaskMaster
             }
             catch (Exception ex)
             {
-                _logError(BuildToggleFailedMessage(engineName), ex);
+                _ = TryInvokeSink(() => _logError(BuildToggleFailedMessage(engineName), ex), out _);
             }
         }
 
@@ -235,181 +262,41 @@ namespace TaskMaster
         }
 
         /// <summary>
-        /// The in-flight — or most recently completed — prime for an engine key, exposed so tests
-        /// can await the prime deterministically instead of polling or sleeping.
+        /// Invokes one injected sink and contains any exception it throws (issues #947 and #964).
+        /// This holds the only <c>catch</c> clause in this type that intercepts a sink failure;
+        /// every <c>notifyUnavailable</c> and <c>logError</c> call goes through it.
         /// </summary>
-        /// <param name="engineName">The engine key; ordinal, case-sensitive.</param>
+        /// <param name="sinkCall">The sink invocation, with its arguments already bound.</param>
+        /// <param name="sinkFailure">
+        /// The exception the sink threw, or <see langword="null"/> when the sink returned
+        /// normally.
+        /// </param>
         /// <returns>
-        /// The prime task, or <see cref="Task.CompletedTask"/> when no prime has been started for
-        /// the key. The returned task never faults: a prime fault is observed inside the prime
-        /// itself and reported through <c>logError</c>.
+        /// <see langword="true"/> when the sink returned normally; <see langword="false"/> when
+        /// it threw. The exception is never rethrown.
         /// </returns>
-        internal Task GetPrimeTask(string engineName)
-        {
-            if (string.IsNullOrEmpty(engineName))
-            {
-                return Task.CompletedTask;
-            }
-
-            return _primeTasks.TryGetValue(engineName, out var prime) ? prime : Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Starts the single prime for an engine key, unless one is already registered or the
-        /// engines are not yet available.
-        /// </summary>
-        private void StartPrimeIfNeeded(string engineName, string controlId)
-        {
-            var engines = _enginesAccessor();
-            if (engines is null)
-            {
-                return;
-            }
-
-            lock (_primeGate)
-            {
-                if (_primeTasks.ContainsKey(engineName))
-                {
-                    return;
-                }
-
-                _primeTasks[engineName] = StartObservedPrime(engines, engineName, controlId);
-            }
-        }
-
-        /// <summary>
-        /// Runs <see cref="ApplyPrimeAsync"/> and attaches the fault observer.
-        /// </summary>
         /// <remarks>
-        /// The observer is a continuation rather than a <c>catch</c> clause, so this type keeps
-        /// exactly one <c>catch</c> — the click boundary. Reading
-        /// <see cref="Task.Exception"/> inside <see cref="CompletePrime"/> marks the fault
-        /// observed, so no unobserved task remains. The returned continuation task always
-        /// completes successfully, which is what makes it safe for a test to await.
+        /// The caller decides what happens to a contained failure, following
+        /// <c>RibbonCommandBoundary.ReportFailure</c>: the refusal path of
+        /// <see cref="HandleToggleClickAsync"/> forwards a notification failure to the log sink,
+        /// and every log-sink caller discards a log failure because no further channel remains.
+        /// <see cref="CompletePrime"/> records a reported fault kind only when this method
+        /// returns <see langword="true"/>, so a sink that throws leaves the report owed
+        /// (issue #948).
         /// </remarks>
-        private Task StartObservedPrime(
-            IAppItemEngines engines,
-            string engineName,
-            string controlId
-        )
+        private static bool TryInvokeSink(Action sinkCall, out Exception sinkFailure)
         {
-            return ApplyPrimeAsync(engines, engineName, controlId)
-                .ContinueWith(
-                    completed => CompletePrime(completed, engineName),
-                    CancellationToken.None,
-                    TaskContinuationOptions.None,
-                    TaskScheduler.Default
-                );
-        }
-
-        /// <summary>
-        /// Reads the real activation state once, stores it, and invalidates the mapped control.
-        /// Contains no <c>catch</c>: a fault propagates into the returned task, where
-        /// <see cref="CompletePrime"/> observes it.
-        /// </summary>
-        private async Task ApplyPrimeAsync(
-            IAppItemEngines engines,
-            string engineName,
-            string controlId
-        )
-        {
-            // The ticket is taken immediately before the activation read, so a prime whose
-            // observation began before a toggle's cannot overwrite the toggle's newer result.
-            var sequence = _pressedState.NextSequence();
-            var active = await engines.EngineActiveAsync(engineName).ConfigureAwait(false);
-
-            if (_pressedState.TryApplyState(engineName, active, sequence))
+            try
             {
-                _invalidateControl(controlId);
+                sinkCall();
+                sinkFailure = null;
+                return true;
             }
-        }
-
-        /// <summary>
-        /// Observes the outcome of a prime. On any outcome other than ran-to-completion the cache
-        /// is left unset — so the key still reports unchecked — the in-flight marker is cleared so
-        /// a later read may re-prime, and the failure is reported through <c>logError</c>.
-        /// </summary>
-        /// <remarks>
-        /// The status is tested rather than the exception. A CANCELED task carries a null
-        /// <see cref="Task.Exception"/>, so a handler keyed on the exception returned early for a
-        /// cancellation: nothing was logged, the cache stayed unset, and the in-flight marker stayed
-        /// registered, which blocked any re-prime for the rest of the session. When there is no
-        /// exception to unwrap a <see cref="TaskCanceledException"/> is synthesized so the sink
-        /// always receives one. The faulted path is unchanged and still reports the unwrapped base
-        /// exception.
-        /// </remarks>
-        private void CompletePrime(Task completed, string engineName)
-        {
-            if (completed.Status == TaskStatus.RanToCompletion)
+            catch (Exception ex)
             {
-                return;
+                sinkFailure = ex;
+                return false;
             }
-
-            _primeTasks.TryRemove(engineName, out _);
-
-            var failure =
-                (Exception)completed.Exception?.GetBaseException()
-                ?? new TaskCanceledException(completed);
-
-            _logError(BuildPrimeFailedMessage(engineName), failure);
-        }
-
-        /// <summary>
-        /// Renders an engine key for inclusion in a message, so a null key is never ambiguous.
-        /// </summary>
-        private static string RenderEngineName(string engineName)
-        {
-            return string.IsNullOrEmpty(engineName) ? NullEngineNameToken : engineName;
-        }
-
-        /// <summary>
-        /// The message emitted when a toggle click is refused because the engines are unavailable.
-        /// </summary>
-        private static string BuildUnavailableMessage(string engineName)
-        {
-            return string.Format(
-                CultureInfo.CurrentCulture,
-                "The engine '{0}' is not available yet, so its enable/disable setting cannot be "
-                    + "changed. Please try again once initialization completes.",
-                RenderEngineName(engineName)
-            );
-        }
-
-        /// <summary>
-        /// The message logged when the toggle path faults.
-        /// </summary>
-        private static string BuildToggleFailedMessage(string engineName)
-        {
-            return string.Format(
-                CultureInfo.CurrentCulture,
-                "Toggling the enable/disable setting for engine '{0}' failed.",
-                RenderEngineName(engineName)
-            );
-        }
-
-        /// <summary>
-        /// The message logged when the state prime faults.
-        /// </summary>
-        private static string BuildPrimeFailedMessage(string engineName)
-        {
-            return string.Format(
-                CultureInfo.CurrentCulture,
-                "Reading the activation state for engine '{0}' failed; its toggle continues to "
-                    + "report unchecked.",
-                RenderEngineName(engineName)
-            );
-        }
-
-        /// <summary>
-        /// The message carried by the <see cref="ArgumentException"/> for an unmapped engine key.
-        /// </summary>
-        private static string BuildUnmappedKeyMessage(string engineName)
-        {
-            return string.Format(
-                CultureInfo.CurrentCulture,
-                "The engine key '{0}' has no toggle checkbox in EngineToggleCatalog.",
-                RenderEngineName(engineName)
-            );
         }
     }
 }

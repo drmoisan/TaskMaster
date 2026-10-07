@@ -218,9 +218,9 @@ function Find-PackageAbsentFromManifest {
         Detects dependent elements whose package is absent from the sibling manifest.
     .DESCRIPTION
         The class is non-fatal: counted and named in the report, never a failure result.
-        QuickFiler.Test carries a live instance in two Exists() guarded <Import> elements
-        naming an altcover package no manifest declares. No exception is hard-coded for any
-        package identifier.
+        Issue 929 removed the last live instance, two Exists() guarded <Import> elements in
+        QuickFiler.Test naming an altcover package no manifest declared; the shape survives as
+        an in-memory test fixture. No exception is hard-coded for any package identifier.
     .PARAMETER ProjectText
         The project file text.
     .PARAMETER ManifestText

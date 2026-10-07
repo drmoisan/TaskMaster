@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-22T07:30:13.9296825Z
 
-Command: `@('<workspace>\QuickFiler\Viewers\BreadcrumbDropDownHost.cs','<workspace>\QuickFiler\Viewers\BreadcrumbDropDownOpenLifetime.cs','<workspace>\QuickFiler.Test\Viewers\BreadcrumbDropDownCoverageThresholdTests.cs') | & 'C:\Users\DanMoisan\.dotnet\tools\csharpier.exe' pipe-files`
+Command: `@('<workspace>\QuickFiler\Viewers\BreadcrumbDropDownHost.cs','<workspace>\QuickFiler\Viewers\BreadcrumbDropDownOpenLifetime.cs','<workspace>\QuickFiler.Test\Viewers\BreadcrumbDropDownCoverageThresholdTests.cs') | & '<user-profile>\.dotnet\tools\csharpier.exe' pipe-files`
 
 EXIT_CODE: 0
 

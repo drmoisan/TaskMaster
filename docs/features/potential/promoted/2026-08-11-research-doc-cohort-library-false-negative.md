@@ -36,7 +36,7 @@ The research document's blocker inventory should reflect the actual state of bot
 Both files exist:
 
 - TaskMaster carries a bash entry point at `.claude/lib/bash/compute-cohorts.sh` (present at commit `2073f717`, executable, 4463 bytes). It requires neither Python nor Poetry, so the skill's `poetry run python -c "from scripts.dev_tools..."` invocation form is not the applicable one here.
-- The upstream authority is `C:\Users\DanMoisan\repos\drm-copilot\scripts\dev_tools\parallel_cohort_computation.py` (commit `663d71ee`, issue #445).
+- The upstream authority is `<user-profile>\repos\drm-copilot\scripts\dev_tools\parallel_cohort_computation.py` (commit `663d71ee`, issue #445).
 
 The P5 recomputation-parity concern recorded alongside the blocker is also resolved: the bash port documents itself as reproducing the Python authority's output byte-for-byte, so a parity check compares two independent implementations rather than a module against itself.
 
@@ -47,7 +47,7 @@ The P5 recomputation-parity concern recorded alongside the blocker is also resol
 
   ```
   $ ls -la .claude/lib/bash/compute-cohorts.sh
-  -rwxr-xr-x 1 DanMoisan 197121 4463 Aug 11 09:19 .claude/lib/bash/compute-cohorts.sh
+  -rwxr-xr-x 1 <user> 197121 4463 Aug 11 09:19 .claude/lib/bash/compute-cohorts.sh
   ```
 
 ## Impact / Severity

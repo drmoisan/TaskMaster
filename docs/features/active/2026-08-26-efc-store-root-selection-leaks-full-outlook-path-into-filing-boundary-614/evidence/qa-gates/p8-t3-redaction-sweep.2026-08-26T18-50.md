@@ -124,7 +124,7 @@ task's edits and are left unmodified.
 Every Outlook and filesystem path literal introduced by this change uses a fabricated placeholder:
 `\\mailbox@example.com` and `\\mailbox@example.com\Archive` for the Outlook store and archive
 root, `\\other@example.org` for the cross-store cases, `\\fileserver\Archive` for the UNC
-ancestor case, `C:\Users\testuser\OneDrive - Contoso` for the OneDrive-for-business root, and
+ancestor case, `<user-profile>\OneDrive - Contoso` for the OneDrive-for-business root, and
 `C:\Mail`, `C:\Mail Archive [2026]`, `C:\OneDrive` for the remaining filesystem roots. No
 production message, log line, or exception message added by this change embeds any path value at
 all: each names the violated rule only and states that the value is withheld.

@@ -2,7 +2,7 @@
 
 - Epic: #136 QuickFiler Per-File 80% Coverage — child F10 (`quickfiler-item-controller-coverage`, issue #453)
 - Branch: `feature/quickfiler-item-controller-coverage`
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a359b62de7a79b16e`
+- Worktree: `<repo-root>\.claude\worktrees\agent-a359b62de7a79b16e`
 - Production file: `QuickFiler/Controllers/QfcItemController.cs` (323 lines, verified — file ends at line 323)
 - Research date: 2026-08-07
 

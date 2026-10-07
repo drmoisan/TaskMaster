@@ -33,3 +33,6 @@ jobs:
   pester:
     name: pester
     uses: ./.github/workflows/_pester.yml
+  hygiene:
+    name: hygiene
+    uses: ./.github/workflows/_hygiene.yml

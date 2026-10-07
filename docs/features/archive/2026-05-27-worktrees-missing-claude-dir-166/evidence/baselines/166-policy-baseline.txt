@@ -3,7 +3,7 @@ Captured: 2026-05-27T11:32 (local)
 
 Governing policy files read for this change:
 
-1. c:\Users\DanMoisan\repos\TaskMaster\CLAUDE.md
+1. <repo-root>\CLAUDE.md
    Governing clauses:
    - General Code Change Policy: design principles (simplicity first, separation of
      concerns); mandatory toolchain loop (format -> lint -> type-check -> test);
@@ -16,7 +16,7 @@ Governing policy files read for this change:
      prohibited." A git-process-based test is therefore not written as an MSTest unit
      test; the regression is adapted to deterministic git check-ignore commands.
 
-2. c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-code-change.md
+2. <repo-root>\.claude\rules\general-code-change.md
    Governing clauses:
    - Design Principles (simplicity first, separation of concerns).
    - Mandatory Toolchain Loop (format, lint, type-check, test) — documented N/A per
@@ -24,7 +24,7 @@ Governing policy files read for this change:
    - File Size Limit (<= 500 lines). Markdown documentation files are exempt.
    - I/O Boundaries: core logic testable without filesystem/network; no temp files.
 
-3. c:\Users\DanMoisan\repos\TaskMaster\.claude\rules\general-unit-test.md
+3. <repo-root>\.claude\rules\general-unit-test.md
    Governing clauses:
    - Core Principles (independence, isolation, fast, deterministic, readable).
    - External Dependencies: no external services/processes; no temporary files.

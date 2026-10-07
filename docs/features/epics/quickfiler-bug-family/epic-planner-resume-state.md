@@ -148,7 +148,7 @@ Deferred to fan-in time, to avoid a forward reference to a folder not yet on the
 ## Blocked persists — ACTION REQUIRED BY THE USER
 
 Both files below are correct and complete on disk in the integration worktree
-`C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/epic-quickfiler-bug-family`, and both are
+`<repo-root>/.claude/worktrees/epic-quickfiler-bug-family`, and both are
 untracked because the preimplementation gate denies staging and history verbs to epic-planner.
 
 1. **`docs/features/epics/quickfiler-bug-family/epic.md` — HIGH severity.** `git ls-tree` confirms

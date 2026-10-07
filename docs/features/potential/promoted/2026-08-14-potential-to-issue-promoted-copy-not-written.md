@@ -27,7 +27,7 @@ Promoting `docs/features/potential/2026-08-14-ci-parallel-job-split.md` returned
   "tool": "potential_to_issue",
   "summary": "Promoted '.../docs/features/potential/2026-08-14-ci-parallel-job-split.md' as a feature workflow in full-feature mode.",
   "artifacts": ["https://github.com/drmoisan/TaskMaster/issues/553"],
-  "destination_path": "C:/Users/DanMoisan/repos/TaskMaster-wt/2026-08-14T09-01/docs/features/potential/promoted/2026-08-14-ci-parallel-job-split.md"
+  "destination_path": "<user-profile>/repos/TaskMaster-wt/2026-08-14T09-01/docs/features/potential/promoted/2026-08-14-ci-parallel-job-split.md"
 }
 ```
 
@@ -76,7 +76,7 @@ not exist, which weakens the audit trail.
    file.
 
 Observed with the bundled drm-copilot MCP server in the TaskMaster worktree
-`C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-14T09-01` on 2026-08-14.
+`<user-profile>\repos\TaskMaster-wt\2026-08-14T09-01` on 2026-08-14.
 
 ## Acceptance Criteria
 

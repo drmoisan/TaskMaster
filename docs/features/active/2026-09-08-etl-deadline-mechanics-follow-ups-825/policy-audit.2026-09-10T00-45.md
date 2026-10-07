@@ -17,7 +17,7 @@ Glob.
 Consequences, stated so the basis of each row is transparent:
 
 - Every file-content fact below was read directly from the delivered tree at
-  `C:/Users/DanMoisan/repos/TaskMaster-wt/rr0908-825` and is first-hand.
+  `<user-profile>/repos/TaskMaster-wt/rr0908-825` and is first-hand.
 - Every **git-derived** fact — the committed footprint against the base, per-file numstat, the
   1011→966 line delta, and file LastWriteTime — is taken from the invoking agent's independent
   measurement and from the committed evidence artifacts, and was corroborated wherever a

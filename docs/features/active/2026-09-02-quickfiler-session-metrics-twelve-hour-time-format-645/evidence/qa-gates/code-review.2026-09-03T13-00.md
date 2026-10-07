@@ -54,7 +54,7 @@ remediation cycle.
 ## Evidence-Hygiene Fix Review (the remediation itself)
 
 - **Mechanism:** a scoped textual substitution replacing the absolute worktree-root prefix
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a6cd1c774527c71c3\` (and its
+  `<repo-root>\.claude\worktrees\agent-a6cd1c774527c71c3\` (and its
   forward-slash / lowercase variants, per the remediation plan's case-insensitive requirement) with
   nothing, leaving a repository-relative `filename="QuickFiler\Controllers\...cs"` attribute value.
   Spot-checked sample: `filename="QuickFiler\Controllers\EfcHomeController.cs"` at line 6 of
@@ -74,7 +74,7 @@ remediation cycle.
   `coverage` in a fresh PowerShell `[xml]` cast, with no exception. `filename="` attribute count is
   unchanged before/after (3,147 in each file), confirming no attribute was dropped or malformed by
   the substitution.
-- **Completeness of the sweep:** an independent case-insensitive regex sweep for `DanMoisan` and for
+- **Completeness of the sweep:** an independent case-insensitive regex sweep for `<user>` and for
   `C:\Users` (case-insensitive) against the raw file content of both files returned 0 matches for
   both patterns in both files, corroborating the plan's own `MATCH_COUNT=0` closeout evidence
   (`rem1-ac-closeout.2026-09-03T12-11.md`) with an independently-run check rather than trusting the

@@ -25,24 +25,24 @@ TargetConfigPattern: EfcViewerQueue|ItemViewerQueue|QfcThemeHelper|EfcHomeContro
 ThresholdPattern: threshold|fail-under|line-rate|80\.00|90\.00|Minimum|CoverageThreshold
 
 ## Exemption Hits
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:12: <ModulePaths>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:14: <ModulePath>.*Deedle.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:15: <ModulePath>.*FSharp.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:16: <ModulePath>.*Castle\.Core.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:17: <ModulePath>.*FluentAssertions.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:18: <ModulePath>.*Moq.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:19: <ModulePath>.*Microsoft\.Testing.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:20: <ModulePath>.*MSTest.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:22: </ModulePaths>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:14: <ModulePaths>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:16: <ModulePath>.*Deedle.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:17: <ModulePath>.*FSharp.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:18: <ModulePath>.*Castle\.Core.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:19: <ModulePath>.*FluentAssertions.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:20: <ModulePath>.*Moq.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:21: <ModulePath>.*Microsoft\.Testing.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:22: <ModulePath>.*MSTest.*</ModulePath>
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:24: </ModulePaths>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:12: <ModulePaths>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:14: <ModulePath>.*Deedle.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:15: <ModulePath>.*FSharp.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:16: <ModulePath>.*Castle\.Core.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:17: <ModulePath>.*FluentAssertions.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:18: <ModulePath>.*Moq.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:19: <ModulePath>.*Microsoft\.Testing.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:20: <ModulePath>.*MSTest.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\coverage.config:22: </ModulePaths>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:14: <ModulePaths>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:16: <ModulePath>.*Deedle.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:17: <ModulePath>.*FSharp.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:18: <ModulePath>.*Castle\.Core.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:19: <ModulePath>.*FluentAssertions.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:20: <ModulePath>.*Moq.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:21: <ModulePath>.*Microsoft\.Testing.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:22: <ModulePath>.*MSTest.*</ModulePath>
+- <user-profile>\repos\TaskMaster-wt-2026-07-04-12-57\TaskMaster.runsettings:24: </ModulePaths>
 
 ## Target Name Hits In Coverage Configuration
 none

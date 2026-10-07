@@ -6,7 +6,7 @@
 - **Requirements source:** `docs/features/active/2026-08-07-quickfiler-explorer-controller-latent-defects-449/spec.md` (Status `Approved`, AC-1 through AC-16, decisions D1 through D7). Under `full-bug` this `spec.md` is the sole acceptance-criteria source; `issue.md`'s early-draft list is superseded.
 - **Primary evidence:** `docs/features/active/2026-08-07-quickfiler-explorer-controller-latent-defects-449/research/qfc-explorer-controller-defects.2026-08-21T18-20.md`
 - **Feature folder (FEATURE):** `docs/features/active/2026-08-07-quickfiler-explorer-controller-latent-defects-449`
-- **Worktree root (WORKTREE):** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a272dc0deeeda462c`
+- **Worktree root (WORKTREE):** `<repo-root>\.claude\worktrees\agent-a272dc0deeeda462c`
 
 ## Execution conventions
 

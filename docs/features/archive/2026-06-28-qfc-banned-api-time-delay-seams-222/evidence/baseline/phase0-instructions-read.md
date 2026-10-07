@@ -10,11 +10,11 @@ Policy Order:
 5. BannedSymbols.txt (banned-API enforcement list)
 
 Files Read:
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-49\CLAUDE.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-49\.claude\rules\general-code-change.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-49\.claude\rules\general-unit-test.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-49\.claude\rules\csharp.md
-- C:\Users\DanMoisan\repos\TaskMaster-wt-2026-06-28-18-49\BannedSymbols.txt
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-49\CLAUDE.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-49\.claude\rules\general-code-change.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-49\.claude\rules\general-unit-test.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-49\.claude\rules\csharp.md
+- <user-profile>\repos\TaskMaster-wt-2026-06-28-18-49\BannedSymbols.txt
 - Supporting: .claude/rules/ci-workflows.md, .claude/rules/tonality.md (auto-loaded)
 
 Key constraints confirmed:

@@ -126,7 +126,7 @@ them and no artifact is required for them.
 | Tests | PASS | 0 failures, final run |
 | C# coverage gates | PASS | 85.59% line / 79.06% branch repo-wide; no regression |
 | File-size budget | PASS | 418 / 474 / 398 lines |
-| Host-identifier hygiene | PASS | Added-line scan of the full branch diff for real `C:\Users\...` paths, the account name, and the machine name: zero real identifiers added (the only matches are the placeholder examples inside the sanitization rule document itself). |
+| Host-identifier hygiene | PASS | Added-line scan of the full branch diff for real `<user-profile>` paths, the account name, and the machine name: zero real identifiers added (the only matches are the placeholder examples inside the sanitization rule document itself). |
 | Closing-keyword scan | PASS | `git log --format=%B f85a36fa..HEAD`: zero matches of the case-insensitive regex for closing keywords before `#511` or `#571`. File-content matches exist only in `remediation-inputs.2026-08-23T20-57.md` (three negations, exempt by the recorded carve-out) and `plan.2026-08-21T18-10.md:26` (pre-existing; file content cannot auto-close an issue). |
 | `modified-workflow-needs-green-run` | PASS | The diff touches no `.github/workflows/**`, `scripts/benchmarks/**`, or `.github/actions/**` path, so the rule does not fire. |
 

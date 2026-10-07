@@ -5,7 +5,7 @@ Scope: classify the five test files that reference the legacy `ScoDictionary<TKe
 (`UtilitiesCS/ReusableTypeClasses/Serializable/Concurrent/SCO/SCODictionary.cs`) in live code, and
 determine the exact production/test footprint of retiring that class. No source files were
 modified; all findings below are from direct reads of the feature worktree
-(`C:/Users/DanMoisan/repos/TaskMaster-wt/legacy-scodictionary-removal-315`).
+(`<user-profile>/repos/TaskMaster-wt/legacy-scodictionary-removal-315`).
 
 ## Summary verdicts
 
