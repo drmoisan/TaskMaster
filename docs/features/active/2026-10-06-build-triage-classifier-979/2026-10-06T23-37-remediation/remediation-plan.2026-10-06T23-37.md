@@ -315,7 +315,7 @@ only the 19 reported trailing spaces from four feature-owned Markdown files.
   collected staged context; a missing routing receipt, context path, or exact
   result blocks commit creation.
 
-- [ ] [P5-T5] Commit the staged remediation once with the exact P5-T4 message,
+- [x] [P5-T5] Commit the staged remediation once with the exact P5-T4 message,
   then record the new commit SHA, its replayed-feature parent, complete path
   list, `git diff-tree --check` result, and both preservation-ref objects in
   `artifacts/orchestration/orchestrator-state.json`.
@@ -324,7 +324,7 @@ only the 19 reported trailing spaces from four feature-owned Markdown files.
   hygiene passes, both backup refs remain valid, the worktree has no remaining
   feature-owned change, and no push or force-push occurs in this task.
 
-- [ ] [P5-T6] Invoke the `drm-copilot` MCP `collect_pr_context` tool with base
+- [x] [P5-T6] Invoke the `drm-copilot` MCP `collect_pr_context` tool with base
   `main` and target `feature/build-triage-classifier-979`; require fresh
   `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt`
   for the P5-T5 head. Acceptance: both context files identify the clean
@@ -332,7 +332,7 @@ only the 19 reported trailing spaces from four feature-owned Markdown files.
   `.agents/**` or `.codex/**` changes, and the MCP response satisfies the
   repository automation contract.
 
-- [ ] [P5-T7] Delegate a fresh full-feature re-review to the routed C4
+- [x] [P5-T7] Delegate a fresh full-feature re-review to the routed C4
   `feature-reviewer`, supplying P5-T6 context, this plan, all Cycle 3 evidence,
   the three `2026-10-06T23-34-audit/` inputs, and the coverage authorization at
   `evidence/other/coverage-exception.2026-10-06T21-37.md`. Acceptance: the
@@ -348,30 +348,30 @@ only the 19 reported trailing spaces from four feature-owned Markdown files.
 
 ## Acceptance criteria for this remediation
 
-- [ ] The reviewed state remains recoverable from
+- [x] The reviewed state remains recoverable from
   `backup/issue-979-pre-isolation-f09f2ae2` at
   `f09f2ae2d44f34cfaa1854d065a5d10c1dbc2bf7`.
-- [ ] Every initially uncommitted audit, remediation, plan, and Cycle 3 evidence
+- [x] Every initially uncommitted audit, remediation, plan, and Cycle 3 evidence
   file is recoverable from
   `refs/backup/issue-979/uncommitted-artifacts-f09f2ae2` and is restored in the
   worktree before documentation correction.
-- [ ] The feature branch merge base with `origin/main` is
+- [x] The feature branch merge base with `origin/main` is
   `5ddf7f03d6b92b2981cd0d5d74f10a0733e80964`.
-- [ ] Exactly the three issue #979 patches are replayed in their original order,
+- [x] Exactly the three issue #979 patches are replayed in their original order,
   and range-diff reports three exact `=` matches.
-- [ ] `git diff --name-only origin/main..HEAD -- .agents .codex` returns no
+- [x] `git diff --name-only origin/main..HEAD -- .agents .codex` returns no
   path; the inherited `35e748279` work remains preserved under the backup ref.
-- [ ] The four historical Markdown files have only the 19 reported trailing
+- [x] The four historical Markdown files have only the 19 reported trailing
   spaces removed, with all wording and findings retained.
-- [ ] Working, staged, and committed diff-hygiene checks pass with zero
+- [x] Working, staged, and committed diff-hygiene checks pass with zero
   trailing-whitespace diagnostics.
-- [ ] No C# production, test, or project content is edited during remediation;
+- [x] No C# production, test, or project content is edited during remediation;
   prior final C# evidence remains applicable through exact patch identity.
-- [ ] All 12 authoritative `spec.md` and `user-story.md` acceptance criteria and
+- [x] All 12 authoritative `spec.md` and `user-story.md` acceptance criteria and
   all five issue-level remediation cross-checks remain checked and supported;
   coverage remains waived only for issue #979 under the user's one-time
   exception.
-- [ ] Canonical commit context and refreshed PR context are collected through
+- [x] Canonical commit context and refreshed PR context are collected through
   `drm-copilot`, the remediation is committed without any push, and the fresh
   routed feature review returns `REVIEW_STATUS: PASS` before PR readiness is
   reported.
