@@ -1,0 +1,11 @@
+Timestamp: 2026-10-06T22-40
+Command: dotnet tool run csharpier format TaskMaster/Ribbon/RibbonController.Intelligence.cs TaskMaster.Test/Ribbon/RibbonViewerEngineCallbackShapeTests.cs; msbuild TaskMaster.sln /t:Rebuild /m /v:minimal /nologo /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true; C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName=TaskMaster.Test.Ribbon.RibbonViewerEngineCallbackShapeTests.BuildTriageClassifierAsync_WhenTriageEngineIsAbsent_UsesLazyTriageBeforeInjectedRebuild|FullyQualifiedName=TaskMaster.Test.Ribbon.RibbonViewerEngineCallbackShapeTests.BuildTriageClassifierAsync_AwaitsInjectedRebuildOperation" /ResultsDirectory:TestResults\issue-979-focused-pass-2026-10-06T22-40-10 /Logger:trx /Diag:TestResults\issue-979-focused-pass-2026-10-06T22-40-10\vstest.diag.log;tracelevel=verbose
+EXIT_CODE: 0
+Output Summary: The scoped C# files were formatted, and a fresh warnings-as-errors solution rebuild succeeded before test execution. VSTest passed 2 of 2 focused tests: the disabled-engine lazy path passed in 60 ms and the existing TriageClassifierRebuildAsync first-bypass test passed in 181 ms. The test correction waits for the asynchronous lazy dispatch before asserting state, eliminating the prior race without changing production behavior. The disabled-engine delegate independently asserts that the existing AsyncLazy<Triage> factory resolves before TriageRebuildAsync runs.
+
+The prior p1-t4 artifact is superseded because it did not record a current assembly identity. The accepted run used `TaskMaster.Test\bin\Debug\TaskMaster.Test.dll` written at `2026-10-07T02:39:48.9017826Z`, before the TRX start at `2026-10-06T22:40:10.4884140-04:00`. The TRX storage path resolves to that exact assembly. SHA-256 before and after VSTest was `C8584A32C46F62A611BF26810AF45A2EB038E98F18037FF4A119E5E7EC17AE1A`, and PE module MVID was `e628beee-b510-4e67-ae44-fc95f319a840`.
+
+Result artifacts:
+
+- `TestResults/issue-979-focused-pass-2026-10-06T22-40-10/DanMoisan_MEGALODON4_2026-10-06_22_40_12_net481.trx`
+- `TestResults/issue-979-focused-pass-2026-10-06T22-40-10/vstest.diag.log`

@@ -16,7 +16,7 @@ using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.EmailIntelligence
 {
-    public class Triage : IConditionalEngine<MailItemHelper>
+    public partial class Triage : IConditionalEngine<MailItemHelper>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType

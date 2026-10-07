@@ -18,7 +18,7 @@ namespace TaskMaster.Test.Ribbon
     /// is caught in CI rather than at runtime.
     /// </summary>
     [TestClass]
-    public class RibbonExplorerXmlTests
+    public partial class RibbonExplorerXmlTests
     {
         private const string ResourceName = "TaskMaster.Ribbon.RibbonExplorer.xml";
 
