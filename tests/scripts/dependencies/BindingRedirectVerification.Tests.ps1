@@ -290,24 +290,8 @@ Describe 'Repository binding redirects (issue 953)' {
 
         $map = ConvertTo-ReferenceVersionMap -ProjectText @($projectPath | ForEach-Object { [System.IO.File]::ReadAllText($_) })
         $provider = { param($Name) $map[$Name] }.GetNewClosure()
-        $expectedDebt = @(
-            'Azure.Core|1.62.0.0',
-            'Microsoft.Bcl.Memory|10.0.0.7',
-            'Microsoft.Bcl.Numerics|10.0.0.5',
-            'Microsoft.Extensions.Diagnostics.Abstractions|10.0.0.5',
-            'Microsoft.Identity.Client|4.89.0.0',
-            'Microsoft.Identity.Client.Extensions.Msal|4.89.0.0',
-            'Microsoft.IdentityModel.Abstractions|8.22.0.0',
-            'Microsoft.IdentityModel.JsonWebTokens|8.22.0.0',
-            'Microsoft.IdentityModel.Logging|8.22.0.0',
-            'Microsoft.IdentityModel.Protocols|8.22.0.0',
-            'Microsoft.IdentityModel.Protocols.OpenIdConnect|8.22.0.0',
-            'Microsoft.IdentityModel.Tokens|8.22.0.0',
-            'Microsoft.IdentityModel.Validators|8.22.0.0',
-            'System.IdentityModel.Tokens.Jwt|8.22.0.0',
-            'System.ClientModel|1.3.0.0'
-        )
-        $expectedUnverifiable = @('Microsoft.IdentityModel.Clients.ActiveDirectory', 'System.Linq.AsyncEnumerable', 'netstandard')
+        $expectedDebt = @()
+        $expectedUnverifiable = @('netstandard')
 
         # Act
         $redirectElement = 0
@@ -328,8 +312,90 @@ Describe 'Repository binding redirects (issue 953)' {
         # Assert
         $redirectElement | Should -BeGreaterThan 0
         $examined | Should -Be $redirectElement -Because 'every bindingRedirect element must be examined'
-        $actualDebt | Should -Be @($expectedDebt | Sort-Object -Unique) -Because ('the stale redirect set must equal the recorded known debt; observed: ' + ($actualDebt -join '; '))
-        $actualUnverifiable | Should -Be @($expectedUnverifiable | Sort-Object -Unique)
+        $actualDebt.Count | Should -Be $expectedDebt.Count -Because ('every bindingRedirect newVersion must equal a csproj Reference version (issue 973 emptied the recorded known-debt set; a new stale pair is fixed, not recorded); observed: ' + ($actualDebt -join '; '))
+        $actualUnverifiable | Should -Be @($expectedUnverifiable | Sort-Object -Unique) -Because ('only the deliberate netstandard redirect may be unverifiable; observed: ' + ($actualUnverifiable -join '; '))
         @($actualDebt | Where-Object { $_ -like 'Fizzler|*' -or $_ -like 'System.Runtime.CompilerServices.Unsafe|*' }).Count | Should -Be 0
+    }
+
+    It 'bounds every corrected redirect range at its newVersion across the repository app.config files' {
+        # Arrange: the 16 names issue 973 corrected, every app.config and every csproj directly under a root-level directory.
+        $correctedName = @(
+            'Azure.Core', 'Microsoft.Bcl.Memory', 'Microsoft.Bcl.Numerics',
+            'Microsoft.Extensions.Diagnostics.Abstractions', 'Microsoft.Identity.Client',
+            'Microsoft.Identity.Client.Extensions.Msal', 'Microsoft.IdentityModel.Abstractions',
+            'Microsoft.IdentityModel.JsonWebTokens', 'Microsoft.IdentityModel.Logging',
+            'Microsoft.IdentityModel.Protocols', 'Microsoft.IdentityModel.Protocols.OpenIdConnect',
+            'Microsoft.IdentityModel.Tokens', 'Microsoft.IdentityModel.Validators',
+            'System.IdentityModel.Tokens.Jwt', 'System.ClientModel', 'System.Linq.AsyncEnumerable'
+        )
+        $rootDirectory = @(Get-ChildItem -LiteralPath $script:RepoRoot -Directory)
+        $configPath = @(
+            $rootDirectory |
+                ForEach-Object { Join-Path $_.FullName 'app.config' } |
+                    Where-Object { Test-Path -LiteralPath $_ }
+        )
+        $projectPath = @(
+            $rootDirectory |
+                ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Filter '*.csproj' -File } |
+                    ForEach-Object { $_.FullName }
+        )
+        $configPath.Count | Should -BeGreaterThan 9
+        $projectPath.Count | Should -BeGreaterThan 9
+        $map = ConvertTo-ReferenceVersionMap -ProjectText @($projectPath | ForEach-Object { [System.IO.File]::ReadAllText($_) })
+
+        # Act: one record per corrected-name redirect; a record is consistent when its range is bounded at its
+        # newVersion and that newVersion is a version some csproj Reference declares for the name.
+        $record = @(
+            foreach ($path in $configPath) {
+                $text = [System.IO.File]::ReadAllText($path)
+                foreach ($item in @(ConvertFrom-AppConfigText -Text $text | Where-Object { $correctedName -contains $_.Name -and $_.NewVersion -ne '' })) {
+                    $deployed = @(if ($map.ContainsKey($item.Name)) { $map[$item.Name] })
+                    [pscustomobject]@{
+                        Name       = $item.Name
+                        Label      = (Split-Path -Leaf (Split-Path -Parent $path)) + ':' + $item.Name + '=' + $item.OldVersion + '/' + $item.NewVersion
+                        Consistent = ($item.OldVersion -eq ('0.0.0.0-' + $item.NewVersion)) -and ($deployed -contains $item.NewVersion)
+                    }
+                }
+            }
+        )
+        $inconsistent = @($record | Where-Object { -not $_.Consistent })
+        $observedName = @($record | ForEach-Object { $_.Name } | Sort-Object -Unique)
+        $missingName = @($correctedName | Where-Object { $observedName -notcontains $_ })
+
+        # Assert
+        $record.Count | Should -BeGreaterThan 0 -Because 'the corrected names must carry redirects somewhere'
+        $missingName.Count | Should -Be 0 -Because ('every corrected name must be observed at least once; missing: ' + ($missingName -join '; '))
+        $inconsistent.Count | Should -Be 0 -Because ('every corrected redirect must bound its range at a csproj Reference version; observed: ' + (($inconsistent | ForEach-Object { $_.Label }) -join '; '))
+    }
+
+    It 'carries an Aliases child on every System.Linq.AsyncEnumerable project Reference' {
+        # Arrange: every csproj directly under a root-level directory, matched as raw text because the
+        # PackageGraph parser models Reference and HintPath lines only and never an Aliases child.
+        $projectPath = @(
+            Get-ChildItem -LiteralPath $script:RepoRoot -Directory |
+                ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Filter '*.csproj' -File } |
+                    ForEach-Object { $_.FullName }
+        )
+        $projectPath.Count | Should -BeGreaterThan 9
+        $expectedProject = 'QuickFiler,TaskMaster,ToDoModel,UtilitiesCS,UtilitiesCS.Test'
+        $pattern = '(?s)<Reference Include="System\.Linq\.AsyncEnumerable,[^>]*?(/>|>.*?</Reference>)'
+
+        # Act
+        $element = @(
+            foreach ($path in $projectPath) {
+                foreach ($match in [regex]::Matches([System.IO.File]::ReadAllText($path), $pattern)) {
+                    [pscustomobject]@{
+                        Project  = Split-Path -Leaf (Split-Path -Parent $path)
+                        HasAlias = $match.Value.Contains('<Aliases>SystemLinqAsyncEnumerable</Aliases>')
+                    }
+                }
+            }
+        )
+        $withoutAlias = @($element | Where-Object { -not $_.HasAlias } | ForEach-Object { $_.Project })
+        $carrier = @($element | ForEach-Object { $_.Project } | Sort-Object -Unique)
+
+        # Assert
+        $withoutAlias.Count | Should -Be 0 -Because ('every System.Linq.AsyncEnumerable Reference must carry the alias; missing in: ' + ($withoutAlias -join '; '))
+        ($carrier -join ',') | Should -BeExactly $expectedProject -Because 'exactly the five projects that install System.Linq.Async carry the aliased Reference'
     }
 }

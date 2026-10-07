@@ -398,6 +398,15 @@
     <Reference Include="System.Linq.Async, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Linq.Async.7.0.1\lib\net48\System.Linq.Async.dll</HintPath>
     </Reference>
+    <!-- Aliased on purpose (issue #973): the project compiles against lib\net48\System.Linq.Async.dll,
+         which still defines a public System.Linq.AsyncEnumerable type for binary compatibility; a global
+         reference to the BCL assembly of the same type name makes every shared operator call CS0121
+         (and any type-name use CS0433). The alias keeps the assembly deployed and resolvable without
+         putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+    <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.12, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.12\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
+      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+    </Reference>
     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
       <Private>True</Private>
@@ -608,6 +617,7 @@
     </Compile>
     <Compile Include="EmailIntelligence\ClassifierGroups\Actionable\ActionableClassifierGroup.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Categories\CategoryClassifierGroup.ConditionalEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroupUtilities.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\OlFolder\LcppnFolderPredictorStore.cs" />
