@@ -280,5 +280,23 @@ session checkout's own branch was the item branch, one commit atop the CURRENT `
 clean, re-hashed plan blob equal to the clearance's. No child delegated; ADMIT into the in-flight
 cohort because its only current-cohort member (950) shared no edge.
 
+**Ninth case, 2026-10-02 `/parallel-add 964`: fourth rung, no child.** The checkpoint had moved to
+the primary checkout (`TaskMaster/artifacts/...`), not the new session worktree, so locate it first.
+The worktree's six UNCOMMITTED agent-memory paths were what decided the verdict: the narrow radius
+shared no edge with current-cohort member 961, but the reconciled `orchestrator/MEMORY.md` did, so
+ADMIT became DEFER (cohort 10, gen 10). Never skip the dirty-tree reconciliation before deciding.
+
+**Tenth case, 2026-10-03 `/parallel-add 968` (round-1 deltas held, #972 folded in):** the verbatim
+deltas were in the grandchild's `.output` (grep the TaskMaster temp tasks dir for a unique defect
+token). Commit them into `evidence/other/` before you delegate. A non-isolated preparation child's
+executor had EVERY pwsh probe denied with PREIMPLEMENTATION_GATE_BLOCKED, because the session root
+had no `orchestrator-state.json`. Seed the 4-key file first ([[preimplementation-gate-scope]]),
+otherwise the "build-access" confirming round is read-only and does not converge. Here it returned 8 defects; not admitted.
+After the seed, rounds 3 to 5 found 4, 3 and 1 defects (5-round cap, still not cleared). Most of them
+were consequences of the previous round's own fixes: the Phase 8 restart path re-entering the P6-T2
+format/census gate. When you set a round cap, ask the reviewer to trace the restart path in the
+FIRST round. Round 6 cleared it (6 rounds in total). The result was ADMIT into in-flight cohort 10 at
+generation 12, because the in-flight member 964 shared no edge with it.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].

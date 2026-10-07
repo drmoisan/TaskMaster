@@ -19,6 +19,7 @@
 - [Measure your hook exposure, don't assume it](parallel-child-hook-exposure-measured-not-assumed.md) — a non-isolated child committed + delegated with NO shared-file sync; prd-feature gates only atomic-planner
 
 ## PR authoring and CI gate
+- [Item-scoped hooks read the ITEM worktree checkpoint](item-scoped-hooks-read-item-worktree-checkpoint.md) — mirror receipts there; an inherited override there is a policy hold
 - [pr-author is a skill, not an agent](pr-author-hook-blocks-gh-in-this-repo.md) · [exact checkpoint schema](pr-author-hook-exact-checkpoint-schema.md) — agents must be a LIST; `relativeFile` required
 - [PR readiness gate bars ANY recorded override](pr-readiness-gate-bars-any-recorded-override.md) — step8 must not be `pending`
 - [PR-creation checkpoint shape](pr-creation-readiness-exact-requirements.md) — Invoke-OrchestratorStatePreflight's exact demand
@@ -60,6 +61,7 @@
 - [One executor per worktree](one-executor-per-worktree.md) · [Agent() cannot course-correct a running subagent](agent-tool-cannot-course-correct-running-subagent.md)
 - [No SendMessage tool: relaunch with a resume brief](no-sendmessage-relaunch-with-resume-brief.md) — never a placeholder prompt
 - [Dead subagent's work may already be complete on disk](dead-subagent-work-may-be-complete-on-disk.md) — diff before relaunching
+- [Apply a planner-raised knock-on in the delta round](apply-planner-raised-knockon-in-the-delta-round.md) — a gap in the reviewer's own delta; saved a round on #968
 - [Remediation loop strict handoff](remediation-loop-strict-handoff.md) · [Remediation-plan em-dash required](remediation-plan-em-dash-required.md)
 - [Get-BlastRadius over-includes citations, omits gitignored writes](get-blastradius-overincludes-citations-omits-gitignored-writes.md)
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) · [use the portable PS modules](model-routing-scripts-absent-on-epic-integration-base.md) · [feature-review is fable only under `preferred`](model-routing-feature-review-is-always-fable.md)

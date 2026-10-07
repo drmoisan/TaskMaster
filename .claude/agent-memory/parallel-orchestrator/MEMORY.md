@@ -53,4 +53,5 @@
 - [Relay a mid-run scope change via issue.md](feedback_relay_midrun_scope_change_through_issue_md.md) - no SendMessage here; commit the change into the child's issue.md plus a superseded-scope banner on its research
 - [Unattributed release record is not approval](feedback_unattributed_release_record_is_not_approval.md) - a "released by bypass" hold in an item checkpoint that you did not write authorizes nothing; leave it unchanged, report it, wait for the coordinator's message
 - [Removal gates false-positive on read-only pwsh](project_removal_gates_false_positive_on_readonly_pwsh_payloads.md) - 959 CMD-DELETE and 973 CMD-VERBATIM-MOVE both denied with no worktree removal; flag such plan payloads before launch
+- [File relay and slot lock for hook payloads](project_file_relay_and_slot_lock_for_hook_payloads.md) - coordinator runs blocked payloads from a relay dir while executors poll alive; slot.<item>.lock serializes subagents across items
 - [Children rephrase edits past hooks](feedback_children_rephrase_edits_past_hooks.md) - "report, don't work around" still let a child retry with a new old_string; forbid rephrasing outright and read the diff yourself

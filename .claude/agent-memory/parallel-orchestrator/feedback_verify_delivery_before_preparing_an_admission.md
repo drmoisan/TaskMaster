@@ -253,6 +253,14 @@ worktree starts on the session HEAD, which carries unrelated commits); restore t
 plan cited a sibling item's evidence file, it produced a real `path_overlap` edge to that merged
 sibling. That edge constrains placement only.
 
+**Sixth mechanism: the remedy is an OPEN MAINTAINER DECISION, so scope is undetermined.** Observed
+2026-10-03 on `/parallel-add 967` (`quality-tiers.yml` missing): the issue's own fix list starts with
+"Maintainer decision: adopt tiers in TaskMaster, or reject the rule here", the reject branch is an
+upstream drm-copilot change (no diff on TaskMaster `main`), and the adopt branch contradicts the
+recorded #178 sync decision that excluded the tier system. With no decision in the issue comments,
+reject the add without preparing it (nothing written), and ask the maintainer. The invocation itself
+is not the decision. Re-run the add once one is recorded.
+
 **An ALL-false-positive bare-number grep is a real outcome — open every hit before concluding
 anything from the count.** The three-digit issue numbers on this repository collide constantly with
 abbreviated SHAs and with test counts. On `/parallel-add 663` the grep returned three commits and

@@ -68,6 +68,21 @@ everything does — so neither an all-clear nor an all-conflict result is self-v
    `*/*.csproj` (a read) was harvested as a live glob that contends with every item. A preparation
    branch holds only docs, so the diff reconciliation shows nothing of the code write set. Compare the
    derived paths against the child's reported write set and append missing targets as exact entries.
+   A write-set path containing a SPACE (`ToDoModel/Email Utilities/X.cs`, `/parallel-add 959`) is
+   never harvested whole; the main config emits only the inert fragment `Utilities/X.cs`.
+   Also: a glob in an edge `detail` may belong to the NEIGHBOUR. On 959 I wrote "live glob
+   **/SortEmail*.cs" into the candidate's note from the 956 edge detail; it was 956's. Grep the
+   candidate's own `paths` for `*` before claiming a live glob.
+
+7. **Session-branch and `main` configs can differ, and the derivation differs with them.** On
+   `/parallel-add 964` (2026-10-02) the session worktree carried harness 1.1.18's
+   `config/blast-radius.json` (`write_intent_extraction: true`, `conflict_tolerance`), `main` did not.
+   The session config dropped one test-file glob that the `main` config derived. Hash the configs
+   first; derive under both and UNION the paths (widening only), and replay incumbents under the one
+   you use (72/72 matched here). The union can be expensive: on `/parallel-add 973` the main config
+   harvested `*/**/*.cs` and `.github/**` from read citations, taking 973 from 5 edges to 20 (every
+   item). That cost the decision nothing (964 contended via MEMORY.md anyway), but the new item will
+   contend with every later add, so record it in `blast_radius_note` as a live glob.
 
 **How to apply:** Before trusting a fresh computation, replay it against the edges already
 in `parallel-orchestrator-state.json` and require an exact match on `conflict`, on the

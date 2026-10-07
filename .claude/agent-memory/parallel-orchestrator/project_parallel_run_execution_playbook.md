@@ -240,7 +240,9 @@ present were never ported. Discovering each gap mid-run costs a stall.
   `parallel_slug` out of each hit to pick the right one — several runs each keep their own copy, and
   the filename is identical in all of them. On `bugs-2026-09-02` the file was in
   `TaskMaster-wt/2026-09-02T08-47`. Run every close operation, including the MCP validation, with
-  `workspace_root` pointed at THAT worktree.
+  `workspace_root` pointed at THAT worktree. The converse also happens: on `bugs-2026-09-28`
+  (closed 2026-10-07) the checkpoint lived in the PRIMARY checkout while the invoking session sat in
+  `TaskMaster-wt/2026-10-02T21-24`, which had none. Search every worktree, never just the cwd.
   - The plan-home branch may be gone by then and the run docs merged to `main`, so
     `docs/features/parallel/<slug>/parallel-status.md` is regenerated in the PRIMARY checkout even
     though the checkpoint is not there. The two artifacts legitimately live in different trees at

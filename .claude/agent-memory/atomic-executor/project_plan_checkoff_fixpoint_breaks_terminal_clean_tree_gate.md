@@ -57,3 +57,10 @@ reason: eleven earlier Phase 5 artifacts were also still uncommitted.
   an enumerated-porcelain acceptance, count the plan file itself as a guaranteed member of the set from
   the first check-off onward, and admit it for PORCELAIN only: it is a Write Set path that must stay in
   the anchored diff / committed footprint.
+- Mirror trap on the COMMIT side (issue #973 remediation preflight, 2026-10-06): when a commit macro
+  says `<paths>` "always includes this plan" and gates `COMMITTED-PATHS` (`diff --name-only HEAD~1 HEAD`)
+  equal to `<paths>` as a set, any commit made while the plan carries no change is unsatisfiable: the
+  final task that defers its own flip until after the commit (its predecessors' flips were already
+  committed by their own tasks), and a mid-loop fix commit made before the loop task flips. `git add`
+  of an unchanged file stages nothing, so the committed set is one path short. Check every commit
+  site for "does the plan file actually differ from HEAD at this moment".

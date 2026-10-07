@@ -2,74 +2,46 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#973 R1](project_973_r1_last_task_artifact_only_commit_and_measured_line_length_seams.md) — last task commits its artifact alone (plan is clean until its flip); dossier cites no later result; flip then transcribe; measure line length with `^.{N,}` (CR +1); Glob zero-gate needs a positive-control Glob; loop-fix commit needs `<paths>`
+- [#973 cycle 1](project_973_cycle1_premise_correction_refscan_and_tautology_fold_seams.md) — false-premise AC fixed by a metadata refscan + positive control; a "tautology" may be an analyzer workaround (fold the read into the real assertion, amend the AC operand); hunk header omits `,1`; commit-per-task flip-then-commit
+- [#964 cycle 1](project_964_cycle1_test_only_coverage_gap_remediation_seams.md) — test-only coverage-gap plan: dossier not fail-before, data-row trx prefix match, commit-task check-off circularity, no-Bash gitdir reads
+
+- [#968 R5](project_968_r5_multi_pass_format_exemption_and_no_bash_cr_check_seams.md) — a format exemption keyed to "rewritten this pass" fails on any restart: add PRIOR-PASS-REWRITTEN + RESTART-CORRECTED (union of ALL corrections); no Bash means Grep `\r` for the CR check
+- [#968 R4](project_968_r4_restart_path_reanchor_and_recorded_not_gated_exemption_seams.md) — restart into a pre-commit census needs BASE ref + membership porcelain; exempt recorded-not-gated values (HUNK_COUNT, SPAN) from "as last recorded"; #region hits need a category
+- [#968 R3](project_968_r3_last_recorded_value_rule_and_merged_payload_hook_seams.md) — post-format census must say "as last recorded for its file"; classification stop-rules must cover method-group assignments; merged pwsh payloads trip the gh+issue+new hook; re-count spec facts after amendments
+- [#964 R4](project_964_r4_post_merge_footprint_reanchor_with_negative_controls.md) — mid-plan merge: move only the whole-tree footprint gate to MERGE-SHA, add two committed-range negative controls; no Bash means no hash-object
 - [#964 R3](project_964_r3_glob_backslash_and_hit_attribution_seams.md) — Glob paths are backslash (rev-parse HEAD: needs `/`); totals-only sweep can't decide per-file branch
 - [#964 R2](project_964_r2_preparation_record_closed_evidence_set.md) — preparation commits preflight-clearance.*.md before execution; closed evidence sets must admit + blob-pin it
-- [#964 R0-R1](project_964_partial_split_sink_guard_plan_seams.md) — Grep tokens are regex; ordinal multiset split census; pre-existing-failure rule must compare trx FQNs (testName is short); last-task hygiene sweep
-- [#950 R2](project_950_r2_self_matching_process_probe_and_bom_numstat_seams.md) — CommandLine process probe counts itself (exclude $PID); BOM drop adds +1/-1 numstat; failed set hides aborted tests
-- [#950 R1](project_950_r1_inline_continuation_and_reindent_width_seams.md) — default TCS continues inline so Drain() is vacuous (RunContinuationsAsynchronously + delete-Drain control); using() re-indent breaks width
-- [#950 v1.0](project_950_hygiene_blocks_absolute_prefix_and_always_failing_probe_seams.md) — absolute prefix in Command rows breaks hygiene rule B; always-failing probe; commit task's own artifact in porcelain; re-indent vs added-line scans
-- [#956 R1.2](project_956_r12_rethrow_brace_exemptions_and_indent_keyed_catch_rule.md) — lifting ExcludeFromCodeCoverage exposes braces after `throw;`; construct-identified exemptions; catch rule keyed to indent; recount control; ITERATION 1 + RERUN
+- [#964 R0-R1](project_964_partial_split_sink_guard_plan_seams.md) — Grep tokens are regex; ordinal multiset split census; pre-existing-failure rule compares trx FQNs; last-task hygiene sweep
+- [#950 R2](project_950_r2_self_matching_process_probe_and_bom_numstat_seams.md) — CommandLine process probe counts itself; BOM drop adds +1/-1 numstat; failed set hides aborted tests
+- [#950 R1](project_950_r1_inline_continuation_and_reindent_width_seams.md) — default TCS continues inline so Drain() is vacuous; using() re-indent breaks width
+- [#950 v1.0](project_950_hygiene_blocks_absolute_prefix_and_always_failing_probe_seams.md) — absolute prefix breaks hygiene rule B; always-failing probe; commit task's own artifact in porcelain
+- [#956 R1.2](project_956_r12_rethrow_brace_exemptions_and_indent_keyed_catch_rule.md) — lifting EFCC exposes braces after `throw;`; construct-identified exemptions; catch rule keyed to indent
 - [#956 R1](project_956_r1_spec_self_hit_and_raw_doc_name_seams.md) — spec-wording counts self-hit the AC line; anchor `cobertura[^/]*\.xml$`; amended AC needs a P0 literal check
-- [#953 R3](project_953_r3_grep_gitignore_directory_path_and_measured_line_lengths.md) — Grep honours .gitignore for a DIRECTORY path (pass the file path), Glob does not; measure line lengths with `^.{N,}`
-- [#953 R2](project_953_r2_grep_long_line_omission_and_cr_anchor_seams.md) — Grep omits lines over ~500 chars; ripgrep `$` fails before CR (`\r?$`); expect-fail needs a wrong-reason branch
-- [#953 R1](project_953_r1_pwsh_refused_and_count_recheck_seams.md) — Bash guard refuses pwsh (`git -C <root>`, absolute operands); re-count blocks per file; `-Force` count-0 self-hits
-- [#953 R0](project_953_fizzler_redirect_sweep_and_ratchet_plan_seams.md) — ripgrep strips the BOM; text=auto hides CRLF loss (gate `git ls-files --eol`); shared attribute needs a two-line Edit
+- [#953 R3](project_953_r3_grep_gitignore_directory_path_and_measured_line_lengths.md) — Grep honours .gitignore for a DIRECTORY path, Glob does not; measure line lengths with `^.{N,}`
+- [#953 R2](project_953_r2_grep_long_line_omission_and_cr_anchor_seams.md) — Grep omits lines over ~500 chars; `$` fails before CR (`\r?$`); expect-fail needs a wrong-reason branch
+- [#953 R1](project_953_r1_pwsh_refused_and_count_recheck_seams.md) — Bash guard refuses pwsh; re-count blocks per file; `-Force` count-0 self-hits
+- [#953 R0](project_953_fizzler_redirect_sweep_and_ratchet_plan_seams.md) — ripgrep strips the BOM; text=auto hides CRLF loss (gate `git ls-files --eol`)
 - [#952 R3](project_952_r3_shared_origin_main_ancestry_gate_seam.md) — origin/main is shared by all worktrees: a no-fetch plan still needs a P0 `merge-base == BASE-SHA` gate
-- [#952 R2](project_952_r2_label_counts_helper_enumeration_and_hex_backslash_seams.md) — recount `all N required` labels; a directory-enumerating helper reads every file; backslash as `\x5C`
+- [#952 R2](project_952_r2_label_counts_helper_enumeration_and_hex_backslash_seams.md) — recount `all N required` labels; directory-enumerating helper reads every file; backslash as `\x5C`
 - [#952 R1](project_952_r1_read_phantom_row_and_frozen_clause_a_seams.md) — Read trailing empty row is inconsistent (count with Grep `^`); freeze footprint Clause A from P0
-- [#952 R0](project_952_runbook_and_workflow_comment_plan_seams.md) — `.yml` edits are pre-impl-gated; CRLF adds 1 to line length; removed bullet diffs as `-- `; actionlint silent on success
-- [#948 v0.3](project_948_sibling_first_shape_reconciliation_seams.md) — sibling lands first: named shapes with content anchors, baseline-relative try/catch gate, re-budget the 500-line ceiling, hit-count guards, dynamic census
-- [#947 pass A](project_947_passA_second_call_site_consolidation_seams.md) — mid-plan second call site: nested catch end keyed to the header's indent; re-derive "N catch clauses"; drop promotion handoff
-- [#945 R0](project_945_sortemail_trysave_directory_seam_plan_seams.md) — whitespace-stripped token census; compile-red fail-before; uncommitted-fix control via backup copy; two-dot MERGE-BASE gates
-- [#940 R3](project_940_r3_per_file_coverage_rule_and_post_merge_reanchor_seams.md) — aggregate not-lower gates trip on variance; per-file lines+branches rule with in-memory control; ANCHOR-SHA-2 = `<merge>^2`
+- [#952 R0](project_952_runbook_and_workflow_comment_plan_seams.md) — `.yml` edits are pre-impl-gated; CRLF adds 1 to line length; actionlint silent on success
+- [#948 v0.3](project_948_sibling_first_shape_reconciliation_seams.md) — sibling lands first: named shapes with content anchors, baseline-relative try/catch gate, re-budget 500-line ceiling
+- [#947 pass A](project_947_passA_second_call_site_consolidation_seams.md) — mid-plan second call site: nested catch end keyed to header indent; re-derive "N catch clauses"
+- [#945 R0](project_945_sortemail_trysave_directory_seam_plan_seams.md) — whitespace-stripped token census; compile-red fail-before; uncommitted-fix control via backup copy
+- [#940 R3](project_940_r3_per_file_coverage_rule_and_post_merge_reanchor_seams.md) — aggregate not-lower gates trip on variance; per-file lines+branches rule; ANCHOR-SHA-2 = `<merge>^2`
 - [#929 R5](project_929_r5_text_auto_terminator_only_formatter_rewrite_seam.md) — `* text=auto` makes a terminator-only rewrite uncommittable; key the commit on numstat non-empty
-- [#929 R4](project_929_r4_wrapper_led_hook_containment_and_actions_log_seams.md) — pr-author hook matches gh+pr+create substrings in any pwsh payload; strip SGR from Actions logs; wrap msbuild in Set-Location
-- [#929 R3](project_929_r3_post_merge_ci_sourced_gates_seams.md) — feature push starts NO ci.yml run (dispatch + watch); red-by-design needs ExpectedExitCode 1; no-shell git facts from .git/worktrees
-- [#927 v1.15](project_927_r12_three_dot_anchor_and_control_ref_ancestry_seams.md) — after a mid-plan merge use `origin/main...HEAD`; read the reflog before adopting a control ref; no digits in spec AC lines
+- [#929 R4](project_929_r4_wrapper_led_hook_containment_and_actions_log_seams.md) — pr-author hook matches gh+pr+create substrings in any pwsh payload; strip SGR from Actions logs
+- [#929 R3](project_929_r3_post_merge_ci_sourced_gates_seams.md) — feature push starts NO ci.yml run; red-by-design needs ExpectedExitCode 1; no-shell git facts from .git/worktrees
+- [#927 v1.15](project_927_r12_three_dot_anchor_and_control_ref_ancestry_seams.md) — after a mid-plan merge use `origin/main...HEAD`; read the reflog before adopting a control ref
 - [#927 v1.14](project_927_r11_ci_sourced_coverage_and_multiset_fidelity_seams.md) — PoshQC returns only an ok flag: counts from JUnit, coverage from CI; blob-level multiset
-- [#927 v1.13](project_927_v113_checkoff_must_read_the_pre_record_seams.md) — after a gate becomes pre/post, sweep consumers: check-off reads the PRE record; Tee-Object -Append is a write
-- [#927 v1.12](project_927_v112_two_point_census_and_ac_amendment_seams.md) — post-cleanup zero needs a pre-cleanup 1; `[char]92` vs `$b`; ripgrep transcodes UTF-16; AC-amendment placement
-- [#927 R10](project_927_r10_ci_session_state_and_folder_level_mcp_seams.md) — payload mirroring CI needs StrictMode + Stop; folder-scoped MCP results; QA-loop commits break "every commit at a boundary"
-- [#927 R9](project_927_r9_pwsh_process_directory_and_backslash_collapse_seams.md) — Set-Location does not move the .NET process dir; Git Bash collapses `\\`; Read over-counts by one
-- [#927 R8](project_927_r8_powershell_batch_phases_and_post_merge_reanchor_seams.md) — PS batch-budget hook is per session; a mid-run main merge voids BASE-SHA diffs and Phase 0 baselines
-- [#928 R1-R2](project_928_r1_part_file_credit_diagnostic_seams.md) — a "part file 5/5" diagnostic cannot fail; Pester mocks beat re-dot-source; derive numstat floors
-- [#839](project_839_createcancellationtoken_init_plan_seams.md) — lone comment deletion not CSharpier-stable; never record a porcelain COUNT; exempt commit form
-- [#838 R1–R2](project_838_gettableinviewasync_null_contract_plan_seams.md) — timed CTS ctors exist; porcelain gates assert SCOPE only; ExpectedExitCode = observed value
-- [#871](project_871_qfcqueue_enqueue_seams_plan_seams.md) — relocated-vs-new must be diff-derived; PS try/catch can't catch an external process; gate the delta
-- [#602 R1-R3](project_602_host_identifier_sweep_plan_seams.md) — literal-free counts = ONE pwsh segment; never `git add -A`; exit-1 baselines need ExpectedExitCode
-- [#873 R2](project_873_evidence_projection_plan_seams.md) — It-level mock overrides beyond BeforeEach; [int]GetAttribute('hits') throws when absent
-- [#792 R2](project_792_breadcrumb_webview2_init_plan_seams.md) — a bare token gate is pre-falsified by a sibling member name; moved Write Set path leaves prose residuals
-- [#900 R2](project_900_r2_channel_gate_and_hash_placement_seams.md) — isolation refuses pwsh -Command/-File; probe channel in Phase 0; copy XML after the last clean format
-- [#900 R1](project_900_dedicated_thread_mutation_placement_seams.md) — mutation before the precondition tests the wrong assertion; `\"` corrupts `-Command` payloads
-- [#895 R0](project_895_fsharp_core_hintpath_plan_seams.md) — spec's "no 879 folder" false; AC5 token twice; Rebuild keeps copied-ref timestamps; Meziantou bootstrap
-- [#816 R1-R3](project_816_iscompleted_branch2_ac5_plan_seams.md) — re-derive recovered figures; `coverage/.gitkeep` tracked; HangDumpType=None; every delta needs a baseline
-- [#826 factory](project_826_factory_outside_try_reachability_seams.md) · [#826 R2-R5](project_826_console_out_banned_symbol_plan_seams.md) — seam outside `try`; `0 Error(s)` substring of `10 Error(s)`
-- [#825 R1-R6](project_825_etl_deadline_mechanics_plan_seams.md) — latch encodes fixed timer order; Csc line names no project; a comment above a cited range shifts it
-- [#824 R1-R5](project_824_ilglobals_static_publication_plan_seams.md) — gate the installer's FS marker; "move" must state deletion; sort TRX by LastWriteTime
-- [#823](project_823_self_anchor_diff_base_seams.md) — self-anchor at P0; check-off can complete with AC unmet; never key ExpectedExitCode to a baseline count
-- [#821 R1](project_821_parentcleanup_double_release_plan_seams.md) — Read over-counts one line; Select-String is case-insensitive; untested pre-existing catch voids gate
-- [#815](project_815_coverage_aggregation_exposure_plan_seams.md) — zero baseline needs a positive control; pinned allowlist zeroes the helper; 500 legal, 501 not
-- [#810 R1-R2](project_810_teardown_dropdown_residuals_plan_seams.md) — inherited paths as a RULE; never upper-bound a csharpier delta; TokenSource null before Cleanup
-- [#798 R1](project_798_qfc_column_timeout_plan_seams.md) — frozen write set vs 882-line member; unwired seam observes 0; paren anchor misses generics
-- [#797](project_797_folder_settings_persistence_plan_seams.md) — runner TestCaseFilter hard-coded; generic logger has no attach point; red baseline voids exit-0 demands
-- [#791](project_791_hc_deadline_cancel_teardown_plan_seams.md) · [#781](project_781_excludefromcodecoverage_guard_plan_seams.md) — QfcDatamodel excluded; no shell var survives; EFCC unmeasurable
-- [#752](project_752_relative_path_anchor_plan_seams.md) · [#751 R3](project_751_r3_detached_launch_seams.md) · [#751 R2](project_751_sync_barrier_revision_seams.md) — `(^|\\)` anchor; detached sentinels; `nuget restore`
-- [#736 R1-R5](project_736_efc_archiveroot_boundary_sink_plan_seams.md) · [#735 R1](project_735_evidence_content_sanitization_seams.md) — 485-line test file voids Write Set; name-only sanitization can't fail
-- [#731 R1-R5](project_731_lifecycle_disposal_plan_seams.md) · [#731 R6-R12](project_731_r6_coverage_runner_bypass_seams.md) — near-limit forces partial; runner self-blocks in agent worktree
-- [#680](project_680_menu_mode_plan_seams.md) · [#678](project_678_carry_folder_predictor_plan_seams.md) · [#677 R1-R8](project_677_keyboard_focus_leak_plan_seams.md) — HostTests 499; runner throws twice; ctor param REJECTED
-- [#670 fault](project_670_webview_fault_boundary_plan_seams.md) · [#670 sanitisation](project_670_capture_time_sanitisation_seams.md) · [#663](project_663_qfc_alt_chord_plan_seams.md) — awaiter breaks "no pump"; vswhere leak
-- [#662](project_662_banner_prefix_arity_plan_seams.md) · [R2](project_662_banner_prefix_revision_round_seams.md) · [R3](project_662_round3_trx_hygiene_and_verbatim_seams.md) — `AC5` prefixes `AC5b`; `*.trx` NOT gitignored
-- [#656](project_656_closecompleted_guard_plan_seams.md) · [#648](project_648_ungated_static_swap_plan_seams.md) · [#647 R1-R2](project_647_fileio2_retry_plan_seams.md) — no TestCaseFilter override; 5% tolerance; `/Settings:`
-- [#644](project_644_ac16_referral_revision_seams.md) · [c2](project_644_cycle2_sweep_gate_evasion_seams.md) · [PA-7](project_644_pa7_redaction_plan_seams.md) — named instrument prints no figure; rewording is evasion
-- [#637 R6](project_637_r6_superseded_spec_claim_seams.md) · [R2-R5](project_637_selectrow_rooted_path_plan_seams.md) · [#635](project_635_reflective_caller_audit_plan_seams.md) · [#633](project_633_undo_handoff_plan_seams.md)
-- [#614](project_614_store_root_leak_plan_seams.md) · [#553](project_553_ci_parallel_split_plan_seams.md) · [#512](project_512_toolchain_gate_fidelity_plan_seams.md) · [#511 R1](project_511_r1_preflight_delta_seams.md)
-- [#505](project_505_toggle_state_guards_plan_seams.md) · [#503](project_503_ribbon_readiness_plan_seams.md) · [#501 R1](untracked-file-and-linecount-gate-seams.md) · [#501 R3](project_501_r3_preflight_seams.md)
-- [#498](conditional-ladder-and-unowned-class-gates.md) · [#497 F16](project_497_f16_capstone_plan_seams.md) · [#494](project_494_threshold_reconciliation_plan_seams.md) · [#493](project_493_uithread_dispatcher_plan_seams.md)
-- [#489](project_489_partn_reroute_amendment_seams.md) · [#484](project_484_qfc_revision_seams.md) · [capacity squeeze](project_qfcitemcontroller_test_capacity_squeeze.md) · [#469](project_469_comment_accuracy_plan_seams.md)
-- [#468 preflight](project_468_preflight_revision_seams.md) · [#468 QFC](project_468_qfc_collection_controller_plan_seams.md) · [#464](project_464_efc_controller_plan_seams.md) · [#457](project_457_closure_filter_plan_seams.md)
-- [#456 F14](project_456_f14_itemviewer_plan_seams.md) · [#455 F13](project_455_f13_breadcrumb_webview_plan_seams.md) · [#453](project_453_qfcitemcontroller_plan_seams.md) · [#452 F9](project_452_efc_form_item_viewer_plan_seams.md)
-- [#442](project_442_quickfiler_metrics_plan_seams.md) · [#441](project_441_cobertura_arithmetic_plan_seams.md) · [#440](project_440_breadcrumb_left_arrow_plan_seams.md) · [#437](project_437_efc_home_controller_plan_seams.md)
-- [#433 F7](project_433_f7_qfchomecontroller_plan_seams.md) · [#432](project_432_coverage_ledger_plan_seams.md) · [#430](project_430_quickfiler_keyboard_plan_seams.md) · [#400](project_400_partial_class_headroom_placement.md) · [#136](project_136_wave1_nonhalting_f1_dependency.md)
+- [#927 v1.13](project_927_v113_checkoff_must_read_the_pre_record_seams.md) — after a gate becomes pre/post, sweep consumers; Tee-Object -Append is a write
+- [#927 v1.12](project_927_v112_two_point_census_and_ac_amendment_seams.md) — post-cleanup zero needs a pre-cleanup 1; ripgrep transcodes UTF-16; AC-amendment placement
+- [#927 R10](project_927_r10_ci_session_state_and_folder_level_mcp_seams.md) — payload mirroring CI needs StrictMode + Stop; QA-loop commits break "every commit at a boundary"
+- [#927 R9](project_927_r9_pwsh_process_directory_and_backslash_collapse_seams.md) — Set-Location does not move the .NET process dir; Git Bash collapses `\\`
+- [#927 R8](project_927_r8_powershell_batch_phases_and_post_merge_reanchor_seams.md) — PS batch-budget hook is per session; a mid-run main merge voids BASE-SHA diffs
+- [#928 R1-R2](project_928_r1_part_file_credit_diagnostic_seams.md) — a "part file 5/5" diagnostic cannot fail; Pester mocks beat re-dot-source
+- [Legacy seams #136–#900](index_legacy_preflight_seams_pre_900.md) — sub-index of every per-issue seam note for #839 and earlier (#900, #895, #873, #871, #839 … #136)
 
 ## Plan structure and revision mechanics
 

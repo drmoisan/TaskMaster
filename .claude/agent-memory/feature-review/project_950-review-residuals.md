@@ -24,8 +24,9 @@ already [x]; AC17 left [ ] by binding ruling).
   field in the comparison bullet; keep every C#/csharp/dotnet+coverage line free of N/A/UNVERIFIED.
 - Hook-safe zero-file-language wording: checklist lines `none consulted (zero PowerShell files changed on this branch)` and
   a `PowerShell coverage gate: PASS by vacuity (...)` line, so a stale session `pr_context.summary.txt` listing .ps1 files
-  cannot trip the narrowing regex on `N/A - out of scope`. Not yet confirmed against the validator; it accepted at #950
-  only if the orchestrator's validator run passes (unknown at write time).
+  cannot trip the narrowing regex on `N/A - out of scope`. CONFIRMED at #968 (2026-10-03): the same wording, the `N/A`
+  New Code cell and the omitted `New/changed-code coverage:` field passed `validate_orchestration_artifacts` first try
+  (see [[968-review-residuals]]).
 - THEME TEST NULL-DISPATCHER EXPOSURE analysis (FocusAndThemeTests call `EnsureUiThreadDispatcher()` and discard the scope,
   then read the static): count the null-restoring writes R4 performs before vs after. Pre-fix null baseline: one null write
   at `transactionA.Dispose()`. Post-fix: restore-to-parked at Dispose, then one null write at the `using (baseline)` exit via

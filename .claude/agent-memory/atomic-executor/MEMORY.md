@@ -27,8 +27,13 @@
 - [Multi-line trx MESSAGE; Markdown-indent width](project_trx_message_multiline_and_markdown_indent_width.md) (Moq Verify splits reason and count onto two lines; recount wrap claims without the 4-space indent)
 - [Ambient drainable SyncContext is vacuous](project_ambient_drainable_synccontext_is_vacuous_without_async_continuations.md) (same-thread SetResult inlines; needs RunContinuationsAsynchronously)
 - [Glob blind under .claude/worktrees](project_glob_tool_blind_under_claude_worktrees.md) (empty Glob in an item worktree is not absence; use Read/Grep)
+- [FullName .claude skip + DisplayName census](project_preflight_fullname_claude_exclusion_and_displayname_census.md) (FullName `*\.claude\*` filter empties counts in item worktrees; DisplayName rows inflate name tokens)
 - [Stall probe treats a failure as a stall](project_stall_probe_clear_rule_treats_a_failure_as_a_stall.md) (fast shell-icon failure picks DIRECT, so a runner-verbatim AC becomes unreachable)
+- [pwsh payload hook containment](project_phrase_count_payload_trips_promotion_gh_issue_hook.md) (pwsh is a wrapper: issue+new+any "gh" substring is refused; never merge payloads)
+- [Restart re-enters pre-commit census; closed class lists](project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md) (follow restart arrows post-commit and into pass 2; map every census line)
 - [gh/CI-log traps](project_gh_ci_log_and_download_gotchas.md) (createdAt trips pr-author hook; ANSI in Pester log; gh download never overwrites) · [Abbreviated caller facts](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md)
+
+- [Generic seam over embedded interop = CS1769](project_generic_seam_over_embedded_interop_type_cs1769.md) (Func<Attachment,...> seams compile in UtilitiesCS, fail at every test call site)
 
 ## Build / toolchain environment
 - [pwsh/git/gh gotchas](project_pwsh_git_gh_cli_gotchas.md) · [Build/Test env](project_build_test_env.md) · [VS18 paths](project_vs18_build_toolchain_paths.md) · [SDK + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md)
