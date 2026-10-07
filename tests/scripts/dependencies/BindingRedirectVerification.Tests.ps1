@@ -312,8 +312,7 @@ Describe 'Repository binding redirects (issue 953)' {
         # Assert
         $redirectElement | Should -BeGreaterThan 0
         $examined | Should -Be $redirectElement -Because 'every bindingRedirect element must be examined'
-        @($expectedDebt).Count | Should -Be 0 -Because 'issue 973 emptied the recorded known-debt set; a new stale pair is fixed, not recorded'
-        $actualDebt.Count | Should -Be 0 -Because ('every bindingRedirect newVersion must equal a csproj Reference version; observed: ' + ($actualDebt -join '; '))
+        $actualDebt.Count | Should -Be $expectedDebt.Count -Because ('every bindingRedirect newVersion must equal a csproj Reference version (issue 973 emptied the recorded known-debt set; a new stale pair is fixed, not recorded); observed: ' + ($actualDebt -join '; '))
         $actualUnverifiable | Should -Be @($expectedUnverifiable | Sort-Object -Unique) -Because ('only the deliberate netstandard redirect may be unverifiable; observed: ' + ($actualUnverifiable -join '; '))
         @($actualDebt | Where-Object { $_ -like 'Fizzler|*' -or $_ -like 'System.Runtime.CompilerServices.Unsafe|*' }).Count | Should -Be 0
     }

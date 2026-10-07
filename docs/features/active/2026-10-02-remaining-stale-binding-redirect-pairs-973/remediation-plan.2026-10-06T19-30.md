@@ -141,7 +141,7 @@ Output shape (every line is printed by the payload itself): one `ASM <file> REFS
 
 ### Phase 2 — CR-2: fold the known-debt literal into the count assertion
 
-- [ ] [P2-T1] In `tests/scripts/dependencies/BindingRedirectVerification.Tests.ps1`, one Edit-tool replacement whose old_string is the two lines (section 4 fact 2, lines 315 and 316 today, each with its eight leading spaces)
+- [x] [P2-T1] In `tests/scripts/dependencies/BindingRedirectVerification.Tests.ps1`, one Edit-tool replacement whose old_string is the two lines (section 4 fact 2, lines 315 and 316 today, each with its eight leading spaces)
 
     ```
             @($expectedDebt).Count | Should -Be 0 -Because 'issue 973 emptied the recorded known-debt set; a new stale pair is fixed, not recorded'
