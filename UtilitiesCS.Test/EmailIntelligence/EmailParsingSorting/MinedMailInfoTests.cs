@@ -145,5 +145,39 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert
             actual.Should().BeEquivalentTo(expected);
         }
+
+        [DataTestMethod]
+        [DataRow("A")]
+        [DataRow("B")]
+        [DataRow("C")]
+        [DataRow(null)]
+        public void ConstructorAndDeepCopy_PreserveTriageValue(string triage)
+        {
+            // Arrange
+            this.mockIItemInfo.SetupGet(item => item.Triage).Returns(triage);
+
+            // Act
+            var minedMail = new MinedMailInfo(this.mockIItemInfo.Object);
+            var copy = minedMail.DeepCopy();
+
+            // Assert
+            minedMail.Triage.Should().Be(triage);
+            copy.Triage.Should().Be(triage);
+        }
+
+        [TestMethod]
+        public void JsonRoundTrip_PreservesNullTriage()
+        {
+            // Arrange
+            var source = new MinedMailInfo { Triage = null };
+
+            // Act
+            var json = JsonConvert.SerializeObject(source);
+            var roundTrip = JsonConvert.DeserializeObject<MinedMailInfo>(json);
+
+            // Assert
+            roundTrip.Should().NotBeNull();
+            roundTrip!.Triage.Should().BeNull();
+        }
     }
 }

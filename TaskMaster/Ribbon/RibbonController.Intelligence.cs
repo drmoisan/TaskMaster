@@ -136,6 +136,23 @@ namespace TaskMaster
             await miner.BuildClassifiersAsync(5);
         }
 
+        internal Func<Task> TriageClassifierRebuildAsync { get; set; }
+
+        internal async Task BuildTriageClassifierAsync()
+        {
+            if (TriageClassifierRebuildAsync is not null)
+            {
+                await TriageClassifierRebuildAsync();
+                return;
+            }
+
+            var triage = Triage;
+            if (triage is not null)
+            {
+                await triage.RebuildFromStagedMinedMailAsync();
+            }
+        }
+
         #endregion Folder Classifier
 
         #region BayesianPerformance

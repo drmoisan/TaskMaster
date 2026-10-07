@@ -222,6 +222,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             item.SetupGet(x => x.StoreId).Returns("store");
             item.SetupGet(x => x.Subject).Returns("subject");
             item.SetupGet(x => x.Actionable).Returns("Yes");
+            item.SetupGet(x => x.Triage).Returns("A");
 
             var miner = new EmailDataMiner(new StubGlobals());
 
@@ -234,6 +235,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             result[0].Tokens.Should().Equal("alpha", "beta");
             result[0].Subject.Should().Be("subject");
             result[0].Actionable.Should().Be("Yes");
+            result[0].Triage.Should().Be("A");
         }
 
         [TestMethod]

@@ -121,6 +121,13 @@ namespace TaskMaster
             ribbon.InvalidateControl(controlId);
         }
 
+        #region Folder Classifier
+
+        public async void BuildTriageClassifier_Click(Office.IRibbonControl control) =>
+            await Controller.BuildTriageClassifierAsync();
+
+        #endregion Folder Classifier
+
         #region Spam Manager
 
         public async void ClearSpam_Click(Office.IRibbonControl control) =>

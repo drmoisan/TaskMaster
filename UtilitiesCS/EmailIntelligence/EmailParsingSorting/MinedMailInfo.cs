@@ -21,6 +21,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             StoreId = info.StoreId;
             Subject = info.Subject;
             Actionable = info.Actionable;
+            Triage = info.Triage;
         }
 
         private string? _categories;
@@ -95,6 +96,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public string? Actionable { get; set; }
 
+        public string? Triage { get; set; }
+
         internal string? GroupingKey { get; set; }
 
         #region IClonable
@@ -119,6 +122,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 StoreId = this.StoreId,
                 Subject = this.Subject,
                 Actionable = this.Actionable,
+                Triage = this.Triage,
                 GroupingKey = this.GroupingKey,
             };
 

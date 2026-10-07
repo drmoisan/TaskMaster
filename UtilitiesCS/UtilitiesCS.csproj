@@ -711,6 +711,7 @@
     <Compile Include="EmailIntelligence\ClassifierGroups\SpamBayes\SpamInitTimingProbe.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\TristateEngine.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\Triage\Triage.MinedMailRebuild.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ManagerAsyncLazy.cs" />
     <Compile Include="EmailIntelligence\Flags\FlagConsolidator.cs" />
     <Compile Include="EmailIntelligence\IntelligenceConfig.cs" />

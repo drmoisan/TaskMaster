@@ -52,6 +52,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             itemInfo.SetupGet(x => x.StoreId).Returns("store-id");
             itemInfo.SetupGet(x => x.Subject).Returns("Subject line");
             itemInfo.SetupGet(x => x.Actionable).Returns("Yes");
+            itemInfo.SetupGet(x => x.Triage).Returns("A");
 
             // Act
             var minedMailInfo = new MinedMailInfo(itemInfo.Object);
@@ -68,6 +69,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
             minedMailInfo.StoreId.Should().Be("store-id");
             minedMailInfo.Subject.Should().Be("Subject line");
             minedMailInfo.Actionable.Should().Be("Yes");
+            minedMailInfo.Triage.Should().Be("A");
         }
 
         [TestMethod]

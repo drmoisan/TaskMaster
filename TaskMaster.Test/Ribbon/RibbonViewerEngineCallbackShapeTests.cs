@@ -65,6 +65,8 @@ namespace TaskMaster.Test.Ribbon
             "TriageGetSaveLocation_Click",
         };
 
+        private const string BuildTriageClassifierControlId = "BuildTriageClassifier";
+
         /// <summary>
         /// The <c>getPressed</c> callback of each toggle checkbox must expose the exact Office
         /// contract: a public instance method returning <see cref="bool"/> with a single
@@ -254,6 +256,86 @@ namespace TaskMaster.Test.Ribbon
                     );
                 AssertAwaitedAsyncVoidShape(handler, handlerName);
             }
+        }
+
+        [TestMethod]
+        public void BuildTriageClassifierCallback_MatchesOfficeButtonSignature()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+
+            // Act
+            var callbackName = ResolveCallbackName(
+                document,
+                BuildTriageClassifierControlId,
+                "onAction"
+            );
+            var callback = GetPublicInstanceMethod(callbackName);
+
+            // Assert
+            callback.Should().NotBeNull("the new ribbon button must resolve to RibbonViewer");
+            callback!.ReturnType.Should().Be(typeof(void));
+            callback.GetParameters().Should().ContainSingle();
+            callback.GetParameters()[0].ParameterType.FullName.Should().Be(RibbonControlTypeName);
+            AssertAwaitedAsyncVoidShape(callback, callbackName);
+        }
+
+        [TestMethod]
+        public async Task BuildTriageClassifierAsync_AwaitsInjectedRebuildOperation()
+        {
+            // Arrange
+            var controller = new RibbonController();
+            var rebuildStarted = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            var rebuildCompletion = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            controller.TriageClassifierRebuildAsync = () =>
+            {
+                rebuildStarted.SetResult(true);
+                return rebuildCompletion.Task;
+            };
+
+            // Act
+            var dispatch = controller.BuildTriageClassifierAsync();
+            await rebuildStarted.Task;
+
+            // Assert
+            dispatch
+                .IsCompleted.Should()
+                .BeFalse("the controller must await the rebuild operation");
+            rebuildCompletion.SetResult(true);
+            await dispatch;
+        }
+
+        [TestMethod]
+        public async Task BuildTriageClassifierCallback_DispatchesToControllerWithoutOutlook()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+            var callbackName = ResolveCallbackName(
+                document,
+                BuildTriageClassifierControlId,
+                "onAction"
+            );
+            var callback = GetPublicInstanceMethod(callbackName);
+            var controller = new RibbonController();
+            var rebuildStarted = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            controller.TriageClassifierRebuildAsync = () =>
+            {
+                rebuildStarted.SetResult(true);
+                return Task.CompletedTask;
+            };
+            var viewer = new RibbonViewer(controller);
+
+            // Act
+            callback!.Invoke(viewer, new object[] { null });
+
+            // Assert
+            await rebuildStarted.Task;
         }
 
         /// <summary>
