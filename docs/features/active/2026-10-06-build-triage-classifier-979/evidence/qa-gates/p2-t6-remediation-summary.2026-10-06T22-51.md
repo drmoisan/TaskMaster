@@ -1,0 +1,10 @@
+Timestamp: 2026-10-06T22-51
+Command: remediation evidence comparison
+EXIT_CODE: 0
+Output Summary: Final C# QA passed. CSharpier formatted the repository without changing either scoped C# file, and the read-only check reported all 1,646 files clean. The full analyzer/code-style rebuild and the full warnings-as-errors compiler/nullable rebuild each completed with 0 warnings and 0 errors, matching the P0 zero-diagnostic baselines. Fresh, identity-verified coverage runs passed 5,013 UtilitiesCS tests and 478 TaskMaster standard-QC tests, for 5,491 passed and 0 failed. The developer-only `LiveOutlook` category was excluded as required by its test source and standard QC contract.
+
+Regression verification passed independently: `BuildTriageClassifierAsync_WhenTriageEngineIsAbsent_UsesLazyTriageBeforeInjectedRebuild` proves that an absent active-engine lookup resolves the existing `AsyncLazy<Triage>` before dispatching the rebuild seam. `BuildTriageClassifierAsync_AwaitsInjectedRebuildOperation` proves the original `TriageClassifierRebuildAsync` seam remains the first bypass and is still awaited.
+
+Coverage was observed and merged as Cobertura. The remediation baseline records 52.7659 percent (`129,819 / 246,028`); the isolated-and-merged post result records 65.1604 percent (`128,768 / 197,617`). The different denominator reflects per-assembly test-host isolation used after verbose VSTest diagnostics proved combined-host order interference. Feature production coverage is 100 percent for `RebuildFromStagedMinedMailAsync`, `PersistClassifierGroupAsync`, `ReplaceClassifierGroup`, and `MinedMailInfo`, and 93.55 percent for `RebuildFromMinedMailAsync`. `RibbonController` remains absent from Cobertura because of its existing class-level exclusion, while its two command paths are behaviorally verified by passing tests.
+
+The exact user-authorized one-time exception in `evidence/other/coverage-exception.2026-10-06T21-37.md` applies to all issue-979 coverage requirements. Coverage values and the RibbonController instrumentation exclusion are recorded, but no coverage threshold is treated as blocking. All functional tests and non-coverage gates passed.

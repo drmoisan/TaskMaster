@@ -3,10 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence;
 
 namespace TaskMaster.Test.Ribbon
 {
@@ -307,6 +311,55 @@ namespace TaskMaster.Test.Ribbon
                 .BeFalse("the controller must await the rebuild operation");
             rebuildCompletion.SetResult(true);
             await dispatch;
+        }
+
+        [TestMethod]
+        public void BuildTriageClassifierAsync_WhenTriageEngineIsAbsent_UsesLazyTriageBeforeInjectedRebuild()
+        {
+            // Arrange
+            var originalSynchronizationContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var controller = new RibbonController();
+                var lazyTriageResolved = false;
+                var rebuildStarted = false;
+                var triage = new Triage(new Mock<IApplicationGlobals>().Object);
+                var lazyField = typeof(RibbonController).GetField(
+                    "_triageAsync",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                lazyField.Should().NotBeNull();
+                lazyField!.SetValue(
+                    controller,
+                    new AsyncLazy<Triage>(() =>
+                    {
+                        lazyTriageResolved = true;
+                        return triage;
+                    })
+                );
+                controller.TriageRebuildAsync = resolvedTriage =>
+                {
+                    rebuildStarted = true;
+                    resolvedTriage.Should().BeSameAs(triage);
+                    lazyTriageResolved
+                        .Should()
+                        .BeTrue(
+                            "the absent-engine command path must resolve the existing lazy Triage first"
+                        );
+                    return Task.CompletedTask;
+                };
+
+                // Act
+                controller.BuildTriageClassifierAsync().GetAwaiter().GetResult();
+
+                // Assert
+                rebuildStarted.Should().BeTrue();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(originalSynchronizationContext);
+            }
         }
 
         [TestMethod]

@@ -137,6 +137,7 @@ namespace TaskMaster
         }
 
         internal Func<Task> TriageClassifierRebuildAsync { get; set; }
+        internal Func<Triage, Task> TriageRebuildAsync { get; set; }
 
         internal async Task BuildTriageClassifierAsync()
         {
@@ -146,9 +147,15 @@ namespace TaskMaster
                 return;
             }
 
-            var triage = Triage;
+            var triage = Triage ?? await TriageAsync;
             if (triage is not null)
             {
+                if (TriageRebuildAsync is not null)
+                {
+                    await TriageRebuildAsync(triage);
+                    return;
+                }
+
                 await triage.RebuildFromStagedMinedMailAsync();
             }
         }
