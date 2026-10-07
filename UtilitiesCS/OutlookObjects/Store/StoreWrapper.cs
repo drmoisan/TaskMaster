@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Deedle.Internal;
-using Microsoft.Graph.Models.TermStore;
 using Microsoft.Office.Interop.Outlook;
 using Newtonsoft.Json;
 using UtilitiesCS.OutlookObjects.Folder;

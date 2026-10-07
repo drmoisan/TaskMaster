@@ -21,4 +21,5 @@ Issue #956 (SortEmail.cs 1,454 lines, 28 ExcludeFromCodeCoverage), researched 20
   on reading (exclusion is relative to the search root); unverified at runtime.
 
 **Why:** the next SortEmail item (follow-up F1: overwrite/alt-name prompts) can reuse the session type.
-**How to apply:** re-verify line numbers after the partial split lands; files will be SortEmail.*.cs.
+**How to apply:** the split landed 2026-10-01 (files are SortEmail.*.cs); post-split line numbers and the
+L1-L4 fix designs are in [[sortemail-latent-defects-959]]. Follow-ups F1-F3 are tracked under #966.

@@ -250,3 +250,7 @@
 - [Planner prompts need issue + branch lines every round](planner-prompt-needs-issue-and-branch-lines-every-round.md)
 - [Clock via `git var GIT_COMMITTER_IDENT` when pwsh is refused](read-the-clock-with-git-var-when-pwsh-is-refused.md)
 - [Amend the AC text when ratifying a measurement rule](amend-ac-text-when-a-measurement-rule-is-ratified.md) — ratification alone fails preflight; one-line in-place spec edit
+- [--body-file must be relative to the session root](pr-body-file-must-be-relative-session-root.md) — absolute path denied PR_BODY_PATH_NONCANONICAL; parallel items write gitignored PR files at session root
+- [Deployment premise: check compiled references](deployment-premise-check-compiled-references.md) — csc drops unused refs, so "deployed beside the host" can be false; scan metadata with a positive control
+- [Epic worktree-removal hook fires on a plain file delete](epic-worktree-removal-hook-fires-on-plain-file-delete.md) — git + Remove-Item in one payload; split at preflight
+- [Overflow index: ~95 older/duplicate entries](index_overflow_legacy_entries.md) — grep it before writing a new memory

@@ -28,3 +28,13 @@ and a `-CI -CodeCoverage` fallback; both were unsatisfiable as written across th
 **How to apply:** before accepting any plan clause that reads a number off a Pester result object, run
 the expression once against a throwaway fixture. See [[project_poshqc_pester_mcp_exit_minus1]] for the
 MCP-route counterpart (no counts, no exit code at all).
+
+3. **Failure-message shape for two strings.** `Should -Be` and `Should -BeExactly` with a string actual
+   and a string expected print `Expected strings to be the same, because <text>, but they were different.`,
+   then lengths, the differing index, `Expected: '<x>'` and `But was:  '<y>'`. They never print
+   `Expected exactly <x>, ..., but got <y>.`; that form is for non-string operands, as is
+   `Expected <x>, because ..., but got <y>.` Observed: #929 p1-t2 fail-before (`-Be`) and #911 rc2-t4
+   (`-BeExactly '1.0.2'` against `''`). The #973 r0 plan expected `Expected exactly ` for a
+   `($list -join ',') | Should -BeExactly` failure, and it also declared every other message shape a test
+   defect. On a correct test that pair of clauses forces an endless fix loop. In preflight, classify the
+   operand types of every expected-failure message assertion.

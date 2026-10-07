@@ -10,6 +10,7 @@ using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler.Test.TestSupport;
 using UtilitiesCS;
 using UtilitiesCS.ReusableTypeClasses;
 
@@ -55,22 +56,6 @@ namespace QuickFiler.Controllers.Tests
                 .NotBeNull($"private field '{name}' should exist on {target.GetType().Name}");
             return field.GetValue(target);
         }
-
-        /// <summary>
-        /// Test-side worker whose <see cref="RaiseDoWork"/> raises <c>DoWork</c> synchronously on
-        /// the calling thread through the protected <c>OnDoWork</c>, so the privately subscribed
-        /// <c>Worker_DoWork</c> runs to its first incomplete await before <c>InitEmailQueue</c>
-        /// returns (issue #950). Duplicated per file, following the convention documented on
-        /// <c>QfcDatamodelLivenessTests</c>.
-        /// </summary>
-        private sealed class SynchronousBackgroundWorker : BackgroundWorker
-        {
-            public void RaiseDoWork() => OnDoWork(new DoWorkEventArgs(null));
-        }
-
-        /// <summary>The synchronous starter assigned to <c>QfcDatamodel.WorkerStarter</c>.</summary>
-        private static void StartSynchronously(BackgroundWorker worker) =>
-            ((SynchronousBackgroundWorker)worker).RaiseDoWork();
 
         /// <summary>
         /// AC2, the reported crash. Once <c>Cleanup()</c> has nulled <c>_masterQueue</c> and
@@ -219,7 +204,7 @@ namespace QuickFiler.Controllers.Tests
 
             using (var worker = new SynchronousBackgroundWorker())
             {
-                model.WorkerStarter = StartSynchronously;
+                model.WorkerStarter = SynchronousBackgroundWorker.StartSynchronously;
 
                 // Act — the issue #244 zero-batch short-circuit is COM-free and starts the worker
                 // through the issue #950 seam, which raises DoWork on this thread, so

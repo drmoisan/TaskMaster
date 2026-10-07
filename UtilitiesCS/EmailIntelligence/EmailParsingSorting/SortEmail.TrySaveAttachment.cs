@@ -1,22 +1,9 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using Deedle;
 using Microsoft.Office.Interop.Outlook;
-using SDILReader;
-using UtilitiesCS;
-using UtilitiesCS.EmailIntelligence;
-using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
-using UtilitiesCS.OutlookExtensions;
-using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
-using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
@@ -78,18 +65,43 @@ namespace UtilitiesCS
         /// attempt. When the save is denied, <paramref name="removeReadOnlyPrompt"/> supplies the
         /// answer to the read-only prompt, asking only while it holds no answer, and
         /// <paramref name="clearReadOnly"/> clears the read-only attribute of the destination
-        /// directory before the save is retried.
+        /// directory before the save is retried. This overload forwards to the private core with
+        /// the retry flag cleared; the core bounds the retry to one clear per call.
         /// </summary>
         /// <returns>
         /// True when the attachment was saved; false when the answer declined the change or the
-        /// attribute could not be cleared. A cancelled prompt rethrows the original exception.
+        /// attribute could not be cleared. A cancelled prompt, and a denial that persists after
+        /// the attribute was cleared under a held "to all" answer, rethrow the original exception.
         /// </returns>
-        internal static async Task<bool> TrySaveAttachmentAsync(
+        internal static Task<bool> TrySaveAttachmentAsync(
             this Attachment attachment,
             string filePathSave,
             Action<string> createDirectory,
             Action<string> clearReadOnly,
             YesNoToAllPromptSession removeReadOnlyPrompt
+        )
+        {
+            return TrySaveAttachmentCoreAsync(
+                attachment,
+                filePathSave,
+                createDirectory,
+                clearReadOnly,
+                removeReadOnlyPrompt,
+                isRetryAfterClear: false
+            );
+        }
+
+        /// <summary>
+        /// The retrying save. The last parameter records whether this call is the retry that
+        /// follows a successful attribute clear, which is what bounds the recursion.
+        /// </summary>
+        private static async Task<bool> TrySaveAttachmentCoreAsync(
+            Attachment attachment,
+            string filePathSave,
+            Action<string> createDirectory,
+            Action<string> clearReadOnly,
+            YesNoToAllPromptSession removeReadOnlyPrompt,
+            bool isRetryAfterClear
         )
         {
             try
@@ -100,7 +112,25 @@ namespace UtilitiesCS
             }
             catch (System.UnauthorizedAccessException e)
             {
-                Debug.WriteLine(e.Message);
+                logger.Warn(
+                    $"Saving {filePathSave} was denied; the read-only prompt decides whether to retry.",
+                    e
+                );
+
+                // The attribute was already cleared once in this call chain and a "to all" answer
+                // is never asked again, so another clear-and-retry cannot change the outcome
+                // (issue #959, L2): surface the denial to the caller instead of looping.
+                if (
+                    isRetryAfterClear
+                    && removeReadOnlyPrompt.Response == YesNoToAllResponse.YesToAll
+                )
+                {
+                    logger.Error(
+                        $"The file {filePathSave} is still denied after the read-only attribute was cleared.",
+                        e
+                    );
+                    throw;
+                }
 
                 // Exception usually is thrown when readonly folder attribute is set.
                 // When the session holds no answer yet, ask whether the user wants to remove the
@@ -124,19 +154,23 @@ namespace UtilitiesCS
                     }
                     catch (System.Exception inner)
                     {
-                        Debug.WriteLine(inner.Message);
+                        logger.Error(
+                            $"The read-only attribute of {directory} could not be cleared; {filePathSave} was not saved.",
+                            inner
+                        );
                         return false;
                     }
                     finally
                     {
                         removeReadOnlyPrompt.ReleaseSingleAnswer();
                     }
-                    return await TrySaveAttachmentAsync(
+                    return await TrySaveAttachmentCoreAsync(
                         attachment,
                         filePathSave,
                         createDirectory,
                         clearReadOnly,
-                        removeReadOnlyPrompt
+                        removeReadOnlyPrompt,
+                        isRetryAfterClear: true
                     );
                 }
                 else if (
@@ -144,7 +178,9 @@ namespace UtilitiesCS
                     || (removeReadOnlyPrompt.Response == YesNoToAllResponse.NoToAll)
                 )
                 {
-                    Debug.WriteLine($"The file {filePathSave} was not saved.");
+                    logger.Warn(
+                        $"The file {filePathSave} was not saved because the read-only change was declined."
+                    );
                     removeReadOnlyPrompt.ReleaseSingleAnswer();
                     return false;
                 }
@@ -152,10 +188,6 @@ namespace UtilitiesCS
                 {
                     throw;
                 }
-            }
-            catch (System.Exception)
-            {
-                throw;
             }
         }
 

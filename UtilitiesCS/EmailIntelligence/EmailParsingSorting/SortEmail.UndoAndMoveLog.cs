@@ -1,27 +1,38 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Deedle;
 using Microsoft.Office.Interop.Outlook;
-using SDILReader;
-using UtilitiesCS;
-using UtilitiesCS.EmailIntelligence;
 using UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder;
-using UtilitiesCS.OutlookExtensions;
 using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
-using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
     public static partial class SortEmail
     {
+        // Column names of the moved-mails log, in the order of the record fields that
+        // EmailDetails.Details produces after its unused index zero.
+        private static readonly string[] MovedMailsHeader =
+        {
+            "Triage",
+            "FolderName",
+            "Sent_On",
+            "From",
+            "To",
+            "CC",
+            "Subject",
+            "Body",
+            "fromDomain",
+            "Conversation_ID",
+            "EntryID",
+            "Attachments",
+            "FlaggedAsTask",
+        };
+
         // Duplicative with QuickFiler but it is still mapped to main menu so I need to take it out
         [ExcludeFromCodeCoverage]
         public static async Task UndoAsync(
@@ -106,7 +117,6 @@ namespace UtilitiesCS
             _globals.Ol.EmailMoveWriter.Enqueue(output);
         }
 
-        [ExcludeFromCodeCoverage]
         private static string SanitizeArrayLineTSV(ref string[] strOutput)
         {
             //if (strOutput.IsInitialized())
@@ -136,60 +146,45 @@ namespace UtilitiesCS
             return result;
         }
 
+        // Excluded from coverage: wiring of the real file-system defaults only; a test call would
+        // read and write the disk (UT4). The four-parameter overload is the test seam.
         [ExcludeFromCodeCoverage]
         public static void WriteCSV_StartNewFileIfDoesNotExist(
             string strFileName,
             string strFileLocation
         )
         {
-            string[]? strOutput = null;
-            string[,]? strAryOutput;
-            if (File.Exists(Path.Combine(strFileName, strFileLocation)))
-            {
-                strAryOutput = new string[14, 2];
-
-                strAryOutput[1, 1] = "Triage";
-                strAryOutput[2, 1] = "FolderName";
-                strAryOutput[3, 1] = "Sent_On";
-                strAryOutput[4, 1] = "From";
-                strAryOutput[5, 1] = "To";
-                strAryOutput[6, 1] = "CC";
-                strAryOutput[7, 1] = "Subject";
-                strAryOutput[8, 1] = "Body";
-                strAryOutput[9, 1] = "fromDomain";
-                strAryOutput[10, 1] = "Conversation_ID";
-                strAryOutput[11, 1] = "EntryID";
-                strAryOutput[12, 1] = "Attachments";
-                strAryOutput[13, 1] = "FlaggedAsTask";
-
-                SanitizeArray(strAryOutput, ref strOutput);
-                FileIO2.WriteTextFile(strFileName, strOutput!, folderpath: strFileLocation);
-            }
-            strOutput = null;
-            strAryOutput = null;
+            WriteCSV_StartNewFileIfDoesNotExist(
+                strFileName,
+                strFileLocation,
+                File.Exists,
+                FileIO2.WriteTextFile
+            );
         }
 
-        [ExcludeFromCodeCoverage]
-        private static void SanitizeArray(string[,]? strAryOutput, ref string[]? strOutput)
+        /// <summary>
+        /// Seeds the moved-mails log with its single tab-separated header line when the file does
+        /// not exist. <paramref name="fileExists"/> answers whether the combination of the folder
+        /// and the file name exists; <paramref name="writeTextFile"/> receives the file name, the
+        /// lines and the folder, in that order.
+        /// </summary>
+        internal static void WriteCSV_StartNewFileIfDoesNotExist(
+            string strFileName,
+            string strFileLocation,
+            Func<string, bool> fileExists,
+            Action<string, string[], string> writeTextFile
+        )
         {
-            if (strAryOutput == null)
+            if (fileExists(Path.Combine(strFileLocation, strFileName)))
             {
-                Debug.WriteLine($"The array {nameof(strAryOutput)} is empty.");
+                return;
             }
-            else
-            {
-                for (int j = 0; j < strAryOutput.GetLength(0); j++)
-                {
-                    strOutput![j] = string.Join(
-                        "\t",
-                        strAryOutput
-                            .SliceRow(j)
-                            .Where(s => !string.IsNullOrEmpty(s))
-                            .Select(s => StripTabsCrLf(s))
-                            .ToArray()
-                    );
-                }
-            }
+
+            writeTextFile(
+                strFileName,
+                new[] { string.Join("\t", MovedMailsHeader) },
+                strFileLocation
+            );
         }
     }
 }

@@ -317,6 +317,35 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         /// <summary>
+        /// T12. Scenario: YesToAll is held, the attribute is cleared once and the retried save is
+        /// denied again (issue #959, L2). Expected: the original access exception is rethrown
+        /// after exactly one clear, two save attempts and one prompt; the YesToAll answer stays
+        /// held. The directory-creation tripwire ends an unbounded retry deterministically.
+        /// </summary>
+        [TestMethod]
+        public async Task TrySaveAttachmentAsync_WhenYesToAllIsHeldAndRetryIsStillDenied_RethrowsAfterOneClear()
+        {
+            // Arrange
+            var seams = new Seams(YesNoToAllResponse.YesToAll) { CreateDirectoryLimit = 3 };
+            var denied = new UnauthorizedAccessException("denied");
+            var attachment = new Mock<Attachment>(MockBehavior.Loose);
+            attachment.Setup(x => x.SaveAsFile(SandboxFilePath)).Throws(denied);
+
+            // Act
+            Func<Task> act = () => SaveAsync(attachment, seams);
+
+            // Assert
+            (await act.Should().ThrowAsync<UnauthorizedAccessException>())
+                .Which.Should()
+                .BeSameAs(denied);
+            seams.CreatedDirectories.Should().Equal(SandboxDirectory, SandboxDirectory);
+            seams.ClearedDirectories.Should().Equal(SandboxDirectory);
+            seams.PromptMessages.Should().Equal(ExpectedPrompt);
+            seams.Session.Response.Should().Be(YesNoToAllResponse.YesToAll);
+            attachment.Verify(x => x.SaveAsFile(SandboxFilePath), Times.Exactly(2));
+        }
+
+        /// <summary>
         /// Calls the five-argument overload under test with the sandbox file path and the seams
         /// of the given recorder.
         /// </summary>
@@ -351,8 +380,16 @@ namespace UtilitiesCS.Test.EmailIntelligence
             public List<string> PromptMessages { get; } = new List<string>();
             public System.Exception ClearException { get; set; }
 
+            // Tripwire for an unbounded retry: the directory-creation seam runs once per save
+            // attempt, so a limit on recorded calls ends a loop deterministically without a timer.
+            public int CreateDirectoryLimit { get; set; } = int.MaxValue;
+
             public void CreateDirectory(string path)
             {
+                if (CreatedDirectories.Count >= CreateDirectoryLimit)
+                {
+                    throw new InvalidOperationException("retry bound exceeded");
+                }
                 CreatedDirectories.Add(path);
             }
 

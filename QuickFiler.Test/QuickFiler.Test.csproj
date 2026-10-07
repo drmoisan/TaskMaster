@@ -125,6 +125,7 @@
     <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />
+    <Compile Include="Controllers\EfcDataModelFilerCleanupTests.cs" />
     <Compile Include="Controllers\EfcDataModelIssue792CarryTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.Part2.cs" />
@@ -201,6 +202,7 @@
     <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixture.cs" />
     <Compile Include="Controllers\QfcItemController.SeamMarshallingTests.cs" />
     <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixtureTests.cs" />
+    <Compile Include="Controllers\QfcItemController.UiThreadDispatcherPinCountTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part2.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part3.cs" />
@@ -226,6 +228,8 @@
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
     <Compile Include="TestSupport\DedicatedWorkerThread.cs" />
+    <Compile Include="TestSupport\SynchronousBackgroundWorker.cs" />
+    <Compile Include="TestSupport\ArmingFakeTimeProvider.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Helper Classes\ConversationResolverTests.cs" />

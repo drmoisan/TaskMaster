@@ -92,3 +92,7 @@
 - [Nested quotes $( )](project_pwsh_nested_quotes_in_subexpression_fail_to_parse.md) · [$Log/$log](project_pwsh_param_name_case_collision_flattens_log_array.md) · [Reference rewrite](project_reference_version_rewrite_when_assemblyversion_omitted.md)
 - [Numstat elides](project_replacement_span_numstat_elides_identical_boundary_lines.md) · [Finding description](project_review_finding_line_number_right_description_wrong.md) · [Splatting lines](project_splatting_is_the_line_budget_lever_for_ceiling_bound_test_files.md)
 - [-WhatIf module scope](project_whatif_does_not_reach_module_session_state.md) · [Removal hook: git + "remove"](project_worktree_removal_hooks_match_git_plus_remove_substring.md)
+- [FluentAssertions truncates string diffs](project_fluentassertions_truncates_string_diff_breaks_message_substring_gates.md) — "…59Sandbox\origin": full-path MESSAGE substring gates cannot match
+- [Cited-tree gate vs main; span enumeration](project_preflight_cited_tree_gate_and_span_enumeration.md) — intersect cited paths with the files main changed; every stop string needs a task that detects it
+- [Field gate `Contains("EXIT_CODE:")` matches FORMAT_EXIT_CODE:](project_schema_field_contains_check_matches_prefixed_labels.md) — anchor the field match to the line start
+- [Worktree-gate hook: git + "remove" in any identifier](project_worktree_removal_hook_matches_git_plus_remove_in_variable_names.md) — read-only payloads with `$removed` halt the run; flag at preflight
