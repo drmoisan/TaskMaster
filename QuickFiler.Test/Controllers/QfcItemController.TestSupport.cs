@@ -214,25 +214,27 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Ensures the static <c>UiThread.Dispatcher</c> is non-null by seeding it (only when unset)
-        /// with a dedicated dispatcher hosted on a parked background thread that is never pumped.
-        /// Needed for members that still delegate to a callee using the static
-        /// <c>UiThread.Dispatcher</c> before the Phase 6 <c>IUiDispatcher</c> seam replaces it.
+        /// Takes one reference-counted pin on the shared static <c>UiThread.Dispatcher</c> through
+        /// <see cref="UiThreadDispatcherFixture.EnsureDispatcher"/> (issue #968): the first pin on a
+        /// <c>null</c> field seeds a dedicated dispatcher hosted on a parked background thread that is
+        /// never pumped, later pins install nothing, and the field reverts to <c>null</c> only when
+        /// the last live pin releases and the fixture itself seeded it. The remaining legitimate
+        /// callers are the fixture tests <c>QfcItemController_UiThreadDispatcherFixtureTests</c> and
+        /// <c>QfcItemController_UiThreadDispatcherPinCountTests</c>, each of which acquires and
+        /// releases its pin while holding a <see cref="UiThreadDispatcherTransaction"/>.
         /// <para>
         /// A dedicated (non-<c>CurrentDispatcher</c>) instance is used deliberately for test
-        /// isolation: fire-and-forget <c>BeginInvoke</c>/<c>InvokeAsync</c> operations posted by these
-        /// tests are enqueued on the parked dispatcher and never execute, so they cannot leak onto the
-        /// test thread's own dispatcher and be run (and fault on a handle-less control) by an unrelated
-        /// later test that pumps <c>Dispatcher.CurrentDispatcher</c>. Becomes moot once the callee
-        /// routes through the injectable dispatcher seam.
+        /// isolation: fire-and-forget <c>BeginInvoke</c>/<c>InvokeAsync</c> operations posted to the
+        /// parked dispatcher are enqueued and never execute, so they cannot leak onto the test
+        /// thread's own dispatcher and be run (and fault on a handle-less control) by an unrelated
+        /// later test that pumps <c>Dispatcher.CurrentDispatcher</c>.
         /// </para>
         /// <para>
-        /// The returned value is a scope whose <c>Dispose</c> conditionally reverts the seeding: it
-        /// writes <c>null</c> back only when the static still holds the exact instance this call
-        /// installed, and a call that installed nothing returns a no-op scope. Discarding the scope is
-        /// permitted and leaks exactly as the pre-issue-#493 <c>void</c> helper did, no more. The
-        /// implementation lives in <see cref="UiThreadDispatcherFixture"/>, which is the single owner
-        /// of every mutation of that static made from this assembly's owned files.
+        /// Dispose the returned scope inside the same transaction that was held when it was taken: a
+        /// discarded scope pins for the process lifetime, and a pin released outside its caller's
+        /// transaction is released while another class may hold the gate. The implementation lives
+        /// in <see cref="UiThreadDispatcherFixture"/>, the single owner of every mutation of that
+        /// static made from this assembly's owned files.
         /// </para>
         /// </summary>
         internal static IDisposable EnsureUiThreadDispatcher() =>
@@ -282,9 +284,9 @@ namespace QuickFiler.Controllers.Tests
         /// <summary>
         /// Issue #480 shared arrange helper. Builds a viewer mock whose <c>Invoke</c> and
         /// <c>BeginInvoke</c> execute the supplied delegate synchronously, so a dispatch made through
-        /// either path produces a countable call on whatever collaborator the delegate targets. Mirrors
-        /// the <c>private static BuildExecutingViewer()</c> in
-        /// <c>QfcItemController.FocusAndThemeTests.cs</c>, which is not reachable from another test file.
+        /// either path produces a countable call on whatever collaborator the delegate targets. Since
+        /// issue #968 this is the single implementation; QfcItemController.FocusAndThemeTests.cs calls
+        /// it instead of carrying a private copy.
         /// </summary>
         internal static Mock<IItemViewer> BuildExecutingViewer()
         {

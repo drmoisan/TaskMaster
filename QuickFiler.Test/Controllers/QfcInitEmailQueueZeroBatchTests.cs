@@ -10,6 +10,7 @@ using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler.Test.TestSupport;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -30,8 +31,8 @@ namespace QuickFiler.Controllers.Tests
     /// (<c>_olApp.GetNamespace("MAPI")</c>) — this is the maintainer-reported defect in the v1.0
     /// revision of these tests, and this file must never reproduce it. Issue #950: every test also
     /// assigns the <c>WorkerStarter</c> seam a starter that raises <c>DoWork</c> synchronously on
-    /// the test thread through the nested <c>SynchronousBackgroundWorker</c>, so no test starts a
-    /// thread-pool worker and none outlives the test.
+    /// the test thread through the shared <c>SynchronousBackgroundWorker</c> test-support helper
+    /// (issue #968 consolidated the per-file copies), so no started worker outlives its test.
     /// </remarks>
     [TestClass]
     public class QfcInitEmailQueueZeroBatchTests
@@ -94,9 +95,9 @@ namespace QuickFiler.Controllers.Tests
         /// Builds an inert <see cref="QfcDatamodel.RemainingEmailLoader"/> replacement that records
         /// invocation via <paramref name="invoked"/> and returns a completed <c>true</c> result without
         /// ever touching <see cref="System.Windows.Forms.MessageBox"/> or Outlook COM (<c>_olApp</c>).
-        /// Assigning this delegate before starting a real <see cref="BackgroundWorker"/> is what makes
-        /// it safe to call <see cref="QfcDatamodel.InitEmailQueue(int, BackgroundWorker)"/> with a real
-        /// worker in a unit test.
+        /// Assigning this delegate before the synchronous test worker is started is what makes it
+        /// safe to call <see cref="QfcDatamodel.InitEmailQueue(int, BackgroundWorker)"/> in a unit
+        /// test (issue #950: the worker raises DoWork on the test thread).
         /// </summary>
         private static Func<CancellationToken, Task<bool>> CreateInertRemainingEmailLoader(
             out TaskCompletionSource<bool> invoked
@@ -112,21 +113,6 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Test-side worker whose <see cref="RaiseDoWork"/> raises <c>DoWork</c> synchronously on
-        /// the calling thread through the protected <c>OnDoWork</c>, so no worker started by
-        /// <c>InitEmailQueue</c> outlives the test (issue #950). Duplicated per file, following
-        /// the convention documented on <c>QfcDatamodelLivenessTests</c>.
-        /// </summary>
-        private sealed class SynchronousBackgroundWorker : BackgroundWorker
-        {
-            public void RaiseDoWork() => OnDoWork(new DoWorkEventArgs(null));
-        }
-
-        /// <summary>The synchronous starter assigned to <c>QfcDatamodel.WorkerStarter</c>.</summary>
-        private static void StartSynchronously(BackgroundWorker worker) =>
-            ((SynchronousBackgroundWorker)worker).RaiseDoWork();
-
-        /// <summary>
         /// Issue #244 AC1: a zero batch size must not throw the Deedle "The interface member
         /// 'EntryId' does not exist in the column index." exception, and must return an empty,
         /// non-null list. The inert <see cref="QfcDatamodel.RemainingEmailLoader"/> is assigned before
@@ -140,17 +126,19 @@ namespace QuickFiler.Controllers.Tests
             var model = CreateUninitializedDatamodel();
             SetPrivateField(model, "_frame", CreateTwoRowEmailFrame());
             model.RemainingEmailLoader = CreateInertRemainingEmailLoader(out _);
-            model.WorkerStarter = StartSynchronously;
+            model.WorkerStarter = SynchronousBackgroundWorker.StartSynchronously;
             IList<MailItem> result = null;
 
-            // Act
-            System.Action act = () =>
-                result = model.InitEmailQueue(0, new SynchronousBackgroundWorker());
+            using (var worker = new SynchronousBackgroundWorker())
+            {
+                // Act
+                System.Action act = () => result = model.InitEmailQueue(0, worker);
 
-            // Assert
-            act.Should().NotThrow();
-            result.Should().NotBeNull();
-            result.Should().BeEmpty();
+                // Assert
+                act.Should().NotThrow();
+                result.Should().NotBeNull();
+                result.Should().BeEmpty();
+            }
         }
 
         /// <summary>
@@ -169,17 +157,20 @@ namespace QuickFiler.Controllers.Tests
             var model = CreateUninitializedDatamodel();
             SetPrivateField(model, "_frame", CreateTwoRowEmailFrame());
             model.RemainingEmailLoader = CreateInertRemainingEmailLoader(out var loaderInvokedTcs);
-            model.WorkerStarter = StartSynchronously;
-            var worker = new SynchronousBackgroundWorker();
+            model.WorkerStarter = SynchronousBackgroundWorker.StartSynchronously;
+            using (var worker = new SynchronousBackgroundWorker())
+            {
+                // Act
+                model.InitEmailQueue(0, worker);
 
-            // Act
-            model.InitEmailQueue(0, worker);
-
-            // Assert
-            worker.WorkerSupportsCancellation.Should().BeTrue();
-            loaderInvokedTcs
-                .Task.IsCompleted.Should()
-                .BeTrue("the injected RemainingEmailLoader must be invoked by the started worker");
+                // Assert
+                worker.WorkerSupportsCancellation.Should().BeTrue();
+                loaderInvokedTcs
+                    .Task.IsCompleted.Should()
+                    .BeTrue(
+                        "the injected RemainingEmailLoader must be invoked by the started worker"
+                    );
+            }
         }
 
         /// <summary>
@@ -199,7 +190,7 @@ namespace QuickFiler.Controllers.Tests
             var model = CreateUninitializedDatamodel();
             SetPrivateField(model, "_frame", CreateTwoRowEmailFrame());
             model.RemainingEmailLoader = CreateInertRemainingEmailLoader(out _);
-            model.WorkerStarter = StartSynchronously;
+            model.WorkerStarter = SynchronousBackgroundWorker.StartSynchronously;
 
             var mailItemsByEntryId = new Dictionary<string, MailItem>
             {
@@ -217,16 +208,19 @@ namespace QuickFiler.Controllers.Tests
 
             SetPrivateField(model, "_olApp", application.Object);
 
-            // Act
-            var result = model.InitEmailQueue(2, new SynchronousBackgroundWorker());
+            using (var worker = new SynchronousBackgroundWorker())
+            {
+                // Act
+                var result = model.InitEmailQueue(2, worker);
 
-            // Assert
-            result.Should().HaveCount(2);
-            result.Should().BeEquivalentTo(mailItemsByEntryId.Values);
+                // Assert
+                result.Should().HaveCount(2);
+                result.Should().BeEquivalentTo(mailItemsByEntryId.Values);
 
-            var frameField = typeof(QfcDatamodel).GetField("_frame", NonPublicInstance);
-            var frame = (Frame<int, string>)frameField.GetValue(model);
-            frame.RowCount.Should().Be(0);
+                var frameField = typeof(QfcDatamodel).GetField("_frame", NonPublicInstance);
+                var frame = (Frame<int, string>)frameField.GetValue(model);
+                frame.RowCount.Should().Be(0);
+            }
         }
     }
 }

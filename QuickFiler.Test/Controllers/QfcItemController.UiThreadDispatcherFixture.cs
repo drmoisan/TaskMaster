@@ -28,6 +28,19 @@ namespace QuickFiler.Controllers.Tests
     /// that carry no <c>[Timeout]</c>, so making them wait on a gate another test class holds for a
     /// whole test body would convert a bounded failure elsewhere into an unbounded hang there.
     /// </para>
+    /// <para>
+    /// Issue #968: ensure pins are reference counted. A pin counter and an install-ownership flag
+    /// live under <c>FieldLock</c>. The first pin on a <c>null</c> field seeds the parked dispatcher
+    /// and sets the flag; the last release writes <c>null</c> back only when the flag is set and the
+    /// field still holds the parked instance, then clears the flag. A discarded scope therefore
+    /// pins for the process lifetime and leaves the parked dispatcher installed, so every caller
+    /// disposes its scope, and every pin is acquired and released while its caller holds a
+    /// transaction, which keeps the count at zero whenever a transaction is acquired. Residual: a
+    /// transaction that installs over a pinned parked value and restores it after the last pin
+    /// released leaves the parked value installed with zero pins and the flag set; the next pin
+    /// cycle reverts it. No test in this assembly installs over a pinned value, so the residual is
+    /// documented rather than exercised.
+    /// </para>
     /// </summary>
     internal static class UiThreadDispatcherFixture
     {
@@ -36,6 +49,11 @@ namespace QuickFiler.Controllers.Tests
         private static readonly object ParkedDispatcherLock = new object();
         private static readonly FieldInfo DispatcherField = ResolveDispatcherField();
         private static Dispatcher _parkedDispatcher = null;
+
+        // Issue #968: the count of live ensure scopes and whether the fixture itself seeded the parked
+        // dispatcher into a null field. Both are read and written only while FieldLock is held.
+        private static int _pinCount;
+        private static bool _fixtureInstalledParked;
 
         // Issue #743 AC1 observable: three monotonic counters over TransactionGate. A contended
         // acquisition is one that observed CurrentCount == 0 immediately before waiting. In a serial
@@ -114,10 +132,13 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Seeds the static with the parked dispatcher only when it is currently <c>null</c>, and
-        /// returns a scope whose <c>Dispose</c> conditionally reverts that seeding. Never acquires
-        /// <c>TransactionGate</c> and never blocks on anything a caller must release. Disposing the
-        /// returned scope is optional: a discarded scope leaks exactly as the pre-fix helper did.
+        /// Takes one counted pin on the shared static (issue #968). The first pin on a <c>null</c>
+        /// field seeds the parked dispatcher and records that the fixture owns the seeding; a pin
+        /// taken while the field is non-null installs nothing. Disposing the returned scope releases
+        /// the pin, and the field reverts to <c>null</c> only on the last release, only when the
+        /// fixture owns the seeding, and only when the field still holds the parked instance. Never
+        /// acquires <c>TransactionGate</c> and never blocks on anything a caller must release. A
+        /// discarded scope pins for the process lifetime, so every caller disposes its scope.
         /// </summary>
         internal static IDisposable EnsureDispatcher()
         {
@@ -127,14 +148,15 @@ namespace QuickFiler.Controllers.Tests
 
             lock (FieldLock)
             {
+                _pinCount++;
                 if (DispatcherField.GetValue(null) == null)
                 {
                     DispatcherField.SetValue(null, parked);
-                    return new EnsureScope(parked);
+                    _fixtureInstalledParked = true;
                 }
             }
 
-            return new EnsureScope(null);
+            return new EnsureScope(parked);
         }
 
         /// <summary>
@@ -241,19 +263,21 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// The scope returned by <see cref="EnsureDispatcher"/>. Reverts the seeding only when the
-        /// static still holds the exact instance this scope installed. A scope that installed nothing
-        /// carries <c>null</c> and is a no-op, which is what keeps a discarded scope from clobbering a
-        /// value some other owner installed in the meantime.
+        /// The scope returned by <see cref="EnsureDispatcher"/>: one counted pin. Disposal is
+        /// idempotent and performs the decrement and the conditional revert inline in one
+        /// <c>FieldLock</c> critical section, so no other pin can interleave between them. The revert
+        /// writes <c>null</c> only when this release brings the count to zero, the fixture itself
+        /// seeded the parked dispatcher, and the field still holds that instance; a value some other
+        /// owner installed in the meantime is left in place.
         /// </summary>
         private sealed class EnsureScope : IDisposable
         {
-            private readonly Dispatcher _installed;
+            private readonly Dispatcher _parked;
             private bool _disposed = false;
 
-            internal EnsureScope(Dispatcher installed)
+            internal EnsureScope(Dispatcher parked)
             {
-                _installed = installed;
+                _parked = parked;
                 _disposed = false;
             }
 
@@ -266,9 +290,18 @@ namespace QuickFiler.Controllers.Tests
 
                 _disposed = true;
 
-                if (_installed != null)
+                lock (FieldLock)
                 {
-                    UiThreadDispatcherFixture.CompareExchange(_installed, null);
+                    _pinCount--;
+                    if (
+                        _pinCount == 0
+                        && _fixtureInstalledParked
+                        && ReferenceEquals(DispatcherField.GetValue(null), _parked)
+                    )
+                    {
+                        DispatcherField.SetValue(null, null);
+                        _fixtureInstalledParked = false;
+                    }
                 }
             }
         }
