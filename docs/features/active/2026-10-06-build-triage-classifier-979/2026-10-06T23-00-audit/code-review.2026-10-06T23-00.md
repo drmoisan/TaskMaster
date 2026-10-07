@@ -1,11 +1,11 @@
 # Code Review: Build Triage Classifier (#979)
 
-**Review Date:** 2026-10-06  
-**Reviewer:** Codex feature reviewer  
-**Feature Folder:** `docs/features/active/2026-10-06-build-triage-classifier-979`  
-**Feature Folder Selection Rule:** Canonical folder supplied by the orchestrator and confirmed by PR context issue #979.  
-**Base Branch:** `main` at merge base `c76e830c18976221b5730f84b8d88aebbfc4f04b`  
-**Head Branch:** `feature/build-triage-classifier-979` at `3a355e14a57109f5470fcf3b7d747351bade5804`  
+**Review Date:** 2026-10-06
+**Reviewer:** Codex feature reviewer
+**Feature Folder:** `docs/features/active/2026-10-06-build-triage-classifier-979`
+**Feature Folder Selection Rule:** Canonical folder supplied by the orchestrator and confirmed by PR context issue #979.
+**Base Branch:** `main` at merge base `c76e830c18976221b5730f84b8d88aebbfc4f04b`
+**Head Branch:** `feature/build-triage-classifier-979` at `3a355e14a57109f5470fcf3b7d747351bade5804`
 **Review Type:** Post-remediation re-review
 
 ## Executive Summary

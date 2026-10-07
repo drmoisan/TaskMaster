@@ -1,10 +1,10 @@
 # Feature Audit: Build Triage Classifier (#979)
 
-**Audit Date:** 2026-10-06  
-**Feature Folder:** `docs/features/active/2026-10-06-build-triage-classifier-979`  
-**Base Branch:** `main`  
-**Head Branch:** `feature/build-triage-classifier-979` at `3a355e14a57109f5470fcf3b7d747351bade5804`  
-**Work Mode:** `full-feature`  
+**Audit Date:** 2026-10-06
+**Feature Folder:** `docs/features/active/2026-10-06-build-triage-classifier-979`
+**Base Branch:** `main`
+**Head Branch:** `feature/build-triage-classifier-979` at `3a355e14a57109f5470fcf3b7d747351bade5804`
+**Work Mode:** `full-feature`
 **Audit Type:** Post-remediation acceptance verification
 
 ## Scope and Baseline

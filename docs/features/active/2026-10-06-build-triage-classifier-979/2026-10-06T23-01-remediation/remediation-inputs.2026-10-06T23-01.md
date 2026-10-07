@@ -1,8 +1,8 @@
 # Remediation Inputs: Build Triage Classifier (#979)
 
-Timestamp: 2026-10-06T23-01  
-Review-Verdict: REMEDIATION_REQUIRED  
-Base merge commit: `c76e830c18976221b5730f84b8d88aebbfc4f04b`  
+Timestamp: 2026-10-06T23-01
+Review-Verdict: REMEDIATION_REQUIRED
+Base merge commit: `c76e830c18976221b5730f84b8d88aebbfc4f04b`
 Reviewed head: `3a355e14a57109f5470fcf3b7d747351bade5804`
 
 ## Blocking Finding

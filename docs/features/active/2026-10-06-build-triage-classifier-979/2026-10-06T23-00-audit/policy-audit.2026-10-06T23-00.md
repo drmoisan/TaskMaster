@@ -1,10 +1,10 @@
 # Policy Compliance Audit: Build Triage Classifier (#979)
 
-Timestamp: 2026-10-06T23-00  
-Review type: Post-remediation re-review  
-Base branch: `main`  
-Merge base: `c76e830c18976221b5730f84b8d88aebbfc4f04b`  
-Reviewed branch: `feature/build-triage-classifier-979`  
+Timestamp: 2026-10-06T23-00
+Review type: Post-remediation re-review
+Base branch: `main`
+Merge base: `c76e830c18976221b5730f84b8d88aebbfc4f04b`
+Reviewed branch: `feature/build-triage-classifier-979`
 Reviewed head: `3a355e14a57109f5470fcf3b7d747351bade5804`
 
 | Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
