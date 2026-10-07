@@ -186,6 +186,7 @@
     <Compile Include="EmailIntelligence\PeopleScoDictionaryNew_Tests.cs" />
     <Compile Include="EmailIntelligence\ManagerAsyncLazy_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailDataMiner_Tests.cs" />
+    <Compile Include="EmailIntelligence\EmailDataMinerTriageMapping_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailDataMiner_Additional_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailDataMiner_FolderExtractionCoverage_Tests.cs" />
     <Compile Include="EmailIntelligence\EmailDataMiner_TestSupport.cs" />
@@ -528,6 +529,7 @@
     <Compile Include="Dialogs\DialogTests.cs" />
     <Compile Include="Dialogs\FunctionButton_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ClassifierGroups_Tests.cs" />
+    <Compile Include="EmailIntelligence\ClassifierGroups\TriageClassifierRebuild_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\ConditionalItemEngine_Tests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\EngineTests.cs" />
     <Compile Include="EmailIntelligence\ClassifierGroups\MulticlassEngine_Tests.cs" />

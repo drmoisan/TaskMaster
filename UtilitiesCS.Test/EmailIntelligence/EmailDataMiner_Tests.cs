@@ -206,39 +206,6 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
-        public async Task ToMinedMail_WhenItemsProvided_ProjectsItemFieldsIntoSerializableModels()
-        {
-            // Arrange
-            var folder = new FolderWrapper(true, 1, 10, "Inbox", "root/inbox");
-            var item = new Mock<IItemInfo>(MockBehavior.Strict);
-            item.SetupGet(x => x.Categories).Returns("Blue");
-            item.SetupGet(x => x.Tokens).Returns(["alpha", "beta"]);
-            item.SetupGet(x => x.FolderInfo).Returns(folder);
-            item.SetupGet(x => x.ToRecipients).Returns(Array.Empty<IRecipientInfo>());
-            item.SetupGet(x => x.CcRecipients).Returns(Array.Empty<IRecipientInfo>());
-            item.SetupGet(x => x.Sender).Returns((IRecipientInfo)null);
-            item.SetupGet(x => x.ConversationID).Returns("conversation");
-            item.SetupGet(x => x.EntryId).Returns("entry");
-            item.SetupGet(x => x.StoreId).Returns("store");
-            item.SetupGet(x => x.Subject).Returns("subject");
-            item.SetupGet(x => x.Actionable).Returns("Yes");
-            item.SetupGet(x => x.Triage).Returns("A");
-
-            var miner = new EmailDataMiner(new StubGlobals());
-
-            // Act
-            var result = await miner.ToMinedMail([item.Object]);
-
-            // Assert
-            result.Should().ContainSingle();
-            result[0].FolderInfo.Should().BeSameAs(folder);
-            result[0].Tokens.Should().Equal("alpha", "beta");
-            result[0].Subject.Should().Be("subject");
-            result[0].Actionable.Should().Be("Yes");
-            result[0].Triage.Should().Be("A");
-        }
-
-        [TestMethod]
         public void Deserialize_WhenAppDataFolderMissing_ReturnsDefaultValue()
         {
             // Arrange
