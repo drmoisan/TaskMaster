@@ -40,6 +40,16 @@ Each `delegation_receipts.promotion.*` field stores the raw MCP receipt payload 
 
 Note: VS Code command-palette commands may exist for interactive extension use, but this note is non-authoritative for agent sessions.
 
+## Pre-Existing Issue Path
+
+When the GitHub issue already exists (it was transferred, filed before orchestration, or created by epic decomposition), do not call `potential_to_issue`: that tool creates a new issue and would duplicate the existing one. Instead:
+
+1. Verify the issue read-only with `gh issue view`, a `gh api` GET request, or a GitHub MCP issue read, and use its number as `${issue-num}`.
+2. Record a top-level `issue_adoption` object in the orchestrator checkpoint (`issue_num`, `issue_url`, `origin`, `verified_via`, `verified_at`, `evidence`, `waived_tools`, and `potential_record` when a promotion-entry tool is waived). A valid record waives the `potential_to_issue` receipt requirement at completion.
+3. `delegation_receipts.promotion.issue` may be omitted, because no promotion receipt exists for an adopted issue.
+
+The field rules, the closed set of waivable tools, and the fail-closed behavior are defined in `.claude/rules/orchestrator-state.md` under `## Invariants (issue_adoption object)`.
+
 ## Canonical Variables
 
 - `${promotion-type}`: `feature` or `bug`

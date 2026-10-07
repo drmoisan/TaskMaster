@@ -96,7 +96,9 @@ PR creation and PR body edits must be delegated to `Agent(pr-author)`. The orche
 
 When the orchestrator runs the remediation loop, it records a top-level `remediation_loop` object in `artifacts/orchestration/orchestrator-state.json`:
 
-- `current_cycle` — integer index of the active cycle.
+- `current_cycle` — integer index of the active cycle's record in `cycles[]`; a record position, not an attempt count.
+- `completed_attempts` — non-negative integer equal to the number of cycles whose `candidate_applied` is `true`. This is the shared attempt count for local, CI-failure, merge-conflict, and parallel-drift cycles; the guard halts after three completed attempts.
+- `review_outcomes[]` — one entry per review, including `PASS`, appended in order. Each entry is an object with `verdict` (one of `PASS`, `REMEDIATION_REQUIRED`, `HALT_NON_REMEDIABLE`, `AWAITING_CI`) and `findings[]`, the review's blocking findings only, each an object with `remediability` (one of `autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, `human_decision_required`). An optional `inputs_path` names the `remediation-inputs` file.
 - `cycles[]` — an ordered array of cycle records. Each cycle is an object with:
   - `entry_timestamp` — ISO-8601 timestamp when the cycle was entered.
   - `inputs_path` — path to the `remediation-inputs.<entry-ts>.md` that opened the cycle.
@@ -106,14 +108,25 @@ When the orchestrator runs the remediation loop, it records a top-level `remedia
   - `audit_paths` — the reaudit artifact paths produced at cycle exit (`code-review`, `feature-audit`, `policy-audit`).
   - `blocking_count` — the total number of blocking findings across the reaudit artifacts.
   - `exit_condition_met` — boolean; `true` only when the cycle's exit gate is satisfied.
+  - `candidate_applied` — boolean; `true` only for a completed attempt (execution `complete` and a non-empty pre-reaudit commit). A cycle without a candidate records `false` and consumes no attempt number.
+  - `opened_by_review` — zero-based index of the `review_outcomes[]` entry that opened the cycle.
+
+These four fields are recorded by producers. Verdicts follow from the classes of a review's blocking findings: none is `PASS`; any `autonomous` is `REMEDIATION_REQUIRED`; otherwise any `external_dependency`, `policy_hold`, or `human_decision_required` is `HALT_NON_REMEDIABLE`; otherwise `AWAITING_CI`. A `HALT_NON_REMEDIABLE` or `AWAITING_CI` review opens no cycle.
 
 Malformed-cycle rules:
 
 - `plan_path` must be a non-empty string.
 - `execution_status` may be in `{in_progress, complete, failed}` only when `preflight.final_status == 'clear'`; any other preflight status with one of those execution statuses is malformed (execution recorded before preflight cleared).
 - `exit_condition_met == true` requires `blocking_count == 0`; a non-zero `blocking_count` with `exit_condition_met == true` is malformed.
+- R5: `candidate_applied`, when present, must be a boolean.
+- R6: `candidate_applied == true` requires `execution_status == "complete"`.
+- R7: `completed_attempts`, when present, must be a non-negative integer equal to the number of object cycles whose `candidate_applied` is `true`.
+- R8: `review_outcomes`, when present, must be a list, and each entry must be an object.
+- R9: each outcome's `verdict` must be one of the four verdicts, its `findings` must be a list, and each finding must be an object whose `remediability` is one of the five classes (case-sensitive).
+- R10: each well-formed outcome's `verdict` must equal the verdict derived from its findings' classes.
+- R11: `opened_by_review`, when present, must be a non-negative integer that indexes an object entry of `review_outcomes` whose `verdict` is `REMEDIATION_REQUIRED`.
 
-Cycle-aware `next_step` uses the form `remediation.cycle_N.{plan,preflight,execute,reaudit,exit_check}`, where `N` is the cycle index and the sub-step names the current position in the loop.
+Cycle-aware `next_step` uses the form `remediation.cycle_N.{plan,preflight,execute,reaudit,exit_check}`, where `N` is `completed_attempts + 1` (the active cycle number) and the sub-step names the current position in the loop; `current_cycle` remains a record position in `cycles[]`.
 
 ### CI Monitoring and Post-PR Remediation
 
@@ -149,7 +162,7 @@ A new finding discovered during execution triggers a NEW cycle with a follow-up 
 
 ### Exit Gate
 
-`blocking_count` is the total of FAIL and blocking-PARTIAL findings across the three reaudit artifacts (`code-review`, `feature-audit`, `policy-audit`). Only `blocking_count == 0` sets `exit_condition_met = true`. A non-zero `blocking_count` leaves the gate unmet and opens the next cycle.
+`blocking_count` is the total of FAIL and blocking-PARTIAL findings across the three reaudit artifacts (`code-review`, `feature-audit`, `policy-audit`). Only `blocking_count == 0` sets `exit_condition_met = true`. The exit gate counts only `autonomous` blocking findings when deciding whether to open the next cycle: a non-zero count of `autonomous` blocking findings leaves the gate unmet and opens the next cycle, while remaining blocking findings that are all non-remediable halt (`HALT_NON_REMEDIABLE`) or wait (`AWAITING_CI`) instead of opening a cycle.
 
 ### Citations
 

@@ -110,7 +110,8 @@ your own initiative; withdrawal is a caller decision made through F6's remove op
 Update `artifacts/orchestration/parallel-planner-state.json` after every completed step with:
 `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`, `max_concurrency`,
 `plan_home_branch`, `items[]`, `cohorts[]`, `conflict_edges[]`, `recolor_generation`,
-`kickoff_prompt_path`, `completed_steps`, `next_step`, and `last_updated`.
+`kickoff_prompt_path`, `completed_steps`, `next_step`, and `last_updated`. Also record the
+`tolerated_overlaps` list returned by Get-BlastRadiusConflictEdge (tolerated-not-validated).
 
 Each `items[]` entry carries `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`,
 `preparation_status`, `research_path`, `plan_path`, `preflight_status`, `branch_name`,
@@ -162,6 +163,22 @@ The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObser
 
 `Test-BlastRadiusConflict` reads that table's optional `mergeable_paths` list and contributes no
 `path_overlap` edge for a path matching it, while the path stays in the declared radius.
+
+The facade also exports the scheduling entry point Get-BlastRadiusConflictEdge (with its per-pair
+helper `Get-BlastRadiusPairDecision`), the PowerShell port of `schedule_conflict_edges` in
+`scripts/dev_tools/_blast_radius_scheduling.py`. Build the conflict edges with one call,
+`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`,
+rather than applying `Test-BlastRadiusConflict` to each pair by hand. The -Relation argument is
+required: the scheduling module does not resolve the relation itself, and an omitted relation fails
+fast. It applies the detection
+relation to every unordered pair and then the integration-cost edge rule of
+`.claude/rules/parallel-orchestration.md` under the table's configured `conflict_tolerance`, and
+returns `edges` and `tolerated_overlaps`. Record the edges in `conflict_edges[]` (each entry may
+carry the tolerated extra fields `hard`, `cost`, and `benefit`) and record every returned tolerated
+overlap in a `tolerated_overlaps` list on the planner checkpoint; tolerated overlaps are required
+checkpoint content, never discarded. A tolerated pair runs in the same or adjacent cohorts without a
+barrier, and the later-merging item merges `origin/main` and re-passes CI. The configured tolerance
+is the only sanctioned relaxation: never hand-narrow a radius to suppress an edge.
 
 **Cohort seeding and concurrency batching — bash entry points.** The bash library is granted as
 four entry-point-specific allowlist entries — `"Bash(bash .claude/lib/bash/compute-cohorts.sh*)"`,

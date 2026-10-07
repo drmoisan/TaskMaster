@@ -14,4 +14,5 @@
 - [Unchanged ref does not prove a dead child](feedback_unchanged_ref_does_not_prove_a_dead_child.md) — after an interruption, check liveness separately before relaunching; always require fast-forward-only pushes
 - [Never emit fable_policy: disabled](feedback_never_emit_fable_policy_disabled.md) — clamps fable to opus; use preferred
 - [coverage/** and .claude/** pollute derived radii](project_coverage_and_claude_paths_pollute_derived_radii.md)
+- [Embed all directives at launch](feedback_embed_all_directives_at_launch_no_sendmessage.md) — SendMessage may be disabled; running children can't be amended
 - [Checkout collision set is larger than status suggests](reference_checkout_collision_set_is_larger_than_status_suggests.md)

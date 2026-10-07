@@ -1,0 +1,20 @@
+---
+name: project-973-cycle1-premise-correction-refscan-and-tautology-fold-seams
+description: "#973 remediation cycle 1 plan seams - an AC whose premise is false (requester not deployed beside the add-in) is corrected by the planner with a metadata reference scan plus a positive-control scan, not reworded to prose; a 'tautological' Pester assertion on a literal may be an analyzer workaround (PSUseDeclaredVarsMoreThanAssignments) so fold the read into the real assertion and amend the AC operand; git omits ',1' in one-line hunk headers; commit-per-task mechanics flip the box before the commit and revert on failure"
+metadata:
+  type: project
+---
+
+Remediation cycle 1 for #973 (2026-10-06): B-1 AC17 premise correction, CR-1 plan-text pattern, CR-2 tautological assertion. Planned without Bash, without the plan validator, in worktree agent-a24d410b914bcefd7.
+
+**Why:** the review found AC17 unsatisfiable because its Azure.Core clause assumed Microsoft.Kiota.Authentication.Azure is deployed beside TaskMaster.dll; the orchestrator ruled a planner-authored premise correction with a fail-capable replacement, and ruled CR-2 remediated in the same cycle.
+
+**How to apply:**
+- Replacing a false conclusion in an AC: keep every true observation of the old text, replace only the conclusion, and make the replacement a scan the executor runs (System.Reflection.Metadata over every dll/exe in the output folder, printing `ASM`/`REF`/`SKIP`/summary lines the payload itself emits) paired with the identical scan over a folder known to contain the reference (positive control naming the referrer and the referenced version), plus a GetAssemblyName version read of the deployed target. Gate the control at "referenced version at or below the redirect's upper bound", with the printed value governing.
+- When the planner cannot run the payload, say so in the plan (D-record), assert only over lines the payload prints by construction, load the metadata assembly explicitly (`[System.Reflection.Assembly]::Load("System.Reflection.Metadata")`), and make every error branch a STOP. Avoid `->` in printed lines (angle brackets in payloads).
+- A reviewer's "self-assertion on a literal" nit can be the planner's own earlier workaround for PSUseDeclaredVarsMoreThanAssignments (round-0 note item 6). Do not delete the line alone (analyze goes red) or delete the literal (the AC names it); fold the read into the real assertion (`Should -Be $expectedDebt.Count`) and amend the AC's operand clause plus the Proposed Fix sentence in the same planner round. Write a fail-before exception dossier: the edit changes no outcome, so the alternative proof is a token census (old token 1 then 0, new token 0 then 1) and the unchanged pass count.
+- `git diff -U0` prints `@@ -315,2 +315 @@` for a two-lines-to-one replacement: the `,1` is omitted. Do not write `+315,1`.
+- Orchestrator-mandated commit-per-task: define one CMD-COMMIT (add explicit paths incl. the plan, commit with the dictated trailer segments, push, rev-parse, `diff --name-only HEAD~1 HEAD` equal to the staged set, porcelain), flip the task box before the commit so each commit carries its own check-off, revert the flip and STOP on any add/commit/push failure, and let the last task's flip be admitted in porcelain with numstat `1<TAB>1`. Require the orchestrator's preparation commit (spec amendments, base-plan revision, the remediation plan) before P0 and gate it in P0-T2 (`PREP-DIFF` contains the three files; `START-PORCELAIN` only agent-memory).
+- A spec-wording count self-hits across amendment entries: measure after editing (here `Should -Be $expectedDebt.Count` was 2, not the 3 first written). Re-measure line counts too (spec was 419, not 420).
+- Sweep sibling text when narrowing a pattern (CR-1): the section-14 citation repeated the same defect as P0-T20.
+- Related: [[project-973-r0-range-guard-vacuous-before-and-coverage-tolerance-seams]], [[project-964-cycle1-test-only-coverage-gap-remediation-seams]], [[acceptance-criteria-are-amended-by-planners-not-executors]].

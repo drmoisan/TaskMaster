@@ -93,17 +93,10 @@ $script:STEP_SPECIFIC_EXTRA_STATUS = @{
     step9_status = @('passed', 'failed_remediation_required', 'blocked_ci_loop_limit')
 }
 
-# The allowed blocked_reason vocabulary. Pinned to VALID_BLOCKED_REASONS in the
-# primary validator.
-$script:VALID_BLOCKED_REASONS = @(
-    'none',
-    'spawn_agent_unavailable',
-    'delegation_launch_failed',
-    'delegate_no_receipt',
-    'delegate_contract_incomplete',
-    'validator_failed',
-    'user_requested_stop'
-)
+# blocked_reason vocabulary; mirrors scripts/dev_tools/_orchestrator_state_blocked_reason.py.
+$script:MECHANICAL_BLOCKED_REASONS = @('spawn_agent_unavailable', 'delegation_launch_failed', 'delegate_no_receipt', 'delegate_contract_incomplete', 'validator_failed', 'user_requested_stop')
+$script:NON_MECHANICAL_BLOCKED_REASONS = @('premise_falsified', 'external_dependency', 'policy_hold', 'awaiting_ci', 'human_decision_required')
+$script:VALID_BLOCKED_REASONS = @('none') + $script:MECHANICAL_BLOCKED_REASONS + $script:NON_MECHANICAL_BLOCKED_REASONS
 
 # The upstream steps that must not be pending/blocked before the first PR creation
 # of a branch. Pinned to PR_CREATION_READY_STEP_KEYS in
@@ -290,7 +283,7 @@ function Get-OrchestratorStateBasePresenceError {
     # A present, non-null blocked_reason must be a member of the allowed vocabulary.
     $blocked = Get-OrchestratorStateField -State $State -Name 'blocked_reason'
     if ($blocked.Present -and $null -ne $blocked.Value -and
-        ($script:VALID_BLOCKED_REASONS -notcontains [string]$blocked.Value)) {
+        ($script:VALID_BLOCKED_REASONS -cnotcontains [string]$blocked.Value)) {
         $errors.Add("Checkpoint has invalid blocked_reason: $($blocked.Value)")
     }
 
@@ -333,7 +326,7 @@ function Get-OrchestratorStatePrCreationReadinessError {
     # blocked_reason must read as clear: absent, null, or the literal 'none'. Any
     # other recorded reason means the branch is not ready for PR creation.
     $blocked = Get-OrchestratorStateField -State $State -Name 'blocked_reason'
-    if ($blocked.Present -and $null -ne $blocked.Value -and ([string]$blocked.Value -ne 'none')) {
+    if ($blocked.Present -and $null -ne $blocked.Value -and ([string]$blocked.Value -cne 'none')) {
         $errors.Add('Checkpoint PR-creation readiness validation failed: blocked_reason is not `none`.')
     }
 

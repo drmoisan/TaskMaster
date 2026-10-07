@@ -37,6 +37,7 @@ $ErrorActionPreference = 'Stop'
 # module's directory so the import travels with the pushed-down pack regardless
 # of the consumer repository's working directory.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateRemediationAccounting.psm1') -Force -ErrorAction Stop
 
 # The eight keys every list-form delegation receipt must carry. Pinned to
 # REQUIRED_RECEIPT_KEYS in scripts/dev_tools/validate_orchestrator_state.py.
@@ -290,12 +291,15 @@ function Get-RemediationCycleError {
 function Get-OrchestratorStateRemediationLoopError {
     <#
     .SYNOPSIS
-        Return the remediation_loop errors (inventory rows U6.R1-U6.R4).
+        Return the remediation_loop errors (inventory rows U6.R1-U6.R4, R5-R11).
     .DESCRIPTION
         Public entry mirroring _validate_remediation_loop. A non-object
-        remediation_loop, or a cycles value that is not a list, carries no cycles
-        to validate and deliberately yields ZERO errors, matching the Python
-        tolerance rather than fabricating a structural error.
+        remediation_loop deliberately yields ZERO errors, matching the Python
+        tolerance rather than fabricating a structural error. When cycles is a
+        list each cycle is validated independently (U6.R1-U6.R4); the issue #484
+        review-outcome and accounting invariants R5-R11 then run through
+        Get-OrchestratorStateRemediationAccountingError with the cycle list, or
+        $null when cycles is absent or not a list.
     .PARAMETER Value
         The raw deserialized value of the checkpoint's remediation_loop key.
     .OUTPUTS
@@ -313,21 +317,24 @@ function Get-OrchestratorStateRemediationLoopError {
 
     if (-not (Test-CheckpointObjectValue -Value $Value)) { return $errors.ToArray() }
     $cycles = (Get-CheckpointObjectMember -Owner $Value -Name $script:REMEDIATION_CYCLES_KEY).Value
-    if (-not (Test-CheckpointListValue -Value $cycles)) { return $errors.ToArray() }
-
-    # Validate each cycle independently so a malformed entry does not mask the
-    # errors of the cycles that follow it.
-    $index = 0
-    foreach ($cycle in @($cycles)) {
-        if (-not (Test-CheckpointObjectValue -Value $cycle)) {
-            $errors.Add("Checkpoint remediation cycle #$index must be an object.")
+    $cycleList = $null
+    if (Test-CheckpointListValue -Value $cycles) {
+        $cycleList = $cycles
+        # Validate each cycle independently so a malformed entry does not mask the
+        # errors of the cycles that follow it.
+        $index = 0
+        foreach ($cycle in @($cycles)) {
+            if (-not (Test-CheckpointObjectValue -Value $cycle)) {
+                $errors.Add("Checkpoint remediation cycle #$index must be an object.")
+                $index++
+                continue
+            }
+            $errors.AddRange([string[]]@(Get-RemediationCycleError -Index $index -Cycle $cycle))
             $index++
-            continue
         }
-        $errors.AddRange([string[]]@(Get-RemediationCycleError -Index $index -Cycle $cycle))
-        $index++
     }
 
+    $errors.AddRange([string[]]@(Get-OrchestratorStateRemediationAccountingError -RemediationLoop $Value -Cycle $cycleList))
     return $errors.ToArray()
 }
 

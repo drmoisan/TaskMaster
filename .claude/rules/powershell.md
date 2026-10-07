@@ -36,9 +36,9 @@ Run the toolchain in order: format → analyze → test. Restart from step 1 if 
 
 ## Change Budget
 
-- Direct-mode overall scope: up to 2 production PowerShell files (plus corresponding tests). Requests exceeding this must be routed to `powershell-orchestrator` per `powershell-change-budget-router`.
-- Per-batch cap in all modes: at most 3 production files and 3 test files unless an explicit override has been approved.
-- If a batch would exceed the cap, split the work into smaller batches.
+- Direct-mode scope: 1-3 production PowerShell files (plus corresponding tests). A change that touches more than 3 production PowerShell files belongs on the orchestrated large path: route it through `/orchestrate` (the `orchestrator` agent) per `powershell-change-budget-router`.
+- The orchestrated large path has no production-file cap. Test files are not counted toward the routing threshold.
+- `.claude/hooks/enforce-powershell-batch-budget.ps1` enforces the threshold outside the large path: it denies the 4th distinct production PowerShell file with a routing instruction.
 
 ## Design Seams (Minimal DI)
 

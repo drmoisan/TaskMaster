@@ -45,10 +45,11 @@ single pass. Do not substitute the VS Code task wrappers for the native command 
 
 ## Discovery Contract
 
-- Search roots: `tools/`, `scripts/`, and `.claude/lib/bash/`, relative to the current working
-  directory; a missing root is silently skipped. The `.claude/lib/bash/` root carries the
-  destination-portable bash library published by push-down, so those scripts are held to the
-  same format, lint, test, and coverage standards as `tools/` and `scripts/`.
+- Search roots: `tools/`, `scripts/`, `.claude/lib/bash/`, and `.claude/skills/`, relative to the
+  current working directory; a missing root is silently skipped. The `.claude/lib/bash/` root carries
+  the destination-portable bash library published by push-down, and the `.claude/skills/` root carries
+  scripts bundled inside a skill folder, so those scripts are held to the same format, lint, test, and
+  coverage standards as `tools/` and `scripts/`.
 - A file is a shell script when its suffix (lowercased) is `.sh` or its first line is a
   shebang whose resolved interpreter is `bash` or `sh` (including `env` and `env -S`/`-flag`
   forms; the shebang is lowercased before parsing, so `#!/usr/bin/env BASH` qualifies).
@@ -62,9 +63,9 @@ single pass. Do not substitute the VS Code task wrappers for the native command 
 - Coverage is measured with kcov, which emits a single merged Cobertura report `cov.xml` under
   `artifacts/pester/kcov` (or `SHELL_QC_KCOV_OUT_DIR`). The run prints
   `Bash coverage (lines): NN.N%`.
-- The kcov include pattern covers all three discovery roots — `tools/`, `scripts/`, and
-  `.claude/lib/bash/` — so the Claude bash library is measured, not merely discovered. The
-  `tests/` tree remains excluded.
+- The kcov include pattern covers all four discovery roots — `tools/`, `scripts/`,
+  `.claude/lib/bash/`, and `.claude/skills/` — so the Claude bash library and skill-bundled scripts are
+  measured, not merely discovered. The `tests/` tree remains excluded.
 - kcov reports **line coverage only**. The uniform line-coverage threshold (>= 85% per
   `.claude/rules/quality-tiers.md`) applies. Branch coverage is not measurable by kcov for
   bash; there is no bash branch-coverage gate.

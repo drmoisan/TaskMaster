@@ -1,93 +1,120 @@
-- [breadcrumb Close returns before OpenState=false](project_breadcrumb-close-returns-before-openstate-false.md) — #656: reopen-path enumeration doesn't prove `_closeCompleted && IsOpen` unreachable; CompleteClose is queued, not synchronous
-- [verify-zero-own-effect-coverage-noise-491](project_verify-zero-own-effect-coverage-noise-491.md) — verify "shortfall is noise" claims by grepping both Cobertura XMLs for the changed assembly; distrust deleted-raw-XML narratives (#491)
-- [poshqc-bundled-coverage-artifact-reads-zero](project_poshqc-bundled-coverage-artifact-reads-zero.md) — run_poshqc_test's Pester XML reads 0 covered (invalid capture) -> FAIL non-blocking; use direct-Pester JaCoCo (#441)
-- [441-review-residuals-and-494-handoff](project_441-review-residuals-and-494-handoff.md) — #441 PASS/0 blocking; 85.0317% vs 85% margin -> #494 decides; NF-1 uncovered Helpers.ps1:220; #529-#532 OPEN (deliberate)
-- [nullable-remediation-epic-review-pattern](project_nullable-remediation-epic-review-pattern.md) — utilitiescs-nullable epic children (#363+): epic-integration diff base, per-file #nullable enable; use per-project AC1 proof
-- [gitignore-tracking-expands-diff-scope](project_gitignore-tracking-diff-scope.md) — un-ignoring `.claude/` shows the whole subtree as added; audit the full diff, not the plan's "single file" claim
-- [powershell-coverage-mandatory-when-ps1-in-diff](feedback_powershell-coverage-gate.md) — hook blocks termination unless a PASS/FAIL PowerShell coverage verdict exists when .ps1 changed
-- [csharp-coverage-artifact-is-cobertura](project_csharp-coverage-artifact-is-cobertura.md) — artifacts/csharp/coverage.xml format VARIES (Cobertura/VS/JaCoCo); read root element first; `<report>` = hook enforcement live
-- [csharpier-formats-xml-probe-verification](project_csharpier-formats-xml-probe-verification.md) — CSharpier 1.3.0 formats *.xml (width=100); reproduce "formatter mandated this" claims with a scratch probe
-- [jacoco-summary-substitution-is-valid-coverage-evidence](project_jacoco-summary-substitution-is-valid-coverage-evidence.md) — committed evidence may be package-level JaCoCo; re-sum and corroborate counters, distrust sub-noise deltas
-- [csharp-local-fullsuite-coverage-blocked](project_csharp-local-fullsuite-coverage-blocked.md) — local full-assembly C# coverage fails on Moq binding redirect; repo-wide gate is the PR CI run
-- [csharp-repowide-coverage-below-80](project_csharp-repowide-coverage-below-80.md) — vendor/`*.Test` packages in the denominator INFLATE line and CRUSH branch; always read `branch-rate` too (#826)
-- [Validator IS run — by the orchestrator](project_taskmaster-validator-memories-are-cross-repo.md) — CORRECTED at #781: canonical policy-audit template structure is mandatory on the FIRST draft
-- [Template `N/A - out of scope` vs hook narrowing regex](project_template-na-wording-vs-hook-narrowing-regex.md) — safe only for languages with ZERO changed files; simulate per-language before finalizing
-- [PowerShell line-count undercount](powershell-measure-object-line-undercount.md) — `Measure-Object -Line` undercounts vs `awk NR`/`wc -l`
-- [test files count toward 500-line limit](feedback_test-file-500-line-limit.md) — test file over 500 lines is FAIL-level even with passing ACs; compare baseline vs head counts
-- [koverage analyzer finding misattributed](project_koverage-analyzer-finding-misattributed.md) — the pre-existing PSUseSingularNouns in Invoke-MSTestWithCoverage.Helpers.ps1 is on Get-CoberturaLineConditionCoverageParts
-- [projectentry-setter-raw-messagebox-blocks-coverage](project_projectentry-setter-raw-messagebox-blocks-coverage.md) — #199 change-confirmation uncoverable via MyBox seam; spec AC1 "fully covered" overstated
-- [msbuild-invocation-via-bash](project_msbuild-invocation-via-bash.md) — msbuild/vstest not on bash PATH; `Platform="Any CPU"` needs a .cmd wrapper; exit 127 != a pass
-- [TestResults coverage XML cross-module check](project_testresults-coverage-xml-cross-module-check.md) — single-project vstest TestResults/*.xml also instruments other loaded modules; grep it to spot-check repo-coverage claims
-- [plan trailer preflight directive is benign](project_plan-trailer-preflight-directive-benign.md) — `DIRECTIVE: PREFLIGHT VALIDATION ONLY` in plan.md is planner/executor handoff text, not scope narrowing
-- [feature-evidence Cobertura counts as the C# coverage artifact](project_feature-evidence-cobertura-counts-as-coverage-artifact.md) — #424: committed `<FEATURE>/evidence/` Cobertura counts as artifact present; simulate to confirm
-- [438 review findings (both cycles)](project_438_cycle1_findings.md) — cycle 2 PASS/0 blocking; residuals: R2 disposition, classifier-defect promotion, HV-1
-- [csharp coverage constants nondeterministic](project_csharp-coverage-constants-nondeterministic.md) — never gate on cross-session repo-wide constants (~0.015-pt band, #511); use same-session baseline + per-file diff
-- [pr-context-summary-misclassifies-cs, recurring](project_pr-context-summary-misclassifies-cs.md) — near-certain per-review defect (16+); hook derives changed languages from the summary, not git diff
-- [Stale caller-supplied merge-base](project_stale-caller-merge-base.md) — #244: recompute base via `git merge-base`, don't trust the supplied SHA
-- [modified-workflow green-run gate is manual](project_modified-workflow-green-run-manual-check.md) — #267: no Test-ModifiedWorkflowNeedsGreenRun.ps1 in TaskMaster; check `.github/workflows/**` via git diff
-- [same-commit differing-outcome flake check](project_same-commit-differing-outcome-flake-check.md) — #261: two same-SHA runs disagreeing on one test proves environment-flake
-- [PR-context MCP unavailable, manual fallback](project_pr-context-mcp-unavailable-manual-fallback.md) — #269: hand-author pr_context.summary.txt from `git diff --numstat` in the hook's `- path (+N/-N)` format
-- [C# coverage: convert raw .coverage when canonical XML absent](project_csharp-coverage-independent-verification-via-raw-coverage-conversion.md) — #278: `dotnet-coverage merge -f cobertura` on TestResults/*.coverage gives independent verification
-- [coverage hook forces FAIL below 85% even with exemption](coverage-hook-forces-fail-below-floor-despite-exemption.md) — #283: below-floor row must read FAIL, non-blocking disposition, never PASS
-- [coverage hook label+verdict regex quirks](project_coverage-hook-label-substring-false-positive.md) — labels match as substrings ("csharpier"->C#, bare "pester"->PS); simulate first
-- [deletion-only PR with absent canonical C# artifact](project_deletion-only-pr-absent-coverage-artifact-309.md) — #309: pure-deletion PR still gets FAIL per artifact-absence rule; disposition procedural, not code defect
-- [canonical JaCoCo rescoping to instrumented assemblies](project_csharp-canonical-jacoco-includes-uninstrumented-assemblies.md) — uninstrumented assemblies read ~0% and block sub-75; re-scope to fix (#328); not guaranteed (#392)
-- [durable feature-script triggers Python coverage gate](project_durable-feature-script-triggers-python-coverage-gate.md) — #354: committed `<FEATURE>/scripts/*.py` audit script still triggers the mandatory coverage gate
-- [SVGControl stale binding redirect out of scope](project_svgcontrol-stale-binding-redirect-out-of-scope.md) — SVGControl/app.config Unsafe redirect (6.0.2.0 vs 6.0.3.0) still stale as of 2026-07-18
-- [pr-context stale after remediation commit](project_pr-context-stale-after-remediation-commit.md) — compare `git rev-parse HEAD` vs the summary's Head ref every re-audit cycle; refresh if stale
-- [partial remediation still fails new-code floor](project_partial-remediation-new-code-floor-still-fails-209.md) — #209: 0%->7.7% improves but still FAILs 85/90; recommend maintainer exemption when irreducible
-- [nullable-epic full-solution TWAE is pre-existing](project_nullable-epic-fullsolution-twae-preexisting-blocker.md) — #364: full-solution pragma-only TWAE exits 1 on out-of-scope CS0649/CS0618
-- [coverage hook skips when no pr_context.summary.txt](coverage-hook-skips-when-no-pr-context-summary.md) — absent summary = empty changedLanguages = only 3 path checks run; still write clean rows
-- [ScoDictionaryNew swap: enumeration order + removal API](project_scodictionary-new-enumeration-order-and-removal-api.md) — swordfish epic: insertion->concurrent order change needs tie-breaks; .Remove->.TryRemove
-- [epic-child-twodot-diff-divergence-noise](project_epic-child-twodot-diff-divergence-noise.md) — epic child vs integration branch: use three-dot merge-base diff (#307)
-- [rescoping to instrumented package doesn't always clear floor](project_rescoping-to-instrumented-package-does-not-always-clear-floor.md) — #392: QuickFiler's own instrumented figure (73.68/64.62) is itself sub-floor; re-check after rescoping
-- [modified-file sub-floor non-blocking disposition](project_modified-file-subfloor-nonblocking-disposition-230.md) — #230: FAIL row non-blocking without remediation-inputs when >=80%, no changed-line regression, improved vs baseline
-- [orchestrator-state human_interaction verifies scope_change ratification](project_orchestrator-state-human-interaction-verifies-scope-change-ratification.md) — cross-check "maintainer ratified" claims against the gitignored orchestrator-state.json
-- [stale untracked coverage.xml leftover false-blocks the hook](project_stale-untracked-coverage-xml-leftover-false-block.md) — #398: stale untracked artifacts/csharp/coverage.xml trips the sub-75 block; remove it; simulate first
-- [vstest argument order + missing transitive dep](project_vstest-argument-order-transitive-dep.md) — #418: packages.config projects don't flow transitive copy-local; always run a changed test assembly ALONE
-- [LangVersion-less test projects emit CS8630](project_langversion-missing-test-projects-cs8630.md) — #418: 6 test projects default C# 7.3; solution nullable gate passes only as a no-op
-- [remediation-handoff skill layout conflicts with the hook](project_remediation-handoff-skill-conflicts-with-hook.md) — use the flat timestamped artifact form, not audit/<ts>/; several named validators don't exist in TaskMaster
-- [Verify claims before trusting them (#418)](feedback_verify-parity-claims-in-remediation-inputs.md) — a "parity with siblings" directive was false (verify on disk); measure every claim, don't trust it written
-- [verify the asserted evidence mechanism](feedback_verify-asserted-evidence-mechanism.md) — #418: "proven by unit tests" can be false with 100% coverage; grep the mechanism, correct the basis
-- [maintainer waiver hides in gitignored state](project_maintainer-waiver-recorded-only-in-gitignored-state.md) — #418: waivers land only in gitignored state; require transcription into issue.md; never convert to ExcludeFromCodeCoverage
-- [two vstest binaries: binding-redirect trap](project_two-vstest-binaries-binding-redirect.md) — #503: TestWindow vstest.console.exe drops the redirect and fakes 26 Moq failures; use Extensions\TestPlatform
-- [package-counter delta proves new-type coverage](project_package-counter-delta-corroborates-new-type-coverage.md) — #503: unchanged `missed`+`covered` up by exactly the new types' line total proves new-code floor
-- [mandated nullable solution gate is vacuous](project_nullable_build_gate_is_vacuous.md) — #503: `/t:Build` with only `/p:` changes skips CoreCompile; force `/t:Rebuild` on the changed project
-- [null-conditional fix relocates NRE, check callers](project_null-conditional-fix-relocates-nre-check-callers.md) — #507: grep every call site before crediting a throw->null fix with resolving the reachable crash
-- [coverage hook needs label+coverage+PASS/FAIL on one line](project_coverage-hook-label-plus-verdict-same-line-507.md) — #507: dot-source and simulate before finalizing
-- [505 coordinator prime/toggle race (CR-1)](project_505-coordinator-prime-toggle-race.md) — EngineToggleStateCoordinator lazy prime can overwrite a fresher toggle write; TryAdd fix recommended
-- [457 review residuals](project_457-review-residuals.md) — PASS/0 blocking; CR-1 rollup-rebuild drift vs merge path; AC15 potential_to_issue owed at epic close
-- [553 CI split closed, cycle 2](project_553_ci_split_review_pattern.md) — 0 blocking, 18/18 AC; reviewer self-dispatched ci.yml; branch rebase made ALL caller SHAs stale
-- [review worktree differs from session cwd](project_review-worktree-differs-from-session-cwd-mirror-artifacts.md) — hook Test-Paths relative to its own cwd; mirror the 3 artifacts into session cwd's docs/features/active/<feature>/
-- [epic fan-in artifact path + hook regex traps](project_epic_fanin_artifact_path_and_hook_regex.md) — hook regex demands docs/features/active/; UNVERIFIED is a narrowing word; "Pester" alone satisfies both tests
-- [Cobertura substitution leaves blobs in history](project_cobertura-substitution-leaves-blobs-in-history.md) — #648: raw XML committed then removed stays reachable (21 MB); remedy is squash-merge
-- [evidence Timestamps can be synthetic](project_evidence-timestamps-are-synthetic-cross-check-commit-dates.md) — #648: falsify against the commit date and banners quoted inside the same artifact
-- [80-vs-85 coverage floor doc conflict](project_build-ci-coverage-gate-fidelity-epic-outcome.md) — CLAUDE.md 80/90 vs `.claude/rules` uniform 85/75, unreconciled; report against whichever governs (recurred at #287)
-- [PowerShell coverage is nondeterministic](project_powershell-coverage-nondeterministic-vsbuild-tests.md) — Invoke-VSBuild.Tests.ps1 runs vswhere for real; measure PS coverage in-session, never quote a stored figure
-- [review-residuals index (misc closed issues)](project_review-residuals-index.md) — one-line PASS/0-blocking pointers for 16 closed issues (#442-670) with residual/owed items, for lookup
-- [511-rescope-review-residuals](project_511-rescope-review-residuals.md) — re-audit PASS/0 blocking; PR must not close #511/#571 (#592/#594/#597 carry the real defects)
-- [464-review-residuals](project_464-review-residuals.md) — PASS/0 blocking; 7 promotions owed (RC7 EfcSelectionGuard "===" arity)
-- [489-review-residuals](project_489-review-residuals.md) — cycle-1 reaudit GO/0 blocking; RED TRX committed with test then fix next commit = provable RED-first
-- [493-review-residuals + msbuild-log gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — PASS/0 blocking; an unsatisfiable msbuild-log byte-equality gate adjudicated without downgrading the AC
-- [680-review-residuals](project_680-review-residuals.md) — closed GO c3; leak class recurred 3x (TRX, plan draft, QA's own fresh vstest output); sanitize in-task every cycle
-- [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file non-blocking
-- [781-review-residuals](project_781-review-residuals.md) — PASS/0 blocking; ItemViewer `[ExcludeFromCodeCoverage]` = 0 Cobertura classes; executor blamed the wrong package for a -2 line delta
-- [791-review-residuals](project_791-review-residuals.md) — PASS/0 blocking, 6/6 AC; QfcDatamodel excluded from Cobertura; walk ALL THREE links of a "runs under finally" ownership chain
-- [440-review-residuals](project_440-review-residuals.md) — PASS/0 blocking; a "corrected" defect-encoding test can be defect-NEUTRAL (check fail-before Totals)
-- [644-review-residuals](project_644-review-residuals.md) — all 3 cycles PASS/0 blocking; rejecting the caller's `.claude/agent-memory` diff exclusion found the only new defect
-- [826-review-residuals](project_826-review-residuals.md) — PASS/0, 16/16; only finding was unreported branch coverage; a no-Bash review parsed Cobertura fine with Grep `-o`
-- [647-review-residuals](project_647-review-residuals.md) — PASS/0 blocking, 21/21 AC; AC20 PASS-with-deviation on in-spec provisions
-- [measure every changed file, not just the AC-named one](feedback_measure-every-changed-file-not-just-the-ac-named-one.md) — per-file Cobertura aggregation exposed a call-site regression (77.05%, new lines uncovered) no executor artifact reported
-- [sibling `Should().Be(other)` assertion has no pinning power](project_662-sibling-assertion-blind-spot.md) — #662: apply the prohibited edit and evaluate EVERY assertion; a two-valued constant pair can be load-bearing
-- [Cobertura `d__N` class complexity proves new-branch coverage](project_285-review-residuals.md) — #285: complexity 4->10 at rate 1.0 in two greps proves new-branch coverage
-- [RED-first equivalence patterns](project_red-first-equivalence-patterns.md) — #489 (RED TRX, fix next commit) and #677 (compile-red) both provable RED-first; #440/#680 residual notes
-- [SHA-256 as compile/footprint proof](project_sha256-compile-footprint-proof.md) — #644/#647: SHA-256 beats mtime as compile proof; footprint hash binds all gates to head
-- [StoreWrapperController absent from Cobertura](project_storewrapper-controller-absent-from-cobertura.md) — whole class missing from both baseline+post Cobertura XML despite only 2/N members `[ExcludeFromCodeCoverage]`; pre-existing (#287)
-- [287-review-outcome](project_287-review-outcome.md) — PASS/0 blocking; 85.297%/79.293% repo-wide clears both coverage floors
-- [Cobertura `.//line` double-counts under a class](project_cobertura-class-line-double-count-trap.md) — #670: method rows re-count field initializers; use `lines/line` and cross-check `line-rate`
-- [Verify the caller's factual "correction"](feedback_verify-the-callers-factual-correction.md) — #670: caller's ODE-absent claim was wrong; they'd found D3/D4, not D5's throw
+# feature-review memory index
+
+## Coverage evidence and hooks
+- [csharp-coverage-artifact-is-cobertura](project_csharp-coverage-artifact-is-cobertura.md) — artifacts/csharp/coverage.xml format varies; read the root element first
+- [feature-evidence Cobertura counts as artifact](project_feature-evidence-cobertura-counts-as-coverage-artifact.md) — #424: committed `<FEATURE>/evidence/` coverage = artifact present
+- [jacoco-summary-substitution-is-valid](project_jacoco-summary-substitution-is-valid-coverage-evidence.md) — re-sum package counters; distrust sub-noise deltas
+- [csharp coverage constants nondeterministic](project_csharp-coverage-constants-nondeterministic.md) — ~0.015-pt band (#511); same-session baseline + per-file diff only
+- [csharp-repowide-coverage-below-80](project_csharp-repowide-coverage-below-80.md) — vendor/`*.Test` in denominator inflates line, crushes branch; read `branch-rate` (#826)
+- [csharp-local-fullsuite-coverage-blocked](project_csharp-local-fullsuite-coverage-blocked.md) — Moq binding redirect; repo-wide gate is the PR CI run
+- [convert raw .coverage when canonical XML absent](project_csharp-coverage-independent-verification-via-raw-coverage-conversion.md) — #278: `dotnet-coverage merge -f cobertura`
+- [canonical JaCoCo includes uninstrumented assemblies](project_csharp-canonical-jacoco-includes-uninstrumented-assemblies.md) — ~0% rows block sub-75; re-scope (#328); not guaranteed (#392)
+- [rescoping doesn't always clear floor](project_rescoping-to-instrumented-package-does-not-always-clear-floor.md) — #392: QuickFiler itself 73.68/64.62
+- [deletion-only PR, absent artifact](project_deletion-only-pr-absent-coverage-artifact-309.md) — #309: still FAIL per artifact-absence rule; procedural disposition
+- [modified-file sub-floor non-blocking](project_modified-file-subfloor-nonblocking-disposition-230.md) — #230: FAIL row non-blocking when >=80%, no changed-line regression, improved
+- [partial remediation still fails new-code floor](project_partial-remediation-new-code-floor-still-fails-209.md) — #209: 0->7.7% still FAILs; recommend maintainer exemption
+- [80-vs-85 floor doc conflict](project_build-ci-coverage-gate-fidelity-epic-outcome.md) — CLAUDE.md 80/90 vs rules 85/75; report against whichever governs
+- [measure every changed file](feedback_measure-every-changed-file-not-just-the-ac-named-one.md) — per-file aggregation exposed a 77.05% call-site regression no artifact reported
+- [verify-zero-own-effect-coverage-noise](project_verify-zero-own-effect-coverage-noise-491.md) — grep both Cobertura XMLs for the changed assembly (#491)
+- [package-counter delta proves new-type coverage](project_package-counter-delta-corroborates-new-type-coverage.md) — #503
+- [Cobertura `.//line` double-count trap](project_cobertura-class-line-double-count-trap.md) — #670: use `lines/line`, cross-check `line-rate`
+- [Cobertura `<class>` Grep keys on `filename=`](project_956-review-residuals.md) — #956: attribute order is `line-rate branch-rate complexity name filename`; a `class name=... filename=` pattern finds nothing; closure classes stay separate rows
+- [Cobertura `d__N` complexity proves new-branch coverage](project_285-review-residuals.md) — #285
+- [TestResults XML cross-module check](project_testresults-coverage-xml-cross-module-check.md) — single-project vstest XML also instruments other modules
+- [StoreWrapperController absent from Cobertura](project_storewrapper-controller-absent-from-cobertura.md) — pre-existing (#287)
+- [const-string JS bridge files zero lines](project_const-string-js-bridge-files-zero-cobertura-lines.md) — #737: correct signal, not a gap
+- [don't trust "unreachable" on an escape set](feedback_dont-trust-the-unreachable-label-on-a-coverage-escape-set.md) — check U against BASELINE hits
+- [ExcludeFromCodeCoverage ruling](project_excludefromcodecoverage-attribute-ruling.md) — attributes not Blocking; the rules clause covers config `exclude` globs
+- [powershell-coverage-mandatory-when-ps1-in-diff](feedback_powershell-coverage-gate.md) — hook blocks without a PS PASS/FAIL verdict
+- [PowerShell coverage nondeterministic](project_powershell-coverage-nondeterministic-vsbuild-tests.md) — measure in-session, never quote a stored figure
+- [Pester counts commands, not lines](project_pester-line-coverage-node-appears-only-with-an-analyzable-command.md) — operand-only line gets no node
+- [Pester breakpoints bind to the FIRST ParseFile copy](project_pester-breakpoint-coverage-binds-to-first-parsefile-copy.md) — #928: an entry-point line reached only by a later-sorting suite reads 0 hits though its test passes; relocate logic to a path-loaded part file
+- [poshqc bundled coverage reads zero](project_poshqc-bundled-coverage-artifact-reads-zero.md) — use direct-Pester JaCoCo (#441)
+- [PowerShell line-count undercount](powershell-measure-object-line-undercount.md) — `Measure-Object -Line` vs `awk NR`
+- [durable feature-script triggers Python gate](project_durable-feature-script-triggers-python-coverage-gate.md) — #354
+- [coverage hook: label+coverage+PASS/FAIL one line](project_coverage-hook-label-plus-verdict-same-line-507.md) — #507: dot-source and simulate
+- [coverage hook label substring quirks](project_coverage-hook-label-substring-false-positive.md) — "csharpier"->C#, "pester"->PS
+- [coverage hook forces FAIL below 85%](coverage-hook-forces-fail-below-floor-despite-exemption.md) — #283: never PASS a below-floor row
+- [coverage hook skips without pr_context summary](coverage-hook-skips-when-no-pr-context-summary.md) — only 3 path checks run; still write clean rows
+- [coverage hook trusts misclassified summary](project_coverage-hook-trusts-misclassified-summary.md) — C#-as-docs skips C# enforcement
+- [Template `N/A - out of scope` vs narrowing regex](project_template-na-wording-vs-hook-narrowing-regex.md) — safe only for zero-file languages
+- [stale untracked coverage.xml false-blocks](project_stale-untracked-coverage-xml-leftover-false-block.md) — #398: remove it; simulate first
+- [review worktree differs from session cwd](project_review-worktree-differs-from-session-cwd-mirror-artifacts.md) — mirror the 3 artifacts into session cwd (again at #930)
+- [epic fan-in artifact path + regex traps](project_epic_fanin_artifact_path_and_hook_regex.md) — hook demands docs/features/active/; UNVERIFIED narrows
+
+## PR context, base, scope
+- [pr-context-summary-misclassifies-cs](project_pr-context-summary-misclassifies-cs.md) — recurring; verify scope against git diff
+- [pr_context artifacts are TRACKED](project_pr-context-artifacts-are-tracked-not-gitignored.md) — main carries a stale pair; derive from git
+- [PR-context MCP unavailable](project_pr-context-mcp-unavailable-manual-fallback.md) — #269: hand-author from `git diff --numstat`
+- [pr-context stale after remediation commit](project_pr-context-stale-after-remediation-commit.md) — compare HEAD vs summary Head ref
+- [Stale caller-supplied merge-base](project_stale-caller-merge-base.md) — #244: recompute `git merge-base`
+- [three-dot degenerates when base is ancestor](project_three-dot-degenerates-when-base-is-ancestor.md) — #735
+- [epic-child two-dot divergence noise](project_epic-child-twodot-diff-divergence-noise.md) — use three-dot (#307)
+- [gitignore-tracking-expands-diff-scope](project_gitignore-tracking-diff-scope.md) — un-ignoring `.claude/` adds the subtree; audit it
+- [plan trailer preflight directive is benign](project_plan-trailer-preflight-directive-benign.md) — not scope narrowing
+- [modified-workflow green-run gate is manual](project_modified-workflow-green-run-manual-check.md) — #267
+- [remediation-handoff skill vs hook layout](project_remediation-handoff-skill-conflicts-with-hook.md) — flat timestamped form; validators absent here
+- [re-audit cycle playbook](project_re-audit-cycle-review-playbook.md) — split remediable blockers from PR-time gates
+
+## Toolchain and build traps
+- [msbuild-invocation-via-bash](project_msbuild-invocation-via-bash.md) — not on bash PATH; `Any CPU` needs a .cmd wrapper
+- [two vstest binaries binding-redirect trap](project_two-vstest-binaries-binding-redirect.md) — #503: use Extensions\TestPlatform
+- [vstest argument order + transitive dep](project_vstest-argument-order-transitive-dep.md) — #418: run a changed test assembly ALONE
+- [mandated nullable gate is vacuous](project_nullable_build_gate_is_vacuous.md) — #503: force `/t:Rebuild`
+- [LangVersion-less test projects CS8630](project_langversion-missing-test-projects-cs8630.md) — #418
+- [nullable-epic full-solution TWAE pre-existing](project_nullable-epic-fullsolution-twae-preexisting-blocker.md) — #364
+- [nullable-remediation-epic review pattern](project_nullable-remediation-epic-review-pattern.md) — #363+: per-project AC1 proof
+- [csharpier formats xml, probe it](project_csharpier-formats-xml-probe-verification.md) — reproduce "formatter mandated this"
+- [koverage analyzer finding misattributed](project_koverage-analyzer-finding-misattributed.md) — Get-CoberturaLineConditionCoverageParts
+- [SVGControl stale binding redirect](project_svgcontrol-stale-binding-redirect-out-of-scope.md) — still stale 2026-07-18
+- [bash heredoc backslash + /tmp traps](project_bash-heredoc-backslash-and-tmp-traps.md) — Windows python3 can't see /tmp
+- [Write-Verbose remedy is inert](feedback_write-verbose-remedy-is-inert-without-a-verbose-call-site.md) — needs -Verbose at the call site
+
+## Verification discipline
+- [Verify parity claims](feedback_verify-parity-claims-in-remediation-inputs.md) — #418: measure every claim on disk
+- [verify the asserted evidence mechanism](feedback_verify-asserted-evidence-mechanism.md) — #418: grep the mechanism, correct the basis
+- [Verify the caller's factual "correction"](feedback_verify-the-callers-factual-correction.md) — #670
+- [test files count toward 500-line limit](feedback_test-file-500-line-limit.md) — compare baseline vs head counts
+- [evidence Timestamps can be synthetic](project_evidence-timestamps-are-synthetic-cross-check-commit-dates.md) — #648: cross-check commit dates; Cobertura root `timestamp=` epoch is a no-shell clock (#942)
+- [same-commit differing-outcome flake check](project_same-commit-differing-outcome-flake-check.md) — #261
+- [SHA-256 as compile/footprint proof](project_sha256-compile-footprint-proof.md) — #644/#647
+- [RED-first equivalence patterns](project_red-first-equivalence-patterns.md) — RED TRX then fix (#489); compile-red (#677)
+- [sibling `Should().Be(other)` has no pinning power](project_662-sibling-assertion-blind-spot.md) — evaluate EVERY assertion
+- [null-conditional fix relocates NRE](project_null-conditional-fix-relocates-nre-check-callers.md) — #507: grep every call site
+- [DoNotParallelize census misses lazy-init writers](project_donotparallelize-census-misses-lazy-init-writers.md)
+- [YAML comment-only diff proof](project_yaml-comment-only-diff-proof-via-parse-tree.md) — parse-tree compare, 2 parsers
+- [orchestrator-state verifies ratification claims](project_orchestrator-state-human-interaction-verifies-scope-change-ratification.md) — gitignored state
+- [maintainer waiver hides in gitignored state](project_maintainer-waiver-recorded-only-in-gitignored-state.md) — require transcription into issue.md
+- [ScoDictionaryNew swap hazards](project_scodictionary-new-enumeration-order-and-removal-api.md) — enumeration order; .TryRemove
+- [projectentry setter raw MessageBox](project_projectentry-setter-raw-messagebox-blocks-coverage.md) — #199 uncoverable via MyBox seam
+- [breadcrumb Close returns before OpenState=false](project_breadcrumb-close-returns-before-openstate-false.md) — #656
+- [505 coordinator prime/toggle race](project_505-coordinator-prime-toggle-race.md) — TryAdd fix recommended
 
 ## Artifact hygiene
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no account/host names; control vstest `/ResultsDirectory:`
+- [sweep drive-letter paths, not just identity patterns](feedback_sweep-drive-letter-paths-not-just-identity-patterns.md) — #930: `Using vstest.console: C:\Program Files\...` passed an identity gate
+- [Cobertura substitution leaves blobs](project_cobertura-substitution-leaves-blobs-in-history.md) — #648: squash-merge
+- [policy-audit-template MCP unavailable](project_policy-audit-template-mcp-unavailable-737.md) — hand-author the 12 headings
+
+## Artifact structure (cross-repo validator, run by the orchestrator)
+- [Validator IS run by the orchestrator](project_taskmaster-validator-memories-are-cross-repo.md) — canonical template structure on the FIRST draft (#781)
+- [policy-audit required structure](policy-audit-required-structure.md) — Appendix A/B, 4 TS/PS checklist lines, numeric comparison line, 7-col metrics table
+- [policy-audit comparison-line schema](policy-audit-comparison-line-schema.md) — `Baseline:` `Post-change:` `Change:` `Disposition:` `Evidence:` labels
+- [policy-audit validator uses full template](policy-audit-validator-uses-full-template.md) — `## Executive Summary` + `## 1`..`## 7`
+- [policy-audit section-7 row-label parser](policy-audit-section7-row-label-parser.md) — reuse cycle-1 wording
+- [numeric new-code coverage + Scope-and-Baseline](policy-audit-numeric-new-code-coverage.md) — literal percent; feature-audit needs `## Scope and Baseline`
+- [feature-audit check-off heading case](feature-audit-checkoff-heading-case.md) — `## Acceptance Criteria Check-off`
+- [feature-audit requires Summary heading](feature-audit-requires-summary-heading.md) — literal `## Summary`
+- [code-review findings table header](code-review-findings-table-header.md) — exact 7-column header
+- [code-review/feature-audit required headings](code-review-required-headings.md) — `## Executive Summary`, `## Findings Table`, `## Acceptance Criteria Inventory/Evaluation`
+
+## Closed-issue residuals (lookup only)
+- [review-residuals index](project_review-residuals-index.md) — one-line pointers for #442-#942 (incl. #930 AC7 host-path PARTIAL; #942 `.csproj` disarms the C# hook check)
+- [973](project_973-review-residuals.md) — REMEDIATION_REQUIRED 21/23 (AC17 premise defect = autonomous spec amendment; AC18 manual); split-coverage arithmetic from class-node fractions; bundled PoshQC FAIL row + vacuous PASS; PS JaCoCo epoch is local-as-UTC
+- [438](project_438_cycle1_findings.md) · [440](project_440-review-residuals.md) · [441](project_441-review-residuals-and-494-handoff.md) · [457](project_457-review-residuals.md) · [464](project_464-review-residuals.md) · [489](project_489-review-residuals.md) · [493](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) · [511](project_511-rescope-review-residuals.md) · [553](project_553_ci_split_review_pattern.md) · [565](project_565-review-residuals.md) · [584](project_584-review-residuals.md)
+- [644](project_644-review-residuals.md) · [645](project_645-review-residuals.md) · [647](project_647-review-residuals.md) · [677](project_677-review-residuals.md) · [680](project_680-review-residuals.md) · [707](project_707-review-residuals.md) · [730](project_730-review-residuals.md) · [731](project_731-review-residuals.md) · [735](project_735-review-residuals.md) · [736](project_736-review-residuals.md) · [751](project_751-review-residuals.md)
+- [752](project_752-review-residuals.md) (scope lock doesn't discharge host-path sweep) · [781](project_781-review-residuals.md) · [791](project_791-review-residuals.md) · [799](project_799-review-residuals.md) · [826](project_826-review-residuals.md) · [287](project_287-review-outcome.md) · [928](project_928-review-residuals.md) (cycle 1: AC6 uncredited line; exit: PASS 7/7 after part-file relocation; no-Bash review reads gitignored JaCoCo `<sourcefile>` nodes directly; 3-`..` hook path; P-4 bundled PoshQC coverage never covers `scripts/`) · [929](project_929-review-residuals.md) (PASS 7/7, 0 blocking; AC met by tests of a pre-existing rule accepted; labels led UTC clock 38-72 min; `.bak` residue = follow-up) · [944](project_944-review-residuals.md) (PASS 18/18, 0 blocking; keyed TryRemove safe under single-writer-under-lock; Cobertura root epoch as no-shell clock; 3 follow-ups owed) · [945](project_945-review-residuals.md) (PASS 8/8, 0 blocking; attribute-exempt overloads, per-file 24/25 as new-code figure; SortEmail.cs 1454-line pre-existing breach) · [940](project_940-review-residuals.md) (PASS 8/8, 0 blocking; per-file coverage ruling verified at Cobertura `<class>` nodes; worktree `logs/HEAD` reflog epochs as no-shell clock; stale session-cwd coverage.xml handled with an honest FAIL line; 3 follow-ups owed) · [947](project_947-review-residuals.md) (PASS 7/7, 0 blocking; empty `catch (Exception)` around a sink accepted via the SafeLog precedent; third unguarded sink `_notifyUnavailable` owed as follow-up; 5 follow-ups) · [956](project_956-review-residuals.md) (PASS 17/17, 0 blocking; partial split + prompt-session seam; Cobertura `<class>` Grep must key on `filename=`; stale session coverage.xml is Cobertura so the hook's JaCoCo parse is null; DirectoryInfo-inside-try spec inconsistency CR-1) · [948](project_948-review-residuals.md) (PASS 16/16, 0 blocking; lock-free check-then-record safe via marker serialisation; record-after-sink inside the #947 try; Glob hides git-ignored files, Grep/Read the exact path; Cobertura epoch 63 min behind labels; no-Bash review) · [968](project_968-review-residuals.md) (AWAITING_CI 31/32; caller-classed pending AC = one awaiting_ci blocker + remediation-inputs; hook-safe policy-audit wording validator-confirmed; five-`..` path from TaskMaster-wt cwd; session-checkout copies as pre-change text) · [950](project_950-review-residuals.md) (PASS 16/17, AC17 PENDING CI by ruling, 0 blocking; attribute-excluded production file = PASS on no-regression limb + execution proof via seam-removal NRE controls; theme-test null-dispatcher exposure counted not found; hook-safe zero-file wording; reflog clock) · [964](project_964-review-residuals.md) (cycle 0 PASS 8/8 then cycle-1 exit PASS 8/8, 0 blocking; a pure-move split isolated a pre-existing uncovered arm into a new partial reading 50% branches: non-blocking Minor, closed by one data-driven test with the class node moving 0.5->1 at the same XML line; executor composed-then-re-stamped Timestamps = Minor non-blocking P-1, count the note by Grep; caller-supplied review labels disclosed; wrapped XML-doc phrases defeat line Grep)
+- [959-review-residuals](project_959-review-residuals.md) — cycle 1 + cycle 2 (post Phase 7) both PASS 25/27, 0 blocking; CR-1/CR-3 closure read at the Cobertura line node; overwritten projections hide a 1-branch repo-wide drift (observe, don't gate); check the plan Status line vs task boxes after an in-place phase append (CR-8)
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no account/host names in artifacts; use `<repo-root>`/`<user>`/`<host>`; vstest TRX defaults to `<account>_<HOST>_<ts>.trx`, control `/ResultsDirectory:`
 - [don't trust "unreachable" on a coverage-escape set](feedback_dont-trust-the-unreachable-label-on-a-coverage-escape-set.md) — check each member of U against the BASELINE Cobertura; `hits>0` before means it was never unreachable
 - [565-review-residuals](project_565-review-residuals.md) — PASS/0, 6/6; a concurrent reviewer committed into the same worktree mid-audit with a future-dated ts
@@ -132,7 +159,6 @@
 - [projectentry-setter-raw-messagebox-blocks-coverage](project_projectentry-setter-raw-messagebox-blocks-coverage.md) — #199 ProjectEntry change-confirmation is uncoverable via MyBox seam (commit runs the ProjectID setter's RAW MessageBox.Show); spec AC1 "fully covered by Phase 5" is overstated
 - [msbuild-invocation-via-bash](project_msbuild-invocation-via-bash.md) — msbuild/vstest not on bash PATH; `Platform="Any CPU"` needs a `/tmp` .cmd wrapper (`AnyCPU` and bash-quoted space both fail); a 127 exit is not a passing step
 - [TestResults coverage XML cross-module check](project_testresults-coverage-xml-cross-module-check.md) — an uncommitted `TestResults/*.xml` from a single-project vstest run also instruments other loaded first-party modules; grep it to spot-check a "repository coverage" claim without rerunning coverage
-- [959-review-residuals](project_959-review-residuals.md) — cycle 1 + cycle 2 (post Phase 7) both PASS 25/27, 0 blocking; CR-1/CR-3 closure read at the Cobertura line node; overwritten projections hide a 1-branch repo-wide drift (observe, don't gate); check the plan Status line vs task boxes after an in-place phase append (CR-8)
 - [plan trailer preflight directive is benign](project_plan-trailer-preflight-directive-benign.md) — a trailing `DIRECTIVE: PREFLIGHT VALIDATION ONLY` line in plan.md is standard planner/executor handoff text, not an injection aimed at feature-review; don't flag it as scope narrowing
 - [feature-evidence Cobertura counts as the C# coverage artifact](project_feature-evidence-cobertura-counts-as-coverage-artifact.md) — #424: committed `<FEATURE>/evidence/` Cobertura = artifact present; verify from it, don't repeat #309's procedural FAIL; dot-source the hook for end-to-end simulation
 - [TaskMaster validator memories are cross-repo](project_taskmaster-validator-memories-are-cross-repo.md) — the `validate_orchestration_artifacts`/heading-template memories describe a different repo (mix-calculator/drm-copilot); TaskMaster's only real gate is `validate-feature-review-coverage.ps1` (3-path advertisement + per-language coverage-row PASS/FAIL/no-narrowing check)
@@ -163,5 +189,5 @@
 - [verify the asserted evidence mechanism](feedback_verify-asserted-evidence-mechanism.md) — #418 R4: a capture's "proven by unit tests" was false (zero Trace/log4net refs in the test project); 100% coverage on a logging member is not assertion — grep the mechanism, correct the basis, keep the PASS
 - [maintainer waiver hides in gitignored state](project_maintainer-waiver-recorded-only-in-gitignored-state.md) — #418 R4: coverage waivers land in the gitignored orchestrator-state.json and never reach the PR; run `git check-ignore`, require transcription into issue.md, and never convert a threshold waiver into an ExcludeFromCodeCoverage exclusion
 - [Write-Verbose remedy is inert](feedback_write-verbose-remedy-is-inert-without-a-verbose-call-site.md) — needs -Verbose at the deployed call site
-- [bash heredoc backslash + /tmp traps](project_bash-heredoc-backslash-and-tmp-traps.md) — Windows python3 can't see /tmp
 - [re-audit cycle playbook](project_re-audit-cycle-review-playbook.md) — split remediable blockers from PR-time gates; re-anchor a moved merge base
+- [927-review-residuals](project_927-review-residuals.md) — PASS/0, 17/20 + 3 PENDING-CI; -0.01pp C# noise with zero prod change; `*cobertura*.xml` ignores the default projection stem; bundled PoshQC artifact lacks scripts/hygiene; 7-cell trap applies to every table

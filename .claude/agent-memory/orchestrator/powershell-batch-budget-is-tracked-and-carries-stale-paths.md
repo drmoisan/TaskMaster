@@ -5,6 +5,15 @@ metadata:
   type: project
 ---
 
+**SECOND CORRECTION, verified 2026-09-29 (parallel run bugs-2026-09-28, item 927).** When a
+`current-session-id` file exists, the state file is keyed by SESSION, not worktree, and the in-root
+filter uses the session root. Parallel item worktrees live under `.claude/worktrees/` INSIDE that
+root, so every sibling's writes count against one shared 3-prod / 3-test cap. Item 927's executor
+was denied its first production `.ps1` because siblings had used all 3 prod slots. The hook's
+remedies (env override, deleting the session state file) change a control that governs siblings,
+so they need user approval; the orchestrator stopped and reported. When planning a parallel run
+with several PowerShell-writing items, expect this and ask for the budget decision up front.
+
 **CORRECTION, verified 2026-09-08 on the `epic/review-residuals-2026-09-08-integration` base.**
 The blocking behaviour described below has been fixed upstream. Two changes in
 `.claude/hooks/enforce-powershell-batch-budget.ps1` remove it:

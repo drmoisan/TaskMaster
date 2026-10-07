@@ -1,6 +1,6 @@
 ---
 name: batch-budget-hook-discards-out-of-root-powershell-writes
-description: enforce-powershell-batch-budget.ps1 roots itself at the SESSION worktree, so Write/Edit of a .ps1 into a different execution worktree is discarded - no slot consumed, no state file written - making any plan gate that reads prodFiles/testFiles unsatisfiable
+description: enforce-powershell-batch-budget.ps1 roots at the SESSION worktree - .ps1 writes outside it are discarded, but writes into .claude/worktrees/ item worktrees count against ONE session-shared 3+3 cap that parallel siblings exhaust
 metadata:
   type: project
 ---
@@ -31,6 +31,17 @@ absolute supplied `file_path` with `\` normalised to `/`, so membership checks m
 suffixes. `.claude/state/powershell-batch-budget.default.json` is **tracked in git** and already at
 3/3 prod, but it is a different session's file and its three temp-path entries are dropped by the
 containment filter on rehydration, so it is inert. Caps default to 3 prod / 3 test.
+
+**The complement (measured 2026-09-29, #927, parallel run bugs-2026-09-28):** item worktrees under
+`<session-root>/.claude/worktrees/` are INSIDE the root, so their writes ARE counted, and the state
+file is keyed by the session id, which every parallel sibling executor shares. Two sibling items
+(3 prod + 1 test file) had already filled the shared counter, so this item's third test file was
+denied at its P1-T3 Write, and all three of its production files would have been denied too. The
+hook offers only two remedies: an env-var cap raise "with approved scope", or deleting the shared
+state file. Both change a control that also governs the siblings. Do not take either, and do not
+write the .ps1 through a shell to route around the hook. Stop and report instead: the orchestrator
+or user has to reset the budget between items. A parallel plan that fixes one batch of 3+3 per item
+cannot run under a session-scoped counter unless something resets it per item.
 
 **How to apply:** before trusting any batch-budget gate, check which worktree the hook is rooted at
 and whether the target files are inside it. Confirm empirically at the first PowerShell `Write`: if

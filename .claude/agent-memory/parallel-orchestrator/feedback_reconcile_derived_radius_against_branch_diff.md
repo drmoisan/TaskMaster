@@ -143,6 +143,13 @@ fragment token can never match a tracked file, so it is inert, whereas `.claude/
 live glob that would contend with any future item declaring a worktree path. Record the distinction
 in `blast_radius_note` so a later reader can tell an inert artifact from a latent one.
 
+**Also read the item WORKTREE's dirty tree, not only the branch diff.** On `/parallel-add 961`
+(2026-10-02) the branch diff was clean, but the finished preparation child had left
+`.claude/agent-memory/orchestrator/MEMORY.md` modified plus one untracked sibling note in the item
+worktree, which the execution child will reuse. `git -C <wt> status --porcelain` found them; adding
+both as exact paths created one new edge (to 945, merged, via MEMORY.md). Prompts that omit the
+memory-disclosure clause should expect this.
+
 **Re-test the widened radius before writing it.** Adding paths can in principle resolve a new
 shared surface or a new edge, and a radius that silently gained contention is worth knowing
 about before it reaches the checkpoint rather than after. On 656 the re-test came back clean —

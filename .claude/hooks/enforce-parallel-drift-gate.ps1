@@ -45,10 +45,15 @@
     retrospective backstop, is the PARALLEL_DRIFT_GATE_VIOLATION invariant in
     scripts/dev_tools/_parallel_orchestrator_state_drift.py.
 
+    Issue #690: the parallel checkpoint is read beneath the worktree that the prompt's
+    parallel_slug: value resolves to, never beneath the payload cwd. An unresolved or
+    ambiguous target denies after the subagent and marker filter and before the folder check.
+
 .NOTES
-    PowerShell 7+, no module dependencies. Both read boundaries -- the checkpoint read and the
-    finding-file existence check -- are injectable wrapper functions, so tests mock them
-    without writing temporary files.
+    PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690), imported inside a
+    guard: a failed import is recorded and the decision denies naming the module. Both read
+    boundaries -- the checkpoint read and the finding-file existence check -- are injectable
+    wrapper functions, so tests mock them without writing temporary files.
 
     The eight shape-and-derivation helpers this hook calls live in the dot-sourced sibling
     module .claude/hooks/enforce-parallel-drift-gate-helpers.ps1, together with the
@@ -63,12 +68,21 @@ param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+
+# Import guard (issue #690): a failed import denies instead of failing open.
+$script:ParallelDriftGateResolutionImportFailure = $null
+try {
+    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
+}
+catch {
+    $script:ParallelDriftGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
+}
+
 # Dot-source the shape-and-derivation helpers. Guarded so a missing file produces a clear error
 # and so dot-sourcing this hook in tests loads the helpers too.
 $script:ParallelDriftGateHelpersPath = Join-Path $PSScriptRoot 'enforce-parallel-drift-gate-helpers.ps1'
 . $script:ParallelDriftGateHelpersPath
 
-$script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
 $script:ParallelModeMarker = 'Parallel mode: true'
 $script:ReviewSubagentType = 'feature-review'
 $script:ActiveFeatureRoot = 'docs/features/active'
@@ -85,15 +99,38 @@ function Get-ParallelDriftGateCheckpointContent {
     .SYNOPSIS
         Read the raw JSON text of the parallel checkpoint, or $null when the file is absent.
         Tests mock this function (checkpoint-read seam).
+    .PARAMETER Path
+        The absolute checkpoint path composed beneath the resolved worktree root.
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
 
-    if (-not (Test-Path -LiteralPath $script:ParallelCheckpointPath -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return $null
     }
-    return (Get-Content -LiteralPath $script:ParallelCheckpointPath -Raw)
+    return (Get-Content -LiteralPath $Path -Raw)
+}
+
+function Resolve-ParallelDriftGateTarget {
+    <#
+    .SYNOPSIS
+        Resolve the worktree whose parallel checkpoint governs a review delegation (issue #690
+        seam).
+    .DESCRIPTION
+        Keyed on the prompt's parallel_slug: value; never on a feature-folder path or the
+        payload cwd.
+    .PARAMETER Prompt
+        The delegation prompt text.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject (the worktree-resolution target result).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Prompt)
+
+    $signal = Find-WorktreeRunIdentitySignal -Text $Prompt
+    return Resolve-WorktreeParallelTarget -ParallelSlug $signal.ParallelSlug -SessionRoot (Get-Location).Path
 }
 
 function Test-ParallelDriftFindingPresent {
@@ -282,6 +319,13 @@ function Invoke-ParallelDriftGateDecision {
         [string] $ToolInputRaw
     )
 
+    # A failed worktree-resolution import denies before any other logic (issue #690).
+    if ($script:ParallelDriftGateResolutionImportFailure) {
+        return Get-ParallelDriftGateBlockDecision -Reason (
+            "PARALLEL_DRIFT_GATE_BLOCKED: the worktree-resolution module '$($script:ParallelDriftGateResolutionImportFailure)' " +
+            'failed to import, so the parallel checkpoint that governs this review cannot be located; the gate fails closed.')
+    }
+
     $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $envelope.IsValid) {
         return Get-ParallelDriftGateBlockDecision -Reason (
@@ -302,12 +346,18 @@ function Invoke-ParallelDriftGateDecision {
         return Get-ParallelDriftGateAllowDecision
     }
 
+    # The parallel checkpoint is located by the delegation's parallel_slug (issue #690).
+    $target = Resolve-ParallelDriftGateTarget -Prompt $prompt
+    if ($target.Status -eq 'NoTarget' -or $target.Status -eq 'Ambiguous') {
+        return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: $($target.ReasonCode): $($target.Detail)"
+    }
+
     $featureFolder = Find-ParallelDriftGateFeatureFolderFromPrompt -Prompt $prompt
     if (-not $featureFolder) {
         return Get-ParallelDriftGateBlockDecision -Reason 'PARALLEL_DRIFT_GATE_BLOCKED: a parallel-mode feature-review delegation must reference the target item feature folder in the prompt so its drift state can be verified.'
     }
 
-    $checkpointRaw = Get-ParallelDriftGateCheckpointContent
+    $checkpointRaw = Get-ParallelDriftGateCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind parallel -WorktreeRoot $target.WorktreeRoot)
     $checkpoint = $null
     if (-not [string]::IsNullOrWhiteSpace($checkpointRaw)) {
         try {
@@ -317,7 +367,7 @@ function Invoke-ParallelDriftGateDecision {
         }
     }
     if ($null -eq $checkpoint) {
-        return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: the parallel checkpoint '$script:ParallelCheckpointPath' is missing or unreadable, so the drift state of '$featureFolder' cannot be verified."
+        return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: the parallel checkpoint 'artifacts/orchestration/parallel-orchestrator-state.json' in worktree '$($target.WorktreeRoot)' is missing or unreadable, so the drift state of '$featureFolder' cannot be verified."
     }
 
     $item = Find-ParallelDriftGateItemRecord -Checkpoint $checkpoint -FeatureFolder $featureFolder

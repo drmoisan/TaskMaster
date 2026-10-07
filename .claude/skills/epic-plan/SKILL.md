@@ -204,6 +204,17 @@ content-widening options, and any operand that resolves outside the five exempt 
 exempt operand with one production operand denies the whole invocation. Name each exempt path
 explicitly; the exemption is allow-side only and every parse ambiguity denies.
 
+#### Attribution trailers (issue #713)
+
+With no ready feature checkpoint, the exemption admits two attribution-trailer forms on a pathspec-bearing `git commit`, each followed by the double-dash separator and the exempt path operands:
+
+- The trailer option: `git commit -m 'docs: plan' --trailer 'Co-Authored-By: Name <email>' --trailer 'Claude-Session: <url>' -- <exempt paths>`. The separate-value form and the `--trailer=<value>` form are both admitted, any number of times, on `git commit` only; `git add --trailer` and a trailer option with no value are denied. Git writes every trailer value into one trailer block.
+- The one-paragraph multi-message form: the subject in the first `-m` and every trailer in one single-quoted second `-m` value, separated by a literal newline. Each `-m` value becomes its own paragraph and git parses only the last paragraph as the trailer block, so trailers split across separate `-m` values do not form one trailer block.
+
+Quoting rules: `$` and backtick are literal and admitted inside single quotes, and denied outside quotes and inside double quotes, where the shell expands them. `<` and `>` are admitted inside single or double quotes and denied outside quotes. An unquoted `#` is denied anywhere, because it starts a shell comment that the exemption does not model; a `#` inside quotes is admitted. A typographic quote character (U+2018 to U+201E) anywhere in the command line is denied, because a PowerShell host reads it as a quote.
+
+Not admitted: heredoc-fed messages, including `git commit -m "$(cat <<'EOF' ... EOF)"` and `git commit -F - <<'EOF'`, and message files supplied through `-F <file>` or `--file=<file>`. Use one of the two forms above instead.
+
 ## Checkpoint Handling
 
 Persist `artifacts/orchestration/epic-planner-state.json` after every completed step with the

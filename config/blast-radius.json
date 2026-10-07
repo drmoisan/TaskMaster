@@ -20,7 +20,8 @@
     ".claude/skills/policy-compliance-order/SKILL.md",
     ".claude/agent-memory/**",
     ".agents/skills/**",
-    "scripts/vscode/**"
+    "scripts/vscode/**",
+    ".github/copilot-instructions.md"
   ],
   "mergeable_paths": [
     "**/*.csproj",
@@ -29,6 +30,28 @@
     "**/*.vbproj",
     "**/*.props"
   ],
+  "conflict_tolerance": {
+    "tolerance_percent": 100,
+    "weights": {
+      "same_file": 8,
+      "possible_overlap": 2,
+      "append_only": 1,
+      "module": 2
+    },
+    "band_durations": {
+      "C1": 1,
+      "C2": 2,
+      "C3": 4,
+      "C4": 8
+    },
+    "default_band": "C1",
+    "append_only_paths": [
+      "**/CHANGELOG.md",
+      "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+    ]
+  },
+  "write_intent_extraction": true,
+  "path_roots": [],
   "modules": {
     "config": [
       "config/**"

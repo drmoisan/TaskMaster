@@ -38,10 +38,16 @@
     policy-level-not-cryptographic posture already accepted for
     enforce-pr-author-skill.ps1's own receipt mechanism. It is not a cryptographic control.
 
+    Issue #690: with an explicit PR number, the epic and parallel checkpoints are read
+    beneath the live worktree whose run checkpoint records that number, and the child
+    branch binds the number to pr_gate.pr_number when the per-feature checkpoint records
+    it. A bare command reads every checkpoint beneath the session worktree.
+
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies. Filesystem reads go
-    through injectable wrapper functions so tests can mock the boundary without writing
-    temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the
+    dot-sourced enforce-epic-merge-gate-resolution.ps1, whose import guard denies on a
+    failed import. Filesystem reads go through injectable wrapper functions so tests can
+    mock the boundary without writing temporary files.
 
     Honest disclosure: the standalone-merge authorization record is a policy-level,
     auditable declaration and is not a cryptographic or security control. authorized_by is
@@ -59,64 +65,8 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 # Standalone-merge authorization predicates and the two decision-envelope factories (issue #670).
 . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-authorization.ps1')
-
-$script:ChildCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
-$script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
-$script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
-
-function Get-ChildOrchestratorCheckpointContent {
-    <#
-    .SYNOPSIS
-        Read the raw JSON text of the per-feature orchestrator checkpoint. Tests mock
-        this function (read seam).
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:ChildCheckpointPath -PathType Leaf)) {
-        return $null
-    }
-    return (Get-Content -LiteralPath $script:ChildCheckpointPath -Raw)
-}
-
-function Get-EpicOrchestratorCheckpointContent {
-    <#
-    .SYNOPSIS
-        Read the raw JSON text of the epic checkpoint. Tests mock this function
-        (read seam).
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:EpicCheckpointPath -PathType Leaf)) {
-        return $null
-    }
-    return (Get-Content -LiteralPath $script:EpicCheckpointPath -Raw)
-}
-
-function Get-ParallelOrchestratorCheckpointContent {
-    <#
-    .SYNOPSIS
-        Read the raw JSON text of the parallel-orchestrator checkpoint. Tests mock
-        this function (read seam).
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:ParallelCheckpointPath -PathType Leaf)) {
-        return $null
-    }
-    return (Get-Content -LiteralPath $script:ParallelCheckpointPath -Raw)
-}
+# Checkpoint read seams, the import guard, and run-target resolution (issue #690).
+. (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-resolution.ps1')
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -361,6 +311,12 @@ function Invoke-EpicMergeGateDecision {
         [string] $ToolInputRaw
     )
 
+    # A failed worktree-resolution import denies before any other logic (issue #690).
+    $importFailure = Get-EpicMergeGateImportFailureDecision
+    if ($null -ne $importFailure) {
+        return $importFailure
+    }
+
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
         return Get-EpicMergeGateBlockDecision -Reason (
@@ -399,18 +355,35 @@ function Invoke-EpicMergeGateDecision {
     }
 
     $commandPrNumber = Get-EpicMergeGateCommandPrNumber -CommandText $commandText
+    $sessionRoot = Get-EpicMergeGateSessionWorktreeRoot
 
-    $childCheckpoint = ConvertFrom-EpicMergeGateJson -Raw (Get-ChildOrchestratorCheckpointContent)
-    if (Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) {
+    # The child merges from its own worktree, so its checkpoint is the session worktree's;
+    # a recorded pr_gate.pr_number must match an explicit command PR number (issue #690).
+    $childCheckpoint = ConvertFrom-EpicMergeGateJson -Raw (Get-ChildOrchestratorCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind item -WorktreeRoot $sessionRoot))
+    if ((Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) -and
+        (Test-ChildCheckpointPrGateBinding -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber)) {
         return Get-EpicMergeGateAllowDecision
     }
 
-    $epicCheckpoint = ConvertFrom-EpicMergeGateJson -Raw (Get-EpicOrchestratorCheckpointContent)
+    # A bare command targets the current branch's PR, so it reads the session worktree. An
+    # explicit PR number locates each run checkpoint that records it (issue #690).
+    $epicTarget = $null
+    $parallelTarget = $null
+    $epicRoot = $sessionRoot
+    $parallelRoot = $sessionRoot
+    if ($null -ne $commandPrNumber) {
+        $epicTarget = Resolve-EpicMergeGateRunTarget -Kind epic -PrNumber $commandPrNumber
+        $parallelTarget = Resolve-EpicMergeGateRunTarget -Kind parallel -PrNumber $commandPrNumber
+        $epicRoot = if (@('SessionRoot', 'OtherWorktree') -contains $epicTarget.Status) { $epicTarget.WorktreeRoot } else { $null }
+        $parallelRoot = if (@('SessionRoot', 'OtherWorktree') -contains $parallelTarget.Status) { $parallelTarget.WorktreeRoot } else { $null }
+    }
+
+    $epicCheckpoint = if ($epicRoot) { ConvertFrom-EpicMergeGateJson -Raw (Get-EpicOrchestratorCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind epic -WorktreeRoot $epicRoot)) } else { $null }
     if (Test-EpicCheckpointAllowsMerge -Checkpoint $epicCheckpoint -CommandPrNumber $commandPrNumber) {
         return Get-EpicMergeGateAllowDecision
     }
 
-    $parallelCheckpoint = ConvertFrom-EpicMergeGateJson -Raw (Get-ParallelOrchestratorCheckpointContent)
+    $parallelCheckpoint = if ($parallelRoot) { ConvertFrom-EpicMergeGateJson -Raw (Get-ParallelOrchestratorCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind parallel -WorktreeRoot $parallelRoot)) } else { $null }
     if (Test-ParallelCheckpointAllowsMerge -Checkpoint $parallelCheckpoint -CommandPrNumber $commandPrNumber) {
         return Get-EpicMergeGateAllowDecision
     }
@@ -423,7 +396,10 @@ function Invoke-EpicMergeGateDecision {
         if ($standalone.Allowed) {
             return Get-EpicMergeGateAllowDecision
         }
-        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $standalone.ReasonCode + ': ' + $standalone.Message)
+        # When neither run branch resolved, its reason code and detail precede the standalone reason.
+        $unresolved = Get-EpicMergeGateUnresolvedReason -EpicTarget $epicTarget -ParallelTarget $parallelTarget
+        $prefix = if ($unresolved) { $unresolved + '; ' } else { '' }
+        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message)
     }
 
     return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'

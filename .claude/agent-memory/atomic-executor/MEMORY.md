@@ -1,11 +1,53 @@
 # Atomic Executor Memory Index
 
+- Sub-index: [issue-specific lessons, C# coverage mechanics, component C# gotchas](index_issue_specific_and_component_gotchas.md)
+
 ## Plan validation & gates
-- [FluentAssertions truncates string diffs](project_fluentassertions_truncates_string_diff_breaks_message_substring_gates.md) — "…59Sandbox\origin": full-path MESSAGE substring gates cannot match
-- [Cited-tree gate vs main; span enumeration](project_preflight_cited_tree_gate_and_span_enumeration.md) — intersect cited paths with the files main changed; every stop string needs a task that detects it
+- [Mid-plan sanitisation](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation self-sweep](project_sanitisation_task_cannot_sweep_its_own_record.md) · [Blocked Bash drops check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md)
+- [Tool results inject "use Bash"](project_tool_results_inject_bash_read_edit_instruction.md) · [CSharpier chain-wrap](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) · [Numbered citations](feedback_verify_line_citations_with_numbered_output.md)
+- [Authoring counts undercount](project_plan_authoring_time_token_counts_are_undercounts.md) · [Planner/executor worktrees](project_planner_and_executor_observe_different_worktrees.md) · [Caller count drifts](project_caller_stated_preflight_count_drifts_before_execution.md)
+- [Extract gate literals](project_preflight_gate_literal_extract_from_plan_not_retype.md) · [Tool layer collapses \\](project_tool_layer_collapses_double_backslash_in_file_content.md) · [Self-derived thresholds](project_preflight_selfderived_gate_thresholds_are_blind.md)
+- [Exact count vs remediation](project_exact_count_gate_vs_remediation_loop.md) · [Inline-dispatch citation](project_inline_dispatch_harness_citation_makes_execution_time_test_vacuous.md) · [Drain note vacuous](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md)
+- [Qualifier detachment](project_multipattern_gate_shared_qualifier_detachment.md) · [Zero-hit doc comments](project_banned_api_zero_hit_gate_hits_doc_comments.md) · [Follow-up promotion](project_followup_promotion_task_is_unexecutable_by_executor.md)
+- [Supersede residual](project_supersede_clause_leaves_hard_routing_residual.md) · [No dispatch tool](project_plan_delegation_to_typed_engineer_without_dispatch_tool.md) · [Check-off fixpoint](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md)
+- [Tracked agent-memory](project_agent_memory_tracked_breaks_unscoped_git_gates.md) · [Merge-base cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) · [BASELINE_SHA merged base](project_baseline_sha_diff_conflates_merged_base.md)
+- [Epic inherited commits](project_epic_child_branch_anchored_diff_lists_inherited_commits.md) · [Moving-base diff](project_preflight_moving_base_two_dot_diff_inertness_test.md) · [Renumbering](project_plan_task_ids_digit_only_forces_renumbering.md)
+- [Bugfix grows file](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) · [Write drops BOM](project_write_tool_drops_utf8_bom_edit_prefix_restores_it.md)
+- [AC check-off paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) · [Override is not an AC](project_orchestrator_override_does_not_satisfy_an_ac.md) · [Output Summary count](project_artifact_output_summary_breaks_its_own_exact_count_gate.md)
+- [Scope gate vs later artifacts](project_scope_gate_cannot_list_artifacts_written_after_it.md) · [Sibling-owned zero gate](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) · [Dir-scoped format](project_directory_scoped_format_breaks_ownership_gates.md)
+- [Proportionate bar](feedback_confirmatory_preflight_proportionate_bar.md) · [4 C# defect classes](project_preflight_recurring_csharp_plan_defect_classes.md)
+- [Scratch reconstruction + cached CSharpier](project_preflight_scratch_reconstruction_with_cached_csharpier.md) (verify census rows post-format; FailedTestName blind to aborted; stray gate misses pwsh runner)
+- [msbuild log csc line](project_msbuild_log_token_search_matches_csc_command_line.md) · [Epic base line counts](project_epic_integration_base_invalidates_research_line_counts.md) · [Citation-match false fact](project_preflight_citation_match_propagates_false_fact.md)
+- [Cites LATER artifact](project_preflight_checkoff_cites_later_task_artifact.md) · [Pre-edit vs post-edit table](project_preedit_gate_cites_postedit_replacement_table.md) · [Conjunctive criteria](project_preflight_conjunctive_criterion_citation_gap.md)
+- [Unrecorded baseline count](project_gate_cites_a_baseline_count_the_baseline_task_never_records.md) · [Blanket + forward deps](project_preflight_blanket_assertion_and_forward_dependency.md) · [pwsh quoting boundary](project_pwsh_command_quoting_boundary.md)
+- [Stale locators](project_plan_line_locators_stale_after_doc_edit.md) · [csproj ranges shift](project_plan_csproj_line_ranges_shift_during_execution.md) · [csc probe](project_preflight_csc_probe_for_mandated_csharp_shapes.md) · [Evidence token scan](project_preflight_evidence_field_token_scan.md)
+- [Research arithmetic](project_plan_literal_assertions_inherit_research_arithmetic.md) · [Fix tasks inherit rules](project_preflight_fix_tasks_inherit_decomposition_rules.md) · [Conditional split](project_conditional_split_three_task_shape.md)
+- [No round diff](project_preflight_round_over_round_diff_unavailable.md) · [Flaky carve-out](project_flaky_test_carveout_added_to_one_task_only.md) · [Bullet negates clause](project_revision_bullet_negates_earlier_clause_left_standing.md)
+- [Mid-run main merge re-anchor](project_midrun_main_merge_reanchor_scope_phrasing.md) (an "in pass 2" scope misses post-loop tasks; restart basis not restated in the conventions)
+- [Multi-line trx MESSAGE; Markdown-indent width](project_trx_message_multiline_and_markdown_indent_width.md) (Moq Verify splits reason and count onto two lines; recount wrap claims without the 4-space indent)
+- [Ambient drainable SyncContext is vacuous](project_ambient_drainable_synccontext_is_vacuous_without_async_continuations.md) (same-thread SetResult inlines; needs RunContinuationsAsynchronously)
+- [Glob blind under .claude/worktrees](project_glob_tool_blind_under_claude_worktrees.md) (empty Glob in an item worktree is not absence; use Read/Grep)
+- [FullName .claude skip + DisplayName census](project_preflight_fullname_claude_exclusion_and_displayname_census.md) (FullName `*\.claude\*` filter empties counts in item worktrees; DisplayName rows inflate name tokens)
+- [Stall probe treats a failure as a stall](project_stall_probe_clear_rule_treats_a_failure_as_a_stall.md) (fast shell-icon failure picks DIRECT, so a runner-verbatim AC becomes unreachable)
+- [pwsh payload hook containment](project_phrase_count_payload_trips_promotion_gh_issue_hook.md) (pwsh is a wrapper: issue+new+any "gh" substring is refused; never merge payloads)
+- [Restart re-enters pre-commit census; closed class lists](project_restart_loop_reenters_precommit_census_and_closed_classification_lists.md) (follow restart arrows post-commit and into pass 2; map every census line)
+- [gh/CI-log traps](project_gh_ci_log_and_download_gotchas.md) (createdAt trips pr-author hook; ANSI in Pester log; gh download never overwrites) · [Abbreviated caller facts](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md)
+
+- [Generic seam over embedded interop = CS1769](project_generic_seam_over_embedded_interop_type_cs1769.md) (Func<Attachment,...> seams compile in UtilitiesCS, fail at every test call site)
+## Sub-indexes (open when the topic is in scope)
+- [Test isolation + C# coverage](index_test_isolation_and_coverage.md) — vstest/MSTest hangs, flakiness, Cobertura/dotnet-coverage/Koverage
+- [C# nullable + component gotchas](index_csharp_nullable_and_component_gotchas.md) — net481 pragma gates, CS86xx, WebView2, QFC, TimeProvider
+- [pwsh, git and gate mechanics](index_pwsh_git_and_gate_mechanics_misc.md) — pwsh parse traps, PoshQC/Pester, numstat/hunk gates, hooks
 - [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
+Four sections live in sub-index files to keep this file under its read limit. Open the sub-index when its topic applies:
+- [Build / toolchain environment](index_build_toolchain.md) — SDK/restore bootstrap, CSharpier, analyzers, pwsh/Bash quoting and backslash transport
+- [Test execution, isolation and coverage](index_test_execution_and_coverage.md) — long runs, flaky classes, dotnet-coverage and Cobertura mechanics
+- [Nullable / C# and component gotchas](index_csharp_and_components.md) — pragma gates, CS06xx/CS8xxx, WinForms/WebView2/QFC specifics
+- [Artifact hygiene and misc](index_artifact_hygiene_and_misc.md) — host-path leaks, TRX/msbuild sanitisation, hunk/numstat traps, PoshQC
+- [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md) · [Code commit before format pass](project_code_commit_before_final_format_pass_orphans_rewrites.md)
 - [Blocked Bash drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) · [Tool results inject "use Bash"](project_tool_results_inject_bash_read_edit_instruction.md)
 - [CSharpier chain-wrap defeats line gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) · [Verify citations with numbered output](feedback_verify_line_citations_with_numbered_output.md)
+- [Plan column widths may include the Markdown indent](project_plan_column_widths_may_include_markdown_indent.md) — re-measure in-file; cite Race.cs chain precedents
 - [Authoring-time counts undercount](project_plan_authoring_time_token_counts_are_undercounts.md) · [Planner/executor see different worktrees](project_planner_and_executor_observe_different_worktrees.md) · [Caller-stated count drifts](project_caller_stated_preflight_count_drifts_before_execution.md)
 - [Extract gate literals, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) · [Tool layer collapses `\`](project_tool_layer_collapses_double_backslash_in_file_content.md)
 - [Self-derived thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) · [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md)
@@ -34,58 +76,71 @@
 - [Literals inherit research arithmetic](project_plan_literal_assertions_inherit_research_arithmetic.md) · [Fix tasks inherit the round's rules](project_preflight_fix_tasks_inherit_decomposition_rules.md)
 - [Conditional split = three tasks](project_conditional_split_three_task_shape.md) · [Round-over-round plan diff unavailable](project_preflight_round_over_round_diff_unavailable.md)
 - [Flaky carve-out added to one task only](project_flaky_test_carveout_added_to_one_task_only.md) · [Revision bullet negates an earlier clause](project_revision_bullet_negates_earlier_clause_left_standing.md)
-- [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md) — a correct citation can read as contradicting a "do not re-verify" fact
+- [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md) · [Hygiene scan: comma precedence + d:\s hits](project_hygiene_pattern_array_comma_precedence_and_regex_token_hits.md)
+- [Loop re-runs vs one-artifact glob + hash anchors](project_loop_iteration_vs_single_artifact_glob_and_hash_anchor.md)
+- [Route-keyed branches miss derived-flag cases](project_outcome_branch_sets_keyed_on_route_miss_derived_flag_cases.md) · [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md)
 
 ## Build / toolchain environment
-- [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) · [Project Build/Test Env](project_build_test_env.md) · [VS18 toolchain paths](project_vs18_build_toolchain_paths.md)
-- [Repo-local SDK + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) · [Fresh worktree needs SDK + RestorePackagesConfig](project_fresh_worktree_needs_sdk_and_packages_config_restore.md)
-- [Start-Process -ArgumentList strips quoting](project_startprocess_arglist_array_strips_quoting.md) · [Relative pwsh paths hit the wrong worktree](project_relative_path_in_pwsh_dotnet_io_hits_wrong_worktree.md)
-- [QuickFiler.Test coverage hang](project_quickfiler_test_coverage_hang_and_build_flags.md) · [Dot-sourcing clobbers $CoverageOutput](project_dotsourcing_invoke_mstest_clobbers_coverageoutput_param.md)
-- [vstest TestCaseFilter: `|` not OR](project_vstest_testcasefilter_or_operator_and_env_setup.md) · [Test file name != partial class name](project_test_file_name_vs_partial_class_name.md)
-- [Analyzer HintPath skew](project_analyzer_hintpath_skew_breaks_all_four_gates.md) · [Analyzer version skew on a fresh worktree](project_analyzer_version_skew_fresh_worktree.md)
-- [SecurityCodeScan vs Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) · [Missing VSTO runtime breaks baselines](project_missing_vsto_runtime_breaks_baseline_gates.md)
-- [New sln member surfaces MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) · [Legacy csproj: no transitive compile refs](project_legacy_csproj_no_transitive_compile_refs.md)
-- [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) · [Incremental build = vacuous baseline](project_incremental_build_vacuous_baseline.md) · [Nullable /t:Build is vacuous](project_nullable_build_gate_is_vacuous_incremental.md)
-- [CSharpier skips *.Designer.cs](project_csharpier_skips_designer_cs_by_filename.md) · [.gitignore `*.log` blocks msbuild evidence](project_gitignore_star_log_blocks_committed_msbuild_log_evidence.md)
-- [csharpier pipe-files is non-enforcing](project_csharpier_pipefiles_nonenforcing_gate.md) · [Count-idiom pitfalls](project_count_idiom_pitfalls_csharpier_and_measureobject.md) · [New .cs force a format restart](project_new_cs_files_guarantee_a_format_loop_restart.md)
-- [PowerShell files need UTF-8 BOM](powershell-bom-required.md) · [BOM breaks grep ^](project_bom_grep_anchor_false_negative.md) · [StrictMode + missing XML attribute](project_pester_strictmode_xml_attribute_property_access.md)
-- [Pester 5 helper lives in BeforeAll](project_pester5_helper_function_must_live_in_beforeall.md) · [`-NoExecute` unreachability premise is false](project_noexecute_early_return_premise_hides_reachable_entry_point_tests.md)
-- [poshqc test MCP has no verdict](project_poshqc_pester_mcp_exit_minus1.md) · [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) · [Pester 5 result shape](project_pester5_result_shape_container_tests_and_ci_codecoverage.md)
-- [Heredoc collapses `\\`](project_bash_heredoc_collapses_doubled_backslashes.md) · [Unquoted backslash redirects output](project_unquoted_backslash_in_bash_arg_silently_redirects_output.md) · [Doubled backslash de-doubles](project_doubled_backslash_dedoubles_bash_to_native_exe.md)
-- [Recursive delete: both idioms blocked](project_recursive_delete_idioms_blocked_use_dotnet_api.md) · [pwsh -Command quoting](project_pwsh_command_quoting_from_bash.md) · [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md)
-- [Compile-red needs body-level refs](project_compile_red_needs_body_level_references.md) · [Cross-task shell-variable splat gates](project_cross_task_shell_variable_splat_gate.md)
-- [Evidence <TS> collision clobbers artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) · [Shared artifact + floating <ts>](project_shared_evidence_artifact_floating_ts.md)
+- [pwsh/git/gh gotchas](project_pwsh_git_gh_cli_gotchas.md) · [Build/Test env](project_build_test_env.md) · [VS18 paths](project_vs18_build_toolchain_paths.md) · [SDK + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md)
+- [Fresh worktree restore](project_fresh_worktree_needs_sdk_and_packages_config_restore.md) · [Start-Process quoting](project_startprocess_arglist_array_strips_quoting.md) · [Relative pwsh paths](project_relative_path_in_pwsh_dotnet_io_hits_wrong_worktree.md)
+- [QuickFiler.Test hang](project_quickfiler_test_coverage_hang_and_build_flags.md) · [$CoverageOutput clobber](project_dotsourcing_invoke_mstest_clobbers_coverageoutput_param.md) · [TestCaseFilter OR](project_vstest_testcasefilter_or_operator_and_env_setup.md)
+- [File vs partial class](project_test_file_name_vs_partial_class_name.md) · [HintPath skew](project_analyzer_hintpath_skew_breaks_all_four_gates.md) · [Analyzer skew fresh](project_analyzer_version_skew_fresh_worktree.md) · [SecurityCodeScan](project_securitycodescan_roslyn56_incompat.md)
+- [VSTO runtime](project_missing_vsto_runtime_breaks_baseline_gates.md) · [MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) · [No transitive refs](project_legacy_csproj_no_transitive_compile_refs.md) · [CRLF](project_sln_csproj_edit_crlf_preserve.md)
+- [Incremental vacuous](project_incremental_build_vacuous_baseline.md) · [Nullable /t:Build](project_nullable_build_gate_is_vacuous_incremental.md) · [Designer.cs skip](project_csharpier_skips_designer_cs_by_filename.md) · [*.log ignore](project_gitignore_star_log_blocks_committed_msbuild_log_evidence.md)
+- [pipe-files](project_csharpier_pipefiles_nonenforcing_gate.md) · [Count idioms](project_count_idiom_pitfalls_csharpier_and_measureobject.md) · [New .cs restart](project_new_cs_files_guarantee_a_format_loop_restart.md) · [PS BOM](powershell-bom-required.md)
+- [BOM grep ^](project_bom_grep_anchor_false_negative.md) · [StrictMode XML attr](project_pester_strictmode_xml_attribute_property_access.md) · [Pester helper BeforeAll](project_pester5_helper_function_must_live_in_beforeall.md)
+- [-NoExecute premise](project_noexecute_early_return_premise_hides_reachable_entry_point_tests.md) · [poshqc test no verdict](project_poshqc_pester_mcp_exit_minus1.md) · [analyze exit 1](project_poshqc_analyze_exit1_on_warning.md)
+- [Pester 5 result shape](project_pester5_result_shape_container_tests_and_ci_codecoverage.md) · [Heredoc \\](project_bash_heredoc_collapses_doubled_backslashes.md) · [Unquoted backslash](project_unquoted_backslash_in_bash_arg_silently_redirects_output.md)
+- [Doubled backslash](project_doubled_backslash_dedoubles_bash_to_native_exe.md) · [Recursive delete](project_recursive_delete_idioms_blocked_use_dotnet_api.md) · [pwsh -Command quoting](project_pwsh_command_quoting_from_bash.md)
+- [pwsh -File list](project_pwsh_file_array_param_from_bash.md) · [Compile-red refs](project_compile_red_needs_body_level_references.md) · [Splat gates](project_cross_task_shell_variable_splat_gate.md)
+- [<TS> collision](project_evidence_timestamp_collision_clobbers_artifacts.md) · [Floating <ts>](project_shared_evidence_artifact_floating_ts.md)
 
 ## Test execution & isolation
-- [Long runs need a detached process](project_long_runs_need_detached_process.md) · [Tests must mock GUI](feedback_tests_must_mock_gui_no_visible_window.md)
-- [Full-suite run hangs though baseline passed](project_full_suite_run_hangs_while_earlier_runs_idle.md) · [#511 is a test-host crash](project_511_is_a_testhost_crash_not_n_failing_tests.md)
-- [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) · [vstest /InIsolation + FilePathHelper](project_vstest_isolation_and_filepathhelper_serialization.md)
-- [Invoke-MSTest.ps1 dies on one assembly](project_418_invoke_mstest_single_assembly_bug.md) · [Timed-out MSTest leaves a runner](project_timedout_mstest_leaves_detached_runner.md)
-- [Sibling-worktree shared-tooling hazard](project_sibling_worktree_shared_tooling_hazard.md) · [Concurrent executor in one worktree](project_concurrent_executor_same_worktree.md)
-- [Concurrent dotnet-coverage deadlock](project_concurrent_dotnet_coverage_deadlock_and_doccomment_retention_gate.md) · [UtilitiesCS.Test parallelism flakiness](project_utilitiescs_test_parallelism_flakiness.md)
-- [[DoNotParallelize] overlaps the parallel bucket](project_mstest_donotparallelize_overlaps_parallel_bucket.md) · [log4net MemoryAppender shared per TYPE](project_log4net_memoryappender_shared_per_type_across_parallel_classes.md)
-- [UiThread.Dispatcher static-swap race](project_uithread_dispatcher_static_swap_race.md) · [runsettings DataCollector default-enabled](project_runsettings_datacollector_default_enabled.md)
-- [dotnet-coverage Deedle/FSharp breaks tests](project_dotnet_coverage_deedle_fsharp_instrumentation.md) · [DispatcherDelay hangs unit tests](project_dispatcherdelay_hangs_unit_tests.md)
-- [ConfigController STA pump deadlock](project_configcontroller_sta_pump_deadlock.md)
+- [Detached long runs](project_long_runs_need_detached_process.md) · [Mock GUI](feedback_tests_must_mock_gui_no_visible_window.md) · [Suite hangs](project_full_suite_run_hangs_while_earlier_runs_idle.md)
+- [PumpHost flaky](project_winformspumphost_tests_load_flaky.md) · [/InIsolation](project_vstest_isolation_and_filepathhelper_serialization.md)
+- [Timed-out runner](project_timedout_mstest_leaves_detached_runner.md) · [Sibling tooling](project_sibling_worktree_shared_tooling_hazard.md) · [Concurrent executor](project_concurrent_executor_same_worktree.md)
+- [coverage deadlock](project_concurrent_dotnet_coverage_deadlock_and_doccomment_retention_gate.md) · [UtilitiesCS parallel](project_utilitiescs_test_parallelism_flakiness.md) · [DoNotParallelize](project_mstest_donotparallelize_overlaps_parallel_bucket.md)
+- [MemoryAppender per TYPE](project_log4net_memoryappender_shared_per_type_across_parallel_classes.md) · [Dispatcher swap race](project_uithread_dispatcher_static_swap_race.md) · [DataCollector default](project_runsettings_datacollector_default_enabled.md)
+- [Deedle/FSharp](project_dotnet_coverage_deedle_fsharp_instrumentation.md) · [DispatcherDelay hangs](project_dispatcherdelay_hangs_unit_tests.md) · [ConfigController STA](project_configcontroller_sta_pump_deadlock.md)
 
 ## Coverage measurement
-- [Exempt-forward extraction leaves the call site uncovered](project_exempt_forward_extraction_leaves_call_site_uncovered.md) · [Async state machine emits no `<method>`](project_async_state_machine_emits_no_method_element.md)
-- [Reproduce the baseline's counting method](project_coverage_delta_reproduce_baseline_counting_method.md) · [First-party denominator (#197)](project_coverage_firstparty_denominator_method.md)
-- [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) · [Failed run leaves RAW Cobertura](project_failed_coverage_run_leaves_raw_unprocessed_cobertura.md)
-- [Runner throws before post-processing](project_coverage_runner_throws_before_postprocessing.md) · [Koverage post-processing shape](project_koverage_cobertura_postprocessing_shape.md)
-- [C# canonical coverage conversion](project_csharp_canonical_coverage_artifact_conversion.md) · [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md)
-- [Package rollup must use the repo helper](project_cobertura_package_rollup_must_use_repo_helper.md) · [Processed Cobertura names use backslashes](project_processed_cobertura_filenames_use_backslash.md)
-- [Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) · [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md)
-- [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) · [ExcludeFromCodeCoverage on partial = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md)
-- Closed one-offs: [#400](project_400_completeopenasync_unreachable_recovery_catch.md), [Swordfish](project_swordfish_removal_epic_incidental_coverage_sideeffect.md), [#298](project_taskvis_scocollection_and_livebridge_exemptions.md), [#328](project_328_rebuild_threading_olobjectsproxy_conflict.md)
+- C# coverage mechanics (Cobertura, Koverage, denominators): see the sub-index at the top
+- [Package-rate not-lower gate vs variance](project_package_rate_not_lower_gate_trips_on_unrelated_file_variance.md) — unrelated-file variance fails package/repo not-lower gates on small-delta items
+- [Cobertura hits are binary](project_dotnet_coverage_cobertura_hits_are_binary.md) — dotnet-coverage hits are 0/1; "guard hits > record hits" can never hold; use the guard line's condition-coverage
 
 ## Nullable / C# language
-- [Per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) · [net481 pragma-gate mechanics](project_nullable_pragma_gate_net481_mechanics.md) · [Epic pragma gate + analyzer restore](project_nullable_epic_pragma_gate_and_analyzer_restore.md)
-- [#364 pre-existing blockers](project_364_nullable_gate_preexisting_blockers.md) · [CLAUDE.md command != the CI gate](project_507_nullconditional_return_triggers_cs8603_under_genuine_nullable_check.md)
-- [Remediation annotation patterns](project_nullable_remediation_annotation_patterns.md) · [CS8632 scoping](project_nullable_annotation_cs8632_scoping.md) · [CS8714 not on net481](project_nullable_cs8714_not_on_net481.md)
-- [init/record struct = CS0518 on net48](project_record_struct_isexternalinit_netfx.md) · [Outlook `Action`/`Exception` CS0104](project_outlook_action_ambiguity.md) · [CS1769 forces reflection](project_cs1769_forces_reflection_for_outlook_returning_apis.md)
-- Nullable-epic (closed): [#366a](project_366_notnull_cascades_beyond_wrapperscodictionary.md), [#366b](project_366_scdictionary_constraint_cascades_to_fourth_file.md), [#366c](project_366_batch7_tnullable_return_cs8766.md), [#371](project_371_outlookobjects_nullable_lessons.md), [#372](project_372_email_classifier_nullable_patterns.md), [#375](project_375_residuals_nullable_gotchas.md)
+- [Pragma gate](project_nullable_pragma_gate_mechanics.md) · [net481 pragma](project_nullable_pragma_gate_net481_mechanics.md) · [Epic pragma](project_nullable_epic_pragma_gate_and_analyzer_restore.md)
+- [CLAUDE.md != CI](project_507_nullconditional_return_triggers_cs8603_under_genuine_nullable_check.md) · [Annotations](project_nullable_remediation_annotation_patterns.md) · [CS8632](project_nullable_annotation_cs8632_scoping.md) · [CS8714](project_nullable_cs8714_not_on_net481.md)
+- [CS0518](project_record_struct_isexternalinit_netfx.md) · Closed issues and component gotchas: see the sub-index at the top
 
+## Artifact hygiene & misc mechanics
+- [No host paths](../_shared_no_absolute_host_paths.md) · [Never predict](feedback_never_predict_an_observation_into_an_artifact.md) · [<TS> drift](project_evidence_timestamp_labels_drift_ahead_of_write_time.md) · [Probe literal](project_selftest_probe_literal_trips_the_next_sweep_pass.md)
+- [TRX case](project_trx_sanitisation_must_be_case_insensitive.md) · [TRX/msbuild sanitise](project_vstest_trx_evidence_needs_sanitisation_task.md) · [msbuild 2 roots](project_msbuild_log_has_two_absolute_path_leak_classes.md) · [Deploy_ leaks](project_mstest_deploy_dir_leaks_tokens_on_failing_runs.md)
+- [Two .coverage](project_vstest_emits_two_coverage_files_per_run.md) · [No Failed line](project_vstest_success_run_prints_no_failed_or_skipped_line.md) · [Scratch .ps1](project_powershell_scratch_script_budget_hook_blocks_helpers.md) · [Mandated .ps1](project_plan_mandated_ps1_helpers_collide_with_budget_cap_and_frozen_porcelain_gate.md)
+- [2nd pass fields](project_appending_a_second_pass_must_not_qualify_schema_fields.md) · [env -C](project_bash_cwd_resets_use_env_dash_c.md) · [global.json cwd](project_dotnet_global_json_cwd_search_vs_bash_discipline.md) · [pwsh -File root](project_pwsh_file_starts_in_session_root_needs_workingdirectory.md)
+- [pwsh stdin REPL](project_pwsh_stdin_repl_mode_and_nonascii_mangling.md) · [Isolation guard](project_worktree_isolation_guard_refuses_pwsh_from_bash.md) · [Branch gate fix](project_changed_line_coverage_branch_gate_invalidated_by_the_fix.md)
+- [ExpectedExitCode](project_expectedexitcode_declared_from_baseline_not_observed_run.md) · [Blank before comment](project_csharpier_requires_blank_line_before_comment_breaking_numstat_bounds.md) · [this-lambdas](project_excludefromcodecoverage_misses_this_capturing_lambdas.md)
+- [Koverage separators](project_koverage_reporoot_needs_native_separators.md) · [FakeTimeProvider zero](project_faketimeprovider_zero_duetime_fires_at_creation.md) · [Reflective read](project_reflective_property_read_escapes_member_expression_grep.md)
+- [Preparation mode](project_preparation_mode_flips_anchored_diff_gate_membership.md) · [git grep -c oracle](project_git_grep_c_empty_is_the_allowlisted_line_count_oracle.md) · [Fallback orphans](project_contingency_fallback_orphans_downstream_hardcoded_paths.md)
+- [Per-comment literal](project_stale_citation_gate_literal_must_match_the_comments_legitimate_citations.md) · [TimeoutAfter race](project_timeoutafter_iscompleted_shortcircuit_loses_to_taskrun_race.md) · [Cobertura class nodes](project_cobertura_filename_maps_to_several_class_nodes.md)
+- [Logger double-counts](project_msbuild_filelogger_double_counts_each_warning.md) · [Reconciliation merge](project_orchestrator_reconciliation_merge_tracks_feature_docs.md) · [Seam sentences](project_preflight_seam_sentences_outlive_a_removed_member.md)
+- [Compile items](project_explicit_compile_items_decide_membership_not_file_presence.md) · [git add -N](project_intent_to_add_span_defeats_do_not_stage_invariant.md) · [Hunk header](project_git_hunk_header_literal_slides_past_blank_line.md)
+- [Budget hook out-of-root](project_batch_budget_hook_discards_out_of_root_powershell_writes.md) · [BOM .cs numstat](project_bom_bearing_cs_files_and_prerestore_numstat_head_gates.md) · [CLAUDE.md per worktree](project_claude_md_differs_between_worktrees_read_execution_copy.md)
+- [Token kill own shells](project_commandline_match_on_results_dir_token_kills_own_tool_shells.md) · [No .vsto](project_commandline_rebuild_omits_vsto_manifests_addin_cannot_load.md) · [git show ibm437](project_conservation_gate_git_show_decodes_ibm437_and_keeps_bom.md)
+- [$LASTEXITCODE StrictMode](project_coverage_helpers_dotsource_strictmode_lastexitcode_throws.md) · [Exactly-once literal](project_exactly_once_literal_clause_conflicts_with_pattern_containment_clause.md) · [Sibling test file](project_fixed_run_path_coverage_gate_blind_to_sibling_test_file.md)
+- [Promotion rename](project_footprint_inventory_clause_omits_inherited_promotion_rename.md) · [AC count claim](project_handoff_stated_ac_count_contradicts_the_ac_source_file.md) · [Kill by PID](project_killing_a_build_lock_waiter_by_script_name_hits_every_sibling.md)
+- [Malformed payload](project_malformed_pwsh_payload_surfaces_as_unrelated_hook_block.md) · [Blank line binding](project_mandatory_string_array_param_rejects_blank_line_turning_red_into_binding_error.md) · [Whole-file hunk](project_mergebase_diff_over_branch_created_file_is_whole_file_hunk.md)
+- [Mid-plan commit spans](project_midplan_commit_breaks_deletion_staging_and_porcelain_spans.md) · [Minute timestamps](project_minute_resolution_timestamp_cannot_be_strictly_increasing.md) · [/m N> prefix](project_msbuild_parallel_log_node_prefix_defeats_anchored_target_counts.md)
+- [Import-Module -Force](project_nested_import_module_force_unloads_session_wide.md) · [Hold-commits](project_parent_orchestrator_hold_commits_your_branch_midrun.md) · [Pester NotRun](project_pester_filtered_total_counts_notrun.md)
+- [Auto-property guard](project_plan_mandated_autoproperty_with_setter_guard_is_not_expressible.md) · [PoshQC format rules](project_poshqc_format_rewrites_differ_from_invoke_formatter_defaults.md) · [PoshQC BOM/CRLF](project_poshqc_format_strips_bom_and_crlf_only_when_it_rewrites.md)
+- [PS double-quote \\](project_powershell_double_quoted_backslash_defeats_msbuild_nonvacuity_grep.md) · [PSSA traps](project_psscriptanalyzer_traps_in_new_powershell_modules.md) · [$args param](project_pwsh_function_param_named_args_makes_msbuild_gate_vacuous.md)
+- [Nested quotes $( )](project_pwsh_nested_quotes_in_subexpression_fail_to_parse.md) · [$Log/$log](project_pwsh_param_name_case_collision_flattens_log_array.md) · [Reference rewrite](project_reference_version_rewrite_when_assemblyversion_omitted.md)
+- [Numstat elides](project_replacement_span_numstat_elides_identical_boundary_lines.md) · [Finding description](project_review_finding_line_number_right_description_wrong.md) · [Splatting lines](project_splatting_is_the_line_budget_lever_for_ceiling_bound_test_files.md)
+- [-WhatIf module scope](project_whatif_does_not_reach_module_session_state.md) · [Removal hook: git + "remove"](project_worktree_removal_hooks_match_git_plus_remove_substring.md)
+- [FluentAssertions truncates string diffs](project_fluentassertions_truncates_string_diff_breaks_message_substring_gates.md) — "…59Sandbox\origin": full-path MESSAGE substring gates cannot match
+- [Cited-tree gate vs main; span enumeration](project_preflight_cited_tree_gate_and_span_enumeration.md) — intersect cited paths with the files main changed; every stop string needs a task that detects it
+- [Field gate `Contains("EXIT_CODE:")` matches FORMAT_EXIT_CODE:](project_schema_field_contains_check_matches_prefixed_labels.md) — anchor the field match to the line start
+- [Worktree-gate hook: git + "remove" in any identifier](project_worktree_removal_hook_matches_git_plus_remove_in_variable_names.md) — read-only payloads with `$removed` halt the run; flag at preflight
 ## Component-specific gotchas
 - [WebView2 EndInit creates child handles](project_webview2_endinit_creates_handles.md) · [#349 breadcrumb WebView2](project_349_breadcrumb_webview2_gotchas.md)
 - QFC #227: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md) · [cycle-3 seam](project_theme_folderpredictor_seam_retrofit_gotchas.md)
@@ -94,7 +149,6 @@
 - [ProjectEntry setter raw MessageBox](project_projectentry_setter_raw_messagebox.md) · [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md)
 - [TimeProvider seam gotchas](project_timeprovider_seam_gotchas.md) · [GetOrLoad discards setter injection](project_initializer_getorload_discards_injection_when_dependency_null.md)
 - [ScoDictionaryNew needs TryAdd](project_scodictionarynew_tryadd_not_add.md) · [Equal(params) has no because](project_fluentassertions_equal_params_no_because.md) · [BeEmpty names only the first item](project_fluentassertions_beempty_names_only_first_item.md)
-
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) · [Never predict an observation](feedback_never_predict_an_observation_into_an_artifact.md)
 - [<TS> drifts ahead of write time](project_evidence_timestamp_labels_drift_ahead_of_write_time.md) · [Probe literal trips the NEXT sweep](project_selftest_probe_literal_trips_the_next_sweep_pass.md)
@@ -103,10 +157,9 @@
 - [vstest leaves TWO .coverage files](project_vstest_emits_two_coverage_files_per_run.md) · [Green run prints no Failed/Skipped line](project_vstest_success_run_prints_no_failed_or_skipped_line.md)
 - [PS budget hook blocks scratch .ps1](project_powershell_scratch_script_budget_hook_blocks_helpers.md) · [Plan-mandated .ps1 + frozen porcelain gate](project_plan_mandated_ps1_helpers_collide_with_budget_cap_and_frozen_porcelain_gate.md)
 - [2nd pass must not qualify schema fields](project_appending_a_second_pass_must_not_qualify_schema_fields.md) · [Bash resets cwd; use `env -C`](project_bash_cwd_resets_use_env_dash_c.md)
-- [Field gate `Contains("EXIT_CODE:")` matches FORMAT_EXIT_CODE:](project_schema_field_contains_check_matches_prefixed_labels.md) — anchor the field match to the line start
 - [global.json cwd-search vs no-cd discipline](project_dotnet_global_json_cwd_search_vs_bash_discipline.md) · [pwsh -File starts in the SESSION root](project_pwsh_file_starts_in_session_root_needs_workingdirectory.md)
 - [pwsh stdin is a REPL](project_pwsh_stdin_repl_mode_and_nonascii_mangling.md) · [Isolation guard refuses pwsh from Bash](project_worktree_isolation_guard_refuses_pwsh_from_bash.md)
-- [Changed-line branch gate invalidated by the fix](project_changed_line_coverage_branch_gate_invalidated_by_the_fix.md) · [ExpectedExitCode keyed off the baseline](project_expectedexitcode_declared_from_baseline_not_observed_run.md)
+- [ExpectedExitCode keyed off the baseline](project_expectedexitcode_declared_from_baseline_not_observed_run.md) · [Koverage -RepoRoot needs native separators](project_koverage_reporoot_needs_native_separators.md)
 - [CSharpier forces a blank line before a comment](project_csharpier_requires_blank_line_before_comment_breaking_numstat_bounds.md) · [ExcludeFromCodeCoverage misses `this`-capturing lambdas](project_excludefromcodecoverage_misses_this_capturing_lambdas.md)
 - [Koverage -RepoRoot needs native separators](project_koverage_reporoot_needs_native_separators.md) · [FakeTimeProvider zero due time fires at creation](project_faketimeprovider_zero_duetime_fires_at_creation.md)
 - [Reflective property read escapes a member grep](project_reflective_property_read_escapes_member_expression_grep.md) · [Preparation mode flips anchored-diff membership](project_preparation_mode_flips_anchored_diff_gate_membership.md)
@@ -115,7 +168,6 @@
 - [TimeoutAfter IsCompleted loses to the Task.Run race](project_timeoutafter_iscompleted_shortcircuit_loses_to_taskrun_race.md) · [One Cobertura filename, several class nodes](project_cobertura_filename_maps_to_several_class_nodes.md)
 - [msbuild file logger double-counts warnings](project_msbuild_filelogger_double_counts_each_warning.md) · [Reconciliation merge already tracks the feature docs](project_orchestrator_reconciliation_merge_tracks_feature_docs.md)
 - [Seam sentences outlive a removed member](project_preflight_seam_sentences_outlive_a_removed_member.md) — after a decision removes an interface member, grep the spec for "Moq double of the .* interface"/"injectable"; keyword sweeps miss them
-- [Worktree-gate hook: git + "remove" in any identifier](project_worktree_removal_hook_matches_git_plus_remove_in_variable_names.md) — read-only payloads with `$removed` halt the run; flag at preflight
 - [Explicit Compile items decide membership, not file presence](project_explicit_compile_items_decide_membership_not_file_presence.md) — a grep hit can be uncompiled
 - [`git add -N -- .` defeats a "do not stage X" invariant](project_intent_to_add_span_defeats_do_not_stage_invariant.md) — it reads as diff plumbing, so a staging audit skips it
 - [Hunk-header literal slides past a blank line](project_git_hunk_header_literal_slides_past_blank_line.md) — measured; assert numstat deleted=0, never `@@ -N,0 +M,`
@@ -148,9 +200,16 @@
 - [Param named $args makes msbuild gate vacuous](project_pwsh_function_param_named_args_makes_msbuild_gate_vacuous.md)
 - [Nested quotes in "$( )" fail to parse](project_pwsh_nested_quotes_in_subexpression_fail_to_parse.md)
 - [$Log/$log case collision flattens array](project_pwsh_param_name_case_collision_flattens_log_array.md)
+- [pwsh @(a + x, b + y) is ONE string](project_pwsh_array_literal_comma_binds_before_plus.md)
+- [Pre-impl gate reads the SESSION-root checkpoint](project_preimplementation_gate_reads_session_root_checkpoint_not_item_worktree.md)
 - [Invoke-VersionReconciliation rewrites Reference version](project_reference_version_rewrite_when_assemblyversion_omitted.md)
 - [Replaced-span numstat elides identical boundary lines](project_replacement_span_numstat_elides_identical_boundary_lines.md)
 - [Finding's line right, description wrong](project_review_finding_line_number_right_description_wrong.md)
 - [Splatting frees lines in ceiling-bound test files](project_splatting_is_the_line_budget_lever_for_ceiling_bound_test_files.md)
 - [-WhatIf does not reach module ShouldProcess](project_whatif_does_not_reach_module_session_state.md)
 - [WinForms control field installs SyncContext, deadlocks await](project_winforms_control_field_installs_synccontext_and_deadlocks_await.md)
+- [Backtick-span Grep returns gaps](project_backtick_span_grep_gap_matches.md) — manual blast-radius token re-check
+## Artifact hygiene, shell/pwsh pitfalls, misc (sub-index)
+- [Sub-index: 58 entries](index_artifact_hygiene_and_misc.md) — evidence sanitisation, TRX/msbuild path leaks, pwsh quoting, csharpier/numstat, git spans, Pester, hooks
+- [Caller fact list can be abbreviated](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md) — a correct citation can read as contradicting a "do not re-verify" fact
+- [git grep -I skips UTF-16 evidence](project_git_grep_binary_flag_skips_utf16_evidence.md)

@@ -41,6 +41,14 @@ its own commit over the original's correction and silently discarded it.
    the hazard, let the fast-forward rule arbitrate, and verify the final head against the expected
    correction rather than against the child's self-report.
 
+**Second incident, `bugs-2026-09-28` (2026-09-29).** The coordinator reported item 927's orchestrator
+"completed" at 02:42Z, while that child's own gitignored checkpoint in its worktree had been rewritten at
+02:46:51Z recording a new planner round as pending. I relaunched on the coordinator's word. The
+original was alive, reached ALL CLEAR on round 7, and could not push because the relaunch had already
+pushed an older copy. Only the fast-forward rule prevented an overwrite. **A child checkpoint written
+AFTER a claimed death beats the claim.** Say so to the coordinator before relaunching, and if relaunching
+anyway, make the relaunch's first push go to a DIFFERENT branch name so the original can still land.
+
 See [[planner-git-commits-must-be-single-bare-segments]] for the related fact that a planner-created
 worktree cannot be cleaned up, which is why these agent worktrees accumulate (53 live at the time of
 this incident) and why a stale one holding a branch name is the normal case rather than the

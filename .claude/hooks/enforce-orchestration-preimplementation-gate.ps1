@@ -19,16 +19,14 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 # proof the issue #539 exemption is behaviourally unchanged.
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1')
 
-# Epic-scope command and path legs (issue #663, decision D2), plus the two per-mode read
-# seams relocated from this file to keep it inside the 500-line cap.
+# Epic-scope command and path legs (issue #663, decision D2), the three checkpoint read
+# seams, the mode deny reason, and the target resolution with its import guard (issue
+# #690), all relocated to this sibling to keep the gate inside the 500-line cap.
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1')
 
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
-
-# The readiness checkpoint this gate reads and names in its block message.
-$script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
 # of these is orchestration bookkeeping, not implementation, so the gate must not
@@ -254,17 +252,6 @@ function Test-OrchestrationReady {
     )
 }
 
-function Get-CheckpointContent {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:CheckpointPath)) {
-        return ''
-    }
-    return Get-Content -Raw -LiteralPath $script:CheckpointPath
-}
-
 function Get-OrchestrationPreimplementationGateAllowDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -295,23 +282,6 @@ function Get-OrchestrationPreimplementationGateBlockDecision {
     }
 }
 
-# Builds a mode-specific deny reason naming the checkpoint actually consulted and the
-# predicate that failed, behind the unchanged PREIMPLEMENTATION_GATE_BLOCKED prefix
-# that downstream reason-matching reads.
-function Get-OrchestrationModeDenyReason {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory)][string] $Mode,
-        [Parameter(Mandatory)][string] $Failure
-    )
-
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode $Mode
-    return ("PREIMPLEMENTATION_GATE_BLOCKED: this $Mode-mode delegation was evaluated against " +
-        "$path, and the failed readiness predicate is '$Failure'. Implementation operations " +
-        'require that checkpoint to satisfy every readiness predicate before implementation begins.')
-}
-
 function Invoke-OrchestrationPreimplementationGateDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -336,6 +306,9 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         [AllowEmptyString()]
         [string] $ParallelCheckpointRaw
     )
+
+    # A failed worktree-resolution import denies before any other logic (issue #690).
+    $importFailure = Get-OrchestrationGateImportFailureDecision; if ($null -ne $importFailure) { return $importFailure }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
@@ -396,9 +369,16 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if ($mode -eq 'epic' -or $mode -eq 'parallel') {
         $isEpic = ($mode -eq 'epic')
         $injected = if ($isEpic) { 'EpicCheckpointRaw' } else { 'ParallelCheckpointRaw' }
-        $modeRaw = if ($PSBoundParameters.ContainsKey($injected)) {
-            [string]$PSBoundParameters[$injected]
-        } elseif ($isEpic) { Get-EpicCheckpointContent } else { Get-ParallelCheckpointContent }
+        $modePath = ''
+        if ($PSBoundParameters.ContainsKey($injected)) {
+            $modeRaw = [string]$PSBoundParameters[$injected]
+        } else {
+            # The run checkpoint is read beneath the worktree the kickoff identifies (#690).
+            $read = Read-OrchestrationGateCheckpoint -Mode $mode -Prompt $prompt
+            if (-not $read.Resolved) { return Get-OrchestrationPreimplementationGateBlockDecision -Reason $read.DenyReason }
+            $modeRaw = $read.Raw
+            $modePath = $read.Path
+        }
         try {
             $modeCheckpoint = ConvertFrom-CheckpointJson -Json ([string]$modeRaw)
         } catch { $modeCheckpoint = $null }
@@ -411,11 +391,14 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         }
         if (-not $failure) { return Get-OrchestrationPreimplementationGateAllowDecision }
         return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
-            Get-OrchestrationModeDenyReason -Mode $mode -Failure $failure)
+            Get-OrchestrationModeDenyReason -Mode $mode -Failure $failure -CheckpointPath $modePath)
     }
 
+    # Truthiness fall-through is kept: an empty -CheckpointRaw resolves like an unbound one.
     if (-not $CheckpointRaw) {
-        $CheckpointRaw = Get-CheckpointContent
+        $read = Read-OrchestrationGateCheckpoint -Mode 'single-feature' -Prompt $prompt -FilePath $filePath -Command $command
+        if (-not $read.Resolved) { return Get-OrchestrationPreimplementationGateBlockDecision -Reason $read.DenyReason }
+        $CheckpointRaw = $read.Raw
     }
     try {
         $checkpoint = ConvertFrom-CheckpointJson -Json $CheckpointRaw

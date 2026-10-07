@@ -235,5 +235,68 @@ Three further mechanics on this rung:
   nothing was rewritten. Re-derive anyway and say so — the value of the pass is the confirmation,
   and a resume that skips it cannot tell agreement from luck.
 
+**Fourth case, 2026-10-01 `/parallel-add 941`: a `next_step` reading "941 not admitted" meant the
+WRITE was missing, not the preparation.** Branch had the clearance commit, worktree `item-941` clean
+and unlocked; whole add ran with no child. Also check main has not touched the plan's target files
+since the branch's merge-base (`git log <base>..origin/main -- <targets>` empty) before calling the
+plan current.
+
+**Fifth case, 2026-10-01 `/parallel-add 951`: preflight REVISIONS REQUIRED landed, then the child
+stopped.** The reviewer's verbatim replacement text survives in the dead child's transcript at
+`<scratchpad-parent>/tasks/<child-agent-id>.output`: find the JSONL `user` line whose text holds
+`<task-notification>` and `PREFLIGHT: REVISIONS REQUIRED` (run python with `PYTHONIOENCODING=utf-8`;
+the text is HTML-escaped, so `&lt;TS&gt;` means `<TS>`). The grandchild's own `.output` was empty.
+Apply the text yourself (Edit is allowed in `docs/features/active/`), commit, push, then delegate
+ONE confirming preflight non-isolated in the same worktree. One child, about 4 minutes.
+
+**Sixth case, 2026-10-01 `/parallel-add 956`: died DURING planning on a quota stop, and the child
+said so in-band.** The last commit subject read `save the incomplete plan draft ... at the quota
+stop` and the plan header carried `INCOMPLETE: stopped for quota`, so diagnosis was two reads. One
+non-isolated child in the existing worktree completed the plan in place (132 to 1803 lines) and
+cleared preflight in 2 rounds, about 90 minutes. Poll the plan file mtime and line count, not only
+HEAD: the tree stayed clean for ~25 minutes while the planner read, which looks like a dead child.
+
+**Sixth case, 2026-10-01 `/parallel-add 948`: the plan was a PARTIAL draft marked `INCOMPLETE: stopped for
+quota` with `SELF-REVIEW: BLOCKED`.** Design, AC table, and delivered source were done; phases were not.
+One non-isolated preparation child finished it in place and cleared preflight in 3 rounds (about 2.5 h).
+Agent-memory directories are absolute paths into the primary checkout, so a non-isolated child's
+subagents write memory into the SESSION tree even when told not to. Expect those files there, not on
+the item branch. Meanwhile the pinned sibling merged and a new add landed, so the verdict stayed DEFER
+but against a different neighbour; recompute, never carry.
+
+**Seventh case, 2026-10-02 `/parallel-add 950`: died at S3b_research on a quota hold**, research
+committed but `INCOMPLETE` with a section-7 to-do list, spec stale, plan a 44-line scaffold. One
+non-isolated child (opus, `fable_policy: disabled` per the C3 floor) closed research, rewrote spec,
+planned in place and cleared preflight in 3 rounds (7, 5, 0 defects), about 2 h 15 m. The child
+reported two delegation mechanics: its subagent prompts needed `Canonical issue number for this
+feature is <N>.` plus a `branch:` line, and a `Parallel mode: true` marker made the
+pre-implementation gate deny its atomic-executor PREFLIGHT call, so omit that marker from
+preparation-phase subagent prompts. Meanwhile 956 merged and 948 launched, so the verdict was
+re-derived against a pinned set that did not exist when the add started.
+
+**Eighth case, 2026-10-02 `/parallel-add 952`: fourth rung again, diagnosed in five calls.** The
+session checkout's own branch was the item branch, one commit atop the CURRENT `origin/main`
+(`prepare issue 952 ... preflight-cleared minimal-audit plan`) carrying the clearance artifact; worktree
+clean, re-hashed plan blob equal to the clearance's. No child delegated; ADMIT into the in-flight
+cohort because its only current-cohort member (950) shared no edge.
+
+**Ninth case, 2026-10-02 `/parallel-add 964`: fourth rung, no child.** The checkpoint had moved to
+the primary checkout (`TaskMaster/artifacts/...`), not the new session worktree, so locate it first.
+The worktree's six UNCOMMITTED agent-memory paths were what decided the verdict: the narrow radius
+shared no edge with current-cohort member 961, but the reconciled `orchestrator/MEMORY.md` did, so
+ADMIT became DEFER (cohort 10, gen 10). Never skip the dirty-tree reconciliation before deciding.
+
+**Tenth case, 2026-10-03 `/parallel-add 968` (round-1 deltas held, #972 folded in):** the verbatim
+deltas were in the grandchild's `.output` (grep the TaskMaster temp tasks dir for a unique defect
+token). Commit them into `evidence/other/` before you delegate. A non-isolated preparation child's
+executor had EVERY pwsh probe denied with PREIMPLEMENTATION_GATE_BLOCKED, because the session root
+had no `orchestrator-state.json`. Seed the 4-key file first ([[preimplementation-gate-scope]]),
+otherwise the "build-access" confirming round is read-only and does not converge. Here it returned 8 defects; not admitted.
+After the seed, rounds 3 to 5 found 4, 3 and 1 defects (5-round cap, still not cleared). Most of them
+were consequences of the previous round's own fixes: the Phase 8 restart path re-entering the P6-T2
+format/census gate. When you set a round cap, ask the reviewer to trace the restart path in the
+FIRST round. Round 6 cleared it (6 rounds in total). The result was ADMIT into in-flight cohort 10 at
+generation 12, because the in-flight member 964 shared no edge with it.
+
 See [[defer-the-checkpoint-write-until-admission]] for why the checkpoint stays untouched while the
 resumed preparation runs, and [[parallel-run-execution-playbook]].

@@ -16,8 +16,11 @@
       1. Resolve the target item's feature folder from the prompt text by scanning for a
          docs/features/active/<token> path, mirroring the epic hook's technique
          (longest match wins; a .md-suffixed match uses its parent directory).
-      2. Read artifacts/orchestration/parallel-orchestrator-state.json and locate the
-         items[] record whose feature_folder resolves to the same basename.
+      2. Resolve the worktree whose parallel checkpoint records the prompt's
+         parallel_slug: value (issue #690), deny an unresolved or ambiguous target, then
+         read artifacts/orchestration/parallel-orchestrator-state.json beneath that
+         worktree and locate the items[] record whose feature_folder resolves to the same
+         basename.
       3. Project the cohort coloring to the cohorts[] rows whose generation equals the
          top-level recolor_generation, and read the target item's cohort index from that
          projection.
@@ -40,16 +43,26 @@
     SubagentStop time.
 
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies. Filesystem reads go
-    through an injectable wrapper function so tests can mock the boundary without writing
-    temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690),
+    imported inside a guard: a failed import is recorded and the decision denies naming
+    the module. Filesystem reads go through an injectable wrapper function so tests can
+    mock the boundary without writing temporary files.
 #>
 [CmdletBinding()]
 param()
 
 
 Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
-$script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
+
+# Import guard (issue #690): a failed import denies instead of failing open.
+$script:ParallelCohortBarrierResolutionImportFailure = $null
+try {
+    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
+}
+catch {
+    $script:ParallelCohortBarrierResolutionImportFailure = 'WorktreeRunResolution.psm1'
+}
+
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 $script:ParallelModeMarker = 'Parallel mode: true'
 
@@ -62,17 +75,39 @@ function Get-ParallelCohortBarrierCheckpointContent {
     .SYNOPSIS
         Read the raw JSON text of the parallel checkpoint. Tests mock this function
         (read seam).
+    .PARAMETER Path
+        The absolute checkpoint path composed beneath the resolved worktree root.
     .OUTPUTS
         System.String or $null
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
 
-    if (-not (Test-Path -LiteralPath $script:ParallelCheckpointPath -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return $null
     }
-    return (Get-Content -LiteralPath $script:ParallelCheckpointPath -Raw)
+    return (Get-Content -LiteralPath $Path -Raw)
+}
+
+function Resolve-ParallelCohortBarrierTarget {
+    <#
+    .SYNOPSIS
+        Resolve the worktree whose parallel checkpoint governs a kickoff (issue #690 seam).
+    .DESCRIPTION
+        Keyed on the prompt's parallel_slug: value; never on a feature-folder path or the
+        payload cwd.
+    .PARAMETER Prompt
+        The delegation prompt text.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject (the worktree-resolution target result).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Prompt)
+
+    $signal = Find-WorktreeRunIdentitySignal -Text $Prompt
+    return Resolve-WorktreeParallelTarget -ParallelSlug $signal.ParallelSlug -SessionRoot (Get-Location).Path
 }
 
 function Get-ParallelCohortBarrierFolderBasename {
@@ -196,6 +231,13 @@ function Invoke-ParallelCohortBarrierDecision {
         [string] $ToolInputRaw
     )
 
+    # A failed worktree-resolution import denies before any other logic (issue #690).
+    if ($script:ParallelCohortBarrierResolutionImportFailure) {
+        return Get-ParallelCohortBarrierBlockDecision -Reason (
+            "PARALLEL_COHORT_BARRIER_BLOCKED: the worktree-resolution module '$($script:ParallelCohortBarrierResolutionImportFailure)' " +
+            'failed to import, so the parallel checkpoint that governs this delegation cannot be located; the gate fails closed.')
+    }
+
     $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $envelope.IsValid) {
         return Get-ParallelCohortBarrierBlockDecision -Reason (
@@ -214,12 +256,18 @@ function Invoke-ParallelCohortBarrierDecision {
         return Get-ParallelCohortBarrierAllowDecision
     }
 
+    # The parallel checkpoint is located by the kickoff's parallel_slug (issue #690).
+    $target = Resolve-ParallelCohortBarrierTarget -Prompt $prompt
+    if ($target.Status -eq 'NoTarget' -or $target.Status -eq 'Ambiguous') {
+        return Get-ParallelCohortBarrierBlockDecision -Reason "PARALLEL_COHORT_BARRIER_BLOCKED: $($target.ReasonCode): $($target.Detail)"
+    }
+
     $featureFolder = Find-ParallelCohortBarrierFeatureFolderFromPrompt -Prompt $prompt
     if (-not $featureFolder) {
         return Get-ParallelCohortBarrierBlockDecision -Reason 'PARALLEL_COHORT_BARRIER_BLOCKED: a parallel-mode orchestrator delegation must reference the target item feature folder path (docs/features/active/<folder>) in the prompt so its conflict edges and cohort position can be verified.'
     }
 
-    $checkpointRaw = Get-ParallelCohortBarrierCheckpointContent
+    $checkpointRaw = Get-ParallelCohortBarrierCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind parallel -WorktreeRoot $target.WorktreeRoot)
     $checkpoint = $null
     if (-not [string]::IsNullOrWhiteSpace($checkpointRaw)) {
         try {

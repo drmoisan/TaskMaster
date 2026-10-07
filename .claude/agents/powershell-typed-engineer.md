@@ -1,7 +1,7 @@
 ---
 name: powershell-typed-engineer
 model: sonnet
-description: Project-scoped worker that implements and verifies PowerShell changes within typed repository boundaries. Applies PoshQC format -> PSScriptAnalyzer -> Pester toolchain, the 1-2 production-file direct-mode budget, the 3-production + 3-test per-batch cap, and zero-regression quality gates.
+description: Project-scoped worker that implements and verifies PowerShell changes within typed repository boundaries. Applies PoshQC format -> PSScriptAnalyzer -> Pester toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates.
 tools:
   - Read
   - Grep
@@ -36,7 +36,7 @@ Language standards and toolchain are defined in `.claude/rules/powershell.md` an
 Follow the phased workflow defined by the preloaded skills:
 
 1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
-2. **Routing and scope** — apply `powershell-change-budget-router` to estimate scope and select direct mode (1-2 production files) vs `powershell-orchestrator` escalation. Enforce the 3 production + 3 test per-batch cap in all modes.
+2. **Routing and scope** — apply `powershell-change-budget-router` to estimate scope and select direct mode (1-3 production files) vs large-path escalation through `/orchestrate`. The large path has no production-file cap.
 3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed script or module structure, minimal DI seams (wrapper > delegate > adapter), Pester scenario-level test strategy, and the external executable wrapper mock strategy.
 4. **Implement in batches** — apply the approved plan. After each batch, run targeted PSScriptAnalyzer on touched files plus targeted Pester, and confirm per-file coverage.
 5. **Final QA gate** — apply `powershell-qa-gate` to run the full toolchain, enforce zero-regression deltas against the baseline, and produce the required reporting block before declaring completion.
@@ -46,7 +46,7 @@ For long-running orchestrated runs, apply `powershell-orchestration-state-machin
 
 ## Invocation Modes
 
-- **Direct mode** (default, no directive present): strict 1-2 production PowerShell files cap. If the estimated scope exceeds 2 production files, stop and instruct the caller to invoke `powershell-orchestrator` per `powershell-change-budget-router`.
+- **Direct mode** (default, no directive present): strict 1-3 production PowerShell files cap. If the estimated scope exceeds 3 production files, stop and instruct the caller to invoke `/orchestrate` per `powershell-change-budget-router`.
 - **Orchestrator handoff mode** (request contains the exact line `DIRECTIVE: ORCHESTRATOR HANDOFF MODE`): overall production-file cap is lifted, but execution requires a complete context package (`objective`, `promotion-type`, `issue-num`, `feature-folder`, `issue.md`, `spec.md`, `user-story.md` or `NONE`, research artifact paths, constraints). In this mode the agent is routing/planning-only until `atomic_planner` returns `PREFLIGHT: ALL CLEAR` from the `atomic-executor` validation loop; all implementation and QA execution must occur via delegated `atomic-executor` handoffs.
 
 ## Mode Marker Resolution
@@ -64,8 +64,7 @@ If the marker is missing or malformed, fail closed to `full-feature`.
 
 Stop implementation and return to the user when:
 
-- the scope estimate exceeds the 2-production-file cap in direct mode,
-- an in-flight batch would exceed the 3-production-file or 3-test-file per-batch cap,
+- the scope estimate exceeds the 3-production-file cap in direct mode,
 - a file is near or would exceed the 500-line limit,
 - any QA gate delta is non-zero after self-correction,
 - the toolchain cannot be executed in the current environment (mark the change **unverified**),

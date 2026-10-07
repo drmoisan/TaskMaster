@@ -30,6 +30,12 @@ skill or rule, so each costs a diagnosis cycle.
   re-preflight, or clear it as an exception the USER explicitly authorizes. Preserve the records
   (the child may already have staged `local_execution_overrides_archived`) and record the
   authorizing party.
+- **A PREPARATION run can plant the override, and it surfaces only at execution's `gh pr create`.**
+  On 968 (2026-10-03) the preparation orchestrator amended spec.md itself (prd-feature exit hooks
+  unsatisfiable in a reused worktree) and recorded `S4b_spec_amendment`; the execution child then
+  finished the whole plan and halted before the PR. The PR gate reads the checkpoint of the
+  `--head` branch's worktree, not the session root. At /parallel-add admission, read the item
+  worktree checkpoint for `local_execution_overrides` and escalate it BEFORE launching execution.
 - **`local_execution_overrides_archived` is an OBJECT, not an array** — shape `{note, entries}`.
   An `Array.isArray` probe returns false and looks like the archive is missing; read `.entries`.
 - **Run the readiness check locally before theorising.** Dot-source the module and call

@@ -1,60 +1,212 @@
 <#
 .SYNOPSIS
-    Epic-scope command and path legs of the preimplementation gate (issue #663).
+    Epic-scope legs, checkpoint read seams, and target resolution of the preimplementation gate.
 
 .DESCRIPTION
-    Dot-sourced by enforce-orchestration-preimplementation-gate.ps1. Holds two groups of
+    Dot-sourced by enforce-orchestration-preimplementation-gate.ps1. Holds four groups of
     functions:
 
-    - The two per-mode read seams of issue #554 (Get-EpicCheckpointContent and
-      Get-ParallelCheckpointContent), relocated verbatim from the gate file by issue #663
-      so the gate stays inside the 500-line cap. Their names and behaviour are unchanged,
-      so tests that mock or shadow them by name are unaffected.
-    - The epic-scope decision for the command and path legs. A staging command or a
-      Write/Edit call is epic scope when the effective worktree's HEAD (the -C selector
-      worktree when present, otherwise the session root) equals the integration_branch of
-      artifacts/orchestration/epic-orchestrator-state.json. In epic scope the call is
-      decided by the epic command-leg readiness predicate, and under decision D2 an
-      implementation-classified operand is allowed only while a merge is in progress in
-      that worktree. Outside epic scope the decision function returns $null and the gate's
-      single-feature path runs unchanged.
+    - The import guard for the worktree-resolution modules (issue #690). A failed import
+      is recorded in $script:OrchestrationGateResolutionImportFailure, and
+      Get-OrchestrationGateImportFailureDecision turns that record into a deny, so a
+      missing module cannot make the gate exit non-zero and fail open.
+    - The three checkpoint read seams, Get-CheckpointContent, Get-EpicCheckpointContent,
+      and Get-ParallelCheckpointContent. Each takes a mandatory absolute path, so no
+      read binds to the calling process's directory. Get-CheckpointContent and
+      Get-OrchestrationModeDenyReason were relocated here from the gate file by issue #690
+      to keep the gate inside the 500-line cap.
+    - The target resolution of issue #690. Resolve-OrchestrationGateTarget selects the
+      worktree whose checkpoint governs the call from portable identity only: the
+      integration_branch: value for an epic delegation, the parallel_slug: value for a
+      parallel delegation, the file_path or git -C operand for the path and command legs,
+      and the canonical issue-number line and branch: label for a single-feature
+      delegation. Read-OrchestrationGateCheckpoint reads the checkpoint beneath the
+      resolved root, or returns the deny for an unresolved target.
+    - The epic-scope decision for the command and path legs (issue #663). A staging
+      command or a Write/Edit call is epic scope when the effective worktree's HEAD equals
+      the integration branch of the epic checkpoint that Resolve-EpicScopeCheckpoint
+      locates. Outside epic scope the decision function returns $null and the gate's
+      single-feature path runs.
 
 .NOTES
     PowerShell 7+. Depends on functions the gate defines or dot-sources before any call:
     Split-OrchestrationCommandLine and ConvertTo-OrchestrationCommandToken (helpers file),
     Get-OrchestrationDelegationCheckpointPath (modes file), and the gate's allow and block
-    decision constructors. Mirrored byte-identically under
+    decision constructors. Imports WorktreeItemResolution.psm1 and WorktreeRunResolution.psm1
+    before EpicScopeResolution.psm1, so the nested import inside EpicScopeResolution reuses
+    the same module instance. Mirrored byte-identically under
     extensions/drm-copilot/resources/claude-customizations/.
 #>
 
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop
+# Import guard (issue #690). Each worktree-resolution import is attempted in order; the
+# first failure is recorded by file name and the decision function denies on it.
+$script:OrchestrationGateResolutionImportFailure = $null
+foreach ($resolutionModule in @('WorktreeItemResolution.psm1', 'WorktreeRunResolution.psm1', 'EpicScopeResolution.psm1')) {
+    try {
+        Import-Module (Join-Path $PSScriptRoot "../lib/worktree-resolution/$resolutionModule") -Force -ErrorAction Stop
+    }
+    catch {
+        if (-not $script:OrchestrationGateResolutionImportFailure) { $script:OrchestrationGateResolutionImportFailure = $resolutionModule }
+    }
+}
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop
 
-# The two per-mode read seams (issue #554). Each takes its path from the fixed mode
-# table and never from a delegation's own text; an absent file returns an empty
-# string, which the readiness predicate then treats as a deny.
+function Get-OrchestrationGateImportFailureDecision {
+    <#
+    .SYNOPSIS
+        Returns the deny for a failed worktree-resolution import, or $null.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary, or $null when every import succeeded.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param()
+
+    if (-not $script:OrchestrationGateResolutionImportFailure) {
+        return $null
+    }
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
+        "PREIMPLEMENTATION_GATE_BLOCKED: the worktree-resolution module '$($script:OrchestrationGateResolutionImportFailure)' " +
+        'failed to import, so the checkpoint that governs this call cannot be located; the gate fails closed.')
+}
+
+# The three checkpoint read seams. Each takes the absolute path composed beneath a
+# resolved worktree root; an absent file returns an empty string, which the readiness
+# predicate then treats as a deny.
+function Get-CheckpointContent {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return ''
+    }
+    return Get-Content -Raw -LiteralPath $Path
+}
+
 function Get-EpicCheckpointContent {
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
 
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode 'epic'
-    if (-not (Test-Path -LiteralPath $path)) {
+    if (-not (Test-Path -LiteralPath $Path)) {
         return ''
     }
-    return Get-Content -Raw -LiteralPath $path
+    return Get-Content -Raw -LiteralPath $Path
 }
 
 function Get-ParallelCheckpointContent {
     [CmdletBinding()]
     [OutputType([string])]
-    param()
+    param([Parameter(Mandatory)][ValidatePattern('^([A-Za-z]:[\\/]|/)')][string] $Path)
 
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode 'parallel'
-    if (-not (Test-Path -LiteralPath $path)) {
+    if (-not (Test-Path -LiteralPath $Path)) {
         return ''
     }
-    return Get-Content -Raw -LiteralPath $path
+    return Get-Content -Raw -LiteralPath $Path
+}
+
+# Builds a mode-specific deny reason naming the checkpoint actually consulted and the
+# predicate that failed, behind the unchanged PREIMPLEMENTATION_GATE_BLOCKED prefix
+# that downstream reason-matching reads. A resolved absolute path is named when known.
+function Get-OrchestrationModeDenyReason {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Mode,
+        [Parameter(Mandatory)][string] $Failure,
+        [AllowNull()][AllowEmptyString()][string] $CheckpointPath = ''
+    )
+
+    $path = if ($CheckpointPath) { $CheckpointPath } else { Get-OrchestrationDelegationCheckpointPath -Mode $Mode }
+    return ("PREIMPLEMENTATION_GATE_BLOCKED: this $Mode-mode delegation was evaluated against " +
+        "$path, and the failed readiness predicate is '$Failure'. Implementation operations " +
+        'require that checkpoint to satisfy every readiness predicate before implementation begins.')
+}
+
+function Resolve-OrchestrationGateTarget {
+    <#
+    .SYNOPSIS
+        Resolves the worktree whose checkpoint governs a gated call (issue #690 seam).
+    .DESCRIPTION
+        An epic delegation is keyed on integration_branch: (with epic_feature_folder: as a
+        cross-check), a parallel delegation on parallel_slug:, a path leg on its file_path
+        operand, a command leg on its git -C selector (none means the session root), and a
+        single-feature delegation on its canonical issue-number line and branch: label.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject (the worktree-resolution target result).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][string] $Mode,
+        [AllowNull()][AllowEmptyString()][string] $Prompt = '',
+        [AllowNull()][AllowEmptyString()][string] $FilePath = '',
+        [AllowNull()][AllowEmptyString()][string] $Command = ''
+    )
+
+    $sessionRoot = (Get-Location).Path
+    if ($Mode -eq 'epic' -or $Mode -eq 'parallel') {
+        $signal = Find-WorktreeRunIdentitySignal -Text $Prompt
+        if ($Mode -eq 'epic') {
+            return Resolve-WorktreeEpicTarget -IntegrationBranch $signal.IntegrationBranch -EpicSlug $signal.EpicSlug -SessionRoot $sessionRoot
+        }
+        return Resolve-WorktreeParallelTarget -ParallelSlug $signal.ParallelSlug -SessionRoot $sessionRoot
+    }
+    if ($FilePath) {
+        return Resolve-WorktreeOperandTarget -Path $FilePath -SessionRoot $sessionRoot
+    }
+    if ($Command) {
+        return Resolve-WorktreeOperandTarget -Path (Get-OrchestrationEpicScopeSelector -Command $Command) -SessionRoot $sessionRoot
+    }
+    return Resolve-WorktreeItemTarget -Text $Prompt -SessionRoot $sessionRoot
+}
+
+function Read-OrchestrationGateCheckpoint {
+    <#
+    .SYNOPSIS
+        Reads the checkpoint beneath the resolved target worktree, or returns the deny reason.
+    .DESCRIPTION
+        Resolved is $false, with DenyReason set, when the target is NoTarget or Ambiguous.
+        Otherwise Raw holds the checkpoint text (empty when absent) and Path its absolute
+        path. Only Status, WorktreeRoot, ReasonCode, and Detail are read from the target.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][string] $Mode,
+        [AllowNull()][AllowEmptyString()][string] $Prompt = '',
+        [AllowNull()][AllowEmptyString()][string] $FilePath = '',
+        [AllowNull()][AllowEmptyString()][string] $Command = ''
+    )
+
+    $target = Resolve-OrchestrationGateTarget -Mode $Mode -Prompt $Prompt -FilePath $FilePath -Command $Command
+    if ($target.Status -eq 'NoTarget' -or $target.Status -eq 'Ambiguous') {
+        return [pscustomobject]@{
+            Resolved   = $false
+            Raw        = ''
+            Path       = $null
+            DenyReason = ("PREIMPLEMENTATION_GATE_BLOCKED: $($target.ReasonCode): the target worktree of this $Mode call " +
+                "could not be resolved: $($target.Detail). Implementation operations require an identifiable target " +
+                'worktree whose checkpoint is ready.')
+        }
+    }
+
+    $kind = if ($Mode -eq 'epic' -or $Mode -eq 'parallel') { $Mode } else { 'item' }
+    $path = Get-WorktreeRunCheckpointPath -Kind $kind -WorktreeRoot $target.WorktreeRoot
+    $raw = switch ($kind) {
+        'epic' { Get-EpicCheckpointContent -Path $path }
+        'parallel' { Get-ParallelCheckpointContent -Path $path }
+        default { Get-CheckpointContent -Path $path }
+    }
+    return [pscustomobject]@{
+        Resolved   = $true
+        Raw        = [string]$raw
+        Path       = $path
+        DenyReason = $null
+    }
 }
 
 function Get-OrchestrationEpicScopeSelector {

@@ -46,6 +46,8 @@ Use this skill when:
 Use `yyyy-MM-ddTHH-mm` for all audit, remediation, and evidence artifacts.
 Example: `2026-02-06T14-30`.
 
+The `Timestamp` value is local time read from the host system clock when the recorded command runs (for example `Get-Date -Format yyyy-MM-ddTHH-mm`); the agent never composes or estimates it.
+
 ## Canonical Evidence Locations
 
 - Baseline evidence: `evidence/baseline/`
@@ -109,6 +111,8 @@ When evidence artifacts are used for automated checking or plan reconciliation, 
 - `Timestamp: <ISO-8601>`
 - `Command: <exact command>`
 - `EXIT_CODE: <int>`
+
+The first occurrence of `Timestamp`, `Command`, `EXIT_CODE`, and `ExpectedExitCode` forms the record in both the Python and the TypeScript parser; later occurrences, including empty later values, are ignored. An artifact that records several gates therefore reports its first gate.
 
 One optional field may also be declared:
 - `ExpectedExitCode: <int>` — the exit code the gate is expected to produce.

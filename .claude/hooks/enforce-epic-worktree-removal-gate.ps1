@@ -50,10 +50,16 @@
     allow for a removal to proceed; this gate keeps the EPIC_WORKTREE_REMOVAL_BLOCKED
     prefix for both of its branches so transcript attribution stays unambiguous.
 
+    Issue #690: each checkpoint is read beneath the live worktree whose run checkpoint
+    records the removal target under worktree_path, located by
+    enforce-epic-worktree-removal-gate-resolution.ps1. An ambiguous target denies before
+    any allow; when neither kind resolves, the deny names TARGET_WORKTREE_NOT_DERIVABLE.
+
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies. Filesystem reads go
-    through an injectable wrapper function so tests can mock the boundary without writing
-    temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the
+    dot-sourced resolution sibling, whose import guard denies on a failed import.
+    Filesystem reads go through injectable wrapper functions so tests can mock the
+    boundary without writing temporary files.
 #>
 [CmdletBinding()]
 param()
@@ -67,49 +73,12 @@ Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeM
 # Invoke-EpicWorktreeRemovalGateDecision and by Get-EpicWorktreeRemovalCommandPath.
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
-$script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
-$script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'
+# Checkpoint read seams, the import guard, and run-target resolution (issue #690).
+. (Join-Path $PSScriptRoot 'enforce-epic-worktree-removal-gate-resolution.ps1')
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
-# Sanctioned-removal manifest location. Recorded here beside the two checkpoint paths
-# so every hook-read document this gate consults is named in one place; the module
-# owns the read itself.
+# Sanctioned-removal manifest location. Recorded here so every hook-read document this
+# gate consults is named; the module owns the read itself.
 $script:CleanupWorktreeManifestPath = 'artifacts/orchestration/cleanup-worktrees-manifest.json'
-
-function Get-EpicWorktreeGateCheckpointContent {
-    <#
-    .SYNOPSIS
-        Read the raw JSON text of the epic checkpoint. Tests mock this function
-        (read seam).
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:EpicCheckpointPath -PathType Leaf)) {
-        return $null
-    }
-    return (Get-Content -LiteralPath $script:EpicCheckpointPath -Raw)
-}
-
-function Get-EpicWorktreeGateParallelCheckpointContent {
-    <#
-    .SYNOPSIS
-        Read the raw JSON text of the parallel-orchestrator checkpoint. Tests mock
-        this function (read seam).
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:ParallelCheckpointPath -PathType Leaf)) {
-        return $null
-    }
-    return (Get-Content -LiteralPath $script:ParallelCheckpointPath -Raw)
-}
 
 function ConvertFrom-EpicWorktreeGateJson {
     <#
@@ -361,6 +330,12 @@ function Invoke-EpicWorktreeRemovalGateDecision {
         [string] $ToolInputRaw
     )
 
+    # A failed worktree-resolution import denies before any other logic (issue #690).
+    $importFailure = Get-EpicWorktreeGateImportFailureDecision
+    if ($null -ne $importFailure) {
+        return $importFailure
+    }
+
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
         return Get-EpicWorktreeGateBlockDecision -Reason (
@@ -383,14 +358,23 @@ function Invoke-EpicWorktreeRemovalGateDecision {
 
     $worktreePath = Get-EpicWorktreeRemovalCommandPath -CommandText $commandText
 
-    $checkpoint = ConvertFrom-EpicWorktreeGateJson -Raw (Get-EpicWorktreeGateCheckpointContent)
+    # Each run checkpoint is read beneath the worktree that records this path (issue #690);
+    # an ambiguous target denies before any allow or manifest evaluation.
+    $epicRead = Read-EpicWorktreeGateRunCheckpoint -Kind epic -WorktreePath $worktreePath
+    $parallelRead = Read-EpicWorktreeGateRunCheckpoint -Kind parallel -WorktreePath $worktreePath
+    foreach ($read in @($epicRead, $parallelRead)) {
+        if ($read.Target.Status -eq 'Ambiguous') {
+            return Get-EpicWorktreeGateBlockDecision -Reason "EPIC_WORKTREE_REMOVAL_BLOCKED: $($read.Target.ReasonCode): $($read.Target.Detail)"
+        }
+    }
+    $checkpoint = $epicRead.Checkpoint
 
     $featureRecord = Find-EpicWorktreeFeatureRecord -Checkpoint $checkpoint -WorktreePath $worktreePath
     if (Test-EpicWorktreeRemovalAllowed -FeatureRecord $featureRecord) {
         return Get-EpicWorktreeGateAllowDecision
     }
 
-    $parallelCheckpoint = ConvertFrom-EpicWorktreeGateJson -Raw (Get-EpicWorktreeGateParallelCheckpointContent)
+    $parallelCheckpoint = $parallelRead.Checkpoint
     if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath) {
         return Get-EpicWorktreeGateAllowDecision
     }
@@ -411,7 +395,12 @@ function Invoke-EpicWorktreeRemovalGateDecision {
         return Get-EpicWorktreeGateAllowDecision
     }
 
-    return Get-EpicWorktreeGateBlockDecision -Reason "EPIC_WORKTREE_REMOVAL_BLOCKED: git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal."
+    # When neither kind resolved, the deny names the resolution reason first (issue #690).
+    $prefix = ''
+    if ($epicRead.Target.Status -eq 'NoTarget' -and $parallelRead.Target.Status -eq 'NoTarget') {
+        $prefix = "EPIC_WORKTREE_REMOVAL_BLOCKED: $($epicRead.Target.ReasonCode): $($epicRead.Target.Detail). "
+    }
+    return Get-EpicWorktreeGateBlockDecision -Reason ($prefix + "EPIC_WORKTREE_REMOVAL_BLOCKED: git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal.")
 }
 
 function Invoke-EpicWorktreeRemovalGateEntryPoint {

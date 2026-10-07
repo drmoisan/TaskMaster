@@ -25,10 +25,10 @@
     .claude/hooks/enforce-epic-worktree-removal-gate.ps1.
 
     The two token values are declared ONCE EACH below and every match in this file reads
-    those variables rather than repeating a literal. The producer side of the same pair is
-    scripts/dev_tools/parallel_mutation_abandon_cli.py, and
-    tests/scripts/dev_tools/test_parallel_abandon_token_seam.py parses both sides at run
-    time so a rename on one side without the other fails.
+    those variables rather than repeating a literal. The pushed-down producer of the same pair
+    is .claude/lib/bash/abandon-parallel-item.sh (the Python CLI it ports remains the parity
+    reference), and tests/scripts/dev_tools/test_parallel_abandon_token_seam.py parses every
+    side at run time so a rename on one side without the others fails.
 #>
 [CmdletBinding()]
 param()

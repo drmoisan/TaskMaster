@@ -38,6 +38,13 @@ increments and are not observed clock readings. Three cheap falsifiers, in incre
    Corollary at #752: nine artifacts inside commit `eea3bb9b` (committed 12:14:51) declared `12-15`
    through `12-29`, i.e. up to 14 minutes *after* the commit that contains them.
 
+7. **Cobertura root `timestamp=` epoch as the writer clock, and as a local-offset probe (#942).** The
+   post-processed `coverage/*.cobertura.xml` root element carries `timestamp="<unix seconds>"`. At #942
+   the final document read `1790769007` = 2026-09-30T11:50:07Z against the executor's `07-50` label, so
+   the labels are local time at UTC-4 and the baseline/final pair (19 minutes apart, different root
+   counters) are provably two runs. Works with Grep alone (`^<coverage `) when no shell is available; it
+   also tells you what "now" is to within the run's duration when the session has no clock.
+
 **Why:** the stamps look plausible in isolation and are monotonic, so they pass a casual read. They
 matter because plan gates are often written as "this run's X equals the baseline's X," and ordering
 between gates is part of that claim.

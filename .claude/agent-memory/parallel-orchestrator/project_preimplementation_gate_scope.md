@@ -24,6 +24,16 @@ not use and a "checkpoint state" key the hook never actually reads.
   `docs/features/active/<basename>` token or issue number, and that record's `merge_status`
   not in `{merged, worktree_removed}`. A validly seeded parallel checkpoint clears it.
   See [[parallel-run-execution-playbook]].
+- **BUT the Write/Edit and git add/commit legs DO need a session-root `orchestrator-state.json`.**
+  Parallel-mode redirection exists only on the Agent leg. The path and command legs read
+  `artifacts/orchestration/orchestrator-state.json` relative to the hook cwd (the session root,
+  even for a non-isolated child working in another worktree) and require only the four keys
+  `issue-num`, `feature-folder` (prefix `docs/features/active/`), `route_id`, top-level
+  `lifecycle_ready: true`. They are NOT item-keyed, so ONE seed unblocks every child. On
+  `bugs-2026-09-28` (2026-09-29) I launched without it, following the skill's issue-673 hygiene
+  rule, and the 928 child stopped at its first `.ps1` edit. Seed it BEFORE the first launch
+  (label `checkpoint_origin`), probe the Edit leg with a real item path, and tell children they may
+  overwrite it with their full checkpoint right before `gh pr create` and must re-verify `issue-num`.
 - A prompt-declared `parallel_checkpoint_path:` must equal the canonical value exactly or it
   is a deny; it can never redirect the gate to a different file.
 - **Write/Edit is extension-gated, not path-gated.** Blocked extensions:

@@ -58,25 +58,38 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    advances `proposed` -> `admitted` -> `prepared` during this step, recorded as item-state updates in
    `items[]` with the checkpoint's lifecycle timestamps.
 
-3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the contention
-   relation `Test-BlastRadiusConflict` from the destination-runtime PowerShell port
+3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the scheduling
+   entry point Get-BlastRadiusConflictEdge from the destination-runtime PowerShell port
    `.claude/lib/blast-radius/BlastRadius.psm1`, which is published by push-down and needs no Python
    interpreter (the default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1`
    file, so `pwsh` is mandatory: run as `$repoRoot = git rev-parse --show-toplevel; Import-Module
    (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop`).
-   Its two radius arguments are the two items' radius hashtables, not strings, and the third
-   argument is the required parsed `config/blast-radius.json` mapping, which push-down publishes
-   into the destination workspace. That mapping's optional `mergeable_paths` list is read by
-   `Test-BlastRadiusConflict`, which contributes no `path_overlap` edge for a path matching it
-   while the path stays in the declared radius. `conflicts(a, b, config)` in
+   Call it once, as `Get-BlastRadiusConflictEdge -Item <items> -Config <config> -Relation ${function:Test-BlastRadiusConflict}`, where each item
+   record carries `key` (the `items[].issue_num` value), `radius` (the item's radius hashtable, not
+   a string), and the optional complexity `band`, and `-Config` is the required parsed
+   `config/blast-radius.json` mapping, which push-down publishes into the destination workspace.
+   The -Relation argument is required and carries the facade's detection relation; an omitted
+   relation fails fast. The entry point applies the contention relation `Test-BlastRadiusConflict` to every unordered
+   pair and then the integration-cost edge rule of `.claude/rules/parallel-orchestration.md`
+   (hard classes, integer cost, pairwise benefit, and the configured `conflict_tolerance`); the
+   relation still reads the mapping's optional `mergeable_paths` list and contributes no
+   `path_overlap` edge for a path matching it while the path stays in the declared radius.
+   `schedule_conflict_edges(items, config)` and `conflicts(a, b, config)` in
    `scripts/dev_tools/compute_blast_radius.py` (defined in
-   `scripts/dev_tools/_blast_radius_conflicts.py`) remains the repository authority and the parity
-   reference. Read the verdict from `$result['conflict']`; do not test the returned hashtable
-   itself, since it is always truthy under PowerShell boolean coercion, so a bare `if ($result)`
-   check treats every pair as conflicting. Map each conflicting pair onto an `(int, int)` conflict
-   edge of `items[].issue_num` values, normalized so `a < b`. Do not reimplement the relation and do not
-   compute edges over the unstarted subset only: an in-flight conflict is precisely what the
-   admission decision turns on.
+   `scripts/dev_tools/_blast_radius_scheduling.py` and `scripts/dev_tools/_blast_radius_conflicts.py`)
+   remain the repository authority and the parity reference. The call returns a hashtable with
+   `edges` (records `a`, `b`, `reason`, `hard`, `cost`, `benefit`, already normalized so `a < b`)
+   and `tolerated_overlaps` (records `a`, `b`, `reasons`, `cost`, `benefit`). Take each returned
+   edge as an `(int, int)` conflict edge of `items[].issue_num` values, and record the returned
+   tolerated overlaps in the checkpoint's tolerated_overlaps list. When `Test-BlastRadiusConflict`
+   is called directly for a single pair, read the verdict from `$result['conflict']`; do not test
+   the returned hashtable itself, since it is always truthy under PowerShell boolean coercion, so a
+   bare `if ($result)` check treats every pair as conflicting. Do not reimplement the relation or
+   the edge rule, do not apply the relation to each pair by hand, and do not compute edges over the
+   unstarted subset only: an in-flight conflict is precisely what the admission decision turns on.
+   A tolerated overlap is not an edge: the two items run in the same or adjacent cohorts without a
+   barrier, and the later-merging item merges `origin/main` under the existing per-item
+   merge-conflict handling and re-passes CI before it merges.
 
 4. **Decide admission.** Call
    `decide_admission(candidate, conflict_edges, in_flight, current_cohort_members=current_cohort_members)`
@@ -150,9 +163,11 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
 
 - One admission per invocation, one `mutations[]` entry per successful admission. A failed
   preparation appends no entry and leaves `items[]` without the candidate.
-- No field and no enum member is added to `mutations[]`, `conflict_edges[]`, `items[]`, or any
-  state or merge-status enum. The nine parallel enums are owned by
-  `.claude/rules/parallel-orchestration.md` and are consumed, never extended.
+- No field and no enum member is added to `mutations[]`, `items[]`, or any state or merge-status
+  enum. A `conflict_edges[]` entry may carry only the three tolerated extra fields `hard`, `cost`,
+  and `benefit` (tolerated-not-validated, returned by the scheduling entry point), and no reason
+  member is added: the four `conflict_edges[].reason` members are unchanged. The nine parallel
+  enums are owned by `.claude/rules/parallel-orchestration.md` and are consumed, never extended.
 - This operation never moves, restates, or re-derives an in-flight item's cohort or state.
 - This operation performs no destructive side effect: it closes no pull request and removes no
   worktree. Those belong to `/parallel-remove` with `--disposition abandon`.

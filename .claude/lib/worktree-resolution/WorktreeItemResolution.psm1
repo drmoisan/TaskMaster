@@ -213,11 +213,25 @@ function Get-WorktreeItemLiveRoot {
     return , [string[]] $live.ToArray()
 }
 
-# Private: convert a resolved root and session path into a result, labelling it
-# SessionRoot or OtherWorktree so that test is written once, as the sibling normalisation
-# constructor does. The ConvertTo verb is deliberate: a New- verb is state-changing to
-# PSScriptAnalyzer and this function changes nothing.
 function ConvertTo-WorktreeItemResolvedResult {
+    <#
+    .SYNOPSIS
+        Convert a resolved root and session path into a SessionRoot or OtherWorktree result.
+    .DESCRIPTION
+        Labels the result SessionRoot when the root is the session's own worktree and
+        OtherWorktree otherwise, so that test is written once. Exported for issue #690 so
+        the run resolver shares this one labelling definition rather than a second copy.
+        The ConvertTo verb is deliberate: a New- verb is state-changing to PSScriptAnalyzer
+        and this function changes nothing.
+    .PARAMETER WorktreeRoot
+        The resolved worktree root.
+    .PARAMETER SessionRoot
+        The calling process's path.
+    .PARAMETER Detail
+        A prose clause safe to append to a gate's deny reason.
+    .PARAMETER Branch
+        Optional. The branch signal that produced the target.
+    #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
@@ -389,4 +403,5 @@ Export-ModuleMember -Function `
     Get-WorktreeItemCheckpointText, `
     Get-WorktreeItemCheckpointIssue, `
     Get-WorktreeItemLiveRoot, `
+    ConvertTo-WorktreeItemResolvedResult, `
     Resolve-WorktreeItemTarget
