@@ -9,8 +9,8 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 - max_concurrency: 16
 - current_cohort: 12
 - recolor_generation: 12
-- last_updated: 2026-10-06T21-24
-- next_step: 973 PR 980 open; await child S9 DONE, then confirm headRefOid equals the child ci_gate.head_sha, update the branch if BEHIND, confirm CI green on the exact head, merge with the merge-commit method and head match, confirm issue 973 closed. 959 merged.
+- last_updated: 2026-10-06T21-34
+- next_step: 973 PR 980 held: AC18 (manual designer and add-in load runbook) unchecked; awaiting a coordinator or maintainer decision (run the runbook and check AC18 in the item worktree, then re-run S9; or authorize merging with AC18 open). Then update the branch if BEHIND, confirm CI on the exact head, merge with the merge-commit method and head match, confirm issue 973 closed. 959 merged (PR 978).
 
 ## Items
 
