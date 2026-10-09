@@ -268,6 +268,76 @@ Describe 'Invoke-BindingRedirectSync (in-memory fixtures)' {
         $result.Text | Should -Not -BeExactly $text
         ($restored -ceq $text) | Should -BeTrue -Because 'only the two attribute values may differ'
     }
+
+    It 'marks a rewrite to a higher version as an upgrade' {
+        # Arrange
+        $text = Get-AppConfigText -Redirect @(, @('log4net', '0.0.0.0-3.4.0.0', '3.4.0.0'))
+        $deployed = Get-VersionProvider -Map @{ 'log4net' = @('3.5.0.0') }
+
+        # Act
+        $result = Invoke-BindingRedirectSync -AppConfigText $text -DeployedVersionProvider $deployed
+
+        # Assert
+        $result.Repair[0].Direction | Should -BeExactly 'Upgrade'
+    }
+
+    It 'marks a rewrite to a lower version as a downgrade' {
+        # Arrange: the stale newVersion is higher than every deployed version.
+        $text = Get-AppConfigText -Redirect @(, @('log4net', '0.0.0.0-3.6.0.0', '3.6.0.0'))
+        $deployed = Get-VersionProvider -Map @{ 'log4net' = @('3.5.0.0') }
+
+        # Act
+        $result = Invoke-BindingRedirectSync -AppConfigText $text -DeployedVersionProvider $deployed
+
+        # Assert
+        $result.Repair[0].To | Should -Be '3.5.0.0'
+        $result.Repair[0].Rule | Should -Be 'HighestDeployed'
+        $result.Repair[0].Direction | Should -BeExactly 'Downgrade'
+        $result.Text | Should -Match 'newVersion="3\.5\.0\.0"'
+    }
+
+    It 'marks the direction unknown when the stale version does not parse' {
+        # Arrange
+        $text = Get-AppConfigText -Redirect @(, @('log4net', '0.0.0.0-3.4.0.0', 'latest'))
+        $deployed = Get-VersionProvider -Map @{ 'log4net' = @('3.5.0.0') }
+
+        # Act
+        $result = Invoke-BindingRedirectSync -AppConfigText $text -DeployedVersionProvider $deployed
+
+        # Assert
+        $result.Repair[0].To | Should -Be '3.5.0.0'
+        $result.Repair[0].Direction | Should -BeExactly 'Unknown'
+    }
+
+    It 'marks the direction unknown when the two versions are numerically equal' {
+        # Arrange: 3.05.0.0 and 3.5.0.0 differ as text but parse to the same version.
+        $text = Get-AppConfigText -Redirect @(, @('log4net', '0.0.0.0-3.05.0.0', '3.05.0.0'))
+        $deployed = Get-VersionProvider -Map @{ 'log4net' = @('3.5.0.0') }
+
+        # Act
+        $result = Invoke-BindingRedirectSync -AppConfigText $text -DeployedVersionProvider $deployed
+
+        # Assert
+        $result.Repair[0].To | Should -Be '3.5.0.0'
+        $result.Repair[0].Direction | Should -BeExactly 'Unknown'
+    }
+
+    It 'processes an assembly name once when two blocks differ only in letter case' {
+        # Arrange: a PowerShell hashtable literal looks keys up case-insensitively, so the
+        # deployed provider answers for both spellings of the name.
+        $text = Get-AppConfigText -Redirect @(
+            @('log4net', '0.0.0.0-3.4.0.0', '3.4.0.0'),
+            @('Log4Net', '0.0.0.0-3.4.0.0', '3.4.0.0'))
+        $deployed = Get-VersionProvider -Map @{ 'log4net' = @('3.5.0.0') }
+
+        # Act
+        $result = Invoke-BindingRedirectSync -AppConfigText $text -DeployedVersionProvider $deployed
+
+        # Assert
+        @($result.Repair).Count | Should -Be 1
+        $result.ExaminedCount | Should -Be 2
+        [regex]::Matches($result.Text, 'newVersion="3\.5\.0\.0"').Count | Should -Be 2
+    }
 }
 
 Describe 'Invoke-SolutionBindingRedirectSync (in-memory store)' {
@@ -343,8 +413,8 @@ Describe 'Format-BindingRedirectSyncReport' {
     It 'returns the heading and one line per repair' {
         # Arrange
         $repair = @(
-            [pscustomobject]@{ ProjectDirectory = 'Tags.Test'; AssemblyName = 'log4net'; From = '3.4.0.0'; To = '3.5.0.0'; Rule = 'HighestDeployed' },
-            [pscustomobject]@{ ProjectDirectory = 'Prod'; AssemblyName = 'Contoso'; From = '1.0.0.0'; To = '2.0.0.0'; Rule = 'OwnReference' })
+            [pscustomobject]@{ ProjectDirectory = 'Tags.Test'; AssemblyName = 'log4net'; From = '3.4.0.0'; To = '3.5.0.0'; Rule = 'HighestDeployed'; Direction = 'Upgrade' },
+            [pscustomobject]@{ ProjectDirectory = 'Prod'; AssemblyName = 'Contoso'; From = '1.0.0.0'; To = '2.0.0.0'; Rule = 'OwnReference'; Direction = 'Upgrade' })
 
         # Act
         $line = (Format-BindingRedirectSyncReport -Repair $repair) -split [regex]::Escape([System.Environment]::NewLine)
@@ -352,7 +422,19 @@ Describe 'Format-BindingRedirectSyncReport' {
         # Assert
         $line.Count | Should -Be 3
         $line[0] | Should -BeExactly '## Binding redirects synchronised'
-        $line[1] | Should -BeExactly '- Tags.Test: log4net 3.4.0.0 to 3.5.0.0 (HighestDeployed)'
-        $line[2] | Should -BeExactly '- Prod: Contoso 1.0.0.0 to 2.0.0.0 (OwnReference)'
+        $line[1] | Should -BeExactly '- Tags.Test: log4net 3.4.0.0 to 3.5.0.0 (HighestDeployed, Upgrade)'
+        $line[2] | Should -BeExactly '- Prod: Contoso 1.0.0.0 to 2.0.0.0 (OwnReference, Upgrade)'
+    }
+
+    It 'states a downgrade in the report line' {
+        # Arrange
+        $repair = @(
+            [pscustomobject]@{ ProjectDirectory = 'Tags.Test'; AssemblyName = 'log4net'; From = '3.6.0.0'; To = '3.5.0.0'; Rule = 'HighestDeployed'; Direction = 'Downgrade' })
+
+        # Act
+        $line = (Format-BindingRedirectSyncReport -Repair $repair) -split [regex]::Escape([System.Environment]::NewLine)
+
+        # Assert
+        $line[1] | Should -BeExactly '- Tags.Test: log4net 3.6.0.0 to 3.5.0.0 (HighestDeployed, Downgrade)'
     }
 }

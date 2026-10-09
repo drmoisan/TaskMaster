@@ -139,3 +139,19 @@ not the full record.
   85.33/79.71 -> 85.36/79.75; TrySave class 63/66 with exactly L49/L154/L155 at 0 hits (coordinator-ruled
   exemptions, reviewer concurred); session 20/20. Details and the Cobertura-Grep attribute-order lesson in
   [[956-review-residuals]].
+
+## Moved from MEMORY.md on 2026-10-09 (index size consolidation)
+
+- **#928**: cycle 1 AC6 uncredited line; exit PASS 7/7 after part-file relocation; no-Bash review reads gitignored JaCoCo `<sourcefile>` nodes; 3-`..` hook path; bundled PoshQC coverage never covers `scripts/`. [[928-review-residuals]]
+- **#929**: PASS 7/7; AC met by tests of a pre-existing rule accepted; labels led UTC clock 38-72 min; `.bak` residue follow-up. [[929-review-residuals]]
+- **#940**: PASS 8/8; per-file coverage ruling verified at Cobertura `<class>` nodes; worktree reflog epochs as no-shell clock; stale session-cwd coverage.xml handled with an honest FAIL line. [[940-review-residuals]]
+- **#944**: PASS 18/18; keyed TryRemove safe under single-writer-under-lock; Cobertura root epoch as clock. [[944-review-residuals]]
+- **#945**: PASS 8/8; attribute-exempt overloads, per-file 24/25 as new-code figure; SortEmail.cs 1454-line pre-existing breach. [[945-review-residuals]]
+- **#947**: PASS 7/7; empty `catch (Exception)` around a sink accepted via SafeLog precedent; `_notifyUnavailable` follow-up. [[947-review-residuals]]
+- **#948**: PASS 16/16; lock-free check-then-record safe via marker serialisation; Glob hides git-ignored files. [[948-review-residuals]]
+- **#950**: PASS 16/17, AC17 PENDING CI by ruling; attribute-excluded production file PASS on no-regression limb. [[950-review-residuals]]
+- **#959**: cycles 1 and 2 PASS 25/27; overwritten projections hide a 1-branch repo-wide drift; check plan Status line vs task boxes (CR-8). [[959-review-residuals]]
+- **#964**: PASS 8/8 both cycles; pure-move split isolated a pre-existing uncovered arm (non-blocking Minor). [[964-review-residuals]]
+- **#968**: AWAITING_CI 31/32; caller-classed pending AC = one awaiting_ci blocker; hook-safe wording validator-confirmed. [[968-review-residuals]]
+- **#927**: PASS 17/20 + 3 PENDING-CI; -0.01pp C# noise with zero prod change; 7-cell trap applies to every table. [[927-review-residuals]]
+- Older one-liners (#565, #584, #645, #707, #730, #731, #735, #736, #751, #752, #799): see each `project_<N>-review-residuals.md`.

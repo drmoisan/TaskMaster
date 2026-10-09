@@ -23,7 +23,7 @@ Out of scope (spec "Scope & Non-Goals"): any file under `.github/workflows/**` (
 **C1. Symbols.**
 - `FEATURE` = `docs/features/active/2026-10-09-dependabot-repair-borrowed-packages-and-transitive-redirects-985`.
 - `WORKTREE` = the executor's worktree root (the checkout of branch `bug/dependabot-repair-borrowed-packages-and-transitive-redirects-985`). Every repository path in this plan is relative to `WORKTREE`.
-- `SCRATCH` = the directory `$env:LOCALAPPDATA\Temp\claude\C--Users-DanMoisan-repos-TaskMaster-wt-2026-10-09T12-47\a87f8bd5-b2ae-46b5-8bba-6b4ed90e8d09\scratchpad` (the caller-supplied session scratchpad, written through the environment variable so no drive-rooted profile path appears in this tracked file). Resolve it once with `pwsh -NoProfile -Command "Join-Path $env:LOCALAPPDATA 'Temp\claude\C--Users-DanMoisan-repos-TaskMaster-wt-2026-10-09T12-47\a87f8bd5-b2ae-46b5-8bba-6b4ed90e8d09\scratchpad'"`.
+- `SCRATCH` = the directory `$env:LOCALAPPDATA\Temp\claude\<encoded-worktree>\<session-id>\scratchpad` (the caller-supplied session scratchpad, written through the environment variable so no drive-rooted profile path appears in this tracked file). Resolve it once with `pwsh -NoProfile -Command "Join-Path $env:LOCALAPPDATA 'Temp\claude\<encoded-worktree>\<session-id>\scratchpad'"`.
 - `CMDDIR` = `SCRATCH\985-cmd` (helper scripts, outside the repository).
 - `REHEARSAL` = `SCRATCH\rehearsal-985` (the throwaway rehearsal worktree, outside the repository).
 - `FIX-BRANCH` = `bug/dependabot-repair-borrowed-packages-and-transitive-redirects-985`. `REHEARSAL-BRANCH` = `rehearsal-985-throwaway`. `DEPENDABOT-REF` = `origin/dependabot/nuget/QuickFiler.Test/all-nuget-updates-2542c001c9`.

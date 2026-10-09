@@ -71,6 +71,25 @@ function Test-SyncProjectPath {
     return (@($parent | Where-Object { $script:ExcludedSegment -contains $_ }).Count -eq 0)
 }
 
+# Private. Classifies a rewrite by numeric version comparison so a downward rewrite is visible in
+# the report; an unparsable value or a numerically equal pair yields Unknown.
+function Get-RedirectDirection {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string]$From,
+        [Parameter(Mandatory = $true)][string]$To
+    )
+
+    $fromVersion = $null
+    $toVersion = $null
+    if ([System.Version]::TryParse($From, [ref]$fromVersion) -and [System.Version]::TryParse($To, [ref]$toVersion)) {
+        if ($toVersion -lt $fromVersion) { return 'Downgrade' }
+        if ($toVersion -gt $fromVersion) { return 'Upgrade' }
+    }
+    return 'Unknown'
+}
+
 function Invoke-BindingRedirectSync {
     <#
     .SYNOPSIS
@@ -78,9 +97,9 @@ function Invoke-BindingRedirectSync {
         assembly version.
     .DESCRIPTION
         Pure over text. A dependentAssembly block with no bindingRedirect is not examined, and a
-        name already handled in this call is skipped. Empty or whitespace text examines zero
-        entries; text that is not an application configuration document is rejected by the
-        parser, whose exception propagates.
+        name already handled in this call, compared case-insensitively, is skipped. Empty or
+        whitespace text examines zero entries; text that is not an application configuration
+        document is rejected by the parser, whose exception propagates.
     .PARAMETER AppConfigText
         The application configuration text.
     .PARAMETER DeployedVersionProvider
@@ -91,7 +110,8 @@ function Invoke-BindingRedirectSync {
         project file references for it.
     .OUTPUTS
         A BindingRedirectSync.Result carrying the text, the repair records, the unverifiable and
-        unresolvable names and the examined count.
+        unresolvable names and the examined count. Each repair record carries a Direction of
+        Upgrade, Downgrade or Unknown.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -111,15 +131,15 @@ function Invoke-BindingRedirectSync {
     $repair = [System.Collections.Generic.List[pscustomobject]]::new()
     $unverifiable = [System.Collections.Generic.List[string]]::new()
     $unresolvable = [System.Collections.Generic.List[string]]::new()
-    $handled = [System.Collections.Generic.List[string]]::new()
+    # Assembly names bind case-insensitively, so a block differing only in letter case names the same assembly.
+    $handled = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
     $examined = 0
 
     if (-not [string]::IsNullOrWhiteSpace($AppConfigText)) {
         foreach ($record in @(ConvertFrom-AppConfigText -Text $AppConfigText)) {
             if ([string]::IsNullOrEmpty($record.NewVersion)) { continue }
             $examined++
-            if ($handled.Contains($record.Name)) { continue }
-            $handled.Add($record.Name)
+            if (-not $handled.Add($record.Name)) { continue }
 
             $deployed = @(Get-ProviderVersion -Provider $DeployedVersionProvider -Name $record.Name)
             if ($deployed.Count -eq 0) { $unverifiable.Add($record.Name); continue }
@@ -152,6 +172,7 @@ function Invoke-BindingRedirectSync {
                     From         = $record.NewVersion
                     To           = $target
                     Rule         = $rule
+                    Direction    = (Get-RedirectDirection -From $record.NewVersion -To $target)
                 })
         }
     }
@@ -279,7 +300,8 @@ function Format-BindingRedirectSyncReport {
     .PARAMETER Repair
         The repair records Invoke-SolutionBindingRedirectSync returned.
     .OUTPUTS
-        The block text, or an empty string when there are no repairs.
+        The block text, or an empty string when there are no repairs. Each line ends with the
+        rule and the direction of the rewrite.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -293,8 +315,8 @@ function Format-BindingRedirectSyncReport {
     $line = [System.Collections.Generic.List[string]]::new()
     $line.Add('## Binding redirects synchronised')
     foreach ($record in $Repair) {
-        $line.Add(('- {0}: {1} {2} to {3} ({4})' -f $record.ProjectDirectory, $record.AssemblyName,
-                $record.From, $record.To, $record.Rule))
+        $line.Add(('- {0}: {1} {2} to {3} ({4}, {5})' -f $record.ProjectDirectory, $record.AssemblyName,
+                $record.From, $record.To, $record.Rule, $record.Direction))
     }
     return ($line -join [System.Environment]::NewLine)
 }

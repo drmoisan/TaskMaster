@@ -170,6 +170,10 @@ Describe 'Repair-PackageManifestConsistency redirect synchronisation (issue 985)
             $kind | Should -Not -Contain 'BindingRedirectSync'
         }
 
+        It 'states the direction of the synchronised redirect in the body' {
+            $script:FirstResult.Body | Should -Match 'log4net 3\.4\.0\.0 to 3\.5\.0\.0 \(HighestDeployed, Upgrade\)'
+        }
+
         It 'writes nothing on a second run over the repaired store' {
             @($script:SecondResult.WrittenPath).Count | Should -Be 0
         }
@@ -182,6 +186,33 @@ Describe 'Repair-PackageManifestConsistency redirect synchronisation (issue 985)
             $result = & $script:EntryPoint @argument -WhatIf
             $fixture.Store[$script:TestAppConfigPath] | Should -Match 'newVersion="3\.4\.0\.0"'
             @($result.WrittenPath).Count | Should -Be 0
+        }
+    }
+
+    Context 'An application configuration rewritten by both the redirect sync and the normalisation pass' {
+        BeforeAll {
+            # The sync pass writes the stale redirect and the normalisation pass then writes the
+            # collapsed assemblyBinding start tag, so one file is written twice in a single run.
+            $reflowed = $script:TestAppConfig.Replace('    <assemblyBinding xmlns=', "    <assemblyBinding`r`n        xmlns=")
+            $script:DoubleWrite = Get-RepairFixture -File @{
+                'X:\fixture\Prod\packages.config' = $script:ProdManifest
+                'X:\fixture\Prod\Prod.csproj'     = $script:ProdProject
+                'X:\fixture\Test\packages.config' = $script:TestManifest
+                'X:\fixture\Test\Test.csproj'     = $script:TestProject
+                $script:TestAppConfigPath         = $reflowed
+            } -Identity $script:AssemblyIdentity
+            $argument = $script:DoubleWrite.Argument
+            $script:DoubleWriteResult = & $script:EntryPoint @argument
+        }
+
+        It 'applies both rewrites to the application configuration' {
+            $stored = $script:DoubleWrite.Store[$script:TestAppConfigPath]
+            $stored | Should -Match 'newVersion="3\.5\.0\.0"'
+            $stored | Should -Match '<assemblyBinding xmlns="urn:schemas-microsoft-com:asm\.v1">'
+        }
+
+        It 'lists the application configuration once in the written paths' {
+            @($script:DoubleWriteResult.WrittenPath | Where-Object { $_ -eq $script:TestAppConfigPath }).Count | Should -Be 1
         }
     }
 }

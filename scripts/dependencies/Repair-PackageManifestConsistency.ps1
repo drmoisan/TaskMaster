@@ -463,6 +463,8 @@ $failure = @($verification | ForEach-Object { $_.Failure } | Where-Object { $nul
 $body = & $script:ReportBody $verification.ToArray() $skipped.ToArray()
 $syncReport = Format-BindingRedirectSyncReport -Repair @($redirectSync.Repair)
 if ($syncReport) { $body = $body + [System.Environment]::NewLine + [System.Environment]::NewLine + $syncReport }
+# A file rewritten by more than one pass is listed once; Windows paths compare case-insensitively.
+$distinctWritten = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
 [pscustomobject]@{
     PSTypeName                = 'Repair.Result'
@@ -471,7 +473,7 @@ if ($syncReport) { $body = $body + [System.Environment]::NewLine + [System.Envir
     Verification              = $verification.ToArray()
     Skipped                   = $skipped.ToArray()
     Upgraded                  = $upgraded.ToArray()
-    WrittenPath               = $written.ToArray()
+    WrittenPath               = [string[]]@($written | Where-Object { $distinctWritten.Add($_) })
     RepairCount               = (& $total { $_.Report.RepairCount })
     ExaminedProjectCount      = $verification.Count
     ExaminedElementCount      = (& $total { $_.Report.Examined.Total })

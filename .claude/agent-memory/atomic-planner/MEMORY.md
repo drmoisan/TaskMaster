@@ -2,6 +2,7 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#985 R1](project_985_r1_scratchpad_identity_and_double_write_seams.md) — never spell the scratchpad (encoded name holds the account); sweep diff + untracked; reflowed tag forces a double write
 - [#985 R0](project_985_r0_rehearsal_fidelity_and_hygiene_path_seams.md) — merge-into-Dependabot rehearsal needs a simulated nuget update; hygiene guard flags Users paths in tracked plans; Invoke-VSBuild rewrites csproj
 - [#973 R1](project_973_r1_last_task_artifact_only_commit_and_measured_line_length_seams.md) — last task commits its artifact alone; dossier cites no later result; measure line length with `^.{N,}`; Glob zero-gate needs a positive control
 - [#973 cycle 1](project_973_cycle1_premise_correction_refscan_and_tautology_fold_seams.md) — false-premise AC fixed by a refscan + positive control; a "tautology" may be an analyzer workaround; commit-per-task flip-then-commit
