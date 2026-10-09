@@ -89,6 +89,32 @@ Describe 'Repository tree consistency (issue 929)' {
         $finding.Count | Should -Be 0 -Because ('these Import elements name a package the sibling manifest omits: ' + ($finding -join '; '))
     }
 
+    It 'reports no HintPath whose package folder the sibling manifest does not declare, for every project directory that carries a manifest' {
+        # Arrange: the pair discovery of the Import gate above, so both gates read one population.
+        $pair = @(Get-ChildItem -LiteralPath $script:RepoRoot -Directory | ForEach-Object {
+                $manifest = Join-Path $_.FullName 'packages.config'
+                $project = @(Get-ChildItem -LiteralPath $_.FullName -File | Where-Object { $_.Extension -eq '.csproj' })
+                if ((Test-Path -LiteralPath $manifest) -and $project.Count -eq 1) {
+                    [pscustomobject]@{ Project = $project[0].FullName; Manifest = $manifest }
+                }
+            })
+
+        # Act
+        $examined = 0
+        $finding = [System.Collections.Generic.List[string]]::new()
+        foreach ($entry in $pair) {
+            $detection = Find-OrphanedHintPath -ProjectText ([System.IO.File]::ReadAllText($entry.Project)) -ManifestText ([System.IO.File]::ReadAllText($entry.Manifest))
+            $examined += $detection.ExaminedCount
+            foreach ($item in @($detection.Finding)) {
+                $finding.Add(('{0}: line {1} {2}' -f (Split-Path -Leaf $entry.Project), $item.LineNumber, $item.PackageFolder))
+            }
+        }
+
+        # Assert: the examined count guards the zero finding count.
+        $examined | Should -BeGreaterThan 0 -Because 'a zero examined count would mean the detector never fired'
+        $finding.Count | Should -Be 0 -Because ('these HintPath elements name a package folder the sibling manifest does not declare: ' + ($finding -join '; '))
+    }
+
     It 'names in the SVGControl binding redirects the assembly version the SVGControl project reference declares' {
         # Arrange
         $projectText = [System.IO.File]::ReadAllText((Join-Path $script:RepoRoot 'SVGControl/SVGControl.csproj'))

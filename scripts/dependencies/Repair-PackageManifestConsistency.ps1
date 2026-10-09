@@ -10,7 +10,8 @@
     whole pipeline be driven over an in-memory fixture with no temporary file. The passes run in
     the order in which each consumes the previous one's output: asset-level compatibility gate over
     the candidate upgrades; version reconciliation; analyzer-item regeneration; binding-redirect
-    reconciliation; normalisation; verification. An incompatible package is skipped with a recorded
+    reconciliation; solution-wide binding-redirect synchronisation, which runs on every invocation
+    (issue #985); normalisation; verification. An incompatible package is skipped with a recorded
     reason and the remaining upgrades proceed, so a skip is never a run failure.
 
     Two resolution rules confirm rather than select, because this script can observe what a
@@ -69,6 +70,7 @@ Import-Module (Join-Path $PSScriptRoot 'PackageCompatibility.psm1')
 Import-Module (Join-Path $PSScriptRoot 'AnalyzerItemRepair.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ProjectConsistency.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConsistencyVerifier.psm1')
+Import-Module (Join-Path $PSScriptRoot 'BindingRedirectSync.psm1')
 
 # Separators are built from their character codes rather than written as escaped literals: a
 # doubled backslash can be collapsed in transit and leave a pattern that matches nothing.
@@ -380,6 +382,7 @@ $verification = [System.Collections.Generic.List[pscustomobject]]::new()
 $skipped = [System.Collections.Generic.List[pscustomobject]]::new()
 $upgraded = [System.Collections.Generic.List[pscustomobject]]::new()
 $written = [System.Collections.Generic.List[string]]::new()
+$projectTextOverride = @{}
 
 foreach ($manifest in @(Get-PackageManifestPath -Kind 'PackagesConfig' -DirectoryLister $lister)) {
     $directory = Split-Path -Parent $manifest
@@ -415,6 +418,7 @@ foreach ($manifest in @(Get-PackageManifestPath -Kind 'PackagesConfig' -Director
         & $writer $project[0] $repaired.Text
         $written.Add($project[0])
     }
+    $projectTextOverride[$project[0]] = $repaired.Text
 
     $verification.Add((Get-ProjectVerification -ProjectName $projectName -ProjectText $repaired.Text `
                 -ManifestText $manifestText -Repair @($repaired.Repair) `
@@ -440,6 +444,12 @@ foreach ($manifest in @(Get-PackageManifestPath -Kind 'PackagesConfig' -Director
     }
 }
 
+# The redirect sync runs on every invocation, with or without -CandidateUpgrade, and before
+# normalisation so normalisation stays the last writer; -WhatIf is passed for the reason below.
+$redirectSync = Invoke-SolutionBindingRedirectSync -DirectoryLister $lister -TextReader $reader `
+    -TextWriter $writer -ProjectTextOverride $projectTextOverride -WhatIf:$WhatIfPreference
+foreach ($path in @($redirectSync.ChangedPath)) { $written.Add($path) }
+
 # -WhatIf is passed explicitly: a preference variable set on this script does not reach a module's
 # own session state, so a normalisation called without it writes during a what-if run.
 $normalisation = Invoke-ManifestNormalization -DirectoryLister $lister -TextReader $reader `
@@ -450,6 +460,11 @@ foreach ($path in @($normalisation.ChangedPath)) { $written.Add($path) }
 # aggregate reads from the same source the per-project report already published.
 $total = { param($Selector) [int](@($verification | ForEach-Object $Selector | Measure-Object -Sum).Sum) }
 $failure = @($verification | ForEach-Object { $_.Failure } | Where-Object { $null -ne $_ })
+$body = & $script:ReportBody $verification.ToArray() $skipped.ToArray()
+$syncReport = Format-BindingRedirectSyncReport -Repair @($redirectSync.Repair)
+if ($syncReport) { $body = $body + [System.Environment]::NewLine + [System.Environment]::NewLine + $syncReport }
+# A file rewritten by more than one pass is listed once; Windows paths compare case-insensitively.
+$distinctWritten = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
 [pscustomobject]@{
     PSTypeName                = 'Repair.Result'
@@ -458,7 +473,7 @@ $failure = @($verification | ForEach-Object { $_.Failure } | Where-Object { $nul
     Verification              = $verification.ToArray()
     Skipped                   = $skipped.ToArray()
     Upgraded                  = $upgraded.ToArray()
-    WrittenPath               = $written.ToArray()
+    WrittenPath               = [string[]]@($written | Where-Object { $distinctWritten.Add($_) })
     RepairCount               = (& $total { $_.Report.RepairCount })
     ExaminedProjectCount      = $verification.Count
     ExaminedElementCount      = (& $total { $_.Report.Examined.Total })
@@ -471,5 +486,10 @@ $failure = @($verification | ForEach-Object { $_.Failure } | Where-Object { $nul
     ExaminedManifestCount     = $normalisation.ExaminedPackagesConfig
     ExaminedAppConfigCount    = $normalisation.ExaminedAppConfig
     Failure                   = $failure
-    Body                      = (& $script:ReportBody $verification.ToArray() $skipped.ToArray())
+    RedirectSync              = [pscustomobject]@{
+        Repair       = @($redirectSync.Repair)
+        Unverifiable = @($redirectSync.Unverifiable)
+        Unresolvable = @($redirectSync.Unresolvable)
+    }
+    Body                      = $body
 }

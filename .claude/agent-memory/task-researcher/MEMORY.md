@@ -1,19 +1,36 @@
 # Task Researcher Memory Index
 
+## Sub-indexes
+- [epic136-percoverage-children](index_epic136_percoverage_children.md) — 35 QuickFiler/EFC per-file coverage child notes (430-495, 227)
+- [quickfiler-efc-defects](index_quickfiler_efc_defects.md) — 40 QuickFiler/EFC/SortEmail defect and behaviour notes
+
 ## Hygiene, feedback, references
 - [no-absolute-host-paths](../_shared_no_absolute_host_paths.md) — use `<repo-root>`/`<user>`/`<host>`; rename TRX before citing
-- [no-absolute-host-paths](../_shared_no_absolute_host_paths.md) — use `<repo-root>`/`<user>`; rename TRX before citing
-- [exemption-audit-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — grep proven techniques before IRREDUCIBLE
-- [measure-item-worktree](feedback_measure_item_worktree_not_session_worktree.md) — measure the item worktree, not the session one
-- [committed-cobertura-baselines](reference_committed_cobertura_baselines.md) — per-line coverage in docs/features/*/evidence
-- [net481-timeprovider](reference_net481_timeprovider_available.md) — FakeTimeProvider usable on net481
+- [exemption-audit-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — grep proven techniques + sibling consistency before IRREDUCIBLE
+- [measure-item-worktree](feedback_measure_item_worktree_not_session_worktree.md) — read facts from the ITEM worktree; uniform off-by-N = stale tree
+- [committed-cobertura-baselines](reference_committed_cobertura_baselines.md) — per-line coverage in docs/features/*/evidence/*.cobertura.xml
+- [net481-timeprovider](reference_net481_timeprovider_available.md) — FakeTimeProvider usable on net481; reject "net8+ only"
 - [github-issue-search-without-gh](reference_github_issue_search_without_gh.md) — WebFetch issues?q=...; mark [V-web]
-- [nuget-flatcontainer-nuspec-webfetch](reference_nuget_flatcontainer_nuspec_webfetch.md) — packages/ has no .nuspec; fetch api.nuget.org flat-container nuspec
+- [nuget-flatcontainer-nuspec](reference_nuget_flatcontainer_nuspec_webfetch.md) — packages/ has no .nuspec; fetch api.nuget.org flat-container nuspec
+
+## Dependencies / Dependabot / packages.config
+- [dependabot-repair-script-source-985](project_dependabot_repair_workflow_run_script_source_985.md) — repair runs branch's script; YAML edits can't green-run; redirect invariant is a union
+- [binding-redirect-drift-973](project_binding_redirect_drift_and_missing_asyncenumerable_973.md) — NuGet rewrites only installer's config; AsyncEnumerable aliased
+- [graph-usings-973](project_graph_usings_removable_and_models_name_collisions_973.md) — all 6 Graph usings removable; Models name collisions
+- [ixnet-v7-lib-ref-clash](project_ixnet_v7_lib_ref_clash_packages_config.md) — lib/net48 public AsyncEnumerable; global BCL ref = CS0121; use `<Aliases>`
+- [fsharp-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; ns2.1>2.0 ranking; ToDoModel.Test gap
+- [dependabot-net481-340](project_dependabot_net481_340.md) — semver-major ignore, no fabricated ceilings
+- [svgcontrol-test-418](project_svgcontrol_test_unwired_418.md) — STALE (in .sln since 2026-08-14)
 
 ## Threading / test determinism
-- [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult INLINES on pool thread
+- [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult on a pool thread INLINES
+- [taskrun-triage-931](project_taskrun_triage_931.md) — 2/22 Task.Run sites thread-dependent; OpenRead returns FileStream
+- [prime-marker-944](project_prime_marker_register_before_start_944.md) — ContinueWith(None) never inlines; TCS marker before start
+- [engine-toggle-prime-log-order-942](project_engine_toggle_prime_fault_log_order_942.md) — CompletePrime removes marker BEFORE log
+- [engine-toggle-fault-suppression-948](project_engine_toggle_fault_suppression_948.md) — pressed cache never clears; first fault can be NRE
+- [transactiongate-probe-882](project_transactiongate_parallel_safe_probe_882.md) — zero-bound probes assert only failure while holding
 - [pump-timeout-743](project_pump_timeout_743.md) — dispatcher-gate lead stale; TRX timestamps as instrument
-- [uithread-dispatcher-restore-493](project_uithread_dispatcher_restore_scope_493.md) — never one semaphore for helper+fixture
+- [uithread-restore-493](project_uithread_dispatcher_restore_scope_493.md) — never one semaphore for helper+fixture
 - [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — WinFormsPumpHost; CreateAsync factory gap
 - [onedrive-timeout-253](project_onedrive_timeout_test_determinism_253.md) — catches TimeoutException not TCE
 - [unobserved-task-fault-670](project_unobserved_task_fault_670.md) — ViewerSetup.cs 499/500; raw WPF Dispatcher
@@ -22,38 +39,6 @@
 - [analyzer-severity-runsettings](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 only rule above suggestion
 - [lock-recursion-317](project_lock_recursion_coverage_317.md) — deleted LockRecursionTests.cs is a restoration
 - [gettableinviewasync-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts; OCE is not TCE
-- [engine-toggle-fault-suppression-948](project_engine_toggle_fault_suppression_948.md) — pressed cache never clears; first fault can be NRE
-- [no-absolute-host-paths](../_shared_no_absolute_host_paths.md) — use `<repo-root>`/`<user>`/`<host>`; rename vstest TRX before citing
-- [measure-item-worktree](feedback_measure_item_worktree_not_session_worktree.md) — measure the item worktree, not the session worktree
-- [exemption-audit-check-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — grep proven techniques + sibling consistency before IRREDUCIBLE
-- [committed-cobertura-baselines](reference_committed_cobertura_baselines.md) — per-line coverage in docs/features/*/evidence/*.cobertura.xml; read, don't infer
-- [net481-timeprovider-available](reference_net481_timeprovider_available.md) — FakeTimeProvider usable on net481; reject "net8+ only"
-- [github-issue-search-without-gh](reference_github_issue_search_without_gh.md) — WebFetch github issues?q=... when gh absent; mark [V-web]
-- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — PQ setting no var substitution; rg-vs-git deltas; basename gotcha
-- [push-down-claude-dir-149](project_push_down_claude_dir.md) — pushDownClaudeDir research (2026-04-16)
-- [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult on a pool thread INLINES; MSTest 4.4 bodies run inside Task.Run; CheckAccess = Thread identity
-- [pump-timeout-743](project_pump_timeout_743.md) — dispatcher-gate lead stale (#493); 9/19 pump tests skip the gate; TRX timestamps as instrument; finally runs LATE not never
-- [transactiongate-parallel-safe-probe-882](project_transactiongate_parallel_safe_probe_882.md) — zero-bound probes assert only failure while holding; success via production entry; no DoNotParallelize; SemaphoreFullException surfaces at holder's Dispose
-- [taskrun-triage-931](project_taskrun_triage_931.md) — 2/22 Task.Run sites thread-dependent; DispatchValue never reads _ownerThreadId; IFileInfo.OpenRead returns FileStream (no MemoryStream)
-- [exemption-audit-proven-techniques](feedback_exemption_audit_check_proven_techniques.md) — grep proven techniques + sibling consistency before IRREDUCIBLE
-- [engine-toggle-prime-fault-log-order-942](project_engine_toggle_prime_fault_log_order_942.md) — CompletePrime removes marker BEFORE log; H1 false; probe handle from inside the sink; NB-2 unpromoted
-- [measure-item-worktree](feedback_measure_item_worktree_not_session_worktree.md) — read facts from the ITEM worktree; uniform off-by-N = stale tree
-- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — rg-vs-git one-file deltas; `basename $USERPROFILE` wrong in Git Bash; PQ setting no var substitution
-- [evidence-identity-hygiene-sweep-927](project_evidence_identity_hygiene_sweep_927.md) — classify raw evidence by XML root (243/23/27/18); _pester.yml paths explicit; `<drive>:` placeholders
-- [push-down-claude-dir-149](project_push_down_claude_dir.md) — #149 pushDownClaudeDir research (2026-04-16)
-- [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult on a pool thread INLINES; MSTest 4.4 bodies run inside Task.Run
-- [pump-timeout-743](project_pump_timeout_743.md) — dispatcher-gate lead stale (#493); 9/19 pump tests skip the gate; TRX timestamps as instrument
-- [uithread-dispatcher-restore-scope-493](project_uithread_dispatcher_restore_scope_493.md) — 2-lock split; never one semaphore for helper+fixture; CI runs QuickFiler.Test serially
-- [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — WinFormsPumpHost design; CreateAsync factory-seam gap
-- [onedrive-timeout-test-determinism-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask overload catches TimeoutException not TCE; DI-seam fix
-- [onedrive-timeout-test-determinism-253](project_onedrive_timeout_test_determinism_253.md) — TimeOutTask overload catches TimeoutException not TaskCanceled
-- [unobserved-task-fault-670](project_unobserved_task_fault_670.md) — ViewerSetup.cs 499/500; IItemViewer.UiDispatcher is raw WPF Dispatcher
-- [filerqueue-consumer-unsound-633](project_filerqueue_consumer_unsound_633.md) — Consumer orphaned-item race; BackGroundMove tests vacuous
-- [terminal-hook-barrier-751](project_terminal_hook_barrier_751.md) — notify runs after terminal TrySet; `run.Terminal` is the barrier
-- [gettableinviewasync-null-contract-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts; OCE is not TCE
-- [analyzer-severity-and-runsettings-split](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 only rule above suggestion; no .globalconfig
-- [lock-recursion-coverage-317](project_lock_recursion_coverage_317.md) — deleted LockRecursionTests.cs is a restoration
-- [gettableinviewasync-null-contract-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts; OCE is not TCE
 
 ## Coverage / Cobertura mechanics
 - [cobertura-closure-exemption-457](project_cobertura_closure_exemption_457.md) — exempt members emit NO `<method>`; async `d__` trap
@@ -76,210 +61,6 @@
 - [capstone-f16](project_quickfiler_capstone_f16_measurement.md) — `<sources>` discriminates raw vs post-processed
 - [f9-measurement-441](project_qfc_f9_measurement_441_and_designer_inheritance.md) — #441 corrupts per-file line-rate
 
-## Epic #136 per-file coverage children
-- [qfc-helper-classes-434](project_qfc_helper_classes_f4_434.md) — EmailMoveMonitor seam; explicit Compile Includes
-- [qfc-theme-cluster-434](project_qfc_theme_cluster_f4_434.md) — theme+layout tests-only
-- [qfc-viewerqueue-434](project_qfc_perfile_coverage_viewerqueue_434.md) — method-group sites forbid optional params
-- [qfc-keyboard-coverage-430](project_qfc_keyboard_coverage_430.md) — no IVT UtilitiesCS->QuickFiler.Test
-- [qfc-keyboard-actions-430](project_qfc_keyboard_actions_430.md) — KaStringAsync has no async/timer
-- [qfc-datamodel-436](project_qfc_datamodel_coverage_436.md) — type-scoped exclude hides 3 partials
-- [efcdatamodel-436](project_efcdatamodel_coverage_436.md) — EmailFiler Sort/Open non-virtual
-- [qfc-queueprocessing-436](project_qfc_queueprocessing_436.md) — missing FakeTimeProvider fails silently
-- [qfc-framebuilding-436](project_qfc_framebuilding_436.md) — Deedle not WinForms
-- [qfc-explorer-controller-435](project_qfc_explorer_controller_435.md) — DynamicProxyGenAssembly2 IVT location
-- [qfc-form-controller-435](project_qfc_form_controller_coverage_435.md) — UndoConsumer busy-spins; re-verify
-- [qfc-form-setup-disposal-435](project_qfc_form_controller_setup_disposal_435.md) — Cleanup idempotent
-- [duplicate-iqfcformcontroller-435](project_quickfiler_duplicate_iqfcformcontroller_435.md) — Interfaces copy is dead
-- [qfc-home-metrics-433](project_qfc_home_controller_metrics_433.md) — metrics consumer never runs
-- [qfc-home-iteration-433](project_qfc_home_controller_iteration_433.md) — #424 deadline leaked; Iterate dead
-- [qfc-home-coverage-433](project_qfc_home_controller_coverage_433.md) — LaunchAsync 0% structurally
-- [efc-home-deps-437](project_efc_home_controller_deps_437.md) — Production* statics vs ClassLevel hazard
-- [efc-home-coverage-437](project_efc_home_controller_coverage_437.md) — Timing.cs reads no clock
-- [efc-item-controller-452](project_efc_item_controller_452.md) — IItemViewer covers ~70% of viewer
-- [efc-form-controller-452](project_efc_form_controller_452.md) — ViewerQueueCore does NOT pool
-- [qfc-item-230-pump-seam](project_qfc_item_controller_230_pump_seam.md) — #230 root of 4 exemptions
-- [qfc-item-f10-453](project_qfc_item_controller_f10_coverage_453.md) — test files at 497/498 of 500
-- [qfc-item-f10-init-453](project_excludefromcodecoverage_lambda_leak.md) — 3/7 exemptions on DEAD members
-- [qfc-conversation-seam-453](project_qfc_conversation_seam_ratified_453.md) — exemption #227-ratified
-- [qfc-collection-controller-454](project_qfc_collection_controller_454.md) — `async public` defeats greps
-- [quickfiler-test-sta-ivt](project_quickfiler_test_sta_and_ivt.md) — manual STA infra exists
-- [qfc-dropdown-f13-455](project_qfc_breadcrumb_dropdown_f13_455.md) — async `throw;` brace unreachable
-- [qfc455-reentrant-dispose](project_qfc455_reentrant_dispose_seam.md) — disposal reentrancy opens async window
-- [qfc-itemviewer-456](project_qfc_itemviewer_coverage_456.md) — line-rate corrupt, branch-rate sound
-- [qfc-breadcrumb-lifecycle-495](project_qfc_breadcrumb_lifecycle_f12_495.md) — `0/2` on `?? throw` = factory threw
-- [qfc-bridge-router-495](project_qfc_breadcrumb_bridge_router_495.md) — wrong router's rate matches to 6 dp
-- [breadcrumb-messenger-hub-495](project_breadcrumb_messenger_hub_495.md) — finalizer makes branch GC-dependent
-- [qfc-upgrade-lifetime-495](project_qfc_upgrade_lifetime_495.md) — `<class name>` can name secondary type
-- [qfc-item-227-r2-denial](project_qfc_item_controller_227_r2_denial.md) — blanket exemption denied
-- [qfc227-headless-itemviewer](project_qfc227_headless_itemviewer_and_tlpcellsnapshot.md) — headless ItemViewer safe
-- [qfc-datamodel-coverage-436](project_qfc_datamodel_coverage_436.md) — type-scoped exclude hides 3 partials; remove last
-- [efcdatamodel-coverage-436](project_efcdatamodel_coverage_436.md) — EmailFiler Sort/Open non-virtual; PackageItems(bool) dead
-- [qfc-queueprocessing-436](project_qfc_queueprocessing_436.md) — zero COM deref; missing FakeTimeProvider fails silently
-- [qfc-framebuilding-436](project_qfc_framebuilding_436.md) — Deedle not WinForms; DfDeedle dialogs behind IVT wall
-- [qfc-explorer-controller-435](project_qfc_explorer_controller_435.md) — DynamicProxyGenAssembly2 IVT in QfcHighConfidencePreFilter.cs
-- [qfc-form-controller-coverage-435](project_qfc_form_controller_coverage_435.md) — UndoConsumer `|| exit` busy-spins; RECONSTRUCTED, re-verify
-- [qfc-form-controller-setup-disposal-435](project_qfc_form_controller_setup_disposal_435.md) — no new seams; Cleanup idempotent
-- [duplicate-iqfcformcontroller-435](project_quickfiler_duplicate_iqfcformcontroller_435.md) — QuickFiler.Interfaces.IQfcFormController is dead code
-- [qfc-home-controller-metrics-433](project_qfc_home_controller_metrics_433.md) — metrics consumer never runs; BlockingCollection OCE needs token
-- [qfc-home-controller-iteration-433](project_qfc_home_controller_iteration_433.md) — #424 deadline leaked into 2-arg dequeue; Iterate dead
-- [qfc-home-controller-coverage-433](project_qfc_home_controller_coverage_433.md) — LaunchAsync 0% structurally; check both halves before splitting
-- [efc-home-controller-deps-437](project_efc_home_controller_deps_437.md) — deps ~86-93%; Production* statics vs ClassLevel hazard
-- [efc-home-controller-coverage-437](project_efc_home_controller_coverage_437.md) — Timing.cs reads no clock; dual default lambdas order-dependent
-- [efc-item-controller-452](project_efc_item_controller_452.md) — IItemViewer covers ~70% of viewer; WpfUiDispatcher ctor internal
-- [efc-form-controller-452](project_efc_form_controller_452.md) — ViewerQueueCore does NOT pool; #439 = namespace mismatch
-- [qfc-item-controller-230-pump-seam](project_qfc_item_controller_230_pump_seam.md) — #230 root of 4 exemptions; 3/19 on DEAD members
-- [qfc-item-controller-f10-coverage-453](project_qfc_item_controller_f10_coverage_453.md) — test files at 497/498 of 500
-- [qfc-item-controller-f10-init-453](project_excludefromcodecoverage_lambda_leak.md) — 3/7 Initialization exemptions on DEAD members
-- [qfc-conversation-seam-ratified-453](project_qfc_conversation_seam_ratified_453.md) — DoLoadConversationResolverCoreAsync exemption #227-ratified
-- [qfc-collection-controller-454](project_qfc_collection_controller_454.md) — 12 unreachable members; `async public` defeats greps
-- [quickfiler-test-sta-and-ivt](project_quickfiler_test_sta_and_ivt.md) — QuickFiler grants internals to QuickFiler.Test; manual STA infra exists
-- [qfc-breadcrumb-dropdown-f13-455](project_qfc_breadcrumb_dropdown_f13_455.md) — async `throw;` makes catch brace unreachable
-- [qfc455-reentrant-dispose-seam](project_qfc455_reentrant_dispose_seam.md) — disposal-callback reentrancy opens the async window
-- [qfc-itemviewer-coverage-456](project_qfc_itemviewer_coverage_456.md) — class line-rate corrupt, branch-rate sound; STA attrs in MSTest 4.3.3
-- [qfc-breadcrumb-lifecycle-f12-495](project_qfc_breadcrumb_lifecycle_f12_495.md) — `0/2` on `factory() ?? throw` means factory threw
-- [qfc-breadcrumb-bridge-router-495](project_qfc_breadcrumb_bridge_router_495.md) — wrong router's branch-rate matches to 6 digits
-- [breadcrumb-messenger-hub-495](project_breadcrumb_messenger_hub_495.md) — Component finalizer makes a branch GC-dependent
-- [qfc-upgrade-lifetime-495](project_qfc_upgrade_lifetime_495.md) — `<class name>` can name a secondary type
-- [qfc-item-controller-227-r2-denial](project_qfc_item_controller_227_r2_denial.md) — maintainer denied blanket exemption; per-member precedent
-- [qfc227-headless-itemviewer](project_qfc227_headless_itemviewer_and_tlpcellsnapshot.md) — headless ItemViewer safe; target 24 -> 19
-- [issue-search-without-gh](reference_github_issue_search_without_gh.md) — WebFetch issues?q=...; mark [V-web]
-- [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult on pool thread INLINES
-- [prime-marker-944](project_prime_marker_register_before_start_944.md) — ContinueWith(None) never inlines; TCS marker before start
-- [uithread-restore-493](project_uithread_dispatcher_restore_scope_493.md) — never one semaphore for helper+fixture
-- [filerqueue-consumer-633](project_filerqueue_consumer_unsound_633.md) — orphaned-item race; vacuous tests
-- [gettableinviewasync-838](project_gettableinviewasync_null_contract_838.md) — `maxAttempts:1` = TWO attempts
-- [closure-exemption-457](project_cobertura_closure_exemption_457.md) — exempt members emit no `<method>`; `d__` trap
-- [root-attrs-raw-vs-post](project_cobertura_root_attrs_raw_vs_postprocessed.md) — never compare raw vs Koverage totals
-- [double-count-815](project_cobertura_double_count_moves_counts_not_rates_815.md) — doubles counters, pct <=0.46pp
-- [threshold-reconciliation-494](project_coverage_threshold_reconciliation_494.md) — 85/75 foreign leakage; gate evadable
-- [perfile-attribution](project_cobertura_perfile_attribution_contract.md) — recompute from `<lines>`
-- [line-double-count](project_cobertura_line_double_count.md) — lines-valid ~2x actual
-- [exemption-branchrate-gotchas](project_cobertura_exemption_and_branchrate_gotchas.md) — method exclude leaks lambdas
-- [qfc455-lambda-leak](project_qfc455_exclude_attribute_lambda_leak.md) — #441 inflation = per-method `<lines>`
-- [webview2-exemption-asymmetry](project_webview2_exemption_and_coverage_asymmetry.md) — class-level hides lambdas
-- [partial-type-exclusion-456](project_partial_type_coverage_exclusion_456.md) — de-exempting designer RAISES coverage
-- [designer-coverage](project_winforms_designer_coverage_mechanics.md) — one construction covers ~99% Designer
-- [itemviewer-partial-coupling](project_itemviewer_partial_exemption_coupling.md) — one attr hides 6 partials
-- [iqfcdatamodel-436](project_iqfcdatamodel_contract_436.md) — no class element for interfaces/enums
-- [interface-only-files-433](project_quickfiler_interface_only_files_433.md) — IQfcHomeController.cs exists twice
-- [percoverage-epic-136](project_quickfiler_percoverage_epic_136.md) — read per-file rate from Cobertura
-- [coverage-ledger-432](project_quickfiler_coverage_ledger_432.md) — 40 usages/21 files, not 33
-- [capstone-f16](project_quickfiler_capstone_f16_measurement.md) — `<sources>` discriminates raw vs post
-- [f9-441-designer](project_qfc_f9_measurement_441_and_designer_inheritance.md) — 6dp vs 16dp tell
-- [helper-classes-434](project_qfc_helper_classes_f4_434.md) — EmailMoveMonitor seam exists
-- [theme-cluster-434](project_qfc_theme_cluster_f4_434.md) — no colour getters
-- [viewerqueue-434](project_qfc_perfile_coverage_viewerqueue_434.md) — method-group sites forbid optional params
-- [keyboard-430](project_qfc_keyboard_coverage_430.md) — no IVT to QuickFiler.Test; headless ItemViewer OK
-- [keyboard-actions-430](project_qfc_keyboard_actions_430.md) — KaStringAsync has no async/timer
-- [datamodel-436](project_qfc_datamodel_coverage_436.md) — type exclude hides 3 partials
-- [efcdatamodel-436](project_efcdatamodel_coverage_436.md) — Sort/Open non-virtual
-- [queueprocessing-436](project_qfc_queueprocessing_436.md) — missing FakeTimeProvider fails silently
-- [framebuilding-436](project_qfc_framebuilding_436.md) — Deedle; dialogs behind IVT wall
-- [explorer-controller-435](project_qfc_explorer_controller_435.md) — DynamicProxy IVT in QfcHighConfidencePreFilter.cs
-- [form-controller-435](project_qfc_form_controller_coverage_435.md) — UndoConsumer busy-spins; re-verify
-- [form-controller-disposal-435](project_qfc_form_controller_setup_disposal_435.md) — Cleanup idempotent
-- [duplicate-iqfcformcontroller-435](project_quickfiler_duplicate_iqfcformcontroller_435.md) — Interfaces copy dead
-- [home-metrics-433](project_qfc_home_controller_metrics_433.md) — metrics consumer never runs
-- [home-iteration-433](project_qfc_home_controller_iteration_433.md) — Iterate dead; deadline leak
-- [home-coverage-433](project_qfc_home_controller_coverage_433.md) — LaunchAsync 0% structurally
-- [efc-home-deps-437](project_efc_home_controller_deps_437.md) — Production* statics vs ClassLevel
-- [efc-item-controller-452](project_efc_item_controller_452.md) — IItemViewer covers ~70%
-- [item-controller-230-seam](project_qfc_item_controller_230_pump_seam.md) — #230 root of 4 exemptions
-- [item-controller-f10-453](project_qfc_item_controller_f10_coverage_453.md) — test files at 497/498
-- [f10-init-453](project_excludefromcodecoverage_lambda_leak.md) — 3/7 exemptions on DEAD members
-- [conversation-seam-453](project_qfc_conversation_seam_ratified_453.md) — #227-ratified exemption
-- [collection-controller-454](project_qfc_collection_controller_454.md) — `async public` defeats greps
-- [test-sta-and-ivt](project_quickfiler_test_sta_and_ivt.md) — manual STA infra exists
-- [breadcrumb-dropdown-455](project_qfc_breadcrumb_dropdown_f13_455.md) — async `throw;` brace unreachable
-- [reentrant-dispose-455](project_qfc455_reentrant_dispose_seam.md) — reentrancy opens async window
-- [itemviewer-456](project_qfc_itemviewer_coverage_456.md) — line-rate corrupt, branch-rate sound
-- [breadcrumb-lifecycle-495](project_qfc_breadcrumb_lifecycle_f12_495.md) — `0/2` on `?? throw` = factory threw
-- [bridge-router-495](project_qfc_breadcrumb_bridge_router_495.md) — wrong router matches 6 digits
-- [messenger-hub-495](project_breadcrumb_messenger_hub_495.md) — finalizer makes branch GC-dependent
-- [upgrade-lifetime-495](project_qfc_upgrade_lifetime_495.md) — `<class name>` can name secondary type
-- [item-controller-227-denial](project_qfc_item_controller_227_r2_denial.md) — per-member precedent
-- [headless-itemviewer-227](project_qfc227_headless_itemviewer_and_tlpcellsnapshot.md) — target 24 -> 19
-
-## QuickFiler / EFC / SortEmail defects and behaviour
-- [sortemail-split-prompt-seam-956](project_sortemail_split_and_prompt_seam_956.md) — per-call prompt session; AsyncLocal breaks stickiness
-- [sortemail-966-consolidation-959](project_sortemail_966_consolidation_959.md) — live path builds helpers with FOLDER NAME; A 235 re-roots one path; ToDoModel copy uncompiled
-- [sortemail-latent-defects-959](project_sortemail_latent_defects_959.md) — callers discard the bool: only rethrow surfaces; L4 has a 3rd (null-array) defect
-- [qfc-high-confidence-pipelines](project_qfc_high_confidence_dual_pipeline.md) — THREE pipelines; #233 gate LIVE
-- [qfc424-startup-stall](project_qfc424_high_confidence_startup_stall.md) — serial scoring; async-void worker
-- [qfc678-predictor-carry](project_qfc678_predictor_carry.md) — named producer DORMANT
-- [qfc791-deadline-teardown](project_qfc791_deadline_and_cancel_teardown.md) — superseded by #424/#608 ACs
-- [qfc810-teardown-dropdown](project_qfc810_teardown_dropdown_residuals.md) — method-group blocks optional param
-- [qfc823-review-residuals](project_qfc823_review_residuals.md) — R2 follow-up is #813
-- [teardown-guard-821](project_teardown_guard_enumeration_821.md) — 4th sharer is 4th Cancel() site
-- [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — sharing EmailMoveMonitor drops actions
-- [qfc254-darkmode-labels](project_qfc254_darkmode_stale_labels.md) — labels themed only in MailRead branch
-- [qfc254-residual](project_qfc254_residual_after_comexception_fix.md) — #269 cause = fore/back swap
-- [qfc254-ambient-inheritance](project_qfc254_ambient_inheritance_mechanism.md) — SUPERSEDED; ambient notes accurate
-- [qfc438-focus-steal](project_qfc438_search_focus_steal.md) — TWO focus-steal mechanisms
-- [qfc677-webview2-focus](project_qfc677_webview2_focus_hold_outlook_keyboard.md) — WV2 focus hold + anchor steal
-- [qfc680-menu-mode](project_qfc680_menu_mode_keyboard_capture.md) — ModalMenuFilter; AutoClose=false pre-Show
-- [qfc663-alt-chord](project_qfc663_alt_chord_no_altf.md) — only Alt+M swallowed
-- [qfc-keyboard-defects-444](project_qfc_keyboard_action_defects_444.md) — trigger Right/Down/Right
-- [breadcrumb-nav-439-440](project_breadcrumb_navigation_defects_439_440_498_499.md) — #439 fix regresses join
-- [issue-440-via-498](project_issue_440_already_landed_via_498.md) — Efc/Qfc do NOT share BreadcrumbRow
-- [qfc-item-defects-484](project_qfc_item_controller_defects_484.md) — all 5 Suspected Fix sections wrong
-- [webview2-initializer-476](project_webview2_host_initializer_defects_476.md) — EfcViewerQueue not a pool
-- [qfc-efc-metrics-442](project_qfc_efc_metrics_442.md) — stopwatch race unfixable in owned files
-- [qfc-collection-defects-468](project_qfc_collection_defects_468.md) — MovedMails param redundant
-- [qfc-collection-controller-468](project_qfc_collection_controller_defects_468.md) — "unrelated interfaces" FALSE
-- [issue-469-residual-629](project_issue_469_already_fixed_residual_is_629.md) — `Initialized<T>` never memoizes
-- [reflective-caller-635](project_reflective_caller_closure_635.md) — `GetField(` is the reaching mechanism
-- [selectrow-families-637](project_selectrow_two_families_637.md) — TWO SelectRow families
-- [issue-656-no-bypass](project_issue_656_bypass_path_does_not_exist.md) — premise FALSE
-- [efc614-stem-leak](project_efc614_store_root_stem_leak.md) — FolderConverterTests.cs:329 codifies a bug
-- [efc736-archiveroot-sink](project_efc736_archiveroot_boundary_sink.md) — 6 sink sites not 4
-- [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — `/Tests:` vs `/TestCaseFilter:` exclusive
-- [qfc-folder-tree-325](project_qfc_folder_tree_percentage_325.md) — 1 live viewer, 9 dead CboFolders
-- [qfc-breadcrumb-webview2-351](project_qfc_breadcrumb_webview2_351.md) — bridge greenfield
-- [folder-hierarchy-provider-350](project_folder_hierarchy_provider_350.md) — reuse snapshot infra
-- [efcviewer-breadcrumb-349](project_efcviewer_breadcrumb_webview2_349.md) — unscaled ColumnHeader widths
-- [folder-settings-797](project_folder_settings_persistence_797.md) — ThisAddIn_Shutdown never raised
-- [ilglobals-static-824](project_ilglobals_static_publication_824.md) — BeSameAs only order-independent RED gate
-- [etl-deadline-825](project_etl_deadline_followups_825.md) — read shipped package .xml to verify API
-## QuickFiler / EFC defects and behaviour
-- [qfc-high-confidence-dual-pipeline](project_qfc_high_confidence_dual_pipeline.md) — THREE pipelines; #233 gate LIVE, #169/#171 dormant
-- [qfc424-startup-stall](project_qfc424_high_confidence_startup_stall.md) — gate scores serially; async-void BackgroundWorker; STA blocks parallel COM
-- [qfc678-predictor-carry](project_qfc678_predictor_carry.md) — named producer DORMANT; PreScored never read
-- [qfc791-deadline-cancel-teardown](project_qfc791_deadline_and_cancel_teardown.md) — empty-at-deadline superseded by #424/#608 ACs
-- [qfc810-teardown-dropdown-residuals](project_qfc810_teardown_dropdown_residuals.md) — method-group blocks optional param (CS0123); files at 496/500
-- [qfc823-review-residuals](project_qfc823_review_residuals.md) — R3 null-tolerance doc FALSE; R2 follow-up is #813
-- [teardown-guard-enumeration-821](project_teardown_guard_enumeration_821.md) — 4th sharer is the 4th Cancel() SITE; enabler is SetCancellationTokenSource
-- [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — sharing EmailMoveMonitor DROPS actions; `volatile` = CS0420
-- [qfc254-darkmode-stale-labels](project_qfc254_darkmode_stale_labels.md) — labels themed only in MailRead()-guarded branch
-- [qfc254-residual-after-comexception-fix](project_qfc254_residual_after_comexception_fix.md) — historical; #269 real cause = Light-theme fore/back swap
-- [qfc254-ambient-inheritance](project_qfc254_ambient_inheritance_mechanism.md) — SUPERSEDED for #269; WinForms ambient inheritance notes still accurate
-- [qfc438-search-focus-steal](project_qfc438_search_focus_steal.md) — TWO focus-steal mechanisms; CancelSelector emits no SelectionChanged
-- [qfc677-webview2-focus-hold](project_qfc677_webview2_focus_hold_outlook_keyboard.md) — WebView2 focus hold + _focusAnchor steal; fix = focus predicate
-- [qfc680-menu-mode-keyboard-capture](project_qfc680_menu_mode_keyboard_capture.md) — ModalMenuFilter; AutoClose=false pre-Show only opt-out
-- [qfc663-alt-chord-no-altf](project_qfc663_alt_chord_no_altf.md) — only Alt+M swallowed; Alt+F is EFC-only
-- [qfc-keyboard-action-defects-444](project_qfc_keyboard_action_defects_444.md) — #468 removes duplicate registration; trigger Right/Down/Right
-- [breadcrumb-navigation-defects-439-440](project_breadcrumb_navigation_defects_439_440_498_499.md) — fixing #439 regresses percentage join
-- [issue-440-already-landed-via-498](project_issue_440_already_landed_via_498.md) — Efc/Qfc do NOT share BreadcrumbRow
-- [qfc-item-controller-defects-484](project_qfc_item_controller_defects_484.md) — all 5 "Suspected Fix" sections wrong; verify callers first
-- [webview2-host-initializer-defects-476](project_webview2_host_initializer_defects_476.md) — EfcViewerQueue not a pool; real WebView2 built in tests
-- [qfc-efc-metrics-442](project_qfc_efc_metrics_442.md) — MoveAndIterate stopwatch race unfixable in owned files
-- [qfc-collection-defects-468](project_qfc_collection_defects_468.md) — MovedMails param redundant; no log4net in QuickFiler.Test
-- [qfc-collection-controller-defects-468](project_qfc_collection_controller_defects_468.md) — #474 "unrelated interfaces" FALSE
-- [issue-469-already-fixed-residual-629](project_issue_469_already_fixed_residual_is_629.md) — `Initialized<T>` never memoizes
-- [reflective-caller-closure-635](project_reflective_caller_closure_635.md) — removal was 13 members; `GetField(` is the reaching mechanism
-- [selectrow-two-families-637](project_selectrow_two_families_637.md) — TWO SelectRow families; ButtonOK_Click does NOT rethrow
-- [issue-656-bypass-path-does-not-exist](project_issue_656_bypass_path_does_not_exist.md) — premise FALSE; owner files at cap
-- [efc614-store-root-stem-leak](project_efc614_store_root_stem_leak.md) — FolderConverterTests.cs:329 codifies a bug
-- [efc736-archiveroot-boundary-sink](project_efc736_archiveroot_boundary_sink.md) — finding 6 cause FALSE; 6 sink sites not 4
-- [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — `/Tests:` and `/TestCaseFilter:` mutually exclusive
-- [qfc-folder-tree-percentage-325](project_qfc_folder_tree_percentage_325.md) — 1 live viewer despite 9 dead CboFolders
-- [qfc-breadcrumb-webview2-351](project_qfc_breadcrumb_webview2_351.md) — 9101 provider absent; bridge greenfield
-- [folder-hierarchy-provider-350](project_folder_hierarchy_provider_350.md) — reuse snapshot infra; no new COM seam
-- [efcviewer-breadcrumb-webview2-349](project_efcviewer_breadcrumb_webview2_349.md) — EfcViewer3 dead; unscaled ColumnHeader widths
-- [folder-settings-persistence-797](project_folder_settings_persistence_797.md) — ThisAddIn_Shutdown never raised; a test asserts the AC8 bug
-- [ilglobals-static-publication-824](project_ilglobals_static_publication_824.md) — BeSameAs only order-independent RED gate; CA2211 never fires
-- [etl-deadline-followups-825](project_etl_deadline_followups_825.md) — read shipped package .xml to verify API
-
 ## Stores / watchdog / add-in lifecycle
 - [store-runtime-reenable-263](project_store_runtime_reenable_263.md) — no per-store hookup seam
 - [store-lockup-f4](project_store_lockup_resilience_f4_research.md) — AsyncLocal rejected; MyBox no modeless
@@ -287,84 +68,16 @@
 - [storewrapper-dialog-287](project_storewrapper_dialog_287_state_inversion.md) — issue inverts the two states
 
 ## Ribbon, CI, toolchain, repo structure
-- [ribbon-readiness-503](project_ribbon_engine_readiness_503.md) — Ribbon coverage-excluded; 5 orphan callbacks
+- [ribbon-readiness-503](project_ribbon_engine_readiness_503.md) — Ribbon coverage-excluded; 5 orphan onAction callbacks
 - [ribbon-toggle-guards-505](project_ribbon_toggle_state_guards_505.md) — toggle vs command guard asymmetry
-- [ribbon-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — 84 callbacks (5 dead)
-- [ci-parallel-split-553](project_ci_parallel_split_553.md) — check names "caller / callee"
-- [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — ~1.2s vs ~17s = vacuity
-- [console-out-rs0030-826](project_console_out_and_rs0030_promotion_826.md) — no GenerateDocumentationFile: IDE0005 silent
-- [fsharp-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; packages.config gap
-- [binding-redirect-drift-973](project_binding_redirect_drift_and_missing_asyncenumerable_973.md) — NuGet rewrites only installer's config; AsyncEnumerable install ruled in scope (aliased)
-- [graph-usings-removable-973](project_graph_usings_removable_and_models_name_collisions_973.md) — all 6 Graph usings removable; Models exports List/Application/OutlookItem; reflog = clock fallback
-- [ixnet-v7-lib-ref-clash](project_ixnet_v7_lib_ref_clash_packages_config.md) — lib/net48 keeps public AsyncEnumerable; global BCL ref = CS0121; use `<Aliases>`; Directory.Build.props exists
-- [dependabot-net481-340](project_dependabot_net481_340.md) — semver-major ignore, no ceilings
-- [svgcontrol-test-418](project_svgcontrol_test_unwired_418.md) — STALE; in .sln since 2026-08-14
-- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — PQ setting no var substitution
-- [push-down-claude-dir-149](project_push_down_claude_dir.md) — pushDownClaudeDir research
-- [winforms-testability-298](project_winforms_testability_epic_298.md) — #298 depends on #297
-- [tagcontroller-293](project_tagcontroller_refactor_293.md) — PrefixItem NotImplemented
-- [swordfish-removal-306](project_swordfish_removal_epic_306.md) — legacy JSON via ScoDictionaryNew
-- [legacy-scodictionary-315](project_legacy_scodictionary_removal_315.md) — delete SCODictionary_Tests
-- [ribbon-engine-readiness-503](project_ribbon_engine_readiness_503.md) — Ribbon layer coverage-excluded; 5 orphan onAction callbacks
-- [ribbon-toggle-state-guards-505](project_ribbon_toggle_state_guards_505.md) — toggle vs command guard asymmetry
-- [ribbon-engine-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — 84 callback names (5 dead); ManagerAsyncLazy constructible
-- [fsharp-core-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; Sync-PackageReferences ranks ns2.1>2.0; ToDoModel.Test packages.config gap
-- [fsharp-core-hintpath-skew-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; Sync-PackageReferences ranks ns2.1>2.0; ToDoModel.Test gap
+- [ribbon-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — 84 callbacks (5 dead); ManagerAsyncLazy constructible
 - [ci-parallel-split-553](project_ci_parallel_split_553.md) — 4 independent jobs; check names "caller / callee"
-- [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — AGENTS.md externally owned; ~1.2s vs ~17s = vacuity
-- [console-out-and-rs0030-826](project_console_out_and_rs0030_promotion_826.md) — Directory.Build.props exists; CS0169/CS0414 is the hazard
-- [dependabot-net481-340](project_dependabot_net481_340.md) — semver-major ignore, no fabricated ceilings
-- [svgcontrol-test-unwired-418](project_svgcontrol_test_unwired_418.md) — STALE (in .sln since 2026-08-14); redirect topology historical
-- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — PQ setting no var substitution; rg-vs-git deltas; basename gotcha
+- [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — ~1.2s vs ~17s = vacuity
+- [console-out-rs0030-826](project_console_out_and_rs0030_promotion_826.md) — CS0169/CS0414 hazard; IDE0005 silent
+- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — PQ setting no var substitution; rg-vs-git deltas
+- [evidence-identity-sweep-927](project_evidence_identity_hygiene_sweep_927.md) — classify raw evidence by XML root
 - [push-down-claude-dir-149](project_push_down_claude_dir.md) — #149 pushDownClaudeDir research (2026-04-16)
-- [winforms-testability-epic-298](project_winforms_testability_epic_298.md) — #298 depends on #297; inverts #197 exemptions
-- [tagcontroller-refactor-293](project_tagcontroller_refactor_293.md) — ITagViewer/IForm gaps; PrefixItem NotImplemented
-- [swordfish-removal-epic-306](project_swordfish_removal_epic_306.md) — legacy flat JSON round-trips via ScoDictionaryNew
-- [legacy-scodictionary-removal-315](project_legacy_scodictionary_removal_315.md) — delete SCODictionary_Tests, retarget 3 files
-- [push-down-claude-dir-149](project_push_down_claude_dir.md) — #149 pushDownClaudeDir research (2026-04-16)
-- [high-confidence-pipelines](project_qfc_high_confidence_dual_pipeline.md) — THREE pipelines; #233 gate LIVE
-- [startup-stall-424](project_qfc424_high_confidence_startup_stall.md) — serial scoring; async-void worker
-- [predictor-carry-678](project_qfc678_predictor_carry.md) — PreScored never read
-- [deadline-teardown-791](project_qfc791_deadline_and_cancel_teardown.md) — superseded by #424/#608 ACs
-- [teardown-dropdown-810](project_qfc810_teardown_dropdown_residuals.md) — CS0123; files at 496/500
-- [review-residuals-823](project_qfc823_review_residuals.md) — follow-up is #813
-- [lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — sharing monitor DROPS actions
-- [darkmode-labels-254](project_qfc254_darkmode_stale_labels.md) — themed only in MailRead() branch
-- [qfc254-residual](project_qfc254_residual_after_comexception_fix.md) — #269 = Light-theme swap
-- [qfc254-ambient](project_qfc254_ambient_inheritance_mechanism.md) — SUPERSEDED; ambient notes accurate
-- [search-focus-438](project_qfc438_search_focus_steal.md) — TWO focus-steal mechanisms
-- [webview2-focus-677](project_qfc677_webview2_focus_hold_outlook_keyboard.md) — fix = focus predicate
-- [menu-mode-680](project_qfc680_menu_mode_keyboard_capture.md) — AutoClose=false pre-Show only
-- [alt-chord-663](project_qfc663_alt_chord_no_altf.md) — only Alt+M swallowed
-- [keyboard-defects-444](project_qfc_keyboard_action_defects_444.md) — trigger Right/Down/Right
-- [issue-440-via-498](project_issue_440_already_landed_via_498.md) — Efc/Qfc don't share BreadcrumbRow
-- [item-controller-484](project_qfc_item_controller_defects_484.md) — all 5 Suspected Fix wrong
-- [webview2-init-476](project_webview2_host_initializer_defects_476.md) — EfcViewerQueue not a pool
-- [metrics-442](project_qfc_efc_metrics_442.md) — stopwatch race unfixable in owned files
-- [collection-defects-468](project_qfc_collection_defects_468.md) — no log4net in QuickFiler.Test
-- [collection-controller-468](project_qfc_collection_controller_defects_468.md) — #474 premise FALSE
-- [issue-469-fixed-629](project_issue_469_already_fixed_residual_is_629.md) — `Initialized<T>` never memoizes
-- [reflective-closure-635](project_reflective_caller_closure_635.md) — `GetField(` reaches 13 members
-- [selectrow-637](project_selectrow_two_families_637.md) — TWO SelectRow families
-- [store-root-stem-614](project_efc614_store_root_stem_leak.md) — test codifies a bug
-- [archiveroot-sink-736](project_efc736_archiveroot_boundary_sink.md) — 6 sink sites not 4
-- [banner-prefix-662](project_banner_prefix_arity_662.md) — `/Tests:` vs `/TestCaseFilter:` exclusive
-- [folder-tree-pct-325](project_qfc_folder_tree_percentage_325.md) — 1 live viewer
-- [breadcrumb-wv2-351](project_qfc_breadcrumb_webview2_351.md) — bridge greenfield
-- [folder-hierarchy-350](project_folder_hierarchy_provider_350.md) — reuse snapshot infra
-- [efcviewer-breadcrumb-349](project_efcviewer_breadcrumb_webview2_349.md) — EfcViewer3 dead
-- [ilglobals-824](project_ilglobals_static_publication_824.md) — BeSameAs only RED gate
-- [etl-deadline-825](project_etl_deadline_followups_825.md) — read package .xml to verify API
-- [store-reenable-263](project_store_runtime_reenable_263.md) — no per-store hookup seam
-- [store-lockup-f4](project_store_lockup_resilience_f4_research.md) — AsyncLocal rejected
-- [storewrapper-dialog-287](project_storewrapper_dialog_287_state_inversion.md) — state inversion
-- [ribbon-readiness-503](project_ribbon_engine_readiness_503.md) — 5 orphan onAction callbacks
-- [ribbon-toggle-guards-505](project_ribbon_toggle_state_guards_505.md) — toggle vs command asymmetry
-- [toolchain-fidelity-512](project_toolchain_gate_fidelity_512.md) — ~1.2s vs ~17s = vacuity
-- [console-out-rs0030-826](project_console_out_and_rs0030_promotion_826.md) — CS0169/CS0414 hazard
-- [fsharp-hintpath-895](project_fsharp_core_hintpath_skew_895.md) — 15 output dirs; ns2.1>2.0 ranking
-- [dependabot-340](project_dependabot_net481_340.md) — semver-major ignore
-- [winforms-epic-298](project_winforms_testability_epic_298.md) — depends on #297
-- [swordfish-306](project_swordfish_removal_epic_306.md) — round-trips via ScoDictionaryNew
-- [scodictionary-315](project_legacy_scodictionary_removal_315.md) — delete tests, retarget 3 files
-- [host-identifier-sweep-602](project_host_identifier_sweep_602.md) — rg-vs-git deltas
+- [winforms-testability-298](project_winforms_testability_epic_298.md) — #298 depends on #297; inverts #197 exemptions
+- [tagcontroller-293](project_tagcontroller_refactor_293.md) — ITagViewer/IForm gaps; PrefixItem NotImplemented
+- [swordfish-removal-306](project_swordfish_removal_epic_306.md) — legacy JSON round-trips via ScoDictionaryNew
+- [legacy-scodictionary-315](project_legacy_scodictionary_removal_315.md) — delete SCODictionary_Tests, retarget 3 files
