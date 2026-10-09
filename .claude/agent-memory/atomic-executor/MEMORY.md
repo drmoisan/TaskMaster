@@ -40,6 +40,7 @@
 - [C# nullable + component gotchas](index_csharp_nullable_and_component_gotchas.md) — net481 pragma gates, CS86xx, WebView2, QFC, TimeProvider
 - [pwsh, git and gate mechanics](index_pwsh_git_and_gate_mechanics_misc.md) — pwsh parse traps, PoshQC/Pester, numstat/hunk gates, hooks
 - [Mid-plan commit sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) · [Sanitisation can't sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
+- [PoshQC analyze: New-* test helpers, comma returns](project_poshqc_analyze_flags_new_verb_test_helpers_and_comma_return.md) · [Rehearsal -X ours drops manifest edits](project_rehearsal_merge_x_ours_drops_adjacent_manifest_edits.md)
 Four sections live in sub-index files to keep this file under its read limit. Open the sub-index when its topic applies:
 - [Build / toolchain environment](index_build_toolchain.md) — SDK/restore bootstrap, CSharpier, analyzers, pwsh/Bash quoting and backslash transport
 - [Test execution, isolation and coverage](index_test_execution_and_coverage.md) — long runs, flaky classes, dotnet-coverage and Cobertura mechanics
