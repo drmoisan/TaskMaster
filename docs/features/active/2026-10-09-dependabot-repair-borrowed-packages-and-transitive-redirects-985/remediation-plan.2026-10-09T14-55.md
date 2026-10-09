@@ -4,7 +4,7 @@
 - **Cycle:** remediation cycle 1 (R1), from review `2026-10-09T14-55`
 - **Owner:** drmoisan
 - **Last Updated:** 2026-10-09
-- **Status:** Draft (planner round 1; awaiting executor preflight)
+- **Status:** Complete (executed in commit 07d3a8a98; re-audit 2026-10-09T15-35 PASS)
 - **Work Mode:** full-bug (AC source: `spec.md`; this cycle changes no AC text and checks off no AC)
 - **Inputs:** `FEATURE/remediation-inputs.2026-10-09T14-55.md` (B-1), `FEATURE/code-review.2026-10-09T14-55.md` (Minor rows 2 and 4, Info row 1)
 

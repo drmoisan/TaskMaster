@@ -111,7 +111,7 @@
 
 ## Closed-issue residuals (lookup only; details in the residuals index)
 - [review-residuals index](project_review-residuals-index.md) — per-issue summaries #442-#968 (#930 host-path PARTIAL; #942 `.csproj` disarms C# hook check)
-- [985](project_985-review-residuals.md) — 1 autonomous blocker: account name inside encoded scratchpad dir; validator rejects "template tool not exposed" wording
+- [985](project_985-review-residuals.md) — cycle 1 blocker: account name in encoded scratchpad dir; cycle 2 PASS; hook sim param is `-RawPayload`
 - [973](project_973-review-residuals.md) — AC premise defect = autonomous spec amendment; bundled PoshQC FAIL row + vacuous PASS
 - [438](project_438_cycle1_findings.md) · [440](project_440-review-residuals.md) · [441](project_441-review-residuals-and-494-handoff.md) · [457](project_457-review-residuals.md) · [464](project_464-review-residuals.md) · [489](project_489-review-residuals.md) · [493](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) · [511](project_511-rescope-review-residuals.md) · [553](project_553_ci_split_review_pattern.md) · [565](project_565-review-residuals.md) · [584](project_584-review-residuals.md)
 - [644](project_644-review-residuals.md) · [645](project_645-review-residuals.md) · [647](project_647-review-residuals.md) · [677](project_677-review-residuals.md) · [680](project_680-review-residuals.md) · [707](project_707-review-residuals.md) · [730](project_730-review-residuals.md) · [731](project_731-review-residuals.md) · [735](project_735-review-residuals.md) · [736](project_736-review-residuals.md) · [751](project_751-review-residuals.md)
