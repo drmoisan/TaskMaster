@@ -396,8 +396,9 @@ Describe 'Dependabot configuration consolidation' {
             $text = [System.IO.File]::ReadAllText($script:RepairWorkflowPath)
             # Assert
             $text.Length | Should -BeGreaterThan 0 -Because 'an empty file would satisfy both containment clauses below vacuously'
-            $text | Should -BeLike "*Where-Object { `$_ -ne 'Analyzer' }*" -Because 'the binding-redirect clause is unreachable under the configured trigger and is removed'
-            $text | Should -BeLike '*not reachable from the workflow_run trigger*' -Because 'the reachability decision must be recorded at the line it explains, so a later author who supplies -CandidateUpgrade is told'
+            $text | Should -BeLike "*Where-Object { `$_ -ne 'Analyzer' }*" -Because 'no binding-redirect record reaches this filter under the configured trigger, so the clause is removed'
+            $text | Should -BeLike '*never count toward beyond-known-weak*' -Because 'the decision must be recorded at the line it explains, covering both the reconciliation pass and the redirect sync pass'
+            $text | Should -BeLike '*supplies -CandidateUpgrade and keeps that record, restore the clause*' -Because 'a later author who supplies -CandidateUpgrade must be told the removed clause becomes load-bearing'
         }
 
         It 'R8- derives the commit identity from the token step outputs' {
