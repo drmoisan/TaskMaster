@@ -526,11 +526,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.4191.47, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.4191.47\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Analyzer Include="..\packages\MSTest.Analyzers.4.4.1\analyzers\dotnet\cs\MSTest.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\MSTest.Analyzers.4.4.1\analyzers\dotnet\cs\MSTest.Analyzers.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.10.34.0.3385\analyzers\SonarAnalyzer.CSharp.dll" />
