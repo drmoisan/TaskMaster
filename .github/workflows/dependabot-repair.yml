@@ -84,23 +84,26 @@ jobs:
           }
           $kind = @($result.Verification | ForEach-Object { $_.Report.Repair } |
               Where-Object { $null -ne $_ } | ForEach-Object { $_.Kind })
-          # The binding-redirect class is not reachable from the workflow_run trigger: this step
-          # invokes the repair entry point with no -CandidateUpgrade, so the applied-upgrade set
-          # is always empty, the app.config reconciliation pass never runs, and the call site
-          # keeps only the reconciled .Text and discards the Kind = 'BindingRedirect' record.
-          # No record of that kind can reach this filter, so the clause excluding it is removed.
-          # The decision is recorded in the AC14 note in spec.md and in the code review dated
-          # 2026-09-20. If a later change supplies -CandidateUpgrade, the removed clause becomes
-          # load-bearing again and must be restored.
+          # Binding redirects reach this run through two passes, and neither produces a record
+          # this filter can see. The -CandidateUpgrade reconciliation pass never runs here: this
+          # step supplies no -CandidateUpgrade, so the applied-upgrade set is always empty; even
+          # when it runs, its call site keeps only the reconciled .Text and discards the
+          # Kind = 'BindingRedirect' record. The redirect sync pass (BindingRedirectSync.psm1,
+          # issue 985) runs on every invocation and rewrites stale redirects, including those
+          # for transitively received assemblies, but it reports through $result.RedirectSync
+          # and the PR body, not through Verification[].Report.Repair. Redirect rewrites
+          # therefore never count toward beyond-known-weak, and the clause excluding
+          # 'BindingRedirect' stays removed (AC14 note in spec.md; code review 2026-09-20). If a
+          # later change supplies -CandidateUpgrade and keeps that record, restore the clause.
           $beyondKnownWeak = @($kind | Where-Object { $_ -ne 'Analyzer' }).Count
           $body = Join-Path $env:RUNNER_TEMP 'repairs-report.md'
           [System.IO.File]::WriteAllText($body, $result.Body)
           "repair-count=$($result.RepairCount)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          # RepairCount counts per-project repair records only. Manifest normalisation and
-          # binding-redirect reconciliation write files without producing one, so a run whose
-          # only writes fall in those classes reports zero, skips the push, and discards the
-          # repair while reporting "No repairs were applied." WrittenPath already carries
-          # every written path, so the push gate reads that instead. repair-count stays
+          # RepairCount counts per-project repair records only. Manifest normalisation, the
+          # redirect sync pass and -CandidateUpgrade reconciliation write files without
+          # producing one, so gating the push on RepairCount would discard a run whose only
+          # writes fall in those classes. WrittenPath carries every written path from every
+          # pass, de-duplicated, so the push gate reads that instead. repair-count stays
           # published because the disclosure body and the beyond-known-weak label read repair
           # records rather than the write set.
           "written-count=$(@($result.WrittenPath).Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
