@@ -4,11 +4,14 @@
 # is a backup file whose final extension is .bak (rule C).
 # Finding lines carry the rule name, the path and a line number only, never the matched text, so
 # the CI log cannot echo an identifier. The guard carries no exemption mechanism of any kind.
+# When run as a script, the finding lines are followed by a human-readable explanation and
+# remediation block, plus GitHub Actions error annotations when running under GitHub Actions.
 
 Set-StrictMode -Version Latest
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Test-RepositoryHygiene.Rules.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Test-RepositoryHygiene.Git.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Test-RepositoryHygiene.Guidance.ps1')
 
 function Invoke-RepositoryHygieneMain {
     <#
@@ -89,5 +92,6 @@ function Invoke-RepositoryHygieneMain {
 if ($MyInvocation.InvocationName -ne '.') {
     $result = Invoke-RepositoryHygieneMain
     $result.Lines
+    Get-HygieneFindingGuidance -Lines $result.Lines -EmitAnnotations:($env:GITHUB_ACTIONS -eq 'true')
     exit $result.ExitCode
 }
