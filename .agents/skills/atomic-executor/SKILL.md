@@ -55,6 +55,17 @@ For each task:
 4. Check off the plan file on disk immediately after verification passes.
 5. Check off satisfied acceptance criteria in the authoritative requirement source file per `acceptance-criteria-tracking`.
 
+## Scratch Location
+
+Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.
+
+- `SCRATCH` resolves to `<session scratchpad>/issue-<issue-num>/`, where `<issue-num>` is the plan's canonical issue number.
+- Every scratch file, helper script, staged copy, and coverage report a plan names lives under `SCRATCH`. Subdirectories such as `SCRATCH/stage/` are permitted.
+- Create `SCRATCH` before the first scratch write. Never write a scratch file to the scratchpad root or to a fixed shared name outside `SCRATCH`.
+- When a plan written before this rule defines `SCRATCH` as the bare session scratchpad, treat that definition as `<session scratchpad>/issue-<issue-num>/`. This is a mechanical micro-action, not replanning.
+- Plans and evidence artifacts record the literal token `SCRATCH`, never a host path.
+- If two runs for the same issue can execute at once, the run-unique form `issue-<issue-num>-<yyyy-MM-ddTHH-mm>` replaces `issue-<issue-num>`.
+
 ## Non-Negotiable Constraints
 
 - Do not invent new phases or tasks.

@@ -2,7 +2,7 @@
 paths:
   - "**/*.ts"
   - "**/*.cs"
-description: Architecture boundary enforcement rules for the No-COM architecture.
+description: Architecture boundary enforcement rules for a host-neutral layered architecture.
 ---
 
 # Architecture Boundaries
@@ -14,7 +14,7 @@ Architecture boundary enforcement is a uniform gate across all tiers (T1–T4). 
 - **TypeScript:** `dependency-cruiser`. Configuration file pattern: `.dependency-cruiser.cjs`.
 - **.NET (when the backend exists):** `NetArchTest.Rules`. Test project naming pattern: `*.ArchitectureTests`.
 
-## No-COM Architecture Rules (enforceable assertions)
+## Host-Neutral Architecture Rules (enforceable assertions)
 
 Production code in this repository must satisfy each of the following assertions. Each assertion is enforced by `dependency-cruiser` (TypeScript) or `NetArchTest.Rules` (.NET) where applicable; legacy import utilities, when added, must satisfy the same assertions.
 
@@ -37,9 +37,9 @@ Production code in this repository must satisfy each of the following assertions
 
 ## Layer Boundary Assertions (.NET, applies once the backend exists)
 
-- `TaskMaster.Domain` must have zero references to Outlook PIA, VSTO, or Office.js types.
-- `TaskMaster.Application` may depend on `TaskMaster.Domain` only.
-- Adapter projects may depend on `TaskMaster.Domain` and `TaskMaster.Application`; domain may not depend on adapters.
+- `<Product>.Domain` must have zero references to Outlook PIA, VSTO, or Office.js types.
+- `<Product>.Application` may depend on `<Product>.Domain` only.
+- Adapter projects may depend on `<Product>.Domain` and `<Product>.Application`; domain may not depend on adapters.
 
 ## Enforcement Outcome
 

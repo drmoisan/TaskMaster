@@ -9,6 +9,11 @@
     tree? Every parse ambiguity answers false, so the caller's pre-change deny is the
     fallback for every unmodeled form.
 
+    Shell-agnostic parsing (issue #735): the shell that executes a hooked command is
+    undetermined per command, so every shape whose meaning differs between a POSIX shell
+    and PowerShell denies - a backslash anywhere, and { } , ( ) @ outside quotes. Evidence:
+    research/research.2026-10-08T14-00.md (Q1) in the issue #732 feature folder.
+
     The normative contract is the D4 fail-closed rule table in
     docs/features/active/2026-08-24-preimplementation-gate-blocks-planner-integration-commits-539/spec.md.
     Rule-table row numbers are cited inline against the code that realizes them.
@@ -28,15 +33,15 @@ $script:OrchestrationBookkeepingTrees = @(
 )
 
 # Characters that make a command line statically unresolvable (D4 row 12, as narrowed by
-# issues #663 and #713): interpolation characters outside single quotes; outside-quote
-# characters (`<`, `>`, and the `#` comment introducer) outside any quote; and typographic
-# quotes (U+2018 to U+201E) anywhere, because a PowerShell host reads them as quotes.
+# issues #663, #713, #732, and #735): interpolation characters outside single quotes;
+# outside-quote characters (`<`, `>`, the `#` comment introducer, and the shell-divergent
+# `{ } , ( ) @`) outside any quote; and typographic quotes (U+2018 to U+201E) anywhere.
 $script:InterpolationCommandCharacters = [char[]]@('$', '`')
-$script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#')
+$script:OutsideQuoteCommandCharacters = [char[]]@('>', '<', '#', '{', '}', ',', '(', ')', '@')
 $script:TypographicQuoteCharacters = [char[]]@(0x2018, 0x2019, 0x201A, 0x201B, 0x201C, 0x201D, 0x201E)
 
-# Wildcards that make an operand a glob (D4 row 15). Only the literal prefix before the
-# first of these is prefix-tested.
+# Wildcards a selector value may not carry (LACS L6). An operand carrying one fails the
+# operand allowlist (issue #732).
 $script:PathspecWildcardCharacters = [char[]]@('*', '?', '[')
 
 # The single repository selector modelled between the command name and the subcommand: D4
@@ -112,12 +117,12 @@ function Test-OrchestrationCommandTextUnresolvable {
     .SYNOPSIS
         Reports whether a command line carries a statically unresolvable character.
     .DESCRIPTION
-        Realizes D4 row 12 as narrowed by issues #663 and #713, with quote state tracked as in
-        Split-OrchestrationCommandLine. `$` or backtick answers true outside quotes or inside
-        double quotes (single quotes keep it literal); `<`, `>`, or a `#` comment answers true
-        only outside a quoted span. A typographic quote (U+2018 to U+201E), a backslash before
-        any quote character, or a backslash inside a double-quoted span answers true anywhere:
-        a shell may end the span where this scan does not (fail closed).
+        Realizes D4 row 12 as narrowed by issues #663, #713, #732, and #735, with quote state
+        tracked as in Split-OrchestrationCommandLine. `$` or backtick answers true outside
+        quotes or inside double quotes (single quotes keep it literal); `<`, `>`, `#`, and
+        `{ } , ( ) @` answer true only outside a quoted span. A typographic quote (U+2018 to
+        U+201E) or a backslash answers true anywhere, because POSIX shells and PowerShell read
+        them differently and the executing shell is undetermined (fail closed).
     .PARAMETER CommandText
         The full command line as the shell would receive it.
     .OUTPUTS
@@ -127,8 +132,8 @@ function Test-OrchestrationCommandTextUnresolvable {
     [OutputType([bool])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $CommandText)
 
-    # An escaped or typographic quote moves a span boundary the scan cannot model (#663, #713).
-    if ($CommandText.Contains('\"') -or $CommandText.Contains("\'") -or $CommandText.IndexOfAny($script:TypographicQuoteCharacters) -ge 0) {
+    # A backslash or typographic quote is read differently by POSIX shells and PowerShell (#735).
+    if ($CommandText.Contains('\') -or $CommandText.IndexOfAny($script:TypographicQuoteCharacters) -ge 0) {
         return $true
     }
 
@@ -141,13 +146,9 @@ function Test-OrchestrationCommandTextUnresolvable {
             return $true
         }
 
-        # Decide by quote state: inside a span only the closing quote matters, and any
-        # backslash inside a double-quoted span is an unmodelled escape; outside a span a
-        # quote opens one and a redirection character is unresolvable.
+        # Decide by quote state: inside a span only the closing quote matters; outside a
+        # span a quote opens one and an outside-quote character is unresolvable.
         if ($openQuote -ne [char]0) {
-            if ($openQuote -eq '"' -and $character -eq '\') {
-                return $true
-            }
             if ($character -eq $openQuote) {
                 $openQuote = [char]0
             }
@@ -222,9 +223,10 @@ function Test-ExemptOrchestrationOperand {
     .SYNOPSIS
         Tests one pathspec operand against the five exempt orchestration trees.
     .DESCRIPTION
-        Realizes D4 rows 3, 9, 15, 16, 17, and 18. Backslashes normalize to forward slashes
-        before the prefix test (row 18); pathspec magic, absolute spellings, parent-directory
-        segments, and globs whose literal prefix escapes the exempt set all deny.
+        Realizes D4 rows 3, 9, 15, 16, and 17 as narrowed by issues #732 and #735. An operand
+        is exempt only when it matches the plain ASCII allowlist A-Z a-z 0-9 . _ / - (which
+        excludes pathspec magic, drive letters, backslashes, globs, braces, and non-ASCII
+        look-alikes), is not rooted, carries no '..' segment, and starts with an exempt tree.
     .OUTPUTS
         System.Boolean
     #>
@@ -232,43 +234,14 @@ function Test-ExemptOrchestrationOperand {
     [OutputType([bool])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Operand)
 
-    if (-not $Operand) {
+    if ($Operand -cnotmatch '^[A-Za-z0-9._/-]+$' -or $Operand.StartsWith('/')) {
         return $false
     }
-
-    # Row 3b and row 9: any leading colon is pathspec magic, which can escape or invert the
-    # tree scope, so no colon-led operand is ever resolvable by a prefix test.
-    if ($Operand.StartsWith(':')) {
+    if (($Operand -split '/') -contains '..') {
         return $false
     }
-
-    # Row 18: separator normalization precedes every prefix comparison below.
-    $normalized = $Operand -replace '\\', '/'
-
-    # Row 16: rooted, drive-lettered, and UNC spellings all deny; the exempt prefixes stay
-    # repo-relative (this is the posture issue #516 later composes with).
-    if ($normalized.StartsWith('/')) {
-        return $false
-    }
-    if ($normalized -match '^[A-Za-z]:') {
-        return $false
-    }
-
-    # Rows 15c and 17: any parent-directory component escapes the prefix.
-    if (($normalized -split '/') -contains '..') {
-        return $false
-    }
-
-    # Row 15: only the literal prefix before the first wildcard is prefix-tested, so a glob
-    # whose wildcard occupies or truncates an ancestor segment cannot pass.
-    $literalPrefix = $normalized
-    $wildcardIndex = $normalized.IndexOfAny($script:PathspecWildcardCharacters)
-    if ($wildcardIndex -ge 0) {
-        $literalPrefix = $normalized.Substring(0, $wildcardIndex)
-    }
-
     foreach ($tree in $script:OrchestrationBookkeepingTrees) {
-        if ($literalPrefix.StartsWith($tree)) {
+        if ($Operand.StartsWith($tree)) {
             return $true
         }
     }
@@ -444,7 +417,7 @@ function Test-ExemptOrchestrationStagingCommand {
         command line splits cleanly into segments and EVERY segment parses as a complete,
         recognized staging or integration invocation carrying at least one pathspec operand,
         with every operand resolving inside one of the five exempt orchestration-bookkeeping
-        trees after balanced-quote stripping and separator normalization.
+        trees after balanced-quote stripping.
 
         The all-segments reading is deliberate and fail-closed: a chained line denies unless
         each of its segments is independently a recognized all-exempt invocation, so a
@@ -464,8 +437,8 @@ function Test-ExemptOrchestrationStagingCommand {
         return $false
     }
 
-    # Row 12: `$` or backtick outside single quotes, `<`, `>`, or `#` outside quotes, any
-    # typographic quote, and unmodelled backslash escapes make the operand list untrustworthy.
+    # Row 12: `$` or backtick outside single quotes, `< > # { } , ( ) @` outside quotes, and
+    # any typographic quote or backslash make the operand list untrustworthy (#732, #735).
     if (Test-OrchestrationCommandTextUnresolvable -CommandText $CommandText) {
         return $false
     }

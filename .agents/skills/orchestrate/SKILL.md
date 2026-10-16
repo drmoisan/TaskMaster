@@ -128,6 +128,11 @@ route.
   `not-applicable`, and `blocked_reason: "none"`.
 - Do not edit production code, execute the plan, author or edit a PR, run feature review, monitor
   CI, set `next_step: "complete"`, record `S12_complete`, or claim feature completion.
+- Premise-falsified halt: use `blocked_reason: "premise_falsified"` when every delegation and
+  validator succeeded but evidence gathered during execution falsified the plan's premise. Still
+  record the evidence path in free-form checkpoint keys; `blocked_reason` carries only the
+  classification. The preparation terminal checkpoint above still sets `blocked_reason: "none"`.
+  The full `blocked_reason` vocabulary and its partition are in `.claude/rules/orchestrator-state.md`.
 
 Only the literal JSON Boolean `false` in the route configuration disables the CI requirement.
 Missing, malformed, string-valued, or unknown route data fails closed. The preparation mutation
@@ -290,10 +295,12 @@ skill use. The checkpoint must include:
 - `required_mcp_tools`: exactly the selected route's `required_mcp_tools`
 - `delegation_receipts`: one receipt for each required agent
 - `skill_receipts`: one required receipt for each required skill, with evidence
-- `mcp_call_receipts`: one successful receipt for each required MCP tool
+- `mcp_call_receipts`: one successful receipt for each required MCP tool unless a valid `issue_adoption` record waives it
 - `local_execution_overrides`: an empty list at completion
 - `delegation_bypasses`: an empty list at completion
 - `lifecycle_operations`: any lifecycle operation must record `surface: "mcp"`
+- `ci_gate`: the CI result object defined in `## CI Green Gate`, with keys `conclusion`, `head_sha`, and `verified_at`
+- `pr_gate`: the pull-request object defined in `## CI Green Gate`, with keys `pr_number`, `pr_url`, `head_branch`, and `head_sha`
 
 If any required handoff, skill receipt, MCP receipt, or empty bypass list is
 missing, `validate_orchestration_artifacts --require-complete` fails and the
@@ -405,22 +412,32 @@ The review subagent compares against a base branch; uncommitted changes are invi
 After each `feature-reviewer` delegation returns:
 
 1. Read the exact terminal status lines from the review result.
-2. If the result does not include `REVIEW_STATUS: PASS` or `REVIEW_STATUS: REMEDIATION_REQUIRED`, stop and record blocked state.
-3. If the result is `REVIEW_STATUS: PASS`, advance to the PR creation gate.
-4. If the result is `REVIEW_STATUS: REMEDIATION_REQUIRED`, require both `REMEDIATION_INPUTS: <path>` and `REMEDIATION_PLAN: <path>` and then enter the remediation loop.
+2. If the result does not include `REVIEW_STATUS: PASS`, `REVIEW_STATUS: REMEDIATION_REQUIRED`, `REVIEW_STATUS: HALT_NON_REMEDIABLE`, or `REVIEW_STATUS: AWAITING_CI`, stop and record blocked state.
+3. When the remediation inputs carry a `Review-Verdict:` line, recompute the verdict from the finding classes (a blocking finding block without a remediability line counts as `autonomous`). A mismatch between the declared and recomputed verdicts is a reviewer contract error: record it under `artifact_errors`, re-request the review once, and halt with `blocked_reason: "delegate_contract_incomplete"` if it persists.
+4. Append a `remediation_loop.review_outcomes[]` entry (`verdict` plus one `findings[]` object with `remediability` per blocking finding) for every review, including `PASS`.
+5. If the result is `REVIEW_STATUS: PASS`, advance to the PR creation gate.
+6. If the result is `REVIEW_STATUS: REMEDIATION_REQUIRED`, require both `REMEDIATION_INPUTS: <path>` and `REMEDIATION_PLAN: <path>` and then enter the remediation loop with the plan scoped to the `autonomous` findings; non-remediable findings carry forward unchanged.
+7. If the result is `REVIEW_STATUS: HALT_NON_REMEDIABLE`, require `REMEDIATION_PLAN: NONE` and halt: set `blocked_reason` to the highest-precedence halt class present, append one `human_interaction.requirements[]` entry with `response: "halt"` for each halt class present (`external_dependency`, `policy_hold`, `human_decision_required`) describing the human action needed, leave `remediation_loop.completed_attempts` unchanged, write no cycle, create no remediation plan, and stop. The precedence is:
+
+   Halt precedence: human_decision_required > policy_hold > external_dependency
+
+8. If the result is `REVIEW_STATUS: AWAITING_CI`, require `REMEDIATION_PLAN: NONE` and wait: set `blocked_reason: "awaiting_ci"`, set `next_step` to the step that re-checks (`S7_feature_review` for a review-time wait, `S9_ci_green` for a CI poll timeout), record no `human_interaction.requirements[]` entry for the wait, write no cycle, and create no remediation plan. Poll within the existing bounded CI interval and timeout; when the bound is exhausted, persist and stop. On resume, set `blocked_reason: "none"` and re-run the named step. For a review-time wait, the awaited workflow is named in the finding's `Remediability-Evidence:` line.
+9. A CI Green Gate poll timeout is recorded as a finding with `Remediability: awaiting_ci` and follows the wait path; a failed check stays `autonomous` and enters the remediation loop.
 
 ## Remediation Loop (R1–R5)
 
-A bounded loop consisting of five steps. The loop variable `remediation_pass` starts at 1 and increments at R5 before returning to R1.
+A bounded loop consisting of five steps. The attempt count is `remediation_loop.completed_attempts`, and `remediation_pass` equals `remediation_loop.completed_attempts`. The active cycle number is `completed_attempts + 1`; `remediation_loop.current_cycle` is a record position in `cycles[]`, not a count. A halt or wait verdict never opens a cycle, and every cycle opened from a review records `opened_by_review`, the zero-based index of that `review_outcomes[]` entry.
+
+Cycle accounting: a remediation attempt is complete when R3 execution finished (`execution_status: "complete"`) and the pre-R4 commit recorded a non-empty change set; only then set `candidate_applied: true` on that cycle and increment `completed_attempts`. A cycle that ends without a candidate (execution not started, execution failed, or an empty staged change set) records `candidate_applied: false` and consumes no number. It is followed by at most one re-plan under the same number when the executor output identifies an autonomous plan defect; otherwise reclassify the blocker (typically `external_dependency`) and halt. Two consecutive no-candidate cycles halt with `step6_status: "blocked_remediation_loop_limit"`.
 
 - **R1 — Remediation plan of record:** Use the exact `REMEDIATION_PLAN: <path>` returned by the review as the starting plan of record for the loop.
 - **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation). If the executor does not return `PREFLIGHT: ALL CLEAR`, return to R1 by re-delegating to `atomic-planner` against the same remediation-plan path with the required-changes output from the executor. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
 - **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Each task's toolchain loop (format → lint → type-check → test) is mandatory; no skipping.
 - **Pre-R4 commit:** Stage all changes (`git add -A`), run MCP tool `collect_commit_context`, delegate to `commit_steward` using the resulting artifact, and commit with the generated message. Advance to R4 only after a successful commit.
 - **R4 — Re-audit:** Refresh PR context via MCP tool `collect_pr_context`, then delegate to `feature-reviewer` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
-- **R5 — Loop-exit decision:** If the re-audit returns `REVIEW_STATUS: PASS`, exit the loop and advance to the PR creation gate. Otherwise, record `remediation_pass` increment in the checkpoint and return to R1.
+- **R5 — Loop-exit decision:** Evaluate the re-audit per Post-Review Outcome Evaluation. If it returns `REVIEW_STATUS: PASS`, exit the loop and advance to the PR creation gate. If it returns `REVIEW_STATUS: HALT_NON_REMEDIABLE` or `REVIEW_STATUS: AWAITING_CI`, follow the halt or wait branch instead of opening the next cycle. Otherwise, record the cycle's `candidate_applied` value and the resulting `completed_attempts` in the checkpoint and return to R1.
 
-**Termination guard:** If `remediation_pass` reaches 3 without resolution, the orchestrator records `step6_status: "blocked_remediation_loop_limit"` in the checkpoint and halts. No further automation is attempted.
+**Termination guard:** Halt after three completed attempts: when `remediation_loop.completed_attempts` equals 3 and the latest verdict is not `PASS`, the orchestrator records `step6_status: "blocked_remediation_loop_limit"` in the checkpoint and halts. No further automation is attempted.
 
 ## Issue Number Consistency
 
@@ -436,9 +453,24 @@ If a subagent artifact references a different issue number, the orchestrator rej
 ## CI Green Gate
 
 Before PR/DONE completion, the orchestrator must observe the live PR head SHA
-and required GitHub checks through `gh`. The checkpoint must record the checked
-head SHA and CI result. DONE is blocked unless the required checks pass for the
-current PR head SHA.
+and every GitHub check on that head SHA through `gh`. The checkpoint must record
+the checked head SHA and CI result. DONE is blocked unless every check on the
+current PR head SHA passed or was skipped.
+
+Gate procedure:
+
+1. Resolve the live PR head SHA and the PR base branch with `gh pr view --json headRefOid,baseRefName`.
+2. Invoke `gh pr checks --json bucket,name,state,link,workflow` against that head SHA. The query covers every check on the head SHA for every PR, whether or not branch protection marks the check as required.
+3. Parse the JSON by running `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <head-sha>`, appending `-RequireWorkflow CI` when the PR base branch is an `epic/<slug>-integration` branch. The parser derives `ci_gate.conclusion` over every queried check: `success` when every check passed or was skipped, `failure` when any check failed or was cancelled, and `pending` when any check is still in progress.
+4. Epic-child rule: when the PR base branch is an `epic/<slug>-integration` branch, an empty check list is not accepted as green. Every check returned by the unfiltered query counts: a failing or cancelled non-`CI` check fails the gate, and a pending one keeps it pending. With `-RequireWorkflow CI`, the parser never returns `success` until at least one passing `CI` check is observed.
+5. No-checks rule: when `gh pr checks` fails with a `no checks reported` error, that error is never treated as green for any PR. On an epic child, the parser runs with `-ChecksJson '[]'` and `-RequireWorkflow CI`, which returns `pending`; on any other PR the gate stays `pending` within the bounded poll.
+6. Parser-absent rule: when `.claude/lib/ci-gate/Invoke-CiGateParser.ps1` does not exist in the repository, the orchestrator does not derive `success` by hand; it must stop and persist blocked state before PR/DONE completion.
+
+The checkpoint records the CI result in a top-level `ci_gate` object with the required keys `conclusion`, `head_sha`, and `verified_at`. `conclusion` is one of `success`, `failure`, or `pending`; `head_sha` is the PR head SHA the queried checks were observed against; `verified_at` is the ISO-8601 time at which this gate (S9) recorded the result. DONE requires `ci_gate.conclusion` equal to `success` and `ci_gate.head_sha` equal to the current PR head SHA. The key set is defined by `CI_GATE_KEYS` in `scripts/dev_tools/validate_orchestrator_state.py`, and the TypeScript MCP validator used by the Codex runtime requires the same keys.
+
+The checkpoint records the pull request in a top-level `pr_gate` object with the keys `pr_number`, `pr_url`, `head_branch`, and `head_sha`. The key set is defined by `PR_GATE_KEYS` in `scripts/dev_tools/_orchestrator_state_routing.py`.
+
+CI-dependent acceptance criteria are criteria whose verification requires the result of CI on the PR head. The item's own orchestrator run owns their check-off. After `ci_gate.conclusion` is `success`, check off each CI-dependent criterion in the item's own worktree, commit, push to the PR branch, and re-run this gate against the new head SHA, so that `ci_gate.head_sha` equals the final PR head before DONE. A failed re-run enters the Remediation Loop (R1–R5) as a blocking finding; the shared `remediation_loop.completed_attempts` count and its halt after three completed attempts are unchanged. A parent or coordinating session never commits these check-offs from its own root.
 
 ## PR Creation Gate
 
@@ -450,7 +482,7 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 2. The AC verification artifact (`p14-acceptance-criteria-checkoff.md` or equivalent) confirms all acceptance criteria pass.
 3. The mandatory toolchain passed in its most recent run on the branch (no linting/type-check/test failures).
 4. The checkpoint `next_step` is `S8_create_pr`.
-5. The required CI checks pass for the current PR head SHA.
+5. Every check on the current PR head SHA passed or was skipped (`ci_gate.conclusion` is `success`).
 
 This gate is non-negotiable. Each condition is independently verified before PR creation proceeds.
 

@@ -8,8 +8,9 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-. (Join-Path $PSScriptRoot 'codex-authority-store.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-authority-store.ps1') } catch { Add-HookDependencyFailure -Name 'codex-authority-store.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicRootGatePayload {
     [CmdletBinding()]
@@ -54,6 +55,8 @@ function Invoke-EpicRootInvocationDecision {
         [Parameter(Mandatory)][string] $PayloadRaw,
         [AllowNull()][AllowEmptyString()][string] $AttestationRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_INVOCATION_ORIGIN_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-EpicRootGatePayload -Raw $PayloadRaw -Name 'PreToolUse input'
     if ([string]::IsNullOrWhiteSpace($AttestationRaw)) {
@@ -87,6 +90,9 @@ function Invoke-EpicRootInvocationDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_INVOCATION_ORIGIN_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_INVOCATION_ORIGIN_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

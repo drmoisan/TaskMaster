@@ -10,10 +10,11 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 $contractPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'scripts/epic-child-launch-contract.ps1'
 if (Test-Path -LiteralPath $contractPath -PathType Leaf) {
-    . $contractPath
+    try { . $contractPath } catch { Add-HookDependencyFailure -Name 'epic-child-launch-contract.ps1' -ErrorRecord $_ }
 }
 
 function ConvertFrom-CodexChildGuardJson {
@@ -218,6 +219,8 @@ function Invoke-CodexEpicChildGuardDecision {
         [Parameter(Mandatory)][AllowEmptyString()][string] $ActualSpecSha256,
         [Parameter(Mandatory)][AllowEmptyString()][string] $ActualProfileSha256
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_BINDING_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-CodexChildGuardJson -Raw $PayloadRaw -Name 'PreToolUse input'
     if ([string]::IsNullOrWhiteSpace([string]$Attestation.launch_id)) {
@@ -282,6 +285,9 @@ function Get-CodexChildGuardLiveBranch {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_WORKTREE_BINDING_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_BINDING_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

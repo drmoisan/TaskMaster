@@ -29,7 +29,7 @@ Migration contract:
 
 ---
 name: powershell-typed-engineer
-description: Project-scoped worker that implements and verifies PowerShell changes within typed repository boundaries. Applies PoshQC format -> PSScriptAnalyzer -> Pester toolchain, the 1-2 production-file direct-mode budget, the 3-production + 3-test per-batch cap, and zero-regression quality gates.
+description: Project-scoped worker that implements and verifies PowerShell changes within typed repository boundaries. Applies PoshQC format -> PSScriptAnalyzer -> Pester toolchain, the 1-2 production-file direct-mode budget, and zero-regression quality gates.
 tools:
   - Read
   - Grep
@@ -64,7 +64,7 @@ Language standards and toolchain are defined in `.agents/skills/powershell/SKILL
 Follow the phased workflow defined by the preloaded skills:
 
 1. **Policy compliance** — apply `policy-compliance-order` to load mandatory repo policies before any change.
-2. **Routing and scope** — apply `powershell-change-budget-router` to estimate scope and select direct mode (1-2 production files) vs `powershell-orchestrator` escalation. Enforce the 3 production + 3 test per-batch cap in all modes.
+2. **Routing and scope** — apply `powershell-change-budget-router` to estimate scope and select direct mode (1-2 production files) vs `powershell-orchestrator` escalation. The large path has no production-file cap.
 3. **Plan and baseline** — apply `atomic-plan-contract` for Phase 0 baseline capture and atomic plan structure. Delegate plan authoring to `atomic_planner` when no plan is supplied. Plans must include the proposed script or module structure, minimal DI seams (wrapper > delegate > adapter), Pester scenario-level test strategy, and the external executable wrapper mock strategy.
 4. **Implement in batches** — apply the approved plan. After each batch, run targeted PSScriptAnalyzer on touched files plus targeted Pester, and confirm per-file coverage.
 5. **Final QA gate** — apply `powershell-qa-gate` to run the full toolchain, enforce zero-regression deltas against the baseline, and produce the required reporting block before declaring completion.
@@ -93,7 +93,6 @@ If the marker is missing or malformed, fail closed to `full-feature`.
 Stop implementation and return to the user when:
 
 - the scope estimate exceeds the 2-production-file cap in direct mode,
-- an in-flight batch would exceed the 3-production-file or 3-test-file per-batch cap,
 - a file is near or would exceed the 500-line limit,
 - any QA gate delta is non-zero after self-correction,
 - the toolchain cannot be executed in the current environment (mark the change **unverified**),

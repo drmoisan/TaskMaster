@@ -43,7 +43,7 @@ is_detached_candidate() {
 	#
 	# The predicate is the porcelain FLAG, not the branch field: emit_record writes the
 	# literal DETACHED into the branch field whenever the branch accumulator is empty
-	# (.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh:115-116), which is also true of a
+	# (emit_record, nested in parse_worktree_list in cleanup_worktrees_enumerate_lib.sh), which is also true of a
 	# bare-repository stanza, and a local branch literally named DETACHED would produce
 	# the same branch field with no `detached` flag.
 	#

@@ -29,32 +29,37 @@
     completion is not asserted, the write is allowed via
     hookSpecificOutput.permissionDecision='allow' (backward compatibility).
 
-    Edit tool calls supply only old_string/new_string (a partial patch) and
-    cannot be reliably validated without the full target file content, so they
-    are allowed by this hook, matching enforce-checkpoint-monotonic.ps1. For
-    Write calls whose content is not valid JSON, the hook allows the operation
-    and defers to downstream tools to surface the error.
+    Edit tool calls supply only old_string/new_string (a partial patch). An Edit
+    call is validated by reading the checkpoint at the Edit's targeted file_path
+    through the injectable CheckpointReader seam and applying the old_string ->
+    new_string replacement in memory; the resulting content is then evaluated
+    like a Write. One occurrence of old_string is replaced unless replace_all is
+    true. The hook fails closed: a missing, empty, or unreadable targeted
+    checkpoint, an absent or empty old_string, zero or ambiguous occurrences of
+    old_string, and a Write with empty content all deny, and the deny reason
+    names the cause. Write content or patched content that is not valid JSON is
+    also denied, because the canonical checkpoint is required to stay valid JSON.
 
 .NOTES
     Compatible with PowerShell 7+. Read-only validation gate.
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Reuse the adjacent hook's shared checkpoint policy logic. This dot-source is by
 # design, not a copy-paste defect, so the hook is not renamed.
-. (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-checkpoint-monotonic.ps1' -ErrorRecord $_ }
 
 # Shared Codex PreToolUse transport. Dot-sourced explicitly rather than relying on
 # the transitive load above, so this hook's transport does not depend on its
 # neighbour's internals. Every transport error it raises names this hook, because
 # the shared parser is called with -HookName 'enforce-completion-consistency'.
-. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # Dot-source the shared validation helpers. Guarded so a missing file produces a
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
-$script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1'
-. $script:CompletionHelpersPath
+try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-completion-helpers.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-CheckpointJson {
     <#
@@ -76,9 +81,10 @@ function Get-CheckpointFileContent {
         Reads the on-disk checkpoint content for the read-then-validate Edit path.
     .DESCRIPTION
         Returns the full file text when the path resolves to a file on disk, or
-        $null when the file does not exist. Tests inject a CheckpointReader
-        scriptblock instead of mocking this function so no temporary files are
-        required.
+        $null when the file does not exist. An existing empty file yields an
+        empty string, never $null, so a missing checkpoint and an empty
+        checkpoint stay distinct. Tests inject a CheckpointReader scriptblock
+        instead of mocking this function so no temporary files are required.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -90,7 +96,9 @@ function Get-CheckpointFileContent {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         return $null
     }
-    return Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+    $text = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+    if ($null -eq $text) { return '' }
+    return [string]$text
 }
 
 function Test-IsCheckpointPath {
@@ -270,26 +278,34 @@ function Get-MissingCompletionEvidence {
 function Resolve-EditedCheckpointContent {
     <#
     .SYNOPSIS
-        Returns the patched checkpoint content for an Edit-tool call, or $null
-        when the patch cannot be applied against the on-disk checkpoint.
+        Returns an object with Content and Failure for an Edit-tool call: the
+        patched checkpoint content on success, or a failure cause when the patch
+        cannot be applied against the targeted checkpoint.
     .DESCRIPTION
-        Implements the read-then-validate Edit path. When the tool input carries
-        an old_string (an Edit patch), the on-disk checkpoint is read through the
-        injectable CheckpointReader seam and the old_string -> new_string
-        replacement is applied in memory (no on-disk mutation). Returns $null
-        when there is no old_string, the on-disk file does not exist, or the
-        old_string is not present in the on-disk content, signalling the caller
-        to allow (defer).
+        Implements the read-then-validate Edit path. The checkpoint at the
+        caller-supplied CheckpointPath (the Edit's targeted file_path, passed to
+        the reader unchanged) is read through the injectable CheckpointReader seam
+        and the old_string -> new_string replacement is applied in memory (no
+        on-disk mutation). One occurrence of old_string is replaced unless
+        replace_all is true. Failure is one of no-old_string (absent or empty
+        old_string), checkpoint-unreadable (the reader threw), checkpoint-missing
+        (the reader returned $null), checkpoint-empty (the reader returned an
+        empty string), old_string-not-found, or old_string-ambiguous. Content is
+        $null on failure and Failure is $null on success. The caller denies on
+        any Failure.
     #>
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)]
         [AllowNull()]
         $ToolInput,
 
         [Parameter(Mandatory)]
-        [scriptblock] $CheckpointReader
+        [scriptblock] $CheckpointReader,
+
+        [Parameter(Mandatory)]
+        [string] $CheckpointPath
     )
 
     $oldString = $null
@@ -297,7 +313,7 @@ function Resolve-EditedCheckpointContent {
         $oldString = [string]$ToolInput.old_string
     }
     if ([string]::IsNullOrEmpty($oldString)) {
-        return $null
+        return [pscustomobject]@{ Content = $null; Failure = 'no-old_string' }
     }
 
     $newString = ''
@@ -305,20 +321,46 @@ function Resolve-EditedCheckpointContent {
         $newString = [string]$ToolInput.new_string
     }
 
-    $onDisk = & $CheckpointReader 'artifacts/orchestration/orchestrator-state.json'
-    if ([string]::IsNullOrEmpty([string]$onDisk)) {
-        # The on-disk checkpoint does not exist (or is empty); cannot patch.
-        return $null
+    try {
+        $onDisk = & $CheckpointReader $CheckpointPath
+    }
+    catch {
+        # A reader exception must not escape the gate; report it as a failure cause.
+        return [pscustomobject]@{ Content = $null; Failure = 'checkpoint-unreadable' }
+    }
+    if ($null -eq $onDisk) {
+        return [pscustomobject]@{ Content = $null; Failure = 'checkpoint-missing' }
     }
 
     $onDiskText = [string]$onDisk
-    if (-not $onDiskText.Contains($oldString)) {
-        # The old_string is not present, so the patch does not apply here.
-        return $null
+    if ($onDiskText.Length -eq 0) {
+        return [pscustomobject]@{ Content = $null; Failure = 'checkpoint-empty' }
     }
 
-    # Apply the patch in memory using a literal (non-regex) replacement.
-    return $onDiskText.Replace($oldString, $newString)
+    # Apply the patch in memory; one occurrence unless replace_all is true.
+    $replaceAll = Get-EditReplaceAllFlag -ToolInput $ToolInput
+    return Invoke-SingleOccurrenceEdit -Text $onDiskText -OldString $oldString -NewString $newString -ReplaceAll $replaceAll
+}
+
+function ConvertTo-CompletionDenyDecision {
+    <#
+    .SYNOPSIS
+        Builds the PreToolUse deny decision for the given reason.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Reason
+    )
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
+    }
 }
 
 function Invoke-CompletionConsistencyDecision {
@@ -341,6 +383,8 @@ function Invoke-CompletionConsistencyDecision {
         [Parameter(Mandatory = $false)]
         [scriptblock] $RoutingMatrixReader
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if (-not $ToolInputRaw) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
@@ -363,18 +407,24 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    # Write tool: validate the content payload directly. Edit tool: no content is
-    # supplied, so read the on-disk checkpoint through the injectable seam and
-    # apply the old_string -> new_string patch in memory (read-then-validate).
-    $content = $toolInput.content
-    if (-not $content) {
-        $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader
+    # Write tool: a present content property is validated directly, and empty
+    # content is denied. Edit tool: no content property is supplied, so read the
+    # targeted checkpoint through the injectable seam and apply the old_string ->
+    # new_string patch in memory (read-then-validate). Any failure cause denies.
+    $cause = $null
+    if ($toolInput.PSObject.Properties.Name -contains 'content') {
+        $content = $toolInput.content
         if (-not $content) {
-            return [ordered]@{ hookSpecificOutput = [ordered]@{
-                    hookEventName = 'PreToolUse'; permissionDecision = 'deny'
-                    permissionDecisionReason = 'COMPLETION_CONSISTENCY_BLOCKED: the canonical checkpoint cannot be deleted, emptied, or replaced through an unresolved patch.'
-                } }
+            $cause = 'write-content-empty'
         }
+    }
+    else {
+        $edit = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader -CheckpointPath $filePath
+        $content = $edit.Content
+        $cause = $edit.Failure
+    }
+    if ($cause) {
+        return ConvertTo-CompletionDenyDecision -Reason "COMPLETION_CONSISTENCY_BLOCKED: the canonical checkpoint cannot be deleted, emptied, or replaced through an unresolved patch ($cause)."
     }
 
     try {
@@ -414,6 +464,9 @@ function Invoke-CompletionConsistencyDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('COMPLETION_CONSISTENCY_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     # -HookName makes every transport error name this hook rather than the

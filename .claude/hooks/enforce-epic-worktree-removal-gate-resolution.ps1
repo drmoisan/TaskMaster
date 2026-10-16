@@ -7,49 +7,29 @@
     dot-sources. Holds:
 
     - The import guard for WorktreeRunResolution.psm1. A failed import is recorded in
-      $script:EpicWorktreeGateResolutionImportFailure, and
-      Get-EpicWorktreeGateImportFailureDecision turns it into a deny, so a missing module
+      $script:HookDependencyFailures, and the gate's call to
+      Get-HookDependencyFailureDecision turns it into a deny, so a missing module
       cannot make the gate exit non-zero and fail open.
     - The two checkpoint read seams, relocated from the gate file with their names kept.
       Each takes a mandatory absolute path composed beneath a resolved worktree root.
     - The resolution seam Resolve-EpicWorktreeGateRunTarget, which locates the epic or
       parallel checkpoint that records the removal target under worktree_path.
-    - Read-EpicWorktreeGateRunCheckpoint, which returns the target and the parsed
-      checkpoint beneath it ($null when the target is unresolved).
+    - Read-EpicWorktreeGateRunCheckpoint, which returns the target, the parsed checkpoint
+      beneath it ($null when the target is unresolved), and the Path it read ($null when
+      the target is unresolved; issue #851).
+    - Find-EpicWorktreeGateParallelItemRecord, which locates the parallel items[] record
+      for the removal target, and Get-EpicWorktreeGateDenyDiagnostics, which builds the
+      diagnostics clause of the final deny from two read results without reading any
+      file (issue #851).
 
 .NOTES
-    PowerShell 7+. Depends on Get-EpicWorktreeGateBlockDecision and
-    ConvertFrom-EpicWorktreeGateJson from the gate file, resolved at call time. Mirrored
-    byte-identically under extensions/drm-copilot/resources/claude-customizations/.
+    PowerShell 7+. Depends on Get-EpicWorktreeGateBlockDecision,
+    ConvertFrom-EpicWorktreeGateJson, and Find-EpicWorktreeFeatureRecord from the gate
+    file, resolved at call time. Mirrored byte-identically under
+    extensions/drm-copilot/resources/claude-customizations/.
 #>
 
-# Import guard (issue #690): a failed import denies instead of failing open.
-$script:EpicWorktreeGateResolutionImportFailure = $null
-try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
-}
-catch {
-    $script:EpicWorktreeGateResolutionImportFailure = 'WorktreeRunResolution.psm1'
-}
-
-function Get-EpicWorktreeGateImportFailureDecision {
-    <#
-    .SYNOPSIS
-        Returns the deny for a failed worktree-resolution import, or $null.
-    .OUTPUTS
-        System.Collections.Specialized.OrderedDictionary, or $null when the import succeeded.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param()
-
-    if (-not $script:EpicWorktreeGateResolutionImportFailure) {
-        return $null
-    }
-    return Get-EpicWorktreeGateBlockDecision -Reason (
-        "EPIC_WORKTREE_REMOVAL_BLOCKED: the worktree-resolution module '$($script:EpicWorktreeGateResolutionImportFailure)' " +
-        'failed to import, so the run checkpoint that governs this removal cannot be located; the gate fails closed.')
-}
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
 function Get-EpicWorktreeGateCheckpointContent {
     <#
@@ -121,7 +101,9 @@ function Read-EpicWorktreeGateRunCheckpoint {
     .PARAMETER WorktreePath
         The removal target the command names.
     .OUTPUTS
-        System.Management.Automation.PSCustomObject with Target and Checkpoint ($null when unresolved).
+        System.Management.Automation.PSCustomObject with Target, Checkpoint ($null when
+        unresolved, absent, or unparseable), and Path (the composed absolute checkpoint
+        path, or $null when the target is unresolved).
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -132,6 +114,7 @@ function Read-EpicWorktreeGateRunCheckpoint {
 
     $target = Resolve-EpicWorktreeGateRunTarget -Kind $Kind -WorktreePath $WorktreePath
     $checkpoint = $null
+    $path = $null
     if ($target.Status -eq 'SessionRoot' -or $target.Status -eq 'OtherWorktree') {
         $path = Get-WorktreeRunCheckpointPath -Kind $Kind -WorktreeRoot $target.WorktreeRoot
         $raw = if ($Kind -eq 'epic') { Get-EpicWorktreeGateCheckpointContent -Path $path } else { Get-EpicWorktreeGateParallelCheckpointContent -Path $path }
@@ -140,5 +123,114 @@ function Read-EpicWorktreeGateRunCheckpoint {
     return [pscustomobject]@{
         Target     = $target
         Checkpoint = $checkpoint
+        Path       = $path
     }
+}
+
+function Find-EpicWorktreeGateParallelItemRecord {
+    <#
+    .SYNOPSIS
+        Locate the parallel items[] record whose worktree_path matches the target path.
+    .DESCRIPTION
+        Pure. Normalizes both paths exactly as Test-ParallelCheckpointAllowsWorktreeRemoval
+        does (backslash to slash, trailing slash trimmed, PowerShell -eq) and returns the
+        first matching entry (issue #851).
+    .PARAMETER Checkpoint
+        Parsed parallel-orchestrator checkpoint, or $null when absent/unreadable.
+    .PARAMETER WorktreePath
+        The removal target the command names.
+    .OUTPUTS
+        System.Object or $null
+    #>
+    [CmdletBinding()]
+    param(
+        [AllowNull()]
+        $Checkpoint,
+
+        [AllowNull()]
+        [string] $WorktreePath
+    )
+
+    if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
+        return $null
+    }
+    $props = @($Checkpoint.PSObject.Properties.Name)
+    if ($props -notcontains 'items' -or $null -eq $Checkpoint.items) {
+        return $null
+    }
+
+    $normalizedTarget = ($WorktreePath -replace '\\', '/').TrimEnd('/')
+    foreach ($item in @($Checkpoint.items)) {
+        if ($null -eq $item) {
+            continue
+        }
+        $itemProps = @($item.PSObject.Properties.Name)
+        if ($itemProps -notcontains 'worktree_path') {
+            continue
+        }
+        $normalizedItemPath = (([string]$item.worktree_path) -replace '\\', '/').TrimEnd('/')
+        if ($normalizedItemPath -eq $normalizedTarget) {
+            return $item
+        }
+    }
+    return $null
+}
+
+function Get-EpicWorktreeGateDenyDiagnostics {
+    <#
+    .SYNOPSIS
+        Build the diagnostics clause of the final deny from the two read results (issue #851).
+    .DESCRIPTION
+        Pure; reads no file. Names, for each run kind, the target status, the checkpoint
+        path read (or that none was read), and the outcome of the record match: the
+        matched record's merge_status, an absent merge_status, no matching record, an
+        absent or unparseable checkpoint, or not evaluated when no checkpoint was read.
+    .PARAMETER EpicRead
+        The epic read result (Target, Checkpoint, Path).
+    .PARAMETER ParallelRead
+        The parallel read result (Target, Checkpoint, Path).
+    .PARAMETER WorktreePath
+        The removal target the command names.
+    .OUTPUTS
+        System.String
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification = 'The name is fixed by the issue #851 plan contract; the plural noun names the one diagnostics clause it returns.')]
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)] $EpicRead,
+        [Parameter(Mandatory)] $ParallelRead,
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+    )
+
+    $parts = foreach ($kind in @('epic', 'parallel')) {
+        $read = if ($kind -eq 'epic') { $EpicRead } else { $ParallelRead }
+        $pathText = if ($null -ne $read.Path) { "checkpoint '$($read.Path)'" } else { 'no checkpoint read' }
+        if ($null -eq $read.Path) {
+            $recordText = 'not evaluated'
+        }
+        elseif ($null -eq $read.Checkpoint) {
+            $recordText = 'checkpoint absent or unparseable'
+        }
+        else {
+            $record = if ($kind -eq 'epic') {
+                Find-EpicWorktreeFeatureRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath
+            }
+            else {
+                Find-EpicWorktreeGateParallelItemRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath
+            }
+            $arrayName = if ($kind -eq 'epic') { 'features' } else { 'items' }
+            $recordText = if ($null -eq $record) {
+                "no matching $arrayName[] record"
+            }
+            elseif (@($record.PSObject.Properties.Name) -contains 'merge_status') {
+                "merge_status '$([string]$record.merge_status)'"
+            }
+            else {
+                'merge_status absent'
+            }
+        }
+        '{0} run {1} ({2}), {3}' -f $kind, $read.Target.Status, $pathText, $recordText
+    }
+    return ('Diagnostics: {0}; {1}.' -f $parts[0], $parts[1])
 }

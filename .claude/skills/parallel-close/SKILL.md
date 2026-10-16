@@ -45,24 +45,37 @@ which is exactly what the gate exists to prevent. The re-derivation is mandatory
 
 1. Re-derive durable state as above and resolve the run's `items[]`.
 
-2. **Gate the close on no item being in flight.** Call `decide_close(items)` from
-   `scripts/dev_tools/parallel_mutation_protocol.py`. It raises the dedicated rejection exception
-   carrying EVERY in-flight key, so the rejection names all the work that must finish first rather
-   than one item at a time. On rejection: report the blocking keys and stop. A rejected close
-   appends NO `mutations[]` entry and makes NO state change — do not record the attempt.
+2. **Gate the close on no item being in flight.** Pass every re-derived item, as one
+   `<key>:<state>` token each, to the bundled entry point, which needs no Python interpreter:
 
-3. **Append exactly one run-scoped `mutations[]` entry** for a successful close, built by
-   `build_close_entry` from `scripts/dev_tools/parallel_mutation_protocol.py`:
+   ```bash
+   bash .claude/lib/bash/mutate-parallel-run.sh close --items "<k>:<state> ..."
+   ```
+
+   Exit 0 (stdout `{"close_permitted":true}`) permits the close. Exit 1 rejects it and prints one
+   stderr line naming EVERY in-flight key, so the rejection names all the work that must finish
+   first rather than one item at a time. On rejection: report the blocking keys and stop. A
+   rejected close appends NO `mutations[]` entry and makes NO state change — do not record the
+   attempt.
+
+3. **Append exactly one run-scoped `mutations[]` entry** for a successful close, built by the
+   bundled entry point:
+
+   ```bash
+   bash .claude/lib/bash/mutate-parallel-run.sh close-entry --generation <g> --at <timestamp>
+   ```
 
    | Case | `op` | `item_key` | `prior_state` | `new_state` | `disposition` | `recolor_generation` |
    | --- | --- | --- | --- | --- | --- | --- |
    | Close | `close` | null (run-scoped) | null | null | null | `g` (unchanged) |
 
    The entry is run-scoped, so `item_key` is null: the close acts on the run, not on an item. The
-   `at` timestamp comes from the engine's injected clock seam.
+   `at` timestamp is supplied through `--at`; when `--at` is omitted the entry point stamps the
+   current UTC minute.
 
 4. **Do not recompute.** Run termination changes no cohort assignment, so `recolor_generation` is
-   UNCHANGED and `cohorts[]` is not rewritten. Do not call `recolor_unstarted` as part of a close.
+   UNCHANGED and `cohorts[]` is not rewritten.
+   Do not run the `recolor` subcommand as part of a close.
 
 5. **Stop admitting.** After the close is recorded, the run accepts no further `/parallel-add`. The
    close record is the run's final mutation; nothing may be appended to `mutations[]` after it.

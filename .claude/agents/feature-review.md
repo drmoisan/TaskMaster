@@ -116,13 +116,15 @@ Coverage metrics are mandatory for every language that has changed files in the 
 
 ### Coverage Thresholds
 
-Coverage thresholds follow the uniform tier rule (Authoritative Decision #2) defined in `.claude/rules/quality-tiers.md`:
+Coverage thresholds follow the threshold precedence defined in `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern. Each metric falls back independently: when the root `CLAUDE.md` states only a line threshold or only a branch threshold, the stated threshold governs that metric and the default below governs the other. The thresholds that govern under this precedence are the governing thresholds referred to in the Verification Procedure below. The defaults are:
 
 - **New code files** (files added in this feature, not previously existing): line coverage >= 85%, branch coverage >= 75% for branch-capable languages.
 - **Modified files** (files that existed before and were changed): line coverage >= 85%, branch coverage >= 75% for branch-capable languages, and no regression on changed lines relative to baseline.
 - **Repo-wide per language**: line coverage >= 85%, branch coverage >= 75% for branch-capable languages.
 
 Tier-specific lower thresholds are not used.
+
+Tier classification findings: report a missing or incomplete `quality-tiers.yml` only when the repository has adopted tiers, that is, when `quality-tiers.yml` exists at the repository root on the resolved base branch or the repository's CI runs a tier-classification check. Otherwise record tier classification as not applicable; it is not a finding.
 
 The branch threshold applies only to branch-capable languages — TypeScript, Python, and C#. PowerShell is a coverage language and is fully subject to the line threshold and the no-regression requirement, but Pester measures command (instruction) coverage and line coverage only, so no branch percentage exists to evaluate and no branch threshold applies to it (see `.claude/rules/powershell.md`). Do not record FAIL for an absent PowerShell branch figure.
 
@@ -134,9 +136,9 @@ For each language that has changed files in the feature branch:
 2. Check whether the coverage artifact exists for that language.
 3. If the artifact exists:
    - Parse the repo-wide coverage percentage and report it in the policy audit.
-   - If repo-wide coverage is below 80%, flag as FAIL and add to remediation triggers.
-   - For each new file: if line coverage is below 90%, flag as FAIL and add to remediation triggers.
-   - For each modified file: if line coverage has regressed from baseline or is below 80%, flag as FAIL and add to remediation triggers.
+   - If repo-wide line or branch coverage is below the governing repo-wide thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+   - For each new file: if line or branch coverage is below the governing new-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+   - For each modified file: if coverage on changed lines has regressed from baseline, or line or branch coverage is below the governing modified-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
 
 The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.

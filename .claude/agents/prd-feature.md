@@ -15,7 +15,7 @@ hooks:
     - matcher: "prd-feature"
       hooks:
         - type: command
-          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName prd-feature -RequiredArtifact 'spec-path|^docs/features/active/.+/spec\.md$|feature spec artifact' -RequiredArtifact 'user-story-path|^docs/features/active/.+/user-story\.md$|feature user story artifact'
+          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName prd-feature -RequiredArtifact 'spec-path|^docs/features/active/.+/spec\.md$|feature spec artifact'
         - type: command
           command: pwsh -NoProfile -File .claude/hooks/validate-prd-feature-output.ps1
 ---

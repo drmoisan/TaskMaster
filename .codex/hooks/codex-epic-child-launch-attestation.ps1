@@ -2,7 +2,7 @@
 
 $contractPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'scripts/epic-child-launch-contract.ps1'
 if (Test-Path -LiteralPath $contractPath -PathType Leaf) {
-    . $contractPath
+    try { . $contractPath } catch { Add-HookDependencyFailure -Name 'epic-child-launch-contract.ps1' -ErrorRecord $_ }
 }
 
 $script:CodexEpicChildContexts = @('epic_preparation_child', 'epic_execution_child')

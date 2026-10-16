@@ -10,8 +10,9 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-. (Join-Path $PSScriptRoot 'codex-epic-child-launch-attestation.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-epic-child-launch-attestation.ps1') } catch { Add-HookDependencyFailure -Name 'codex-epic-child-launch-attestation.ps1' -ErrorRecord $_ }
 
 $script:AllowedDependencyStatuses = @('merged', 'worktree_removed')
 
@@ -178,6 +179,8 @@ function Invoke-CodexEpicWaveDecision {
         [AllowEmptyString()][string] $RepositoryRoot = '',
         [datetimeoffset] $Now = [datetimeoffset]::UtcNow
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WAVE_BARRIER_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-CodexWaveJson -Raw $PayloadRaw -Name 'PreToolUse input'
     if (-not (Test-CodexWaveMutation -Payload $payload)) {
@@ -252,6 +255,9 @@ function Get-CodexPrimaryWorktreeRoot {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_WAVE_BARRIER_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WAVE_BARRIER_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

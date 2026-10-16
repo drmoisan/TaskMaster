@@ -228,7 +228,9 @@
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
     <Compile Include="TestSupport\DedicatedWorkerThread.cs" />
-    <Compile Include="TestSupport\SynchronousBackgroundWorker.cs" />
+    <Compile Include="TestSupport\SynchronousBackgroundWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="TestSupport\ArmingFakeTimeProvider.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />

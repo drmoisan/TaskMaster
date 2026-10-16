@@ -28,12 +28,13 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared command-line parser (issue #545). Every forbidden-token scan and both `gh`
 # expressions below run against each segment's clause-ordered scan text, and the
 # structural matcher reaches the relocating `gh` spellings adjacency cannot.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 $script:PromotionMcpOnlyBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct Bash promotion-script execution is not allowed in agent sessions. Use the drm-copilot MCP promotion tools instead.'
 
@@ -109,9 +110,12 @@ function Get-PromotionBypassReason {
     }
 
     # `gh issue create` and `gh issue new` are direct bypasses of the MCP
-    # promotion path. Tolerate any flags after the subcommand.
+    # promotion path. Tolerate any flags after the subcommand. The adjacency
+    # expression reads the masked text, so a quoted mention is not a match; wrapper
+    # payloads and substitution bodies are covered by the structural check below
+    # (issue #824).
     foreach ($segment in $segments) {
-        if ($segment.ScanText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
+        if ($segment.MaskedText -match '(?i)\bgh\s+issue\s+(?:create|new)\b') {
             return (Get-PromotionMcpOnlyGhIssueBlockedReason)
         }
     }
@@ -224,6 +228,8 @@ function Invoke-PromotionMcpOnlyDecision {
     param(
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PROMOTION_MCP_ONLY_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if (-not $ToolInputRaw) {
         return Get-PromotionMcpOnlyAllowDecision
@@ -273,6 +279,9 @@ function ConvertFrom-CodexPromotionHookPayload {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PROMOTION_MCP_ONLY_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PROMOTION_MCP_ONLY_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payload = ConvertFrom-CodexPromotionHookPayload -PayloadRaw ([Console]::In.ReadToEnd())

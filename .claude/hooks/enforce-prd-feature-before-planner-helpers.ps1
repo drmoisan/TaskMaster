@@ -10,13 +10,16 @@
     cap as target resolution grows.
 
     The file declares no file-scope parameter block, no requires directive, and no
-    entrypoint. Apart from its function declarations,
-    its only file-scope statement is the resolution-module import
-    that follows this block, which brings in issue #669's path normalisation and
-    ambiguity reason code. That import is deliberately unguarded, for the same
-    reason the parent hook's is: a resolution module that cannot be loaded is
-    itself the target-not-resolvable state, so letting the failure surface fails
-    the gate closed rather than degrading it to a permissive path.
+    entrypoint. Apart from its function declarations, its file-scope statements are
+    the resolution-module import that follows this block, which brings in issue
+    #669's path normalisation and ambiguity reason code, and the guarded dot-source
+    of the pure shared resolver feature-folder-resolution.ps1 (issue #565), which
+    owns the single work-mode parser. The module import is deliberately unguarded,
+    for the same reason the parent hook's is: a resolution module that cannot be
+    loaded is itself the target-not-resolvable state, so letting the failure surface
+    fails the gate closed rather than degrading it to a permissive path. A failed
+    dot-source of the shared resolver makes Resolve-PrdFeatureWorkMode return $null,
+    which the planner gate's deny-on-unknown branch treats as an unreadable marker.
 .NOTES
     Compatible with PowerShell 7+. Read-only resolution logic.
 #>
@@ -24,7 +27,17 @@
 # Issue #669 owns path normalisation and the ambiguity reason code. The import is
 # unguarded for the same reason the parent's is: a resolution module that cannot be
 # loaded is itself the target-not-resolvable state.
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force -ErrorAction Stop
+
+# Shared work-mode parser (issue #565). Guarded so a failed dot-source fails closed
+# through the planner gate's deny-on-unknown branch.
+$script:PrdFeatureFolderResolutionImportFailure = $null
+try {
+    . (Join-Path $PSScriptRoot 'feature-folder-resolution.ps1')
+}
+catch {
+    $script:PrdFeatureFolderResolutionImportFailure = 'feature-folder-resolution.ps1'
+}
 
 function Resolve-PrdFeatureWorkMode {
     <#
@@ -36,7 +49,10 @@ function Resolve-PrdFeatureWorkMode {
         Recognizes minor-audit, full-feature, full-bug, and the legacy full
         marker (normalized to full-feature), mirroring the regex convention
         used by scripts/dev_tools/prompt_mode_contract.py so both runtimes
-        agree on what counts as a valid marker line.
+        agree on what counts as a valid marker line. Delegates to the single
+        shared parser, Resolve-FeatureFolderWorkMode (issue #565), with an empty
+        -UnresolvedMode so an unresolved marker still returns $null here; a
+        failed dot-source of the shared resolver also returns $null.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -45,20 +61,15 @@ function Resolve-PrdFeatureWorkMode {
         [string] $IssueContent
     )
 
-    if ([string]::IsNullOrWhiteSpace($IssueContent)) {
+    if ($script:PrdFeatureFolderResolutionImportFailure) {
         return $null
     }
 
-    $match = [regex]::Match($IssueContent, '(?im)^-\s*Work Mode:\s*(minor-audit|full-feature|full-bug|full)\s*$')
-    if (-not $match.Success) {
+    $mode = Resolve-FeatureFolderWorkMode -IssueContent $IssueContent -UnresolvedMode ''
+    if (-not $mode) {
         return $null
     }
-
-    $rawMode = $match.Groups[1].Value
-    if ($rawMode -eq 'full') {
-        return 'full-feature'
-    }
-    return $rawMode
+    return $mode
 }
 
 function Get-PrdFeatureRequiredFile {

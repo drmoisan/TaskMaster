@@ -46,7 +46,16 @@ Use this skill when:
 Use `yyyy-MM-ddTHH-mm` for all audit, remediation, and evidence artifacts.
 Example: `2026-02-06T14-30`.
 
-The `Timestamp` value is local time read from the host system clock when the recorded command runs (for example `Get-Date -Format yyyy-MM-ddTHH-mm`); the agent never composes or estimates it.
+The `Timestamp` value is UTC read from the host system clock when the recorded command runs (for example `Get-Date -AsUTC -Format yyyy-MM-ddTHH-mm` in PowerShell 7, `(Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH-mm')` in Windows PowerShell 5.1, or `date -u +%Y-%m-%dT%H-%M` in a POSIX shell); the agent never composes or estimates it. The value is written without a zone suffix.
+
+### Evidence Filename Timestamp
+
+The stamp in the filename of every artifact under `<FEATURE>/evidence/<kind>/` is the UTC time at which that file is written, read from the host system clock immediately before the write, in the same `yyyy-MM-ddTHH-mm` shape with no zone suffix. It is never a plan-time stamp, a plan-cycle identifier, or any other value fixed before the write.
+
+- Plans name such an artifact `<name>.<timestamp>.md`, and the executor substitutes the write time. A later loop pass writes a new file with a new stamp.
+- A task that consumes an evidence artifact selects the lexicographically greatest file matching `<name>.*.md`. The fixed-width UTC shape sorts in chronological order, so that file is the most recently written one.
+- Plan files (`plan.<timestamp>.md`, stamped by the feature-folder tooling in America/New_York) and the review artifact set (`policy-audit`, `code-review`, `feature-audit`, `remediation-inputs`, which share one stamp) are outside this rule.
+- Existing evidence files whose names carry a plan-time stamp are not renamed.
 
 ## Canonical Evidence Locations
 

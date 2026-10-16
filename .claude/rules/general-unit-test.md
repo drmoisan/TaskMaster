@@ -20,10 +20,11 @@ Every unit test must satisfy all five of these properties:
 
 ## Coverage Requirements
 
+- Threshold precedence: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern. The 85% line and 75% branch figures are defaults that apply only when the root `CLAUDE.md` states none. This precedence applies to every restatement of these figures in other rule files, agents, and skills. Each metric falls back independently: when the root `CLAUDE.md` states only a line threshold or only a branch threshold, the stated threshold governs that metric and the default governs the other.
 - **Line coverage must remain >= 85% across all tiers (T1–T4).**
 - **Branch coverage must remain >= 75% across all tiers (T1–T4) for languages whose coverage tooling measures branch coverage.** PowerShell (Pester) and bash (kcov) are the exceptions: neither tool measures branch coverage in any output format, so only the line threshold applies to them and there is no branch-coverage gate. This is a threshold exemption only; PowerShell and bash production files remain in the coverage denominator under the Coverage Exclusion Policy below.
 - Code changes or refactors must not reduce coverage for the lines that were changed.
-- Tier-specific lower coverage thresholds are not used in this repository. See `.claude/rules/quality-tiers.md` for the full tier system.
+- Tier-specific lower coverage thresholds are not used. See `.claude/rules/quality-tiers.md` for the full tier system, which applies only when `quality-tiers.yml` exists at the repository root.
 - Coverage is a supporting metric, not the sole quality gate. Untested critical behavior is not acceptable even if the overall percentage looks good.
 - Configure coverage tooling to exclude test files (e.g., `tests/`) so metrics reflect application code, not tests.
 - Type-only / interface-only modules with no executable behavior may be omitted from coverage measurement. Examples: Python `Protocol`-only modules consumed only under `TYPE_CHECKING`, TypeScript interface/type-only files, and C# interface-only files. Such modules legitimately report 0% executable coverage and may be excluded from measurement. This is a clarification only; it does not lower any coverage threshold.
@@ -86,7 +87,7 @@ Colocation — placing test files alongside production source files in `src/` or
 
 ## Test Categories
 
-The following test categories apply across the repository, with tier-dependent obligations per `.claude/rules/quality-tiers.md`:
+The following test categories apply across the repository, with tier-dependent obligations per `.claude/rules/quality-tiers.md`; those tier-dependent obligations apply only when `quality-tiers.yml` exists at the repository root:
 
 - **Unit tests** — required for all tiers (T1–T4). Cover single units of behavior in isolation.
 - **Property-based tests** — required for T1 and T2 modules: at least one property test per pure function. Use `fast-check` (TypeScript) or `hypothesis` (Python) where applicable.

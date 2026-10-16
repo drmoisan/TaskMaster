@@ -34,6 +34,16 @@ Each task must be:
 - independently verifiable,
 - free of placeholder text.
 
+## Scratch Location
+
+Concurrent child runs in one session share one session scratchpad, so every plan places its scratch files in a directory unique to the child.
+
+- `SCRATCH` resolves to `<session scratchpad>/issue-<issue-num>/`, where `<issue-num>` is the plan's canonical issue number. Every plan that uses scratch files defines `SCRATCH` this way.
+- Every scratch file, helper script, staged copy, and coverage report a plan names lives under `SCRATCH`. Subdirectories such as `SCRATCH/stage/` are permitted.
+- A plan never directs a scratch file to the scratchpad root or to a fixed shared name outside `SCRATCH`.
+- Plans and evidence artifacts record the literal token `SCRATCH`, never a host path.
+- If two runs for the same issue can execute at once, the run-unique form `issue-<issue-num>-<yyyy-MM-ddTHH-mm>` replaces `issue-<issue-num>`.
+
 ## Mandatory Preflight Loop
 
 Before a plan is finalized:

@@ -1,29 +1,38 @@
-
 <#
 .SYNOPSIS
     Blocks implementation operations before orchestration readiness exists.
+.DESCRIPTION
+    Executing shell (issue #735): Codex runs a command through PowerShell by default on native
+    Windows, but the model may choose another shell per call, and the PreToolUse payload carries
+    only the raw command string, so the executing shell is undetermined per command and every
+    shell-divergent command shape denies (research/research.2026-10-08T14-00.md in the issue
+    #732 feature folder). The payload carries no workdir either, so the session root is the
+    default target of a segment without an explicit -C (issue #738, decision D4).
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
-. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.
 # Extracted to a dot-sourced sibling so this file stays inside the 500-line cap, following
 # the headroom-split precedent already used on this side by enforce-completion-helpers.ps1.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-helpers.ps1' -ErrorRecord $_ }
 
 # Pure mode dispatch and per-mode readiness predicates for issue #554. A new sibling
 # rather than an addition to the helpers file above, whose header declares a different
 # normative contract and which lacks headroom; leaving that file byte-untouched is the
 # proof the issue #539 exemption is behaviourally unchanged.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-modes.ps1' -ErrorRecord $_ }
+# Epic-scope command and path legs (issue #707, porting issue #663 decision D2), plus the
+# two per-mode read seams relocated from this file to keep it inside the 500-line cap.
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
-
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 # The readiness checkpoint this gate reads and names in its block message.
 $script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 
@@ -286,33 +295,6 @@ function Get-CheckpointContent {
     return Get-Content -Raw -LiteralPath $script:CheckpointPath
 }
 
-# The two per-mode read seams (issue #554). Each takes its path from the fixed mode
-# table and never from a delegation's own text; an absent file returns an empty
-# string, which the readiness predicate then treats as a deny.
-function Get-EpicCheckpointContent {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode 'epic'
-    if (-not (Test-Path -LiteralPath $path)) {
-        return ''
-    }
-    return Get-Content -Raw -LiteralPath $path
-}
-
-function Get-ParallelCheckpointContent {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode 'parallel'
-    if (-not (Test-Path -LiteralPath $path)) {
-        return ''
-    }
-    return Get-Content -Raw -LiteralPath $path
-}
-
 function Get-OrchestrationPreimplementationGateAllowDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -381,6 +363,8 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         [AllowEmptyString()]
         [string] $ParallelCheckpointRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PREIMPLEMENTATION_GATE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if (-not $ToolInputRaw) {
         return Get-OrchestrationPreimplementationGateAllowDecision
@@ -398,6 +382,7 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     # default wording they have today.
     $mode = $script:OrchestrationDelegationDefaultMode
     $prompt = ''
+    $command = ''
     $filePath = Get-StringProperty -Value $toolInput -Name 'file_path'
     if ($filePath) {
         $normalized = ([string]$filePath) -replace '\\', '/'
@@ -427,6 +412,16 @@ function Invoke-OrchestrationPreimplementationGateDecision {
             Get-OrchestrationModeDenyReason -Mode $mode -Failure 'declared-checkpoint-path')
     }
 
+    # The command, apply_patch, and path legs consult the epic checkpoint first (issue #707,
+    # porting issue #663). A call that is not epic scope yields $null and continues to the
+    # unchanged single-feature path.
+    if ($filePath -or $command) {
+        $epicDecision = Get-OrchestrationEpicScopeDecision -Command $command -FilePath $filePath
+        if ($null -ne $epicDecision) {
+            return $epicDecision
+        }
+    }
+
     if ($mode -eq 'epic' -or $mode -eq 'parallel') {
         $isEpic = ($mode -eq 'epic')
         $injected = if ($isEpic) { 'EpicCheckpointRaw' } else { 'ParallelCheckpointRaw' }
@@ -437,11 +432,13 @@ function Invoke-OrchestrationPreimplementationGateDecision {
             $modeCheckpoint = ConvertFrom-CheckpointJson -Json ([string]$modeRaw)
         } catch { $modeCheckpoint = $null }
         $folder = Find-OrchestrationDelegationTargetFolder -Prompt $prompt
-        $issue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt
+        # Only the keyed issue number breaks a tie among cited folders (#565 CR-1); the bare hash form feeds the D3 record lookup only.
+        $issue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt -KeyedOnly
+        $fallbackIssue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt
         $failure = if ($isEpic) {
-            Get-EpicOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+            Get-EpicOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue -FallbackIssueNumber $fallbackIssue
         } else {
-            Get-ParallelOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+            Get-ParallelOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue -FallbackIssueNumber $fallbackIssue
         }
         if (-not $failure) { return Get-OrchestrationPreimplementationGateAllowDecision }
         return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
@@ -466,6 +463,9 @@ function Invoke-OrchestrationPreimplementationGateDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PREIMPLEMENTATION_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PREIMPLEMENTATION_GATE_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-orchestration-preimplementation-gate'

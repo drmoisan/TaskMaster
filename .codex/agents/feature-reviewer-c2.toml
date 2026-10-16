@@ -46,6 +46,7 @@ Review constraints:
 
 Acceptance and remediation rules:
 - Trigger remediation if policy audit has FAIL or meaningful PARTIAL findings, toolchain checks fail, blockers exist in code review, or required acceptance criteria are not fully met.
+- When every blocking finding is non-remediable (remediability external_dependency, policy_hold, awaiting_ci, or human_decision_required, with no autonomous finding), report REVIEW_STATUS: HALT_NON_REMEDIABLE or REVIEW_STATUS: AWAITING_CI with REMEDIATION_PLAN: NONE, create no remediation plan target, and do not delegate to atomic-planner.
 - When remediation is triggered, generate remediation-inputs first.
 - Then automatically delegate remediation planning to the atomic-planner agent; do not leave remediation as a manual follow-up.
 - Create the remediation plan target file on disk before the planning handoff.

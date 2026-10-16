@@ -40,6 +40,8 @@
 # the SHELL_QC_<TOOL>_BIN seams substitute a checked-in stand-in for a real dependency.
 # An empty value is treated as missing and falls back to `.git`.
 set -euo pipefail
+# The library path is computed at runtime from BASH_SOURCE, so shellcheck (run without
+# -x) cannot follow it; SC1091 is the expected, benign result.
 # shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh
 # shellcheck disable=SC1091
 source "$(dirname -- "${BASH_SOURCE[0]}")/cleanup_worktrees_enumerate_lib.sh"

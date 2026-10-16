@@ -88,7 +88,7 @@ During feature review (feature-audit phase):
 
 ### When Orchestrators Enforce AC Tracking
 
-Orchestrators do not directly check off AC items. Instead:
+Orchestrators do not directly check off AC items. The one exception is a CI-dependent criterion, which the item's own orchestrator run checks off at S9 as described in `### CI-Dependent Criteria` above. For every other criterion, orchestrators instead:
 
 1. Ensure delegated executors and reviewers reference this skill.
 2. After executor or reviewer completion, verify that AC source files reflect delivered work (spot-check; do not re-execute verification).

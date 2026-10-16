@@ -4,12 +4,13 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared command-line parser (issue #545). The scope filter and the operand extractor below
 # both run against the segment that structurally invokes `git worktree remove`, which is what
 # keeps the two runtimes on one implementation of the same concern.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 $script:SafeWorktreeStatuses = @('merged', 'worktree_removed')
 
@@ -31,40 +32,6 @@ function ConvertFrom-CodexWorktreeJson {
         }
         throw "EPIC_WORKTREE_REMOVAL_BLOCKED: $Name is malformed JSON: $_"
     }
-}
-
-function Get-CodexWorktreeRemovalPath {
-    <#
-    .SYNOPSIS
-        Extract the target worktree path from a git worktree remove command.
-    .DESCRIPTION
-        The operand comes from the segment that structurally invokes git worktree remove, so
-        a chained 'cd <path> &&' segment contributes nothing and a quoted mention of the
-        phrase resolves to no operand. The tokenizer strips balanced double and single
-        quotes, which is what the previous pattern's `double` and `single` alternatives did.
-
-        The previous pattern accepted '--force' only immediately after 'remove'. That
-        spelling is preserved and the trailing spelling now works too, because '--force' is a
-        zero-argument flag that never contributes an operand wherever it is written. Its
-        presence is read structurally through Test-CommandLineFlag rather than by a raw-text
-        search. The empty-string-on-miss contract is unchanged: callers test `if ($target)`.
-    .OUTPUTS
-        System.String
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([Parameter(Mandatory)][AllowEmptyString()][string] $Command)
-
-    $hasForce = Test-CommandLineFlag -CommandText $Command -CommandWord 'git' -SubcommandPath @('worktree', 'remove') -FlagName '--force'
-    $operands = @(Get-CommandLineOperand -CommandText $Command -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))
-
-    if ($operands.Count -gt 0) {
-        return [string]$operands[0]
-    }
-    if ($hasForce) {
-        return '--force'
-    }
-    return ''
 }
 
 function Get-NormalizedCodexWorktreePath {
@@ -114,6 +81,8 @@ function Invoke-CodexWorktreeRemovalDecision {
         [Parameter(Mandatory)][string] $PayloadRaw,
         [AllowNull()][AllowEmptyString()][string] $EpicCheckpointRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-CodexWorktreeJson -Raw $PayloadRaw -Name 'PreToolUse input'
     if ([string]$payload.tool_name -ne 'Bash') {
@@ -126,18 +95,59 @@ function Invoke-CodexWorktreeRemovalDecision {
     if (-not (Test-CommandLineInvocation -CommandText $command -CommandWord 'git' -SubcommandPath @('worktree', 'remove'))) {
         return $null
     }
-    $target = Get-CodexWorktreeRemovalPath -Command $command
+    # Issue #824: the removal targets are derived structurally from every invocation. A
+    # target that cannot be derived denies before the checkpoint is read, and every derived
+    # target must be authorized on its own.
+    $resolution = Resolve-CommandLineInvocationTarget -CommandText $command -CommandWord 'git' -SubcommandPath @('worktree', 'remove')
+    if ($resolution.Status -eq 'NoMatch') {
+        return $null
+    }
+    if ($resolution.Status -ne 'Targets') {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'EPIC_WORKTREE_REMOVAL_BLOCKED: TARGET_WORKTREE_NOT_DERIVABLE: the git worktree remove target cannot be derived from the command text. No checkpoint can authorize this removal.'
+            }
+        }
+    }
     $checkpoint = ConvertFrom-CodexWorktreeJson -Raw $EpicCheckpointRaw -Name 'epic checkpoint' -Optional
     $workingDirectory = if ([string]::IsNullOrWhiteSpace([string]$payload.cwd)) {
         (Get-Location).Path
     } else {
         [string]$payload.cwd
     }
-    $feature = if ($target) {
-        Find-CodexWorktreeFeature -Checkpoint $checkpoint -TargetPath $target -WorkingDirectory $workingDirectory
-    } else {
-        $null
+    foreach ($target in @($resolution.Targets)) {
+        $denial = Get-CodexWorktreeRemovalTargetDenial -Target $target -Checkpoint $checkpoint -WorkingDirectory $workingDirectory
+        if ($null -ne $denial) {
+            return $denial
+        }
     }
+    return $null
+}
+
+function Get-CodexWorktreeRemovalTargetDenial {
+    <#
+    .SYNOPSIS
+        Evaluate one derived removal target and return its deny decision, or $null when authorized.
+    .PARAMETER Target
+        One removal target derived by Resolve-CommandLineInvocationTarget.
+    .PARAMETER Checkpoint
+        The parsed epic checkpoint, or $null when absent or unreadable.
+    .PARAMETER WorkingDirectory
+        The directory a relative target resolves against.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)][string] $Target,
+        [AllowNull()] $Checkpoint,
+        [Parameter(Mandatory)][string] $WorkingDirectory
+    )
+
+    $feature = Find-CodexWorktreeFeature -Checkpoint $Checkpoint -TargetPath $Target -WorkingDirectory $WorkingDirectory
     if ($null -ne $feature -and
         @($feature.PSObject.Properties.Name) -contains 'merge_status' -and
         $script:SafeWorktreeStatuses -contains [string]$feature.merge_status) {
@@ -156,6 +166,9 @@ function Invoke-CodexWorktreeRemovalDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_WORKTREE_REMOVAL_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

@@ -34,6 +34,7 @@ On every invocation, the main session must:
 2. If a valid checkpoint exists with a matching objective, resume from the recorded `next_step`.
 3. If no checkpoint exists or the objective is new, begin the orchestration lifecycle from the start.
 4. **Checkpoint hygiene (issue #673).** When the checkpoint at `artifacts/orchestration/orchestrator-state.json` records an `issue-num` other than the item this invocation is about, move it to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json` before writing a new checkpoint, rather than overwriting it or leaving it in place. Apply the same move when this session hands an item whose checkpoint it holds to another session or worktree. A checkpoint left at a session root is read by gates that resolve against that root, so a foreign one there is state a gate can answer from.
+5. **Required checkpoint keys (issue #798).** Every checkpoint write carries each top-level key listed in `.claude/rules/orchestrator-state.md` under `## Required Top-Level Keys`; plain validation reports each absent key as `Checkpoint missing required key: <key>` under every flag combination. The list includes `last_updated`, an ISO-8601 UTC date-time string (for example `2026-10-08T17:28:00Z`) that is rewritten on every checkpoint write: after every completed step and every state transition, including halts.
 
 ## Prepared-State Portable Handoff Intake
 
@@ -189,6 +190,8 @@ The mandatory sequence is:
 3. The orchestrator then delegates PR creation and any PR body edits to `Agent(pr-author)`. The `pr-author` agent runs the `pr-author` skill to author the body, writes the body file `artifacts/pr_body_<N>.md` and the sibling receipt `artifacts/pr_body_<N>.receipt.json` with the shape `{skill, pr_body_path, number, sha256 (lowercase hex of the body bytes), context_summary_path, created_at (ISO-8601 UTC, strictly newer than `artifacts/pr_context.summary.txt` last-write)}`, issues `gh pr create --body-file artifacts/pr_body_<N>.md` (or `gh pr edit --body-file ...`), and reports the resulting PR URL or PR number.
 4. The orchestrator records `pr_author_receipt` in the checkpoint, citing the body-file path and the receipt path that were verified.
 
+When the pr-author agent runs outside the item worktree (its process directory is not the worktree that holds the item's `artifacts/` tree), it passes the absolute canonical path `<item worktree>/artifacts/pr_body_<N>.md` to `--body-file`. The `enforce-pr-author-skill.ps1` hook resolves the item worktree from `--head` and reads the PR context summary, the body, and the receipt beneath it; in that topology it denies a relative `--body-file` with `PR_BODY_PATH_NONCANONICAL`, because `gh` would read the relative path from its own process directory.
+
 `Agent(pr-author)` is the mandatory delegate for PR creation and PR body edits. Direct `gh pr create`/`gh pr edit --body*` from the main thread is prohibited and is blocked by the hook. Before the five receipt checks, the `enforce-pr-author-skill.ps1` PreToolUse hook independently re-validates the orchestrator-state checkpoint against `--require-pr-creation-ready` (via an injectable `$Invoker` subprocess seam) and blocks with `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` when the checkpoint is missing or invalid — this is the local, hook-level enforcement mechanism that closes the bypass path (it runs inside the same hook that already intercepts `gh pr create`/`gh pr edit`, not as a CI check). The PreToolUse hook then verifies the receipt in five ordered checks: canonical body-file path, receipt present, `number` match, `sha256` match against the body bytes, and `created_at` strictly newer than the context summary last-write.
 
 The SHA-256 receipt is a policy-level integrity check, not a cryptographic or security boundary; any actor with `Write(/artifacts/**)` access can replace both the body file and its receipt together with a matching SHA-256. It binds the body bytes to the receipt, prevents accidental bypass, and requires a deliberate, documented act to circumvent.
@@ -267,7 +270,7 @@ Cycle accounting: a remediation attempt is complete when R3 execution finished (
 
 ## Issue Number Consistency
 
-The canonical issue number is derived once from the active feature folder name: extract the trailing integer from the folder base name (e.g., `2026-04-26-push-down-claude-customizations-162` yields `162`). Record as `issue_num` in the checkpoint.
+The canonical issue number is derived once from the active feature folder name: extract the trailing integer from the folder base name (e.g., `2026-04-26-push-down-claude-customizations-162` yields `162`). Record as `issue-num` in the checkpoint; the hyphenated key is the one listed in `.claude/rules/orchestrator-state.md` under `## Required Top-Level Keys`.
 
 Every delegation prompt to a receipt-gated subagent type — `atomic-planner`, `atomic-executor`, `feature-review`, `task-researcher`, `prd-feature`, and `pr-author` — must include the line:
 
@@ -286,8 +289,13 @@ If a subagent artifact references a different issue number, the orchestrator rej
 S9 procedure:
 
 1. Resolve the live PR head SHA for the feature branch (`gh pr view --json headRefOid` or equivalent).
-2. Invoke `gh pr checks --required --json bucket,name,state,link,workflow` (or an equivalent JSON-emitting command) against that head SHA. `gh` is the only sanctioned channel for querying GitHub Actions state.
-3. Parse the JSON by running `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <head-sha>`, which emits the `ci_gate` object defined below and derives `ci_gate.conclusion` as `success` when all required checks pass, `failure` when any required check failed, and `pending` when any required check is still in progress.
+2. Invoke `gh pr checks --json bucket,name,state,link,workflow` (or an equivalent JSON-emitting command) against that head SHA. The query covers every check on the head SHA for every PR, whether or not branch protection marks the check as required. `gh` is the only sanctioned channel for querying GitHub Actions state.
+
+   No-checks rule: when `gh pr checks` fails with a `no checks reported` error, that error is never treated as green for any PR. On a non-epic PR the gate stays `pending` and step 4 continues the bounded poll. On an epic child, step 3 runs the parser with `-ChecksJson '[]'` and `-RequireWorkflow CI`, which returns `pending`. The parser is never run with `-ChecksJson '[]'` without `-RequireWorkflow CI`, because its default path returns `success` for an empty set.
+
+   Epic-child rule: when the PR base branch is an `epic/<slug>-integration` branch (checkpoint `epic_mode` is `true`), the step 2 query is the same unfiltered query; integration branches carry no required-status-check protection. An empty check list is not accepted as green for such a PR: the gate must observe at least one check whose `workflow` is `CI` against the child head SHA, and every observed `CI` check must succeed before `ci_gate.conclusion` is accepted as `success`. Every check returned by the unfiltered query counts: a failing or cancelled non-`CI` check fails the gate, and a pending one keeps it pending. Step 3 enforces this rule by passing `-RequireWorkflow CI` to the parser, which never returns `success` until at least one passing `CI` check is observed. When `gh pr checks` fails with a `no checks reported` error on the child branch, step 3 runs the parser with `-ChecksJson '[]'`; that error is never treated as green, and the parser returns `pending` for it.
+
+3. Parse the JSON by running `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <head-sha>`, appending `-RequireWorkflow CI` when `epic_mode` is `true`. The parser emits the `ci_gate` object defined below and derives `ci_gate.conclusion` over the queried checks (every check on the PR head SHA, for every PR): `success` when every queried check passed or was skipped, `failure` when any queried check failed or was cancelled, and `pending` when any queried check is still in progress. With `-RequireWorkflow CI`, the parser returns `pending` instead of `success` until at least one check whose `workflow` is `CI` has passed.
 4. Poll with a bounded interval and a documented total timeout while `conclusion == "pending"`. When the timeout is exhausted, record the timeout as a finding with `Remediability: awaiting_ci` in `remediation-inputs.<timestamp>.md` and follow the wait branch in Post-Review Outcome Evaluation (`blocked_reason: "awaiting_ci"`, `next_step: "S9_ci_green"`); `step9_status` stays `pending`. A poll timeout does not enter the remediation loop.
 5. Write the `ci_gate` object and `last_verified_ci_sha` to the checkpoint, and set `step9_status` to `passed` only when `ci_gate.conclusion == "success"` AND `ci_gate.head_sha` equals the current PR head SHA.
 6. If the checkpoint's `epic_mode` is `true`, execute `gh pr merge --merge <PR>` merging the feature branch into `epic_context.integration_branch` (already the PR's base branch per the epic-mode `--base` override applied at S8). On success, record `epic_merge: { merge_commit_sha, target_branch, merged_at }` in the checkpoint. On failure due to merge conflict (non-mergeable PR), do not retry blindly: convert the conflict into a synthetic Blocking finding per "Merge-Conflict Remediation" below and re-enter the standard R1–R5 remediation loop; do not proceed to DONE.
@@ -301,7 +309,7 @@ DONE is not written while `step9_status` is anything other than `passed`.
 The orchestrator checkpoint (`artifacts/orchestration/orchestrator-state.json`) is extended with:
 
 - a top-level `ci_gate` object containing:
-  - `head_sha` — the PR head SHA that the required checks were observed against.
+  - `head_sha` — the PR head SHA that the queried checks were observed against.
   - `pr_pipeline_run_id` — the GitHub Actions run id for the PR Pipeline.
   - `pr_pipeline_run_url` — the URL of that run.
   - `conclusion` — one of `success`, `failure`, `pending`.
@@ -336,7 +344,7 @@ A checkpoint that predates this schema and has no `ci_gate` object (or no `step9
 
 ## Remediation Loop — CI-Failure Handling
 
-When S9 records `step9_status: "failed_remediation_required"` (a failed required check; a poll timeout follows the wait branch per S9 step 4):
+When S9 records `step9_status: "failed_remediation_required"` (a failed check; a poll timeout follows the wait branch per S9 step 4):
 
 1. The failed-check log from `gh run view <run-id> --log-failed` is written as `remediation-inputs.<timestamp>.md` in the active feature folder.
 2. The failure is converted to a synthetic finding with severity `Blocking` that identifies the failing check by name and the failing job by URL.
@@ -438,6 +446,6 @@ Example:
 
 The validator counts an MCP receipt as successful only when `tool` is a non-empty string, `ok` is exactly `true`, and `evidence` is a non-empty string. Every `required_mcp_tools` entry must have such a receipt unless a valid `issue_adoption` record waives it.
 
-When the GitHub issue already exists before orchestration starts (transferred, filed by hand, or created by epic decomposition) and has been verified read-only (`gh issue view`, a `gh api` GET, or a GitHub MCP issue read), do not call `potential_to_issue`. Record a top-level `issue_adoption` object in the checkpoint instead of a `potential_to_issue` receipt. It may waive only `potential_to_issue` and, with a valid `potential_record` under `docs/features/potential/`, the checkpoint's promotion-entry tool (`new_potential_entry`, or `new_potential_bug_entry` for a bug-type checkpoint); `potential_to_issue` must always be listed. Every other required tool still needs a successful receipt. Any adoption error waives nothing. The field rules, the closed waivable set, and the error placement are defined in `.claude/rules/orchestrator-state.md` under `## Invariants (issue_adoption object)`.
+When the GitHub issue already exists before orchestration starts (transferred, filed by hand, or created by epic decomposition) and has been verified read-only (`gh issue view`, a `gh api` GET, or a GitHub MCP issue read), do not call `potential_to_issue`. Record a top-level `issue_adoption` object in the checkpoint instead of a `potential_to_issue` receipt. It may waive only `potential_to_issue` and the checkpoint's promotion-entry tool (`new_potential_entry`, or `new_potential_bug_entry` for a bug-type checkpoint); `potential_to_issue` must always be listed. For a promotion-entry waiver, `potential_record` (a markdown path under `docs/features/potential/`) is required when `origin` is `epic_decomposition`, optional when `origin` is `transferred` or `filed_before_orchestration`, and validated whenever it is present. Every other required tool still needs a successful receipt. Any adoption error waives nothing. The field rules, the closed waivable set, and the error placement are defined in `.claude/rules/orchestrator-state.md` under `## Invariants (issue_adoption object)`.
 
 These three receipt arrays, populated with the retained required names of the selected route, are what allow the routing-contract validation under `require_complete: true` to pass.

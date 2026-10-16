@@ -117,6 +117,10 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 `Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
+## Evidence Filename Timestamps in Plans
+
+Plans name evidence artifacts `<name>.<timestamp>.md` and never fix a plan-time stamp in an evidence filename. An acceptance condition identifies a consumed evidence artifact by the derivation in `evidence-and-timestamp-conventions` (`### Evidence Filename Timestamp`): the lexicographically greatest file matching `<name>.*.md`, not a pre-stamped literal path. This section governs artifact paths only: asserted search tokens remain concrete.
+
 ## Coverage Evidence Contract (Mandatory when policy requires coverage)
 
 For any language in scope where repository policy requires coverage validation:

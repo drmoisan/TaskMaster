@@ -56,7 +56,21 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    contract for parallel admission. Preparation yields the item's DECLARED blast radius, and only
    the planner-computed declared radius is authoritative for scheduling. The item's lifecycle
    advances `proposed` -> `admitted` -> `prepared` during this step, recorded as item-state updates in
-   `items[]` with the checkpoint's lifecycle timestamps.
+   `items[]` with the checkpoint's lifecycle timestamps. After the admitted item's preflight
+   clearance, perform the `parallel-plan` skill's `## Complexity Assessment` procedure for it, and
+   record the resulting `complexity_band` on the admitted orchestrator-checkpoint item so step 3's
+   edge derivation and the parent's model routing read the same band.
+   The admitted item records `complexity_band` and no `model_routing_receipt`; the parent resolves
+   the item's model from that band at spawn time per `parallel-orchestrate` `## Model Selection`.
+   For an issue-number item, the preparation delegation prompt carries the issue-adoption line used
+   by `/parallel-plan` `## Preparation Fan-Out`, quoted verbatim: `Issue adoption: this item's GitHub
+   issue already exists. Verify it read-only (gh issue view), do not call potential_to_issue or the
+   promotion-entry tool, and record a top-level issue_adoption object in the checkpoint per
+   .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when
+   the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the
+   checkpoint's promotion-type. When a lifecycle record for the item exists under
+   docs/features/potential/promoted/, cite it as potential_record.` The line is omitted for a
+   potential-entry item, whose child promotes it.
 
 3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the scheduling
    entry point Get-BlastRadiusConflictEdge from the destination-runtime PowerShell port
@@ -91,17 +105,28 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    barrier, and the later-merging item merges `origin/main` under the existing per-item
    merge-conflict handling and re-passes CI before it merges.
 
-4. **Decide admission.** Call
-   `decide_admission(candidate, conflict_edges, in_flight, current_cohort_members=current_cohort_members)`
-   from `scripts/dev_tools/parallel_mutation_protocol.py`.
-   - `ADMIT_CURRENT_COHORT` — the candidate shares no edge with any member of the current cohort,
+4. **Decide admission.** Call the bundled entry point, which needs no Python interpreter:
+
+   ```bash
+   bash .claude/lib/bash/mutate-parallel-run.sh admit --candidate <key> --edges "<a>:<b> ..." --in-flight "<k> ..." --current-cohort-members "<k> ..."
+   ```
+
+   `--edges` carries the step-3 conflict edges over ALL items, `--in-flight` the in-flight (pinned)
+   keys, and `--current-cohort-members` the full current-cohort membership. The command prints one
+   JSON object whose `outcome` field is one of:
+   - `admit_current_cohort` — the candidate shares no edge with any member of the current cohort,
      pinned or unstarted. Admit it into the current cohort. NO recompute occurs and
      `recolor_generation` is unchanged — precisely because the candidate conflicts with no
      current-cohort member, so no cohort assignment needs to change.
-   - `DEFER_AND_RECOLOR` — the candidate shares an edge with at least one member of the current
-     cohort, pinned or not-yet-launched. Defer it to a future cohort and recolor by calling
-     `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort, highest_pinned_cohort=highest_pinned_cohort)`.
-     `highest_pinned_cohort` is derived from re-verified durable state: the highest
+   - `defer_and_recolor` — the candidate shares an edge with at least one member of the current
+     cohort, pinned or not-yet-launched. Defer it to a future cohort and recolor through the
+     bundled entry point:
+
+     ```bash
+     bash .claude/lib/bash/mutate-parallel-run.sh recolor --unstarted "<k> ..." --edges "<a>:<b> ..." --pinned "<k> ..." --generation <g> --current-cohort <c> --highest-pinned-cohort <h>
+     ```
+
+     `--highest-pinned-cohort` is derived from re-verified durable state: the highest
      current-generation cohort index occupied by any in-flight item.
      The recolor is a recompute: `recolor_generation` increments by exactly one, and it places every
      unstarted item at an index at or above `current_cohort`, strictly above
@@ -125,8 +150,9 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    with an unstarted item OUTSIDE the current cohort does not defer: the cohort barrier keeps the
    two from running concurrently, so the coloring's existing separation already resolves it.
 
-5. **Apply the recolor result.** Write `RecolorResult.cohort_assignments` into `cohorts[]` and set
-   the top-level `recolor_generation` to `RecolorResult.generation`. The result's key set equals the
+5. **Apply the recolor result.** Write the recolor output field `cohort_assignments` into
+   `cohorts[]` and set the top-level `recolor_generation` to the output field `generation`. The
+   result's key set equals the
    unstarted set exactly and contains no pinned key: no in-flight item changes cohort or state as a
    result of this admission. Verify that before writing, and stop rather than write a result that
    names a pinned key. The admit branch performs no recolor at all, precisely because the candidate
@@ -141,8 +167,17 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    values to be unique (`scripts/dev_tools/_parallel_state_structures.py:282-305` — duplicate-index
    detection at 282-293, error emission at 301-305).
 
-6. **Append exactly one `mutations[]` entry**, at admission-decision time, built by
-   `build_add_entry` from `scripts/dev_tools/parallel_mutation_protocol.py`:
+6. **Append exactly one `mutations[]` entry**, at admission-decision time, built by the bundled
+   entry point. Run the first line on the admit branch (`--deferred false`) and the second on the
+   defer branch (`--deferred true`):
+
+   ```bash
+   bash .claude/lib/bash/mutate-parallel-run.sh add-entry --item <key> --deferred false --generation <g> --at <timestamp>
+   bash .claude/lib/bash/mutate-parallel-run.sh add-entry --item <key> --deferred true --generation <g> --at <timestamp>
+   ```
+
+   `--generation` is the run's generation before this admission, read before any step-5 recolor;
+   the printed entry stamps it unchanged or plus one per the table below:
 
    | Case | `op` | `item_key` | `prior_state` | `new_state` | `disposition` | `recolor_generation` |
    | --- | --- | --- | --- | --- | --- | --- |
@@ -152,7 +187,8 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    `prior_state` is null on BOTH add rows. The accompanying `prepared` -> `scheduled` transition is
    not lost and is not recorded in the mutation entry: it is recorded as an item-state update in
    `items[]`, the same mechanism that records `proposed` -> `admitted` -> `prepared` in step 2. The
-   `at` timestamp comes from the engine's injected clock seam.
+   `at` timestamp is supplied through `--at`; when `--at` is omitted the entry point stamps the
+   current UTC minute.
 
 7. **Validate the checkpoint** before treating the admission as applied. Run the
    `validate_orchestration_artifacts` MCP tool with `artifact_type:
@@ -168,6 +204,8 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
   and `benefit` (tolerated-not-validated, returned by the scheduling entry point), and no reason
   member is added: the four `conflict_edges[].reason` members are unchanged. The nine parallel
   enums are owned by `.claude/rules/parallel-orchestration.md` and are consumed, never extended.
+  The `complexity_band` recorded in step 2 is not a new field: it is an existing scheduling field
+  read by drift re-scheduling.
 - This operation never moves, restates, or re-derives an in-flight item's cohort or state.
 - This operation performs no destructive side effect: it closes no pull request and removes no
   worktree. Those belong to `/parallel-remove` with `--disposition abandon`.

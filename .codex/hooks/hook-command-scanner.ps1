@@ -15,6 +15,10 @@
     dot-sourced as: . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
 #>
 
+# Heredoc header and body readers (issue #824). They read $script:CommandLineSegmentDelimiters,
+# which is declared below; both are resolved when a scan runs, after this file has loaded.
+. (Join-Path $PSScriptRoot 'hook-command-heredoc.ps1')
+
 # The wrapper carve-out set (D2 Piece 2). A segment led by one of these names keeps its raw
 # text as scan text, because a wrapper's quoted argument is a nested command line rather
 # than inert data. Pinned by test through Get-CommandLineWrapperName (rule R6).
@@ -125,8 +129,10 @@ function ConvertTo-CommandLineSegmentRecord {
         ScanText selection follows D2 Piece 2 in order: RawText when the segment is
         Unbalanced or carries a live substitution; RawText when it is wrapper-led;
         MaskedText otherwise. TokenText is the segment text with heredoc bodies replaced by
-        spaces and quoted spans intact. Unbalanced also carries the unmaskable-delimiter
-        case of rule R3, because such a heredoc cannot be shown to close.
+        spaces and quoted spans intact; it is carried on the record (issue #824). Unbalanced
+        also carries the unmaskable-delimiter case of rule R3, because such a heredoc cannot
+        be shown to close. Delimiter is the separator that ended the segment, or '' at end
+        of text (issue #824).
     .OUTPUTS
         System.Management.Automation.PSCustomObject
     #>
@@ -137,7 +143,8 @@ function ConvertTo-CommandLineSegmentRecord {
         [Parameter(Mandatory)][AllowEmptyString()][string] $MaskedText,
         [Parameter(Mandatory)][AllowEmptyString()][string] $TokenText,
         [Parameter(Mandatory)][bool] $HasLiveSubstitution,
-        [Parameter(Mandatory)][bool] $Unbalanced
+        [Parameter(Mandatory)][bool] $Unbalanced,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Delimiter
     )
 
     $tokens = @(ConvertTo-CommandLineToken -Segment $TokenText)
@@ -159,6 +166,8 @@ function ConvertTo-CommandLineSegmentRecord {
         HasLiveSubstitution = $HasLiveSubstitution
         Unbalanced          = $Unbalanced
         ScanText            = $scanText
+        Delimiter           = $Delimiter
+        TokenText           = $TokenText
     }
 }
 
@@ -195,111 +204,6 @@ function Test-CommandLineSegmentRawScan {
     return ([bool]$Segment.IsWrapperLed -or [bool]$Segment.HasLiveSubstitution -or [bool]$Segment.Unbalanced)
 }
 
-function Read-CommandLineHeredocHeader {
-    <#
-    .SYNOPSIS
-        Read a heredoc header beginning at a '<<' operator and report its delimiter.
-    .DESCRIPTION
-        Handles the plain '<<' form, the tab-stripping '<<-' form, and an optionally quoted
-        delimiter word. A delimiter produced by expansion is reported as non-literal, which
-        makes the segment unresolvable under R3. Returns NextIndex, Delimiter, StripTabs,
-        and IsLiteral.
-    .OUTPUTS
-        System.Management.Automation.PSCustomObject
-    #>
-    [CmdletBinding()]
-    [OutputType([pscustomobject])]
-    param(
-        [Parameter(Mandatory)][string] $Text,
-        [Parameter(Mandatory)][int] $StartIndex
-    )
-
-    $cursor = $StartIndex + 2
-    $stripTabs = $false
-    if ($cursor -lt $Text.Length -and $Text[$cursor] -eq '-') {
-        $stripTabs = $true
-        $cursor++
-    }
-
-    while ($cursor -lt $Text.Length -and ($Text[$cursor] -eq ' ' -or $Text[$cursor] -eq "`t")) { $cursor++ }
-
-    $word = [System.Text.StringBuilder]::new()
-    $isLiteral = $true
-    $openQuote = [char]0
-    while ($cursor -lt $Text.Length) {
-        $character = $Text[$cursor]
-        if ($openQuote -ne [char]0) {
-            if ($character -eq $openQuote) {
-                $openQuote = [char]0
-            } else {
-                if ($openQuote -eq '"' -and ($character -eq '$' -or $character -eq '`')) { $isLiteral = $false }
-                [void]$word.Append($character)
-            }
-            $cursor++
-            continue
-        }
-
-        if ($character -eq '"' -or $character -eq "'") {
-            $openQuote = $character
-            $cursor++
-            continue
-        }
-
-        if ([char]::IsWhiteSpace($character) -or $script:CommandLineSegmentDelimiters -contains $character) { break }
-        if ($character -eq '$' -or $character -eq '`') { $isLiteral = $false }
-        [void]$word.Append($character)
-        $cursor++
-    }
-
-    $delimiter = $word.ToString()
-    if ($openQuote -ne [char]0 -or [string]::IsNullOrEmpty($delimiter)) { $isLiteral = $false }
-
-    return [pscustomobject]@{
-        NextIndex = $cursor
-        Delimiter = $delimiter
-        StripTabs = $stripTabs
-        IsLiteral = $isLiteral
-    }
-}
-
-function Read-CommandLineHeredocBody {
-    <#
-    .SYNOPSIS
-        Consume one heredoc body from a start index and report where it ends.
-    .DESCRIPTION
-        Consumes lines until a line whose content - after optional leading tabs for the
-        '<<-' form - equals the delimiter exactly, case-sensitively as in the shell. An
-        unterminated body is consumed to end of text and reported through Unbalanced.
-    .OUTPUTS
-        System.Management.Automation.PSCustomObject
-    #>
-    [CmdletBinding()]
-    [OutputType([pscustomobject])]
-    param(
-        [Parameter(Mandatory)][string] $Text,
-        [Parameter(Mandatory)][int] $StartIndex,
-        [Parameter(Mandatory)][AllowEmptyString()][string] $Delimiter,
-        [Parameter(Mandatory)][bool] $StripTabs
-    )
-
-    $cursor = $StartIndex
-    $length = $Text.Length
-    while ($cursor -lt $length) {
-        $lineEnd = $Text.IndexOf("`n", $cursor)
-        if ($lineEnd -lt 0) { $lineEnd = $length }
-
-        $line = $Text.Substring($cursor, $lineEnd - $cursor).TrimEnd("`r")
-        if ($StripTabs) { $line = $line.TrimStart("`t") }
-
-        $cursor = if ($lineEnd -lt $length) { $lineEnd + 1 } else { $length }
-        if ($line -ceq $Delimiter) {
-            return [pscustomobject]@{ NextIndex = $cursor; Terminated = $true }
-        }
-    }
-
-    return [pscustomobject]@{ NextIndex = $length; Terminated = $false }
-}
-
 function Read-CommandLineSegment {
     <#
     .SYNOPSIS
@@ -333,6 +237,12 @@ function Read-CommandLineSegment {
           ScanText            [string]   the clause-ordered selection: RawText when
                                          Unbalanced or HasLiveSubstitution or
                                          IsWrapperLed; MaskedText otherwise
+          Delimiter           [string]   the separator that ended the segment: ';', '&&',
+                                         '||', '|', '&', newline, '(', ')', '{', '}', '$(',
+                                         the backtick, or '' at end of text. '&&' and '||'
+                                         are consumed as one separator.
+          TokenText           [string]   the segment text with attached heredoc bodies
+                                         replaced by spaces and quoted spans intact
         Returns an empty array for null, empty, or whitespace-only input.
     #>
     [CmdletBinding()]
@@ -433,6 +343,7 @@ function Read-CommandLineSegment {
 
         $isSubstitutionOpener = $character -eq '$' -and $next -eq '('
         if ($isSubstitutionOpener -or $script:CommandLineSegmentDelimiters -contains $character) {
+            $delimiter = [string]$character
             if ($character -eq "`n" -and $pending.Count -gt 0) {
                 [void]$raw.Append($character)
                 [void]$tokenText.Append($character)
@@ -449,6 +360,12 @@ function Read-CommandLineSegment {
                 }
                 $pending.Clear()
             } elseif ($isSubstitutionOpener) {
+                $delimiter = '$('
+                $index += 2
+            } elseif (($character -eq '&' -or $character -eq '|') -and $next -eq $character) {
+                # '&&' and '||' are one separator, so the second character no longer opens an
+                # empty segment of its own (issue #824).
+                $delimiter = "$character$next"
                 $index += 2
             } else {
                 $index++
@@ -456,7 +373,7 @@ function Read-CommandLineSegment {
 
             $rawText = $raw.ToString()
             if (-not [string]::IsNullOrWhiteSpace($rawText)) {
-                $records.Add((ConvertTo-CommandLineSegmentRecord -RawText $rawText -MaskedText $masked.ToString() -TokenText $tokenText.ToString() -HasLiveSubstitution $hasLiveSubstitution -Unbalanced $unbalanced))
+                $records.Add((ConvertTo-CommandLineSegmentRecord -RawText $rawText -MaskedText $masked.ToString() -TokenText $tokenText.ToString() -HasLiveSubstitution $hasLiveSubstitution -Unbalanced $unbalanced -Delimiter $delimiter))
             }
             [void]$raw.Clear()
             [void]$masked.Clear()
@@ -476,7 +393,7 @@ function Read-CommandLineSegment {
 
     $rawText = $raw.ToString()
     if (-not [string]::IsNullOrWhiteSpace($rawText)) {
-        $records.Add((ConvertTo-CommandLineSegmentRecord -RawText $rawText -MaskedText $masked.ToString() -TokenText $tokenText.ToString() -HasLiveSubstitution $hasLiveSubstitution -Unbalanced $unbalanced))
+        $records.Add((ConvertTo-CommandLineSegmentRecord -RawText $rawText -MaskedText $masked.ToString() -TokenText $tokenText.ToString() -HasLiveSubstitution $hasLiveSubstitution -Unbalanced $unbalanced -Delimiter ''))
     }
 
     return $records.ToArray()

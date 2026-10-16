@@ -43,6 +43,8 @@ $script:WAIVABLE_TOOLS = [string[]]@($script:POTENTIAL_TO_ISSUE_TOOL, $script:FE
 $script:PROMOTION_ENTRY_TOOLS = [string[]]@($script:FEATURE_PROMOTION_ENTRY_TOOL, $script:BUG_PROMOTION_ENTRY_TOOL)
 $script:POTENTIAL_RECORD_PREFIX = 'docs/features/potential/'
 $script:POTENTIAL_RECORD_SUFFIX = '.md'
+# Origins whose promotion-entry waiver may omit the potential_record key (rule 9).
+$script:RECORD_OPTIONAL_ORIGINS = [string[]]@('transferred', 'filed_before_orchestration')
 $script:ISSUE_NUM_PATTERN = '\A[1-9][0-9]*\z'
 
 $script:ERROR_NOT_OBJECT = 'Checkpoint issue_adoption must be an object when present.'
@@ -264,6 +266,13 @@ function Get-AdoptionPotentialRecordError {
         The well-formed waived tool list, in checkpoint order.
     .PARAMETER PotentialRecord
         The deserialized potential_record value. May be $null.
+    .PARAMETER Origin
+        The deserialized origin value. May be $null. When the potential_record
+        key is absent and the origin is transferred or filed_before_orchestration,
+        nothing is reported.
+    .PARAMETER RecordPresent
+        Whether the potential_record key is present. A present record, including
+        $null, is always validated.
     .OUTPUTS
         System.String[] - zero or more error strings.
     #>
@@ -275,8 +284,19 @@ function Get-AdoptionPotentialRecordError {
 
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [object] $PotentialRecord
+        [object] $PotentialRecord,
+
+        [Parameter()]
+        [AllowNull()]
+        [object] $Origin,
+
+        [Parameter(Mandatory = $true)]
+        [bool] $RecordPresent
     )
+
+    if (-not $RecordPresent -and ($Origin -is [string]) -and ($script:RECORD_OPTIONAL_ORIGINS -ccontains [string]$Origin)) {
+        return [string[]]@()
+    }
 
     $recordIsValid = $false
     if ($PotentialRecord -is [string]) {
@@ -356,8 +376,9 @@ function Get-OrchestratorStateIssueAdoptionResult {
     }
 
     $errors.AddRange([string[]]@(Get-AdoptionWaivedToolError -WaivedTool $waived.Value -RouteId $RouteId -RequiredMcpTool $RequiredMcpTool -SuccessfulTool $SuccessfulTool))
-    $potentialRecord = (Get-CheckpointObjectMember -Owner $adoption -Name 'potential_record').Value
-    $errors.AddRange([string[]]@(Get-AdoptionPotentialRecordError -WaivedTool $waived.Value -PotentialRecord $potentialRecord))
+    $recordMember = Get-CheckpointObjectMember -Owner $adoption -Name 'potential_record'
+    $origin = (Get-CheckpointObjectMember -Owner $adoption -Name 'origin').Value
+    $errors.AddRange([string[]]@(Get-AdoptionPotentialRecordError -WaivedTool $waived.Value -PotentialRecord $recordMember.Value -Origin $origin -RecordPresent $recordMember.Present))
 
     if ($errors.Count -gt 0) {
         return @{ Errors = $errors.ToArray(); WaivedTools = [string[]]@() }

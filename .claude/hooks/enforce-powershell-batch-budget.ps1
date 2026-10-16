@@ -57,10 +57,11 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
-. (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1')
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-batch-budget-route.ps1' -ErrorRecord $_ }
 
 function Test-PowerShellBatchBudgetPathInRoot {
     <#
@@ -277,6 +278,8 @@ function Invoke-PowerShellBatchBudgetDecision {
         [AllowEmptyString()]
         [string] $ObservedRoute = ''
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'POWERSHELL_LARGE_PATH_REQUIRED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $normalized = $FilePath -replace '\\', '/'
     if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
@@ -474,6 +477,9 @@ function Invoke-PowerShellBatchBudgetEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('POWERSHELL_LARGE_PATH_REQUIRED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'POWERSHELL_LARGE_PATH_REQUIRED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit
