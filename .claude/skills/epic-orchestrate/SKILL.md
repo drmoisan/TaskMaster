@@ -95,14 +95,32 @@ function of the DAG.
 2. Before starting each wave, `epic-orchestrator` runs
    `git fetch origin epic/<epic-slug>-integration` so the wave's child worktrees branch off the
    current remote tip, not a stale local ref.
-3. Each child feature's worktree/branch (created via
+3. Before each wave launches (wave 0 included), `epic-orchestrator` runs
+   `git fetch origin main` and then
+   `git rev-list --count origin/epic/<epic-slug>-integration..origin/main`. A zero count
+   proceeds directly to the wave. A non-zero count means `origin/main` has commits the
+   integration branch lacks, and the main-sync runs as a dedicated chore child item before the
+   wave launches, following the `epic-852-main-sync` / PR #882 pattern. Before delegating it,
+   `epic-orchestrator` writes the sync child's `features[]` row (with `depends_on: []`) and its
+   own `waves[]` entry to the epic checkpoint, because `enforce-epic-wave-barrier.ps1` denies a
+   delegation whose feature record is absent. The sync child must not reuse a manifest child's
+   issue number; it uses the epic issue number or a dedicated chore issue. Its branch is created
+   from the integration branch, merges `origin/main` with a merge commit
+   (`git merge --no-ff origin/main`; no rebase, no force-push), resolves any conflict inside its
+   own remediation loop, and opens a PR into the integration branch. The wave does not launch
+   until that PR has merged into the integration branch and the sync entry's `merge_status` is
+   `merged`. At most one main-sync child runs per wave: after it merges, `epic-orchestrator`
+   re-runs step 2 and launches the wave without repeating the count, and commits that reach
+   `origin/main` afterwards are picked up by the next wave's check or by the final integration
+   PR in step 6.
+4. Each child feature's worktree/branch (created via
    `Agent(orchestrator, isolation: "worktree", run_in_background: true)`) is branched from
    `origin/<integration_branch>`, not `origin/main`. The child's own `orchestrator` instance
    honors this via the epic-mode kickoff line below.
-4. Each child feature's PR base branch is the integration branch, not `main` — an explicit
+5. Each child feature's PR base branch is the integration branch, not `main` — an explicit
    epic-mode override recorded in the checkpoint, not a reliance on `pr-base-branch-merge-base`'s
    ancestry heuristic. Non-epic (standalone) orchestration is unchanged.
-5. At epic completion (every feature in the final wave has `merge_status: "merged"`),
+6. At epic completion (every feature in the final wave has `merge_status: "merged"`),
    `epic-orchestrator` drives a final PR merging `epic/<epic-slug>-integration` into `main`,
    delegating PR authoring to `Agent(pr-author)` and refreshing context via
    `mcp__drm-copilot__collect_pr_context`. `epic-orchestrator` runs the same S9 CI-green
@@ -241,9 +259,15 @@ cross-call/conversation-state visibility.
   prompt text, reads `artifacts/orchestration/epic-orchestrator-state.json`, looks up that
   feature's `depends_on`, and denies with reason `EPIC_WAVE_BARRIER_BLOCKED` unless every
   dependency's `merge_status` is `merged` or `worktree_removed`.
-- **Layer 2 — retrospective backstop:** the wave-barrier ordering invariant inside
-  `validate_epic_orchestrator_state_text`, enforced at `epic-orchestrator` `SubagentStop` time via
-  the parameterized `validate-orchestrator-output.ps1` hook. It checks only a dependent feature
+- **Layer 2 — retrospective backstop:** the wave-barrier ordering invariant of
+  `validate_epic_orchestrator_state_text`, enforced at `epic-orchestrator` `SubagentStop` time by a
+  PowerShell port, `Get-OrchestratorStateEpicWaveBarrierError` in
+  `.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1`, which the parameterized
+  `validate-orchestrator-output.ps1` hook invokes for `epic-orchestrator-state` after resolving the
+  epic checkpoint through `WorktreeRunResolution.psm1`. The hook starts no Python process. Parity
+  with `validate_epic_orchestrator_state_text` is pinned by the shared fixtures under
+  `tests/fixtures/epic_wave_barrier/`, and the Python validator remains the authority used through
+  the `mcp__drm-copilot__validate_orchestration_artifacts` call. It checks only a dependent feature
   that is treated as started: one with a string `worktree_created_at`, or with a `merge_status`
   other than `not_started` (a missing or non-string `merge_status` counts as started). It appends
   exactly one error per violated dependency edge. When the dependency's `merge_status` is not
@@ -252,6 +276,9 @@ cross-call/conversation-state visibility.
   Otherwise, when the dependency's `merge_confirmed_at` is later than the dependent's
   `worktree_created_at`, the error is
   `EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes dependency <d> merge_confirmed_at`.
+  A violation blocks with an instruction to report it to the operator and halt. The `SubagentStop`
+  transport and exit-code defect that this check previously depended on was resolved by epic #904
+  and issue #928: a violation blocks the stop with exit 2 and a stderr reason.
 
 Both layers are required; neither alone closes the gap. `epic-orchestrator` does not launch wave
 N+1 until every wave-N feature's dependency edges are durably confirmed merged, verified against

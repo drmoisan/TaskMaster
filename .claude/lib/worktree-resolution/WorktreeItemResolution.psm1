@@ -21,7 +21,8 @@
     PowerShell 7+. Re-uses its siblings for enumeration, the marker test, the ascent,
     the branch reader, normalisation, the join, the result constructor, and both
     reason-code accessors, re-implementing none. Neither reason-code literal appears
-    here. Its only filesystem read is the checkpoint-text seam. Mirrored byte-identically.
+    here. Its only filesystem read is still the checkpoint-text seam, including for the
+    item-by-pull-request resolver added for issue #850. Mirrored byte-identically.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -395,6 +396,81 @@ function Resolve-WorktreeItemTarget {
     return (Resolve-WorktreeItemTargetByIssue -Session $session -Issue $issues[0])
 }
 
+# Private: whether checkpoint text records a pull request number in pr_gate.pr_number or
+# in a standalone_merge_authorizations entry whose pr_number is a positive JSON integer.
+function Test-WorktreeItemCheckpointRecordsPr {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $Text,
+        [Parameter(Mandatory = $true)] [long] $PrNumber
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Text)) { return $false }
+    $payload = $null
+    try { $payload = $Text | ConvertFrom-Json } catch { return $false }
+    if ($null -eq $payload -or $payload -isnot [pscustomobject]) { return $false }
+    # Names are collected per property, because strict mode throws on .Name of an empty object.
+    $names = @($payload.PSObject.Properties | ForEach-Object { $_.Name })
+    if ($names -contains 'pr_gate' -and $payload.pr_gate -is [pscustomobject] -and @($payload.pr_gate.PSObject.Properties | ForEach-Object { $_.Name }) -contains 'pr_number') {
+        $recorded = [long] 0
+        if ([long]::TryParse([string] $payload.pr_gate.pr_number, [ref] $recorded) -and $recorded -eq $PrNumber) { return $true }
+    }
+    if ($names -notcontains 'standalone_merge_authorizations') { return $false }
+    foreach ($entry in @($payload.standalone_merge_authorizations)) {
+        if ($entry -isnot [pscustomobject] -or @($entry.PSObject.Properties | ForEach-Object { $_.Name }) -notcontains 'pr_number') { continue }
+        $value = $entry.pr_number
+        # Only a JSON integer counts; a string, fraction, zero, or negative never matches.
+        if (($value -is [int] -or $value -is [long]) -and $value -gt 0 -and [long] $value -eq $PrNumber) { return $true }
+    }
+    return $false
+}
+
+function Resolve-WorktreeItemTargetByPrNumber {
+    <#
+    .SYNOPSIS
+        Resolve the live worktree whose orchestrator checkpoint records a pull request number (issue #850).
+    .DESCRIPTION
+        Keeps each live root whose checkpoint records the number in pr_gate.pr_number or
+        in a standalone_merge_authorizations entry. Zero matches resolve NoTarget, one
+        resolves, and several are Ambiguous with no tie-break. A number of zero or less
+        is NoTarget. Reads only through the checkpoint-text seam.
+    .PARAMETER PrNumber
+        The pull request number the command names.
+    .PARAMETER SessionRoot
+        The calling process's path, used only to find the repository and label a result.
+        Defaults to the current location when blank.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [long] $PrNumber,
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $SessionRoot
+    )
+
+    $session = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).ProviderPath } else { $SessionRoot }
+    $noTarget = "pull request {0} is recorded in pr_gate.pr_number or a standalone_merge_authorizations entry of no live worktree's orchestrator checkpoint" -f $PrNumber
+    if ($PrNumber -le 0) {
+        return (New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot $session -Detail $noTarget)
+    }
+    # Assigned before it is wrapped, for the reason recorded in the branch resolver.
+    $liveRoots = Get-WorktreeItemLiveRoot -SessionRoot $session
+    $matched = [System.Collections.Generic.List[string]]::new()
+    foreach ($root in @($liveRoots)) {
+        $text = Get-WorktreeItemCheckpointText -Path (Get-WorktreeItemCheckpointPath -WorktreeRoot $root)
+        if (Test-WorktreeItemCheckpointRecordsPr -Text $text -PrNumber $PrNumber) { $matched.Add($root) }
+    }
+    if ($matched.Count -eq 0) {
+        return (New-WorktreeResolutionTargetResult -Status 'NoTarget' -SessionRoot $session -Detail $noTarget)
+    }
+    if ($matched.Count -eq 1) {
+        return (ConvertTo-WorktreeItemResolvedResult -WorktreeRoot $matched[0] -SessionRoot $session -Detail (
+                "pull request {0} resolves to the live worktree whose orchestrator checkpoint records it" -f $PrNumber))
+    }
+    return (New-WorktreeResolutionTargetResult -Status 'Ambiguous' -SessionRoot $session -Candidate $matched.ToArray() -Detail (
+            "pull request {0} is recorded in the orchestrator checkpoints of {1} live worktrees; move the stale checkpoint to artifacts/orchestration/handoff/ so that one worktree records it" -f $PrNumber, $matched.Count))
+}
+
 Export-ModuleMember -Function `
     Get-WorktreeItemCheckpointRelativePath, `
     Get-WorktreeItemCheckpointPath, `
@@ -404,4 +480,5 @@ Export-ModuleMember -Function `
     Get-WorktreeItemCheckpointIssue, `
     Get-WorktreeItemLiveRoot, `
     ConvertTo-WorktreeItemResolvedResult, `
-    Resolve-WorktreeItemTarget
+    Resolve-WorktreeItemTarget, `
+    Resolve-WorktreeItemTargetByPrNumber

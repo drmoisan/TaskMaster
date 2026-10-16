@@ -32,6 +32,37 @@ A hardened snapshot from another repository contains a JSON Schema for the orche
 
 This prohibition is specific to the disqualified foreign schema identified by the `drmoisan.github.io/mix-calculator/` `$id`. A schema whose `$id` is repo-local and whose required-field set and `additionalProperties` policy match this repository's checkpoint contract is not the disqualified foreign artifact; even so, the repository's enforcement mechanism remains the Python validator prose-and-logic above, not an imported schema file.
 
+## Required Top-Level Keys
+
+Plain validation requires every key below at the top level of the orchestrator-state checkpoint. The authority is `REQUIRED_STATE_KEYS` in `scripts/dev_tools/validate_orchestrator_state.py`. The TypeScript port in `extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts` and the PowerShell port in `.claude/lib/orchestrator-state/OrchestratorState.psm1` carry the same keys in the same order.
+
+- `objective`
+- `change_budget_estimate`
+- `path_selected`
+- `promotion-type`
+- `short-name`
+- `relativeFile`
+- `long-name`
+- `issue-num`
+- `feature-folder`
+- `work-mode`
+- `plan-path`
+- `completed_steps`
+- `next_step`
+- `last_updated`
+- `step5_status`
+- `step6_status`
+- `step7_status`
+- `step8_status`
+- `step9_status`
+- `step10_status`
+- `delegation_receipts`
+- `blocked_reason`
+
+The check is unconditional: it runs with or without `--require-complete`, `--require-pr-creation-ready`, `--require-model-routing`, `--require-codex-model-routing`, and `--require-codex-topology`, and it is skipped only for a `portable_orchestration_handoff` envelope. The check is presence-only: a key whose value is any JSON value, including `null`, satisfies it. Each absent key produces one error line, `Checkpoint missing required key: <key>`. Some keys carry further validation when present, such as the step-status vocabulary for the `step*_status` keys and the Blocked-Reason Vocabulary below for `blocked_reason`.
+
+`last_updated` records when the checkpoint was last written. Write it as an ISO-8601 UTC date-time string, for example `2026-10-08T17:28:00Z`. The value is rewritten on every checkpoint write: after every completed step and every state transition, including halts. The validators check presence only and do not parse the value, so a non-UTC, placeholder, or `null` value still passes the required-key check.
+
 ## Scope and Backward Compatibility
 
 These invariants apply only when the checkpoint contains a top-level `remediation_loop`; the per-cycle invariants apply when it has a `cycles` array, and the review-outcome and attempt-count invariants apply when their keys are present. A checkpoint with no `remediation_loop` (the existing step-based checkpoint shape) is unaffected: it validates exactly as before and produces no new errors. The invariants are additive.
@@ -170,7 +201,7 @@ The complexity-assessment and model-routing-receipt invariants above are key-gat
 
 ## Bare-Module CLI Contract
 
-The validator module runs directly as `python -m scripts.dev_tools.validate_orchestrator_state <path> [--require-complete] [--require-model-routing] [--require-pr-creation-ready] [--require-codex-model-routing] [--require-codex-topology]`. The dispatcher `python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state` stays available and accepts the same flags. Exit code 0 means the checkpoint passed and the success line `orchestrator-state validation passed: <path>` is written to stdout. Exit code 1 means validation errors, written one per stderr line. Exit code 2 means the path is missing, unreadable, or not UTF-8, with one stderr diagnostic and no traceback; argparse usage errors also exit 2.
+The validator module runs directly as `python -m scripts.dev_tools.validate_orchestrator_state <path> [--require-complete] [--require-model-routing] [--require-pr-creation-ready] [--require-codex-model-routing] [--require-codex-topology]`. The dispatcher stays available and accepts the same flags in two invocation forms: the module form `python -m scripts.dev_tools.validate_orchestration_artifacts orchestrator-state`, run from the repository root, and the file-path form `python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state`. Both forms reach the same `main()`, so their flags, output lines, and exit codes are identical, and a relative artifact path resolves against the working directory in both. The file-path form derives the repository root from the script location and inserts it first in `sys.path` only when the script runs without a package context. The bare-module validator is supported in the module form only. Exit code 0 means the checkpoint passed and the success line `orchestrator-state validation passed: <path>` is written to stdout. Exit code 1 means validation errors, written one per stderr line. Exit code 2 means the path is missing, unreadable, or not UTF-8, with one stderr diagnostic and no traceback; argparse usage errors also exit 2.
 
 ## Invariants (require_model_routing mode)
 
@@ -204,7 +235,7 @@ Enforcement is validator logic plus this prose, never an imported JSON Schema. T
 
 These invariants apply only when a checkpoint contains a top-level `standalone_merge_authorizations` array. The key may appear in any of the three checkpoints the epic merge gate reads: `artifacts/orchestration/orchestrator-state.json`, `artifacts/orchestration/epic-orchestrator-state.json`, and `artifacts/orchestration/parallel-orchestrator-state.json`. A checkpoint with no such key (the existing checkpoint shape) is unaffected: it validates exactly as before and produces no new errors. The invariants are additive and key-gated. No JSON Schema file is authored, imported, or read for the block (see the Foreign Schema Warning above); the enforcing surface is the `PreToolUse` merge gate (issue #670).
 
-Each entry records one authorized standalone merge with the shape `{ pr_number, pr_url, issue_num, branch_name, authorized_by, authorized_at, session_id, basis, run_slug? }`. The gate consults the array only for a `gh pr merge --merge` command that names an explicit pull request number, and only after its per-feature, epic, and parallel allow conditions have all declined.
+Each entry records one authorized standalone merge with the shape `{ pr_number, pr_url, issue_num, branch_name, authorized_by, authorized_at, session_id, basis, run_slug? }`. The gate consults the array only for a `gh pr merge --merge` command that names an explicit pull request number, and only after its per-feature, epic, and parallel allow conditions have all declined. For a command that names an explicit pull request number, the gate reads the per-feature checkpoint `artifacts/orchestration/orchestrator-state.json` beneath the one live worktree whose checkpoint records that number in `pr_gate.pr_number` or in a `standalone_merge_authorizations` entry, and it reads no per-feature checkpoint when no live worktree or more than one records it; a bare command reads the checkpoint beneath the session worktree.
 
 Honest disclosure: the standalone-merge authorization record is a policy-level, auditable declaration and is
 not a cryptographic or security control.
@@ -243,7 +274,7 @@ The object has the shape `{ issue_num, issue_url, origin, verified_via, verified
 | `verified_at` | Present, not `null`, and not a blank string. |
 | `evidence` | A string with non-whitespace content. |
 | `waived_tools` | A non-empty list of non-blank tool names that includes `potential_to_issue`. |
-| `potential_record` | Required when waiving a promotion-entry tool: a path under `docs/features/potential/` ending in `.md`. |
+| `potential_record` | When waiving a promotion-entry tool: required when `origin` is `epic_decomposition`, optional when `origin` is `transferred` or `filed_before_orchestration`, and validated whenever it is present (a path under `docs/features/potential/` ending in `.md`). |
 
 The rules run in this order, and their errors accumulate:
 
@@ -255,9 +286,11 @@ The rules run in this order, and their errors accumulate:
 6. `verified_at` must be present: absent, `null`, and blank strings are rejected; any other value passes.
 7. `evidence` must be a non-empty string.
 8. `waived_tools` must be a non-empty list of non-blank strings; otherwise no further rule-8 or rule-9 check runs. Each entry, in list order, receives the first applicable error of: listed more than once; not in the closed waivable set; not required by the selected route after promotion-type resolution; already holding a successful MCP receipt. The list must include `potential_to_issue`.
-9. Only when the rule-8 shape check passed: each distinct waived promotion-entry tool (`new_potential_entry` or `new_potential_bug_entry`) requires a valid `potential_record`.
+9. Only when the rule-8 shape check passed: each distinct waived promotion-entry tool (`new_potential_entry` or `new_potential_bug_entry`) requires a valid `potential_record`, except that rule 9 reports nothing when `origin` is `transferred` or `filed_before_orchestration` and the `potential_record` key is absent. A present `potential_record`, including `null`, is always validated.
 
 The closed waivable set is `potential_to_issue`, `new_potential_entry`, and `new_potential_bug_entry`. `new_active_feature_folder`, `collect_pr_context`, `validate_orchestration_artifacts`, and every other tool can never be waived. All comparisons are ordinal and case-sensitive.
+
+A lifecycle record moved to `docs/features/potential/promoted/` satisfies the `potential_record` path rule, because the rule checks only the `docs/features/potential/` prefix and the `.md` suffix and does not check that the file exists.
 
 Fail-closed behavior: any adoption error waives nothing, so each missing receipt is still reported as `Checkpoint missing successful MCP receipt: <tool>.`. Adoption errors are placed after the receipt-loop errors and before the `local_execution_overrides` errors. The waiver affects only receipt presence: the declared `required_mcp_tools` equality check with the routing matrix is unchanged, so a checkpoint must still declare every route tool it waives.
 

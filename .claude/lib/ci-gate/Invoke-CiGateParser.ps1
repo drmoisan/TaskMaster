@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     Consumes the JSON array emitted by
-    `gh pr checks --required --json bucket,name,state,link,workflow` and produces
+    `gh pr checks --json bucket,name,state,link,workflow` and produces
     the `ci_gate` object the orchestrator writes to its checkpoint. The object
     carries the five contract fields: head_sha, pr_pipeline_run_id,
     pr_pipeline_run_url, conclusion, and verified_at.
@@ -17,25 +17,33 @@
     the logic is deterministically testable.
 
     Conclusion derivation (per the documented bucket mapping):
-      - Any required check with bucket 'fail' or 'cancel'  -> conclusion 'failure'
-      - Else any required check with bucket 'pending'       -> conclusion 'pending'
+      - Any check with bucket 'fail' or 'cancel'  -> conclusion 'failure'
+      - Else any check with bucket 'pending'       -> conclusion 'pending'
       - Else (all checks 'pass' or 'skipping', or empty set) -> conclusion 'success'
-    An empty required-check set is treated as 'success' (vacuously satisfied: no
-    required check can fail or be in progress). An unrecognized bucket value is a
+    An empty check set is treated as 'success' (vacuously satisfied: no
+    check can fail or be in progress). An unrecognized bucket value is a
     fail-fast error so the parser never silently passes an enum it does not
     understand.
+
+    Epic-child guard (-RequireWorkflow): when -RequireWorkflow names a workflow
+    (S9 passes 'CI' when the checkpoint epic_mode is true), the empty-set rule
+    above does not apply. Failure and pending precedence is unchanged over every
+    observed check; the conclusion is 'success' only when at least one observed
+    check whose workflow property equals the name (case-sensitive) has bucket
+    'pass', and 'pending' otherwise. An empty or null check set therefore yields
+    'pending'. The default value ('') keeps the behavior described above.
 
     The verified_at timestamp is produced through an injectable clock delegate
     (-NowProvider) so tests can assert an exact deterministic value without
     reading the wall clock.
 
 .PARAMETER ChecksJson
-    The JSON array string emitted by `gh pr checks --required --json ...`. Each
+    The JSON array string emitted by `gh pr checks --json ...`. Each
     element is expected to expose at least a `bucket` property. Accepts pipeline
     / stdin input so the orchestrator can pipe the `gh` output directly.
 
 .PARAMETER HeadSha
-    The PR head SHA the required checks were observed against. Recorded verbatim
+    The PR head SHA the queried checks were observed against. Recorded verbatim
     as ci_gate.head_sha.
 
 .PARAMETER PrPipelineRunId
@@ -51,14 +59,25 @@
     ci_gate.verified_at. Defaults to a UTC Get-Date formatted as ISO-8601. Tests
     inject a fixed delegate to make verified_at deterministic.
 
+.PARAMETER RequireWorkflow
+    Optional workflow name (default ''). When non-empty, the conclusion is
+    'success' only after at least one check whose `workflow` property equals
+    this value (case-sensitive) has bucket 'pass'; an empty or null check set
+    yields 'pending'. S9 passes 'CI' for an epic-child PR. A whitespace-only
+    value is rejected with an error.
+
 .PARAMETER AsJson
     When set, emits the ci_gate object as a JSON string instead of a PowerShell
     object. The default (object) output is convenient for in-process callers; the
     JSON output is convenient for checkpoint serialization.
 
 .EXAMPLE
-    gh pr checks --required --json bucket,name,state,link,workflow |
+    gh pr checks --json bucket,name,state,link,workflow |
         ./.claude/lib/ci-gate/Invoke-CiGateParser.ps1 -HeadSha $sha
+
+.EXAMPLE
+    gh pr checks --json bucket,name,state,link,workflow |
+        ./.claude/lib/ci-gate/Invoke-CiGateParser.ps1 -HeadSha $sha -RequireWorkflow CI
 
 .OUTPUTS
     A PSCustomObject (or JSON string when -AsJson is set) with properties
@@ -85,6 +104,9 @@ param(
     [ScriptBlock]$NowProvider = { (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ') },
 
     [Parameter(Mandatory = $false)]
+    [string]$RequireWorkflow = '',
+
+    [Parameter(Mandatory = $false)]
     [switch]$AsJson
 )
 
@@ -96,7 +118,7 @@ begin {
     function Get-CiGateConclusion {
         <#
     .SYNOPSIS
-        Pure derivation of ci_gate.conclusion from a parsed required-check set.
+        Pure derivation of ci_gate.conclusion from a parsed check set.
 
     .DESCRIPTION
         Implements the documented bucket precedence with no I/O and no external
@@ -109,9 +131,20 @@ begin {
         bucket value outside the known enum throws a fail-fast error naming the
         unrecognized value, preventing a silent pass on an unknown state.
 
+        With -RequireWorkflow set, one rule follows the pending rule: when no
+        check whose `workflow` property equals the name (case-sensitive) has
+        bucket 'pass', the result is 'pending'. An empty or null set then yields
+        'pending' instead of 'success'.
+
     .PARAMETER Checks
-        The parsed required-check collection (each element exposing a `bucket`
-        property). May be $null or empty, which yields 'success'.
+        The parsed check collection (each element exposing a `bucket`
+        property). May be $null or empty, which yields 'success' unless
+        -RequireWorkflow is set.
+
+    .PARAMETER RequireWorkflow
+        Optional workflow name; '' (default) disables the guard. A
+        whitespace-only value throws. An element without a `workflow` property
+        never matches.
 
     .OUTPUTS
         One of the strings 'success', 'failure', or 'pending'.
@@ -124,12 +157,27 @@ begin {
         param(
             [Parameter(Mandatory = $false)]
             [AllowNull()]
-            [object[]]$Checks
+            [object[]]$Checks,
+
+            [Parameter(Mandatory = $false)]
+            [string]$RequireWorkflow = ''
         )
 
-        # Empty or null required-check set is vacuously satisfied: there is no check
-        # that can fail or be in progress, so the gate concludes 'success'.
+        # A non-empty, whitespace-only workflow name is invalid input. Reject it
+        # rather than silently disabling the guard and restoring vacuous success.
+        if ($RequireWorkflow.Length -gt 0 -and [string]::IsNullOrWhiteSpace($RequireWorkflow)) {
+            throw "Invoke-CiGateParser: -RequireWorkflow must be '' or a workflow name; a whitespace-only value is not accepted."
+        }
+
+        $requireWorkflowGuard = $RequireWorkflow.Length -gt 0
+
+        # Empty or null check set. Without the guard it is vacuously satisfied (no
+        # check can fail or be in progress); with the guard no passing check from
+        # the named workflow was observed, so the gate stays 'pending'.
         if ($null -eq $Checks -or $Checks.Count -eq 0) {
+            if ($requireWorkflowGuard) {
+                return 'pending'
+            }
             return 'success'
         }
 
@@ -137,7 +185,10 @@ begin {
         # decision until after confirming nothing failed (failure outranks pending).
         $anyPending = $false
 
-        # Inspect each required check once, classifying by its bucket value. Failure
+        # Track whether a passing check from the named workflow was observed.
+        $requiredWorkflowPassed = $false
+
+        # Inspect each check once, classifying by its bucket value. Failure
         # short-circuits immediately because it is the highest-precedence outcome.
         foreach ($check in $Checks) {
             # A check element must expose a bucket; absence is an undefined state and
@@ -152,10 +203,19 @@ begin {
             # change semantics because failure short-circuits via return; pending is
             # only recorded (not returned) so a later failure can still take priority.
             switch ($bucket) {
-                'fail' { return 'failure' }       # a failed required check is terminal-non-success
-                'cancel' { return 'failure' }       # a cancelled required check is treated conservatively as failure
+                'fail' { return 'failure' }       # a failed check is terminal-non-success
+                'cancel' { return 'failure' }       # a cancelled check is treated conservatively as failure
                 'pending' { $anyPending = $true }     # in-progress; defer until failures are ruled out
-                'pass' { }                        # passing check contributes to success; no state change
+                'pass' {
+                    # Under the guard, record a pass from the named workflow. The
+                    # property test keeps an element without `workflow` from
+                    # throwing under Set-StrictMode; such an element never matches.
+                    if ($requireWorkflowGuard -and
+                        ($check.PSObject.Properties.Name -contains 'workflow') -and
+                        ([string]$check.workflow -ceq $RequireWorkflow)) {
+                        $requiredWorkflowPassed = $true
+                    }
+                }
                 'skipping' { }                        # skipped check is non-blocking; neither failure nor pending
                 default {
                     # Unknown bucket: fail fast and name the value so the unsupported
@@ -168,6 +228,12 @@ begin {
         # No failure or cancel was seen. If any check was pending the gate is still
         # in progress; otherwise every check was pass/skipping and the gate succeeds.
         if ($anyPending) {
+            return 'pending'
+        }
+
+        # With the guard, nothing failed or is pending, but success also requires
+        # at least one passing check from the named workflow.
+        if ($requireWorkflowGuard -and -not $requiredWorkflowPassed) {
             return 'pending'
         }
 
@@ -241,6 +307,8 @@ begin {
         See script-level parameter of the same name.
     .PARAMETER NowProvider
         See script-level parameter of the same name.
+    .PARAMETER RequireWorkflow
+        See script-level parameter of the same name.
     .PARAMETER AsJson
         See script-level parameter of the same name.
 
@@ -270,6 +338,9 @@ begin {
             [ScriptBlock]$NowProvider = { (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ') },
 
             [Parameter(Mandatory = $false)]
+            [string]$RequireWorkflow = '',
+
+            [Parameter(Mandatory = $false)]
             [switch]$AsJson
         )
 
@@ -288,7 +359,7 @@ begin {
         # downstream Count/foreach logic uniform for the empty, single, and many cases.
         $checks = @($parsed)
 
-        $conclusion = Get-CiGateConclusion -Checks $checks
+        $conclusion = Get-CiGateConclusion -Checks $checks -RequireWorkflow $RequireWorkflow
 
         # Resolve the timestamp through the injected delegate so tests can pin an
         # exact value; the default delegate reads UTC wall-clock time.
@@ -324,6 +395,7 @@ process {
             -PrPipelineRunId $PrPipelineRunId `
             -PrPipelineRunUrl $PrPipelineRunUrl `
             -NowProvider $NowProvider `
+            -RequireWorkflow $RequireWorkflow `
             -AsJson:$AsJson
     }
 }

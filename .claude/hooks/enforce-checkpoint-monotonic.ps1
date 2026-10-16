@@ -42,9 +42,10 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 $script:CanonicalStepPrefixes = @(
     'S0_startup_checks',
     'S1_change_budget_estimation',
@@ -206,6 +207,8 @@ function Invoke-CheckpointMonotonicDecision {
     param(
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'CHECKPOINT_MONOTONIC_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $envelope.IsValid) {
@@ -301,6 +304,9 @@ function Invoke-CheckpointMonotonicDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('CHECKPOINT_MONOTONIC_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'CHECKPOINT_MONOTONIC_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 

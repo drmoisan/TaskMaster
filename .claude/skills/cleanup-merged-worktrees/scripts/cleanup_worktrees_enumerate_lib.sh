@@ -348,6 +348,8 @@ cleanup_wt_derive_scan_roots() {
 		p=${paths[i]//\\//}
 		parent=${p%/*}
 		[[ -z $parent || $parent == "$p" ]] && continue
+		# A drive-relative parent (a registration directly under a drive root, such as D:/wt) is not an absolute root and is dropped.
+		cleanup_wt_is_absolute_path "$parent" || continue
 		n=$(normalize_wt_path "$parent")
 		[[ -z $n || -n ${seen[$n]:-} ]] && continue
 		[[ $n == "$main_norm" || $main_norm == "$n"/* ]] && continue

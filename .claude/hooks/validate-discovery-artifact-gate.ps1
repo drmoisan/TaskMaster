@@ -5,19 +5,24 @@
 
 .DESCRIPTION
     Invoked by the Claude Code SubagentStop hook under the existing broad
-    generic-agent matcher group. The hook reads $env:CLAUDE_HOOK_INPUT JSON
-    containing .output (the terminating subagent's final text), scans that
-    text for discovery-artifact path references via Get-DiscoveryArtifactType,
-    and for each recognized reference (when a required-artifact declaration is
-    present) invokes the discovery validator CLI via
-    Invoke-DiscoveryValidatorExe.
+    generic-agent matcher group. The hook reads the SubagentStop envelope JSON
+    from stdin through the shared envelope helper (subagentstop-envelope.ps1),
+    takes its last_assistant_message field (the terminating subagent's last
+    assistant message), scans that text for discovery-artifact path references
+    via Get-DiscoveryArtifactType, and for each recognized reference (when a
+    required-artifact declaration is present) invokes the discovery validator
+    via Invoke-DiscoveryValidatorExe.
 
     Any referenced artifact that fails validation blocks the subagent's
-    termination: the hook writes an error with a
-    DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix and exits with a non-zero code.
-    When no reference fails validation, or when no discovery-artifact path is
-    referenced, or when the required-artifact declaration is absent
-    (fail-open), the hook allows termination.
+    termination: the hook writes the reason with a
+    DISCOVERY_ARTIFACT_GATE_BLOCKED: prefix to stderr and exits 2 through the
+    shared envelope helper. An invalid envelope (empty, not valid JSON, not a
+    JSON object, or without a string last_assistant_message) also blocks, with
+    a "DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly" reason. The hook
+    allows termination when the last assistant message is blank, when it
+    references no discovery-artifact path, when the required-artifact
+    declaration is absent (fail-open), or when every referenced artifact
+    passes validation.
 
     This hook provides the authoritative, defense-in-depth check of final
     workspace state, regardless of which tool produced the artifact,
@@ -32,9 +37,13 @@
     `Test-Json -SchemaFile` Draft 2020-12 support). Read-only validation gate that
     invokes NO external process: validation runs in-process through
     `.claude/lib/discovery-validation/DiscoveryValidation.psm1` (issue #475).
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
+try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryValidation.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryValidation.psm1' -ErrorRecord $_ }
 
 function Invoke-DiscoveryValidatorExe {
     <#
@@ -179,7 +188,7 @@ function Find-DiscoveryArtifactReference {
     $foundReferences = New-Object System.Collections.Generic.List[string]
     foreach ($token in $tokens) {
         $trimmed = $token.Trim('`', '"', "'", ',', ';', '(', ')', '[', ']')
-        if (Get-DiscoveryArtifactType -Path $trimmed) {
+        if ($trimmed -and (Get-DiscoveryArtifactType -Path $trimmed)) {
             if (-not $foundReferences.Contains($trimmed)) {
                 $foundReferences.Add($trimmed)
             }
@@ -192,35 +201,24 @@ function Find-DiscoveryArtifactReference {
 function Invoke-DiscoveryArtifactGateValidation {
     <#
     .SYNOPSIS
-        Parses CLAUDE_HOOK_INPUT and returns an Ok/Message validation result
-        for a discovery-artifact completion gate.
+        Reads the SubagentStop envelope and returns an Ok/Message validation
+        result for a discovery-artifact completion gate.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [string] $RawPayload,
+        [AllowNull()] [AllowEmptyString()] [string] $InputText,
 
         [Parameter(Mandatory = $false)]
         [scriptblock] $RequiredArtifactReader = { Get-RequiredDiscoveryArtifactDeclaration }
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) { return @{ Ok = $false; Message = "DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)" } }
+    $assistantMessage = [string]$envelope.AssistantText
 
-    if ([string]::IsNullOrWhiteSpace($RawPayload)) {
-        return @{ Ok = $false; Message = 'discovery artifact gate hook: CLAUDE_HOOK_INPUT is empty' }
-    }
-
-    try {
-        $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        return @{ Ok = $false; Message = "discovery artifact gate hook: CLAUDE_HOOK_INPUT is not valid JSON: $_" }
-    }
-
-    $outputText = ''
-    if ($null -ne $payload -and ($payload.PSObject.Properties.Name -contains 'output')) {
-        $outputText = [string]$payload.output
-    }
-
-    $references = Find-DiscoveryArtifactReference -OutputText $outputText
+    $references = Find-DiscoveryArtifactReference -OutputText $assistantMessage
     if ($references.Count -eq 0) {
         return @{ Ok = $true; Message = $null }
     }
@@ -233,10 +231,10 @@ function Invoke-DiscoveryArtifactGateValidation {
 
     foreach ($reference in $references) {
         $artifactType = Get-DiscoveryArtifactType -Path $reference
-        $result = Invoke-DiscoveryValidatorExe -ValidatorArgs @($artifactType, $reference)
-        $hasErrorOutput = -not [string]::IsNullOrWhiteSpace($result.Output)
-        if ($result.ExitCode -ne 0 -or $hasErrorOutput) {
-            return @{ Ok = $false; Message = "DISCOVERY_ARTIFACT_GATE_BLOCKED: $($result.Output)" }
+        $validatorResult = Invoke-DiscoveryValidatorExe -ValidatorArgs @($artifactType, $reference)
+        $hasErrorOutput = -not [string]::IsNullOrWhiteSpace($validatorResult['Output'])
+        if ($validatorResult['ExitCode'] -ne 0 -or $hasErrorOutput) {
+            return @{ Ok = $false; Message = "DISCOVERY_ARTIFACT_GATE_BLOCKED: $($validatorResult['Output'])" }
         }
     }
 
@@ -247,11 +245,11 @@ function Invoke-DiscoveryArtifactGateValidation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('DISCOVERY_ARTIFACT_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
-$result = Invoke-DiscoveryArtifactGateValidation -RawPayload $env:CLAUDE_HOOK_INPUT
-if (-not $result.Ok) {
-    Write-Error $result.Message
-    exit 1
-}
-
+try { $result = Invoke-DiscoveryArtifactGateValidation }
+catch { Exit-SubagentStopBlock -Message ('DISCOVERY_ARTIFACT_GATE_BLOCKED: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

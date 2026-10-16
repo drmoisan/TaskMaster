@@ -17,14 +17,19 @@
 
     Both helpers read the script-scoped configuration the parent hook declares and call the
     parent hook's injectable read seams, so this file is only ever dot-sourced from that hook
-    and never invoked on its own. $script:PrContextArtifactPath is a process-directory-relative
-    artifact path and stays one. $script:OrchestratorStateCheckpointPath is different after
+    and never invoked on its own. $script:PrContextArtifactPath is the repository-relative
+    literal used in messages and as the composition input; every artifact read is composed
+    beneath the root Resolve-PrAuthorArtifactRoot selects (issue #850).
+    $script:OrchestratorStateCheckpointPath is different after
     issue #673: the parent declares it null, and Get-PrAuthorBypassReason assigns it the
     absolute checkpoint path of the worktree identity resolution selected, so every later
     reader receives one resolved path rather than deriving its own.
 
 .NOTES
-    Compatible with PowerShell 7+. No external module dependencies.
+    Compatible with PowerShell 7+. Dependencies are in-repository only: the command parsers
+    and worktree-resolution modules loaded below, and the artifact-root and docs-only siblings.
+    No PowerShell Gallery module is required.
+    The docs-only sibling runs the git executable at call time (issue #901).
 #>
 [CmdletBinding()]
 param()
@@ -47,6 +52,10 @@ Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemR
 # Epic scope (issue #663): the epic integration pull request is gated against the epic checkpoint.
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop
+# Artifact-root resolution and the Check 1 body-path binding (issue #850).
+. (Join-Path $PSScriptRoot 'enforce-pr-author-skill.artifact-root.ps1')
+# Docs-only exemption from the orchestrator-state preflight (issue #901).
+. (Join-Path $PSScriptRoot 'enforce-pr-author-skill.docs-only.ps1')
 
 function Resolve-PrAuthorWorktreeTarget {
     <#
@@ -98,7 +107,9 @@ function Get-PrAuthorTargetCheckpointResolution {
         refuses to answer rather than answering from unrelated state. Neither reason-code
         literal appears in this file; both come from the accessors named above.
     .OUTPUTS
-        System.Collections.Specialized.OrderedDictionary with CheckpointPath and Reason.
+        System.Collections.Specialized.OrderedDictionary with CheckpointPath, Reason,
+        WorktreeRoot (the resolved root, or $null when unresolved), and Status (the target's
+        status), so the artifact root is taken from the same resolution (issue #850).
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -111,13 +122,49 @@ function Get-PrAuthorTargetCheckpointResolution {
 
     switch ($target.Status) {
         { $_ -in @('SessionRoot', 'OtherWorktree') } {
-            return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null }
+            return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null; WorktreeRoot = $target.WorktreeRoot; Status = $target.Status }
         }
         default {
             $reason = "$($target.ReasonCode): $($target.Detail) The pr-author gate will not validate this call against the session root's checkpoint, because that checkpoint may belong to a different item. Pass --head <branch> on the gh pr create command so the call names its own target."
-            return [ordered]@{ CheckpointPath = $null; Reason = $reason }
+            return [ordered]@{ CheckpointPath = $null; Reason = $reason; WorktreeRoot = $null; Status = $target.Status }
         }
     }
+}
+
+function Get-PrAuthorBodyFileValue {
+    <#
+    .SYNOPSIS
+        Return the normalized --body-file value of the matched gh pr create or gh pr edit, or $null.
+    .DESCRIPTION
+        Reads the flag value from the first Structural gh pr create match, else gh pr edit.
+        Backslashes become forward slashes and one leading './' is removed (issue #824). A
+        rooted value is returned as written, with separators normalized, and is bound to the
+        resolved worktree by Get-PrAuthorBodyPathBindingReason (issue #850).
+    .PARAMETER CommandText
+        The Bash command text under evaluation.
+    .OUTPUTS
+        System.String or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $CommandText
+    )
+
+    $subcommandPath = @('pr', 'edit')
+    if (Test-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'create')) {
+        $subcommandPath = @('pr', 'create')
+    }
+    $value = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body-file'
+    if ($null -eq $value) {
+        return $null
+    }
+    $value = $value.Replace('\', '/')
+    if ($value.StartsWith('./')) {
+        $value = $value.Substring(2)
+    }
+    return $value
 }
 
 function Test-PrAuthorReceiptVerification {
@@ -127,8 +174,9 @@ function Test-PrAuthorReceiptVerification {
     .DESCRIPTION
         Runs the six ordered receipt checks on the --body-file-with-context path. Each check is its
         own short-circuiting branch; the first failure returns its reason code:
-          1. PR_BODY_PATH_NONCANONICAL        - --body-file path does not match the canonical
-                                                 artifacts/pr_body_<N>.md pattern (case-sensitive).
+          1. PR_BODY_PATH_NONCANONICAL        - --body-file path is not the canonical
+                                                 artifacts/pr_body_<N>.md beneath the artifact
+                                                 root (relative only for the session worktree).
           2. PR_AUTHOR_RECEIPT_MISSING        - sibling artifacts/pr_body_<N>.receipt.json absent.
           3. PR_AUTHOR_RECEIPT_NUMBER_MISMATCH- receipt.number (integer) != <N> from the path.
           4. PR_AUTHOR_RECEIPT_HASH_MISMATCH  - inline SHA-256 (lowercase hex) of the body bytes
@@ -139,9 +187,10 @@ function Test-PrAuthorReceiptVerification {
                                                  matching --base <epic_context.integration_branch>.
         Returns $null when all six checks pass (allow). All disk access flows through the four
         injectable seams (Get-PrBodyFileBytes, Get-PrAuthorReceiptContent,
-        Get-PrContextSummaryLastWriteUtc, Get-PrAuthorCheckpointContent); SHA-256 is computed
-        inline. This is a policy-level integrity check, not a cryptographic control: any actor
-        with Write access to artifacts/ can replace the body file and the receipt together.
+        Get-PrContextSummaryLastWriteUtc, Get-PrAuthorCheckpointContent), each given an absolute
+        path beneath the artifact root (issue #850); SHA-256 is computed inline. This is a
+        policy-level integrity check, not a cryptographic control: any actor with Write access
+        to artifacts/ can replace the body file and the receipt together.
     .PARAMETER CommandText
         The Bash command text containing the --body-file argument.
     .PARAMETER CheckpointPath
@@ -150,6 +199,10 @@ function Test-PrAuthorReceiptVerification {
     .PARAMETER EpicScope
         Optional. The epic-scope result Get-PrAuthorBypassReason resolved (issue #663), passed
         through to check 6 so the call is resolved once; $null outside epic scope.
+    .PARAMETER ArtifactRoot
+        The resolved worktree root the body, receipt, and summary are read beneath.
+    .PARAMETER RelativeBodyAllowed
+        Whether a relative --body-file is read from the resolved worktree (the session worktree).
     .OUTPUTS
         System.String or $null
     #>
@@ -163,18 +216,25 @@ function Test-PrAuthorReceiptVerification {
         [string] $CheckpointPath,
 
         [AllowNull()]
-        [object] $EpicScope
+        [object] $EpicScope,
+
+        [Parameter(Mandatory)]
+        [string] $ArtifactRoot,
+
+        [bool] $RelativeBodyAllowed
     )
 
-    # Check 1: the --body-file argument must match the canonical artifacts/pr_body_<N>.md pattern.
-    # The match is case-sensitive (-cmatch) so a non-canonical path is rejected before any read.
-    if ($CommandText -cnotmatch '--body-file\s+artifacts/pr_body_(\d+)\.md\b') {
-        return "PR_BODY_PATH_NONCANONICAL: ``--body-file`` must reference a canonical ``artifacts/pr_body_<N>.md`` file produced by the pr-author skill. The path supplied does not match ``artifacts/pr_body_<N>.md``."
+    # Check 1: the --body-file value must be the canonical artifacts/pr_body_<N>.md beneath the
+    # artifact root (issue #850); C1a's structural read and spelling normalization are reused.
+    $binding = Get-PrAuthorBodyPathBindingReason -CommandText $CommandText -ArtifactRoot $ArtifactRoot -RelativeBodyAllowed $RelativeBodyAllowed
+    if ($binding.Reason) {
+        return $binding.Reason
     }
 
-    $bodyNumber = [int]$Matches[1]
-    $bodyFilePath = "artifacts/pr_body_$bodyNumber.md"
-    $receiptFilePath = "artifacts/pr_body_$bodyNumber.receipt.json"
+    $bodyNumber = $binding.BodyNumber
+    $bodyFilePath = Join-WorktreeResolutionPath -WorktreeRoot $ArtifactRoot -RepoRelativePath "artifacts/pr_body_$bodyNumber.md"
+    $receiptFilePath = Join-WorktreeResolutionPath -WorktreeRoot $ArtifactRoot -RepoRelativePath "artifacts/pr_body_$bodyNumber.receipt.json"
+    $summaryPath = Join-WorktreeResolutionPath -WorktreeRoot $ArtifactRoot -RepoRelativePath $script:PrContextArtifactPath
 
     # Check 2: the sibling receipt file must exist (read via the injectable seam).
     $receiptRaw = Get-PrAuthorReceiptContent -ReceiptFilePath $receiptFilePath
@@ -228,7 +288,7 @@ function Test-PrAuthorReceiptVerification {
         return "PR_AUTHOR_RECEIPT_STALE: ``$receiptFilePath`` has a missing or unparseable ``created_at``. The pr-author agent must record a UTC ISO-8601 ``created_at`` strictly newer than ``$script:PrContextArtifactPath``."
     }
 
-    $contextLastWrite = Get-PrContextSummaryLastWriteUtc
+    $contextLastWrite = Get-PrContextSummaryLastWriteUtc -Path $summaryPath
     if (($null -eq $contextLastWrite) -or ($createdAt -le $contextLastWrite)) {
         return "PR_AUTHOR_RECEIPT_STALE: ``$receiptFilePath`` ``created_at`` is not strictly newer than the last-write time of ``$script:PrContextArtifactPath``. The pr-author agent must regenerate the body and receipt after refreshing the PR context."
     }
@@ -248,17 +308,16 @@ function Get-PrAuthorBypassReason {
         Inspect the command text and return a block reason string, or $null when the command is allowed.
     .DESCRIPTION
         Returns PR_AUTHOR_SKILL_BLOCKED when gh pr create or gh pr edit is run with --body (inline,
-        no --body-file), or when gh pr create is run with no body flag at all. Returns
-        PR_CONTEXT_MISSING when --body-file is present but the context artifact does not exist on
-        disk. When --body-file is present and the context artifact exists, verifies the SHA-256
-        receipt via Test-PrAuthorReceiptVerification and returns its block reason
-        (PR_BODY_PATH_NONCANONICAL / PR_AUTHOR_RECEIPT_*) when verification fails. Returns $null for
-        all allowed patterns. Cases A, B, and C are evaluated first and unchanged; receipt
-        verification only extends the previously-allowed --body-file-with-context path.
+        no --body-file), or when gh pr create is run with no body flag at all; these cases and the
+        gh pr edit no-body allow perform no resolution. For a --body-file command the artifact root
+        is resolved once (issue #850), and the deny precedence is: the resolution reason
+        (no-target or ambiguity code, or an underivable epic worktree), PR_CONTEXT_MISSING when the
+        context summary is absent beneath the resolved worktree, ORCHESTRATOR_STATE_PREFLIGHT_FAILED
+        unless Get-PrAuthorDocsOnlyExemption exempts a docs-only gh pr create (issue #901), then
+        receipt checks 1-6 via Test-PrAuthorReceiptVerification. Returns $null for all allowed
+        patterns.
     .PARAMETER CommandText
         The Bash command text extracted from the envelope's tool_input.
-    .PARAMETER ContextExists
-        Whether artifacts/pr_context.summary.txt currently exists on disk.
     .OUTPUTS
         System.String or $null
     #>
@@ -266,10 +325,7 @@ function Get-PrAuthorBypassReason {
     [OutputType([string])]
     param(
         [Parameter(Mandatory)]
-        [string] $CommandText,
-
-        [Parameter(Mandatory)]
-        [bool] $ContextExists
+        [string] $CommandText
     )
 
     # Only act on gh pr create or gh pr edit subcommands. The test is structural: a segment
@@ -290,22 +346,21 @@ function Get-PrAuthorBypassReason {
     $hasBodyFile = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body-file'
     $hasInlineBody = Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--body'
 
-    # Raw-scan fallback for a wrapper-led, live-substitution, or unbalanced segment. A
-    # wrapper's quoted argument collapses into ONE token, so both flags read absent there and
-    # the gh pr edit no-body branch below allowed bash -c "gh pr edit 42 --body 'x'". The
-    # --body-file test runs first and wins, so a --body-file carried inside a wrapper is never
-    # misread as an inline body. That ordering restores the pre-parser routing, in which one
-    # whole-text --body-file match set $hasBodyFile for exactly this input.
+    # Raw-scan fallback (issue #824). Wrapper payloads are now read structurally, so the flags
+    # above already come from a payload's own tokens. The raw text is scanned only when the
+    # invocation could not be read structurally at all: no Structural match exists for the
+    # subcommand path and at least one Indeterminate match does. The --body-file test runs
+    # first and wins, so a --body-file is never misread as an inline body.
     if (-not $hasBodyFile -and -not $hasInlineBody) {
-        $comparison = [System.StringComparison]::OrdinalIgnoreCase
-        foreach ($segment in @(Read-CommandLineSegment -CommandText $CommandText)) {
-            if (-not (Test-CommandLineSegmentRawScan -Segment $segment)) {
-                continue
-            }
-            if ($segment.ScanText.IndexOf('--body-file', $comparison) -ge 0) {
-                $hasBodyFile = $true
-            } elseif ($segment.ScanText.IndexOf('--body', $comparison) -ge 0) {
-                $hasInlineBody = $true
+        $matchList = @(Get-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath)
+        if (@($matchList | Where-Object { $_.Status -eq 'Structural' }).Count -eq 0) {
+            $comparison = [System.StringComparison]::OrdinalIgnoreCase
+            foreach ($match in @($matchList | Where-Object { $_.Status -eq 'Indeterminate' })) {
+                if ($match.Segment.RawText.IndexOf('--body-file', $comparison) -ge 0) {
+                    $hasBodyFile = $true
+                } elseif ($match.Segment.RawText.IndexOf('--body', $comparison) -ge 0) {
+                    $hasInlineBody = $true
+                }
             }
         }
     }
@@ -330,36 +385,34 @@ function Get-PrAuthorBypassReason {
         }
     }
 
-    # Case C: --body-file present but context artifact is absent.
-    if ($hasBodyFile -and -not $ContextExists) {
-        return "PR_CONTEXT_MISSING: ``$script:PrContextArtifactPath`` is absent. Run ``mcp__drm-copilot__collect_pr_context`` before creating or editing the PR body."
+    # Issue #850: the worktree whose artifacts are read is resolved once, before Case C. Epic
+    # scope (issue #663) selects the epic checkpoint's worktree and reads no per-feature
+    # checkpoint; otherwise identity resolution selects the item worktree, and an unresolved
+    # target denies here, ahead of PR_CONTEXT_MISSING.
+    $artifact = Resolve-PrAuthorArtifactRoot -CommandText $CommandText
+    if ($artifact.Reason) {
+        return $artifact.Reason
     }
 
-    # Epic scope (issue #663): when the call's --head equals the epic checkpoint's
-    # integration_branch, the integration pull request is gated by the epic PR-creation
-    # readiness predicate on artifacts/orchestration/epic-orchestrator-state.json, and no
-    # per-feature checkpoint is resolved or read. Resolved once; check 6 reuses the result.
-    $epicScope = $null
-    if ($hasBodyFile -and $ContextExists) {
-        $epicScope = Resolve-EpicScopeCheckpoint -Text $CommandText -SessionRoot (Get-Location).Path
+    # Case C: --body-file present but the context artifact is absent beneath the resolved worktree.
+    $summaryPath = Join-WorktreeResolutionPath -WorktreeRoot $artifact.ArtifactRoot -RepoRelativePath $script:PrContextArtifactPath
+    if (-not (Get-PrContextArtifactExistence -Path $summaryPath)) {
+        return "PR_CONTEXT_MISSING: '$script:PrContextArtifactPath' in worktree '$($artifact.ArtifactRoot)' is absent. Run ``mcp__drm-copilot__collect_pr_context`` in that worktree before creating or editing the PR body."
     }
 
     # Orchestrator-state preflight: runs inside this same PreToolUse hook (so it cannot be
-    # bypassed by invoking gh pr create/edit directly) before receipt verification.
-    if ($null -ne $epicScope -and $epicScope.IsEpicScope) {
+    # bypassed by invoking gh pr create/edit directly) before receipt verification. The
+    # checkpoint path is assigned once here and read by every later consumer, so the
+    # preflight, the receipt verifier, and the epic base-branch check gate one item.
+    if ($null -ne $artifact.EpicScope) {
+        $epicScope = $artifact.EpicScope
         $failure = Get-EpicPrCreationReadinessFailure -Checkpoint $epicScope.Checkpoint -HeadBranch $epicScope.Branch
         if ($failure) {
             return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: this epic-scope pull request was evaluated against $($epicScope.CheckpointPath), and the failed readiness predicate is '$failure'."
         }
-        $script:OrchestratorStateCheckpointPath = $epicScope.CheckpointPath
-    } elseif ($hasBodyFile -and $ContextExists) {
-        $resolution = Get-PrAuthorTargetCheckpointResolution -CommandText $CommandText
-        if ($resolution.Reason) {
-            return $resolution.Reason
-        }
-        # Assigned once here and read by every later consumer, so the preflight, the receipt
-        # verifier, and the epic base-branch check cannot disagree about which item is gated.
-        $script:OrchestratorStateCheckpointPath = $resolution.CheckpointPath
+        $script:OrchestratorStateCheckpointPath = $artifact.CheckpointPath
+    } else {
+        $script:OrchestratorStateCheckpointPath = $artifact.CheckpointPath
         $checkpointPath = $script:OrchestratorStateCheckpointPath
         $preflightResult = Invoke-OrchestratorStatePreflight -CheckpointPath $checkpointPath
         if ($preflightResult.HasErrors) {
@@ -368,16 +421,17 @@ function Get-PrAuthorBypassReason {
             } else {
                 $preflightResult.ErrorText
             }
-            return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: $preflightSummary"
+            $exemption = Get-PrAuthorDocsOnlyExemption -CommandText $CommandText -WorktreeRoot $artifact.ArtifactRoot -CheckpointPath $checkpointPath
+            if (-not $exemption.Exempt) {
+                return "ORCHESTRATOR_STATE_PREFLIGHT_FAILED: $preflightSummary (docs-only exemption not applied: $($exemption.Reason))"
+            }
         }
     }
 
     # Receipt verification: extends, and does not replace, the previously-allowed path.
-    if ($hasBodyFile -and $ContextExists) {
-        $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText -CheckpointPath $script:OrchestratorStateCheckpointPath -EpicScope $epicScope
-        if ($receiptReason) {
-            return $receiptReason
-        }
+    $receiptReason = Test-PrAuthorReceiptVerification -CommandText $CommandText -CheckpointPath $script:OrchestratorStateCheckpointPath -EpicScope $artifact.EpicScope -ArtifactRoot $artifact.ArtifactRoot -RelativeBodyAllowed $artifact.RelativeBodyAllowed
+    if ($receiptReason) {
+        return $receiptReason
     }
 
     return $null

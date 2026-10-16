@@ -104,6 +104,10 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 
 `Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
+## Evidence Filename Timestamps in Plans
+
+Plans name evidence artifacts `<name>.<timestamp>.md` and never fix a plan-time stamp in an evidence filename. An acceptance condition identifies a consumed evidence artifact by the derivation in `evidence-and-timestamp-conventions` (`### Evidence Filename Timestamp`): the lexicographically greatest file matching `<name>.*.md`, not a pre-stamped literal path. This section governs artifact paths only: asserted search tokens remain concrete.
+
 ## Coverage Evidence Contract (Mandatory when policy requires coverage)
 
 For any language in scope where repository policy requires coverage validation:
@@ -191,7 +195,7 @@ Before a plan can be treated as approved:
 
 The same validator call also applies the acceptance-gate rules G1 through G6 defined in `.claude/rules/plan-acceptance-gates.md`. Those rules report acceptance conditions that cannot fail — a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. They run automatically on the existing `plan` route with no additional flag. Blocking findings appear in the validator's error output and fail the gate; Warnings are surfaced without failing it, prefixed with `PLAN GATE WARNING: ` on the CLI and carried on the optional `warnings` field of the MCP result. Read that rule file before authoring acceptance conditions.
 
-The same call additionally applies the rules G7, G8, G8b, and G9, which report a write-mode command observed only by its exit code, an unanchored `git diff`, a name-listing diff with no companion span, and a coverage command that prints no table. All four ship in the Warning channel, so they surface without failing the gate. The complete shipped set is therefore G1 through G9.
+The same call additionally applies the rules G7, G8, G8b, and G9, which report a write-mode command observed only by its exit code, an unanchored `git diff`, a name-listing diff with no companion span, and a coverage command that prints no table. All four ship in the Warning channel, so they surface without failing the gate. The same call also applies G10, a document-level rule that reports a SCRATCH definition not namespaced by issue number. G10 ships in the Blocking channel and reports each finding with a `Line N: ` prefix rather than a task identifier, because the definition sits outside any task window. The complete shipped set is therefore G1 through G10.
 
 ## Wrap-Tolerant Assertion Authoring (Mandatory)
 

@@ -13,24 +13,29 @@
     conflict_edges[], and position is read from the current cohort coloring.
 
     Resolution and decision procedure:
-      1. Resolve the target item's feature folder from the prompt text by scanning for a
-         docs/features/active/<token> path, mirroring the epic hook's technique
-         (longest match wins; a .md-suffixed match uses its parent directory).
-      2. Resolve the worktree whose parallel checkpoint records the prompt's
-         parallel_slug: value (issue #690), deny an unresolved or ambiguous target, then
-         read artifacts/orchestration/parallel-orchestrator-state.json beneath that
-         worktree and locate the items[] record whose feature_folder resolves to the same
-         basename.
-      3. Project the cohort coloring to the cohorts[] rows whose generation equals the
+      1. Resolve the worktree whose parallel checkpoint records the prompt's
+         parallel_slug: value (issue #690) and deny an unresolved or ambiguous target.
+      2. Collect the cited feature-folder candidates with the shared resolver
+         (feature-folder-resolution.ps1, issue #565): every docs/features/active/<token>
+         path is truncated to its feature-folder segment, so a nested research/ or
+         evidence/ citation names its own folder. No candidate denies.
+      3. Read artifacts/orchestration/parallel-orchestrator-state.json beneath that
+         worktree and select the target among the candidates with
+         Select-FeatureFolderTarget. The canonical issue-number line, when it names exactly
+         one number, breaks a tie among the cited run items; two or more remaining
+         candidates otherwise deny as ambiguous. Neither string length nor prompt position
+         takes part in the selection. Then locate the items[] record whose feature_folder
+         resolves to the selected basename.
+      4. Project the cohort coloring to the cohorts[] rows whose generation equals the
          top-level recolor_generation, and read the target item's cohort index from that
          projection.
-      4. Collect every conflict_edges[] neighbor of the target item.
-      5. Deny with reason PARALLEL_COHORT_BARRIER_BLOCKED unless every neighbor that sits
+      5. Collect every conflict_edges[] neighbor of the target item.
+      6. Deny with reason PARALLEL_COHORT_BARRIER_BLOCKED unless every neighbor that sits
          in a strictly prior current-generation cohort has merge_status in
          {merged, worktree_removed}. ci_green does NOT satisfy the barrier: an item whose
          CI is green has not merged, so its worktree is still live and its contention is
          unresolved. Same-cohort and later-cohort neighbors do not block Layer 1.
-      6. A missing or unparseable checkpoint, an unresolved feature-folder token, a
+      7. A missing or unparseable checkpoint, an unresolved feature-folder token, a
          missing items[] record, a target with no current-generation cohort assignment, a
          missing neighbor record, and a missing merge_status all deny (fail-closed).
 
@@ -43,24 +48,33 @@
     SubagentStop time.
 
 .NOTES
-    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690),
-    imported inside a guard: a failed import is recorded and the decision denies naming
-    the module. Filesystem reads go through an injectable wrapper function so tests can
-    mock the boundary without writing temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeItemResolution.psm1 and
+    WorktreeRunResolution.psm1 (issue #690) and the pure sibling
+    feature-folder-resolution.ps1 (issue #565), each loaded inside a guard: the first
+    failure is recorded and the decision denies naming the dependency. Filesystem reads go
+    through an injectable wrapper function so tests can mock the boundary without writing
+    temporary files.
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
-# Import guard (issue #690): a failed import denies instead of failing open.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 $script:ParallelCohortBarrierResolutionImportFailure = $null
+
+# Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
+# rather than failing open; an earlier recorded failure is kept.
 try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
+    . (Join-Path $PSScriptRoot 'feature-folder-resolution.ps1')
 }
 catch {
-    $script:ParallelCohortBarrierResolutionImportFailure = 'WorktreeRunResolution.psm1'
+    if (-not $script:ParallelCohortBarrierResolutionImportFailure) {
+        $script:ParallelCohortBarrierResolutionImportFailure = 'feature-folder-resolution.ps1'
+    }
 }
 
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
@@ -68,7 +82,7 @@ $script:ParallelModeMarker = 'Parallel mode: true'
 
 # Dot-source the record-resolution and barrier helpers. Guarded so dot-sourcing this
 # hook in tests loads the helpers too (issue #501 headroom split).
-. (Join-Path $PSScriptRoot 'enforce-parallel-cohort-barrier-helpers.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-parallel-cohort-barrier-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-parallel-cohort-barrier-helpers.ps1' -ErrorRecord $_ }
 
 function Get-ParallelCohortBarrierCheckpointContent {
     <#
@@ -147,43 +161,27 @@ function Get-ParallelCohortBarrierFolderBasename {
 function Find-ParallelCohortBarrierFeatureFolderFromPrompt {
     <#
     .SYNOPSIS
-        Scans a prompt string for docs/features/active/<...> path tokens and returns the
-        longest unique match's basename. Returns $null when no match is found.
+        Returns the distinct feature-folder basenames cited in a prompt, in first-occurrence
+        order. Returns no output when no folder is cited.
     .DESCRIPTION
-        Mirrors the epic wave-barrier hook's technique: forward- or backslash-separated
-        path tokens are accepted, the longest match wins, and a .md-suffixed match resolves
-        to its parent directory before the basename is extracted.
+        Delegates to Find-FeatureFolderCandidate in the shared resolver (issue #565): each
+        docs/features/active/<token> path, in either separator style, is truncated to its
+        feature-folder segment, so a nested research/ or evidence/ citation names its own
+        folder. Selection among several candidates is made by Select-FeatureFolderTarget.
     .PARAMETER Prompt
         The delegation prompt text under evaluation.
     .OUTPUTS
-        System.String or $null
+        System.String[]
     #>
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([string[]])]
     param(
         [Parameter(Mandatory)]
         [AllowEmptyString()]
         [string] $Prompt
     )
 
-    if (-not $Prompt) {
-        return $null
-    }
-
-    $pattern = 'docs[\\/]+features[\\/]+active[\\/]+[^\s"''`]+'
-    $matchList = [regex]::Matches($Prompt, $pattern)
-    if ($matchList.Count -eq 0) {
-        return $null
-    }
-
-    $unique = @{}
-    foreach ($m in $matchList) {
-        $normalized = ($m.Value -replace '\\', '/').TrimEnd('/')
-        $unique[$normalized] = $true
-    }
-
-    $candidates = @(@($unique.Keys) | Sort-Object -Property Length -Descending)
-    return (Get-ParallelCohortBarrierFolderBasename -FolderPath $candidates[0])
+    return [string[]]@(Find-FeatureFolderCandidate -Text $Prompt)
 }
 
 function Get-ParallelCohortBarrierAllowDecision {
@@ -230,11 +228,13 @@ function Invoke-ParallelCohortBarrierDecision {
     param(
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_COHORT_BARRIER_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    # A failed worktree-resolution import denies before any other logic (issue #690).
+    # A failed dependency import denies before any other logic (issue #565).
     if ($script:ParallelCohortBarrierResolutionImportFailure) {
         return Get-ParallelCohortBarrierBlockDecision -Reason (
-            "PARALLEL_COHORT_BARRIER_BLOCKED: the worktree-resolution module '$($script:ParallelCohortBarrierResolutionImportFailure)' " +
+            "PARALLEL_COHORT_BARRIER_BLOCKED: the dependency '$($script:ParallelCohortBarrierResolutionImportFailure)' " +
             'failed to import, so the parallel checkpoint that governs this delegation cannot be located; the gate fails closed.')
     }
 
@@ -262,8 +262,8 @@ function Invoke-ParallelCohortBarrierDecision {
         return Get-ParallelCohortBarrierBlockDecision -Reason "PARALLEL_COHORT_BARRIER_BLOCKED: $($target.ReasonCode): $($target.Detail)"
     }
 
-    $featureFolder = Find-ParallelCohortBarrierFeatureFolderFromPrompt -Prompt $prompt
-    if (-not $featureFolder) {
+    $candidates = @(Find-ParallelCohortBarrierFeatureFolderFromPrompt -Prompt $prompt)
+    if ($candidates.Count -eq 0) {
         return Get-ParallelCohortBarrierBlockDecision -Reason 'PARALLEL_COHORT_BARRIER_BLOCKED: a parallel-mode orchestrator delegation must reference the target item feature folder path (docs/features/active/<folder>) in the prompt so its conflict edges and cohort position can be verified.'
     }
 
@@ -276,6 +276,18 @@ function Invoke-ParallelCohortBarrierDecision {
             $checkpoint = $null
         }
     }
+
+    # The target is selected among the cited candidates (issue #565). The canonical
+    # issue-number line breaks a tie only when it names exactly one number.
+    $records = if ($null -ne $checkpoint -and @($checkpoint.PSObject.Properties.Name) -contains 'items') { @($checkpoint.items) } else { @() }
+    $selectionArguments = @{ Records = $records; Candidate = $candidates }
+    $declared = Find-WorktreeItemIssueSignal -Text $prompt
+    if (@($declared).Count -eq 1) { $selectionArguments['DeclaredIssueNumber'] = [int]@($declared)[0] }
+    $selection = Select-FeatureFolderTarget @selectionArguments
+    if ($selection.Status -eq 'Ambiguous') {
+        return Get-ParallelCohortBarrierBlockDecision -Reason "PARALLEL_COHORT_BARRIER_BLOCKED: $($selection.Detail)."
+    }
+    $featureFolder = $selection.Basename
 
     $itemRecord = Find-ParallelCohortBarrierItemRecord -Checkpoint $checkpoint -FeatureFolder $featureFolder
     if (Test-ParallelCohortBarrierClear -Checkpoint $checkpoint -ItemRecord $itemRecord) {
@@ -327,5 +339,8 @@ function Invoke-ParallelCohortBarrierEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PARALLEL_COHORT_BARRIER_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_COHORT_BARRIER_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 exit (Invoke-ParallelCohortBarrierEntryPoint)

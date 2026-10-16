@@ -73,17 +73,28 @@ Do not record a partial removal, and do not record the rejection itself in `muta
 
 1. Re-derive durable state as above and resolve the item key against `items[]`.
 
-2. Decide the removal by calling `decide_removal(item_key, items, disposition)` from
-   `scripts/dev_tools/parallel_mutation_protocol.py`. The engine raises the dedicated rejection
-   exception for every rejected row; surface its message and stop.
+2. Decide the removal through the bundled entry point:
+
+   ```shell
+   bash .claude/lib/bash/remove-parallel-item.sh decide --item <key> --state <state> --removal-disposition <detach|abandon>
+   ```
+
+   `--state` is the state re-derived in step 1; omit it when the key resolves to no `items[]`
+   entry. Pass the caller's disposition as `--removal-disposition`, and omit the option when none
+   was supplied. Exit 0 prints the decision object (`item_key`, `prior_state`, `new_state`,
+   `disposition`, `triggers_recompute`) as one JSON line on stdout. Exit 1 is a rejected row:
+   surface its single stderr line and stop. Exit 2 is a usage error in the invocation itself.
 
 3. **Unstarted removal (recompute).** Set the item's state to `withdrawn`, drop its vertex, and
-   recolor by calling `recolor_unstarted(unstarted_items, conflict_edges, pinned,
-   current_generation, current_cohort=current_cohort,
-   highest_pinned_cohort=highest_pinned_cohort)`. Write
-   `RecolorResult.cohort_assignments` into `cohorts[]` and set the top-level `recolor_generation`
-   to `RecolorResult.generation`; the generation increments by exactly one. The result names no
-   pinned key, so no in-flight item moves.
+   recolor through the bundled entry point:
+
+   ```shell
+   bash .claude/lib/bash/remove-parallel-item.sh recolor --unstarted "<k> ..." --edges "<a>:<b> ..." --pinned "<k> ..." --generation <g> --current-cohort <c> --highest-pinned-cohort <h>
+   ```
+
+   Write the output field `cohort_assignments` into `cohorts[]` and set the top-level
+   `recolor_generation` to the output field `generation`; the generation increments by exactly
+   one. The result names no pinned key, so no in-flight item moves.
 
    `current_cohort` is F3's top-level field, read from the re-verified durable state: the lowest
    current-generation cohort index still holding a non-terminal item. Under the per-edge barrier an
@@ -117,8 +128,18 @@ Do not record a partial removal, and do not record the rejection itself in `muta
    invocation above, so an ad hoc command is not matchable and would bypass the confirmation
    contract entirely. One invocation, one item, both side effects.
 
-6. **Append exactly one `mutations[]` entry** for a successful removal, built by
-   `build_remove_entry` from `scripts/dev_tools/parallel_mutation_protocol.py`:
+6. **Append exactly one `mutations[]` entry** for a successful removal, built through the
+   bundled entry point:
+
+   ```shell
+   bash .claude/lib/bash/remove-parallel-item.sh entry --item <key> --prior-state <state> --removal-disposition <detach|abandon> --recompute <true|false> --generation <g> --at <timestamp>
+   ```
+
+   `--recompute` equals the decision's `triggers_recompute`. `--generation` is the generation
+   before the removal. Omit `--removal-disposition` for an unstarted item. `--at` is the mutation
+   timestamp in `yyyy-MM-ddTHH-mm` form; when it is omitted the entry point uses the current UTC
+   minute. Exit 0 prints the entry as one JSON line on stdout; exit 1 is a contract rejection whose
+   single stderr line is surfaced before stopping; exit 2 is a usage error.
 
    | Case | `op` | `item_key` | `prior_state` | `new_state` | `disposition` | `recolor_generation` |
    | --- | --- | --- | --- | --- | --- | --- |
@@ -127,7 +148,9 @@ Do not record a partial removal, and do not record the rejection itself in `muta
    | Remove, `abandon` | `remove` | item key | `in_flight` | `withdrawn` | `abandon` | `g` (unchanged) |
 
    `disposition` is non-null only on an in-flight removal and is null on the unstarted row. The `at`
-   timestamp comes from the engine's injected clock seam.
+   timestamp comes from the `--at` value, or from the current UTC minute when `--at` is omitted.
+   The repository-local module `scripts/dev_tools/parallel_mutation_protocol.py` is retained as the
+   parity reference for this entry point and is not invoked on this path.
 
 7. **Validate the checkpoint** before treating the removal as applied. Run the
    `validate_orchestration_artifacts` MCP tool with `artifact_type:

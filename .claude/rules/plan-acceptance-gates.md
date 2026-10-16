@@ -7,14 +7,14 @@ paths:
   - "docs/features/**/plan.*.md"
   - "docs/features/**/remediation-plan.*.md"
   - ".claude/skills/atomic-plan-contract/SKILL.md"
-description: Acceptance-gate rules G1 through G6 applied to the shell commands an atomic plan states as acceptance conditions.
+description: Acceptance-gate rules G1 through G10 for atomic plans. G1 through G9 judge the shell commands a plan states as acceptance conditions; the document-level G10 rule reports a SCRATCH definition that is not namespaced by issue number.
 ---
 
 # Atomic-Plan Acceptance Gates (G1 through G6)
 
-This rule governs the acceptance-gate rules the plan validator applies to the shell commands an atomic plan states as acceptance conditions. It exists because a plan can state an acceptance condition that cannot fail: a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. Such a condition reads as a verification step and gates nothing (issue #486).
+This rule governs the acceptance-gate rules the plan validator applies to an atomic plan: G1 through G9 judge the shell commands the plan states as acceptance conditions, and G10 judges the whole plan document. It exists because a plan can state an acceptance condition that cannot fail: a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. Such a condition reads as a verification step and gates nothing (issue #486).
 
-The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`, both fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`). Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
+The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`. G1 through G9 are fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`); G10 reads the whole document through `scripts/dev_tools/plan_gate_scratch.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts`. Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
 
 ## Scope of Invocation — no grandfathering or exemption mechanism
 
@@ -26,7 +26,7 @@ The consequence is that adding a rule to this set is cheap in migration cost and
 
 ## Rule Table
 
-Every finding string begins with the square-bracketed `P#-T#` identifier of the task the command is attributed to, and renders the offending value or literal between backticks.
+Every finding string begins with the square-bracketed `P#-T#` identifier of the task the command is attributed to, and renders the offending value or literal between backticks. The G10 exception: a G10 finding begins with `Line N: ` instead, because a SCRATCH definition sits outside any task window; the prefix matches the structural-error prefix in the same error channel, and the offending logical line is still rendered between backticks.
 
 | Rule | Condition | Shipped severity |
 | --- | --- | --- |
@@ -40,14 +40,15 @@ Every finding string begins with the square-bracketed `P#-T#` identifier of the 
 | **G8** | A `git diff` invocation carrying no non-flag ref operand and neither `--cached` nor `--staged`. It compares the worktree against the index, which is ambient state: the comparison passes vacuously once the change is committed. Exonerated when the attributed task text carries a second `git diff` or a `git status` span. | **Warning** |
 | **G8b** | A `git diff` invocation carrying a non-flag ref operand together with `--name-only` or `--name-status`, whose attributed task text carries neither a `git add` span nor a `git status --porcelain` span. A name-listing diff enumerates tracked changes only, so a path the plan creates is invisible to it. | **Warning** |
 | **G9** | A command carrying a `--cov` token, carrying no token beginning `--cov-report=term` and no token beginning `--cov-fail-under`, whose project `addopts` value also carries no `--cov-report=term`. No coverage table is printed, so a coverage number the acceptance condition demands can never be read. | **Warning** |
+| **G10** | An unfenced logical line of the plan document (a physical line plus its indented continuation lines) that matches the SCRATCH definition predicate, and whose text after the first definition match carries neither an `issue-<issue-num>` nor an `issue-<digits>` namespace. One finding per logical line, reported against its first physical line. | **Blocking** |
 
-G1 through G9 are the complete shipped set. G1 through G6 were added by issue #486 and G7 through G9 by issue #519; the parenthetical in this file's title names the original set only.
+G1 through G10 are the complete shipped set. G1 through G6 were added by issue #486, G7 through G9 by issue #519, and G10 by issue #932; the parenthetical in this file's title names the original set only.
 
 G1 through G4 form a cascade over each `--cov` value: the value is decided once, so a value G1 rejects is never additionally reported by G2 or G3. G4 is evaluated independently of the cascade because the ambiguous form is a defect whatever the value resolves to. G6 is evaluated before G5, because cross-line presence falsifies G5's tree-absence claim.
 
 G8b is a distinct rule from G8 and not a sub-case of it: G8 reports a diff with no ref operand, G8b reports one that has a ref operand but cannot observe an untracked path. A single invocation can satisfy only one of the two, because the presence of a ref operand decides between them.
 
-G1 and G4 are context-free and run on every invocation. G2, G3, G5, and G6 require a repository seam; with no context supplied they do not run, and the Blocking list is byte-identical to the pre-change output for the same text. G7, G8, and G8b are likewise context-free and run on every invocation. G9 requires the repository seam, because it reads the project `addopts` value through it, so with no context supplied G9 does not run. All four of the rules added by issue #519 ship in the Warning channel, so none of them can alter the Blocking list at all.
+G1 and G4 are context-free and run on every invocation. G2, G3, G5, and G6 require a repository seam; with no context supplied they do not run. G7, G8, and G8b are likewise context-free and run on every invocation. G9 requires the repository seam, because it reads the project `addopts` value through it, so with no context supplied G9 does not run. All four of the rules added by issue #519 ship in the Warning channel, so none of them can alter the Blocking list at all. G10 is context-free and document-level: it reads the whole plan text, including the preamble and terms lists the command extractor drops, runs on every invocation, and can add Blocking findings without a context.
 
 ### Attribution window
 
@@ -135,6 +136,43 @@ G9's finding count of 8 satisfies the first conjunct. It fails the second: 4 of 
 The remaining 4 findings are true positives, and each is the exact defect the rule was written for: the acceptance condition demands a numeric coverage percentage, the command supplies no terminal reporter, the project `addopts` supplies only an LCOV reporter, and the number the acceptance demands is therefore never printed.
 
 Counts, and every one of the 4 false positives named by plan path, task identifier, offending span, and the reason its acceptance condition is falsifiable: `docs/features/completed/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`.
+
+### G10 — ships as Blocking by operator-approved scope and the pre-declared rule
+
+G10 enforces the child-unique scratch location rule introduced by issue #900: a plan that uses scratch files points the `SCRATCH` token at `<session scratchpad>/issue-<issue-num>/`, so concurrent child runs in one session do not collide. Unlike G1 through G9, it judges document prose rather than task-attributed commands, because a SCRATCH definition is written in a plan preamble or terms list that the command extractor drops.
+
+The detection contract has two steps, and both patterns use no lookbehind so the Python and JavaScript dialects agree. Step 1 is the definition predicate; step 2 is the namespace that accepts the line when it appears in the text after the first definition match:
+
+```text
+(?:^|[^A-Za-z0-9_<>$/.-])`?SCRATCH`?(?:\*\*)?[ \t]*(?:means\b|:=|=|:|is (?:the|a|an)\b|resolves to\b|abbreviates\b|denotes\b|refers to\b|stands for\b)
+issue-(?:<issue-num>|[0-9]+)
+```
+
+Lines inside fenced code blocks are skipped, and a logical line is reported once however many definition matches it contains.
+
+A continuation line is non-blank, begins with whitespace, and is not a fence line, so a heading or task line written at column 0 ends the logical line, and an indented heading or task line is absorbed into it. Both runtimes split the document into physical lines on the CR LF, LF, and CR terminators only; a form feed, a vertical tab, the information separators, NEL, and the Unicode line and paragraph separators do not end a physical line. Both runtimes share one explicit whitespace class for the blank-line test, the continuation test, and whitespace normalization, declared once per runtime as `PLAN_WHITESPACE_CLASS` in the command extractor module, with an identical pattern string in both: tab, line feed, vertical tab, form feed, carriage return, space, the Unicode space separators, and the Unicode line and paragraph separators. NEL, the information separators, and the byte-order mark are outside that class, so in both runtimes a line that begins with one of them ends the logical line, and the character is kept verbatim in the normalized text. G6 uses the same class for its single-line test, its sliding-window join, and the split of the search literal into words, so a tracked file that contains NEL, an information separator, or the byte-order mark produces the same G6 result in both runtimes; the plan-quotation exoneration, which reads the plan text rather than a tracked file, keeps each runtime's native class. The fence test keeps the command extractor's fence pattern, whose leading whitespace is each runtime's native class, so a fence line that begins with NEL, an information separator, or the byte-order mark can be recognized differently by the two runtimes, for G1 through G9 as well as for G10.
+
+The severity was fixed by the same two-conjunct decision rule used for G5 through G9, written and committed before the measurement was taken: Blocking if and only if the total G10 finding count is greater than zero **and** the recorded false-positive count is zero; otherwise the measurement indicates Warning. The pre-declared false-positive definition is a flagged logical line that is not a SCRATCH definition, or that defines SCRATCH in the canonical issue-namespaced form.
+
+The measurement is recorded in `docs/features/active/2026-10-15-plan-validator-accepts-bare-scratch-paths-932/evidence/qa-gates/g10-corpus-measurement.2026-10-16T01-21.md`. It scanned 493 plan and remediation-plan files under `docs/` at the merge base and produced 17 findings, all 17 true positives and 0 false positives, so both conjuncts hold and the rule yields Blocking.
+
+G10 also ships Blocking by operator-approved scope for issue #932. The measurement alone is a weaker basis than the G7 through G9 precedent, because the research for issue #932 observed the committed plan corpus, including the definition forms the predicate targets, before the measurement was taken. The severity is a single constant in each runtime (`G10_SEVERITY`), and a parity test asserts the two constants agree.
+
+### Known false-negative classes — G10
+
+G10 does not report the following, and each is a stated limitation rather than a deferred promise:
+
+- **Wrong issue number.** A namespaced definition whose issue number differs from the plan's own issue is accepted, because the predicate checks the namespace shape, not its value.
+- **`SCRATCHPAD`-family tokens.** `SCRATCHPAD`, `<SCRATCHPAD>`, and `<SCRATCH>` tokens, and root paths written under them, are excluded by the preceding-character class and the token boundary.
+- **Definition by reference.** A plan that defines SCRATCH by pointing at another plan's definition carries no definition text for the predicate to match.
+- **Fenced definitions.** A definition placed inside a fenced code block is skipped, which is also what lets plans and specifications quote rejected forms as examples.
+- **Any issue token after the definition.** A logical line is accepted when an `issue-<digits>` or `issue-<issue-num>` token appears anywhere in its text after the first definition match, including a cross-reference that is not the scratch location, such as `(see issue-900 for context)`. Step 2 checks the namespace shape anywhere in that text, not inside a path segment.
+
+One false-positive class is possible and recorded: the colon connector matches prose in which the word SCRATCH is directly followed by a colon that introduces something other than a definition, as in the line below. The measured corpus contains no instance.
+
+```text
+Each artifact names the token SCRATCH: it never records a host path.
+```
 
 ## The Write-Mode Register
 
@@ -239,7 +277,7 @@ The following are prohibited in gate messages:
 
 The reason is byte-identity across the two runtimes. Python's `repr` selects its quote character based on the value's contents, switching to double quotes when the value contains a single quote, while the TypeScript `pythonRepr` helper used elsewhere in this repository always single-quotes. A value carrying an apostrophe would therefore render differently in the two runtimes, and the parity requirement would fail on exactly the class of value a maintainer is most likely to encounter in a path or a prose literal. Backtick delimiting has no content-dependent behaviour and needs no helper.
 
-The prohibition is enforced by tests, not only by prose: a parity test asserts the Python gate module contains neither `!r` nor `repr(`, a companion test asserts no `pythonRepr(` call appears in any of the three TypeScript gate modules, and the parity fixture set includes an apostrophe-bearing `--cov` value and an apostrophe-bearing search literal whose expected strings are asserted identically in both runtimes.
+The prohibition is enforced by tests, not only by prose: a parity test asserts the Python gate module contains neither `!r` nor `repr(`, a companion test asserts no `pythonRepr(` call appears in any of the TypeScript gate modules, and the parity fixture set includes an apostrophe-bearing `--cov` value and an apostrophe-bearing search literal whose expected strings are asserted identically in both runtimes.
 
 ## Authoring Guidance for Plan Authors
 
@@ -251,7 +289,8 @@ The prohibition is enforced by tests, not only by prose: a parity test asserts t
 
 ## Enforcement
 
-- `scripts/dev_tools/plan_gate_commands.py` extracts task-attributed command candidates; `scripts/dev_tools/plan_gate_discrimination.py` evaluates G1 through G6 and returns the two severity channels.
+- `scripts/dev_tools/plan_gate_commands.py` extracts task-attributed command candidates; `scripts/dev_tools/plan_gate_discrimination.py` evaluates G1 through G9, calls `scripts/dev_tools/plan_gate_scratch.py` for G10, and returns the two severity channels.
 - `scripts/dev_tools/validate_orchestration_artifacts.py` routes the existing `plan` artifact type through the two-channel entry point, prints each Warning to stderr prefixed with `PLAN GATE WARNING: `, and derives its exit code from the error channel alone. No new flag, option, or artifact type is added.
 - The TypeScript parity port is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for the existing `plan` artifact type. The MCP `validate_orchestration_artifacts` input-schema property-key set is unchanged; Warnings surface on an optional `warnings` field that is absent when there are none.
+- `scripts/dev_tools/plan_gate_scratch.py` evaluates G10, the document-level SCRATCH definition rule, and `evaluate_plan_gates` in `scripts/dev_tools/plan_gate_discrimination.py` calls it on every invocation, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` is called the same way from `evaluatePlanGates`. Through the Python CLI a G10 finding is printed as an error and the process exits 1; through the MCP service call it causes the call to throw with the message included.
 - `.claude/hooks/validate-planner-output.ps1` is not modified by this rule and carries no part of its enforcement.

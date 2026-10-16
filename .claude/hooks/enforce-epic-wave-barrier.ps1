@@ -8,45 +8,59 @@
     and the serialized prompt contains the epic-mode kickoff marker "Epic mode: true".
 
     Resolution and decision procedure:
-      1. Resolve the target child feature_folder from the prompt text by scanning for a
-         docs/features/active/<token> path, mirroring
-         enforce-prd-feature-before-planner.ps1's Find-PrdFeatureFolderFromPrompt
-         technique (longest match wins; a .md-suffixed match uses its parent directory).
-      2. Resolve the worktree whose epic checkpoint records the prompt's
-         integration_branch: value (issue #690), deny an unresolved or ambiguous target,
-         then read artifacts/orchestration/epic-orchestrator-state.json beneath that
-         worktree and locate the features[] record whose feature_folder equals the
-         resolved basename.
-      3. Look up that feature's depends_on list, and for every dependency, locate its own
-         features[] record.
-      4. Deny with reason EPIC_WAVE_BARRIER_BLOCKED unless every dependency's merge_status
+      1. Resolve the worktree whose epic checkpoint records the prompt's
+         integration_branch: value (issue #690) and deny an unresolved or ambiguous target.
+      2. Collect the cited feature-folder candidates with the shared resolver
+         (feature-folder-resolution.ps1, issue #565): every docs/features/active/<token>
+         path is truncated to its feature-folder segment, so a nested research/ or
+         evidence/ citation names its own folder. No candidate denies.
+      3. Read artifacts/orchestration/epic-orchestrator-state.json beneath that worktree
+         and select the target among the candidates with Select-FeatureFolderTarget
+         -DependencyAware: a cited upstream dependency of another cited candidate is
+         pruned, and two or more remaining candidates deny as ambiguous. Neither string
+         length nor prompt position takes part in the selection.
+      4. Locate the target's features[] record and, for every depends_on entry, its own
+         record. An entry resolves through the union index, so an issue number matches
+         issue_num and a folder value matches the normalized feature_folder.
+      5. Deny with reason EPIC_WAVE_BARRIER_BLOCKED unless every dependency's merge_status
          is merged or worktree_removed. A missing/unreadable checkpoint, an unresolved
          target feature_folder, or a missing dependency record also denies (fail-closed).
 
-    This is the per-call deterrent (Layer 1) of the two-layer wave-barrier design; the
-    retrospective backstop (Layer 2) is the wave-barrier ordering invariant inside
-    validate_epic_orchestrator_state_text, enforced separately at epic-orchestrator
-    SubagentStop time.
+    This is the per-call deterrent (Layer 1) of the two-layer wave-barrier design. The
+    retrospective backstop (Layer 2) is the wave-barrier ordering invariant of
+    validate_epic_orchestrator_state_text, run at epic-orchestrator SubagentStop time by
+    validate-orchestrator-output.ps1 through its PowerShell port
+    OrchestratorStateEpicWaveBarrier.psm1, with parity pinned by tests/fixtures/epic_wave_barrier/.
+    The SubagentStop transport and exit-code defect that hook depended on was resolved by epic #904
+    and issue #928: a violation blocks the stop with exit 2 and a stderr reason.
+    The two layers share no code.
 
 .NOTES
-    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690),
-    imported inside a guard: a failed import is recorded and the decision denies naming
-    the module. Filesystem reads go through an injectable wrapper function so tests can
-    mock the boundary without writing temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690) and
+    the pure sibling feature-folder-resolution.ps1 (issue #565), each loaded inside a
+    guard: a failure is recorded and the decision denies naming the dependency. Filesystem
+    reads go through an injectable wrapper function so tests can mock the boundary without
+    writing temporary files.
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
-# Import guard (issue #690): a failed import denies instead of failing open.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 $script:EpicWaveBarrierResolutionImportFailure = $null
+
+# Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
+# rather than failing open; an earlier recorded failure is kept.
 try {
-    Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop
+    . (Join-Path $PSScriptRoot 'feature-folder-resolution.ps1')
 }
 catch {
-    $script:EpicWaveBarrierResolutionImportFailure = 'WorktreeRunResolution.psm1'
+    if (-not $script:EpicWaveBarrierResolutionImportFailure) {
+        $script:EpicWaveBarrierResolutionImportFailure = 'feature-folder-resolution.ps1'
+    }
 }
 
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
@@ -95,56 +109,35 @@ function Resolve-EpicWaveBarrierTarget {
 function Find-EpicWaveBarrierFeatureFolderFromPrompt {
     <#
     .SYNOPSIS
-        Scans a prompt string for docs/features/active/<...> path tokens and returns the
-        longest unique match's basename. Returns $null when no match is found.
+        Returns the distinct feature-folder basenames cited in a prompt, in first-occurrence
+        order. Returns no output when no folder is cited.
     .DESCRIPTION
-        Mirrors enforce-prd-feature-before-planner.ps1's
-        Find-PrdFeatureFolderFromPrompt technique: forward- or backslash-separated path
-        tokens are accepted, the longest match wins, and a .md-suffixed match resolves to
-        its parent directory before the basename is extracted.
+        Delegates to Find-FeatureFolderCandidate in the shared resolver (issue #565): each
+        docs/features/active/<token> path, in either separator style, is truncated to its
+        feature-folder segment, so a nested research/ or evidence/ citation names its own
+        folder. Selection among several candidates is made by Select-FeatureFolderTarget.
     .PARAMETER Prompt
         The delegation prompt text under evaluation.
     .OUTPUTS
-        System.String or $null
+        System.String[]
     #>
     [CmdletBinding()]
-    [OutputType([string])]
+    [OutputType([string[]])]
     param(
         [Parameter(Mandatory)]
         [AllowEmptyString()]
         [string] $Prompt
     )
 
-    if (-not $Prompt) {
-        return $null
-    }
-
-    $pattern = 'docs[\\/]+features[\\/]+active[\\/]+[^\s"''`]+'
-    $matchList = [regex]::Matches($Prompt, $pattern)
-    if ($matchList.Count -eq 0) {
-        return $null
-    }
-
-    $unique = @{}
-    foreach ($m in $matchList) {
-        $normalized = ($m.Value -replace '\\', '/').TrimEnd('/')
-        $unique[$normalized] = $true
-    }
-
-    $candidates = @(@($unique.Keys) | Sort-Object -Property Length -Descending)
-    $best = $candidates[0]
-
-    if ($best -match '\.md$') {
-        $best = $best -replace '/[^/]+\.md$', ''
-    }
-
-    return ($best -split '/')[-1]
+    return [string[]]@(Find-FeatureFolderCandidate -Text $Prompt)
 }
 
 function Find-EpicWaveBarrierFeatureRecord {
     <#
     .SYNOPSIS
-        Locate the features[] record whose feature_folder equals the target basename.
+        Locate the features[] record the target basename identifies, through the shared
+        union index (Find-FeatureFolderRecord). A lifecycle-prefixed feature_folder value
+        such as active/<folder> matches its basename; zero or several matches return $null.
     .PARAMETER Checkpoint
         Parsed epic checkpoint, or $null when absent/unreadable.
     .PARAMETER FeatureFolder
@@ -169,17 +162,7 @@ function Find-EpicWaveBarrierFeatureRecord {
         return $null
     }
 
-    # Scan every recorded feature for a feature_folder that equals the target basename.
-    foreach ($feature in @($Checkpoint.features)) {
-        $featureProps = @($feature.PSObject.Properties.Name)
-        if ($featureProps -notcontains 'feature_folder') {
-            continue
-        }
-        if (([string]$feature.feature_folder) -eq $FeatureFolder) {
-            return $feature
-        }
-    }
-    return $null
+    return Find-FeatureFolderRecord -Records @($Checkpoint.features) -Reference $FeatureFolder
 }
 
 function Test-EpicWaveBarrierDependenciesMerged {
@@ -219,9 +202,11 @@ function Test-EpicWaveBarrierDependenciesMerged {
     }
 
     # Every dependency edge must be durably confirmed merged or worktree_removed before
-    # this wave's feature is allowed to start.
-    foreach ($dependencyFolder in $dependsOn) {
-        $dependencyRecord = Find-EpicWaveBarrierFeatureRecord -Checkpoint $Checkpoint -FeatureFolder ([string]$dependencyFolder)
+    # this wave's feature is allowed to start. Each raw entry resolves through the union
+    # index, so an issue-number edge matches issue_num (issue #565).
+    $features = if (@($Checkpoint.PSObject.Properties.Name) -contains 'features') { @($Checkpoint.features) } else { @() }
+    foreach ($dependency in $dependsOn) {
+        $dependencyRecord = Find-FeatureFolderRecord -Records $features -Reference $dependency
         if ($null -eq $dependencyRecord) {
             return $false
         }
@@ -280,11 +265,13 @@ function Invoke-EpicWaveBarrierDecision {
     param(
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WAVE_BARRIER_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    # A failed worktree-resolution import denies before any other logic (issue #690).
+    # A failed dependency import denies before any other logic (issue #565).
     if ($script:EpicWaveBarrierResolutionImportFailure) {
         return Get-EpicWaveBarrierBlockDecision -Reason (
-            "EPIC_WAVE_BARRIER_BLOCKED: the worktree-resolution module '$($script:EpicWaveBarrierResolutionImportFailure)' " +
+            "EPIC_WAVE_BARRIER_BLOCKED: the dependency '$($script:EpicWaveBarrierResolutionImportFailure)' " +
             'failed to import, so the epic checkpoint that governs this delegation cannot be located; the gate fails closed.')
     }
 
@@ -312,8 +299,8 @@ function Invoke-EpicWaveBarrierDecision {
         return Get-EpicWaveBarrierBlockDecision -Reason "EPIC_WAVE_BARRIER_BLOCKED: $($target.ReasonCode): $($target.Detail)"
     }
 
-    $featureFolder = Find-EpicWaveBarrierFeatureFolderFromPrompt -Prompt $prompt
-    if (-not $featureFolder) {
+    $candidates = @(Find-EpicWaveBarrierFeatureFolderFromPrompt -Prompt $prompt)
+    if ($candidates.Count -eq 0) {
         return Get-EpicWaveBarrierBlockDecision -Reason 'EPIC_WAVE_BARRIER_BLOCKED: an epic-mode orchestrator delegation must reference the target feature folder in the prompt so its dependency edges can be verified.'
     }
 
@@ -326,6 +313,15 @@ function Invoke-EpicWaveBarrierDecision {
             $checkpoint = $null
         }
     }
+
+    # The target is selected among the cited candidates (issue #565): a cited upstream
+    # dependency of another candidate is pruned, and an unresolved tie denies.
+    $records = if ($null -ne $checkpoint -and @($checkpoint.PSObject.Properties.Name) -contains 'features') { @($checkpoint.features) } else { @() }
+    $selection = Select-FeatureFolderTarget -Records $records -Candidate $candidates -DependencyAware
+    if ($selection.Status -eq 'Ambiguous') {
+        return Get-EpicWaveBarrierBlockDecision -Reason "EPIC_WAVE_BARRIER_BLOCKED: $($selection.Detail)."
+    }
+    $featureFolder = $selection.Basename
 
     $featureRecord = Find-EpicWaveBarrierFeatureRecord -Checkpoint $checkpoint -FeatureFolder $featureFolder
     if (Test-EpicWaveBarrierDependenciesMerged -Checkpoint $checkpoint -FeatureRecord $featureRecord) {
@@ -377,5 +373,8 @@ function Invoke-EpicWaveBarrierEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_WAVE_BARRIER_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WAVE_BARRIER_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 exit (Invoke-EpicWaveBarrierEntryPoint)

@@ -340,7 +340,7 @@ function Resolve-WorktreeParallelTarget {
 }
 
 # Private: compare two worktree paths, insensitive to separator style and trailing
-# slashes, and case-insensitive only for drive-letter paths.
+# slashes, and case-insensitive for drive-letter and UNC (//) paths.
 function Test-WorktreeRunPathEqual {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -352,8 +352,8 @@ function Test-WorktreeRunPathEqual {
     if ([string]::IsNullOrWhiteSpace($Left) -or [string]::IsNullOrWhiteSpace($Right)) { return $false }
     $a = ($Left.Trim() -replace '\\', '/').TrimEnd('/')
     $b = ($Right.Trim() -replace '\\', '/').TrimEnd('/')
-    $isDrivePath = ($a -match '^[A-Za-z]:') -or ($b -match '^[A-Za-z]:')
-    $comparison = if ($isDrivePath) { [System.StringComparison]::OrdinalIgnoreCase } else { [System.StringComparison]::Ordinal }
+    $isCaseInsensitivePath = ($a -match '^([A-Za-z]:|//)') -or ($b -match '^([A-Za-z]:|//)')
+    $comparison = if ($isCaseInsensitivePath) { [System.StringComparison]::OrdinalIgnoreCase } else { [System.StringComparison]::Ordinal }
     return [string]::Equals($a, $b, $comparison)
 }
 

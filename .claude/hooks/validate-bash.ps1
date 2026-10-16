@@ -37,13 +37,14 @@ param(
     [Parameter(Position = 0, Mandatory = $false)]
     [string]$CommandInput
 )
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545). Both detectors below run against the segment
 # list rather than against the unsegmented command string, so a dangerous phrase quoted
 # inside a message body is no longer a match and a relocating spelling no longer escapes.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 function Get-BlockedBashPattern {
     [CmdletBinding()]
@@ -417,6 +418,8 @@ function Invoke-ValidateBashDecision {
         [AllowNull()]
         [string] $PositionalInput
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'HOOK_DEPENDENCY_LOAD_FAILED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $commandToCheck = Get-BashCommandToCheck -ToolInputRaw $ToolInputRaw -PositionalInput $PositionalInput
 
@@ -431,6 +434,9 @@ function Invoke-ValidateBashDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('HOOK_DEPENDENCY_LOAD_FAILED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'HOOK_DEPENDENCY_LOAD_FAILED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 $toolInputRaw = Read-ClaudeHookRawPayload
 

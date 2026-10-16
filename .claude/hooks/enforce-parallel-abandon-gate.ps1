@@ -32,9 +32,10 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # The two tokens this gate matches on. These are the ONLY places either token literal
 # appears in this file; the seam test extracts the consumer-side values from exactly
 # these two named assignments.
@@ -48,8 +49,8 @@ $script:AbandonBlockedReasonCode = 'PARALLEL_ABANDON_BLOCKED'
 # rather than above them, deliberately: the assignments keep their existing line numbers,
 # so the diff shows no change at either line. Both are still declared before any function
 # body runs, because the file executes top to bottom before any of its functions is called.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 function Get-ParallelAbandonGateToolInput {
     <#
@@ -314,6 +315,8 @@ function Invoke-ParallelAbandonGateDecision {
         [AllowEmptyString()]
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'enforce-parallel-abandon-gate:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     # An absent payload carries no command to gate, so there is nothing in scope. This is
     # allow rather than deny because the gate constrains one specific destructive command
@@ -345,6 +348,9 @@ function Invoke-ParallelAbandonGateDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('enforce-parallel-abandon-gate: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'enforce-parallel-abandon-gate:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw (Get-ParallelAbandonGateToolInput)
 

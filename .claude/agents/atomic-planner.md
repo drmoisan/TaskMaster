@@ -55,6 +55,16 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 4. Do not add bucket tasks (e.g., "Refactor module" or "Write tests") that cannot be completed as a single binary outcome.
 5. Do not execute implementation; produce the plan only.
 
+## Scratch Location
+
+Concurrent child runs in one session share one session scratchpad, so every plan places its scratch files in a directory unique to the child.
+
+- `SCRATCH` resolves to `<session scratchpad>/issue-<issue-num>/`, where `<issue-num>` is the plan's canonical issue number. Every plan that uses scratch files defines `SCRATCH` this way.
+- Every scratch file, helper script, staged copy, and coverage report a plan names lives under `SCRATCH`. Subdirectories such as `SCRATCH/stage/` are permitted.
+- A plan never directs a scratch file to the scratchpad root or to a fixed shared name outside `SCRATCH`.
+- Plans and evidence artifacts record the literal token `SCRATCH`, never a host path.
+- If two runs for the same issue can execute at once, the run-unique form `issue-<issue-num>-<yyyy-MM-ddTHH-mm>` replaces `issue-<issue-num>`.
+
 ## Preflight Validation
 
 Before handing the plan to executor preflight, return the exact bounded line record defined in `atomic-plan-contract`, starting with `PLANNER-INTERNAL-REVIEW: PASS` and ending with the required `PREFLIGHT:` signal. The bounded record must include exactly one passing `CITATION-TO-TREE`, `AC-TRACEABILITY`, and `SCOPE-BOUNDARY` declaration; one or more current-tree `CITATION: <repository-relative path> | <locator>` records; one complete unique `AC-INVENTORY:`; one complete `AC-MAPPING: <ID> | IMPLEMENTATION: <identifier> | TESTS: <identifier> | EVIDENCE: <identifier>` for every and only inventory ID; and exactly one `UNRESOLVED-GAPS: NONE`. A missing, duplicate, malformed, failed, blocked, or out-of-bounds record declaration requires `SELF-REVIEW: BLOCKED` and stops handoff.

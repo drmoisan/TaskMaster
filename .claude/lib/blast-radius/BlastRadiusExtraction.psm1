@@ -68,30 +68,22 @@ $script:PlanTaskPattern = [regex]::new(
 # on its own line, from producing spurious spans.
 $script:InlineCodeSpanPattern = [regex]::new('`([^`]+)`')
 
-# Top-level directories of this repository. A token starting with one of these is
-# accepted without needing a recognized extension, which admits ** globs naming a
-# subtree. artifacts/ is deliberately absent (issue #489): the process-artifact
-# tree is read by mandate rather than written by a work item, so admitting
-# artifacts/** as a subtree claim made unrelated items contend.
+# Top-level directories of this repository. A wildcard token starting with one of
+# these is accepted without its final component naming a file (issue #797), which
+# admits ** globs naming a subtree. artifacts/ is deliberately absent (issue
+# #489): the process-artifact tree is read by mandate rather than written by a
+# work item, so admitting artifacts/** as a subtree claim made unrelated items
+# contend.
 $script:KnownTopLevelSegment = @(
     'scripts/', 'tests/', 'docs/', 'config/', 'schemas/', 'packages/',
     'extensions/', '.claude/', '.codex/', '.github/', '.agents/'
 )
 
 # A file citation may carry a trailing line reference such as :90. The suffix is
-# stripped before the extension test so a line-anchored citation keeps the
-# acceptance its unanchored form has; the token itself is recorded verbatim.
+# stripped before the file-shape test (issue #797) so a line-anchored citation
+# keeps the acceptance its unanchored form has; the token itself is recorded
+# verbatim.
 $script:LineSuffixPattern = [regex]::new(':\d+$')
-
-# Fallback acceptance rule: a token shaped <segment>/.../<name>.<ext> counts as a
-# repository path when its final component carries one of these extensions.
-$script:RecognizedPathExtension = [System.Collections.Generic.HashSet[string]]::new(
-    [string[]] @(
-        'cfg', 'cs', 'csproj', 'ini', 'js', 'json', 'jsx', 'lock', 'md', 'ps1',
-        'psd1', 'psm1', 'py', 'sh', 'sln', 'toml', 'ts', 'tsx', 'txt', 'xml',
-        'yaml', 'yml'
-    ),
-    [StringComparer]::Ordinal)
 
 # Classification vocabulary for accepted path tokens. Concrete entries take part
 # in exact-match checks; glob entries cannot and are matched by pattern.
@@ -249,8 +241,11 @@ function Get-PathTokenKind {
         bare word such as a function name is a contract identifier, not a path.
         It must also be repository-relative: a leading separator marks an absolute
         path and a colon in the leading segment marks a URL scheme or a Windows
-        drive. Acceptance then requires one of the two documented shape rules, a
-        known top-level segment or a recognized final extension.
+        drive. A wildcard-free token is then accepted only when its final
+        component, after any :<line> suffix is stripped, names a file according
+        to Test-FileShapedComponent (a letter-led extension or a known file
+        name, issue #797); a wildcard token needs a known top-level segment or
+        such a final component.
 
         A token carrying any configured placeholder or interpolation marker is
         rejected wherever the marker sits, because it documents a shape rather
@@ -305,7 +300,7 @@ function Get-PathTokenKind {
     # disagree, and putting the cheaper marker scan first would only add work to
     # the common accepted case. It runs BEFORE the separator guard because a
     # marker-bearing token frequently does carry a separator and would otherwise
-    # sail past that guard and reach the extension rule, which accepts it: the
+    # sail past that guard and reach the file-shape rule, which accepts it: the
     # dominant corpus shape is an angle-bracketed leading segment followed by a
     # real .md tail, and that is exactly the token this guard exists to reject.
     if (Test-PlaceholderMarker -Token $Token) {
@@ -320,26 +315,20 @@ function Get-PathTokenKind {
         return $null
     }
 
-    # Read the final component's extension for the fallback acceptance rule; a
-    # component with no dot (a directory name or **) has no extension. A trailing
-    # line reference is stripped first so file.md:90 reads as md rather than as
-    # the unrecognized extension md:90.
+    # Decide whether the final component names a file (issue #797): a letter-led
+    # extension or a known file name does; a directory name, a dot-directory, **,
+    # a digit-led tail, and a trailing dot do not. A trailing line reference is
+    # stripped first so file.md:90 reads as file.md rather than as md:90.
     $finalComponent = $script:LineSuffixPattern.Replace(
         $Token.Substring($Token.LastIndexOf('/') + 1), '')
-    $extension = ''
-    $dotIndex = $finalComponent.LastIndexOf('.')
-    if ($dotIndex -ge 0) {
-        $extension = $finalComponent.Substring($dotIndex + 1).ToLowerInvariant()
-    }
-
-    $hasExtension = $script:RecognizedPathExtension.Contains($extension)
+    $namesFile = Test-FileShapedComponent -Component $finalComponent
 
     # A wildcard-free token must name a file, not a directory (issue #489). A
     # directory-shaped token such as scripts/dev_tools is a location reference,
     # not a write claim, and admitting it made every item touching anything under
     # that directory contend at the path level.
     if ($Token.IndexOf('*') -lt 0) {
-        if ($hasExtension) {
+        if ($namesFile) {
             return $script:PathKindConcrete
         }
         return $null
@@ -356,7 +345,7 @@ function Get-PathTokenKind {
     # A wildcard-bearing token must still satisfy one of the two documented shape
     # rules; failing both means the token is prose or a non-path expression that
     # merely contains a separator, so it is dropped.
-    if (-not $hasKnownSegment -and -not $hasExtension) {
+    if (-not $hasKnownSegment -and -not $namesFile) {
         return $null
     }
 
@@ -469,6 +458,7 @@ Export-ModuleMember -Function `
     Get-InlineCodeToken, `
     Test-PlaceholderMarker, `
     Test-MultipleFeatureFolderSpan, `
+    Test-FileShapedComponent, `
     Get-PathTokenKind, `
     Get-PathFromLine, `
     Get-PlanPaths

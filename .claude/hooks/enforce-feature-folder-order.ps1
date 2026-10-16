@@ -1,32 +1,59 @@
 <#
 .SYNOPSIS
-    Pre-tool-use hook that blocks writes to a feature folder's plan.md when issue.md,
-    spec.md, or user-story.md are not yet present in that same folder.
+    Pre-tool-use hook that blocks writes to a feature folder's plan file until the
+    prerequisite documents its persisted work mode requires exist in that same folder.
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on Write or Edit operations. Acquires
     the hook payload through the shared reader and reads file_path from the envelope's
-    nested tool_input. When the
-    target file_path matches a feature-folder plan.md path under
-    docs/features/(active|archive)/<folder>/plan.md, the script verifies that
-    each of issue.md, spec.md, and user-story.md exists in the same folder.
-
-    If any of the three sibling files is missing, the script emits a PreToolUse
-    JSON response with hookSpecificOutput.permissionDecision='deny' and exits 0 so
-    Claude Code surfaces the reason. All other paths pass through with
+    nested tool_input. The gate applies to a feature-folder plan file under
+    docs/features/(active|archive)/<folder>/: a literal plan.md or a timestamped
+    plan.<yyyy-MM-ddTHH-mm>.md (issue #568). Other paths pass through with
     permissionDecision='allow'.
 
-    Filesystem reads go through Get-FeatureFolderFileExistence so tests can
-    inject a fake without touching disk.
+    For a plan file, the script reads the folder's issue.md through
+    Get-FeatureFolderIssueContent, resolves the persisted '- Work Mode:' marker with the
+    shared Resolve-FeatureFolderWorkMode, and takes the required set from the shared
+    Get-FeatureFolderPlanPrerequisite:
+      - minor-audit                  -> issue.md
+      - full-bug                     -> issue.md, spec.md
+      - full-feature and legacy full -> issue.md, spec.md, user-story.md
+    A missing, empty, malformed, or unrecognized marker, or an unreadable issue.md,
+    fails closed to the full-feature set. Because issue.md is in every set, an absent
+    issue.md always denies.
+
+    If any required file is missing, the script emits a PreToolUse JSON response with
+    hookSpecificOutput.permissionDecision='deny' whose reason names the plan file, the
+    resolved work mode, and the missing files, and exits 0 so Claude Code surfaces it.
+
+    Filesystem reads go through Get-FeatureFolderFileExistence and
+    Get-FeatureFolderIssueContent so tests can inject fakes without touching disk.
 
 .NOTES
-    Compatible with PowerShell 7+. Read-only validation gate; no state mutation.
+    Compatible with PowerShell 7+. Read-only validation gate; no state mutation. The pure
+    sibling feature-folder-resolution.ps1 (issue #565) is dot-sourced inside a guard: when
+    it cannot be loaded, every plan-file write denies and every other path stays allowed.
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+
+# Shared work-mode parser and prerequisite map (issue #565). Guarded so a failed
+# dot-source denies plan writes rather than failing open.
+$script:FeatureFolderOrderResolutionImportFailure = $null
+try {
+    . (Join-Path $PSScriptRoot 'feature-folder-resolution.ps1')
+}
+catch {
+    $script:FeatureFolderOrderResolutionImportFailure = 'feature-folder-resolution.ps1'
+}
+
+# The plan leaf a gated path ends in: plan.md or plan.<yyyy-MM-ddTHH-mm>.md (issue #568).
+$script:FeaturePlanLeafPattern = '/plan(\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2})?\.md$'
+
 function Get-FeatureFolderFileExistence {
     <#
     .SYNOPSIS
@@ -44,25 +71,57 @@ function Get-FeatureFolderFileExistence {
     return [bool](Test-Path -LiteralPath $Path -PathType Leaf)
 }
 
+function Get-FeatureFolderIssueContent {
+    <#
+    .SYNOPSIS
+        Reads a feature folder's issue.md, or returns $null when the file is absent or
+        cannot be read. Tests mock this seam; a $null result fails closed to the
+        full-feature prerequisite set.
+    .PARAMETER FeatureFolder
+        Normalized (forward-slash) feature-folder path.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $FeatureFolder
+    )
+
+    $issuePath = "$FeatureFolder/issue.md"
+    if (-not (Test-Path -LiteralPath $issuePath -PathType Leaf)) {
+        return $null
+    }
+
+    try {
+        return Get-Content -LiteralPath $issuePath -Raw -ErrorAction Stop
+    }
+    catch {
+        return $null
+    }
+}
+
 function Get-FeatureFolderMissingFile {
     <#
     .SYNOPSIS
-        Returns the list of required sibling files missing alongside plan.md.
+        Returns the list of required sibling files missing alongside the plan file.
     .PARAMETER PlanFilePath
-        Normalized (forward-slash) path to the plan.md target.
+        Normalized (forward-slash) path to the plan.md or plan.<timestamp>.md target.
+    .PARAMETER RequiredFile
+        The prerequisite file names to probe. Defaults to the full-feature set.
     #>
     [CmdletBinding()]
     [OutputType([string[]])]
     param(
         [Parameter(Mandatory)]
-        [string] $PlanFilePath
+        [string] $PlanFilePath,
+
+        [string[]] $RequiredFile = @('issue.md', 'spec.md', 'user-story.md')
     )
 
-    $folder = $PlanFilePath -replace '/plan\.md$', ''
-    $required = @('issue.md', 'spec.md', 'user-story.md')
+    $folder = $PlanFilePath -replace $script:FeaturePlanLeafPattern, ''
     [System.Collections.Generic.List[string]] $missing = [System.Collections.Generic.List[string]]::new()
 
-    foreach ($name in $required) {
+    foreach ($name in $RequiredFile) {
         $siblingPath = "$folder/$name"
         if (-not (Get-FeatureFolderFileExistence -Path $siblingPath)) {
             $missing.Add($name)
@@ -75,7 +134,9 @@ function Get-FeatureFolderMissingFile {
 function Test-IsFeaturePlanPath {
     <#
     .SYNOPSIS
-        Returns $true if the normalized path targets a feature-folder plan.md.
+        Returns $true if the normalized path targets a feature-folder plan.md or a
+        timestamped plan.<yyyy-MM-ddTHH-mm>.md directly inside an active or archive
+        feature folder.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
@@ -84,7 +145,30 @@ function Test-IsFeaturePlanPath {
         [string] $NormalizedPath
     )
 
-    return $NormalizedPath -match '(^|/)docs/features/(active|archive)/[^/]+/plan\.md$'
+    return $NormalizedPath -match '(^|/)docs/features/(active|archive)/[^/]+/plan(\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2})?\.md$'
+}
+
+function Get-FeatureFolderOrderDenyDecision {
+    <#
+    .SYNOPSIS
+        Builds the PreToolUse deny decision carrying the given reason.
+    .PARAMETER Reason
+        The deny reason, beginning with FEATURE_FOLDER_ORDER_BLOCKED:.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Reason
+    )
+
+    return [ordered]@{
+        hookSpecificOutput = [ordered]@{
+            hookEventName            = 'PreToolUse'
+            permissionDecision       = 'deny'
+            permissionDecisionReason = $Reason
+        }
+    }
 }
 
 function Invoke-FeatureFolderOrderDecision {
@@ -103,18 +187,15 @@ function Invoke-FeatureFolderOrderDecision {
         [AllowEmptyString()]
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'FEATURE_FOLDER_ORDER_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
-        return [ordered]@{
-            hookSpecificOutput = [ordered]@{
-                hookEventName            = 'PreToolUse'
-                permissionDecision       = 'deny'
-                permissionDecisionReason = 'FEATURE_FOLDER_ORDER_BLOCKED: payload anomaly - ' +
-                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
-                '. The gate fails closed on an envelope it cannot read.'
-            }
-        }
+        return Get-FeatureFolderOrderDenyDecision -Reason (
+            'FEATURE_FOLDER_ORDER_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
     $filePath = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'file_path'
@@ -128,19 +209,25 @@ function Invoke-FeatureFolderOrderDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $missing = Get-FeatureFolderMissingFile -PlanFilePath $normalized
+    $planLeaf = ($normalized -split '/')[-1]
+    if ($script:FeatureFolderOrderResolutionImportFailure) {
+        return Get-FeatureFolderOrderDenyDecision -Reason (
+            "FEATURE_FOLDER_ORDER_BLOCKED: the shared resolver '$($script:FeatureFolderOrderResolutionImportFailure)' " +
+            "failed to load, so the prerequisite documents for $planLeaf cannot be determined; the gate fails closed.")
+    }
+
+    $folder = $normalized -replace $script:FeaturePlanLeafPattern, ''
+    $workMode = Resolve-FeatureFolderWorkMode -IssueContent (Get-FeatureFolderIssueContent -FeatureFolder $folder)
+    $required = @(Get-FeatureFolderPlanPrerequisite -WorkMode $workMode)
+    $missing = @(Get-FeatureFolderMissingFile -PlanFilePath $normalized -RequiredFile $required)
     if ($missing.Count -eq 0) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $list = ($missing -join ', ')
-    return [ordered]@{
-        hookSpecificOutput = [ordered]@{
-            hookEventName            = 'PreToolUse'
-            permissionDecision       = 'deny'
-            permissionDecisionReason = "FEATURE_FOLDER_ORDER_BLOCKED: cannot write plan.md before producing prerequisite documents. Missing in feature folder: $list. Invoke the prd-feature subagent to generate the missing file(s) before authoring plan.md."
-        }
-    }
+    return Get-FeatureFolderOrderDenyDecision -Reason (
+        "FEATURE_FOLDER_ORDER_BLOCKED: cannot write $planLeaf before producing prerequisite documents for work mode '$workMode'. " +
+        "Missing in feature folder: $list. Invoke the prd-feature subagent to generate the missing file(s) before authoring the plan.")
 }
 
 function Invoke-FeatureFolderOrderEntryPoint {
@@ -185,6 +272,9 @@ function Invoke-FeatureFolderOrderEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('FEATURE_FOLDER_ORDER_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'FEATURE_FOLDER_ORDER_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit

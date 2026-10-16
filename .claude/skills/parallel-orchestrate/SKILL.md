@@ -256,11 +256,39 @@ carries exactly these five elements.
    execution from that plan rather than re-running promotion, research, or planning. The item's
    prepared feature folder and approved atomic plan are already committed and preflight-clear on the
    item's own pushed feature branch.
+   The execution child starts a new checkpoint in its own worktree, and the preparation checkpoint
+   does not carry over, so the prompt also instructs the child to verify the item's GitHub issue
+   read-only (gh issue view), not to call `potential_to_issue` or the promotion-entry tool, and to
+   record its own top-level `issue_adoption` object per `.claude/rules/orchestrator-state.md`,
+   with origin `filed_before_orchestration` unless the issue was transferred, waiving
+   `potential_to_issue` and the promotion-entry tool for the checkpoint's promotion-type. When a
+   lifecycle record for the item exists under `docs/features/potential/promoted/`, the child cites
+   it as `potential_record`.
 5. The model-budget marker line `model_budget.fable_policy: <disabled|available|preferred>.`
 
 Spawn parameters, passed on the `Agent` call and never written into the prompt text:
 `isolation: "worktree"`, `run_in_background: true`, branch base `origin/main`, and `model` equal to
 that item's model routing receipt's resolved model.
+
+**Band and receipt source.** The parent reads each item's `complexity_band` and
+`model_routing_receipt` from the planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
+When the planner checkpoint is unavailable, the committed kickoff artifact's `## Item Summary`
+`complexity` column is the fallback band source. The parent passes `model` equal to the receipt's
+`model` when the run's `fable_policy` equals the receipt's `fable_policy`; otherwise it re-resolves
+with `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
+passes that result.
+An item admitted through `/parallel-add` appears neither in the planner checkpoint
+`artifacts/orchestration/parallel-planner-state.json` `items[]` nor in the kickoff
+`## Item Summary`; for such an item the band source is that item's `complexity_band` on the
+orchestrator checkpoint `artifacts/orchestration/parallel-orchestrator-state.json` `items[]`. An
+admitted item carries no `model_routing_receipt`, so the parent resolves `model` at spawn time as
+`model_policy.complexity_to_model[<band>]` from `config/orchestration-routing.json` under the
+run's `fable_policy`, with `fable` clamped to `opus` when `fable_policy` is `disabled`. That result
+equals `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>`
+because `preferred_overlay.agents` does not include `orchestrator`. The parent passes that explicit
+`model` on the spawn rather than relying on the frontmatter default, and it stops rather than
+spawning without `model` when the admitted item has no `complexity_band` on the orchestrator
+checkpoint.
 
 Negative obligations on the prompt:
 
@@ -301,6 +329,27 @@ omitted `model` falls back to the delegate's frontmatter default, `opus`, which 
 `fable` resolution — and MUST NOT hard-code `model=opus` in a way that overrides the resolved
 routing model.
 
+The band and receipt for each item come from the planner checkpoint
+`artifacts/orchestration/parallel-planner-state.json`: the parent reads the item's `complexity_band`
+and `model_routing_receipt` there. When the planner checkpoint is unavailable, the committed kickoff
+artifact's `## Item Summary` `complexity` column is the fallback band source. The parent passes
+`model` equal to the receipt's `model` when the run's `fable_policy` equals the receipt's
+`fable_policy`; otherwise it re-resolves with
+`Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>` and
+passes that result.
+An item admitted through `/parallel-add` appears neither in the planner checkpoint
+`artifacts/orchestration/parallel-planner-state.json` `items[]` nor in the kickoff
+`## Item Summary`; for such an item the band source is that item's `complexity_band` on the
+orchestrator checkpoint `artifacts/orchestration/parallel-orchestrator-state.json` `items[]`. An
+admitted item carries no `model_routing_receipt`, so the parent resolves `model` at spawn time as
+`model_policy.complexity_to_model[<band>]` from `config/orchestration-routing.json` under the
+run's `fable_policy`, with `fable` clamped to `opus` when `fable_policy` is `disabled`. That result
+equals `Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <run fable_policy>`
+because `preferred_overlay.agents` does not include `orchestrator`. The parent passes that explicit
+`model` on the spawn rather than relying on the frontmatter default, and it stops rather than
+spawning without `model` when the admitted item has no `complexity_band` on the orchestrator
+checkpoint.
+
 `route` is never an input to model selection. `route` remains file-count driven and governs only
 agents, skills, and MCP tools. A skill whose frontmatter `context` field holds the value `fork`
 inherits the parent model and ignores a model override, so model selection applies to agent
@@ -324,11 +373,16 @@ Procedure, per item:
 1. The item's child orchestration runs unmodified, with `epic_mode` `false` or absent, and finishes
    at its own DONE. The child's PR Creation Gate condition 6 already requires
    `ci_gate.conclusion == "success"`, so at child DONE the item's pull request is open against
-   `main` and its checks are green. The child is never instructed to merge its own pull request.
+   `main` and every check on its head SHA passed or was skipped. The child is never instructed to
+   merge its own pull request.
 2. On child completion, durably confirm pull-request state and check conclusion with
-   `gh pr view --json state,mergedAt,headRefOid`, and with `gh pr checks` when the check conclusion
-   must be re-read — never from an in-memory completion notification — then record
-   `merge_status: ci_green`.
+   `gh pr view --json state,mergedAt,headRefOid` and an unconditional re-read of every check on
+   that head, never from an in-memory completion notification or from the child's DONE report
+   alone. Run `gh pr checks <PR> --json bucket,name,state,link,workflow` and parse its output with
+   `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <checks-json> -HeadSha <headRefOid>`.
+   Record `merge_status: ci_green` only when that parser conclusion is `success`; on `failure` or
+   `pending`, or when `gh pr checks` fails with a "no checks reported" error, do not record
+   `merge_status: ci_green` and do not run `gh pr merge`.
    Before recording `merge_status: ci_green`, confirm that the `headRefOid` value equals the
    `ci_gate.head_sha` the child reported at DONE and that the child reported no pending
    CI-dependent acceptance criteria. When either check fails, do not record
@@ -613,9 +667,10 @@ Every mutation re-derives durable state (`git worktree list --porcelain`, `git b
 `gh pr view`) before it is applied, because the checkpoint is a cache of durable state and not the
 source of truth. A rejected mutation appends no entry and changes no state.
 
-The decision logic for all three commands is the pure engine
-`scripts/dev_tools/parallel_mutation_protocol.py`. It decides; it never applies. Item keys are
-integers (`items[].issue_num`) everywhere on this surface.
+The decision logic for all three commands runs through the bundled bash entry points, which need no
+Python interpreter: `bash .claude/lib/bash/mutate-parallel-run.sh` for add, close, and requeue, and
+`bash .claude/lib/bash/remove-parallel-item.sh` for remove. They decide; they never apply. Item
+keys are integers (`items[].issue_num`) everywhere on this surface.
 
 ### Pinning invariant
 
@@ -719,8 +774,9 @@ lost and is not recorded in the mutation entry: it is recorded as an item-state 
 with the checkpoint's lifecycle timestamps, the same mechanism that records
 `proposed` -> `admitted` -> `prepared` during preparation. `new_state` is null for `close` only, and
 `item_key` is null for `close` only. `disposition` is non-null only on a `remove` entry whose
-`prior_state` is `in_flight`. Every `at` timestamp comes from the engine's injected clock seam; the
-engine never reads the wall clock. No field and no enum member is added to `mutations[]`; the nine
+`prior_state` is `in_flight`. Every `at` timestamp is supplied by the caller through `--at`; an
+entry point reads the clock only when `--at` is omitted, and then stamps the current UTC minute. No
+field and no enum member is added to `mutations[]`; the nine
 parallel enums of `.claude/rules/parallel-orchestration.md` are consumed, never extended.
 
 Retrospective validation of the log is the helper
@@ -768,18 +824,25 @@ command to evade the match: that defeats the only mechanism protecting a destruc
 ### Drift-requeue append contract
 
 Radius drift detection consumes this protocol rather than reimplementing it. When drift halts the
-later-started item of a newly conflicting pair, the requeue is recorded through the mutation
-engine's `build_requeue_entry` constructor and the recolor through `recolor_unstarted`:
+later-started item of a newly conflicting pair, the requeue is recorded through the `requeue-entry`
+subcommand of the bundled entry point and the recolor through its `recolor` subcommand:
+
+```bash
+bash .claude/lib/bash/mutate-parallel-run.sh requeue-entry --item <key> --generation <g> --at <timestamp>
+```
 
 - Item state becomes `blocked` and per-item `merge_status` becomes `blocked_drift`.
 - Exactly one `mutations[]` entry is appended with `op: requeue`, `prior_state: in_flight`,
   `new_state: blocked`, `disposition: null`, and `recolor_generation` equal to `g` + 1 — the requeue
   is a recompute.
-- The recolor runs over the unstarted subgraph only, so no other in-flight item moves. Its call
-  shape is the six-argument form
-  `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort, highest_pinned_cohort=highest_pinned_cohort)`,
-  where `current_cohort` and `highest_pinned_cohort` are both required and keyword-only.
-  `highest_pinned_cohort` is derived from re-verified durable state: the highest
+- The recolor runs over the unstarted subgraph only, so no other in-flight item moves. Run it as:
+
+  ```bash
+  bash .claude/lib/bash/mutate-parallel-run.sh recolor --unstarted "<k> ..." --edges "<a>:<b> ..." --pinned "<k> ..." --generation <g> --current-cohort <c> --highest-pinned-cohort <h>
+  ```
+
+  where `--current-cohort` and `--highest-pinned-cohort` are both required.
+  `--highest-pinned-cohort` is derived from re-verified durable state: the highest
   current-generation cohort index occupied by any in-flight item.
 
 The drift event itself is recorded in `drift_events[]`, which this protocol does not write. See

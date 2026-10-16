@@ -114,7 +114,7 @@ Update `artifacts/orchestration/parallel-planner-state.json` after every complet
 `tolerated_overlaps` list returned by Get-BlastRadiusConflictEdge (tolerated-not-validated).
 
 Each `items[]` entry carries `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`,
-`preparation_status`, `research_path`, `plan_path`, `preflight_status`, `branch_name`,
+`complexity_assessment`, `preparation_status`, `research_path`, `plan_path`, `preflight_status`, `branch_name`,
 `worktree_path`, `blast_radius`, `radius_validation`, `model_routing_receipt`, and
 `topology_receipt`. No `epic_worthiness` analogue, no `depends_on` field, and no `wave` field is
 written at any level.
@@ -126,16 +126,19 @@ Do not report completion until:
 1. Every non-withdrawn item is `state: prepared` with `preflight_status` exactly
    `PREFLIGHT: ALL CLEAR`, a `declared` blast radius that passed V1 and V2, and a unique pushed
    `branch_name`.
-2. `cohorts[]` is recorded at `generation: 0` covering exactly the prepared item keys, and the
+2. Every item carries a `complexity_band`, a `complexity_assessment`, and a `model_routing_receipt`
+   with `agent: "orchestrator"`, recorded by the `parallel-plan` skill's `## Complexity Assessment`
+   procedure, that satisfy ready-gate invariant P10 (P10).
+3. `cohorts[]` is recorded at `generation: 0` covering exactly the prepared item keys, and the
    recomputation-parity check defined in the `parallel-plan` skill passed.
-3. The manifest at `docs/features/parallel/<slug>/parallel.md` is committed to
+4. The manifest at `docs/features/parallel/<slug>/parallel.md` is committed to
    `parallel/<slug>-plan` in fully resolved form, with no negative `issue_num` remaining.
-4. The checkpoint validates through `mcp__drm-copilot__validate_orchestration_artifacts` with
+5. The checkpoint validates through `mcp__drm-copilot__validate_orchestration_artifacts` with
    `artifact_type: "parallel-planner-state"`, and `next_step` is exactly
    `PARALLEL_EXECUTION_READY`.
-5. The kickoff artifact exists at both paths and validates through
+6. The kickoff artifact exists at both paths and validates through
    `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: "parallel-kickoff"`.
-6. The final report lists, per item, the `plan-path:`, branch name, preflight status, and
+7. The final report lists, per item, the `plan-path:`, branch name, preflight status, and
    radius-validation result; plus the cohort table, the manifest path, both kickoff paths, and the
    statement that execution has NOT started.
 

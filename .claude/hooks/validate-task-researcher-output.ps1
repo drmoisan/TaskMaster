@@ -11,14 +11,22 @@
     convention, and the file exists on disk.
 
 .NOTES
-    Reads the hook payload from CLAUDE_HOOK_INPUT as JSON. Exits 0 to allow
-    termination; exits 1 with an error message to block. Filesystem reads go
-    through Test-ResearchFile so tests can mock the boundary without writing
-    temporary files.
+    Reads the SubagentStop envelope JSON from stdin through the shared
+    envelope helper (subagentstop-envelope.ps1) and validates its
+    last_assistant_message field, the researcher's last assistant message.
+    Exits 0 to allow termination. A block writes the reason to stderr and
+    exits 2 through the shared envelope helper; an invalid envelope blocks
+    with a payload anomaly reason. A hook dependency that fails to load
+    blocks with exit 2 and the validate-task-researcher-output: prefix.
+    Filesystem reads go through Test-ResearchFile so tests can mock the
+    boundary without writing temporary files.
+    An unhandled error during validation blocks with exit 2 and a reason (issue #928).
 #>
 
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
+try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -94,7 +102,7 @@ function Test-IsValidResearchFileName {
     $fileName = [System.IO.Path]::GetFileName($normalized)
     return [regex]::IsMatch(
         $fileName,
-        '^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-[A-Za-z0-9][A-Za-z0-9-]*-research\.md$'
+        '^(?:(?:\d{4}-\d{2}-\d{2}(?:T\d{2}-?\d{2})?|\d{8})-[A-Za-z0-9][A-Za-z0-9-]*[-.]research|research(?:-addendum)?\.\d{4}-\d{2}-\d{2}(?:T\d{2}-\d{2})?)\.md$'
     )
 }
 
@@ -192,7 +200,7 @@ function Test-NumericDerivationEvidence {
         if (-not $match.Success) { return @{ Ok = $false; Message = "task-researcher hook: numeric derivation evidence is missing $label." } }
         $values[$label] = $match.Groups['value'].Value.Trim()
     }
-    if ($values['Exhaustive Search Scope'] -notmatch '(?i)\b(entire|all|complete)\b.*\b(repository|repo|source tree|tree)\b') {
+    if ($values['Exhaustive Search Scope'] -notmatch '(?i)\b(entire|whole|all|complete)\b.*\b(repository|repo|worktree|source tree|tree)\b') {
         return @{ Ok = $false; Message = 'task-researcher hook: numeric derivation evidence does not declare an exhaustive repository search scope.' }
     }
     $primaryStrategy = $values['Primary Search Strategy or Query Expression']
@@ -227,29 +235,18 @@ function Invoke-TaskResearcherOutputValidation {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [string] $RawPayload
+        [AllowNull()] [AllowEmptyString()] [string] $InputText
     )
-
-    if ([string]::IsNullOrWhiteSpace($RawPayload)) {
-        return @{ Ok = $false; Message = 'task-researcher hook: CLAUDE_HOOK_INPUT is empty; cannot validate task-researcher output.' }
-    }
-
-    try {
-        $payload = $RawPayload | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        return @{ Ok = $false; Message = "task-researcher hook: failed to parse CLAUDE_HOOK_INPUT as JSON: $($_.Exception.Message)" }
-    }
-
-    $agentOutput = $null
-    if ($payload.PSObject.Properties.Name -contains 'output') {
-        $agentOutput = $payload.output
-    }
-    if ([string]::IsNullOrWhiteSpace($agentOutput)) {
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-task-researcher-output:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
+    $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
+    if (-not $envelope.IsValid) { return @{ Ok = $false; Message = "task-researcher hook: payload anomaly - $(Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)" } }
+    $assistantMessage = [string]$envelope.AssistantText
+    if ([string]::IsNullOrWhiteSpace($assistantMessage)) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output is empty; researcher must return research-path before termination.' }
     }
 
-    $researchPath = Get-ResearchPathFromOutput -AgentOutput $agentOutput
+    $researchPath = Get-ResearchPathFromOutput -AgentOutput $assistantMessage
     if ($null -eq $researchPath) {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output does not advertise a research-path. Researcher must report `research-path: <path>` pointing to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).' }
     }
@@ -266,13 +263,14 @@ function Invoke-TaskResearcherOutputValidation {
         return @{ Ok = $false; Message = "task-researcher hook: researcher advertised research-path '$researchPath' but no file exists at that location." }
     }
 
-    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $agentOutput
+    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $assistantMessage
     if (-not $feasibilityResult.Ok) {
         return @{ Ok = $false; Message = $feasibilityResult.Message }
     }
 
     if (Test-Path -LiteralPath $researchPath -PathType Leaf) {
-        $numericEvidenceResult = Test-NumericDerivationEvidence -Content (Get-Content -LiteralPath $researchPath -Raw -ErrorAction Stop)
+        try { $researchContent = Get-Content -LiteralPath $researchPath -Raw -ErrorAction Stop } catch { return @{ Ok = $false; Message = "task-researcher hook: failed to read research-path '$researchPath': $($_.Exception.Message)" } }
+        $numericEvidenceResult = Test-NumericDerivationEvidence -Content $researchContent
         if (-not $numericEvidenceResult.Ok) {
             return $numericEvidenceResult
         }
@@ -284,11 +282,10 @@ function Invoke-TaskResearcherOutputValidation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
-
-$result = Invoke-TaskResearcherOutputValidation -RawPayload $env:CLAUDE_HOOK_INPUT
-if (-not $result.Ok) {
-    Write-Error $result.Message
-    exit 1
-}
-
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-task-researcher-output: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-task-researcher-output:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
+try { $result = Invoke-TaskResearcherOutputValidation }
+catch { Exit-SubagentStopBlock -Message ('validate-task-researcher-output: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + 'This condition is not repairable by the subagent. Report it to the operator and halt.') }
+if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
 exit 0

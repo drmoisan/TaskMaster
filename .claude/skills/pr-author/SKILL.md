@@ -49,7 +49,7 @@ PreToolUse hook can verify the body passed to `gh pr create --body-file` is the 
 produced:
 
 1. Write the body text to `artifacts/pr_body_<N>.md`, where `<N>` is the target issue or PR number.
-2. Compute the SHA-256 of the body file bytes and render it as lowercase hexadecimal.
+2. Compute the SHA-256 of the body file by running `sha256sum artifacts/pr_body_<N>.md` as a single command (no chaining) and take the lowercase hexadecimal digest.
 3. Write the sibling receipt `artifacts/pr_body_<N>.receipt.json` with the shape:
 
    ```json
@@ -62,6 +62,8 @@ produced:
      "created_at": "<ISO-8601 UTC timestamp newer than pr_context.summary.txt last-write>"
    }
    ```
+
+   Obtain it by running `date -u +%Y-%m-%dT%H:%M:%SZ` as a single command.
 
 4. Pass the body to the pull request via `--body-file artifacts/pr_body_<N>.md`; do not use inline
    `--body`.

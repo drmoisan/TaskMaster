@@ -52,14 +52,19 @@ PCOH_RESULT=""
 PCOH_WORDS=()
 
 pcoh_split_words() {
-	# Populate PCOH_WORDS by splitting a space-separated string.
+	# Populate PCOH_WORDS by splitting a whitespace-separated string.
 	#
 	# Args: $1 = the string to split. An empty or whitespace-only string yields
 	# an empty array, which is the empty-graph and empty-cohort case. `read -ra`
 	# is used rather than an unquoted expansion so a token is never subjected to
-	# pathname expansion.
+	# pathname expansion. Newline, CR, VT, and FF are converted to spaces first:
+	# `read` consumes one newline-terminated record and splits it on IFS only, so
+	# without the conversion every token after the first newline is dropped and
+	# CR, VT, and FF are not separators. With it, the separator set is space, tab,
+	# LF, CR, VT, and FF, which matches Python str.split() for ASCII.
+	local text="${1-}"
 	PCOH_WORDS=()
-	read -ra PCOH_WORDS <<<"${1-}"
+	read -ra PCOH_WORDS <<<"${text//[$'\n\r\v\f']/ }"
 }
 
 pcoh_fail() {
@@ -123,9 +128,14 @@ pcoh_build_adjacency() {
 	PCOH_ADJACENT=()
 	pcoh_split_words "$keys"
 	local -a key_list=("${PCOH_WORDS[@]}")
+	# Rebuild the membership haystack from the split tokens. The endpoint checks
+	# below match a space-delimited word, so they would miss a key that the caller
+	# separated with a newline, tab, CR, VT, or FF instead of a single space.
+	keys=""
 	# Seed every declared key so an isolated vertex survives into the coloring
 	# step; inferring vertices from the edge list alone would drop it.
 	for key in "${key_list[@]}"; do
+		keys="$keys $key"
 		PCOH_DEGREE["$key"]=0
 		PCOH_NEIGHBORS["$key"]=""
 	done

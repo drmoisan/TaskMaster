@@ -45,14 +45,15 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Portable-identity resolution (issue #673). Unguarded and fail-closed on purpose: a gate
 # that cannot load its resolver must not degrade into the cwd-relative read it replaces.
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 # Epic scope (issue #663): a delegation for the epic integration branch is gated against the epic checkpoint.
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeResolution.psm1' -ErrorRecord $_ }
 function Get-ModelRoutingCheckpoint {
     <#
     .SYNOPSIS
@@ -207,6 +208,8 @@ function Invoke-ModelRoutingReceiptDecision {
     param(
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'MODEL_ROUTING_RECEIPT_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $allow = [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
 
@@ -287,6 +290,9 @@ function Invoke-ModelRoutingReceiptDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('MODEL_ROUTING_RECEIPT_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'MODEL_ROUTING_RECEIPT_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 

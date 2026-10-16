@@ -14,7 +14,7 @@ Use this skill when:
 - Audit findings require remediation (FAIL or material PARTIAL findings).
 - Toolchain checks fail.
 - Acceptance criteria are unmet.
-- A required CI check fails after the pull request is open.
+- A CI check fails after the pull request is open.
 - Any new finding surfaces during execution of an active cycle (in which case begin a new cycle, do not extend the active one).
 
 ## Full Handoff Chain
@@ -52,7 +52,7 @@ Trigger remediation when any of these are true:
 - Audit artifacts contain FAIL or meaningful PARTIAL findings.
 - Toolchain checks fail (format, lint, type-check, test, contract, or integration stages).
 - Acceptance criteria are not met.
-- A required CI check fails after the PR is open (workflow-file changes specifically must enter the loop and trigger the `modified-workflow-needs-green-run` rule defined in `.claude/skills/feature-review-workflow/SKILL.md`).
+- A CI check fails after the PR is open (workflow-file changes specifically must enter the loop and trigger the `modified-workflow-needs-green-run` rule defined in `.claude/skills/feature-review-workflow/SKILL.md`).
 
 Remediation triggers only on blocking findings classified `autonomous`. Each blocking finding carries one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). When no blocking finding is `autonomous`, the review verdict is `HALT_NON_REMEDIABLE` or `AWAITING_CI`: the orchestrator halts or waits, and no cycle, remediation plan, or `atomic-planner` handoff is created.
 

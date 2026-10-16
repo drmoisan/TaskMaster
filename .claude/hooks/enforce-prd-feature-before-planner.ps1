@@ -98,9 +98,10 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Issue #669 owns worktree location and path normalisation; issue #673 owns the
 # portable-identity resolution this gate now selects a worktree with. Both imports are
 # unguarded on purpose: a resolution module that cannot be loaded is itself the
@@ -108,9 +109,9 @@ Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -
 # a permissive path. Both are required rather than one: the absolute-path join the probe
 # step below calls is exported only by the first, because a module whose exports are pinned
 # by an explicit list does not re-export a sibling's functions to its own importer.
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force
-Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force
-. (Join-Path $PSScriptRoot 'enforce-prd-feature-before-planner-helpers.ps1')
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeTargetResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-prd-feature-before-planner-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-prd-feature-before-planner-helpers.ps1' -ErrorRecord $_ }
 function Get-PrdFeatureFileExistence {
     <#
     .SYNOPSIS
@@ -316,6 +317,8 @@ function Invoke-PrdFeatureBeforePlannerDecision {
         [AllowNull()]
         [object] $ResolvedTarget
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PRD_FEATURE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $envelope.IsValid) {
@@ -469,6 +472,9 @@ function Invoke-PrdFeatureBeforePlannerDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PRD_FEATURE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PRD_FEATURE_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 

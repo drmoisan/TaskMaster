@@ -6,7 +6,7 @@ description: 'Quota throttling and account-switching policy for multi-agent orch
 # Quota Throttling and Account-Switching Policy
 
 Policy for keeping long-running, multi-agent orchestration inside account usage limits without
-losing work. Derived from about five days of continuous multi-agent orchestration (TaskMaster runs
+losing work. Derived from about five days of continuous multi-agent orchestration (consumer-repository runs
 `bugs-2026-09-11` and `bugs-2026-09-17`).
 
 Every figure marked **MEASURED** was observed; figures marked **ESTIMATE** are extrapolations.

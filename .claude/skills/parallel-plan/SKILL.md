@@ -42,6 +42,11 @@ identical forms.
 - **Promotion.** Unpromoted items are promoted by their own preparation-mode child, not by the
   planner. The `preparation` route already carries the promotion MCP tools (`new_potential_entry`,
   `potential_to_issue`, `new_active_feature_folder`).
+- **Issue adoption.** Issue-number items are adopted, not promoted. The item's GitHub issue
+  already exists, so its preparation child verifies the issue read-only and records a top-level
+  `issue_adoption` object in its checkpoint instead of calling `potential_to_issue` or the
+  promotion-entry tool. The delegation prompt carries that instruction as the issue-adoption line
+  under `## Preparation Fan-Out`.
 - **`issue_num` resolution.** `issue_num` is the primary key for every item reference. It is known
   at intake for issue-number items. For potential-entry items, record negative placeholders in
   intake order (`-1`, `-2`, ...) and back-fill the real number from each child's promotion receipt
@@ -102,11 +107,13 @@ invocations after the initial plan. Use `/parallel-plan` for intake and `/parall
 admit an item into a run that is already in flight.
 
 Each delegation prompt includes this literal kickoff line, followed by the model-budget marker
-line:
+line and, for an issue-number item only, the issue-adoption line:
 
 > `Preparation mode: true. route_id: preparation. parallel_slug: <slug>. Perform promotion, research, feature documents (spec.md, user-story.md), atomic planning, and preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope for this run and are executed later by parallel-orchestrator. After the atomic-executor preflight returns PREFLIGHT: ALL CLEAR, commit the feature folder and plan to the current branch, push the current branch to origin, set out-of-scope step statuses to not-applicable, set next_step to S5_atomic_execution, and stop, reporting the plan-path and preflight status.`
 >
 > `model_budget.fable_policy: <disabled|available|preferred>.`
+>
+> `Issue adoption: this item's GitHub issue already exists. Verify it read-only (gh issue view), do not call potential_to_issue or the promotion-entry tool, and record a top-level issue_adoption object in the checkpoint per .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the checkpoint's promotion-type. When a lifecycle record for the item exists under docs/features/potential/promoted/, cite it as potential_record.`
 
 Properties of that line, each individually load-bearing:
 
@@ -128,6 +135,13 @@ does not apply to preparation. It contains no `Parallel mode: true`, so F7's fut
 hook, which matches that marker, will not gate preparation either. Both omissions are intentional
 and must be preserved verbatim when the line is emitted.
 
+**Issue-adoption line.** The issue-adoption line is emitted only for an issue-number item, after
+the model-budget marker line, and is omitted for a potential-entry item, whose child promotes it.
+The line carries no mode marker, no digits, and no active feature-folder path, so hook target
+resolution and mode classification are unchanged. The preparation checkpoint does not carry over
+to execution, so the execution child records its own adoption (see
+`.claude/skills/parallel-orchestrate/SKILL.md`, kickoff element 4).
+
 **No edit to shared surfaces.** No edit is made to `.claude/skills/orchestrate/SKILL.md` or to
 `config/orchestration-routing.json`, including the `preparation` route. The route mechanism is
 marker-driven; the child contract's "commit ... to the current branch" wording is satisfied by a
@@ -135,8 +149,9 @@ branch created off `origin/main`; and `routes.preparation` declares no epic-spec
 agent, skill, or MCP tool.
 
 **Collected per child at termination:** `plan-path`, preflight status, the promotion receipt (the
-`issue_num` back-fill source), the model-routing receipt with `logical_agent: "orchestrator"`, the
-topology receipt, `branch_name`, and `worktree_path`. There is no fan-in merge step: the planner
+`issue_num` back-fill source for a potential-entry item) or, for an issue-number item, the
+`issue_adoption` record from the child checkpoint, the model-routing receipt with
+`agent: "orchestrator"`, the topology receipt, `branch_name`, and `worktree_path`. There is no fan-in merge step: the planner
 fetches and records each pushed item branch, back-fills `issue_num` into the manifest on
 `parallel/<slug>-plan`, and updates the checkpoint.
 
@@ -275,6 +290,44 @@ concurrently.
 
 Derivation, the V1-V3 rules, and the contention relation are implemented upstream. This skill calls
 them; it defines none of them.
+
+## Complexity Assessment
+
+**Assessment point.** Assess each item's complexity band after the item is `prepared` — its
+preflight status is `PREFLIGHT: ALL CLEAR` and its `declared` radius is V1/V2-clear — and before
+cohort seeding, which consumes the band through the scheduling entry point. The parallel parent
+reads the same band to choose the `model` of that item's `Agent(orchestrator)` spawn, so an item
+without a band cannot be routed.
+
+**Signals and scale.** Read the signal catalog and the band scale from `model_policy` in
+`config/orchestration-routing.json`. Record every signal the item's approved plan and spec exhibit
+in `signals_present`, then choose a band from the scale.
+
+**Floor.** Compute the floor with `Get-ComplexityFloor -SignalsPresent <signals>` from
+`.claude/lib/model-routing/ModelRouting.psm1` in PowerShell, or `compute_complexity_floor(signals)`
+in Python. The chosen band must be at or above the floor; the floor is a lower bound only.
+
+**Model resolution.** Resolve the child model with
+`Resolve-DelegationModel -Agent orchestrator -Band <band> -FablePolicy <fable_policy>` from the same
+module, or `resolve_delegation_model("orchestrator", band, fable_policy)` in Python, using the
+run's `model_budget.fable_policy`.
+
+**Per-item record.** Write three fields on the item:
+
+- `complexity_band` — one of `C1`, `C2`, `C3`, `C4`.
+- `complexity_assessment` — `{ band, floor, signals_present, rationale, assessed_at }`, where `band`
+  equals `complexity_band`, `floor` is the computed floor, `rationale` is a non-empty string, and
+  `assessed_at` is a non-empty ISO-8601 string.
+- `model_routing_receipt` — `{ agent: "orchestrator", phase, complexity_band, fable_policy,
+  table_model, clamped_from, model }`, copied from the resolver output, with `complexity_band`
+  equal to the item's band.
+
+The kickoff artifact's `## Item Summary` `complexity` cell for the item equals its
+`complexity_band`.
+
+**Routing input, not a verdict.** The band is a routing input for model selection and edge
+derivation. It is distinct from the deliberately absent worthiness verdict: assessing a band never
+admits, rejects, or reorders an item.
 
 ## Cohort Seeding
 
@@ -448,7 +501,8 @@ Top-level fields: `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`
 `last_updated`. F3's landed required-key set (planner invariant P1) is a strict subset of this
 list, and `plan_home_branch` is a permitted additional field.
 
-Per item: `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`, `preparation_status`,
+Per item: `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`, `complexity_assessment`,
+`preparation_status`,
 `research_path`, `plan_path`, `preflight_status`, `branch_name`, `worktree_path`, `blast_radius`
 (with `source: "declared"`), `radius_validation` (the `v1`, `v2`, and `v3` results with their
 severities), `model_routing_receipt`, and `topology_receipt`.
@@ -461,8 +515,10 @@ blast-radius overlap.
 `require_ready_for_execution` gate: at least two items (invariant P6); every item
 `preparation_status: prepared` with `preflight_status` exactly `PREFLIGHT: ALL CLEAR`, non-empty
 `research_path` and `plan_path`, and `blast_radius.source == "declared"` (P7); `next_step` exactly
-the ready sentinel `PARALLEL_EXECUTION_READY` (P8); and `kickoff_prompt_path` exactly
-`artifacts/orchestration/parallel-kickoff-<slug>.md` (P9).
+the ready sentinel `PARALLEL_EXECUTION_READY` (P8); `kickoff_prompt_path` exactly
+`artifacts/orchestration/parallel-kickoff-<slug>.md` (P9); and every item carries a valid
+`complexity_band`, a `complexity_assessment`, and a `model_routing_receipt` with
+`agent: "orchestrator"` that agree with the band (P10).
 
 **Git integrity is F4-owned.** F3's `require_ready_for_execution` gate is structural only, so
 verifying that each item's committed plan blob exists on that item's pushed branch ref — and that
@@ -595,7 +651,7 @@ With no ready feature checkpoint, the exemption admits two attribution-trailer f
 - The trailer option: `git commit -m 'docs: plan' --trailer 'Co-Authored-By: Name <email>' --trailer 'Claude-Session: <url>' -- <exempt paths>`. The separate-value form and the `--trailer=<value>` form are both admitted, any number of times, on `git commit` only; `git add --trailer` and a trailer option with no value are denied. Git writes every trailer value into one trailer block.
 - The one-paragraph multi-message form: the subject in the first `-m` and every trailer in one single-quoted second `-m` value, separated by a literal newline. Each `-m` value becomes its own paragraph and git parses only the last paragraph as the trailer block, so trailers split across separate `-m` values do not form one trailer block.
 
-Quoting rules: `$` and backtick are literal and admitted inside single quotes, and denied outside quotes and inside double quotes, where the shell expands them. `<` and `>` are admitted inside single or double quotes and denied outside quotes. An unquoted `#` is denied anywhere, because it starts a shell comment that the exemption does not model; a `#` inside quotes is admitted. A typographic quote character (U+2018 to U+201E) anywhere in the command line is denied, because a PowerShell host reads it as a quote.
+Quoting rules: `$` and backtick are literal and admitted inside single quotes, and denied outside quotes and inside double quotes, where the shell expands them. `<` and `>` are admitted inside single or double quotes and denied outside quotes. An unquoted `#` is denied anywhere, because it starts a shell comment that the exemption does not model; a `#` inside quotes is admitted. A typographic quote character (U+2018 to U+201E) anywhere in the command line is denied, because a PowerShell host reads it as a quote. Because the executing shell is undetermined (issue #735), a shape whose meaning differs between a POSIX shell and PowerShell is denied: a backslash anywhere in the command line is denied, and `{`, `}`, `,`, `(`, `)`, and `@` are denied outside quotes. Every staging operand must be a plain forward-slash repository-relative path that uses only the characters `A-Z a-z 0-9 . _ / -`.
 
 Not admitted: heredoc-fed messages, including `git commit -m "$(cat <<'EOF' ... EOF)"` and `git commit -F - <<'EOF'`, and message files supplied through `-F <file>` or `--file=<file>`. Use one of the two forms above instead.
 

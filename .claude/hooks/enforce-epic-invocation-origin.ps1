@@ -42,9 +42,10 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 $script:GatedSubagentTypes = @('epic-planner', 'epic-orchestrator', 'parallel-planner', 'parallel-orchestrator')
 $script:ParallelSubagentTypes = @('parallel-planner', 'parallel-orchestrator')
 $script:ProhibitedCallerAgentType = 'orchestrator'
@@ -214,6 +215,8 @@ function Invoke-EpicInvocationOriginDecision {
         [AllowEmptyString()]
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_INVOCATION_ORIGIN_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     # The envelope carries both halves: the caller's agent_type at the root and the
     # delegation target's subagent_type inside tool_input.
@@ -272,6 +275,9 @@ function Invoke-EpicInvocationOriginDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_INVOCATION_ORIGIN_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_INVOCATION_ORIGIN_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 $decision = Invoke-EpicInvocationOriginDecision -HookInputRaw (Read-ClaudeHookRawPayload)
 

@@ -4,29 +4,30 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
 # Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.
 # Extracted to a dot-sourced sibling so this file stays inside the 500-line cap, following
 # the enforce-pr-author-skill.ps1 headroom-split precedent.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-helpers.ps1' -ErrorRecord $_ }
 
 # Pure mode dispatch and per-mode readiness predicates for issue #554. A new sibling
 # rather than an addition to the helpers file above, whose header declares a different
 # normative contract and which lacks headroom; leaving that file byte-untouched is the
 # proof the issue #539 exemption is behaviourally unchanged.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-modes.ps1' -ErrorRecord $_ }
 
 # Epic-scope command and path legs (issue #663, decision D2), the three checkpoint read
 # seams, the mode deny reason, and the target resolution with its import guard (issue
 # #690), all relocated to this sibling to keep the gate inside the 500-line cap.
-. (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
 
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
-. (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
-. (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
+try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
 # of these is orchestration bookkeeping, not implementation, so the gate must not
@@ -306,9 +307,8 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         [AllowEmptyString()]
         [string] $ParallelCheckpointRaw
     )
-
-    # A failed worktree-resolution import denies before any other logic (issue #690).
-    $importFailure = Get-OrchestrationGateImportFailureDecision; if ($null -ne $importFailure) { return $importFailure }
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PREIMPLEMENTATION_GATE_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
@@ -383,11 +383,13 @@ function Invoke-OrchestrationPreimplementationGateDecision {
             $modeCheckpoint = ConvertFrom-CheckpointJson -Json ([string]$modeRaw)
         } catch { $modeCheckpoint = $null }
         $folder = Find-OrchestrationDelegationTargetFolder -Prompt $prompt
-        $issue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt
+        # Only the keyed issue number breaks a tie among cited folders (#565 CR-1); the bare hash form feeds the D3 record lookup only.
+        $issue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt -KeyedOnly
+        $fallbackIssue = Find-OrchestrationDelegationIssueNumber -Prompt $prompt
         $failure = if ($isEpic) {
-            Get-EpicOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+            Get-EpicOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue -FallbackIssueNumber $fallbackIssue
         } else {
-            Get-ParallelOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue
+            Get-ParallelOrchestrationReadinessFailure -Checkpoint $modeCheckpoint -TargetFolder $folder -IssueNumber $issue -FallbackIssueNumber $fallbackIssue
         }
         if (-not $failure) { return Get-OrchestrationPreimplementationGateAllowDecision }
         return Get-OrchestrationPreimplementationGateBlockDecision -Reason (
@@ -454,6 +456,9 @@ function Invoke-OrchestrationPreimplementationGateEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PREIMPLEMENTATION_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PREIMPLEMENTATION_GATE_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit

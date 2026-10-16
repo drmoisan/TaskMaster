@@ -44,11 +44,17 @@
         exactly the two members that matter most.
       - Substring search uses [System.StringComparison]::Ordinal so the result
         is culture-independent and matches Python's byte-wise 'in' operator.
-      - Both predicates are total on every string, including the empty string, a
-        token consisting only of a marker, and a bare bracket pair. Neither
-        throws for any input, because the classifier that calls them runs over
-        every inline-code span in a document and a throw would abort an entire
-        derivation over one stray span.
+      - Every predicate is total on every string, including the empty string, a
+        token consisting only of a marker, a bare bracket pair, and a lone dot.
+        None throws for any input, because the classifier that calls them runs
+        over every inline-code span in a document and a throw would abort an
+        entire derivation over one stray span.
+      - Test-FileShapedComponent (issue #797) ports is_file_shaped_component.
+        Its extension pattern text is identical to FILE_EXTENSION_PATTERN_TEXT
+        and its known-name set equals KNOWN_FILE_NAMES; a Pester test reads both
+        from the Python source and pins them equal. A non-ASCII extension is
+        rejected before lower-casing (issue #903); ToLowerInvariant then matches
+        Python's str.lower on ASCII input, and known-name membership is ordinal.
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -83,6 +89,30 @@ $script:PlaceholderMarker = [string[]]@(
 # segment or any earlier one claims every feature folder in the corpus.
 $script:FeatureCorpusPrefix = 'docs/features/'
 $script:FeatureFolderSegmentIndex = 1
+
+# File-shape extension pattern (issue #797). A final component names a file when
+# the text after its last dot, lower-cased, is an ASCII letter followed by ASCII
+# letters or digits. The pattern text is identical to FILE_EXTENSION_PATTERN_TEXT
+# in the Python reference; \A and \z anchor the whole string without admitting a
+# trailing newline, which matches Python's re.fullmatch. The regex is built with
+# no options, so matching is case-sensitive and the explicit ASCII classes match
+# exactly the inputs the Python pattern matches.
+$script:FileExtensionPatternText = '[a-z][a-z0-9]*'
+$script:FileExtensionPattern = [regex]::new('\A' + $script:FileExtensionPatternText + '\z')
+$script:NonAsciiPattern = [regex]::new('[^\x00-\x7F]')
+
+# Known extensionless file names and dotfiles (issue #797). Membership is exact
+# and ordinal, matching Python's frozenset membership. The set is closed and is
+# pinned equal to KNOWN_FILE_NAMES in the Python reference by a Pester parity
+# test that reads the Python source, so edit both files together.
+$script:KnownFileName = [System.Collections.Generic.HashSet[string]]::new(
+    [string[]] @(
+        'Dockerfile', 'Makefile', 'LICENSE', 'CODEOWNERS', 'NOTICE', '.gitignore',
+        '.gitattributes', '.gitkeep', '.gitmodules', '.vscodeignore', '.npmignore',
+        '.npmrc', '.nvmrc', '.editorconfig', '.prettierrc', '.prettierignore',
+        '.eslintignore', '.shellcheckrc'
+    ),
+    [StringComparer]::Ordinal)
 
 function Test-PlaceholderMarker {
     <#
@@ -184,6 +214,56 @@ function Test-MultipleFeatureFolderSpan {
     return $false
 }
 
+function Test-FileShapedComponent {
+    <#
+    .SYNOPSIS
+        Report whether a final path component names a file (issue #797).
+
+    .DESCRIPTION
+        Port of is_file_shaped_component. The classifier formerly admitted a
+        wildcard-free token only when its extension appeared in a fixed
+        allowlist, so files a plan writes with an unlisted extension, dotfiles,
+        and extensionless names were dropped from the derived radius. This
+        predicate replaces the allowlist with a structural rule that still
+        rejects the directory-shaped tokens of issue #489: a component with no
+        dot, a dot-leading component outside the known-name set, a digit-led
+        tail, and a trailing dot all report false.
+
+    .PARAMETER Component
+        The final path component, after any :<line> suffix has been stripped.
+        The empty string is accepted and reports false.
+
+    .OUTPUTS
+        System.Boolean. True when the component is an ordinal member of the
+        known-name set, or when it has a non-empty stem before its last dot and
+        the lower-cased text after that dot fully matches the extension pattern;
+        otherwise false.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $Component
+    )
+
+    if ($script:KnownFileName.Contains($Component)) {
+        return $true
+    }
+
+    # LastIndexOf returns -1 when there is no dot and 0 when the dot leads the
+    # component; both leave no stem, so neither names a file by this rule.
+    $dotIndex = $Component.LastIndexOf('.')
+    if ($dotIndex -le 0) {
+        return $false
+    }
+
+    $extension = $Component.Substring($dotIndex + 1)
+    if ($script:NonAsciiPattern.IsMatch($extension)) { return $false }
+    return $script:FileExtensionPattern.IsMatch($extension.ToLowerInvariant())
+}
+
 Export-ModuleMember -Function `
     Test-PlaceholderMarker, `
-    Test-MultipleFeatureFolderSpan
+    Test-MultipleFeatureFolderSpan, `
+    Test-FileShapedComponent

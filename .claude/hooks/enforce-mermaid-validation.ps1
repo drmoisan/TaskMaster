@@ -56,10 +56,11 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 Set-StrictMode -Version Latest
 
-Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
 $script:MermaidModulePath = Join-Path -Path $PSScriptRoot -ChildPath '../lib/mermaid/MermaidValidation.psm1'
 $script:MermaidSkillPointer = 'See .claude/skills/mermaid-diagram/SKILL.md.'
@@ -303,6 +304,8 @@ function Invoke-MermaidValidationDecision {
         [AllowNull()]
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'MERMAID_VALIDATION_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     # Envelope-level anomaly: fail closed. See the ENVELOPE VERSUS CONTENT note in
     # this file's header before changing this back to a silent allow.
@@ -394,6 +397,9 @@ function Invoke-MermaidValidationEntryPoint {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('MERMAID_VALIDATION_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'MERMAID_VALIDATION_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 Invoke-MermaidValidationEntryPoint -ToolInputRaw (Read-ClaudeHookRawPayload)
 
