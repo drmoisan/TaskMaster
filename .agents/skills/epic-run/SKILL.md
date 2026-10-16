@@ -22,7 +22,8 @@ Use the epic slug or path supplied in the invoking user request.
    per-feature plan paths, preflight evidence, and current Git state. Derive optional missing
    hashes from Git; fail closed on actual drift.
    Invoke `validate_orchestration_artifacts` for `epic-planner-state` with
-   `require_ready_for_execution: true` and the explicit workspace root. Do not delegate until
+   `require_ready_for_execution: true`, `require_codex_topology: true`,
+   `require_codex_model_routing: true`, and the explicit workspace root. Do not delegate until
    that canonical repository-aware gate succeeds.
 4. Delegate the invocation prompt to `epic-orchestrator` and apply `epic-orchestrate`.
 5. Reuse the existing integration branch. Every child resumes at atomic execution from its

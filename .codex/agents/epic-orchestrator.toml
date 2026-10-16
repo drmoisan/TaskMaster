@@ -40,7 +40,8 @@ prompt, integration branch, child plan paths, preflight evidence, and Git state.
 and existing issues, folders, research, specifications, user stories, plans, and preflight
 receipts. Every child resumes at atomic execution. Drift returns control to `epic-planner`.
 Require `validate_orchestration_artifacts` to pass `epic-planner-state` with
-`require_ready_for_execution: true` and the explicit workspace root before execution. Copy its
+`require_ready_for_execution: true`, `require_codex_topology: true`,
+`require_codex_model_routing: true`, and the explicit workspace root before execution. Copy its
 validated `max_parallel_features` into this agent's checkpoint.
 
 ## Manual Epic

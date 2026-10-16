@@ -20,9 +20,14 @@
           "informational only", "context only", "out of plan scope", "out of scope",
           "not applicable", "N/A", "UNVERIFIED".
       - If the coverage artifact for a language is present, repo-wide line coverage is
-        parsed and compared against the 80 percent floor. When repo-wide coverage is
-        below 80 percent and the audit does not carry a FAIL verdict on a coverage row
-        for that language, validation fails.
+        parsed and compared against the governing line floor: the line coverage
+        threshold the repository's root CLAUDE.md states, otherwise the 85 percent
+        default (read by Get-FeatureReviewCoverageThreshold from this directory's
+        feature-review-coverage-thresholds.ps1); an absent root CLAUDE.md uses the
+        defaults, and an unreadable root CLAUDE.md fails closed. When repo-wide coverage
+        is below the governing line floor and the audit does not carry a FAIL verdict on
+        a coverage row for that language, validation fails. The Codex hook enforces the
+        line floor only.
 
     Coverage artifact paths by language:
         TypeScript  coverage/lcov.info                          (LCOV text)
@@ -40,6 +45,8 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
+try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord $_ }
 
 $ErrorActionPreference = 'Stop'
 
@@ -143,7 +150,8 @@ function Test-LanguageCoverageRow {
     param(
         [string]$AuditText,
         [string]$Language,
-        [Nullable[double]]$RepoWidePct
+        [Nullable[double]]$RepoWidePct,
+        [double] $LineFloor = 85.0
     )
 
     $languageLabelMap = @{
@@ -192,12 +200,12 @@ function Test-LanguageCoverageRow {
         }
     }
 
-    if ($null -ne $RepoWidePct -and $RepoWidePct -lt 80.0) {
+    if ($null -ne $RepoWidePct -and $RepoWidePct -lt $LineFloor) {
         $failLines = $coverageLines | Where-Object { $_ -match '\bFAIL\b' }
         if (-not $failLines -or $failLines.Count -eq 0) {
             return @{
                 Ok     = $false
-                Reason = ("{0} repo-wide coverage is {1}% (below the 80% floor) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct)
+                Reason = ("{0} repo-wide coverage is {1}% (below the {2}% line coverage floor) but the policy-audit contains no FAIL verdict on a coverage row for {0}." -f $Language, $RepoWidePct, $LineFloor)
             }
         }
     }
@@ -229,6 +237,9 @@ function Get-FeatureReviewCoverageContinuation {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('validate-feature-review-coverage: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()
@@ -264,11 +275,16 @@ try {
         exit 0
     }
 
+    $claudeMdPath = Join-Path $repoRoot 'CLAUDE.md'
+    $claudeMdText = $null
+    if (Test-Path -Path $claudeMdPath) { try { $claudeMdText = Get-Content -Path $claudeMdPath -Raw -ErrorAction Stop } catch { throw "root CLAUDE.md exists but could not be read ($(([string]$_.Exception.Message -split "`r?`n")[0])); coverage floors cannot be resolved, so the gate fails closed." } }
+    $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMdText
+
     $failures = [System.Collections.Generic.List[string]]::new()
 
     foreach ($lang in $changedLanguages.Keys) {
         $repoPct = Get-LanguageRepoCoverage -RepoRoot $repoRoot -Language $lang
-        $result = Test-LanguageCoverageRow -AuditText $auditText -Language $lang -RepoWidePct $repoPct
+        $result = Test-LanguageCoverageRow -AuditText $auditText -Language $lang -RepoWidePct $repoPct -LineFloor $thresholds.Line
         if (-not $result.Ok) {
             $failures.Add($result.Reason)
         }
@@ -277,7 +293,7 @@ try {
     if ($failures.Count -gt 0) {
         $header = "Feature-review coverage validation failed against branch diff."
         $body   = "  - " + ($failures -join "`n  - ")
-        $footer = "Audit file: $($audit.FullName)`nFix the policy-audit to carry an explicit PASS or FAIL verdict per language with changed files, and reflect repo-wide coverage below 80% as FAIL."
+        $footer = "Audit file: $($audit.FullName)`nFix the policy-audit to carry an explicit PASS or FAIL verdict per language with changed files, and reflect repo-wide coverage below the governing line coverage floor ($($thresholds.Line)%) as FAIL."
         $reason = "{0}`n{1}`n{2}" -f $header, $body, $footer
         Get-FeatureReviewCoverageContinuation -Reason $reason -StopHookActive $stopHookActive |
             ConvertTo-Json -Compress -Depth 5 |

@@ -9,6 +9,7 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 $script:AllowedPreparationMcpTools = @(
     'mcp__drm-copilot__new_potential_entry',
@@ -209,6 +210,8 @@ function Invoke-EpicPlanningOnlyDecision {
         [AllowNull()][AllowEmptyString()][string] $CurrentBranch,
         [string] $RegistryPath = (Join-Path $script:EpicPlanningRepositoryRoot 'config/orchestration-handoff-registry.json')
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_PLANNING_ONLY_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-EpicPlanningJson -Raw $PayloadRaw -Name 'PreToolUse input'
     $attestedPreparation = $EpicExecutionContext -eq 'epic_preparation_child'
@@ -325,6 +328,9 @@ function Get-EpicPlanningCurrentBranch {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_PLANNING_ONLY_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_PLANNING_ONLY_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

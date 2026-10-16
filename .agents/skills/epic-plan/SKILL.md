@@ -63,6 +63,21 @@ must never use placeholders.
 Create or reuse `epic/<epic-slug>-integration` from `origin/main`, push it, and commit the epic
 home before preparation. All prepared child outputs must fan into this branch.
 
+## Integration Commit Form
+
+The epic planner's own commits of the epic manifest, the fanned-in child feature folders and approved plans, and the kickoff copy are orchestration bookkeeping. `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` exempts them without a ready feature checkpoint only when the invocation is pathspec-bearing and every path operand lies inside `docs/features/epics/`, `docs/features/parallel/`, `docs/features/active/`, `docs/features/potential/`, or `artifacts/orchestration/`. A pathless commit, a whole-tree operand, or any operand outside those trees is denied.
+
+Admitted commit forms, each followed by `--` and the exempt path operands:
+
+- A single-quoted message containing `$`, for example `git commit -m 'docs: costs $5' -- <exempt paths>`.
+- A single-quoted message containing a backtick, for example ``git commit -m 'docs: fix `Foo`' -- <exempt paths>``.
+- The trailer option on `git commit` only, in the separate-value form `--trailer 'Co-Authored-By: Name <email>'` or the `--trailer=<value>` form, any number of times.
+- The one-paragraph multi-message form: the subject in the first `-m` and every trailer in one single-quoted second `-m` value, separated by a literal newline. Each `-m` value becomes its own paragraph and git parses only the last paragraph as the trailer block, so trailers split across separate `-m` values do not form one trailer block.
+
+Quoting rules: `$` and backtick are admitted only inside single quotes. `<`, `>`, and `#` are admitted only inside quotes. A typographic quote character (U+2018 to U+201E) is denied anywhere. Because the executing shell is undetermined (issue #735), a shape whose meaning differs between a POSIX shell and PowerShell is denied: a backslash anywhere in the command line is denied, and `{`, `}`, `,`, `(`, `)`, and `@` are denied outside quotes. Every staging operand must be a plain forward-slash repository-relative path that uses only the characters `A-Z a-z 0-9 . _ / -`.
+
+Not admitted: heredoc-fed messages, and message files supplied through `-F <file>` or `--file=<file>` (issue #732, decision D5).
+
 ## Concurrent Preparation
 
 Place all child preparations in one preparation batch, regardless of execution-wave
@@ -181,7 +196,8 @@ byte-identical; the manifest, durable kickoff, plans, and planning commits must 
 repository-aware readiness validator without worktree drift.
 
 Invoke `validate_orchestration_artifacts` for `epic-planner-state` with
-`require_ready_for_execution: true` and the explicit workspace root. Do not write or delegate the
+`require_ready_for_execution: true`, `require_codex_topology: true`,
+`require_codex_model_routing: true`, and the explicit workspace root. Do not write or delegate the
 kickoff until this canonical gate succeeds.
 
 ## Kickoff Artifacts

@@ -43,10 +43,11 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
-. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # The only path this hook governs. On-disk reconstruction of an apply_patch
 # Update is requested for this path alone, so a patch that merely happens to
@@ -214,6 +215,8 @@ function Invoke-CheckpointMonotonicDecision {
     param(
         [string] $ToolInputRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'CHECKPOINT_ORDER_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     if (-not $ToolInputRaw) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
@@ -312,6 +315,9 @@ function Invoke-CheckpointMonotonicDecision {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('CHECKPOINT_ORDER_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'CHECKPOINT_ORDER_BLOCKED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
     # Transport and mapping come from the shared module. Update reconstruction is

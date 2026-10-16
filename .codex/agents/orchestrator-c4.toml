@@ -157,7 +157,7 @@ Update it after every completed step with:
 - `local_execution_overrides`, `delegation_bypasses`, `lifecycle_operations`
 - raw promotion MCP receipts under `delegation_receipts.promotion.potential_entry`, `delegation_receipts.promotion.issue`, and `delegation_receipts.promotion.feature_folder`
 
-Each required skill in the selected route must have a `skill_receipts[]` entry with `required = true` and non-empty `evidence`. Each required MCP tool must have an `mcp_call_receipts[]` entry with `ok = true` and non-empty `evidence`. `local_execution_overrides` and `delegation_bypasses` must remain empty at completion. Any lifecycle operation recorded in `lifecycle_operations[]` must use `surface = "mcp"`.
+Each required skill in the selected route must have a `skill_receipts[]` entry with `required = true` and non-empty `evidence`. Each required MCP tool must have an `mcp_call_receipts[]` entry with `ok = true` and non-empty `evidence` unless a valid `issue_adoption` record waives it. `local_execution_overrides` and `delegation_bypasses` must remain empty at completion. Any lifecycle operation recorded in `lifecycle_operations[]` must use `surface = "mcp"`.
 
 ## Native Automation Surface
 
@@ -188,9 +188,9 @@ Do not report completion until:
 5. The checkpoint file reflects the final completed state.
 6. The checkpoint proves the selected routing matrix entry: all required agents have delegation receipts, all required skills have skill receipts, all required MCP tools have successful MCP receipts, and no local bypass list is populated.
 7. The deterministic MCP validator passes: `validate_orchestration_artifacts` with `artifact_type = "orchestrator-state"`, `artifact_path = "artifacts/orchestration/orchestrator-state.json"`, `require_complete = true`, `require_codex_topology = true`, and `require_codex_model_routing = true`.
-8. Required GitHub checks are green for the current PR head SHA before any PR/DONE transition.
+8. Every GitHub check on the current PR head SHA passed or was skipped before any PR/DONE transition.
 
-The MCP validator and required CI checks are the hard completion boundary. There is no fallback. If the MCP server or validation tool is unavailable, stop and persist blocked state. Codex lifecycle hooks may provide local feedback, but they are not the authoritative completion gate.
+The MCP validator and every CI check on the current PR head SHA are the hard completion boundary. There is no fallback. If the MCP server or validation tool is unavailable, stop and persist blocked state. Codex lifecycle hooks may provide local feedback, but they are not the authoritative completion gate.
 
 Do not claim mission completion unless all required delegations completed with receipts and the required orchestration artifacts exist on disk.
 '''

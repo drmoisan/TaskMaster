@@ -8,8 +8,9 @@
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-. (Join-Path $PSScriptRoot 'codex-authority-store.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-authority-store.ps1') } catch { Add-HookDependencyFailure -Name 'codex-authority-store.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-CodexStopJson {
     [CmdletBinding()]
@@ -68,6 +69,8 @@ function Invoke-CodexSubagentStopDecision {
         [Parameter(Mandatory)][string] $PayloadRaw,
         [AllowNull()][AllowEmptyString()][string] $AttestationRaw
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'MODEL_ROUTING_ATTESTATION_BLOCKED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $payload = ConvertFrom-CodexStopJson -Raw $PayloadRaw -Name 'SubagentStop input'
     $agentType = [string]$payload.agent_type
@@ -130,6 +133,9 @@ function Find-CodexStopAttestationRaw {
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('MODEL_ROUTING_ATTESTATION_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'MODEL_ROUTING_ATTESTATION_BLOCKED:'
+if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecision.Reason); exit $dependencyDecision.ExitCode }
 
 try {
     $payloadRaw = [Console]::In.ReadToEnd()

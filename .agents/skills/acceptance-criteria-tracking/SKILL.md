@@ -68,6 +68,14 @@ During plan execution, after completing a task whose work satisfies an acceptanc
 
 Timing: Check off AC items as soon as the corresponding plan task passes verification — do not defer all AC updates to the end of plan execution.
 
+### CI-Dependent Criteria
+
+A CI-dependent criterion is one whose verification requires the result of CI on the PR head. It cannot be verified before the pull request exists, so it stays unchecked and is listed as pending-CI in the AC verification artifact until CI has run.
+
+- Owner: the item's own orchestrator run owns the check-off and performs it at S9; this is the one case in which an orchestrator run checks off AC. A parent or coordinating session never commits the check-off from its own root.
+- Timing: after the CI green gate (S9) records `ci_gate.conclusion` as `success`, and before the run reports DONE.
+- Push and re-verify: the check-off is committed in the item's own worktree and pushed to the PR branch, and the CI green gate is re-run against the new head SHA so that `ci_gate.head_sha` equals the final PR head before DONE.
+
 ### When Reviewers Check Off AC
 
 During feature review (feature-audit phase):
@@ -78,7 +86,7 @@ During feature review (feature-audit phase):
 
 ### When Orchestrators Enforce AC Tracking
 
-Orchestrators do not directly check off AC items. Instead:
+Orchestrators do not directly check off AC items. The one exception is a CI-dependent criterion, which the item's own orchestrator run checks off at S9 as described in `### CI-Dependent Criteria` above. For every other criterion, orchestrators instead:
 
 1. Ensure delegated executors and reviewers reference this skill.
 2. After executor or reviewer completion, verify that AC source files reflect delivered work (spot-check; do not re-execute verification).

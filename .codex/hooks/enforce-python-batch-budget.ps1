@@ -1,63 +1,78 @@
 
 <#
 .SYNOPSIS
-    Pre-tool-use hook that enforces the Python per-batch change budget.
+    Pre-tool-use hook that routes Python changes of more than three production files to the orchestrated large path.
 
 .DESCRIPTION
     This script is invoked by the Codex PreToolUse hook before any Write or Edit
-    operation. When the target file is a Python file, it classifies the file as either
-    production or test and checks the running count against the per-batch cap:
-      - 3 production .py files per batch
-      - 3 test .py files per batch
+    operation. When the target file is a Python file (.py), it decides whether the
+    change may proceed in direct mode.
 
-    A "batch" is scoped to the current Codex session. The running count is
-    persisted under .codex/state/python-batch-budget.<session_id>.json. Only distinct
-    file paths are counted; repeated edits to the same file consume one slot.
+    Direct mode counts distinct production Python paths per Codex session. The running
+    set is persisted under .codex/state/python-batch-budget.<session_id>.json, and
+    repeated edits to the same file are counted once. The 4th distinct production path
+    is denied with a PYTHON_LARGE_PATH_REQUIRED reason that instructs the caller to
+    route the change through .codex/prompts/orchestrate-work.md.
 
-    Test files are those matching:
+    The orchestrated large path is detected from
+    <root>/artifacts/orchestration/orchestrator-state.json. The selected route is the
+    route_id value when that key is present, otherwise the path_selected value, and it
+    is usable only as a non-blank string. When the selected route is large,
+    remediation, or preparation and the checkpoint is not terminal (next_step is not
+    complete and completed_steps does not contain S12_complete), no path is denied for
+    count and no state is read or written. Every other checkpoint outcome, including
+    an absent, unreadable, or malformed checkpoint, enforces direct mode.
+
+    Test files are never counted. They are those matching:
       - tests/**/*.py
       - test_*.py
 
-    All other .py files are treated as production files. Non-Python paths pass through.
+    All other .py files are production files. Non-Python paths pass through. The
+    threshold of three production files is a routing constant and is not configurable
+    at runtime. Legacy prodCap, testCap, and testFiles keys in a persisted state file
+    are ignored when the state is loaded.
 
-    An approved per-session override is recorded by writing
-    {"prodCap": N, "testCap": M} into the Codex state file.
+    When a production path is denied, the script emits a PreToolUse JSON response with
+    hookSpecificOutput.permissionDecision = 'deny' and exits 0. Files already counted
+    are always allowed through.
 
-    When the cap would be exceeded by a new file, the script emits a PreToolUse JSON
-    response with hookSpecificOutput.permissionDecision = 'deny' and exits 0. The session
-    must explicitly reset the counter by deleting the state file before starting a new
-    batch. Files already counted are always allowed through.
+    Known limitation: a stale non-terminal large-path checkpoint left at the root
+    exempts a later direct-mode session at that root. Orchestrator checkpoint hygiene
+    (issue #673) moves foreign checkpoints aside before a new run.
 
 .NOTES
     Compatible with PowerShell 7+.
 #>
 [CmdletBinding()]
 param()
+$script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 # Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
-. (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1')
+try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
+
+# Shared route helpers; this file is byte-identical to the Claude runtime copy.
+try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-batch-budget-route.ps1' -ErrorRecord $_ }
 
 function Get-PythonBatchBudgetState {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory)]
         [int] $ProdCap,
 
-        [Parameter(Mandatory)]
-        [int] $TestCap
+        [int] $TestCap = 0
     )
 
     [ordered]@{
         prodCap   = $ProdCap
-        testCap   = $TestCap
         prodFiles = @()
-        testFiles = @()
     }
 }
 
 function ConvertTo-PythonBatchBudgetState {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -67,15 +82,13 @@ function ConvertTo-PythonBatchBudgetState {
         [Parameter(Mandatory)]
         [int] $ProdCap,
 
-        [Parameter(Mandatory)]
-        [int] $TestCap
+        [int] $TestCap = 0
     )
 
-    $state = Get-PythonBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
-    if ($null -ne $InputObject.prodCap) { $state.prodCap = [int]$InputObject.prodCap }
-    if ($null -ne $InputObject.testCap) { $state.testCap = [int]$InputObject.testCap }
+    # Only prodFiles is carried over. Persisted prodCap, testCap, and testFiles keys
+    # come from the removed test-file cap and recorded overrides and are ignored.
+    $state = Get-PythonBatchBudgetState -ProdCap $ProdCap
     if ($null -ne $InputObject.prodFiles) { $state.prodFiles = @($InputObject.prodFiles) }
-    if ($null -ne $InputObject.testFiles) { $state.testFiles = @($InputObject.testFiles) }
 
     return $state
 }
@@ -105,6 +118,7 @@ function Get-PythonBatchBudgetBlockDecision {
 }
 
 function Invoke-PythonBatchBudgetDecision {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -114,35 +128,50 @@ function Invoke-PythonBatchBudgetDecision {
         [Parameter(Mandatory)]
         [System.Collections.IDictionary] $State,
 
-        [Parameter(Mandatory)]
-        [string] $StateFile
+        [AllowEmptyString()]
+        [string] $StateFile = '',
+
+        [int] $TestCap = 0,
+
+        [switch] $LargePathRoute,
+
+        [AllowEmptyString()]
+        [string] $ObservedRoute = ''
     )
+    $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PYTHON_LARGE_PATH_REQUIRED:'
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $normalized = $FilePath -replace '\\', '/'
     if ($normalized -notmatch '\.py$') {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
     }
 
-    $isTestFile = ($normalized -match '(^|/)tests/.*\.py$') -or ($normalized -match '(^|/)test_[^/]+\.py$')
-    $targetList = if ($isTestFile) { @($State.testFiles) } else { @($State.prodFiles) }
-    $cap = if ($isTestFile) { [int]$State.testCap } else { [int]$State.prodCap }
-    $kind = if ($isTestFile) { 'test' } else { 'production' }
-
-    if ($targetList -contains $normalized) {
+    # The orchestrated large path has no production-file cap, so nothing is counted.
+    if ($LargePathRoute) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
     }
 
-    if ($targetList.Count -ge $cap) {
-        $currentFiles = ($targetList -join ', ')
-        $reason = "Python per-batch budget exceeded: $kind file cap is $cap and is already full ($currentFiles). Requested new file: $normalized. Split the work into a new batch, record an approved cap in $StateFile, or reset the batch by deleting that state file."
+    # Test files never count toward the routing threshold.
+    $isTestFile = ($normalized -match '(^|/)tests/.*\.py$') -or ($normalized -match '(^|/)test_[^/]+\.py$')
+    if ($isTestFile) {
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
+    }
+
+    $countedFiles = @($State.prodFiles)
+    if ($countedFiles -contains $normalized) {
+        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $false }
+    }
+
+    $cap = [int]$State.prodCap
+    if ($countedFiles.Count -ge $cap) {
+        Write-Verbose "Denying production Python path '$normalized' in direct mode; counted paths are recorded in '$StateFile'."
+        $counted = $countedFiles -join ', '
+        $route = if ([string]::IsNullOrWhiteSpace($ObservedRoute)) { 'none' } else { $ObservedRoute }
+        $reason = "PYTHON_LARGE_PATH_REQUIRED: this change touches more than $cap production Python files (already counted: $counted; requested: $normalized). A change of this size belongs on the orchestrated large path, which has no production-file cap. Route the change through .codex/prompts/orchestrate-work.md. Checkpoint route observed: $route."
         return Get-PythonBatchBudgetBlockDecision -Reason $reason -State $State
     }
 
-    if ($isTestFile) {
-        $State.testFiles = @($State.testFiles) + @($normalized)
-    } else {
-        $State.prodFiles = @($State.prodFiles) + @($normalized)
-    }
+    $State.prodFiles = $countedFiles + @($normalized)
 
     return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' }; state = $State; shouldWriteState = $true }
 }
@@ -155,7 +184,13 @@ function Invoke-PythonBatchBudgetHook {
         [string] $SessionId = 'default',
         [string] $Root = (Get-Location).Path,
         [int] $ProdCap = 3,
-        [int] $TestCap = 3,
+        [scriptblock] $ReadCheckpoint = {
+            param([string] $Path)
+            if (Test-Path -LiteralPath $Path -PathType Leaf) {
+                return (Get-Content -LiteralPath $Path -Raw)
+            }
+            return ''
+        },
         [scriptblock] $TestPathExists = { param([string] $Path) Test-Path -Path $Path },
         [scriptblock] $EnsureDirectory = { param([string] $Path) New-Item -ItemType Directory -Path $Path -Force | Out-Null },
         [scriptblock] $ReadState = { param([string] $Path) Get-Content -Path $Path -Raw },
@@ -186,23 +221,41 @@ function Invoke-PythonBatchBudgetHook {
     }
 
     $stateDir = Join-Path -Path $Root -ChildPath '.codex/state'
+    $stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$SessionId.json")
+
+    # The checkpoint is read before any state operation, so the large path neither
+    # creates the state directory nor reads or writes the state file.
+    $checkpointPath = Join-Path -Path $Root -ChildPath 'artifacts/orchestration/orchestrator-state.json'
+    $checkpointText = ''
+    try {
+        $checkpointText = [string](& $ReadCheckpoint $checkpointPath)
+    } catch {
+        Write-Verbose "Treating unreadable orchestrator checkpoint '$checkpointPath' as direct mode: $($_.Exception.Message)"
+        $checkpointText = ''
+    }
+
+    $isLargePath = Test-BatchBudgetLargePathRoute -CheckpointText $checkpointText
+    $observedRoute = Get-BatchBudgetSelectedRoute -CheckpointText $checkpointText
+    if ($isLargePath) {
+        return Invoke-PythonBatchBudgetDecision -FilePath $filePath -State (Get-PythonBatchBudgetState -ProdCap $ProdCap) -StateFile $stateFile -LargePathRoute
+    }
+
     if (-not (& $TestPathExists $stateDir)) {
         & $EnsureDirectory $stateDir
     }
 
-    $stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$SessionId.json")
-    $state = Get-PythonBatchBudgetState -ProdCap $ProdCap -TestCap $TestCap
+    $state = Get-PythonBatchBudgetState -ProdCap $ProdCap
 
     if (& $TestPathExists $stateFile) {
         try {
             $loaded = & $ReadState $stateFile | ConvertFrom-Json -ErrorAction Stop
-            $state = ConvertTo-PythonBatchBudgetState -InputObject $loaded -ProdCap $ProdCap -TestCap $TestCap
+            $state = ConvertTo-PythonBatchBudgetState -InputObject $loaded -ProdCap $ProdCap
         } catch {
             Write-Verbose "Ignoring unreadable Python batch-budget state file '$stateFile': $($_.Exception.Message)"
         }
     }
 
-    $decision = Invoke-PythonBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile
+    $decision = Invoke-PythonBatchBudgetDecision -FilePath $filePath -State $state -StateFile $stateFile -ObservedRoute $observedRoute
     if ($decision.shouldWriteState) {
         try {
             & $WriteState $stateFile $decision.state
@@ -214,41 +267,84 @@ function Invoke-PythonBatchBudgetHook {
     return $decision
 }
 
+function Invoke-PythonBatchBudgetCodexEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the Codex Python batch-budget decision and returns the process exit code.
+    .DESCRIPTION
+        Parses the Codex PreToolUse payload through the shared transport, collects both
+        sides of every mapped file edit, and evaluates each path with the Python hook.
+        The first deny is written to the output stream as compact JSON without its state
+        property, followed by exit code 0. When nothing is denied the function returns
+        0 and writes nothing else. Any failure writes the error text to standard error
+        and returns 2. The function does not call exit.
+    .PARAMETER PayloadRaw
+        Raw PreToolUse payload text.
+    .PARAMETER RepositoryRoot
+        Root used to locate the Codex state directory and the orchestrator checkpoint.
+    .PARAMETER HookSeams
+        Optional seam overrides splatted into Invoke-PythonBatchBudgetHook.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $PayloadRaw,
+
+        [Parameter(Mandatory)]
+        [string] $RepositoryRoot,
+
+        [hashtable] $HookSeams = @{}
+    )
+
+    try {
+        # Transport and mapping come from the shared module. session_id is still
+        # required because the direct-mode counter is keyed by it.
+        $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw $PayloadRaw -HookName 'enforce-python-batch-budget' -RequireSessionId
+        $sessionId = ([string]$payload.session_id) -replace '[^A-Za-z0-9._-]', '_'
+
+        # Both sides of a rename are evaluated, matching the path scan that collected
+        # Add/Update/Delete targets and Move destinations alike. Ordering and
+        # de-duplication are preserved. A well-formed payload that maps to no file
+        # yields no paths, so no state is written and the hook allows silently.
+        $budgetPaths = @(
+            @(ConvertTo-CodexFileEditInput -Payload $payload) |
+                ForEach-Object { $_.source_path; $_.file_path } |
+                    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                        Select-Object -Unique
+        )
+
+        foreach ($path in $budgetPaths) {
+            $toolInputRaw = @{ file_path = $path } | ConvertTo-Json -Compress
+            $decision = Invoke-PythonBatchBudgetHook -ToolInputRaw $toolInputRaw -SessionId $sessionId -Root $RepositoryRoot @HookSeams
+            if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
+                $decision.Remove('state')
+                $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+                return 0
+            }
+        }
+
+        return 0
+    } catch {
+        [Console]::Error.WriteLine([string]$_)
+        return 2
+    }
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
+if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PYTHON_LARGE_PATH_REQUIRED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
+$dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PYTHON_LARGE_PATH_REQUIRED:'
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
-try {
-    # Transport and mapping come from the shared module. session_id is still
-    # required because the batch counter is keyed by it.
-    $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-python-batch-budget' -RequireSessionId
-    $sessionId = ([string]$payload.session_id) -replace '[^A-Za-z0-9._-]', '_'
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-    $prodCap = 3
-    $testCap = 3
-
-    # Both sides of a rename consume budget, matching the pre-fix path scan that
-    # collected Add/Update/Delete targets and Move destinations alike. Ordering
-    # and de-duplication are preserved. A well-formed payload that maps to no
-    # file yields no paths, so no state is written and the hook allows silently.
-    $budgetPaths = @(
-        @(ConvertTo-CodexFileEditInput -Payload $payload) |
-            ForEach-Object { $_.source_path; $_.file_path } |
-                Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
-                    Select-Object -Unique
-    )
-
-    foreach ($path in $budgetPaths) {
-        $toolInputRaw = @{ file_path = $path } | ConvertTo-Json -Compress
-        $decision = Invoke-PythonBatchBudgetHook -ToolInputRaw $toolInputRaw -SessionId $sessionId -Root $repositoryRoot -ProdCap $prodCap -TestCap $testCap
-        if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
-            $decision.Remove('state')
-            $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-            exit 0
-        }
-    }
-    exit 0
-} catch {
-    [Console]::Error.WriteLine([string]$_)
-    exit 2
+# The entry point returns its [int] exit code as the last pipeline element and any
+# deny JSON before it, so the JSON is written explicitly before the process exits.
+$entryPointResult = @(Invoke-PythonBatchBudgetCodexEntryPoint -PayloadRaw ([Console]::In.ReadToEnd()) -RepositoryRoot (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent))
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
 }
+
+exit ([int]$entryPointResult[-1])

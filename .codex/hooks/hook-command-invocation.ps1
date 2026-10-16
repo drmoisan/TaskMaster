@@ -3,18 +3,25 @@
     Structural command-invocation matcher shared by the Claude and Codex enforcement hooks.
 .DESCRIPTION
     Realizes Piece 3 of the D2 behavior contract and the retrieval surface of D12 in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
+    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md,
+    as revised by issue #824.
 
-    Answers, per segment produced by hook-command-scanner.ps1, whether a command line
-    INVOKES a named command word with a named subcommand path, rather than merely
-    containing those words adjacently. It also retrieves the operands and flag values of
-    the matched invocation, taken from the matched segment only.
+    Answers whether a command line INVOKES a named command word with a named subcommand
+    path, rather than merely containing those words. Every record produced by
+    Read-CommandLineInvocationSegment (top-level segments, wrapper payloads, substitution
+    bodies, and xargs-injected commands) is classified Structural, Indeterminate, or not a
+    match. An Indeterminate match is fail-closed for every consumer: it means the command may
+    invoke the governed command and its target cannot be read. Classification never rests on
+    substring containment; every presence test is whole-token (Test-CommandLineWordPresent).
 
     Pure string logic only: no disk, process, network, clock, or environment access. It is
     dot-sourced as: . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1')
 #>
 
 . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-payload.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-payload-powershell.ps1')
+. (Join-Path $PSScriptRoot 'hook-command-invocation-operands.ps1')
 
 # The transparent-wrapper set of D2 Piece 3 step 2. These prefix a command without changing
 # which command runs, so the structural matcher skips them. All five are also members of the
@@ -22,25 +29,30 @@
 # both mechanisms. Pinned by test through Get-CommandLineTransparentWrapperName (rule R6).
 $script:CommandLineTransparentWrapperNames = @('command', 'env', 'nohup', 'time', 'timeout')
 
-# The modeled global-option tables of D2 Piece 3 steps 3 and the D6/D10 gh surface. An option
-# in WithArgument consumes the following token as its value, or carries the value inline in
-# the '--name=value' form; an option in Standalone consumes only itself. A dash-leading token
-# in neither list is UNMODELED, and an unmodeled token between the command word and the
-# subcommand classifies as a match: over-classification only forces a checkpoint check,
-# whereas under-classification is a bypass. Pinned by test through
+# The modeled global-option tables of D2 Piece 3 step 3, the D6/D10 gh surface, and the
+# issue #824 Terminal lists. An option in WithArgument consumes the following token as its
+# value, or carries the value inline in the '--name=value' form; an option in Standalone
+# consumes only itself ('--exec-path=<value>' is one token, so it is Standalone); a bare
+# option in Terminal makes the command print and exit, so the segment is a resolved
+# non-match. A dash-leading token in none of the lists is UNMODELED: its arity is unknown, so
+# an unmodeled token between the command word and the subcommand classifies the segment
+# Indeterminate, which every consumer treats fail-closed. Pinned by test through
 # Get-CommandLineGlobalOption (rule R6).
 $script:CommandLineGlobalOptions = @{
     git = [pscustomobject]@{
-        WithArgument = @('-C', '-c', '--git-dir', '--work-tree', '--namespace', '--exec-path')
-        Standalone   = @('-p', '--paginate', '--no-pager', '--literal-pathspecs', '--no-optional-locks', '--bare')
+        WithArgument = @('-C', '-c', '--git-dir', '--work-tree', '--namespace')
+        Standalone   = @('-p', '--paginate', '--no-pager', '--literal-pathspecs', '--no-optional-locks', '--bare', '--exec-path')
+        Terminal     = @('--version', '-v', '--help', '-h', '--html-path', '--man-path', '--info-path', '--exec-path')
     }
     gh  = [pscustomobject]@{
         WithArgument = @('-R', '--repo')
         Standalone   = @()
+        Terminal     = @('--version', '--help')
     }
     npx = [pscustomobject]@{
         WithArgument = @('-p', '--package', '-c', '--call', '--node-arg', '--userconfig')
         Standalone   = @('-y', '--yes', '--no-install', '--ignore-existing', '-q', '--quiet')
+        Terminal     = @()
     }
 }
 
@@ -69,11 +81,10 @@ function Get-CommandLineGlobalOption {
     .SYNOPSIS
         Return the modeled global-option table for one command word.
     .DESCRIPTION
-        Returns a record carrying two string arrays: WithArgument, whose members consume a
-        following token or an inline '=value', and Standalone, whose members consume only
-        themselves. An unrecognized command word yields a record with two empty arrays, so
-        every dash-leading token for that command word is treated as unmodeled and therefore
-        classifies - the fail-closed direction.
+        Returns a record carrying three string arrays: WithArgument, Standalone, and Terminal.
+        An unrecognized command word yields three empty arrays, so every dash-leading token
+        for that command word is unmodeled and classifies Indeterminate - the fail-closed
+        direction.
     .OUTPUTS
         System.Management.Automation.PSCustomObject
     #>
@@ -86,32 +97,40 @@ function Get-CommandLineGlobalOption {
         return $script:CommandLineGlobalOptions[$key]
     }
 
-    return [pscustomobject]@{ WithArgument = @(); Standalone = @() }
+    return [pscustomobject]@{ WithArgument = @(); Standalone = @(); Terminal = @() }
 }
 
-function Test-CommandLineRawContainment {
+function Test-CommandLineTokenLiteral {
     <#
     .SYNOPSIS
-        Report whether a raw text contains the command word and every subcommand element.
-    .DESCRIPTION
-        The "in any arrangement" test D12 specifies for a wrapper-led or live-substitution
-        segment. Comparison is ordinal case-insensitive containment, which is deliberately
-        loose: a false positive only forces a checkpoint check, a false negative is a bypass.
+        Report whether a token is literal: no '$' or backtick, and not led by '(', '@', or '{'.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Token)
+
+    if ($Token.Contains('$') -or $Token.Contains('`')) { return $false }
+    return -not ($Token.StartsWith('(') -or $Token.StartsWith('@') -or $Token.StartsWith('{'))
+}
+
+function Test-CommandLineAllWordPresent {
+    <#
+    .SYNOPSIS
+        Report whether every word passes Test-CommandLineWordPresent on one text.
     .OUTPUTS
         System.Boolean
     #>
     [CmdletBinding()]
     [OutputType([bool])]
     param(
-        [Parameter(Mandatory)][AllowEmptyString()][string] $RawText,
-        [Parameter(Mandatory)][string] $CommandWord,
-        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath
+        [Parameter(Mandatory)][AllowEmptyString()][AllowNull()][string] $Text,
+        [Parameter(Mandatory)][string[]] $Word
     )
 
-    $comparison = [System.StringComparison]::OrdinalIgnoreCase
-    if ($RawText.IndexOf($CommandWord, $comparison) -lt 0) { return $false }
-    foreach ($element in $SubcommandPath) {
-        if ($RawText.IndexOf($element, $comparison) -lt 0) { return $false }
+    foreach ($current in $Word) {
+        if (-not (Test-CommandLineWordPresent -RawText $Text -Word $current)) { return $false }
     }
     return $true
 }
@@ -121,9 +140,10 @@ function Skip-CommandLineOption {
     .SYNOPSIS
         Absorb modeled options from a token list and report where they end.
     .DESCRIPTION
-        Returns Index, the position of the first token that is not a modeled option, and
-        Unmodeled, set when a dash-leading token appears in neither list of the supplied
-        table. A bare '-' and a bare '--' are not options and stop the absorption.
+        Returns Index, the position of the first token that is not a modeled option; Terminal,
+        set when a bare token (no '=') is in the Terminal list, which is tested before any
+        other list; Unmodeled, set when a dash-leading token appears in no list; and Options,
+        the ordered {Name, Value} pairs absorbed. A bare '-' and a bare '--' stop absorption.
     .OUTPUTS
         System.Management.Automation.PSCustomObject
     #>
@@ -136,50 +156,258 @@ function Skip-CommandLineOption {
     )
 
     $index = $StartIndex
+    $options = [System.Collections.Generic.List[pscustomobject]]::new()
     while ($index -lt $Token.Count) {
         $current = $Token[$index]
         if (-not $current.StartsWith('-') -or $current -eq '-' -or $current -eq '--') { break }
 
         $name = $current
-        $hasInlineValue = $false
+        $value = $null
         $split = $current.IndexOf('=')
         if ($split -gt 0) {
             $name = $current.Substring(0, $split)
-            $hasInlineValue = $true
+            $value = $current.Substring($split + 1)
+        } elseif (@($Option.Terminal) -contains $current) {
+            return [pscustomobject]@{ Index = $index; Unmodeled = $false; Terminal = $true; Options = $options.ToArray() }
         }
 
         if ($Option.WithArgument -contains $name) {
-            $index += if ($hasInlineValue) { 1 } else { 2 }
+            if ($null -eq $value) {
+                $value = if ($index + 1 -lt $Token.Count) { $Token[$index + 1] } else { $null }
+                $index++
+            }
+            $options.Add([pscustomobject]@{ Name = $name; Value = $value })
+            $index++
             continue
         }
         if ($Option.Standalone -contains $name) {
+            $options.Add([pscustomobject]@{ Name = $name; Value = $value })
             $index++
             continue
         }
 
-        return [pscustomobject]@{ Index = $index; Unmodeled = $true }
+        return [pscustomobject]@{ Index = $index; Unmodeled = $true; Terminal = $false; Options = $options.ToArray() }
     }
 
-    return [pscustomobject]@{ Index = $index; Unmodeled = $false }
+    return [pscustomobject]@{ Index = $index; Unmodeled = $false; Terminal = $false; Options = $options.ToArray() }
+}
+
+function Get-CommandLineStructuralWalk {
+    <#
+    .SYNOPSIS
+        Walk one record's tokens for a command word and subcommand path (DC-10 rule 3).
+    .DESCRIPTION
+        Skips VAR=value prefixes and transparent wrappers, leaf-compares the command word, and
+        absorbs modeled options before each subcommand element. Outcome is 'Match' (with
+        OperandIndex and GlobalOptions), 'Terminal', 'Unmodeled', or 'NoMatch'. A NoMatch
+        reports whether the command-word token or the subcommand-position token where the walk
+        stopped was non-literal, and whether a transparent wrapper was skipped.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Token,
+        [Parameter(Mandatory)][string] $CommandWord,
+        [Parameter(Mandatory)][string[]] $SubcommandPath,
+        [Parameter(Mandatory)][pscustomobject] $Option
+    )
+
+    $result = [pscustomobject]@{
+        Outcome = 'NoMatch'; OperandIndex = -1; GlobalOptions = [pscustomobject[]]@()
+        SkippedWrapper = $false; CommandWordNonLiteral = $false; SubcommandNonLiteral = $false
+    }
+    $skip = Skip-CommandLineTransparentWrapper -Token $Token -Except $CommandWord
+    $result.SkippedWrapper = $skip.SkippedWrapper
+    $index = $skip.Index
+    if ($index -ge $Token.Count) { return $result }
+    if (-not (Test-CommandLineTokenLiteral -Token $Token[$index])) { $result.CommandWordNonLiteral = $true; return $result }
+    if ((ConvertTo-CommandLineLeafWord -Word $Token[$index]) -ne $CommandWord) { return $result }
+    $index++
+
+    $globalOptions = [System.Collections.Generic.List[pscustomobject]]::new()
+    foreach ($element in $SubcommandPath) {
+        $skipOption = Skip-CommandLineOption -Token $Token -StartIndex $index -Option $Option
+        foreach ($absorbed in @($skipOption.Options)) { $globalOptions.Add($absorbed) }
+        if ($skipOption.Terminal) { $result.Outcome = 'Terminal'; return $result }
+        if ($skipOption.Unmodeled) { $result.Outcome = 'Unmodeled'; return $result }
+        $index = $skipOption.Index
+        if ($index -ge $Token.Count) { return $result }
+        if (-not (Test-CommandLineTokenLiteral -Token $Token[$index])) { $result.SubcommandNonLiteral = $true; return $result }
+        if ($Token[$index] -ne $element) { return $result }
+        $index++
+    }
+
+    $result.Outcome = 'Match'
+    $result.OperandIndex = $index
+    $result.GlobalOptions = $globalOptions.ToArray()
+    return $result
+}
+
+function Get-CommandLineInvocationOperand {
+    <#
+    .SYNOPSIS
+        Collect the operands after a structural match and report whether they are complete (DC-12).
+    .DESCRIPTION
+        OperandsComplete is $false for an argument-injected record, for any non-literal operand,
+        for a redirection after the subcommand (a bare operator also consumes its target), and
+        for an unmodeled dash token followed by another token.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject with Operands and Complete.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Token,
+        [Parameter(Mandatory)][int] $StartIndex,
+        [Parameter(Mandatory)][pscustomobject] $Option,
+        [Parameter(Mandatory)][bool] $ArgumentInjected
+    )
+
+    $operands = [System.Collections.Generic.List[string]]::new()
+    $complete = -not $ArgumentInjected
+    $afterSeparator = $false
+    $index = $StartIndex
+    while ($index -lt $Token.Count) {
+        $current = $Token[$index]
+        if (-not $afterSeparator -and $current -match '^(<|>|\d*>|&>)') {
+            $complete = $false
+            $index += if ($current -match '^(\d*[<>]{1,2}&?|&>{1,2})$') { 2 } else { 1 }
+            continue
+        }
+        if ($afterSeparator) { $operands.Add($current); $index++; continue }
+        if ($current -eq '--') { $afterSeparator = $true; $index++; continue }
+        if ($current.StartsWith('-') -and $current.Length -gt 1) {
+            $name = $current
+            $hasInlineValue = $false
+            $split = $current.IndexOf('=')
+            if ($split -gt 0) { $name = $current.Substring(0, $split); $hasInlineValue = $true }
+            if ($Option.WithArgument -contains $name) { $index += if ($hasInlineValue) { 1 } else { 2 }; continue }
+            if ($Option.Standalone -contains $name -or $script:CommandLineStandaloneFlagNames -contains $name) { $index++; continue }
+            if ($index + 1 -lt $Token.Count) { $complete = $false }
+            break
+        }
+        $operands.Add($current)
+        $index++
+    }
+    foreach ($operand in $operands) {
+        if (-not (Test-CommandLineTokenLiteral -Token $operand)) { $complete = $false }
+    }
+    return [pscustomobject]@{ Operands = [string[]]$operands.ToArray(); Complete = $complete }
+}
+
+function ConvertTo-CommandLineIndeterminateMatch {
+    <#
+    .SYNOPSIS
+        Build an Indeterminate match record: no operand position, no operands, incomplete.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][pscustomobject] $Record,
+        [Parameter(Mandatory)][string] $Reason
+    )
+
+    return [pscustomobject]@{
+        Status = 'Indeterminate'; Reason = $Reason; Segment = $Record; OperandIndex = -1
+        GlobalOptions = [pscustomobject[]]@(); Operands = [string[]]@(); OperandsComplete = $false
+    }
+}
+
+function Get-CommandLineInvocation {
+    <#
+    .SYNOPSIS
+        Return every match of a command word and subcommand path, in source order.
+    .DESCRIPTION
+        For each iterator record the first applicable rule wins (DC-10): Unbalanced, decode
+        failure, and depth limit are Indeterminate; a structural walk that reaches a Terminal
+        option is no match, one that meets an unmodeled option is Indeterminate (Opaque), and
+        one that matches the full path is Structural. Otherwise a wrapper with no payload or a
+        transparent-wrapper-led record whose own RawText carries every word as a whole token
+        is Indeterminate (Opaque); a non-literal command word or subcommand token is
+        Indeterminate (DynamicPosition) when the whole command text carries every word; and a
+        payload, substitution, or injected record is Indeterminate (NotProvenInert) when its
+        PresenceText carries every word and its root's payload is not proven inert, at most
+        once per root.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject[] - each carries Status ('Structural' or
+        'Indeterminate'), Reason ('', 'Unbalanced', 'Opaque', 'DynamicPosition',
+        'NotProvenInert', 'DepthLimit'), Segment (the iterator record), OperandIndex (-1 when
+        Indeterminate), GlobalOptions, Operands, and OperandsComplete.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject[]])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][AllowNull()][string] $CommandText,
+        [Parameter(Mandatory)][string] $CommandWord,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath
+    )
+
+    $matchList = [System.Collections.Generic.List[pscustomobject]]::new()
+    $records = @(Read-CommandLineInvocationSegment -CommandText $CommandText)
+    if ($records.Count -eq 0) { return [pscustomobject[]]$matchList.ToArray() }
+    $option = Get-CommandLineGlobalOption -CommandWord $CommandWord
+    $words = [string[]](@($CommandWord) + $SubcommandPath)
+    $normalized = ConvertTo-CommandLineNormalizedText -CommandText $CommandText
+    $inertByRoot = @{}
+    $presenceRoots = [System.Collections.Generic.HashSet[int]]::new()
+
+    foreach ($record in $records) {
+        if ($record.Unbalanced) { $matchList.Add((ConvertTo-CommandLineIndeterminateMatch -Record $record -Reason 'Unbalanced')); continue }
+        if ($record.Opaque -and $record.OpaqueReason -eq 'DecodeFailure') { $matchList.Add((ConvertTo-CommandLineIndeterminateMatch -Record $record -Reason 'Opaque')); continue }
+        if ($record.Opaque -and $record.OpaqueReason -eq 'DepthLimit') { $matchList.Add((ConvertTo-CommandLineIndeterminateMatch -Record $record -Reason 'DepthLimit')); continue }
+
+        $tokens = [string[]]@($record.Tokens)
+        $walk = Get-CommandLineStructuralWalk -Token $tokens -CommandWord $CommandWord -SubcommandPath $SubcommandPath -Option $option
+        if ($walk.Outcome -eq 'Terminal') { continue }
+        if ($walk.Outcome -eq 'Unmodeled') { $matchList.Add((ConvertTo-CommandLineIndeterminateMatch -Record $record -Reason 'Opaque')); continue }
+        if ($walk.Outcome -eq 'Match') {
+            $collected = Get-CommandLineInvocationOperand -Token $tokens -StartIndex $walk.OperandIndex -Option $option -ArgumentInjected ([bool]$record.ArgumentInjected)
+            $matchList.Add([pscustomobject]@{
+                    Status = 'Structural'; Reason = ''; Segment = $record; OperandIndex = $walk.OperandIndex
+                    GlobalOptions = $walk.GlobalOptions; Operands = $collected.Operands; OperandsComplete = $collected.Complete
+                })
+            continue
+        }
+
+        # A transparent-wrapper-led record that expanded a payload is judged by its payload records.
+        $hasChild = $record.Index + 1 -lt $records.Count -and $records[$record.Index + 1].Depth -gt $record.Depth
+        $opaqueLed = ($record.Opaque -and $record.OpaqueReason -eq 'NoPayload') -or ($walk.SkippedWrapper -and -not $hasChild)
+        if ($opaqueLed -and (Test-CommandLineAllWordPresent -Text $record.RawText -Word $words)) {
+            $matchList.Add((ConvertTo-CommandLineIndeterminateMatch -Record $record -Reason 'Opaque'))
+            continue
+        }
+        if (($walk.CommandWordNonLiteral -or $walk.SubcommandNonLiteral) -and (Test-CommandLineAllWordPresent -Text $normalized -Word $words)) {
+            $matchList.Add((ConvertTo-CommandLineIndeterminateMatch -Record $record -Reason 'DynamicPosition'))
+            continue
+        }
+        if ($record.Origin -eq 'TopLevel' -or $presenceRoots.Contains([int]$record.RootIndex)) { continue }
+        if (-not (Test-CommandLineAllWordPresent -Text $record.PresenceText -Word $words)) { continue }
+        if (-not $inertByRoot.ContainsKey($record.RootIndex)) {
+            $inertByRoot[$record.RootIndex] = Test-CommandLinePayloadInert -Record $records -RootIndex $record.RootIndex
+        }
+        if (-not $inertByRoot[$record.RootIndex]) {
+            [void]$presenceRoots.Add([int]$record.RootIndex)
+            $matchList.Add((ConvertTo-CommandLineIndeterminateMatch -Record $record -Reason 'NotProvenInert'))
+        }
+    }
+
+    return [pscustomobject[]]$matchList.ToArray()
 }
 
 function Resolve-CommandLineInvocation {
     <#
     .SYNOPSIS
-        Locate the first segment that invokes a command word with a subcommand path.
+        Return the first match of a command word and subcommand path, or $null.
     .DESCRIPTION
-        Implements the four mandatory fail-closed rules of D12 in order, per segment:
-        an Unbalanced segment classifies because its structure could not be resolved; a
-        wrapper-led or live-substitution segment classifies when its RawText contains the
-        command word and every subcommand element in any arrangement; an unmodeled
-        dash-leading token between the command word and the subcommand classifies; and a
-        non-dash token that is not the next expected subcommand element terminates that
-        segment's scan without a match, so 'git log --grep add' does not classify.
-
-        Returns $null when no segment matched. Otherwise returns Segment, the matched record,
-        and OperandIndex, the token position just past the subcommand path - or -1 when the
-        match was reached by a non-structural rule, in which case there is no operand
-        position to report.
+        Returns Segment (the matched iterator record), OperandIndex (the token position just
+        past the subcommand path, or -1 when Status is 'Indeterminate'), and Status
+        ('Structural' or 'Indeterminate') for the first record Get-CommandLineInvocation
+        matched. An Indeterminate match means the record may invoke the command and its
+        structure could not be resolved; every consumer treats it fail-closed.
     .OUTPUTS
         System.Management.Automation.PSCustomObject
     #>
@@ -191,50 +419,9 @@ function Resolve-CommandLineInvocation {
         [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath
     )
 
-    $option = Get-CommandLineGlobalOption -CommandWord $CommandWord
-    $transparent = $script:CommandLineTransparentWrapperNames
-
-    foreach ($segment in @(Read-CommandLineSegment -CommandText $CommandText)) {
-        if ($segment.Unbalanced) {
-            return [pscustomobject]@{ Segment = $segment; OperandIndex = -1 }
-        }
-
-        if (($segment.IsWrapperLed -or $segment.HasLiveSubstitution) -and
-            (Test-CommandLineRawContainment -RawText $segment.RawText -CommandWord $CommandWord -SubcommandPath $SubcommandPath)) {
-            return [pscustomobject]@{ Segment = $segment; OperandIndex = -1 }
-        }
-
-        $tokens = @($segment.Tokens)
-        $index = 0
-        while ($index -lt $tokens.Count -and (
-                $tokens[$index] -match '^[A-Za-z_][A-Za-z0-9_]*=' -or
-                ($transparent -contains $tokens[$index] -and $tokens[$index] -ne $CommandWord))) {
-            $index++
-        }
-
-        if ($index -ge $tokens.Count -or $tokens[$index] -ne $CommandWord) { continue }
-        $index++
-
-        $matched = $true
-        foreach ($element in $SubcommandPath) {
-            $skip = Skip-CommandLineOption -Token $tokens -StartIndex $index -Option $option
-            if ($skip.Unmodeled) {
-                return [pscustomobject]@{ Segment = $segment; OperandIndex = -1 }
-            }
-            $index = $skip.Index
-            if ($index -ge $tokens.Count -or $tokens[$index] -ne $element) {
-                $matched = $false
-                break
-            }
-            $index++
-        }
-
-        if ($matched) {
-            return [pscustomobject]@{ Segment = $segment; OperandIndex = $index }
-        }
-    }
-
-    return $null
+    $first = @(Get-CommandLineInvocation -CommandText $CommandText -CommandWord $CommandWord -SubcommandPath $SubcommandPath) | Select-Object -First 1
+    if ($null -eq $first) { return $null }
+    return [pscustomobject]@{ Segment = $first.Segment; OperandIndex = $first.OperandIndex; Status = $first.Status }
 }
 
 function Test-CommandLineInvocation {
@@ -243,10 +430,9 @@ function Test-CommandLineInvocation {
         Report whether a command line invokes a named command word with a named
         subcommand path, structurally rather than by raw-text adjacency.
     .DESCRIPTION
-        Scans every segment produced by Read-CommandLineSegment and applies the four
-        mandatory fail-closed rules of D12, which are stated in full on
-        Resolve-CommandLineInvocation. This predicate is the replacement for every
-        raw-text trigger regex that asked whether a governed command runs.
+        True for any match, Structural or Indeterminate, as Get-CommandLineInvocation
+        defines them. This predicate is the replacement for every raw-text trigger regex
+        that asked whether a governed command runs.
     .PARAMETER CommandText
         The raw Bash command text.
     .PARAMETER CommandWord
@@ -265,193 +451,7 @@ function Test-CommandLineInvocation {
         [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath
     )
 
-    return $null -ne (Resolve-CommandLineInvocation -CommandText $CommandText -CommandWord $CommandWord -SubcommandPath $SubcommandPath)
-}
-
-function Get-CommandLineOperand {
-    <#
-    .SYNOPSIS
-        Return the positional operands of a matched invocation, in source order.
-    .DESCRIPTION
-        Locates the first segment in which CommandWord + SubcommandPath match STRUCTURALLY,
-        then returns the non-option tokens that follow the subcommand path in that segment
-        only. Modeled option-with-argument pairs are consumed, so '-C <arg>' consumes both
-        tokens; known zero-argument flags such as '--force' contribute nothing; a token after
-        a bare '--' separator is always an operand; and a dash-leading token that is not
-        modeled terminates collection, because its arity is unknown and a wrong guess would
-        silently return a flag as a path.
-
-        The operand list comes from the MATCHED segment only, so a 'cd <path>' segment chained
-        before the invocation contributes nothing. That is the direct fix for issue #591. A
-        match reached by a non-structural fail-closed rule reports no operand position, and
-        yields no operands.
-
-        Callers receive the result through the @(...) array form used at every call site, so
-        the no-operand case arrives as an empty array rather than as $null.
-    .PARAMETER CommandText
-        The raw Bash command text.
-    .PARAMETER CommandWord
-        The command name.
-    .PARAMETER SubcommandPath
-        The ordered subcommand tokens.
-    .OUTPUTS
-        System.String[] - operands with balanced quotes already stripped, in source order.
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param(
-        [Parameter(Mandatory)][AllowEmptyString()][AllowNull()][string] $CommandText,
-        [Parameter(Mandatory)][string] $CommandWord,
-        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath
-    )
-
-    $operands = [System.Collections.Generic.List[string]]::new()
-    $resolved = Resolve-CommandLineInvocation -CommandText $CommandText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
-    if ($null -eq $resolved -or $resolved.OperandIndex -lt 0) {
-        return [string[]]$operands.ToArray()
-    }
-
-    $option = Get-CommandLineGlobalOption -CommandWord $CommandWord
-    $tokens = @($resolved.Segment.Tokens)
-    $index = $resolved.OperandIndex
-    $afterSeparator = $false
-
-    while ($index -lt $tokens.Count) {
-        $current = $tokens[$index]
-
-        if ($afterSeparator) {
-            $operands.Add($current)
-            $index++
-            continue
-        }
-        if ($current -eq '--') {
-            $afterSeparator = $true
-            $index++
-            continue
-        }
-
-        if ($current.StartsWith('-') -and $current.Length -gt 1) {
-            $name = $current
-            $hasInlineValue = $false
-            $split = $current.IndexOf('=')
-            if ($split -gt 0) {
-                $name = $current.Substring(0, $split)
-                $hasInlineValue = $true
-            }
-
-            if ($option.WithArgument -contains $name) {
-                $index += if ($hasInlineValue) { 1 } else { 2 }
-                continue
-            }
-            if ($option.Standalone -contains $name -or $script:CommandLineStandaloneFlagNames -contains $name) {
-                $index++
-                continue
-            }
-            break
-        }
-
-        $operands.Add($current)
-        $index++
-    }
-
-    return [string[]]$operands.ToArray()
-}
-
-function Get-CommandLineFlagValue {
-    <#
-    .SYNOPSIS
-        Return the value of a named flag belonging to a matched invocation.
-    .DESCRIPTION
-        Locates the matched segment as Test-CommandLineInvocation does, then searches that
-        segment's tokens for FlagName. Recognizes both the separated form ('--merge 688') and
-        the equals form ('--merge=688'). Returns $null when the flag is absent, when the flag
-        is present with no following value token, and when the following token is itself
-        dash-leading.
-
-        The $null-on-missing-value contract is mandatory and is pinned by issue #591's first
-        constraint: downstream logic treats a missing explicit pull-request number as a
-        fail-closed condition, so a bare 'gh pr merge --merge' must yield $null, never 0 and
-        never ''.
-    .PARAMETER CommandText
-        The raw Bash command text.
-    .PARAMETER CommandWord
-        The command name.
-    .PARAMETER SubcommandPath
-        The ordered subcommand tokens.
-    .PARAMETER FlagName
-        The flag as written, including leading dashes, e.g. '--merge' or '--body-file'.
-        Compared case-insensitively.
-    .OUTPUTS
-        System.String or $null. Quotes are already stripped. Callers that need an integer cast
-        the result themselves after a $null check.
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory)][AllowEmptyString()][AllowNull()][string] $CommandText,
-        [Parameter(Mandatory)][string] $CommandWord,
-        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath,
-        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $FlagName
-    )
-
-    $resolved = Resolve-CommandLineInvocation -CommandText $CommandText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
-    if ($null -eq $resolved) { return $null }
-
-    $tokens = @($resolved.Segment.Tokens)
-    $prefix = $FlagName + '='
-    for ($index = 0; $index -lt $tokens.Count; $index++) {
-        $current = $tokens[$index]
-
-        if ($current -eq $FlagName) {
-            if ($index + 1 -ge $tokens.Count) { return $null }
-            $value = $tokens[$index + 1]
-            if ($value.StartsWith('-') -and $value.Length -gt 1) { return $null }
-            return $value
-        }
-
-        if ($current.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-            $value = $current.Substring($prefix.Length)
-            if ([string]::IsNullOrEmpty($value)) { return $null }
-            return $value
-        }
-    }
-
-    return $null
-}
-
-function Test-CommandLineFlag {
-    <#
-    .SYNOPSIS
-        Report whether a named flag is present on a matched invocation, regardless of whether
-        it carries a value.
-    .DESCRIPTION
-        Presence-only companion to Get-CommandLineFlagValue, for boolean flags such as
-        '--merge', '--force', and '--body'. Matches both '--flag' and '--flag=value'. Exact
-        token comparison after quote stripping: '--body' does not match '--body-file', which
-        is the distinction the pr-author hook's negative lookahead currently expresses as
-        '--body(?!-file)\b'.
-    .OUTPUTS
-        System.Boolean
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param(
-        [Parameter(Mandatory)][AllowEmptyString()][AllowNull()][string] $CommandText,
-        [Parameter(Mandatory)][string] $CommandWord,
-        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]] $SubcommandPath,
-        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $FlagName
-    )
-
-    $resolved = Resolve-CommandLineInvocation -CommandText $CommandText -CommandWord $CommandWord -SubcommandPath $SubcommandPath
-    if ($null -eq $resolved) { return $false }
-
-    $prefix = $FlagName + '='
-    foreach ($current in @($resolved.Segment.Tokens)) {
-        if ($current -eq $FlagName) { return $true }
-        if ($current.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
-    }
-
-    return $false
+    return @(Get-CommandLineInvocation -CommandText $CommandText -CommandWord $CommandWord -SubcommandPath $SubcommandPath).Count -gt 0
 }
 
 function Test-CommandLineMention {
@@ -460,10 +460,9 @@ function Test-CommandLineMention {
         Report whether a command line merely MENTIONS a command word and subcommand path
         without invoking it.
     .DESCRIPTION
-        Convenience inverse used by hooks that want to log or explain an allow. True when the
-        raw text contains the command word and every subcommand element but
-        Test-CommandLineInvocation returns false. Purely informational; no hook makes a deny
-        decision from this predicate.
+        True when Test-CommandLineInvocation returns false and every word occurs in the
+        command text as a whole token (Test-CommandLineWordPresent). Purely informational;
+        no hook makes a deny decision from this predicate.
     .OUTPUTS
         System.Boolean
     #>
@@ -479,5 +478,5 @@ function Test-CommandLineMention {
         return $false
     }
 
-    return (Test-CommandLineRawContainment -RawText ([string]$CommandText) -CommandWord $CommandWord -SubcommandPath $SubcommandPath)
+    return (Test-CommandLineAllWordPresent -Text ([string]$CommandText) -Word ([string[]](@($CommandWord) + $SubcommandPath)))
 }

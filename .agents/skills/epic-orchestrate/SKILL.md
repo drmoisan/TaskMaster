@@ -68,6 +68,14 @@ Create a missing integration branch from current `origin/main` and push it. Befo
 fetch the current remote integration tip. Create every child worktree from that tip, never from
 `main`, and set each feature PR base explicitly to the integration branch.
 
+Before each wave launches, run `git fetch origin main` and then
+`git rev-list --count <integration>..origin/main`. A zero count proceeds directly to the wave.
+A non-zero count runs the main-sync as a dedicated chore child item (the `epic-852-main-sync` /
+PR #882 pattern) whose branch starts from the integration tip, merges `origin/main` with a merge
+commit, and opens a PR into the integration branch; that PR must merge before the wave launches.
+Record the sync child's `features[]` row before its launch, and do not reuse a manifest child's
+issue number for it. Run at most one main-sync child per wave, then re-fetch the integration tip.
+
 Launch all ready children in one bounded parallel wave. Before each launch, persist the
 epic-child topology receipt, reviewed complexity assessment, delegation receipt, and Codex
 model-routing receipt with the same `delegation_id`, then select the generated deployment agent.
@@ -112,9 +120,11 @@ authoritative backstop.
 
 Each child owns its implementation, review, PR, CI-green gate, and merge into the integration
 branch. A merge conflict enters that child's existing remediation loop with a blocking
-`remediation-inputs.<timestamp>.md`. After three unresolved passes, record
-`blocked_conflict_loop_limit` and stop that edge. The epic agent must not resolve child conflicts
-locally.
+`remediation-inputs.<timestamp>.md`. Conflict cycles share the child's attempt count,
+`remediation_loop.completed_attempts`. The active cycle number is `completed_attempts + 1`, and a
+cycle without an applied candidate consumes no number. After three completed attempts without a
+`PASS` review, record `blocked_conflict_loop_limit` and stop that edge. The epic agent must not
+resolve child conflicts locally.
 
 ## Worktree Cleanup
 
