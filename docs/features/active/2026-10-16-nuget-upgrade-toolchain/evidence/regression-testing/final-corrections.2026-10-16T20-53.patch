@@ -1,0 +1,632 @@
+diff --git a/QuickFiler.Test/QuickFiler.Test.csproj b/QuickFiler.Test/QuickFiler.Test.csproj
+index ba8e37859..4d53f428b 100644
+--- a/QuickFiler.Test/QuickFiler.Test.csproj
++++ b/QuickFiler.Test/QuickFiler.Test.csproj
+@@ -551,7 +551,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/QuickFiler.Test/app.config b/QuickFiler.Test/app.config
+index a4b4f7de0..2b5a66b92 100644
+--- a/QuickFiler.Test/app.config
++++ b/QuickFiler.Test/app.config
+@@ -176,7 +176,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -188,7 +188,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/QuickFiler/QuickFiler.csproj b/QuickFiler/QuickFiler.csproj
+index 4fbacdaf9..7b92a5e0c 100644
+--- a/QuickFiler/QuickFiler.csproj
++++ b/QuickFiler/QuickFiler.csproj
+@@ -194,6 +194,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
+@@ -616,7 +617,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/QuickFiler/app.config b/QuickFiler/app.config
+index 68bbe4d4c..4b94b020c 100644
+--- a/QuickFiler/app.config
++++ b/QuickFiler/app.config
+@@ -160,7 +160,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -172,7 +172,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -192,7 +192,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Diagnostics.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Primitives" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/Tags.Test/Tags.Test.csproj b/Tags.Test/Tags.Test.csproj
+index 0ef5b92a2..76a0ed23a 100644
+--- a/Tags.Test/Tags.Test.csproj
++++ b/Tags.Test/Tags.Test.csproj
+@@ -316,7 +316,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/Tags.Test/app.config b/Tags.Test/app.config
+index 57bcec912..8e2082e6a 100644
+--- a/Tags.Test/app.config
++++ b/Tags.Test/app.config
+@@ -204,7 +204,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Identity.Client" publicKeyToken="0a613f4dd989e8ae" culture="neutral" />
+diff --git a/Tags/Tags.csproj b/Tags/Tags.csproj
+index 1fb72419b..e17a04ccf 100644
+--- a/Tags/Tags.csproj
++++ b/Tags/Tags.csproj
+@@ -95,7 +95,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/Tags/app.config b/Tags/app.config
+index 1de180814..628e51b1f 100644
+--- a/Tags/app.config
++++ b/Tags/app.config
+@@ -160,7 +160,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Kiota.Http.HttpClientLibrary" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+@@ -172,7 +172,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -196,7 +196,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Diagnostics.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Primitives" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/TaskMaster.Test/TaskMaster.Test.csproj b/TaskMaster.Test/TaskMaster.Test.csproj
+index 2b99444f9..93f311359 100644
+--- a/TaskMaster.Test/TaskMaster.Test.csproj
++++ b/TaskMaster.Test/TaskMaster.Test.csproj
+@@ -404,7 +404,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskMaster.Test/app.config b/TaskMaster.Test/app.config
+index 0048534a6..f4834455b 100644
+--- a/TaskMaster.Test/app.config
++++ b/TaskMaster.Test/app.config
+@@ -172,7 +172,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -184,7 +184,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/TaskMaster/TaskMaster.csproj b/TaskMaster/TaskMaster.csproj
+index cb48c2c9b..a138357f9 100644
+--- a/TaskMaster/TaskMaster.csproj
++++ b/TaskMaster/TaskMaster.csproj
+@@ -252,6 +252,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
+@@ -583,7 +584,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskMaster/app.config b/TaskMaster/app.config
+index 207a00ba8..32bf4e7b3 100644
+--- a/TaskMaster/app.config
++++ b/TaskMaster/app.config
+@@ -172,7 +172,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -184,7 +184,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -204,7 +204,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Diagnostics.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Primitives" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/TaskTree.Test/TaskTree.Test.csproj b/TaskTree.Test/TaskTree.Test.csproj
+index bc72c4670..f168bcf00 100644
+--- a/TaskTree.Test/TaskTree.Test.csproj
++++ b/TaskTree.Test/TaskTree.Test.csproj
+@@ -317,7 +317,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskTree.Test/app.config b/TaskTree.Test/app.config
+index 57bcec912..8e2082e6a 100644
+--- a/TaskTree.Test/app.config
++++ b/TaskTree.Test/app.config
+@@ -204,7 +204,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Identity.Client" publicKeyToken="0a613f4dd989e8ae" culture="neutral" />
+diff --git a/TaskTree/TaskTree.csproj b/TaskTree/TaskTree.csproj
+index a0074d845..28597273d 100644
+--- a/TaskTree/TaskTree.csproj
++++ b/TaskTree/TaskTree.csproj
+@@ -98,7 +98,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskTree/app.config b/TaskTree/app.config
+index 60d26cda7..112cf77d4 100644
+--- a/TaskTree/app.config
++++ b/TaskTree/app.config
+@@ -160,7 +160,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -172,7 +172,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -196,7 +196,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Diagnostics.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Primitives" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/TaskVisualization.Test/TaskVisualization.Test.csproj b/TaskVisualization.Test/TaskVisualization.Test.csproj
+index 76cf63aa9..5c34fc13c 100644
+--- a/TaskVisualization.Test/TaskVisualization.Test.csproj
++++ b/TaskVisualization.Test/TaskVisualization.Test.csproj
+@@ -341,7 +341,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskVisualization.Test/app.config b/TaskVisualization.Test/app.config
+index 627de274b..1cbc85fc9 100644
+--- a/TaskVisualization.Test/app.config
++++ b/TaskVisualization.Test/app.config
+@@ -176,7 +176,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -188,7 +188,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/TaskVisualization/TaskVisualization.csproj b/TaskVisualization/TaskVisualization.csproj
+index 6e5244421..d90a97fcc 100644
+--- a/TaskVisualization/TaskVisualization.csproj
++++ b/TaskVisualization/TaskVisualization.csproj
+@@ -148,7 +148,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskVisualization/app.config b/TaskVisualization/app.config
+index cf581f9ac..2e1abdb65 100644
+--- a/TaskVisualization/app.config
++++ b/TaskVisualization/app.config
+@@ -160,7 +160,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -172,7 +172,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -196,7 +196,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Diagnostics.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Primitives" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/ToDoModel.Test/ToDoModel.Test.csproj b/ToDoModel.Test/ToDoModel.Test.csproj
+index 4667cd2e3..1f80e45a1 100644
+--- a/ToDoModel.Test/ToDoModel.Test.csproj
++++ b/ToDoModel.Test/ToDoModel.Test.csproj
+@@ -359,7 +359,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/ToDoModel.Test/app.config b/ToDoModel.Test/app.config
+index 2de8faa5e..8e966beb7 100644
+--- a/ToDoModel.Test/app.config
++++ b/ToDoModel.Test/app.config
+@@ -176,7 +176,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -188,7 +188,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/ToDoModel/ToDoModel.csproj b/ToDoModel/ToDoModel.csproj
+index 4eb78f9d8..247674748 100644
+--- a/ToDoModel/ToDoModel.csproj
++++ b/ToDoModel/ToDoModel.csproj
+@@ -93,6 +93,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+@@ -195,7 +196,7 @@
+   </Target>
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/ToDoModel/app.config b/ToDoModel/app.config
+index 6f0d384e7..b9038611a 100644
+--- a/ToDoModel/app.config
++++ b/ToDoModel/app.config
+@@ -165,7 +165,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -177,7 +177,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -201,7 +201,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Diagnostics.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Primitives" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/UtilitiesCS.Test/UtilitiesCS.Test.csproj b/UtilitiesCS.Test/UtilitiesCS.Test.csproj
+index 4d0ff7772..1ff5535c3 100644
+--- a/UtilitiesCS.Test/UtilitiesCS.Test.csproj
++++ b/UtilitiesCS.Test/UtilitiesCS.Test.csproj
+@@ -917,6 +917,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+@@ -1028,7 +1029,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/UtilitiesCS.Test/app.config b/UtilitiesCS.Test/app.config
+index 7fcbda1f6..6e39d86c9 100644
+--- a/UtilitiesCS.Test/app.config
++++ b/UtilitiesCS.Test/app.config
+@@ -168,7 +168,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Std.UriTemplate" publicKeyToken="c118b0afb4598f9a" culture="neutral" />
+@@ -184,7 +184,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/UtilitiesCS/UtilitiesCS.csproj b/UtilitiesCS/UtilitiesCS.csproj
+index dbf622bcb..b6c163299 100644
+--- a/UtilitiesCS/UtilitiesCS.csproj
++++ b/UtilitiesCS/UtilitiesCS.csproj
+@@ -406,6 +406,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
+@@ -1328,7 +1329,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/UtilitiesCS/app.config b/UtilitiesCS/app.config
+index 3900be453..1ea13847c 100644
+--- a/UtilitiesCS/app.config
++++ b/UtilitiesCS/app.config
+@@ -165,7 +165,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Kiota.Http.HttpClientLibrary" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+@@ -177,7 +177,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -201,7 +201,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Diagnostics.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.Primitives" publicKeyToken="adb9793829ddae60" culture="neutral" />
+@@ -241,7 +241,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="AngleSharp" publicKeyToken="e83494dcdc6d31ea" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-1.8.4.0" newVersion="1.8.4.0" />
++        <bindingRedirect oldVersion="0.0.0.0-1.8.5.0" newVersion="1.8.5.0" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="System.Net.ServerSentEvents" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+diff --git a/VBFunctions.Test/VBFunctions.Test.csproj b/VBFunctions.Test/VBFunctions.Test.csproj
+index 45e90ca72..f08678413 100644
+--- a/VBFunctions.Test/VBFunctions.Test.csproj
++++ b/VBFunctions.Test/VBFunctions.Test.csproj
+@@ -294,7 +294,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/VBFunctions.Test/app.config b/VBFunctions.Test/app.config
+index f882349c2..cc6a8ee7e 100644
+--- a/VBFunctions.Test/app.config
++++ b/VBFunctions.Test/app.config
+@@ -172,7 +172,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Memory" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Kiota.Http.HttpClientLibrary" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+@@ -184,7 +184,7 @@
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Bcl.Numerics" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
+-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.12" newVersion="10.0.0.12" />
++        <bindingRedirect oldVersion="0.0.0.0-10.0.0.13" newVersion="10.0.0.13" />
+       </dependentAssembly>
+       <dependentAssembly>
+         <assemblyIdentity name="Microsoft.Extensions.DependencyInjection.Abstractions" publicKeyToken="adb9793829ddae60" culture="neutral" />
+diff --git a/VBFunctions/VBFunctions.csproj b/VBFunctions/VBFunctions.csproj
+index 2a67ba10b..2b87add26 100644
+--- a/VBFunctions/VBFunctions.csproj
++++ b/VBFunctions/VBFunctions.csproj
+@@ -55,7 +55,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />

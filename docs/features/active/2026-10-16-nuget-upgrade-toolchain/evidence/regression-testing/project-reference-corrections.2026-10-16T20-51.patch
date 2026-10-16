@@ -1,0 +1,248 @@
+diff --git a/QuickFiler.Test/QuickFiler.Test.csproj b/QuickFiler.Test/QuickFiler.Test.csproj
+index ba8e37859..4d53f428b 100644
+--- a/QuickFiler.Test/QuickFiler.Test.csproj
++++ b/QuickFiler.Test/QuickFiler.Test.csproj
+@@ -551,7 +551,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/QuickFiler/QuickFiler.csproj b/QuickFiler/QuickFiler.csproj
+index 4fbacdaf9..7b92a5e0c 100644
+--- a/QuickFiler/QuickFiler.csproj
++++ b/QuickFiler/QuickFiler.csproj
+@@ -194,6 +194,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
+@@ -616,7 +617,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/Tags.Test/Tags.Test.csproj b/Tags.Test/Tags.Test.csproj
+index 0ef5b92a2..76a0ed23a 100644
+--- a/Tags.Test/Tags.Test.csproj
++++ b/Tags.Test/Tags.Test.csproj
+@@ -316,7 +316,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/Tags/Tags.csproj b/Tags/Tags.csproj
+index 1fb72419b..e17a04ccf 100644
+--- a/Tags/Tags.csproj
++++ b/Tags/Tags.csproj
+@@ -95,7 +95,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskMaster.Test/TaskMaster.Test.csproj b/TaskMaster.Test/TaskMaster.Test.csproj
+index 2b99444f9..93f311359 100644
+--- a/TaskMaster.Test/TaskMaster.Test.csproj
++++ b/TaskMaster.Test/TaskMaster.Test.csproj
+@@ -404,7 +404,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskMaster/TaskMaster.csproj b/TaskMaster/TaskMaster.csproj
+index cb48c2c9b..a138357f9 100644
+--- a/TaskMaster/TaskMaster.csproj
++++ b/TaskMaster/TaskMaster.csproj
+@@ -252,6 +252,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
+@@ -583,7 +584,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskTree.Test/TaskTree.Test.csproj b/TaskTree.Test/TaskTree.Test.csproj
+index bc72c4670..f168bcf00 100644
+--- a/TaskTree.Test/TaskTree.Test.csproj
++++ b/TaskTree.Test/TaskTree.Test.csproj
+@@ -317,7 +317,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskTree/TaskTree.csproj b/TaskTree/TaskTree.csproj
+index a0074d845..28597273d 100644
+--- a/TaskTree/TaskTree.csproj
++++ b/TaskTree/TaskTree.csproj
+@@ -98,7 +98,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskVisualization.Test/TaskVisualization.Test.csproj b/TaskVisualization.Test/TaskVisualization.Test.csproj
+index 76cf63aa9..5c34fc13c 100644
+--- a/TaskVisualization.Test/TaskVisualization.Test.csproj
++++ b/TaskVisualization.Test/TaskVisualization.Test.csproj
+@@ -341,7 +341,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/TaskVisualization/TaskVisualization.csproj b/TaskVisualization/TaskVisualization.csproj
+index 6e5244421..d90a97fcc 100644
+--- a/TaskVisualization/TaskVisualization.csproj
++++ b/TaskVisualization/TaskVisualization.csproj
+@@ -148,7 +148,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/ToDoModel.Test/ToDoModel.Test.csproj b/ToDoModel.Test/ToDoModel.Test.csproj
+index 4667cd2e3..1f80e45a1 100644
+--- a/ToDoModel.Test/ToDoModel.Test.csproj
++++ b/ToDoModel.Test/ToDoModel.Test.csproj
+@@ -359,7 +359,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/ToDoModel/ToDoModel.csproj b/ToDoModel/ToDoModel.csproj
+index 4eb78f9d8..247674748 100644
+--- a/ToDoModel/ToDoModel.csproj
++++ b/ToDoModel/ToDoModel.csproj
+@@ -93,6 +93,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+@@ -195,7 +196,7 @@
+   </Target>
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/UtilitiesCS.Test/UtilitiesCS.Test.csproj b/UtilitiesCS.Test/UtilitiesCS.Test.csproj
+index 4d0ff7772..1ff5535c3 100644
+--- a/UtilitiesCS.Test/UtilitiesCS.Test.csproj
++++ b/UtilitiesCS.Test/UtilitiesCS.Test.csproj
+@@ -917,6 +917,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+@@ -1028,7 +1029,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/UtilitiesCS/UtilitiesCS.csproj b/UtilitiesCS/UtilitiesCS.csproj
+index dbf622bcb..b6c163299 100644
+--- a/UtilitiesCS/UtilitiesCS.csproj
++++ b/UtilitiesCS/UtilitiesCS.csproj
+@@ -406,6 +406,7 @@
+          putting its types in scope; no source file declares extern alias SystemLinqAsyncEnumerable. -->
+     <Reference Include="System.Linq.AsyncEnumerable, Version=10.0.0.13, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.AsyncEnumerable.10.0.13\lib\net462\System.Linq.AsyncEnumerable.dll</HintPath>
++      <Aliases>SystemLinqAsyncEnumerable</Aliases>
+     </Reference>
+     <Reference Include="System.Linq.Expressions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\packages\System.Linq.Expressions.4.3.0\lib\net463\System.Linq.Expressions.dll</HintPath>
+@@ -1328,7 +1329,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/VBFunctions.Test/VBFunctions.Test.csproj b/VBFunctions.Test/VBFunctions.Test.csproj
+index 45e90ca72..f08678413 100644
+--- a/VBFunctions.Test/VBFunctions.Test.csproj
++++ b/VBFunctions.Test/VBFunctions.Test.csproj
+@@ -294,7 +294,7 @@
+   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />
+diff --git a/VBFunctions/VBFunctions.csproj b/VBFunctions/VBFunctions.csproj
+index 2a67ba10b..2b87add26 100644
+--- a/VBFunctions/VBFunctions.csproj
++++ b/VBFunctions/VBFunctions.csproj
+@@ -55,7 +55,7 @@
+   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+   <ItemGroup>
+     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
+-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.296\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
++    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.303\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
+     <Analyzer Include="..\packages\Roslynator.Analyzers.5.0.1\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Core.dll" />

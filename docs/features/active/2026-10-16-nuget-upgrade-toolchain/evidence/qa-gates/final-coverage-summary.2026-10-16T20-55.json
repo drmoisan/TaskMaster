@@ -1,0 +1,17 @@
+{
+  "Timestamp": "2026-10-16T20-55",
+  "Command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug",
+  "EXIT_CODE": 0,
+  "PassedTests": 7450,
+  "FailedTests": 0,
+  "LineRate": "0.860061",
+  "LinesCovered": "56887",
+  "LinesValid": "66143",
+  "BranchRate": "0.801724",
+  "BranchesCovered": "13768",
+  "BranchesValid": "17173",
+  "LineThreshold": "80%",
+  "BranchThreshold": "75%",
+  "RawCoveragePath": "../TaskMaster-wt/2026-10-16T16-48-toolchain/coverage/coverage.cobertura.xml",
+  "RawCoverageSHA256": "046B8EA2306C7FE523CC9A6931011B267429CF7E6493A2F8028E175385BCB7F3"
+}
