@@ -1,0 +1,133 @@
+{
+  "Timestamp": "2026-10-16T20-53",
+  "Command": "Get-FileHash of each changed project/config in the primary and detached worktrees",
+  "EXIT_CODE": 0,
+  "SourceHead": "b5c9ae35d11044d001a08868122e0bb3dde276b2",
+  "ValidationWorkspace": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-10-16T16-48-toolchain",
+  "Files": [
+    {
+      "Path": "QuickFiler.Test/QuickFiler.Test.csproj",
+      "SHA256": "DAC995708895D193A556905FCA2F55A81A977CBCFF465A8918697A8085D79A79"
+    },
+    {
+      "Path": "QuickFiler.Test/app.config",
+      "SHA256": "2CD4EDD86C1647807383B093F4B797AE4268D3C6182DEE3C5017D251776F5632"
+    },
+    {
+      "Path": "QuickFiler/QuickFiler.csproj",
+      "SHA256": "09E548922A391E1521BD942B67A2AF9E5D6F4A49859E737A29D94AA7CDE92864"
+    },
+    {
+      "Path": "QuickFiler/app.config",
+      "SHA256": "76E50AC5D8C9AE66072978838C88F53648A8F966D5D8BBD9BE0DCA3D794B153A"
+    },
+    {
+      "Path": "Tags.Test/Tags.Test.csproj",
+      "SHA256": "75DFFF2A5421F8B6B5CB3738A0F405627317CA090749FC9268E16A1A291A5716"
+    },
+    {
+      "Path": "Tags.Test/app.config",
+      "SHA256": "11C64C4472EC4CB8033CAE1B60C2301677D1484C958BBB51D6B1449E41667663"
+    },
+    {
+      "Path": "Tags/Tags.csproj",
+      "SHA256": "392526CB14B870E80A3FE53E1C37D913916F3DEDA30526B4940A8EA7B3AC6651"
+    },
+    {
+      "Path": "Tags/app.config",
+      "SHA256": "59748D3C6591854ECA740BFCE6892292BB84EF761105C850A1776892211F4663"
+    },
+    {
+      "Path": "TaskMaster.Test/TaskMaster.Test.csproj",
+      "SHA256": "C60B0A32F53FC05C2F6FB60786AFB5210EDE44E66CD8004458D9E8B09F276AD2"
+    },
+    {
+      "Path": "TaskMaster.Test/app.config",
+      "SHA256": "0D272F25FDD06F354E66C6B6FD491C23CC105862B06E666E0360376551C19EF1"
+    },
+    {
+      "Path": "TaskMaster/TaskMaster.csproj",
+      "SHA256": "68A505BA61805955CBB8A3D9D0A26F3224B17096F30085B729C72E8179323497"
+    },
+    {
+      "Path": "TaskMaster/app.config",
+      "SHA256": "368571EA331DDF8F55150F28D9C966E029B93B9ABB3D993D8E582788C9B47EA3"
+    },
+    {
+      "Path": "TaskTree.Test/TaskTree.Test.csproj",
+      "SHA256": "CA5708B82022C5B36B8568BF89CECF4F444F82BD87A6E4376A9AC3E51F069B41"
+    },
+    {
+      "Path": "TaskTree.Test/app.config",
+      "SHA256": "11C64C4472EC4CB8033CAE1B60C2301677D1484C958BBB51D6B1449E41667663"
+    },
+    {
+      "Path": "TaskTree/TaskTree.csproj",
+      "SHA256": "EBE18D00FFCB5D553F12F80B35E40A450EC871203174632B8278DD11447E2CC6"
+    },
+    {
+      "Path": "TaskTree/app.config",
+      "SHA256": "677976DC6430A71C8FBCAAC207CC33CF18EB7A9BC703A29B2DB2AB3F220C16F5"
+    },
+    {
+      "Path": "TaskVisualization.Test/TaskVisualization.Test.csproj",
+      "SHA256": "637338A39F4480ECFA060AAE4F5FE0FC6AF4EE288531DCFF97C6A0985482EBD2"
+    },
+    {
+      "Path": "TaskVisualization.Test/app.config",
+      "SHA256": "97F42EA3695E536ED847BBDD1B1B5EDC8C9AD7D630EA0BD3FB3763168F9DC6CD"
+    },
+    {
+      "Path": "TaskVisualization/TaskVisualization.csproj",
+      "SHA256": "229917CA41AEDF2120A6FF119E9126C33D3CD173439110050C152EBDD2F4764D"
+    },
+    {
+      "Path": "TaskVisualization/app.config",
+      "SHA256": "FAB3E94D74B6997787BCFEBBCD4466308A0B04DA2C67E8FD295F247F04B4B322"
+    },
+    {
+      "Path": "ToDoModel.Test/ToDoModel.Test.csproj",
+      "SHA256": "F42966C6B7EFE12990796D3267D2F122D5235273853AC6FF30DE5EA58390F181"
+    },
+    {
+      "Path": "ToDoModel.Test/app.config",
+      "SHA256": "22E934878AEB4E1467D3EBD039335768403F15E07E6B17B9839CD61F8D10313F"
+    },
+    {
+      "Path": "ToDoModel/ToDoModel.csproj",
+      "SHA256": "0D5381B38DA52906A0300490E78CC9E7101D4ED1E46A39EE654D76B1FDB496C2"
+    },
+    {
+      "Path": "ToDoModel/app.config",
+      "SHA256": "7868E4EA254F32D63E9D2BA1F92E472E07B918DB24E867E954B28B466926F372"
+    },
+    {
+      "Path": "UtilitiesCS.Test/UtilitiesCS.Test.csproj",
+      "SHA256": "462940F206D4F3952AFED2503D4ABCC4BD7EC105BDCE51FA305B37F7BDC852B4"
+    },
+    {
+      "Path": "UtilitiesCS.Test/app.config",
+      "SHA256": "80545FCDAC75818B33A13C7D2DE5DD73A36A0F73F781DB61E1BD54B69D0232ED"
+    },
+    {
+      "Path": "UtilitiesCS/UtilitiesCS.csproj",
+      "SHA256": "668A32AD9F59E109CD6445AE46B458DA415D4CDB07757EB344E2E78AE7BBD4E6"
+    },
+    {
+      "Path": "UtilitiesCS/app.config",
+      "SHA256": "BE2DFE22DBC4AE0C0F5AA74F857336ED0A2AC8B440226287E8EF972459B8DC59"
+    },
+    {
+      "Path": "VBFunctions.Test/VBFunctions.Test.csproj",
+      "SHA256": "FD6D6334EBB572F599B6E5FF69D0271A961397ECDEB4C4D47EC71427FFC81E8F"
+    },
+    {
+      "Path": "VBFunctions.Test/app.config",
+      "SHA256": "BCE43456C41488B240C65B07C20ECBDEAA1D68C3952FEE45AC923752F1591821"
+    },
+    {
+      "Path": "VBFunctions/VBFunctions.csproj",
+      "SHA256": "0737F9B6B28B020D96CF4C022BD1A64D5BD9D08611646D24275C674570550702"
+    }
+  ]
+}
