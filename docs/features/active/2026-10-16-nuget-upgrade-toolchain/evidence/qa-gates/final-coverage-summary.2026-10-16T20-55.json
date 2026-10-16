@@ -12,6 +12,6 @@
   "BranchesValid": "17173",
   "LineThreshold": "80%",
   "BranchThreshold": "75%",
-  "RawCoveragePath": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-10-16T16-48-toolchain\\coverage\\coverage.cobertura.xml",
+  "RawCoveragePath": "../TaskMaster-wt/2026-10-16T16-48-toolchain/coverage/coverage.cobertura.xml",
   "RawCoverageSHA256": "046B8EA2306C7FE523CC9A6931011B267429CF7E6493A2F8028E175385BCB7F3"
 }

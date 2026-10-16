@@ -3,7 +3,7 @@
   "Command": "Get-FileHash of each changed project/config in the primary and detached worktrees",
   "EXIT_CODE": 0,
   "SourceHead": "b5c9ae35d11044d001a08868122e0bb3dde276b2",
-  "ValidationWorkspace": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-10-16T16-48-toolchain",
+  "ValidationWorkspace": "../TaskMaster-wt/2026-10-16T16-48-toolchain",
   "Files": [
     {
       "Path": "QuickFiler.Test/QuickFiler.Test.csproj",

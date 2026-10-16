@@ -25,7 +25,7 @@ The [task plan](plan.md) requires reproducing failures, correcting only observed
 
 Outlook locks existing TaskMaster native binaries in the primary checkout. Validation therefore used the detached worktree below at the same source commit. Only restored packages and the repo-local SDK were shared through junctions; all build outputs were isolated. All 31 changed input files were verified byte-for-byte using SHA-256, and the two tracked diffs agree.
 
-Validation workspace: `C:\Users\DanMoisan\repos\TaskMaster-wt\2026-10-16T16-48-toolchain`
+Validation workspace: `../TaskMaster-wt/2026-10-16T16-48-toolchain`
 
 ## Diffs
 
