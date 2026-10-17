@@ -79,7 +79,7 @@ issue number for it. Run at most one main-sync child per wave, then re-fetch the
 Launch all ready children in one bounded parallel wave. Before each launch, persist the
 epic-child topology receipt, reviewed complexity assessment, delegation receipt, and Codex
 model-routing receipt with the same `delegation_id`, then select the generated deployment agent.
-C3 epic children use the elevated Sol/High profile. The child prompt contains:
+C3 epic children use the elevated Astra/High profile. The child prompt contains:
 
 > `Epic mode: true. epic_feature_folder: <epic-slug>. integration_branch: epic/<epic-slug>-integration. epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json. PR base branch MUST be <integration_branch>, not main; pass --base <integration_branch> to gh pr create.`
 
@@ -137,12 +137,12 @@ remove its worktree. The worktree-removal hook denies removal before the matchin
 Route selection and model selection are independent. The deterministic file-count or marker
 route selects topology; the C1-C4 assessment selects a checked-in Codex deployment profile.
 
-- C1: `gpt-5.6-luna`, low.
-- C2: `gpt-5.6-terra`, medium.
-- standalone C3 with ceiling C3: `gpt-5.6-terra`, high.
-- epic C3 or C3 with a C4 sibling: `gpt-5.6-sol`, high.
-- C4: `gpt-5.6-sol`, max.
-- `epic-orchestrator`: `gpt-5.6-sol`, ultra.
+- C1: `gpt-6-luna`, low.
+- C2: `gpt-6.1-sol`, medium.
+- standalone C3 with ceiling C3: `gpt-6.1-sol`, high.
+- epic C3 or C3 with a C4 sibling: `gpt-6-astra`, high.
+- C4: `gpt-6-astra`, max.
+- `epic-orchestrator`: `gpt-6-astra`, ultra.
 
 Persist the topology and model-routing receipts before every child or `pr-author` delegation. The
 deployed agent type and actual model must match its receipts and start attestation. If the

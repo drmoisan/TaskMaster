@@ -81,13 +81,13 @@ receipt's logical agent name.
 
 ## Fixed routing outcomes
 
-- C1: `gpt-5.6-luna`, low reasoning.
-- C2: `gpt-5.6-terra`, medium reasoning.
-- C3 standalone with a C3 ceiling: `gpt-5.6-terra`, high reasoning.
+- C1: `gpt-6-luna`, low reasoning.
+- C2: `gpt-6.1-sol`, medium reasoning.
+- C3 standalone with a C3 ceiling: `gpt-6.1-sol`, high reasoning.
 - C3 in either epic-child context, or C3 under a C4 ceiling:
-  `gpt-5.6-sol`, high reasoning through the `-c3-elevated` profile.
-- C4: `gpt-5.6-sol`, max reasoning.
-- `epic-planner` and `epic-orchestrator`: always `gpt-5.6-sol`, ultra
+  `gpt-6-astra`, high reasoning through the `-c3-elevated` profile.
+- C4: `gpt-6-astra`, max reasoning.
+- `epic-planner` and `epic-orchestrator`: always `gpt-6-astra`, ultra
   reasoning.
 
 If the exact model is unavailable, record `model_unavailable`, leave the work

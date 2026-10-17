@@ -102,8 +102,8 @@ Apply the deterministic production-file axis before model selection:
   closed to the large orchestrator topology.
 - Outside the applicable budget, cross-cutting, mixed-language, or unsupported: deploy
   `orchestrator-<profile>` and let that agent run the large path.
-- Epic planning: deploy the forced `epic-planner` Sol/Ultra persona.
-- Prepared or manual epic execution: deploy the forced `epic-orchestrator` Sol/Ultra persona.
+- Epic planning: deploy the forced `epic-planner` Astra/Ultra persona.
+- Prepared or manual epic execution: deploy the forced `epic-orchestrator` Astra/Ultra persona.
 
 Only the production-file limit selects inside versus outside the language topology budget. The
 test-file estimate remains in the receipt and governs typed-engineer batching; it does not change
@@ -158,8 +158,8 @@ checked-in Codex deployment agent. Before every delegation:
 5. Require the `SubagentStart` model attestation to match the receipt before accepting mutation
    or completion.
 
-C3 defaults to Terra/High when it is the standalone orchestration ceiling. It elevates to
-Sol/High only for epic preparation/execution children or when a C4 sibling sets the ceiling to
+C3 defaults to Sol/High when it is the standalone orchestration ceiling. It elevates to
+Astra/High only for epic preparation/execution children or when a C4 sibling sets the ceiling to
 C4. If the required model/profile is unavailable, record `model_unavailable` and stop without a
 silent fallback.
 

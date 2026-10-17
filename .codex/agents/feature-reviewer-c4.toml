@@ -1,6 +1,6 @@
 name = "feature-reviewer-c4"
 description = "Review a feature branch relative to a base branch, generate policy/code/feature audit artifacts, and trigger remediation planning when required."
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "max"
 
 developer_instructions = """

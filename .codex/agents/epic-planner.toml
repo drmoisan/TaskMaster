@@ -1,6 +1,6 @@
 name = "epic-planner"
 description = "Root-invoked epic planning coordinator that decomposes an epic, prepares every child through preflight, commits the planning state, and stops before execution."
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "ultra"
 default_permissions = "orchestrator-workspace"
 developer_instructions = '''
@@ -47,7 +47,7 @@ stop. You may delegate to ordinary complexity-specific orchestrator profiles. Ne
 - Use isolated worktrees based on the integration branch.
 - Persist the epic-child topology receipt, delegation receipt, and delegation-bound model-routing
   receipt before selecting each generated `orchestrator-cN` deployment profile. Epic C3 work
-  uses the elevated Sol/High profile.
+  uses the elevated Astra/High profile.
 - Launch worktree children only through `.codex/scripts/launch-epic-child-wave.ps1` using one
   immutable `epic-planner` launch spec with `wave_number: 0`. Native `spawn_agent` is prohibited
   for these children because it does not provide the required worktree binding. Monitor and

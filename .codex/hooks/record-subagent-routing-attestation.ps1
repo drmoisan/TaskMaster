@@ -177,7 +177,7 @@ function Get-CodexSubagentAttestation {
     $profileValidationError = $null
     $routingValid = $true
     if ($isEpic) {
-        $expectedModel = 'gpt-5.6-sol'
+        $expectedModel = 'gpt-6-astra'
         $expectedReasoningEffort = 'ultra'
     } elseif (Test-CodexRoutedAgentType -AgentType $agentType) {
         $routingReceipt = Find-CodexModelRoutingReceipt -AgentType $agentType -Checkpoints $Checkpoints
@@ -246,23 +246,20 @@ function Write-CodexSubagentAttestation {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string] $RepositoryRoot,
-        [Parameter(Mandatory)][System.Collections.IDictionary] $Attestation
+        [Parameter(Mandatory)][System.Collections.IDictionary] $Attestation,
+        [scriptblock] $OpenStream = { param($Path, $Mode, $Access, $Share) [System.IO.File]::Open($Path, $Mode, $Access, $Share) },
+        [scriptblock] $EnsureDirectory = { param($Path) [System.IO.Directory]::CreateDirectory($Path) | Out-Null }
     )
 
     $directory = Get-CodexAuthorityStateRoot `
         -RepositoryRoot $RepositoryRoot `
         -SessionId ([string]$Attestation.session_id)
-    [System.IO.Directory]::CreateDirectory($directory) | Out-Null
+    & $EnsureDirectory $directory
     $path = Get-CodexAuthorityAttestationPath `
         -RepositoryRoot $RepositoryRoot `
         -SessionId ([string]$Attestation.session_id) `
         -AttestationKey ([string]$Attestation.attestation_key)
-    $stream = [System.IO.File]::Open(
-        $path,
-        [System.IO.FileMode]::CreateNew,
-        [System.IO.FileAccess]::Write,
-        [System.IO.FileShare]::None
-    )
+    $stream = & $OpenStream $path ([System.IO.FileMode]::CreateNew) ([System.IO.FileAccess]::Write) ([System.IO.FileShare]::None)
     try {
         $writer = [System.IO.StreamWriter]::new(
             $stream,
@@ -288,7 +285,9 @@ function Get-CodexSubagentAttestationFromAuthority {
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]] $Checkpoints,
         [Parameter(Mandatory)][string] $RepositoryRoot,
         [Parameter(Mandatory)][string] $CurrentHeadSha,
-        [Parameter(Mandatory)][datetimeoffset] $Now
+        [Parameter(Mandatory)][datetimeoffset] $Now,
+        [scriptblock] $OpenStream = { param($Path, $Mode, $Access, $Share) [System.IO.File]::Open($Path, $Mode, $Access, $Share) },
+        [scriptblock] $FlushStream = { param($Stream) $Stream.Flush($true) }
     )
 
     $isEpic = $script:EpicPersonas -contains [string]$Payload.agent_type
@@ -302,12 +301,7 @@ function Get-CodexSubagentAttestationFromAuthority {
             -Now $Now
     }
 
-    $stream = [System.IO.File]::Open(
-        $ReceiptPath,
-        [System.IO.FileMode]::Open,
-        [System.IO.FileAccess]::ReadWrite,
-        [System.IO.FileShare]::None
-    )
+    $stream = & $OpenStream $ReceiptPath ([System.IO.FileMode]::Open) ([System.IO.FileAccess]::ReadWrite) ([System.IO.FileShare]::None)
     try {
         $reader = [System.IO.StreamReader]::new(
             $stream,
@@ -344,7 +338,7 @@ function Get-CodexSubagentAttestationFromAuthority {
             try {
                 $writer.Write(($receipt | ConvertTo-Json -Depth 8))
                 $writer.Flush()
-                $stream.Flush($true)
+                & $FlushStream $stream
             } finally {
                 $writer.Dispose()
             }
@@ -355,60 +349,78 @@ function Get-CodexSubagentAttestationFromAuthority {
     }
 }
 
+<#
+.SYNOPSIS
+    Evaluates SubagentStart input while leaving console output and process exit to the entry wrapper.
+#>
+function Invoke-CodexSubagentAttestationCommand {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [string] $RepositoryRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
+        [scriptblock] $ReadInput = { [Console]::In.ReadToEnd() },
+        [scriptblock] $ReadCheckpoint = { param($Path) Get-Content -Raw -LiteralPath $Path },
+        [scriptblock] $ReadHead = { param($Root) $sha = [string](& git -C $Root rev-parse HEAD 2>$null); @{ sha = $sha; exit_code = $LASTEXITCODE } },
+        [scriptblock] $GetNow = { [datetimeoffset]::UtcNow }
+    )
+    try {
+        $payload = ConvertFrom-SubagentAttestationJson -Raw (& $ReadInput) -Name 'SubagentStart input'
+        $stateRoot = Join-Path $repositoryRoot 'artifacts/orchestration'
+        $receiptPath = Get-CodexAuthorityReceiptPath `
+            -RepositoryRoot $repositoryRoot `
+            -SessionId ([string]$payload.session_id) `
+            -TurnId ([string]$payload.turn_id)
+        $checkpoints = @()
+        foreach ($name in @('epic-planner-state.json', 'epic-orchestrator-state.json', 'orchestrator-state.json')) {
+            $path = Join-Path $stateRoot $name
+            if (Test-Path -LiteralPath $path -PathType Leaf) {
+                $parsed = ConvertFrom-SubagentAttestationJson -Raw (& $ReadCheckpoint $path) -Name $name -Optional
+                if ($null -ne $parsed) {
+                    $checkpoints += $parsed
+                }
+            }
+        }
+        $now = & $GetNow
+        $head = & $ReadHead $repositoryRoot
+        $headSha = [string]$head.sha
+        if ($head.exit_code -ne 0 -or $headSha -notmatch '^[0-9a-fA-F]{40,64}$') {
+            throw 'EPIC_INVOCATION_ORIGIN_BLOCKED: repository HEAD could not be resolved.'
+        }
+        $attestation = Get-CodexSubagentAttestationFromAuthority `
+            -Payload $payload `
+            -ReceiptPath $receiptPath `
+            -Checkpoints $checkpoints `
+            -RepositoryRoot $repositoryRoot `
+            -CurrentHeadSha $headSha `
+            -Now $now
+        $attestationPath = Write-CodexSubagentAttestation -RepositoryRoot $repositoryRoot -Attestation $attestation
+        $stdout = if (-not $attestation.provenance_valid) {
+            [ordered]@{
+                systemMessage      = "EPIC_INVOCATION_ORIGIN_BLOCKED: $($payload.agent_type) requires a fresh root-session epic invocation receipt."
+                hookSpecificOutput = [ordered]@{
+                    hookEventName     = 'SubagentStart'
+                    additionalContext = 'Do not mutate state. Report EPIC_INVOCATION_ORIGIN_BLOCKED and stop.'
+                }
+            } | ConvertTo-Json -Compress -Depth 5
+        } elseif (-not $attestation.routing_valid) {
+            [ordered]@{
+                systemMessage      = "MODEL_ROUTING_ATTESTATION_BLOCKED: actual model/profile does not match the persisted routing receipt. Attestation: $attestationPath"
+                hookSpecificOutput = [ordered]@{
+                    hookEventName     = 'SubagentStart'
+                    additionalContext = 'Do not mutate state until the parent corrects the deployment profile and routing receipt.'
+                }
+            } | ConvertTo-Json -Compress -Depth 5
+        }
+        return [ordered]@{ exit_code = 0; stdout = $stdout; stderr = $null }
+    } catch {
+        return [ordered]@{ exit_code = 2; stdout = $null; stderr = [string]$_ }
+    }
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
-
-try {
-    $payload = ConvertFrom-SubagentAttestationJson -Raw ([Console]::In.ReadToEnd()) -Name 'SubagentStart input'
-    $repositoryRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-    $stateRoot = Join-Path $repositoryRoot 'artifacts/orchestration'
-    $receiptPath = Get-CodexAuthorityReceiptPath `
-        -RepositoryRoot $repositoryRoot `
-        -SessionId ([string]$payload.session_id) `
-        -TurnId ([string]$payload.turn_id)
-    $checkpoints = @()
-    foreach ($name in @('epic-planner-state.json', 'epic-orchestrator-state.json', 'orchestrator-state.json')) {
-        $path = Join-Path $stateRoot $name
-        if (Test-Path -LiteralPath $path -PathType Leaf) {
-            $parsed = ConvertFrom-SubagentAttestationJson -Raw (Get-Content -Raw -LiteralPath $path) -Name $name -Optional
-            if ($null -ne $parsed) {
-                $checkpoints += $parsed
-            }
-        }
-    }
-    $now = [datetimeoffset]::UtcNow
-    $headSha = [string](& git -C $repositoryRoot rev-parse HEAD 2>$null)
-    if ($LASTEXITCODE -ne 0 -or $headSha -notmatch '^[0-9a-fA-F]{40,64}$') {
-        throw 'EPIC_INVOCATION_ORIGIN_BLOCKED: repository HEAD could not be resolved.'
-    }
-    $attestation = Get-CodexSubagentAttestationFromAuthority `
-        -Payload $payload `
-        -ReceiptPath $receiptPath `
-        -Checkpoints $checkpoints `
-        -RepositoryRoot $repositoryRoot `
-        -CurrentHeadSha $headSha `
-        -Now $now
-    $attestationPath = Write-CodexSubagentAttestation -RepositoryRoot $repositoryRoot -Attestation $attestation
-    if (-not $attestation.provenance_valid) {
-        [ordered]@{
-            systemMessage      = "EPIC_INVOCATION_ORIGIN_BLOCKED: $($payload.agent_type) requires a fresh root-session epic invocation receipt."
-            hookSpecificOutput = [ordered]@{
-                hookEventName     = 'SubagentStart'
-                additionalContext = 'Do not mutate state. Report EPIC_INVOCATION_ORIGIN_BLOCKED and stop.'
-            }
-        } | ConvertTo-Json -Compress -Depth 5 | Write-Output
-    } elseif (-not $attestation.routing_valid) {
-        [ordered]@{
-            systemMessage      = "MODEL_ROUTING_ATTESTATION_BLOCKED: actual model/profile does not match the persisted routing receipt. Attestation: $attestationPath"
-            hookSpecificOutput = [ordered]@{
-                hookEventName     = 'SubagentStart'
-                additionalContext = 'Do not mutate state until the parent corrects the deployment profile and routing receipt.'
-            }
-        } | ConvertTo-Json -Compress -Depth 5 | Write-Output
-    }
-    exit 0
-} catch {
-    [Console]::Error.WriteLine([string]$_)
-    exit 2
-}
+$commandResult = Invoke-CodexSubagentAttestationCommand
+if ($null -ne $commandResult.stdout) { Write-Output $commandResult.stdout }
+if ($null -ne $commandResult.stderr) { [Console]::Error.WriteLine($commandResult.stderr) }
+exit $commandResult.exit_code

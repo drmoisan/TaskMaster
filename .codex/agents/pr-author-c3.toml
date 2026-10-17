@@ -1,6 +1,6 @@
 name = "pr-author-c3"
 description = "Write a GitHub-ready pull request body from the canonical PR-context bundle and its enumerated additional context files."
-model = "gpt-5.6-terra"
+model = "gpt-6.1-sol"
 model_reasoning_effort = "high"
 
 developer_instructions = """

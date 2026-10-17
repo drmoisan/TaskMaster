@@ -275,7 +275,7 @@ If an exact signal or required path field is missing, set the relevant step to `
 8. Keep topology routing separate from C1-C4 model routing. Persist both topology and
    model-routing receipts and select the exact generated Codex deployment agent before every
    delegation.
-9. Use Terra/High for standalone ceiling-C3 work. Use Sol/High for C3 epic children or C3 work in
+9. Use Sol/High for standalone ceiling-C3 work. Use Astra/High for C3 epic children or C3 work in
    an orchestration whose monotonic ceiling is C4. Do not infer this overlay from file count.
 
 ## Small Path

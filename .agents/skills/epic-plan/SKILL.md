@@ -97,7 +97,7 @@ the prepared worktree. Write one immutable launch specification under
 `wave_number: 0`, the planner checkpoint path, integration branch, bounded maximum, and one
 launch record per child. Every record supplies the unique launch/delegation ids, prepared
 worktree and branch, generated `orchestrator-cN` profile, exact model/reasoning/permissions, and
-prompt. C3 epic children use the elevated Sol/High profile. Monitor the returned durable status
+prompt. C3 epic children use the elevated Astra/High profile. Monitor the returned durable status
 path; a nonzero child exit or missing completion status blocks fan-in.
 
 The launch specification schema is:
@@ -118,7 +118,7 @@ The launch specification schema is:
       "feature_folder": "<final-active-feature-folder>",
       "issue_num": 123,
       "deployment_agent": "orchestrator-c3-elevated",
-      "model": "gpt-5.6-sol",
+      "model": "gpt-6-astra",
       "model_reasoning_effort": "high",
       "permissions": "orchestrator-workspace",
       "execution_context": "epic_preparation_child",
