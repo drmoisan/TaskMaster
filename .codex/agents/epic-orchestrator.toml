@@ -81,6 +81,8 @@ integration-to-main PR is merged with its merge SHA recorded, the status project
 acceptance criteria are checked, and `validate_orchestration_artifacts` passes
 `epic-orchestrator-state` with `require_complete: true`, `require_codex_topology: true`, and
 `require_codex_model_routing: true`.
+The final merge SHA is recorded only after the merge is confirmed by polling and ancestry check:
+under a merge queue on `main`, `gh pr merge` can return before the merge happens (issue #952).
 '''
 
 [skills]

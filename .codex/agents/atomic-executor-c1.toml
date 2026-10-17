@@ -11,6 +11,7 @@ Use the following repo-local skills as the canonical workflow source:
 - atomic-plan-contract
 - policy-compliance-order
 - acceptance-criteria-tracking
+- execution-environment
 
 ---
 name: atomic-executor
@@ -35,11 +36,13 @@ tools:
   - "mcp__drm-copilot__run_poshqc_analyze"
   - "mcp__drm-copilot__run_poshqc_test"
   - "mcp__drm-copilot__run_poshqc_analyze_autofix"
+  - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
   - atomic-plan-contract
   - evidence-and-timestamp-conventions
   - acceptance-criteria-tracking
+  - execution-environment
 memory: project
 hooks:
   SubagentStop:
@@ -106,19 +109,20 @@ Concurrent child runs in one session share one session scratchpad, so every scra
 
 ## Preflight Validation
 
-When receiving a plan with directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, perform validation only and return exactly one of `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`.
+When the delegation prompt carries the directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, perform validation only and return exactly one of `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`. The preflight directive belongs in the delegation prompt, never in a plan file.
 
 - `PREFLIGHT: ALL CLEAR`
 - `PREFLIGHT: REVISIONS REQUIRED`
-- If revisions are required, include a precise plan delta that can be applied to the same plan file.
-- When returning `PREFLIGHT: REVISIONS REQUIRED`, automatically hand off back to `atomic-planner` and request that it apply the delta to the same plan file.
-- Continue the validate -> delta -> planner-revise -> validate loop until preflight can return `PREFLIGHT: ALL CLEAR`.
-- If the handoff loop cannot proceed or the required validator is unavailable, stop and report blocked state.
+- Review the entire plan in one pass and classify every defect as trivial or substantive, per `### Single-Pass Preflight` in `atomic-plan-contract`.
+- Fix trivial defects in place, in task text only; never add, remove, or reorder tasks. Report each fix as `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>` and name the fix record as `preflight-fix-record: <path>`.
+- If revisions are required, include a precise plan delta that can be applied to the same plan file, with one `PREFLIGHT-DEFECT: <task id or heading> | <defect class> | <required change>` line per substantive defect.
+- Return the result to the caller. A plan returns to the planner at most once; the orchestrator routes the defect list for one revision and runs one confirming preflight.
+- If the required validator is unavailable, stop and report blocked state.
 - Before any `PREFLIGHT: ALL CLEAR` result is treated as approved, the target plan must pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`.
 
 ## Blocking Protocol
 
-Blocking is permitted only during preflight validation (before `[P0-T1]`). When preflight-blocked:
+Blocking is permitted only during preflight validation (before `[P0-T1]`), including the preflight that opens a combined preflight-and-execute run of a proportionate remediation cycle. When preflight-blocked:
 
 1. State: `BLOCKED at preflight (before [P0-T1])`.
 2. Provide a short, concrete explanation of why.

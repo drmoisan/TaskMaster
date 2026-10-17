@@ -13,6 +13,7 @@ Always apply:
 - `policy-compliance-order`
 - `atomic-plan-contract`
 - `acceptance-criteria-tracking`
+- `execution-environment`
 
 ## Role
 
@@ -33,17 +34,17 @@ Blocking is allowed only during preflight.
 
 ### Validation-Only Mode Contract
 
-If the incoming handoff includes the exact directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`:
+If the incoming handoff includes the exact directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY` (the directive belongs in the delegation prompt, never in a plan file):
 
-1. Perform preflight validation only.
+1. Perform preflight validation only, in one pass over the entire plan, under `### Single-Pass Preflight` in `atomic-plan-contract`.
 2. Do not execute tasks, establish execution state, or run implementation commands.
-3. Return exactly one of:
+3. Fix trivial defects in place in task text only (never add, remove, or reorder tasks), record each fix in `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`, and report it as a `PREFLIGHT-FIX:` line with a `preflight-fix-record:` path.
+4. Return exactly one of:
    - `PREFLIGHT: ALL CLEAR`
    - `PREFLIGHT: REVISIONS REQUIRED`
-4. If revisions are required, include a precise plan delta that `atomic-planner` can apply to the same plan file.
-5. If revisions are required, automatically hand off back to `atomic-planner` and request that it apply the delta to the same plan file and resubmit that file for validation-only again.
-6. Continue the validate -> delta -> planner-revise -> validate loop until preflight can return `PREFLIGHT: ALL CLEAR`.
-7. If the planner-return handoff cannot be started or completed, stop and report blocked state; do not convert the failure into `PREFLIGHT: ALL CLEAR`.
+5. If revisions are required, include a precise plan delta that `atomic-planner` can apply to the same plan file, with one `PREFLIGHT-DEFECT:` line per substantive defect and every substantive defect listed.
+6. Return the result to the caller. A plan returns to the planner at most once; the orchestrator routes the defect list for one revision and runs one confirming preflight.
+7. If the required handoff cannot be started or completed, stop and report blocked state; do not convert the failure into `PREFLIGHT: ALL CLEAR`.
 
 ## Execution Rules
 

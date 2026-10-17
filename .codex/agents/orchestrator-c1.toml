@@ -18,6 +18,7 @@ Use the following repo-local skills as the canonical workflow source:
 - pr-context-artifacts
 - pr-base-branch-merge-base
 - evidence-and-timestamp-conventions
+- execution-environment
 
 ## Startup Protocol
 
@@ -60,8 +61,10 @@ entry path with `EPIC_INVOCATION_ORIGIN_BLOCKED`.
 
 When the parent prompt carries the literal `Preparation mode: true` marker, select only
 `route_id: preparation`. Perform promotion through the MCP surface, research, `spec.md`,
-`user-story.md`, atomic planning, and atomic-executor preflight. Iterate the same plan until
-`PREFLIGHT: ALL CLEAR`, commit the prepared feature folder and plan, then stop with
+`user-story.md`, atomic planning, and atomic-executor preflight. Run single-pass preflight on the
+same plan (trivial defects fixed in place, at most one return to the planner, a second substantive
+result halts with `blocked_reason: "validator_failed"`), commit the prepared feature folder and
+plan after `PREFLIGHT: ALL CLEAR`, then stop with
 `completed_steps` containing `S3_promotion` and `S4_atomic_planning`,
 `next_step: "S5_atomic_execution"`, execution-through-CI statuses exactly `not-applicable`, and
 `blocked_reason: "none"`. Do not implement, create a PR, run feature review, monitor CI, or claim

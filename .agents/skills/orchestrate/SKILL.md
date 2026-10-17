@@ -27,6 +27,7 @@ Before proceeding, the orchestrator must:
 1. Read `AGENTS.md` for repository tone policy and architectural context.
 2. Read applicable `.agents/skills/` files for the languages in scope.
 3. Read the policy files listed in the compliance reading order section of `AGENTS.md`.
+4. Read the `execution-environment` skill (`.agents/skills/execution-environment/SKILL.md`) before delegating any worker. Delegation prompts and plans reference that brief instead of restating tool routes, command-text restrictions, the batch budget, hook context, or CI shape.
 
 ## Checkpoint Handling
 
@@ -121,7 +122,11 @@ route.
 - Copy the exact required agents, skills, and MCP tools from the central `preparation` route.
 - Perform promotion through the MCP surface, research, `spec.md`, `user-story.md`, atomic
   planning, and atomic-executor preflight only.
-- Iterate revisions against the same plan path until `PREFLIGHT: ALL CLEAR`.
+- Run single-pass preflight against the same plan path (`### Single-Pass Preflight` in
+  `atomic-plan-contract`): trivial defects are fixed in place, the plan returns to the planner at
+  most once with the full `PREFLIGHT-DEFECT:` list, and a second substantive result halts with
+  `blocked_reason: "validator_failed"`. The preflight directive goes in the delegation prompt,
+  never in the plan file.
 - Commit the prepared feature folder and approved plan to the worktree branch.
 - Stop with `completed_steps` containing `S3_promotion` and `S4_atomic_planning`,
   `next_step: "S5_atomic_execution"`, all execution-through-CI step statuses exactly
@@ -430,8 +435,13 @@ A bounded loop consisting of five steps. The attempt count is `remediation_loop.
 
 Cycle accounting: a remediation attempt is complete when R3 execution finished (`execution_status: "complete"`) and the pre-R4 commit recorded a non-empty change set; only then set `candidate_applied: true` on that cycle and increment `completed_attempts`. A cycle that ends without a candidate (execution not started, execution failed, or an empty staged change set) records `candidate_applied: false` and consumes no number. It is followed by at most one re-plan under the same number when the executor output identifies an autonomous plan defect; otherwise reclassify the blocker (typically `external_dependency`) and halt. Two consecutive no-candidate cycles halt with `step6_status: "blocked_remediation_loop_limit"`.
 
+Remediation mode. Each cycle's `remediation-inputs.<timestamp>.md` carries exactly one line `Remediation-Mode: proportionate` or `Remediation-Mode: design`. A cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate.
+
+- **Proportionate cycle.** One `atomic-planner` delegation produces a short plan with a `## Pre-Mortem` section and a final self-review task; R2 and R3 then run as one `atomic-executor` delegation that performs single-pass preflight with in-place trivial fixes and executes the plan. Record `preflight: {iterations: 1, final_status: "clear"}` before `execution_status`. A substantive defect stops the run with `BLOCKED at preflight (before [P0-T1])` and no checked task; rewrite the mode line to `Remediation-Mode: design` and continue as a design cycle with one planner revision.
+- **Design cycle.** R1 to R5 run as listed below, with R2 under the single-pass preflight and at-most-one-return rule.
+
 - **R1 — Remediation plan of record:** Use the exact `REMEDIATION_PLAN: <path>` returned by the review as the starting plan of record for the loop.
-- **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation). If the executor does not return `PREFLIGHT: ALL CLEAR`, return to R1 by re-delegating to `atomic-planner` against the same remediation-plan path with the required-changes output from the executor. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
+- **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation), with the preflight directive in the delegation prompt. Trivial defects are fixed in place. If the executor returns `PREFLIGHT: REVISIONS REQUIRED`, return to R1 once by re-delegating to `atomic-planner` against the same remediation-plan path with the full `PREFLIGHT-DEFECT:` list; if the following preflight still reports a substantive defect, record `final_status: "blocked_preflight_iteration_limit"` on the cycle and halt. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
 - **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Each task's toolchain loop (format → lint → type-check → test) is mandatory; no skipping.
 - **Pre-R4 commit:** Stage all changes (`git add -A`), run MCP tool `collect_commit_context`, delegate to `commit_steward` using the resulting artifact, and commit with the generated message. Advance to R4 only after a successful commit.
 - **R4 — Re-audit:** Refresh PR context via MCP tool `collect_pr_context`, then delegate to `feature-reviewer` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.

@@ -11,6 +11,7 @@ Use the following repo-local skills as the canonical workflow source:
 - atomic-plan-contract
 - policy-compliance-order
 - evidence-and-timestamp-conventions
+- execution-environment
 
 ---
 name: atomic-planner
@@ -23,10 +24,12 @@ tools:
   - "Edit(artifacts/**)"
   - "Write(docs/**)"
   - "Write(artifacts/**)"
+  - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
   - atomic-plan-contract
   - evidence-and-timestamp-conventions
+  - execution-environment
 memory: project
 hooks:
   Stop:
@@ -84,8 +87,8 @@ Before reporting completion, explicitly spawn the `atomic-executor` subagent for
   - `PREFLIGHT: ALL CLEAR`
   - `PREFLIGHT: REVISIONS REQUIRED`
 - Treat executor preflight findings as binding plan defects.
-- If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, revise the same target plan file using the executor's precise plan delta and re-run preflight.
-- Reuse the same target plan file for every preflight revision iteration in the same planning cycle.
+- If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, revise the same target plan file once using the executor's precise plan delta and its full `PREFLIGHT-DEFECT:` list, and run one confirming preflight. Preflight is single-pass: trivial defects are fixed in place by the executor, and a plan returns to the planner at most once; a second substantive result halts with `blocked_reason: "validator_failed"`.
+- Reuse the same target plan file for the single permitted preflight revision in the same planning cycle.
 - If the required `atomic-executor` handoff cannot be started or completed, stop and report blocked state; do not self-approve the plan.
 - Before reporting completion, the target plan MUST pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`.
 

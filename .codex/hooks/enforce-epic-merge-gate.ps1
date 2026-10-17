@@ -3,6 +3,11 @@
     Gates epic child and integration PR merges behind checkpointed green state.
 
 .DESCRIPTION
+    Trigger scope (issue #952): every gh pr merge invocation (any merge method, --auto, --admin,
+    or no method flag) and every gh api merge or enqueue mutation is gated, because under a merge
+    queue each of them reaches the base branch; only a pure --disable-auto is out of scope. The
+    predicate and the PR selector reader live in enforce-epic-merge-gate-command.ps1.
+
     Docs-only branch (issue #927): after the standalone branch denies an explicit PR number,
     and only when no checkpoint is present at the repository root (both checkpoint texts are
     blank; operator decision OD-1, stricter than the Claude per-PR rule), the gate calls
@@ -25,6 +30,9 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 # the two runtimes on one implementation of the same concern.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
+# Merge and enqueue scope predicate and the PR selector reader (issue #952), byte-identical to the
+# Claude copy.
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-command.ps1' -ErrorRecord $_ }
 # Shared docs-only diff classification and the merge-side docs-only exemption (issue #927).
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
 
@@ -61,15 +69,11 @@ function Get-CodexMergeCommandPrNumber {
     .SYNOPSIS
         Resolve the explicit pull-request number of a gh pr merge invocation, or $null.
     .DESCRIPTION
-        The number is taken from the segment that structurally invokes `gh pr merge` and
-        from nowhere else: the positional spelling through Get-CommandLineOperand, the
-        flag-led and equals-joined spellings through Get-CommandLineFlagValue. A leading
-        `cd <path>` segment contributes no operand and no flag value, so no digit run
+        The number is resolved by Get-EpicMergeGateSelectorPrNumber in
+        enforce-epic-merge-gate-command.ps1 (issue #952), the file shared byte-identically with
+        the Claude runtime, from the segment that structurally invokes gh pr merge or gh api and
+        from nowhere else. A leading cd <path> segment contributes no selector, so no digit run
         outside the merge segment can be mistaken for a pull-request number.
-
-        This copy has never carried the Claude copy's unanchored whole-text digit scan and
-        deliberately does not acquire one. No regular expression matching a bare digit run
-        is introduced here; the only pattern below anchors an all-digit token end to end.
     .OUTPUTS
         System.Nullable[int]
     #>
@@ -77,18 +81,7 @@ function Get-CodexMergeCommandPrNumber {
     [OutputType([int])]
     param([Parameter(Mandatory)][string] $Command)
 
-    foreach ($operand in @(Get-CommandLineOperand -CommandText $Command -CommandWord 'gh' -SubcommandPath @('pr', 'merge'))) {
-        if ($operand -match '^\d+$') {
-            return [int]$operand
-        }
-    }
-
-    $flagValue = Get-CommandLineFlagValue -CommandText $Command -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
-    if ($null -ne $flagValue -and $flagValue -match '^\d+$') {
-        return [int]$flagValue
-    }
-
-    return $null
+    return Get-EpicMergeGateSelectorPrNumber -CommandText $Command
 }
 
 function Test-CodexChildMergeReady {
@@ -153,23 +146,9 @@ function Invoke-CodexEpicMergeDecision {
         return $null
     }
     $command = [string]$payload.tool_input.command
-    # Both legs are read structurally from the segment that invokes the command, so a
-    # quoted mention of the phrase no longer brings a command into scope. The flag leg needs
-    # a raw-scan fallback: a wrapper's quoted argument collapses into ONE token, so a flag
-    # inside it is never read as a token, and the token-only read took
-    # bash -c "gh pr merge --merge 688" out of scope.
-    $isMergeInvocation = Test-CommandLineInvocation -CommandText $command -CommandWord 'gh' -SubcommandPath @('pr', 'merge')
-    $hasMergeFlag = Test-CommandLineFlag -CommandText $command -CommandWord 'gh' -SubcommandPath @('pr', 'merge') -FlagName '--merge'
-    if (-not $hasMergeFlag) {
-        foreach ($segment in @(Read-CommandLineSegment -CommandText $command)) {
-            if ((Test-CommandLineSegmentRawScan -Segment $segment) -and
-                $segment.ScanText.IndexOf('--merge', [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
-                $hasMergeFlag = $true
-                break
-            }
-        }
-    }
-    if (-not $isMergeInvocation -or -not $hasMergeFlag) {
+    # Scope (issue #952): every gh pr merge invocation except a pure --disable-auto, and every gh api
+    # merge or enqueue mutation, is gated; Test-EpicMergeGateCommandInScope holds the predicate.
+    if (-not (Test-EpicMergeGateCommandInScope -CommandText $command)) {
         return $null
     }
 
@@ -214,7 +193,7 @@ function Invoke-CodexEpicMergeDecision {
         hookSpecificOutput = [ordered]@{
             hookEventName            = 'PreToolUse'
             permissionDecision       = 'deny'
-            permissionDecisionReason = 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires a safe epic child checkpoint or a successful final epic CI gate with a matching PR number.'
+            permissionDecisionReason = 'EPIC_MERGE_GATE_BLOCKED: a pull-request merge or merge-queue enqueue (gh pr merge with any method, --auto, or --admin, or a gh api merge or enqueue mutation) requires a safe epic child checkpoint or a successful final epic CI gate with a matching PR number.'
         }
     }
 }

@@ -169,7 +169,14 @@ On resume, reconcile the checkpoint against `git worktree list --porcelain`, bra
 After every child is merged or its worktree removed, delegate final PR authoring to the routed
 `pr-author` profile, refresh PR context through the MCP surface, run the CI-green procedure,
 record the current head SHA and successful conclusion, and merge the integration branch to
-`main` only through the merge gate.
+`main` only through the merge gate. A zero exit from `gh pr merge` does not prove a merge when
+`main` uses a merge queue: read the pull-request state (`state`, `mergeCommit`, `mergedAt`,
+`isInMergeQueue`, and `autoMergeRequest`) every 30 seconds for at most 90 minutes until it is
+`MERGED`, then run `git fetch origin main` and
+`git merge-base --is-ancestor <merge-commit-oid> origin/main`. The final merge SHA is recorded
+only after the merge is confirmed by polling and ancestry check. When the 90 minutes are
+exhausted, report `awaiting_merge_queue` and do not record a merge; never re-issue the merge in
+a loop (issue #952).
 
 ## Completion
 

@@ -9,6 +9,7 @@ Repository-local Codex skills live under `.agents/skills/<skill-name>/SKILL.md`.
   - `atomic-plan-contract`
   - `acceptance-criteria-tracking`
   - `evidence-and-timestamp-conventions`
+  - `execution-environment`
   - `skill-canonical-location-audit`
 
 - Integration
