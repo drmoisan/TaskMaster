@@ -203,9 +203,13 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    `.claude/settings.json`) carries no `gh` entry; and `.claude/hooks/enforce-epic-merge-gate.ps1`
    would deny the command with `EPIC_MERGE_GATE_BLOCKED` if it were attempted. At this
    boundary the agent reports the consolidation pull request's URL or number to the
-   operator and stops. The ruleset on `main` sets `strict_required_status_checks_policy`,
-   so the branch must be up to date with `main` before the merge becomes available to the
-   operator; the wait for the merge is unbounded within a session. After the consolidation
+   operator and stops. When `main` uses a merge queue (issue #952), the queue tests the merged
+   result of the pull request and the entries ahead of it against the latest `main`, so the
+   branch need not be up to date with `main`, and the operator adds it to the queue once its
+   checks pass. Without a merge queue, the ruleset on `main` sets
+   `strict_required_status_checks_policy`, so the branch must be up to date with `main` before
+   the merge becomes available to the operator. In either case the wait for the merge is
+   unbounded within a session. After the consolidation
    PR merges, verify it with `git fetch` followed by
    `git merge-base --is-ancestor documentationandmemories main`. Exit 0 confirms every
    consolidated commit is now reachable from `main`; that is the only state that unlocks

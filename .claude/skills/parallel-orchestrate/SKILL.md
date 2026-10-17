@@ -389,12 +389,32 @@ Procedure, per item:
    `merge_status: ci_green` and do not run `gh pr merge`; the item waits until its child pushes
    the check-off and re-runs S9, and the parent does not commit the check-off itself.
 3. Execute `gh pr merge --merge <PR>` for that item's pull request, whose base is `main`.
-4. On success, record `merge_commit_sha`, `merged_at`, and `merge_status: merged`, then regenerate
+   Do not pass `--delete-branch` or `--auto`. A zero exit status does not prove a merge: when
+   `main` uses a merge queue, `gh pr merge` exits 0 after it enqueues the pull request or enables
+   auto-merge (issue #952). Confirm the merge before step 4. Every 30 seconds, for at most 90
+   minutes, read the pull-request state with
+   `gh api graphql -f query='query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){state mergedAt isInMergeQueue mergeCommit{oid} autoMergeRequest{enabledAt}}}}' -F owner='{owner}' -F name='{repo}' -F number=<PR> --jq .data.repository.pullRequest`
+   and classify it with
+   `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1 -PrJson <snapshot-json> -AsJson`.
+   On `pending`, read again. When the 90 minutes are exhausted, report the item as
+   `awaiting_merge_queue`, leave its `merge_status` at `ci_green`, and do not record `merged`.
+   On `merged`, run `git fetch origin main` and
+   `git merge-base --is-ancestor <merge-commit-oid> origin/main`; the merge is confirmed only
+   when that command exits 0. On `not_queued`, read `gh pr view <PR> --json mergeable`: a
+   `CONFLICTING` value enters `## Per-Item Merge-Conflict Handling`, and any other value is a
+   merge-group CI failure that re-delegates the item's child to merge `origin/main` and re-run
+   S9 as one CI-failure remediation cycle, consuming a remediation attempt. On `closed`, stop
+   and report a failure for the item. Never re-issue `gh pr merge` in a loop after a
+   `not_queued` outcome.
+4. Record `merge_commit_sha`, `merged_at`, and `merge_status: merged` only after the merge is
+   confirmed by polling and ancestry check, then regenerate
    `docs/features/parallel/<slug>/parallel-status.md`.
 5. On a merge failure caused by a conflict, follow `## Per-Item Merge-Conflict Handling`.
 
 **Merge-gate authorization.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide
-`PreToolUse` Bash-matcher hook that denies any `gh pr merge --merge` unless a checkpoint satisfies
+`PreToolUse` Bash-matcher hook that denies every merge or merge-queue enqueue action (any
+`gh pr merge` spelling except a pure `--disable-auto`, and every `gh api` merge or enqueue
+mutation; issue #952) unless a checkpoint satisfies
 one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate has
 four allow conditions
 which it evaluates in this order: a per-feature checkpoint with `epic_mode == true` and
@@ -436,7 +456,9 @@ security control; see the Standalone-Merge-Authorization section of
 Branch protection on `main` affects only the pacing of step 3, not its ownership: if `main`
 requires branches to be up to date, an automated `gh pr update-branch` plus re-green cycle is
 inserted between same-cohort merges, which serializes those merges in practice while remaining
-unattended.
+unattended. When `main` uses a merge queue, the queue replaces that `gh pr update-branch` cycle:
+step 3 enqueues each green pull request, the queue validates it against the latest `main`
+together with the entries ahead of it, and step 3's confirmation polling waits for the merge.
 
 ## Per-Item Merge-Conflict Handling
 
@@ -447,7 +469,8 @@ this surface.
 Project-file conflicts are resolved by the parent first (issue #643); the numbered steps below are
 the escalation path.
 
-- (a) On a conflicted `gh pr merge --merge`, the parent runs the two commands
+- (a) On a conflicted `gh pr merge --merge`, or a `not_queued` merge confirmation whose
+  `mergeable` value is `CONFLICTING`, the parent runs the two commands
   `git -C <worktree_path> fetch origin main` and
   `git -C <worktree_path> merge --no-commit origin/main`.
 - (b) The parent then runs
@@ -467,7 +490,8 @@ the escalation path.
   item, sets `merge_status: pr_open`, regenerates `parallel-status.md`, and re-enters
   `## Per-Item Merge to Main (Merge-on-Green)` at the durable `gh pr checks` confirmation step.
 
-1. On a conflicted `gh pr merge --merge`, the parent detects the failure and re-delegates that item's
+1. On a conflicted `gh pr merge --merge`, or a `not_queued` merge confirmation whose `mergeable`
+   value is `CONFLICTING`, the parent detects the failure and re-delegates that item's
    child orchestration, passing the conflict signal and the instruction to resolve against
    `origin/main`. The conflict capture and the finding write both belong to the child's
    `atomic-executor`, which works inside the item's own worktree, the only working tree holding the

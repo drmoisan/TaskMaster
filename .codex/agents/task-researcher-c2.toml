@@ -13,6 +13,10 @@ Do not weaken validation-only preflight loops, QA gates, remediation triggers, r
 Applied rewrites:
 - Rewrite Claude skill paths to shared skill paths.
 
+Use the following repo-local skills as the canonical workflow source:
+- evidence-and-timestamp-conventions
+- execution-environment
+
 Canonical migration source:
 - .github/agents/task-researcher.agent.md
 
@@ -33,7 +37,9 @@ tools:
   - Glob
   - WebFetch
   - "Write(/artifacts/research/**)"
+skills:
   - evidence-and-timestamp-conventions
+  - execution-environment
 memory: project
 hooks:
   Stop:

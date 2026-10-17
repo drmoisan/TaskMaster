@@ -14,6 +14,8 @@ tools:
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
   - "Bash(gh *)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
@@ -161,6 +163,9 @@ Do not report completion until:
 
 1. Every feature in the manifest has `merge_status: "merged"` or `"worktree_removed"`.
 2. The final integration-to-`main` PR has merged (`epic_merge_pr.merge_commit_sha` recorded).
+   `epic_merge_pr.merge_commit_sha` is recorded only after the merge is confirmed by polling and
+   ancestry check, because under a merge queue on `main` `gh pr merge` can return before the
+   merge happens (issue #952).
 3. `docs/features/epics/<epic-slug>/epic-status.md` reflects the completed state.
 4. The epic checkpoint passes `validate_epic_orchestrator_state_text` with
    `require_complete=True` (no wave-barrier violations, all features merged/removed).

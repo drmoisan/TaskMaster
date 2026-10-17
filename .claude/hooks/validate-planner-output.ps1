@@ -19,7 +19,9 @@
       - each task uses `- [ ] [P#-T#]` (or checked equivalent),
       - task numbering is sequential within each phase,
       - every task includes at least one explicit path token,
-      - the final phase contains QA-oriented work.
+      - the final phase contains QA-oriented work,
+      - the plan carries a complete `## Pre-Mortem` section (Test-PreMortemSection, issue #964),
+      - no internal-review `CITATION:` locator is a line reference (issue #964).
 
 .NOTES
     Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
@@ -39,6 +41,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 Set-StrictMode -Version Latest
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'premortem-section.ps1') } catch { Add-HookDependencyFailure -Name 'premortem-section.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
 $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
@@ -185,6 +188,10 @@ function Get-PlannerInternalReviewValidation {
         $citation = [regex]::Match($citationLine, '^\s*CITATION\s*:\s*(?<Path>[^|\s]+)\s*\|\s*(?<Locator>.+?\S)\s*$')
         if (-not $citation.Success -or $citation.Groups['Path'].Value -notmatch '^(?![A-Za-z]:)(?!/)(?!\\)(?:\.?[^/\\|\s]+)(?:/[^/\\|\s]+)+$') {
             return @{ Ok = $false; Message = 'planner internal review citations require a repository-relative path and nonblank locator.' }
+        }
+        # Issue #964: a line reference goes stale when main moves (consistent with validator rule G11).
+        if ($citation.Groups['Locator'].Value.Trim() -match '(?i)^(?:\d+(?:\s*-\s*\d+)?|#?L\d+(?:-L?\d+)?|lines?\s+\d+.*|[^\s:|]+:\d+(?:-\d+)?)$') {
+            return @{ Ok = $false; Message = "planner internal review citation locator ``$($citation.Groups['Locator'].Value.Trim())`` is a line reference; cite a symbol, heading, or test name instead." }
         }
     }
 
@@ -419,6 +426,11 @@ function Get-PlannerOutputBlockDecision {
     if ($errors.Count -gt 0) {
         $message = "atomic-planner hook: plan '$planPath' violates the atomic plan contract:`n  - " + ($errors -join "`n  - ")
         return @{ Ok = $false; Repairable = $true; Message = $message }
+    }
+
+    $preMortem = Test-PreMortemSection -Content ($file.Lines -join "`n")
+    if (-not $preMortem.Ok) {
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-planner hook: plan '$planPath' $($preMortem.Message) See ``## Design-Level Plan Contract (Mandatory)`` in atomic-plan-contract." }
     }
 
     $review = Get-PlannerInternalReviewValidation -AgentOutput $agentOutput

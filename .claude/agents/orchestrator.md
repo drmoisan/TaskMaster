@@ -33,6 +33,7 @@ skills:
   - atomic-plan-contract
   - acceptance-criteria-tracking
   - evidence-and-timestamp-conventions
+  - execution-environment
 memory: project
 hooks:
   SubagentStop:
@@ -126,6 +127,8 @@ Malformed-cycle rules:
 - R10: each well-formed outcome's `verdict` must equal the verdict derived from its findings' classes.
 - R11: `opened_by_review`, when present, must be a non-negative integer that indexes an object entry of `review_outcomes` whose `verdict` is `REMEDIATION_REQUIRED`.
 
+Remediation mode lives in the inputs file, not in the checkpoint: each `remediation-inputs.<entry-ts>.md` carries exactly one line `Remediation-Mode: proportionate` or `Remediation-Mode: design`, so no checkpoint field is added. A cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; CI-failure findings are normally proportionate. A proportionate cycle runs one `atomic-planner` delegation and one `atomic-executor` delegation that performs single-pass preflight with in-place trivial fixes and then executes; the orchestrator records `preflight: {iterations: 1, final_status: "clear"}` before `execution_status`, which satisfies the malformed-cycle rule above. When that preflight finds a substantive defect, the executor stops with `BLOCKED at preflight (before [P0-T1])` and no checked task, and the cycle converts to design mode for one planner revision.
+
 Cycle-aware `next_step` uses the form `remediation.cycle_N.{plan,preflight,execute,reaudit,exit_check}`, where `N` is `completed_attempts + 1` (the active cycle number) and the sub-step names the current position in the loop; `current_cycle` remains a record position in `cycles[]`.
 
 ### CI Monitoring and Post-PR Remediation
@@ -154,7 +157,7 @@ Each cycle produces exactly five artifacts:
 
 ### Preflight Sub-State Semantics
 
-`preflight.final_status` is one of `{clear, changes_requested, pending}`. A `changes_requested` status routes back to `atomic-planner` for plan revision. An `execution_status` in `{in_progress, complete, failed}` recorded while `final_status != clear` is malformed. `preflight.iterations` counts the number of preflight passes performed in the cycle.
+`preflight.final_status` is one of `{clear, changes_requested, pending}`, extended by `blocked_preflight_iteration_limit` as defined in the remediation-handoff skill. A `changes_requested` status routes back to `atomic-planner` for plan revision at most once per cycle, carrying the full `PREFLIGHT-DEFECT:` list; when the confirming preflight still reports a substantive defect, the orchestrator records `blocked_preflight_iteration_limit` and halts the cycle. An `execution_status` in `{in_progress, complete, failed}` recorded while `final_status != clear` is malformed. `preflight.iterations` counts the number of preflight passes performed in the cycle; trivial defects fixed in place by the preflight executor do not add a pass.
 
 ### Scope-change Rule
 

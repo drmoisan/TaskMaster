@@ -12,6 +12,7 @@ Planning-only workflow skill for generating executor-ready plans.
 Always apply:
 - `policy-compliance-order`
 - `atomic-plan-contract`
+- `execution-environment`
 
 ## Role
 
@@ -26,7 +27,8 @@ Use `atomic-plan-contract` as the source of truth for:
 - Phase 0 requirements,
 - baseline evidence tasks,
 - final QA requirements,
-- preflight validation loop behavior.
+- the design-level plan contract and the `## Pre-Mortem` section,
+- single-pass preflight behavior.
 
 Each task must be:
 - atomic,
@@ -49,10 +51,10 @@ Concurrent child runs in one session share one session scratchpad, so every plan
 Before a plan is finalized:
 
 1. Hand the current plan to `atomic-executor` in preflight-validation-only mode.
-2. If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, revise the same file.
-3. Repeat until preflight returns `PREFLIGHT: ALL CLEAR`.
+2. If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, apply every listed `PREFLIGHT-DEFECT:` change to the same file in one revision.
+3. A plan returns to the planner at most once. If the confirming preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"`; do not open another revision.
 
-Do not finalize a plan before preflight clears it.
+Do not finalize a plan before preflight clears it. Every plan follows `## Design-Level Plan Contract (Mandatory)` in `atomic-plan-contract`, including the `## Pre-Mortem` section and the final-phase self-review task.
 
 ### Enforced Handoff Contract
 
@@ -62,7 +64,7 @@ Do not finalize a plan before preflight clears it.
   - `PREFLIGHT: ALL CLEAR`
   - `PREFLIGHT: REVISIONS REQUIRED`
 - If revisions are required, `atomic-executor` MUST provide a precise plan delta that can be applied to the same plan file.
-- Continue the validate -> revise -> validate loop until `PREFLIGHT: ALL CLEAR`.
+- Preflight is single-pass: trivial defects are fixed in place by `atomic-executor`, and only substantive defects return, at most once.
 - Do not treat a partial summary as a valid substitute for the exact preflight signal.
 - If the required `atomic-executor` handoff cannot be started or completed, stop and report blocked state; do not self-approve the plan.
 - Before reporting completion, the target plan MUST pass the `validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>`.
@@ -84,7 +86,7 @@ Forbidden writes:
 When a caller provides an explicit target plan path:
 
 - update that exact file in place,
-- reuse that same file for all preflight revision iterations,
+- reuse that same file for the single permitted preflight revision,
 - do not create additional sibling `plan.*.md` files during the same planning cycle.
 
 ## Determinism Gates

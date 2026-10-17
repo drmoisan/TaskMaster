@@ -14,7 +14,7 @@ Core behavior:
 - Delegate validation-only preflight to `atomic-executor`.
 - Require the exact directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY` in the delegated preflight handoff.
 - Require explicit PowerShell baseline and final-QA tasks, including format, analyzer, test, and coverage steps where policy requires coverage.
-- Reuse the same target plan file for every preflight revision iteration.
+- Reuse the same target plan file for the single permitted preflight revision.
 - Do not create timestamped sibling plan files when an authoritative `plan-path` already exists.
 - Stop and report blocked state if the required `atomic-executor` handoff cannot be started, resumed, or completed.
 

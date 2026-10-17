@@ -22,11 +22,13 @@ tools:
   - "mcp__drm-copilot__run_poshqc_analyze"
   - "mcp__drm-copilot__run_poshqc_test"
   - "mcp__drm-copilot__run_poshqc_analyze_autofix"
+  - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
   - atomic-plan-contract
   - evidence-and-timestamp-conventions
   - acceptance-criteria-tracking
+  - execution-environment
 memory: project
 hooks:
   SubagentStop:
@@ -95,19 +97,28 @@ Concurrent child runs in one session share one session scratchpad, so every scra
 
 ## Preflight Validation
 
-When receiving a plan with directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, perform only format and structure validation. Return exactly one of:
+A run is a preflight run when its delegation prompt carries the directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`. The preflight directive belongs in the delegation prompt, never in a plan file. A directive line left in a plan file does not make an execution run a preflight run. Preflight follows `### Single-Pass Preflight` in the `atomic-plan-contract` skill:
 
-- `PREFLIGHT: ALL CLEAR`
-- `PREFLIGHT: REVISIONS REQUIRED` (with precise plan delta)
+- **Review the entire plan in one pass.** Check every phase, task, and prose region; do not stop at the first defect.
+- **Classify every defect.** Trivial defects (stale or misspelled anchors, citation corrections including G11 and G12 findings, typos, literal formatting that does not change what is asserted, evidence filename spelling) are fixed in place. Substantive defects (missing or extra tasks, wrong file set or design, an acceptance criterion without a task, an assertion change, ordering, scope) are returned.
+- **Fix in task text only.** Edit task text and plan preamble in the same plan file. Never add, remove, or reorder tasks. Record every fix in `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`.
+- **Return exactly one signal**, `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`, followed by one `CONVERGENCE:` line and then one line per defect:
+  - `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>`
+  - `PREFLIGHT-DEFECT: <task id or heading> | <defect class> | <required change>`
+  - `preflight-fix-record: <path>` when at least one fix was made.
+- `PREFLIGHT: ALL CLEAR` carries no `PREFLIGHT-DEFECT:` line; `PREFLIGHT: REVISIONS REQUIRED` carries at least one and lists every substantive defect found. A plan returns to the planner at most once; do not request or expect a further round.
+- Validate the plan with `mcp__drm-copilot__validate_orchestration_artifacts` (`artifact_type: "plan"`), or with `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>` when branch-current rules are required (see the `execution-environment` skill).
 
 ## Blocking Protocol
 
-Blocking is permitted only during preflight validation (before `[P0-T1]`). When preflight-blocked:
+Blocking is permitted only during preflight validation (before `[P0-T1]`). This includes a combined preflight-and-execute run of a proportionate remediation cycle: the run first performs single-pass preflight, fixes trivial defects in place, and stops before `[P0-T1]` only when a substantive defect remains. When preflight-blocked:
 
 1. State: `BLOCKED at preflight (before [P0-T1])`.
 2. Provide a short, concrete explanation of why.
-3. Provide a plan delta (exact new or modified task text) that `atomic-planner` can apply, preserving the plan's `[P#-T#]` ID conventions.
-4. Request that `atomic-planner` produce the corrected plan or that the user explicitly approve the delta.
+3. Provide a plan delta (exact new or modified task text) that `atomic-planner` can apply, preserving the plan's `[P#-T#]` ID conventions, with one `PREFLIGHT-DEFECT:` line per substantive defect.
+4. Request that `atomic-planner` produce the corrected plan or that the user explicitly approve the delta. Leave every task unchecked.
+
+Report the blocked state with the uppercase `BLOCKED` token: the SubagentStop hook matches only that token, so lowercase or title-case "blocked" prose is not read as a blocked claim.
 
 After execution begins, do not block. Continue to completion using allowed micro-actions within the current task.
 

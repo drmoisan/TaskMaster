@@ -5,7 +5,7 @@ description: 'Remediation handoff chain from orchestrator through atomic-planner
 
 # Remediation Handoff to atomic-planner
 
-Strict handoff chain for orchestrator-initiated remediation cycles. The chain enforces that an `atomic-planner`-authored plan is preflighted by `atomic-executor`, revised through a preflight sub-loop if needed, executed by `atomic-executor` task-by-task, and reaudited by `feature-review`. Workers are never invoked directly by the orchestrator.
+Strict handoff chain for orchestrator-initiated remediation cycles. The chain enforces that an `atomic-planner`-authored plan is preflighted by `atomic-executor`, revised at most once through the preflight sub-loop if needed, executed by `atomic-executor` task-by-task, and reaudited by `feature-review`. Workers are never invoked directly by the orchestrator.
 
 ## When to Use This Skill
 
@@ -30,7 +30,7 @@ orchestrator
              PREFLIGHT: ALL CLEAR        -> proceed to execution
              PREFLIGHT: REVISIONS REQUIRED -> route back to atomic-planner
                 with a precise plan delta; planner revises in place and
-                orchestrator re-runs preflight (sub-loop until clear)
+                orchestrator re-runs preflight once (at most one return)
      -> atomic-executor executes the cleared plan task-by-task
         (workers are invoked by atomic-executor only)
      -> orchestrator delegates to feature-review
@@ -63,6 +63,11 @@ The orchestrator authors `remediation/<entry-ts>/remediation-inputs.md` with:
 - Enumerated fix list with file paths, expected behavior, and verification commands.
 - A "do not do" list (no scope creep, no policy weakening, no silent skips).
 - A pointer to the audit artifacts that produced the findings.
+- Exactly one mode line, `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate.
+
+Proportionate cycle. One `atomic-planner` delegation writes a short plan; one `atomic-executor` delegation then runs single-pass preflight with in-place trivial fixes and executes the plan in the same run. The orchestrator records `preflight: {iterations: 1, final_status: "clear"}` on the cycle before `execution_status`. When that preflight finds a substantive defect, the executor stops with `BLOCKED at preflight (before [P0-T1])`, a plan delta, and no checked task, and the orchestrator converts the cycle to design mode by rewriting the mode line to `Remediation-Mode: design` before one planner revision.
+
+Design cycle. The full chain above runs with the preflight sub-loop below, bounded by the at-most-one-return rule.
 
 ## Required Artifacts
 
@@ -96,25 +101,28 @@ A comprehensive or final sweep in a remediation cycle covers that cycle's own pl
 - Phase 0 captures policy reads and baseline toolchain results per `policy-compliance-order` and `evidence-and-timestamp-conventions`.
 - Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
 - Evidence paths resolve to `<FEATURE>/evidence/<kind>/` per the non-overridable evidence path clause.
+- The plan is design-level per `## Design-Level Plan Contract (Mandatory)` in `atomic-plan-contract`, carries a `## Pre-Mortem` section, and ends with the final-phase self-review task. A proportionate plan covers only the listed findings and stays short.
 
 The plan must pass the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before `atomic-executor` runs preflight against it.
 
 ## Preflight Sub-Loop
 
-After the plan is authored, `atomic-executor` runs preflight under the directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`. The exact signal returned is either:
+After the plan is authored, `atomic-executor` runs preflight under the directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, which the orchestrator places in the delegation prompt and never in the plan file. Preflight is single-pass: trivial defects are fixed in place and recorded as `PREFLIGHT-FIX:` lines with a `preflight-fix-record:` path. The exact signal returned is either:
 
 - `PREFLIGHT: ALL CLEAR` — the plan proceeds to execution.
-- `PREFLIGHT: REVISIONS REQUIRED` — `atomic-executor` returns a precise plan delta. The orchestrator routes the delta to `atomic-planner` for revision. `atomic-planner` updates the same plan file in place (per the plan-path continuity contract in `atomic-plan-contract`). The orchestrator then re-runs preflight. The sub-loop repeats until `PREFLIGHT: ALL CLEAR` is returned.
+- `PREFLIGHT: REVISIONS REQUIRED` — `atomic-executor` returns a precise plan delta with one `PREFLIGHT-DEFECT:` line per substantive defect. The orchestrator routes the full defect list to `atomic-planner` for one revision. `atomic-planner` updates the same plan file in place (per the plan-path continuity contract in `atomic-plan-contract`). The orchestrator then re-runs preflight once.
+
+At most one return. The sub-loop returns to `atomic-planner` at most once per cycle: when the second preflight still reports a substantive defect, the iteration ceiling below applies.
 
 The orchestrator records the preflight outcome in `remediation_loop.cycles[current_cycle].preflight` with `iterations` (counter) and `final_status` (`clear|changes_requested|pending`).
 
 For a well-scoped item where `preflight.iterations > 1`, record a process-defect investigation that identifies the incomplete planner internal-review dimension. Treat excess rounds as a process signal, not routine iteration.
 
-The exhaustive-pass, defect-enumeration, and delta-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner ↔ Executor)` section of `.claude/skills/atomic-plan-contract/SKILL.md` and are not restated here.
+The exhaustive-pass, defect-classification, in-place-fix, and fix-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner ↔ Executor)` section of `.claude/skills/atomic-plan-contract/SKILL.md` and are not restated here.
 
 Alongside `iterations` and `final_status`, the orchestrator also records in `remediation_loop.cycles[current_cycle].preflight` the convergence line `atomic-executor` returned on that round, which is one of `CONVERGENCE: NO FURTHER ROUNDS EXPECTED` or `CONVERGENCE: FURTHER ROUNDS LIKELY`. This convergence field extends the field set already recorded at `remediation_loop.cycles[current_cycle].preflight` rather than replacing it: `iterations` and `final_status` continue to be recorded exactly as stated above, and the convergence field is written in addition to them.
 
-Iteration ceiling. When a cycle's `iterations` would exceed 2, the orchestrator records `final_status: "blocked_preflight_iteration_limit"`, halts the preflight sub-loop, and escalates to the caller, rather than continuing the sub-loop indefinitely. `blocked_preflight_iteration_limit` is a fourth `final_status` value extending the `clear|changes_requested|pending` enumeration stated above. This ceiling bounds the repeat-until-clear behavior stated above it: the sub-loop still repeats until `PREFLIGHT: ALL CLEAR` is returned, and the ceiling supplies the terminating condition for the case where that signal is not reached within two iterations.
+Iteration ceiling. When a cycle's `iterations` would exceed 2, the orchestrator records `final_status: "blocked_preflight_iteration_limit"`, halts the preflight sub-loop, and escalates to the caller. `blocked_preflight_iteration_limit` is a fourth `final_status` value extending the `clear|changes_requested|pending` enumeration stated above. Under the at-most-one-return rule the ceiling is reached after one planner revision: the first preflight and the confirming preflight are the two permitted iterations.
 
 ## Execution and Reaudit
 
