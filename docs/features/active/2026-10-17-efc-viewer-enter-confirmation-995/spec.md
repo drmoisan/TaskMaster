@@ -127,7 +127,7 @@ Confirmation performs current-row and destination checks over the router's exist
 
 ## Acceptance Criteria
 
-Verification progress: the renderer regression failed before the production edit and passed afterward with all 232 targeted C# cases. All 49 deterministic routing/attestation cases pass, and native MCP protocol validation confirms version `1.1.21` and current receipts. Canonical evidence is linked in `issue.md`; full final gates and coverage comparisons remain pending. JavaScript checks verify generated text, while router/controller tests exercise host behavior without live WebView or Outlook.
+Verification progress: the renderer regression failed before the production edit and passed afterward. Final C# verification passed all 7,471 tests; final PowerShell verification passed all 513 tests, including 50 new routing/attestation cases. Coverage comparisons pass: C# 86.0331%, expanded PowerShell 94.9465%, and every new executable unit at least 90%. Scoped PowerShell analysis is clean; broad comparison preserves 13 preexisting findings (10 warnings, 3 informational), zero errors/parse errors and zero new diagnostics. Native MCP 1.1.21 protocol evidence and post-redaction repository hygiene pass. JavaScript checks verify generated text; router/controller tests exercise host behavior without live WebView or Outlook. Independent review and PR/CI remain coordinator-owned delivery gates.
 
 - [x] One plain, nonrepeated Enter press with a valid highlighted current destination requests the existing guarded OK action exactly once, and a row-selection message alone does not request OK.
 - [x] Missing, unknown, banner, stale, or invalid destinations never file an email through confirmation; the existing OK validation remains effective.
@@ -135,7 +135,7 @@ Verification progress: the renderer regression failed before the production edit
 - [x] Modified Enter and repeated keydown events do not request confirmation; existing arrow navigation, focus transfer, row selection, breadcrumb activation, and cancellation behavior remain unchanged.
 - [x] A deterministic Enter regression fails before the production fix and passes afterward; codec, router, and controller boundary tests cover the positive, invalid, stale-selection, retained-target, and exception scenarios with no live Outlook/WebView or temporary-file dependencies.
 - [x] The complete inherited model-workflow repair has consistent profile/configuration/resolver values, preserved attestation rejection behavior, and compatible MCP package version `1.1.21`; deterministic routing tests and actual MCP protocol validation establish those results without bypassing required gates.
-- [ ] The final C# and PowerShell formatting, analysis, type/compatibility checks, tests, and required coverage comparisons pass with canonical evidence for the entire changed-language scope.
+- [x] The final C# and PowerShell formatting, analysis, type/compatibility checks, tests, and required coverage comparisons pass with canonical evidence for the entire changed-language scope.
 - [x] Issue, spec, promoted-record links, and supporting workflow references match the final behavior and `full-bug` work mode; all required evidence is stored under this feature's canonical evidence directories.
 
 ## Risks & Mitigations
