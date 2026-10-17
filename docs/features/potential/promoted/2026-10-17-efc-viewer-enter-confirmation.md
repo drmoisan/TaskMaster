@@ -2,14 +2,15 @@
 
 - Date captured: 2026-10-17
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/EFC_Viewer_Enter_does_not_confirm_the_highlighted_destination_folder/ (Issue #995)
+- Status: Promoted -> docs/features/active/2026-10-17-efc-viewer-enter-confirmation-995/ (Issue #995)
 
 - Issue: #995
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/995
 - Last Updated: 2026-10-17
+- Work Mode: full-bug
 ## Summary
 
-Pressing Enter after highlighting a destination folder in EFC Viewer does not invoke the OK action. Reported by the user; automated reproduction is pending.
+Pressing Enter after highlighting a destination folder in EFC Viewer did not invoke OK. A deterministic regression fails before the fix and passes afterward. The dedicated `rowConfirmed` message requests the existing guarded OK boundary and preserves the activated destination. Modified/repeated Enter and ordinary selection do not confirm. The active feature's `spec.md` is the sole acceptance source; final full QA and review remain pending.
 
 ## Environment
 
@@ -52,5 +53,5 @@ Inspect EfcViewer keyboard routing, the WebView2 folder selection host, and cont
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch

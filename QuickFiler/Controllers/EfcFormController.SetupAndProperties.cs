@@ -53,6 +53,7 @@ namespace QuickFiler.Controllers
         /// <summary>Releases collaborators. Safe on a partial controller and idempotent.</summary>
         public void Cleanup()
         {
+            DetachBreadcrumbConfirmation();
             // Detach before nulling: release the subscription before dropping its owner.
             var globals = _globals;
             if (globals?.Ol is not null)

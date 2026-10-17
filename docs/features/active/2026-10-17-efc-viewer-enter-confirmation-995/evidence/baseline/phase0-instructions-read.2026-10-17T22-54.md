@@ -1,0 +1,6 @@
+# Issue 995 phase0-instructions-read
+
+Timestamp: 2026-10-17T22-54
+Command: Read repository policy files and applicable shared skills in required order
+EXIT_CODE: 0
+Output Summary: Policy Order: AGENTS.md; .github/copilot-instructions.md; .github/instructions/general-code-change.instructions.md; general-unit-test.instructions.md; csharp-code-change.instructions.md; csharp-unit-test.instructions.md; powershell-code-change.instructions.md; powershell-unit-test.instructions.md; github-actions.instructions.md; github-actions-ci-cd-best-practices.instructions.md; shared atomic-executor, atomic-plan-contract, policy-compliance-order, acceptance-criteria-tracking, execution-environment, evidence-and-timestamp-conventions, csharp, csharp-qa-gate, powershell and powershell-qa-gate skills. Professional tone; no temporary test files, external dependencies or new suppression; 500 physical lines; failing-first regression; baseline/final coverage >=80% repository, >=90% new executable units, no regression. Actual TaskMaster wrappers/CI determine execution; copied upstream-only tools are not invented. Existing per-file nullable opt-in and Rebuild use current local QA contract. Preflight and parent execution gate cleared before mutations; sole AC source spec.md.

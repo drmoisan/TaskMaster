@@ -94,7 +94,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         /// <summary>
-        /// Issue #737 Findings 1 and 2: string-containment assertion against the public
+        /// Issue #995: confirmation and existing scrolling assertions against the public
         /// <see cref="BreadcrumbDocumentAssets.BridgeJs"/> constant, following the
         /// <see cref="Issue439ActiveAncestorChildrenAndEmbeddedBridgeUseTypedStoppedActivation"/>
         /// precedent. This repository's test suite has no headless-browser or JS-engine
@@ -102,14 +102,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         /// not that it executes correctly in a real WebView2/Chromium document.
         /// </summary>
         [TestMethod]
-        public void Issue737BridgeJsPostsRowSelectedOnEnterAndScrollsSelectedRowIntoView()
+        public void Issue995BridgeJsPostsConfirmationForPlainEnterAndScrollsSelectedRowIntoView()
         {
             // Act
             string bridgeJs = BreadcrumbDocumentAssets.BridgeJs;
 
             // Assert
             bridgeJs.Should().Contain("e.key === 'Enter'");
-            bridgeJs.Should().Contain("post({ type: 'rowSelected', rowId: id });");
+            bridgeJs.Should().Contain("post({ type: 'rowConfirmed', rowId: id });");
+            bridgeJs.Should().Contain("e.altKey");
+            bridgeJs.Should().Contain("e.ctrlKey");
+            bridgeJs.Should().Contain("e.shiftKey");
+            bridgeJs.Should().Contain("e.metaKey");
+            bridgeJs.Should().Contain("e.repeat");
+            bridgeJs.Should().Contain("e.preventDefault();");
+            bridgeJs.Should().Contain("e.stopPropagation();");
             bridgeJs.Should().Contain("scrollIntoView({ block: 'nearest' })");
         }
 

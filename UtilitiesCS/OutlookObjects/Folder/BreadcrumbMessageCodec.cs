@@ -98,6 +98,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             string rowId = RequireString(root, "rowId");
+            if (type == BreadcrumbMessageTypes.RowConfirmed && rowId.Length == 0)
+            {
+                throw Fail("Inbound breadcrumb confirmation requires a nonempty rowId.");
+            }
             int? segmentIndex = OptionalInt(root, "segmentIndex");
             int? childIndex = OptionalInt(root, "childIndex");
             string? key = OptionalString(root, "key");
@@ -132,7 +136,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 || type == BreadcrumbMessageTypes.RenderedChildActivate
                 || type == BreadcrumbMessageTypes.LeafExpandToggle
                 || type == BreadcrumbMessageTypes.ArrowKey
-                || type == BreadcrumbMessageTypes.RowSelected;
+                || type == BreadcrumbMessageTypes.RowSelected
+                || type == BreadcrumbMessageTypes.RowConfirmed;
         }
 
         private static string RequireString(JObject root, string fieldName)

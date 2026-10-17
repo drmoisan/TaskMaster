@@ -2,6 +2,8 @@
 
 # Task Research Notes: Issue 995 EFC Viewer Enter confirmation and authorized routing repair
 
+Superseded: use `2026-10-17T22-42-issue-995-efc-enter-routing-research.md` for current scope, evidence paths, elevated C3 reasoning and actual TaskMaster gate contracts. This earlier draft is retained as historical research.
+
 ## Research Executed
 
 ### File Analysis

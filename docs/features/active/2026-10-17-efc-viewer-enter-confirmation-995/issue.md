@@ -2,16 +2,16 @@
 
 - Date captured: 2026-10-17
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/EFC_Viewer_Enter_does_not_confirm_the_highlighted_destination_folder/ (Issue #995)
+- Status: Promoted -> docs/features/active/2026-10-17-efc-viewer-enter-confirmation-995/ (Issue #995)
 
 - Issue: #995
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/995
 - Last Updated: 2026-10-17
-- Work Mode: minor-audit
+- Work Mode: full-bug
 
 ## Summary
 
-Pressing Enter after highlighting a destination folder in EFC Viewer does not invoke the OK action. Reported by the user; automated reproduction is pending.
+Pressing Enter after highlighting a destination folder in EFC Viewer did not invoke OK. A deterministic renderer regression failed before the fix and passes with the new confirmation message and existing OK boundary.
 
 ## Environment
 
@@ -43,7 +43,11 @@ No logs or screenshots supplied.
 
 ## Suspected Cause / Notes
 
-Inspect EfcViewer keyboard routing, the WebView2 folder selection host, and controller confirmation wiring. The root cause has not been verified.
+The document previously consumed Enter and posted selection-only `rowSelected`. Plain, nonrepeated Enter now sends `rowConfirmed`; the router validates current row identity and retained destination, then requests `ButtonOK_Click`. Ancestor/child destinations survive. Cleanup and reconfiguration detach the subscription. Modified/repeated Enter and ordinary selection do not confirm.
+
+Fail-before: `evidence/regression-testing/issue-995-enter-red.2026-10-17T23-03.md`. Pass-after: `evidence/regression-testing/issue-995-csharp-green.2026-10-17T23-09.md` (232 tests). All 49 routing/attestation tests pass; native MCP `1.1.21` validates current receipts in `evidence/qa-gates/issue-995-mcp-compatibility.2026-10-17T23-09.md`. Final full QA, coverage comparison and independent review remain pending.
+
+The user also authorized repair of the model-routing workflow that prevented this fix from proceeding. The expanded scope includes the inherited Codex profiles, routing configuration, PowerShell resolver and attestation hook, supporting skill references, and the MCP dependency pin. The authoritative requirements and acceptance criteria for this `full-bug` work mode are in `spec.md`.
 
 ## Proposed Fix / Validation Ideas
 
@@ -51,13 +55,16 @@ Inspect EfcViewer keyboard routing, the WebView2 folder selection host, and cont
 - Route Enter through the existing OK action while retaining invalid-selection guards.
 - Verify keyboard modifiers and existing cancellation behavior.
 - Run the required C# formatting, analyzers, nullable checks, and tests.
+- Verify the complete inherited workflow-repair diff with routing/profile contract tests and the required PowerShell quality gates; retain mandatory validator and review gates.
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch
 
 ## Acceptance Criteria
+
+These original intake criteria are retained for traceability. `spec.md` is the acceptance-criteria source for the persisted `full-bug` work mode.
 
 - [ ] Pressing Enter with a valid highlighted destination invokes the same action as OK exactly once.
 - [ ] Invalid or absent destinations remain guarded by existing confirmation validation.

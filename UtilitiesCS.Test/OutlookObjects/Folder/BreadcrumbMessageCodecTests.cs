@@ -80,6 +80,34 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void DeserializeInbound_RowConfirmed_RoundTrips()
+        {
+            var message = _codec.DeserializeInbound(
+                "{\"type\":\"rowConfirmed\",\"rowId\":\"row-7\"}"
+            );
+
+            message.Type.Should().Be(BreadcrumbMessageTypes.RowConfirmed);
+            message.RowId.Should().Be("row-7");
+            message.SegmentIndex.Should().BeNull();
+            message.ChildIndex.Should().BeNull();
+            message.Key.Should().BeNull();
+        }
+
+        [DataTestMethod]
+        [DataRow("{\"type\":\"rowConfirmed\"}")]
+        [DataRow("{\"type\":\"rowConfirmed\",\"rowId\":null}")]
+        [DataRow("{\"type\":\"rowConfirmed\",\"rowId\":\"\"}")]
+        [DataRow("{\"type\":\"rowConfirmed\",\"rowId\":7}")]
+        [DataRow("{\"type\":\"rowConfirmed\",\"rowId\":\"row-7\",\"key\":7}")]
+        [DataRow("{\"type\":\"rowConfirmed\",\"rowId\":")]
+        public void DeserializeInbound_RowConfirmed_InvalidEnvelopeIsRejected(string json)
+        {
+            Action deserialize = () => _codec.DeserializeInbound(json);
+
+            deserialize.Should().Throw<BreadcrumbMessageException>();
+        }
+
+        [TestMethod]
         public void DeserializeInbound_SegmentActivateAndRenderedChildActivate_RoundTripTypedIndexes()
         {
             // Act

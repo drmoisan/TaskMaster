@@ -150,6 +150,21 @@ namespace QuickFiler.Controllers
             SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
         }
 
+        private void ConfirmRow(BreadcrumbRow row)
+        {
+            if (
+                row.Kind == BreadcrumbRowKind.Banner
+                || !string.Equals(row.RowId, _selectedRowId, StringComparison.Ordinal)
+                || !EfcSelectionGuard.IsValidFilingSelection(SelectedFolderPath)
+            )
+            {
+                return;
+            }
+
+            // An activated ancestor or child replaces the selected path, not the row's target.
+            ConfirmationRequested?.Invoke(this, EventArgs.Empty);
+        }
+
         private void PostRowRender(BreadcrumbRow row)
         {
             PostOutbound(
