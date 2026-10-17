@@ -63,6 +63,12 @@ Create or update a single research file at one of the two tracked research roots
 - Propose a test strategy consistent with repository policy (unit tests for pure logic, integration seams).
 - Do not write test code; describe the strategy only.
 
+### 6. Pre-Mortem
+
+- Feature-associated research (a research path under `docs/features/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
+- One-off research under `docs/research/` is exempt.
+- The researcher SubagentStop hook blocks feature research without a complete section. The `execution-environment` skill states the CI shape, contract tests, and isolation checks the section accounts for.
+
 ## Constraints
 
 - Research only. Do not implement changes.

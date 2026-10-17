@@ -22,6 +22,7 @@ tools:
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
   - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
   - "Bash(dotnet tool restore*)"
   - "Bash(dotnet csharpier check *)"
   - "Bash(dotnet build *)"
@@ -287,6 +288,9 @@ In `closed` mode, do not report completion until:
 
 1. Every non-withdrawn item has `merge_status` of `merged` or `worktree_removed`, each durably
    confirmed by `git` and `gh` rather than by an in-memory notification.
+   A `merged` value is recorded only after the merge is confirmed by polling and ancestry check
+   (step 3 of the `parallel-orchestrate` skill's `## Per-Item Merge to Main (Merge-on-Green)`),
+   because under a merge queue `gh pr merge` exits 0 before the merge happens.
 2. `docs/features/parallel/<slug>/parallel-status.md` has been regenerated a final time and
    reflects the completed state.
 3. The parallel checkpoint passes validation with `require_complete` (the F3 completion gate for

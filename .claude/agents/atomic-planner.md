@@ -10,10 +10,12 @@ tools:
   - "Edit(artifacts/**)"
   - "Write(docs/**)"
   - "Write(artifacts/**)"
+  - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
   - atomic-plan-contract
   - evidence-and-timestamp-conventions
+  - execution-environment
 memory: project
 hooks:
   SubagentStop:
@@ -45,7 +47,9 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 - Task IDs: `- [ ] [P#-T#] <description>`
 - Sequential task numbering within each phase
 - Phase 0: baseline capture (repo-policy reading tasks + language-specific toolchain baselines)
-- Final phase: full QA loop for each applicable language
+- Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
+
+Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: tasks name files, symbols, behavior, tests, and acceptance; anchors are symbols, headings, or test names, never line numbers or commit SHAs; literals appear only where they are the asserted value; tool routes and launchers are not restated because the `execution-environment` skill owns them; and a plan above 40 tasks or 400 lines carries a `## Size Justification` section. Every plan carries a `## Pre-Mortem` section with one bullet for each of `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`; the planner SubagentStop hook blocks a plan without it.
 
 ## Requirements
 
@@ -67,9 +71,13 @@ Concurrent child runs in one session share one session scratchpad, so every plan
 
 ## Preflight Validation
 
-Before handing the plan to executor preflight, return the exact bounded line record defined in `atomic-plan-contract`, starting with `PLANNER-INTERNAL-REVIEW: PASS` and ending with the required `PREFLIGHT:` signal. The bounded record must include exactly one passing `CITATION-TO-TREE`, `AC-TRACEABILITY`, and `SCOPE-BOUNDARY` declaration; one or more current-tree `CITATION: <repository-relative path> | <locator>` records; one complete unique `AC-INVENTORY:`; one complete `AC-MAPPING: <ID> | IMPLEMENTATION: <identifier> | TESTS: <identifier> | EVIDENCE: <identifier>` for every and only inventory ID; and exactly one `UNRESOLVED-GAPS: NONE`. A missing, duplicate, malformed, failed, blocked, or out-of-bounds record declaration requires `SELF-REVIEW: BLOCKED` and stops handoff.
+Before handing the plan to executor preflight, return the exact bounded line record defined in `atomic-plan-contract`, starting with `PLANNER-INTERNAL-REVIEW: PASS` and ending with the required `PREFLIGHT:` signal. The bounded record must include exactly one passing `CITATION-TO-TREE`, `AC-TRACEABILITY`, and `SCOPE-BOUNDARY` declaration; one or more current-tree `CITATION: <repository-relative path> | <symbol, heading, or test name>` records, none of which uses a line-reference locator; one complete unique `AC-INVENTORY:`; one complete `AC-MAPPING: <ID> | IMPLEMENTATION: <identifier> | TESTS: <identifier> | EVIDENCE: <identifier>` for every and only inventory ID; and exactly one `UNRESOLVED-GAPS: NONE`. A missing, duplicate, malformed, failed, blocked, or out-of-bounds record declaration requires `SELF-REVIEW: BLOCKED` and stops handoff.
+
+Before handoff, validate the plan with `mcp__drm-copilot__validate_orchestration_artifacts` (`artifact_type: "plan"`) and correct every finding the validator reports. The installed validator applies only the rules of the installed extension release, as the `execution-environment` skill states.
 
 Return the finalized plan for validation-only preflight through `atomic-executor` and preserve the same target file path across revision loops. Do not claim nested worker delegation from within planner execution.
+
+Preflight is single-pass (`### Single-Pass Preflight` in `atomic-plan-contract`): the preflight executor applies the rule "Review the entire plan in one pass", fixes trivial defects in place, and returns substantive defects, and a plan returns to the planner at most once. Trivial defects are stale anchors, citation corrections, typos, and formatting that does not change an assertion; Substantive defects are missing or extra tasks, a wrong file set or design, an uncovered acceptance criterion, an assertion change, ordering, and scope. The preflight directive belongs in the delegation prompt, never in a plan file. The preflight return carries `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>` lines for fixes, `PREFLIGHT-DEFECT: <task id or heading> | <defect class> | <required change>` lines for returned defects, and `preflight-fix-record: <path>` when a fix was made. When it returns, it carries the full `PREFLIGHT-DEFECT:` list; apply every listed change in one revision of the same file. If the preflight that follows still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"` rather than requesting another revision.
 
 ## Output
 

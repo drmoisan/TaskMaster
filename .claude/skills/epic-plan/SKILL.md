@@ -118,8 +118,10 @@ A preparation-mode `orchestrator` run:
   `feature-promotion-lifecycle`, and `atomic-plan-contract`, and the promotion plus validator
   MCP tools.
 - Runs promotion via the MCP surface, research, feature documents, atomic planning, and the
-  atomic-executor preflight (precondition validation only, per the orchestrate skill's R2
-  semantics), iterating plan revisions until `PREFLIGHT: ALL CLEAR`.
+  atomic-executor preflight (precondition validation only), under the orchestrate skill's
+  single-pass preflight rule in `## Delegation Model`: trivial defects are fixed in place, a
+  plan returns to the planner at most once, and a second substantive result halts with
+  `blocked_reason: "validator_failed"`.
 - Terminates with `completed_steps` containing `S3_promotion` and `S4_atomic_planning`,
   `next_step: "S5_atomic_execution"`, out-of-scope step statuses `not-applicable`, and
   `blocked_reason: "none"`. The route's `requires_ci_gate: false` means the completion validator

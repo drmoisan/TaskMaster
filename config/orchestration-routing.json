@@ -250,22 +250,22 @@
       "epic_preparation_child",
       "epic_execution_child"
     ],
-      "forced_root_personas": [
-        "epic-planner",
-        "epic-orchestrator"
-      ],
-      "parallelism": {
-        "default_max_parallel_features": 4,
-        "hard_max_parallel_features": 8
-      },
-      "escalation_precedence": [
+    "forced_root_personas": [
+      "epic-planner",
+      "epic-orchestrator"
+    ],
+    "parallelism": {
+      "default_max_parallel_features": 4,
+      "hard_max_parallel_features": 8
+    },
+    "escalation_precedence": [
       "epic_child_context",
       "invalid_estimate",
       "cross_language",
       "unsupported_language",
       "cross_cutting",
-        "direct_mode_disabled",
-        "production_budget_exceeded"
+      "direct_mode_disabled",
+      "production_budget_exceeded"
     ],
     "receipt_key": "codex_topology_receipts"
   },
@@ -308,7 +308,7 @@
         "model_reasoning_effort": "max"
       }
     },
-      "c3_elevated_profile": {
+    "c3_elevated_profile": {
       "suffix": "c3-elevated",
       "model": "gpt-5.6-sol",
       "model_reasoning_effort": "high",
@@ -320,13 +320,13 @@
         ],
         "orchestration_complexity_ceiling": "C4"
       }
-      },
-      "ceiling_transition_policy": {
-        "monotonic": true,
-        "receipt_key": "ceiling_transition",
-        "affected_delegation_ids_required_on_increase": true
-      },
-      "forced_personas": {
+    },
+    "ceiling_transition_policy": {
+      "monotonic": true,
+      "receipt_key": "ceiling_transition",
+      "affected_delegation_ids_required_on_increase": true
+    },
+    "forced_personas": {
       "epic-planner": {
         "suffix": "",
         "model": "gpt-5.6-sol",

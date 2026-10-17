@@ -19,7 +19,8 @@
                                                is balanced; a structural gh pr merge; no inline
                                                VAR= prefix token (GH_REPO=, GH_HOST=); no
                                                single-dash token containing R; no --repo or
-                                               --repo= token; no --auto token.
+                                               --repo= token; no --auto token; no token
+                                               containing /pull/ (a URL selector).
       M2 DOCS_ONLY_EXEMPTION_PR_UNRESOLVED   - the worktree root is an existing directory.
       M3 DOCS_ONLY_EXEMPTION_PR_UNRESOLVED   - gh pr view <N> --json baseRefName,headRefOid
                                                exits 0 and returns a JSON object; headRefOid
@@ -367,6 +368,9 @@ function Get-DocsOnlyMergeShapeViolation {
         }
         if ($text -eq '--repo' -or $text.StartsWith('--repo=', [System.StringComparison]::OrdinalIgnoreCase)) {
             return $prefix + "the repository override '$text' is not accepted."
+        }
+        if ($text.Contains('/pull/')) {
+            return $prefix + "the URL selector '$text' is not accepted."
         }
         if ($text -eq '--auto' -or $text.StartsWith('--auto=', [System.StringComparison]::OrdinalIgnoreCase)) {
             return $prefix + 'auto-merge (--auto) is not eligible.'

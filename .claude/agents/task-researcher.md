@@ -9,7 +9,9 @@ tools:
   - WebFetch
   - "Write(/docs/features/**/research/**)"
   - "Write(/docs/research/**)"
+skills:
   - evidence-and-timestamp-conventions
+  - execution-environment
 memory: project
 hooks:
   SubagentStop:
@@ -70,6 +72,12 @@ The orchestrator resolves which root to use from whether an active feature folde
 ### 5. Testing Implications
 
 - Propose a test strategy consistent with repository policy without writing test code.
+
+### 6. Pre-Mortem
+
+- Feature-associated research (a research path under `docs/features/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
+- One-off research under `docs/research/` is exempt.
+- `.claude/hooks/validate-task-researcher-output.ps1` blocks feature research without a complete section. The `execution-environment` skill states the CI shape, contract tests, and isolation checks the section accounts for.
 
 ## Constraints
 

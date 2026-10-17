@@ -126,7 +126,14 @@ function of the DAG.
    `mcp__drm-copilot__collect_pr_context`. `epic-orchestrator` runs the same S9 CI-green
    procedure (`pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1`) directly against this PR, records
    the result under the epic checkpoint's `epic_merge_pr` object, then executes
-   `gh pr merge --merge` once green, gated by `enforce-epic-merge-gate.ps1`.
+   `gh pr merge --merge` once green, gated by `enforce-epic-merge-gate.ps1`. Under a merge queue
+   on `main`, `gh pr merge` can return before the merge happens, so
+   `epic_merge_pr.merge_commit_sha` is recorded only after the merge is confirmed by polling and
+   ancestry check, using the confirmation procedure of step 3 of
+   `## Per-Item Merge to Main (Merge-on-Green)` in `.claude/skills/parallel-orchestrate/SKILL.md`
+   with `main` as the base branch; each pull-request snapshot is classified with
+   `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1 -PrJson <snapshot-json> -AsJson`
+   (issue #952).
 
 ## Merge-on-Green Kickoff Parameter
 
@@ -138,7 +145,9 @@ the literal epic-mode kickoff line:
 The child's own `orchestrator`, on reading this line, records `epic_mode: true` and
 `epic_context: { epic_feature_folder, integration_branch, epic_checkpoint_path }` at its first
 checkpoint write, and on CI-green (S9 step 6) merges its own PR into the integration branch,
-recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. Standalone (non-epic)
+recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. The child records
+`epic_merge` only after the merge is confirmed by polling and ancestry check against
+`origin/<integration_branch>` (S9 step 6). Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
 
 The run gates `enforce-orchestration-preimplementation-gate.ps1` and `enforce-epic-wave-barrier.ps1` locate the epic checkpoint by the `integration_branch:` value of this line. They select the live worktree whose `artifacts/orchestration/epic-orchestrator-state.json` records `route_id` `epic` and that integration branch, prefer the worktree that has the branch checked out when more than one records it, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one remains. A stale copy of the epic checkpoint is moved to `artifacts/orchestration/handoff/` rather than left at a worktree root. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
@@ -353,7 +362,7 @@ that same call at the completion gate. The validation is implemented in
 
 1. Every feature in the manifest has `merge_status` in `{merged, worktree_removed}`.
 2. The final integration-to-`main` PR has merged and `epic_merge_pr.merge_commit_sha` is
-   recorded.
+   recorded, and it is recorded only after the merge is confirmed by polling and ancestry check.
 3. `docs/features/epics/<epic-slug>/epic-status.md` reflects the completed state.
 4. The epic checkpoint passes `validate_epic_orchestrator_state_text` with
    `require_complete=True`.
