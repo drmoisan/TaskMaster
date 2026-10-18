@@ -17,6 +17,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
         private int _selectedIndex = -1;
         private int _selectedSubfolderIndex = -1;
 
+        internal BreadcrumbDescendantNode? SelectedDescendant { get; private set; }
+
+        internal string? ArchiveRoot { get; set; }
+
+        internal void SelectDescendant(
+            int rowIndex,
+            BreadcrumbDescendantNode node,
+            int legacyIndex = -1
+        )
+        {
+            SelectRow(rowIndex);
+            SelectedDescendant = node;
+            _selectedSubfolderIndex = legacyIndex;
+        }
+
         /// <summary>The rows in display order.</summary>
         public IReadOnlyList<BreadcrumbStateRow> Rows => _rows;
 
@@ -36,6 +51,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public void Clear()
         {
             _rows.Clear();
+            SelectedDescendant = null;
             _selectedIndex = -1;
             _selectedSubfolderIndex = -1;
         }
@@ -66,6 +82,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
             _selectedSubfolderIndex = -1;
             _rows = replacement;
+            SelectedDescendant = null;
         }
 
         /// <summary>Appends a Path A suggestion row (root-first chain, optional probability).</summary>
@@ -130,6 +147,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             _selectedIndex = index;
             _selectedSubfolderIndex = -1;
+            SelectedDescendant = null;
         }
 
         /// <summary>
@@ -156,6 +174,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             _selectedSubfolderIndex = subfolderIndex;
+            SelectedDescendant = row.DescendantRoot!.Children[subfolderIndex];
         }
 
         /// <summary>
@@ -241,6 +260,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             if (_selectedSubfolderIndex >= 0)
             {
                 _selectedSubfolderIndex = -1;
+                SelectedDescendant = null;
             }
             return row.TryCollapseLeaf();
         }

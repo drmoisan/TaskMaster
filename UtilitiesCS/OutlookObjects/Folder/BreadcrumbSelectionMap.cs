@@ -28,11 +28,35 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 return null;
             }
-            if (model.SelectedSubfolderIndex >= 0)
+            if (model.SelectedDescendant != null)
             {
-                return row.Subfolders[model.SelectedSubfolderIndex].FolderPath;
+                return TryDescendantValue(model, model.SelectedDescendant, out string value)
+                    ? value
+                    : null;
             }
             return RowValue(row);
+        }
+
+        internal static bool TryDescendantValue(
+            BreadcrumbStateModel model,
+            BreadcrumbDescendantNode node,
+            out string value
+        )
+        {
+            value = node.Segment.FolderPath;
+            if (model.ArchiveRoot == null)
+            {
+                return true;
+            }
+            if (
+                !ArchiveStemContract.TryMakeArchiveRelative(value, model.ArchiveRoot, out value)
+                || string.IsNullOrWhiteSpace(value)
+            )
+            {
+                return false;
+            }
+            ArchiveStemContract.RequireArchiveRelativeStem(value, nameof(value));
+            return true;
         }
 
         /// <summary>

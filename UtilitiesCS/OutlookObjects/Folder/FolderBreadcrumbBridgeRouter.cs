@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -17,8 +17,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         /// <summary>Creates a router over the injected hierarchy provider.</summary>
         public FolderBreadcrumbBridgeRouter(IFolderHierarchyProvider provider)
+            : this(provider, null) { }
+
+        /// <summary>Creates a router with optional archive-relative descendant filing context.</summary>
+        public FolderBreadcrumbBridgeRouter(IFolderHierarchyProvider provider, string? archiveRoot)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _model.ArchiveRoot = archiveRoot;
             _selectionSession = new BreadcrumbSelectionSession(_model);
         }
 
@@ -231,7 +236,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 new RenderMessage(
                     rows,
                     _model.SelectedSubfolderIndex,
-                    BreadcrumbSelectionMap.GetSelectedFolder(_model)
+                    BreadcrumbSelectionMap.GetSelectedFolder(_model),
+                    _model.SelectedDescendant?.Identity
                 )
             );
         }
@@ -312,6 +318,24 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     case SelectionChangeMessage m:
                         lock (_sync)
                         {
+                            var targetRow = RowAt(m.RowIndex);
+                            if (
+                                m.SubfolderIndex >= 0
+                                && (
+                                    !targetRow.LeafExpanded
+                                    || m.SubfolderIndex >= targetRow.Subfolders.Count
+                                    || !BreadcrumbSelectionMap.TryDescendantValue(
+                                        _model,
+                                        targetRow.DescendantRoot!.Children[m.SubfolderIndex],
+                                        out _
+                                    )
+                                )
+                            )
+                            {
+                                return ErrorResponse(
+                                    "The descendant address is not a valid filing target."
+                                );
+                            }
                             _model.SelectRow(m.RowIndex);
                             if (m.SubfolderIndex >= 0)
                             {
@@ -351,115 +375,6 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 return ErrorResponse(ex.Message);
             }
-        }
-
-        private async Task<IReadOnlyList<string>> ToggleAsync(
-            int rowIndex,
-            CancellationToken cancellationToken
-        )
-        {
-            var row = RowAt(rowIndex);
-            if (row.CollapsedAfterIndex != null)
-            {
-                row.ReExpand();
-                return new[] { RenderJson() };
-            }
-            if (row.LeafExpanded)
-            {
-                row.TryCollapseLeaf();
-                return new[] { RenderJson() };
-            }
-            if (!row.TryExpandLeaf())
-            {
-                return ErrorResponse($"Row {rowIndex} has no expand affordance.");
-            }
-            return await FetchAndAttachSubfoldersAsync(rowIndex, row, cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        private async Task<IReadOnlyList<string>> ArrowAsync(
-            BreadcrumbArrowDirection direction,
-            CancellationToken cancellationToken
-        )
-        {
-            bool handled =
-                direction == BreadcrumbArrowDirection.Right
-                    ? _model.RightArrow()
-                    : _model.LeftArrow();
-            if (!handled)
-            {
-                return new[]
-                {
-                    BreadcrumbBridgeSerializer.Serialize(new UnhandledArrowMessage(direction)),
-                };
-            }
-
-            var row = _model.SelectedRow!;
-            if (row.LeafExpanded && row.Subfolders.Count == 0)
-            {
-                return await FetchAndAttachSubfoldersAsync(
-                        _model.SelectedIndex,
-                        row,
-                        cancellationToken
-                    )
-                    .ConfigureAwait(false);
-            }
-            return new[] { RenderJson() };
-        }
-
-        private async Task<IReadOnlyList<string>> FetchAndAttachSubfoldersAsync(
-            int rowIndex,
-            BreadcrumbStateRow row,
-            CancellationToken cancellationToken
-        )
-        {
-            try
-            {
-                // #440: the expansion belongs to the row's ACTIVE node, which is the leaf until a
-                // parent has been selected by the Left tree transition.
-                var nodeKey = (row.ActiveSegment ?? row.Chain[row.Chain.Count - 1]).Key;
-                var subfolders = await _provider
-                    .GetImmediateSubfoldersAsync(nodeKey, cancellationToken)
-                    .ConfigureAwait(false);
-                row.SetSubfolders(subfolders);
-            }
-            catch (OperationCanceledException)
-            {
-                row.TryCollapseLeaf();
-                throw;
-            }
-            catch (Exception ex)
-            {
-                row.TryCollapseLeaf();
-                return ErrorResponse($"Subfolder query failed: {ex.Message}");
-            }
-
-            var renderJson = RenderJson();
-            var responseJson = BreadcrumbBridgeSerializer.Serialize(
-                new SubfolderResponseMessage(
-                    rowIndex,
-                    BreadcrumbRenderProjection.Project(_model)[rowIndex].Subfolders
-                )
-            );
-            return new[] { renderJson, responseJson };
-        }
-
-        private async Task<IReadOnlyList<string>> SubfolderResponseAsync(
-            int rowIndex,
-            CancellationToken cancellationToken
-        )
-        {
-            var row = RowAt(rowIndex);
-            if (!row.IsSuggestion)
-            {
-                return ErrorResponse($"Row {rowIndex} is a plain row without a subfolder query.");
-            }
-            if (!row.LeafExpanded && !row.TryExpandLeaf())
-            {
-                return ErrorResponse($"Row {rowIndex} has no expand affordance.");
-            }
-            return await FetchAndAttachSubfoldersAsync(rowIndex, row, cancellationToken)
-                .ConfigureAwait(false);
         }
 
         private BreadcrumbStateRow RowAt(int rowIndex)

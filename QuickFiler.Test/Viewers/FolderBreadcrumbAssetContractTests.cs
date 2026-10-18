@@ -16,7 +16,7 @@ namespace QuickFiler.Test.Viewers
     [TestClass]
     public sealed class FolderBreadcrumbAssetContractTests
     {
-        private static readonly string Html = QuickFiler.Properties.Resources.FolderBreadcrumb;
+        private static readonly string Html = FolderBreadcrumbDocument.Html;
 
         [TestMethod]
         public void CompiledResource_RemainsSelfContainedAndThemeAware()
@@ -287,7 +287,7 @@ namespace QuickFiler.Test.Viewers
             Html.Should().Contain("subfolderElement.tabIndex = 0;");
             Html.Should()
                 .MatchRegex(
-                    @"(?s)function\s+activateSubfolder\s*\(\s*event\s*\)\s*\{.*?event\.preventDefault\(\);.*?event\.stopPropagation\(\);.*?post\(\{\s*type:\s*\""selectorSubfolderActivate\"",\s*rowIdentity:\s*row\.identity,\s*subfolderIndex:\s*index\s*\}\);.*?\}"
+                    @"(?s)function\s+activateSubfolder\s*\(\s*event\s*\)\s*\{.*?event\.preventDefault\(\);.*?event\.stopPropagation\(\);.*?post\(\{\s*type:\s*\""selectorDescendantActivate\"",\s*rowIdentity:\s*row\.identity,\s*nodeIdentity:\s*child\.identity\s*\}\);.*?\}"
                 );
             Html.Should()
                 .MatchRegex(
@@ -301,6 +301,12 @@ namespace QuickFiler.Test.Viewers
                 .NotContain(
                     "post({ type: \"selectionChange\", rowIndex: row.rowIndex, subfolderIndex: index });"
                 );
+            var legacy = (BreadcrumbSelectorSubfolderActivationMessage)
+                BreadcrumbSelectorMessageSerializer.Parse(
+                    "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row\",\"subfolderIndex\":0}"
+                );
+            legacy.SubfolderIndex.Should().Be(0);
+            legacy.RowIdentity.Should().Be("row");
         }
 
         [TestMethod]
@@ -325,11 +331,9 @@ namespace QuickFiler.Test.Viewers
             makeSubfoldersBody
                 .Should()
                 .Contain(
-                    "subfolderElement.id = \"folder-option-\" + row.rowIndex + \"-subfolder-\" + index;"
+                    "subfolderElement.id = \"folder-option-\" + row.rowIndex + \"-node-\" + child.identity;"
                 );
-            makeSubfoldersBody
-                .Should()
-                .Contain("selectedChildOwnsActive && state.selectedSubfolderIndex === index");
+            makeSubfoldersBody.Should().Contain("selectedChildOwnsActive && child.selected");
             makeSubfoldersBody
                 .Should()
                 .Contain("subfolderElement.setAttribute(\"aria-selected\", String(active));");
@@ -345,6 +349,12 @@ namespace QuickFiler.Test.Viewers
                     "state.selectedSubfolderIndex = Number.isInteger(msg.selectedSubfolderIndex)"
                 );
             renderReceiver.Groups["body"].Value.Should().Contain("state.selectedFolder =");
+            renderReceiver
+                .Groups["body"]
+                .Value.Should()
+                .Contain("state.selectedDescendantIdentity =");
+            selectedChildBody.Should().Contain("state.selectedDescendantIdentity !== null");
+            makeSubfoldersBody.Should().Contain("makeSubfolders(row, child.children");
             renderReceiver
                 .Groups["body"]
                 .Value.Should()
