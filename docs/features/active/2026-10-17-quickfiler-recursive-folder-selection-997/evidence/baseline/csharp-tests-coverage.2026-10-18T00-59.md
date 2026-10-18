@@ -3,5 +3,3 @@ Command: pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -Sea
 EXIT_CODE: 1
 ExpectedExitCode: 0
 Output Summary: Invoke-MSTestWithCoverage.ps1: A parameter cannot be found that matches parameter name 'ResultsDirectory'.
-
-

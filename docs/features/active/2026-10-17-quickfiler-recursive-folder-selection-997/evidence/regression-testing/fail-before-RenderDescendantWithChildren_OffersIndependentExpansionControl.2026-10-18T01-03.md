@@ -7,4 +7,3 @@ Output Summary:   Failed RenderDescendantWithChildren_OffersIndependentExpansion
    Expected html to match regex "(?s)if\s*\(\s*child\.hasChildren\s*\).*?selectorDescendantToggle", but "<!DOCTYPE html>
 Total tests: 1
      Failed: 1
-

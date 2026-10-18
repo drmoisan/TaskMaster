@@ -75,5 +75,3 @@ Current artifact references:
 - evidence/qa-gates/hygiene.2026-10-18T01-28.md
 - evidence/qa-gates/javascript-syntax.2026-10-18T01-28.md
 - evidence/qa-gates/self-review.2026-10-18T01-32.md
-
-

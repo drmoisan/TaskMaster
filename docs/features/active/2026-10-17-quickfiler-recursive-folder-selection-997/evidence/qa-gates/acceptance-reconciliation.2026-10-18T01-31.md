@@ -16,5 +16,3 @@ Output Summary: Authoritative source: FEATURE/spec.md (issue.md Work Mode: full-
 | AC8 | Pending-CI; unchecked | Final PR-head required CI; orchestrator owner | Independent review/PR/CI delivery gates remain |
 
 Total 8; checked 7; remaining 1. No criterion wording changed. No live Outlook UI verification claimed.
-
-

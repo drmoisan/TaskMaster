@@ -31,5 +31,3 @@ UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.Row.cs: 408
 UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs: 386
 UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.Descendants.cs: 225
 All changed/new source items registered exactly once; script registered once in Resources.resx and generated accessor compiled. Final full test pass includes both production composition tests. QFC-only source scope; no EFC production/customization/CI changes.
-
-

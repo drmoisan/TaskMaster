@@ -8,4 +8,3 @@ Output Summary:   Failed CollapseAncestor_SelectedChild_PreservesCommittedDestin
 System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
 Total tests: 1
      Failed: 1
-

@@ -4,4 +4,3 @@ EXIT_CODE: 0
 ExpectedExitCode: 0
 Output Summary:   Passed LegacySelectionChange_OutOfRootKnownChild_DoesNotMutateOrAcknowledge [12 ms]
 Final full run: 7,504 passed, 0 failed. Source: csharp-tests-coverage.2026-10-18T01-27.md; matching fail-before record retained.
-

@@ -3,5 +3,3 @@ Command: Find-UserProfilePathMatch and scratch-path scan over final FEATURE docu
 EXIT_CODE: 0
 ExpectedExitCode: 0
 Output Summary: Scanned 52 final feature files; 0 findings. No product/source change after clean full QA. Canonical research formatting included; spec AC1–AC7 checked individually, AC8 pending-CI.
-
-

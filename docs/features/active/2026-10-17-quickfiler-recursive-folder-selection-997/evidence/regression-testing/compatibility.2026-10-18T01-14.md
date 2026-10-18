@@ -9,5 +9,3 @@ A total of 2 test files matched the specified pattern.
 
 Passed!  - Failed:     0, Passed:   332, Skipped:     0, Total:   332, Duration: 460 ms - UtilitiesCS.Test.dll (net481)
 Passed!  - Failed:     0, Passed:   513, Skipped:     0, Total:   513, Duration: 6 s - QuickFiler.Test.dll (net481)
-
-

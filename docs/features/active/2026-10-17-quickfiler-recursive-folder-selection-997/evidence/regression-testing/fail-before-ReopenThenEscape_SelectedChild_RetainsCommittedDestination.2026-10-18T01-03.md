@@ -7,4 +7,3 @@ Output Summary:   Failed ReopenThenEscape_SelectedChild_RetainsCommittedDestinat
    Expected router.GetSelectedFolder() to be a match with the expectation, but it differs at index 0:
 Total tests: 1
      Failed: 1
-

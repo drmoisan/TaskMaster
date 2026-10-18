@@ -12,4 +12,3 @@ Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration:
 
 Original fail-before records: fail-before-ActivateImmediateChild_BoundArchiveRoot_CommitsArchiveRelativeDestination.2026-10-18T01-03.md, fail-before-CollapseAncestor_SelectedChild_PreservesCommittedDestination.2026-10-18T01-03.md, fail-before-RenderDescendantWithChildren_OffersIndependentExpansionControl.2026-10-18T01-03.md, fail-before-ReopenThenEscape_SelectedChild_RetainsCommittedDestination.2026-10-18T01-03.md
 Only arrangement change: ActivateImmediateChild_BoundArchiveRoot_CommitsArchiveRelativeDestination now explicitly binds the fixture root. All original destination/collapse/Escape/control assertions remain. Behavioral host tests and compiled asset wiring/syntax contracts; no live Outlook verification.
-

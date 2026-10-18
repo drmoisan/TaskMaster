@@ -61,5 +61,3 @@ Output Summary: Asserting-suite search over changed symbols, resource filenames 
 | QuickFiler.Test/Viewers/FolderBreadcrumbRecursiveAssetIssue997Tests.cs | New focused issue-997 regression/behavior proof; full final run passes. |
 | UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbSubfolderSelectorSessionTests.cs | Unchanged compatibility assertions; full final run passes, including EFC. |
 | UtilitiesCS.Test/OutlookObjects/Folder/FolderHierarchyProviderAdapterTests.cs | Unchanged compatibility assertions; full final run passes, including EFC. |
-
-

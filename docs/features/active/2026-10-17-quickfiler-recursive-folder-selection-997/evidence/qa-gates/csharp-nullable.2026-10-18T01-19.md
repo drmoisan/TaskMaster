@@ -3,5 +3,3 @@ Command: pwsh -NoProfile -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath T
 EXIT_CODE: 1
 ExpectedExitCode: 0
 Output Summary: Invoke-VSBuild.ps1: A positional parameter cannot be found that accepts argument 'T'.
-
-

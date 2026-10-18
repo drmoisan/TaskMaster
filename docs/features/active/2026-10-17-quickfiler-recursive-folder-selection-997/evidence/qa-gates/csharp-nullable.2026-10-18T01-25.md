@@ -7,5 +7,3 @@ Output Summary: Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:15.90
-
-

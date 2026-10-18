@@ -10,5 +10,3 @@ UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbDescendantMessagesIssue997Tests
 QuickFiler.Test.Viewers.FolderBreadcrumbRecursiveAssetIssue997Tests: Passed!  - Failed:     0, Passed:     3, Skipped:     0, Total:     3, Duration: 224 ms - QuickFiler.Test.dll (net481)
 QuickFiler.Test.Viewers.FolderBreadcrumbAssetContractTests: Passed!  - Failed:     0, Passed:    15, Skipped:     0, Total:    15, Duration: 470 ms - QuickFiler.Test.dll (net481)
 QuickFiler.Test.Viewers.BreadcrumbDescendantActivationIssue997Tests: Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 1 s - QuickFiler.Test.dll (net481)
-
-
