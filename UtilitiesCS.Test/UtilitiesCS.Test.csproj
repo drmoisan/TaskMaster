@@ -303,6 +303,10 @@
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterInFlightTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbRouterSelectionConcurrencyTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionMapTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbDescendantSelectionIssue997Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbDescendantMessagesIssue997Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbDescendantValidationIssue997Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderBreadcrumbDescendantOrderingIssue997Tests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjectionTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjectionSelectorTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelTests.cs" />

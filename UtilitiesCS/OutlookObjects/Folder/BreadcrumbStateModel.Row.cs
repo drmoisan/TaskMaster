@@ -17,6 +17,24 @@ namespace UtilitiesCS.OutlookObjects.Folder
             new FolderBreadcrumbSegment[0];
 
         private int? _activeSegmentIndex;
+        private BreadcrumbDescendantNode? _descendantRoot;
+
+        internal BreadcrumbDescendantNode? DescendantRoot
+        {
+            get
+            {
+                var segment = ActiveSegment;
+                if (segment == null)
+                {
+                    return null;
+                }
+                if (_descendantRoot == null || !_descendantRoot.Segment.Key.Equals(segment.Key))
+                {
+                    _descendantRoot = new BreadcrumbDescendantNode(segment);
+                }
+                return _descendantRoot;
+            }
+        }
 
         internal BreadcrumbStateRow(
             IReadOnlyList<FolderBreadcrumbSegment> chain,
@@ -236,6 +254,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             LeafExpanded = true;
+            DescendantRoot!.Expanded = true;
             return true;
         }
 
@@ -297,6 +316,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             LeafExpanded = true;
+            DescendantRoot!.Expanded = true;
             return true;
         }
 
@@ -312,6 +332,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             LeafExpanded = false;
             Subfolders = EmptySegments;
+            DescendantRoot?.Collapse();
             return true;
         }
 
@@ -329,11 +350,14 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             Subfolders = (subfolders ?? EmptySegments).ToArray();
+            DescendantRoot!.Attach(Subfolders);
         }
 
         /// <summary>Resets collapse, expansion, and subfolder state to the initial full chain.</summary>
         public void Reset()
         {
+            _descendantRoot?.Collapse();
+            _descendantRoot = null;
             CollapsedAfterIndex = null;
             _activeSegmentIndex = null;
             LeafExpanded = false;

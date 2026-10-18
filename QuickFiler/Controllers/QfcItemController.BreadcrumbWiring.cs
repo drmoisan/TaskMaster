@@ -23,7 +23,11 @@ namespace QuickFiler.Controllers
                     _globals.Ol.FolderTreeService,
                     () => _globals.Ol.ArchiveRootPath
                 );
-                viewer.InitializeBreadcrumbPipeline(provider);
+                viewer.InitializeBreadcrumbPipeline(
+                    provider,
+                    BreadcrumbPopupUiOperations.CaptureCurrent(),
+                    _globals.Ol.ArchiveRootPath
+                );
             }
 
             if (!ReferenceEquals(_breadcrumbViewer, viewer))

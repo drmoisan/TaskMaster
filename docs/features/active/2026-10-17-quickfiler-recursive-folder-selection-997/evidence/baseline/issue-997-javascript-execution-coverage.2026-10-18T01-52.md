@@ -1,0 +1,5 @@
+Timestamp: 2026-10-18T01-52
+Command: node --test --experimental-test-coverage --test-isolation=none --test-concurrency=1 --test-coverage-include=<exact baseline absolute filename> --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=SCRATCH/<unique baseline>.lcov tests/quickfiler-breadcrumb/issue-997-common.test.mjs; node SCRATCH/issue-997-coverage.mjs SCRATCH/issue-997-javascript-baseline-run.json
+EXIT_CODE: 0
+ExpectedExitCode: 0
+Output Summary: 51/51 tests pass. Complete original merge-base script: lines 314/314 (100.00%); branches 139/140 (99.29%); functions 31/31. Raw V8 source record: 1, 32 functions including wrapper. Independently merged raw ranges reconcile every LCOV DA count and LF/LH/BRF/BRH exactly. Original byte hash and HTML offset 173 retained in SCRATCH/issue-997-baseline-source-mapping.json. Collector gap resolved with normalized exact Windows absolute include; slash glob matched no path. No source excluded. Raw/LCOV/log pointers retained in SCRATCH/issue-997-javascript-baseline-run.json; measured details SCRATCH/issue-997-javascript-baseline-metrics.json.

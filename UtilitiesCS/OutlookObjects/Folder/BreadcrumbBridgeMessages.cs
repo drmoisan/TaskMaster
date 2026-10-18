@@ -141,15 +141,25 @@ namespace UtilitiesCS.OutlookObjects.Folder
             int selectedSubfolderIndex,
             string? selectedFolder
         )
+            : this(rows, selectedSubfolderIndex, selectedFolder, null) { }
+
+        public RenderMessage(
+            IReadOnlyList<BreadcrumbRowRender> rows,
+            int selectedSubfolderIndex,
+            string? selectedFolder,
+            string? selectedDescendantIdentity
+        )
         {
             Rows = rows ?? throw new ArgumentNullException(nameof(rows));
             SelectedSubfolderIndex = selectedSubfolderIndex;
             SelectedFolder = selectedFolder;
+            SelectedDescendantIdentity = selectedDescendantIdentity;
         }
 
         public override string Type => "render";
         public IReadOnlyList<BreadcrumbRowRender> Rows { get; }
         public int SelectedSubfolderIndex { get; }
+        public string? SelectedDescendantIdentity { get; }
         public string? SelectedFolder { get; }
     }
 
@@ -182,7 +192,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// explicitly (<see cref="FormatException"/>) on malformed JSON, an unknown message type, or a
     /// missing required field — never a silent null (#351 P3-T5).
     /// </summary>
-    public static class BreadcrumbBridgeSerializer
+    public static partial class BreadcrumbBridgeSerializer
     {
         /// <summary>Parses one wire message into its typed form.</summary>
         /// <exception cref="FormatException">Malformed JSON, unknown type, or missing/invalid field.</exception>
@@ -237,7 +247,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     return new RenderMessage(
                         ParseRows(RequireArray(root, "rows")),
                         root.Value<int?>("selectedSubfolderIndex") ?? -1,
-                        root.Value<string>("selectedFolder")
+                        root.Value<string>("selectedFolder"),
+                        root["selectedDescendantIdentity"] == null
+                            ? null
+                            : RequireString(root, "selectedDescendantIdentity")
                     );
                 case "unhandledArrow":
                     return new UnhandledArrowMessage(RequireDirection(root));
@@ -290,6 +303,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 case RenderMessage m:
                     root["rows"] = new JArray(m.Rows.Select(RowToJson));
                     root["selectedSubfolderIndex"] = m.SelectedSubfolderIndex;
+                    if (m.SelectedDescendantIdentity != null)
+                    {
+                        root["selectedDescendantIdentity"] = m.SelectedDescendantIdentity;
+                    }
                     if (m.SelectedFolder != null)
                     {
                         root["selectedFolder"] = m.SelectedFolder;
@@ -311,110 +328,6 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         private static string DirectionName(BreadcrumbArrowDirection direction) =>
             direction == BreadcrumbArrowDirection.Left ? "left" : "right";
-
-        private static JObject RowToJson(BreadcrumbRowRender row)
-        {
-            return new JObject
-            {
-                ["rowIndex"] = row.RowIndex,
-                ["isSuggestion"] = row.IsSuggestion,
-                ["selected"] = row.Selected,
-                ["collapsed"] = row.Collapsed,
-                ["leafExpanded"] = row.LeafExpanded,
-                ["percentText"] = row.PercentText,
-                ["cells"] = new JArray(
-                    row.Cells.Select(cell => new JObject
-                    {
-                        ["kind"] = cell.Kind.ToString().ToLowerInvariant(),
-                        ["text"] = cell.Text,
-                        ["segmentIndex"] = cell.SegmentIndex,
-                        ["truncationEligible"] = cell.TruncationEligible,
-                    })
-                ),
-                ["subfolders"] = SubfoldersToJson(row.Subfolders),
-            };
-        }
-
-        private static JArray SubfoldersToJson(IReadOnlyList<BreadcrumbSubfolderRender> subfolders)
-        {
-            return new JArray(
-                subfolders.Select(s => new JObject
-                {
-                    ["displayName"] = s.DisplayName,
-                    ["folderPath"] = s.FolderPath,
-                    ["hasChildren"] = s.HasChildren,
-                })
-            );
-        }
-
-        private static IReadOnlyList<BreadcrumbRowRender> ParseRows(JArray rows)
-        {
-            return rows.Select(token =>
-                {
-                    var row = AsObject(token, "rows[]");
-                    return new BreadcrumbRowRender(
-                        RequireInt(row, "rowIndex"),
-                        RequireBool(row, "isSuggestion"),
-                        RequireBool(row, "selected"),
-                        RequireBool(row, "collapsed"),
-                        RequireBool(row, "leafExpanded"),
-                        RequireString(row, "percentText"),
-                        ParseCells(RequireArray(row, "cells")),
-                        ParseSubfolders(RequireArray(row, "subfolders"))
-                    );
-                })
-                .ToArray();
-        }
-
-        private static IReadOnlyList<BreadcrumbCellRender> ParseCells(JArray cells)
-        {
-            return cells
-                .Select(token =>
-                {
-                    var cell = AsObject(token, "cells[]");
-                    string kindName = RequireString(cell, "kind");
-                    BreadcrumbCellKind kind;
-                    switch (kindName)
-                    {
-                        case "segment":
-                            kind = BreadcrumbCellKind.Segment;
-                            break;
-                        case "arrow":
-                            kind = BreadcrumbCellKind.Arrow;
-                            break;
-                        case "plus":
-                            kind = BreadcrumbCellKind.Plus;
-                            break;
-                        case "minus":
-                            kind = BreadcrumbCellKind.Minus;
-                            break;
-                        default:
-                            throw new FormatException($"Unknown cell kind '{kindName}'.");
-                    }
-                    return new BreadcrumbCellRender(
-                        kind,
-                        RequireString(cell, "text"),
-                        RequireInt(cell, "segmentIndex"),
-                        RequireBool(cell, "truncationEligible")
-                    );
-                })
-                .ToArray();
-        }
-
-        private static IReadOnlyList<BreadcrumbSubfolderRender> ParseSubfolders(JArray subfolders)
-        {
-            return subfolders
-                .Select(token =>
-                {
-                    var subfolder = AsObject(token, "subfolders[]");
-                    return new BreadcrumbSubfolderRender(
-                        RequireString(subfolder, "displayName"),
-                        RequireString(subfolder, "folderPath"),
-                        RequireBool(subfolder, "hasChildren")
-                    );
-                })
-                .ToArray();
-        }
 
         private static BreadcrumbArrowDirection RequireDirection(JObject root)
         {

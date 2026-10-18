@@ -111,6 +111,8 @@
     <Compile Include="Viewers\BreadcrumbDropDownCoverageThresholdTests.cs" />
     <Compile Include="Controllers\QfcItemControllerBreadcrumbDropDownTests.cs" />
     <Compile Include="Viewers\FolderBreadcrumbAssetContractTests.cs" />
+    <Compile Include="Viewers\FolderBreadcrumbRecursiveAssetIssue997Tests.cs" />
+    <Compile Include="Viewers\BreadcrumbDescendantActivationIssue997Tests.cs" />
     <Compile Include="Viewers\ToolStripMenuItemCbTests.cs" />
     <Compile Include="Controllers\KbdActionsTests.cs" />
     <Compile Include="Controllers\KbdActionsRemainingBranchesTests.cs" />

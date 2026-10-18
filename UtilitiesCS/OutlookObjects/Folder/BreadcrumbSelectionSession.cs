@@ -139,6 +139,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             if (IndexOfSelectable(OriginalIdentity) < 0)
             {
                 OriginalIdentity = CommittedIdentity;
+                CaptureDescendantSelection();
             }
             if (IndexOfSelectable(PendingIdentity) < 0)
             {
@@ -258,42 +259,6 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
         }
 
-        /// <summary>Commits an expanded subfolder and ends the current selector session.</summary>
-        /// <param name="rowIdentity">The unique stable identity of the containing row.</param>
-        /// <param name="subfolderIndex">The zero-based expanded subfolder index.</param>
-        /// <returns>
-        /// The complete explicit-commit effects, or <see cref="BreadcrumbSelectionEffects.None"/>
-        /// without mutation when the session, row, or index is invalid.
-        /// </returns>
-        public BreadcrumbSelectionEffects ActivateSubfolder(string rowIdentity, int subfolderIndex)
-        {
-            if (!IsOpen || subfolderIndex < 0)
-            {
-                return BreadcrumbSelectionEffects.None;
-            }
-
-            int rowIndex = IndexOfSelectable(rowIdentity);
-            if (rowIndex < 0)
-            {
-                return BreadcrumbSelectionEffects.None;
-            }
-
-            BreadcrumbStateRow row = _model.Rows[rowIndex];
-            if (!row.IsSuggestion || !row.LeafExpanded || subfolderIndex >= row.Subfolders.Count)
-            {
-                return BreadcrumbSelectionEffects.None;
-            }
-
-            _model.SelectRow(rowIndex);
-            _model.SelectSubfolder(subfolderIndex);
-            CommittedIdentity = row.Identity;
-            EndOpenSession();
-            return BreadcrumbSelectionEffects.Handled
-                | BreadcrumbSelectionEffects.SelectionChanged
-                | BreadcrumbSelectionEffects.OpenStateChanged
-                | BreadcrumbSelectionEffects.RenderRequired;
-        }
-
         public BreadcrumbSelectionEffects CancelSelector()
         {
             return Cancel()
@@ -313,6 +278,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             SynchronizeCommittedSelection();
             OriginalIdentity = CommittedIdentity;
+            CaptureDescendantSelection();
             PendingIdentity = CommittedIdentity;
             IsOpen = true;
             return true;
@@ -342,7 +308,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     _model.Rows[index].Identity,
                     StringComparison.Ordinal
                 );
-                _model.SelectRow(index);
+                if (_model.SelectedIndex != index || _model.SelectedDescendant == null)
+                {
+                    _model.SelectRow(index);
+                }
                 CommittedIdentity = _model.Rows[index].Identity;
             }
             EndOpenSession();
@@ -361,7 +330,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
             if (IsOpen)
             {
                 PendingIdentity = _model.Rows[index].Identity;
-                return CommitPending();
+                bool hadDescendant = _model.SelectedDescendant != null;
+                _model.SelectRow(index);
+                return CommitPending() || hadDescendant;
             }
 
             bool changed = !string.Equals(
@@ -386,6 +357,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             if (originalIndex >= 0)
             {
                 _model.SelectRow(originalIndex);
+                RestoreDescendantSelection(originalIndex);
                 CommittedIdentity = _model.Rows[originalIndex].Identity;
             }
             else if (OriginalIdentity == null)

@@ -138,6 +138,35 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public int SubfolderIndex { get; }
     }
 
+    /// <summary>Page-to-host address of a known descendant occurrence.</summary>
+    public sealed class BreadcrumbSelectorDescendantMessage : BreadcrumbSelectorMessage
+    {
+        public BreadcrumbSelectorDescendantMessage(
+            string rowIdentity,
+            string nodeIdentity,
+            bool toggle = false
+        )
+        {
+            if (string.IsNullOrWhiteSpace(rowIdentity))
+            {
+                throw new ArgumentException("A row identity is required.", nameof(rowIdentity));
+            }
+            if (string.IsNullOrWhiteSpace(nodeIdentity))
+            {
+                throw new ArgumentException("A node identity is required.", nameof(nodeIdentity));
+            }
+            RowIdentity = rowIdentity;
+            NodeIdentity = nodeIdentity;
+            Toggle = toggle;
+        }
+
+        public override string Type =>
+            Toggle ? "selectorDescendantToggle" : "selectorDescendantActivate";
+        public string RowIdentity { get; }
+        public string NodeIdentity { get; }
+        public bool Toggle { get; }
+    }
+
     /// <summary>Strict JSON serializer for the focused selector message family.</summary>
     public static class BreadcrumbSelectorMessageSerializer
     {
@@ -179,6 +208,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         RequireIdentity(root, "rowIdentity"),
                         RequireNonNegativeInt(root, "subfolderIndex")
                     );
+                case "selectorDescendantActivate":
+                case "selectorDescendantToggle":
+                    return new BreadcrumbSelectorDescendantMessage(
+                        RequireIdentity(root, "rowIdentity"),
+                        RequireIdentity(root, "nodeIdentity"),
+                        type == "selectorDescendantToggle"
+                    );
                 default:
                     throw new FormatException($"Unknown selector message type '{type}'.");
             }
@@ -214,6 +250,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 case BreadcrumbSelectorSubfolderActivationMessage subfolderActivation:
                     root["rowIdentity"] = subfolderActivation.RowIdentity;
                     root["subfolderIndex"] = subfolderActivation.SubfolderIndex;
+                    break;
+                case BreadcrumbSelectorDescendantMessage descendant:
+                    root["rowIdentity"] = descendant.RowIdentity;
+                    root["nodeIdentity"] = descendant.NodeIdentity;
                     break;
                 default:
                     throw new FormatException(

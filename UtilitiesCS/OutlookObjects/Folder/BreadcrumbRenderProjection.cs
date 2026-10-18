@@ -53,12 +53,32 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// <summary>One rendered immediate subfolder in an open leaf expansion (FR-4).</summary>
     public sealed class BreadcrumbSubfolderRender
     {
-        internal BreadcrumbSubfolderRender(string displayName, string folderPath, bool hasChildren)
+        internal BreadcrumbSubfolderRender(
+            string displayName,
+            string folderPath,
+            bool hasChildren,
+            string? identity = null,
+            bool expanded = false,
+            bool selected = false,
+            bool childrenLoaded = false,
+            IReadOnlyList<BreadcrumbSubfolderRender>? children = null
+        )
         {
             DisplayName = displayName;
             FolderPath = folderPath;
             HasChildren = hasChildren;
+            Identity = identity;
+            Expanded = expanded;
+            Selected = selected;
+            ChildrenLoaded = childrenLoaded;
+            Children = children ?? Array.Empty<BreadcrumbSubfolderRender>();
         }
+
+        public string? Identity { get; }
+        public bool Expanded { get; }
+        public bool Selected { get; }
+        public bool ChildrenLoaded { get; }
+        public IReadOnlyList<BreadcrumbSubfolderRender> Children { get; }
 
         /// <summary>The subfolder display name.</summary>
         public string DisplayName { get; }
@@ -144,7 +164,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
             var rows = new List<BreadcrumbRowRender>(model.Rows.Count);
             for (int i = 0; i < model.Rows.Count; i++)
             {
-                rows.Add(ProjectRow(model.Rows[i], i, i == model.SelectedIndex));
+                rows.Add(
+                    ProjectRow(model.Rows[i], i, i == model.SelectedIndex, model.SelectedDescendant)
+                );
             }
             return rows;
         }
@@ -164,13 +186,14 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 return new BreadcrumbRowRender[0];
             }
-            return new[] { ProjectRow(row, model.SelectedIndex, true) };
+            return new[] { ProjectRow(row, model.SelectedIndex, true, model.SelectedDescendant) };
         }
 
         private static BreadcrumbRowRender ProjectRow(
             BreadcrumbStateRow row,
             int rowIndex,
-            bool selected
+            bool selected,
+            BreadcrumbDescendantNode? selectedDescendant
         )
         {
             var names = row.IsSuggestion
@@ -217,13 +240,14 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
             }
 
-            var subfolders = row
-                .Subfolders.Select(s => new BreadcrumbSubfolderRender(
-                    s.DisplayName,
-                    s.FolderPath,
-                    s.HasChildren
-                ))
-                .ToArray();
+            var subfolders =
+                row.LeafExpanded && row.DescendantRoot != null
+                    ? row
+                        .DescendantRoot.Children.Select(node =>
+                            ProjectDescendant(node, selected ? selectedDescendant : null)
+                        )
+                        .ToArray()
+                    : Array.Empty<BreadcrumbSubfolderRender>();
 
             return new BreadcrumbRowRender(
                 rowIndex,
@@ -238,6 +262,23 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 subfolders
             );
         }
+
+        private static BreadcrumbSubfolderRender ProjectDescendant(
+            BreadcrumbDescendantNode node,
+            BreadcrumbDescendantNode? selected
+        ) =>
+            new BreadcrumbSubfolderRender(
+                node.Segment.DisplayName,
+                node.Segment.FolderPath,
+                node.Segment.HasChildren,
+                node.Identity,
+                node.Expanded,
+                node == selected,
+                node.Loaded,
+                node.Expanded
+                    ? node.Children.Select(child => ProjectDescendant(child, selected)).ToArray()
+                    : Array.Empty<BreadcrumbSubfolderRender>()
+            );
 
         private static string[] SplitVerbatim(string verbatimText)
         {

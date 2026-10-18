@@ -1,0 +1,4 @@
+Timestamp: 2026-10-18T02:07:07Z
+Command: gh pr view 998 --json headRefOid; gh pr checks 998 --json bucket,name,state,link,workflow; pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1 -ChecksJson <live checks JSON> -HeadSha 63715ddef30df12737e3d1720c1aad06c5dd51e3 -PrPipelineRunId 39088675059 -PrPipelineRunUrl https://github.com/drmoisan/TaskMaster/actions/runs/39088675059 -RequireWorkflow CI -AsJson; gh pr view 998 --json headRefOid
+EXIT_CODE: 0
+Output Summary: Both live head reads equal 63715ddef30df12737e3d1720c1aad06c5dd51e3. All seven observed CI checks passed: actionlint, format-check, build-analyzers, build-nullable, mstest-coverage, pester and hygiene. Parser conclusion success. This is the initial PR-head verification supporting the item's orchestrator-owned AC8 check-off. Subsequent check-off/audit commits require another exact-head check before DONE; no future head success is claimed.

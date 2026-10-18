@@ -47,10 +47,19 @@ namespace QuickFiler.Viewers
             IFolderHierarchyProvider provider,
             BreadcrumbUiDispatcher dispatcher
         )
+            : this(messenger, provider, dispatcher, null) { }
+
+        internal BreadcrumbBridgeCoordinator(
+            IWebViewMessenger messenger,
+            IFolderHierarchyProvider provider,
+            BreadcrumbUiDispatcher dispatcher,
+            string? archiveRoot
+        )
         {
             _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
             _router = new FolderBreadcrumbBridgeRouter(
-                provider ?? throw new ArgumentNullException(nameof(provider))
+                provider ?? throw new ArgumentNullException(nameof(provider)),
+                archiveRoot
             );
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _upgradeLifetime = new BreadcrumbCoordinatorUpgradeLifetime(_dispatcher.Report);
@@ -296,6 +305,11 @@ namespace QuickFiler.Viewers
                 throw new ArgumentNullException(nameof(json));
             }
 
+            if (MessageType(json) is "selectorDescendantActivate" or "selectorDescendantToggle")
+            {
+                await DispatchDescendantMessageAsync(json).ConfigureAwait(false);
+                return;
+            }
             if (IsSelectorMessage(json))
             {
                 await _dispatcher.Dispatch(() => HandleSelectorMessage(json)).ConfigureAwait(false);

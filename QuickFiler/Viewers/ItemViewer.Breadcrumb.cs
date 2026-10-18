@@ -46,6 +46,12 @@ namespace QuickFiler
         internal void InitializeBreadcrumbPipeline(
             IFolderHierarchyProvider provider,
             BreadcrumbPopupUiOperations operations
+        ) => InitializeBreadcrumbPipeline(provider, operations, null);
+
+        internal void InitializeBreadcrumbPipeline(
+            IFolderHierarchyProvider provider,
+            BreadcrumbPopupUiOperations operations,
+            string archiveRoot
         )
         {
             ThrowIfOffUiBoundary(nameof(InitializeBreadcrumbPipeline));
@@ -77,7 +83,8 @@ namespace QuickFiler
             var bridgeCoordinator = new BreadcrumbBridgeCoordinator(
                 lifecycle.Hub,
                 provider,
-                BreadcrumbUiDispatcher.CaptureCurrent()
+                BreadcrumbUiDispatcher.CaptureCurrent(),
+                archiveRoot
             );
             lifecycle.SetBridgeCoordinator(bridgeCoordinator);
             BreadcrumbCoordinator = bridgeCoordinator;
@@ -115,7 +122,7 @@ namespace QuickFiler
                         _l0vhBreadcrumb_WebView2,
                         () =>
                             _l0vhBreadcrumb_WebView2.NavigateToString(
-                                Properties.Resources.FolderBreadcrumb
+                                FolderBreadcrumbDocument.Html
                             ),
                         "Collapsed"
                     )
@@ -199,7 +206,7 @@ namespace QuickFiler
                 _l0vhBreadcrumb_WebView2,
                 environment,
                 initializer,
-                Properties.Resources.FolderBreadcrumb,
+                FolderBreadcrumbDocument.Html,
                 () => host.ControlHost?.Control.Focus(),
                 FocusBreadcrumbCore,
                 () => BreadcrumbCoordinator?.CancelSelector(),

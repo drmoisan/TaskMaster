@@ -1,0 +1,5 @@
+Timestamp: 2026-10-18T01-53
+Command: node --test --experimental-test-coverage --test-isolation=none --test-concurrency=1 --test-coverage-include=QuickFiler\Resources\FolderBreadcrumb.js --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=SCRATCH/issue-997-javascript-final-20261018015321.lcov --test-coverage-lines=85 --test-coverage-branches=75 tests/quickfiler-breadcrumb/issue-997-common.test.mjs tests/quickfiler-breadcrumb/issue-997-recursive.test.mjs
+EXIT_CODE: 0
+ExpectedExitCode: 0
+Output Summary: 78/78 actual-script tests pass. Complete actual production JavaScript: lines347/347(100.00%), branches162/162(100.00%), functions35/35(100.00%). Native line85/branch75 thresholds pass. Raw V8 record reconciles every LCOV DA count and all LF/LH/BRF/BRH totals exactly via SCRATCH/issue-997-coverage.mjs. No source transform or production exclusions. Raw/log/LCOV pointers: SCRATCH/issue-997-javascript-final-run.json; detailed raw-derived metrics: SCRATCH/issue-997-javascript-final-metrics.json.
