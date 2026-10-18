@@ -3,16 +3,16 @@
 - **Issue:** #997
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-18T01-31
-- **Status:** Implemented and locally verified; independent review and final PR-head CI pending
-- **Version:** 0.2
+- **Last Updated:** 2026-10-18T02-07
+- **Status:** Implemented and independently reviewed; initial PR CI passed, verification update requires head recheck
+- **Version:** 0.3
 
 ## Context
 - QuickFiler expands top-level folders, but revealed descendants cannot be used reliably as filing destinations and descendants with children lack expansion controls. Every displayed folder must be selectable, while its plus/minus control changes expansion only.
 - Observed environment(s): TaskMaster QuickFiler QFC embedded WebView2 breadcrumb selector on Windows. The separate EFC renderer is compatibility regression scope.
 - Customer impact and severity (who is affected, how often, how bad): Users navigating an archive hierarchy cannot file to revealed descendants or navigate below the first revealed level. No production frequency measurement is available.
 - First observed date and version(s) impacted: Reported 2026-10-17; exact first affected release is unknown.
-- Research: [research/research.2026-10-18T00-45.md](research/research.2026-10-18T00-45.md). The supplied research is sufficient to complete this spec; implementation and local tests are now verified by the delivery evidence below; independent review and final PR-head CI remain pending.
+- Research: [research/research.2026-10-18T00-45.md](research/research.2026-10-18T00-45.md). Implementation and local tests are verified by the delivery evidence below. Independent local audits passed; the initial PR head passed all seven CI jobs. Every subsequent delivery commit requires exact-head CI verification before completion.
 
 ## Repro & Evidence
 - Steps to reproduce (with data/flags/inputs): Provide a rooted hierarchy `\\mailbox\Archive\Projects\Apollo\Alpha\Review`, with `Alpha` containing `Review` and `Review` containing a leaf. Bind archive root `\\mailbox\Archive`, present the top-level target as `Projects\Apollo`, open the QFC selector, and expand Apollo. Select Alpha, then reopen and expand Alpha and Review. Separately select Alpha, reopen, collapse Apollo, read the committed destination, and reopen/Escape.
@@ -127,7 +127,7 @@ Opening/rendering must not eagerly enumerate the archive subtree. Fetch only req
 - [x] Unknown, unloaded, cross-row, malformed, and out-of-root descendant requests cannot commit; controlled late/reversed fetches after collapse or population replacement cannot attach stale children or change selection.
 - [x] Existing no-root full-path selection, duplicate identity/score contracts, immediate-child message compatibility, and EFC compatibility suites pass; expansion performs no eager whole-subtree enumeration.
 - [x] The full ordered CSharpier, analyzer rebuild, warnings-as-errors rebuild, and MSTest/coverage pass succeeds with baseline comparisons, at least 80% repository line coverage, at least 90% new-code coverage, no reduced changed-line coverage, and no added exclusions; source/test/script files remain within 500 physical lines.
-- [ ] This spec and implementation evidence describe delivered behavior, and all required CI checks succeed against the final PR head.
+- [x] This spec and implementation evidence describe delivered behavior, and all required CI checks succeed against the final PR head.
 
 ## Risks & Mitigations
 - Technical or operational risks: Confusing provider full paths with filing stems can target invalid destinations; recursive messages can select the wrong duplicate row; late provider results can reinsert collapsed/replaced nodes; near-limit files can breach repository size constraints.
@@ -136,7 +136,7 @@ Opening/rendering must not eagerly enumerate the archive subtree. Fetch only req
 ## Rollout & Follow-up
 - Release/rollout steps: Complete regression-first implementation, ordered baseline/final QA, acceptance tracking, required review/remediation, and final-head CI through the orchestrator. Ship through the existing TaskMaster release process; no migration.
 - Post-fix monitoring or clean-up tasks: Check existing diagnostics for descendant resolution/provider failures; no unrelated cleanup is included.
-- Links: [Issue #997](https://github.com/drmoisan/TaskMaster/issues/997), [issue.md](issue.md), and [research report](research/research.2026-10-18T00-45.md). PR link, independent review and final-head CI are pending the orchestrator delivery gates.
+- Links: [Issue #997](https://github.com/drmoisan/TaskMaster/issues/997), [PR #998](https://github.com/drmoisan/TaskMaster/pull/998), [issue.md](issue.md), and [research report](research/research.2026-10-18T00-45.md). Initial exact-head CI evidence is recorded below; the orchestrator rechecks every subsequent PR head before completion.
 
 ## Delivered Behavior and Local Verification
 
@@ -150,7 +150,7 @@ The final coverage comparison includes tracked working changes and new untracked
 
 ## Usage and Remaining Delivery Gates
 
-Click a folder name to select that destination. Click its plus/minus to reveal or hide immediate children; child folders with children have their own controls. No new setting or migration is required. The separate EFC production renderer remains unchanged and its compatibility tests pass. Ship through the existing TaskMaster release process after independent review, canonical PR context, final PR-head required CI and completion validation. AC8 remains unchecked until the orchestrator verifies those CI results.
+Click a folder name to select that destination. Click its plus/minus to reveal or hide immediate children; child folders with children have their own controls. No new setting or migration is required. The separate EFC production renderer remains unchanged and its compatibility tests pass. Ship through the existing TaskMaster release process after final exact-head CI and completion validation. The orchestrator checked AC8 after the initial PR-head success and must reverify the commit containing this check-off.
 
 ## JavaScript Verification Remediation for Issue #997
 
@@ -162,4 +162,8 @@ All 78 fixtures also pass in normal, reversed and seeded shuffled order (seed 99
 
 Evidence: [JavaScript coverage comparison](evidence/qa-gates/issue-997-javascript-coverage-comparison.2026-10-18T01-54.md), [actual-script final execution](evidence/qa-gates/issue-997-javascript-execution-coverage.2026-10-18T01-53.md), [fixture isolation](evidence/regression-testing/issue-997-javascript-isolation-shuffled.2026-10-18T01-54.md), [remediation self-review](evidence/qa-gates/issue-997-remediation-self-review.2026-10-18T01-56.md) and the timestamped remediation handoff under evidence/qa-gates. Raw collector files and exact mapping are retained only under SCRATCH.
 
-R1/R2 local evidence is complete. Independent re-review accepted AC7 using the new audit set under audit/2026-10-18T01-58/; AC8 remains unchecked until required CI succeeds at the final PR head. Historical rejected audits remain historical. Final delivery completion is not claimed before exact final-head CI.
+R1/R2 local evidence is complete. Independent re-review accepted AC7 using the new audit set under audit/2026-10-18T01-58/. Historical rejected audits remain historical.
+
+## PR CI Verification
+
+The orchestrator verified all seven checks on PR #998 head `63715ddef30df12737e3d1720c1aad06c5dd51e3` at `2026-10-18T02:07:07Z`: actionlint, formatting, analyzer build, nullable build, MSTest coverage, Pester and hygiene. [CI run 39088675059](https://github.com/drmoisan/TaskMaster/actions/runs/39088675059) succeeded; the repository CI parser returned `success` after matching the live PR head before and after the checks query. This supports AC8 check-off. The check-off and any subsequent audit commits must be pushed and pass the same exact-head gate again. Final delivery completion is not claimed until that recheck and native completion validation pass.
