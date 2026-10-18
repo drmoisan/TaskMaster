@@ -126,7 +126,7 @@ Opening/rendering must not eagerly enumerate the archive subtree. Fetch only req
 - [x] Rooted-provider/relative-presented-target selection, selected-descendant collapse/readback, reopen/Escape, and recursive asset regressions have recorded fail-before/pass-after evidence and passing named MSTest coverage.
 - [x] Unknown, unloaded, cross-row, malformed, and out-of-root descendant requests cannot commit; controlled late/reversed fetches after collapse or population replacement cannot attach stale children or change selection.
 - [x] Existing no-root full-path selection, duplicate identity/score contracts, immediate-child message compatibility, and EFC compatibility suites pass; expansion performs no eager whole-subtree enumeration.
-- [ ] The full ordered CSharpier, analyzer rebuild, warnings-as-errors rebuild, and MSTest/coverage pass succeeds with baseline comparisons, at least 80% repository line coverage, at least 90% new-code coverage, no reduced changed-line coverage, and no added exclusions; source/test/script files remain within 500 physical lines.
+- [x] The full ordered CSharpier, analyzer rebuild, warnings-as-errors rebuild, and MSTest/coverage pass succeeds with baseline comparisons, at least 80% repository line coverage, at least 90% new-code coverage, no reduced changed-line coverage, and no added exclusions; source/test/script files remain within 500 physical lines.
 - [ ] This spec and implementation evidence describe delivered behavior, and all required CI checks succeed against the final PR head.
 
 ## Risks & Mitigations
@@ -162,4 +162,4 @@ All 78 fixtures also pass in normal, reversed and seeded shuffled order (seed 99
 
 Evidence: [JavaScript coverage comparison](evidence/qa-gates/issue-997-javascript-coverage-comparison.2026-10-18T01-54.md), [actual-script final execution](evidence/qa-gates/issue-997-javascript-execution-coverage.2026-10-18T01-53.md), [fixture isolation](evidence/regression-testing/issue-997-javascript-isolation-shuffled.2026-10-18T01-54.md), [remediation self-review](evidence/qa-gates/issue-997-remediation-self-review.2026-10-18T01-56.md) and the timestamped remediation handoff under evidence/qa-gates. Raw collector files and exact mapping are retained only under SCRATCH.
 
-R1/R2 local evidence is complete. AC7 remains unchecked until independent review accepts the regenerated audits; AC8 remains unchecked until required CI succeeds at the final PR head. Historical rejected audits remain historical; this executor does not claim canonical audit acceptance or final CI completion.
+R1/R2 local evidence is complete. Independent re-review accepted AC7 using the new audit set under audit/2026-10-18T01-58/; AC8 remains unchecked until required CI succeeds at the final PR head. Historical rejected audits remain historical. Final delivery completion is not claimed before exact final-head CI.
