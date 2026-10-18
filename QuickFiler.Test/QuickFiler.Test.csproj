@@ -66,6 +66,7 @@
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.Activation.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterScoreJoinTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue637Tests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue995Tests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorSupersessionTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.Part2.cs" />
     <Compile Include="Controllers\EfcFormControllerIssue792Tests.cs" />
+    <Compile Include="Controllers\EfcFormControllerIssue995Tests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesProductionFactoryTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerExecuteMovesTests.cs" />

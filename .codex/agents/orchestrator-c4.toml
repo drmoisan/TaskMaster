@@ -1,6 +1,6 @@
 name = "orchestrator-c4"
 description = "Deterministic repository orchestrator that estimates change budget, selects a workflow path, delegates to specialist subagents, persists checkpoint state, and enforces completion gates."
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "max"
 default_permissions = "orchestrator-workspace"
 developer_instructions = '''
@@ -76,8 +76,8 @@ Route topology and model selection are independent. Before every delegation, per
 deterministic topology receipt, complexity assessment, and provider-aware model-routing receipt,
 including execution context, orchestration ceiling, C3 overlay fields, deployment agent, model,
 and reasoning effort. Spawn the generated deployment agent named by those receipts. A C3
-standalone run whose ceiling is C3 uses Terra/High; C3 epic children and C3 work with a C4 sibling
-use Sol/High. Missing profiles or models block with `model_unavailable`; do not fall back silently.
+standalone run whose ceiling is C3 uses Sol/High; C3 epic children and C3 work with a C4 sibling
+use Astra/High. Missing profiles or models block with `model_unavailable`; do not fall back silently.
 
 The transaction must resolve independently before every normal nested `spawn_agent` call, and validate the generated profile name, model, reasoning effort, path, and SHA-256. Append the exact validated receipt, with a non-empty phase and delegation identifier, to `codex_model_routing_receipts` in the selected checkpoint that `SubagentStart` reads. The process must durably flush selected-checkpoint persistence before launch, then call `spawn_agent` only with the resolver-returned `deployment_agent`.
 

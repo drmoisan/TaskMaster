@@ -1,6 +1,6 @@
 name = "csharp-typed-engineer-c4"
 description = "Converted subagent"
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "max"
 developer_instructions = '''
 Canonical migration source: .github/agents/csharp-typed-engineer.agent.md

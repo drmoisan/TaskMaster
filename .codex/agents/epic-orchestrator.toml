@@ -1,6 +1,6 @@
 name = "epic-orchestrator"
 description = "Root-invoked epic execution coordinator that schedules prepared or manual epic features in dependency waves and drives integration fan-in and the final PR."
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "ultra"
 default_permissions = "orchestrator-workspace"
 developer_instructions = '''
@@ -54,7 +54,7 @@ begin the normal epic lifecycle without requiring planner output.
 - Recompute longest-path waves as an integrity check without rewriting a prepared plan.
 - Persist each child topology receipt, complexity assessment, delegation receipt, and
   delegation-bound model-routing receipt before launch.
-- Select the generated deployment profile. Epic C3 children use Sol/High; C4 uses Sol/Max.
+- Select the generated deployment profile. Epic C3 children use Astra/High; C4 uses Astra/Max.
 - Launch all ready features in a bounded wave concurrently from the current integration tip.
 - Use `.codex/scripts/launch-epic-child-wave.ps1` with an immutable `epic-orchestrator` wave spec,
   exact profile values, and `max_parallel_features` from 1 through 8. Native `spawn_agent` is

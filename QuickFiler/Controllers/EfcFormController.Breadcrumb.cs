@@ -25,6 +25,34 @@ namespace QuickFiler.Controllers
 {
     internal partial class EfcFormController
     {
+        private EventHandler _breadcrumbConfirmationHandler;
+
+        internal void ConfigureBreadcrumbConfirmation(
+            BreadcrumbBridgeRouter router,
+            EventHandler confirmationHandler = null
+        )
+        {
+            if (router == null)
+            {
+                throw new ArgumentNullException(nameof(router));
+            }
+
+            DetachBreadcrumbConfirmation();
+            _router = router;
+            _breadcrumbConfirmationHandler = confirmationHandler ?? ButtonOK_Click;
+            _router.ConfirmationRequested += _breadcrumbConfirmationHandler;
+        }
+
+        private void DetachBreadcrumbConfirmation()
+        {
+            if (_router != null && _breadcrumbConfirmationHandler != null)
+            {
+                _router.ConfirmationRequested -= _breadcrumbConfirmationHandler;
+            }
+
+            _breadcrumbConfirmationHandler = null;
+        }
+
         /// <summary>Fixed number of host initialization attempts before the failure is reported (#792).</summary>
         internal const int BreadcrumbInitializationAttemptLimit = 3;
 
@@ -48,12 +76,14 @@ namespace QuickFiler.Controllers
                 _globals.Ol.FolderTreeService,
                 () => _globals.Ol.ArchiveRootPath
             );
-            _router = new BreadcrumbBridgeRouter(
-                provider,
-                _breadcrumbHost,
-                new UtilitiesCS.OutlookObjects.Folder.BreadcrumbMessageCodec(),
-                new UtilitiesCS.OutlookObjects.Folder.BreadcrumbHtmlRenderer(),
-                new BreadcrumbOutboundQueue(_breadcrumbHost)
+            ConfigureBreadcrumbConfirmation(
+                new BreadcrumbBridgeRouter(
+                    provider,
+                    _breadcrumbHost,
+                    new UtilitiesCS.OutlookObjects.Folder.BreadcrumbMessageCodec(),
+                    new UtilitiesCS.OutlookObjects.Folder.BreadcrumbHtmlRenderer(),
+                    new BreadcrumbOutboundQueue(_breadcrumbHost)
+                )
             );
             _breadcrumbHost.CoreInitialized += (s, e) => _router.NotifyCoreInitialized();
             _router.FocusSearchRequested += (s, e) => _formViewer?.SearchText.Select();

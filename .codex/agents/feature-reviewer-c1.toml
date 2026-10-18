@@ -1,6 +1,6 @@
 name = "feature-reviewer-c1"
 description = "Review a feature branch relative to a base branch, generate policy/code/feature audit artifacts, and trigger remediation planning when required."
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 model_reasoning_effort = "low"
 
 developer_instructions = """

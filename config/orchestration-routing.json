@@ -289,28 +289,28 @@
     "complexity_to_profile": {
       "C1": {
         "suffix": "c1",
-        "model": "gpt-5.6-luna",
+        "model": "gpt-6-luna",
         "model_reasoning_effort": "low"
       },
       "C2": {
         "suffix": "c2",
-        "model": "gpt-5.6-terra",
+        "model": "gpt-6.1-sol",
         "model_reasoning_effort": "medium"
       },
       "C3": {
         "suffix": "c3",
-        "model": "gpt-5.6-terra",
+        "model": "gpt-6.1-sol",
         "model_reasoning_effort": "high"
       },
       "C4": {
         "suffix": "c4",
-        "model": "gpt-5.6-sol",
+        "model": "gpt-6-astra",
         "model_reasoning_effort": "max"
       }
     },
       "c3_elevated_profile": {
       "suffix": "c3-elevated",
-      "model": "gpt-5.6-sol",
+      "model": "gpt-6-astra",
       "model_reasoning_effort": "high",
       "activation": {
         "operator": "any",
@@ -329,12 +329,12 @@
       "forced_personas": {
       "epic-planner": {
         "suffix": "",
-        "model": "gpt-5.6-sol",
+        "model": "gpt-6-astra",
         "model_reasoning_effort": "ultra"
       },
       "epic-orchestrator": {
         "suffix": "",
-        "model": "gpt-5.6-sol",
+        "model": "gpt-6-astra",
         "model_reasoning_effort": "ultra"
       }
     },

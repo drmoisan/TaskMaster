@@ -7,9 +7,9 @@
     `scripts/dev_tools/resolve_codex_deployment.py`. It resolves the exact Codex
     deployment agent, model, and reasoning effort for one delegation from the
     logical agent, the assessed complexity band, the execution context, and the
-    orchestration complexity ceiling. C3 defaults to Terra/high and elevates to
-    Sol/high only for an epic child or a C4 orchestration ceiling; the epic
-    planner and epic orchestrator personas are always forced to Sol/ultra. No
+    orchestration complexity ceiling. C3 defaults to Sol/high and elevates to
+    Astra/high only for an epic child or a C4 orchestration ceiling; the epic
+    planner and epic orchestrator personas are always forced to Astra/ultra. No
     model alias and no silent fallback is accepted.
 
     SINGLE-IMPLEMENTATION RULE. The orchestrator-state U6.X checks
@@ -81,20 +81,20 @@ $script:LOGICAL_AGENT_ALIASES = @{ 'feature-review' = 'feature-reviewer' }
 
 # The per-band deployment profiles (suffix, model, reasoning effort).
 $script:BASE_PROFILES = @{
-    C1 = @{ suffix = 'c1'; model = 'gpt-5.6-luna'; model_reasoning_effort = 'low' }
-    C2 = @{ suffix = 'c2'; model = 'gpt-5.6-terra'; model_reasoning_effort = 'medium' }
-    C3 = @{ suffix = 'c3'; model = 'gpt-5.6-terra'; model_reasoning_effort = 'high' }
-    C4 = @{ suffix = 'c4'; model = 'gpt-5.6-sol'; model_reasoning_effort = 'max' }
+    C1 = @{ suffix = 'c1'; model = 'gpt-6-luna'; model_reasoning_effort = 'low' }
+    C2 = @{ suffix = 'c2'; model = 'gpt-6.1-sol'; model_reasoning_effort = 'medium' }
+    C3 = @{ suffix = 'c3'; model = 'gpt-6.1-sol'; model_reasoning_effort = 'high' }
+    C4 = @{ suffix = 'c4'; model = 'gpt-6-astra'; model_reasoning_effort = 'max' }
 }
 
 # The profile a C3 delegation elevates to when the overlay applies.
-$script:C3_ELEVATED_PROFILE = @{ suffix = 'c3-elevated'; model = 'gpt-5.6-sol'; model_reasoning_effort = 'high' }
+$script:C3_ELEVATED_PROFILE = @{ suffix = 'c3-elevated'; model = 'gpt-6-astra'; model_reasoning_effort = 'high' }
 
 # The personas whose profile is forced regardless of band, context, or ceiling.
 # Their deployment agent is the logical agent itself (empty suffix).
 $script:FORCED_PERSONA_PROFILES = @{
-    'epic-planner'      = @{ suffix = ''; model = 'gpt-5.6-sol'; model_reasoning_effort = 'ultra' }
-    'epic-orchestrator' = @{ suffix = ''; model = 'gpt-5.6-sol'; model_reasoning_effort = 'ultra' }
+    'epic-planner'      = @{ suffix = ''; model = 'gpt-6-astra'; model_reasoning_effort = 'ultra' }
+    'epic-orchestrator' = @{ suffix = ''; model = 'gpt-6-astra'; model_reasoning_effort = 'ultra' }
 }
 
 

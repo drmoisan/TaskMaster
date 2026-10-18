@@ -1,6 +1,6 @@
 name = "prd-feature-c3-elevated"
 description = "Converted subagent"
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "high"
 developer_instructions = '''
 Canonical migration source: .github/agents/prd-feature.agent.md

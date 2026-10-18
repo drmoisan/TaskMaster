@@ -1,0 +1,6 @@
+# Issue 995 branch-contracts
+
+Timestamp: 2026-10-17T23-30
+Command: Read complete branch inventory from merge base; count physical lines; parse config/profile TOML; verify legacy Compile entries, selector diff and asserting-test dispositions
+EXIT_CODE: 0
+Output Summary: All62changed agent profiles and .codex/config.toml parse as valid TOML; MCP pin1.1.21. All changed executable source, tests and reusable scripts are <=459physical lines. QuickFiler.Test.csproj is existing declarative metadata:569base lines plus2required Compile entries=571; no executable logic added there. Both issue995test Compile entries appear exactly once; all required C# tests are discovered in7,471passing cases. Separate FolderBreadcrumb.html has zero branch diff. Existing renderer/codec/router/controller asserting-test dispositions are preserved except intentional Enter regression replacement; full Pester513passed and allthree isolation seeds passed50cases. SDKbootstrap: pwsh -NoProfile -File scripts/vscode/Install-RepoDotNetSdk.ps1 installs ignored repo-local8.0.205; fresh ordinary dotnet from checkout resolves8.0.205 automatically via global.json. No PATH override required. Repository hygiene actual EXIT0/Findings0. Inventory raw details under SCRATCH; all evidence paths canonical.

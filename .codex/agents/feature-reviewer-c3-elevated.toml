@@ -1,6 +1,6 @@
 name = "feature-reviewer-c3-elevated"
 description = "Review a feature branch relative to a base branch, generate policy/code/feature audit artifacts, and trigger remediation planning when required."
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 model_reasoning_effort = "high"
 
 developer_instructions = """

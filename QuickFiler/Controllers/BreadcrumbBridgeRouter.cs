@@ -71,6 +71,9 @@ namespace QuickFiler.Controllers
         /// <summary>Raised when Up is pressed on the top row (SearchText focus parity).</summary>
         public event EventHandler? FocusSearchRequested;
 
+        /// <summary>Raised when the current valid destination is explicitly confirmed.</summary>
+        public event EventHandler? ConfirmationRequested;
+
         /// <summary>
         /// Builds breadcrumb rows from the presented suggestion rows (9101 ancestor chain per
         /// suggestion via <c>ResolveLeafKeyAsync</c> + <c>GetAncestorChainAsync</c>), renders the
@@ -433,6 +436,9 @@ namespace QuickFiler.Controllers
                     break;
                 case BreadcrumbMessageTypes.RowSelected:
                     SelectRow(row);
+                    break;
+                case BreadcrumbMessageTypes.RowConfirmed:
+                    ConfirmRow(row);
                     break;
             }
         }

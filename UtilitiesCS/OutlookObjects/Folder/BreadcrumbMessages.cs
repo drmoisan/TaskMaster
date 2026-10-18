@@ -27,6 +27,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <summary>Inbound: a row was selected in the hosted document.</summary>
         public const string RowSelected = "rowSelected";
 
+        /// <summary>Inbound: confirm the currently selected filing destination.</summary>
+        public const string RowConfirmed = "rowConfirmed";
+
         /// <summary>Outbound: render a full document or per-row fragment.</summary>
         public const string Render = "render";
 

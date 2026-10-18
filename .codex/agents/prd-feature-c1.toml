@@ -1,6 +1,6 @@
 name = "prd-feature-c1"
 description = "Converted subagent"
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 model_reasoning_effort = "low"
 developer_instructions = '''
 Canonical migration source: .github/agents/prd-feature.agent.md
