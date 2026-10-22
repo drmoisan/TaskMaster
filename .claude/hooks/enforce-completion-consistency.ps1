@@ -50,9 +50,9 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
-# Dot-source the shared validation helpers. Guarded so a missing file produces a
-# clear error and so dot-sourcing this hook in tests loads the helpers too.
-try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-completion-helpers.ps1' -ErrorRecord $_ }
+# Dot-source the shared validation helpers (handler H9, issue #984). A failed load is recorded in
+# $script:CompletionHelpersImportFailure and denies only checkpoint writes; other paths are allowed.
+$script:CompletionHelpersImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { $script:CompletionHelpersImportFailure = 'enforce-completion-helpers.ps1' }
 
 function ConvertFrom-CheckpointJson {
     <#
@@ -402,6 +402,7 @@ function Invoke-CompletionConsistencyDecision {
     if (-not (Test-IsCheckpointPath -NormalizedPath $normalized)) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
+    if ($script:CompletionHelpersImportFailure) { return ConvertTo-CompletionDenyDecision -Reason "COMPLETION_CONSISTENCY_BLOCKED: the shared helpers '$($script:CompletionHelpersImportFailure)' failed to load, so the canonical checkpoint cannot be validated; the gate fails closed." }
 
     # Write tool: a present content property is validated directly, and empty
     # content is denied. Edit tool: no content property is supplied, so read the
