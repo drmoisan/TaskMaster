@@ -240,6 +240,52 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             Regex.Matches(css, @"(?m)^\.child \{").Count.Should().Be(1, "the rule is merged");
         }
 
+        [TestMethod]
+        public void LightThemeCss_SelectedChild_UsesSelectionBackground()
+        {
+            // Arrange
+            string css = BreadcrumbDocumentAssets.LightThemeCss;
+
+            // Act / Assert
+            css.Should()
+                .Contain(".child[aria-selected=\"true\"] { background: #cce8ff; }")
+                .And.Contain(".rowwrap.selected .row { background: #cce8ff; }");
+        }
+
+        [TestMethod]
+        public void DarkThemeCss_SelectedChild_UsesSelectionBackground()
+        {
+            // Arrange
+            string css = BreadcrumbDocumentAssets.DarkThemeCss;
+
+            // Act / Assert
+            css.Should()
+                .Contain(".child[aria-selected=\"true\"] { background: #264f78; }")
+                .And.Contain(".rowwrap.selected .row { background: #264f78; }");
+        }
+
+        [TestMethod]
+        public void BaseCss_ChildName_CarriesEllipsisRule()
+        {
+            // Arrange
+            string css = BreadcrumbDocumentAssets.BaseCss;
+
+            // Act
+            Match nameRule = Regex.Match(css, @"(?m)^\.child \.name \{[^}]*\}");
+            Match childRule = Regex.Match(css, @"(?m)^\.child \{[^}]*\}");
+
+            // Assert
+            nameRule.Success.Should().BeTrue("the name rule exists");
+            nameRule
+                .Value.Should()
+                .Contain("min-width: 0")
+                .And.Contain("overflow: hidden")
+                .And.Contain("text-overflow: ellipsis")
+                .And.Contain("white-space: nowrap");
+            childRule.Value.Should().NotContain("text-overflow");
+            childRule.Value.Should().Contain("display: flex").And.Contain("align-items: center");
+        }
+
         private static BreadcrumbRow ExpandableRow() =>
             new BreadcrumbRow(
                 "row-0",

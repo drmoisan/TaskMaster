@@ -293,6 +293,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbHtmlRendererTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessageCodecTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessageCodecIssue1002Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbMessagesIssue1002Tests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowDescendantsIssue1002Tests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbHtmlRendererIssue1002Tests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilderTests.cs" />

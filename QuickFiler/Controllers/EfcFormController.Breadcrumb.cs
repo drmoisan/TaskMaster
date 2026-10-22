@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -66,6 +67,9 @@ namespace QuickFiler.Controllers
         // Wiring-only breadcrumb setup (#349): constructs the exempt WebView2 host adapter and the
         // non-exempt router where ConfigureFolderTreeView previously wired the TreeListView, then
         // connects the router's events back to the form. All breadcrumb logic lives in the router.
+        // Coverage exemption (#1002, maintainer-ratified CLAUDE.md UT2 COM/VSTO/WinForms exemption):
+        // this wiring constructs WebView2BreadcrumbHost over the live viewer control and cannot run headless.
+        [ExcludeFromCodeCoverage]
         private void ConfigureBreadcrumbControl()
         {
             _breadcrumbHost = new WebView2BreadcrumbHost(

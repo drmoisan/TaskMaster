@@ -26,18 +26,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
             + ".affordance { cursor: pointer; font-weight: bold; padding: 0 4px; }\n"
             + ".row.banner { justify-content: center; opacity: 0.7; pointer-events: none; }\n"
             + ".children { margin-left: 18px; }\n"
-            + ".child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; }\n";
+            + ".child { display: flex; align-items: center; }\n"
+            + ".child .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n";
 
         /// <summary>Light-theme CSS block.</summary>
         public const string LightThemeCss =
             "body { background: #ffffff; color: #1b1b1b; }\n"
             + ".rowwrap.selected .row { background: #cce8ff; }\n"
+            + ".child[aria-selected=\"true\"] { background: #cce8ff; }\n"
             + ".affordance { color: #005a9e; }\n";
 
         /// <summary>Dark-theme CSS block.</summary>
         public const string DarkThemeCss =
             "body { background: #1e1e1e; color: #e6e6e6; }\n"
             + ".rowwrap.selected .row { background: #264f78; }\n"
+            + ".child[aria-selected=\"true\"] { background: #264f78; }\n"
             + ".affordance { color: #6cb6ff; }\n";
 
         /// <summary>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -27,7 +28,10 @@ namespace QuickFiler.Controllers
     {
         #region Major Actions
 
-        async public Task ActionOkAsync()
+        // Coverage exemption (#1002, maintainer-ratified CLAUDE.md UT2 COM/VSTO/WinForms exemption):
+        // this handler is bound to MessageBox and the live WinForms viewer and cannot run headless.
+        [ExcludeFromCodeCoverage]
+        public async Task ActionOkAsync()
         {
             if (SynchronizationContext.Current is null)
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
@@ -63,6 +67,9 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // Coverage exemption (#1002, maintainer-ratified CLAUDE.md UT2 COM/VSTO/WinForms exemption):
+        // this handler closes the live WinForms viewer, whose MessageBox-bound form cannot run headless.
+        [ExcludeFromCodeCoverage]
         public async Task ActionCancelAsync()
         {
             //Debug.WriteLine($"Thread Id before await: {Thread.CurrentThread.ManagedThreadId}");
@@ -113,6 +120,9 @@ namespace QuickFiler.Controllers
             await ApplyDeleteGestureAsync();
         }
 
+        // Coverage exemption (#1002, maintainer-ratified CLAUDE.md UT2 COM/VSTO/WinForms exemption):
+        // this handler depends on MessageBox and the Outlook-bound folder helper and cannot run headless.
+        [ExcludeFromCodeCoverage]
         public async Task CreateFolderAsync()
         {
             if (!IsValidSelection)
@@ -175,6 +185,9 @@ namespace QuickFiler.Controllers
         /// #465 B (RC8): the control read happens here, on the UI thread, before any
         /// <c>Task.Run</c>, carrying an unchanged value into the worker.
         /// </summary>
+        // Coverage exemption (#1002, maintainer-ratified CLAUDE.md UT2 COM/VSTO/WinForms exemption):
+        // this refresh reads the live WinForms search box and the Outlook-bound data model.
+        [ExcludeFromCodeCoverage]
         public async Task RefreshSuggestionsAsync()
         {
             var searchText = _formViewer.SearchText.Text;
