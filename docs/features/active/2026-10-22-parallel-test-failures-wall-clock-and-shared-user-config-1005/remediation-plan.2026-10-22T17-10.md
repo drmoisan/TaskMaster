@@ -1,0 +1,50 @@
+# Remediation Plan: Issue #1005 (review 2026-10-22T17-10, cycle R1, proportionate)
+
+- Feature folder: `docs/features/active/2026-10-22-parallel-test-failures-wall-clock-and-shared-user-config-1005`
+- Source: `remediation-inputs.2026-10-22T17-10.md` finding B-1 (the `IDList.MaxLengthOfID` getter lost all coverage; `IDList.cs` branch coverage regressed from 20.69% to 19.35%).
+- Merge base: derived as `git merge-base origin/main HEAD`; merge-base `IDList.cs` figures: 24.36% of lines (38/156) and 20.69% of branches; `get_MaxLengthOfID` 7/7 lines and 4/4 branches.
+- `SCRATCH` is `<session scratchpad>/issue-1005/`; every scratch file starts with `issue-1005-`.
+- Scope: test-only. No production code, no `spec.md` change, no `.claude/**` or `CLAUDE.md` edit. The executor does not commit. Raw `.trx` and Cobertura documents are never added to git.
+- Hard rules: no `[DoNotParallelize]`, no `Workers=1`, no retries, no sleeps or delays, no longer timeouts, no temporary files; every new test injects a `Mock<ISettingsStore>`; MSTest, Moq, FluentAssertions; `ToDoModel.Test` is C# 7.3 (no nullable annotations); every touched file stays at or under 500 lines; the helper `CreateListWithCachedMaxLength` is not reintroduced.
+
+## Acceptance Inventory
+
+- B-1: `get_MaxLengthOfID` has every line and branch covered again, and `IDList.cs` line and branch rates are not below the merge-base rates.
+- B-1-EVIDENCE: a new timestamped coverage comparison under `evidence/qa-gates/` reports `IDList.cs` line and branch rates at the merge base and at head and names `get_MaxLengthOfID`.
+- SCOPE: no production change; the earlier `coverage-comparison.2026-10-22T16-36.md` is left in place.
+
+### Phase 0 — Policy reads and current IDList baseline
+
+- [x] [P0-T1] Read `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, and `.claude/rules/csharp.md` in that order and write `evidence/baseline/phase0-instructions-read.<timestamp>.md` carrying `Timestamp:`, `Policy Order:`, and the list of files read. Acceptance: the artifact exists with all three fields and four listed files.
+- [x] [P0-T2] Read `artifacts/csharp/coverage.xml` (the head Cobertura from the reviewed run) and write `evidence/baseline/remediation-idlist-coverage-baseline.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` recording the `IDList.cs` line rate, the `IDList.cs` branch rate, and the `get_MaxLengthOfID` method line and branch rates. Acceptance: the artifact records `get_MaxLengthOfID` at line-rate 0 and branch-rate 0, and `IDList.cs` branch rate 19.35% (the regressed head state).
+- [x] [P0-T3] Record the line count of `ToDoModel.Test/Data Model/ID/IDListGetNextToDoIDTests.cs` before the edit in the same baseline artifact family as `evidence/baseline/remediation-file-size.<timestamp>.md`. Acceptance: the artifact states 235 lines and the 500-line ceiling.
+
+### Phase 1 — Restore MaxLengthOfID coverage with store-injected tests
+
+- [x] [P1-T1] In `ToDoModel.Test/Data Model/ID/IDListGetNextToDoIDTests.cs` add test `MaxLengthOfID_ColdCacheOnMixedLengthList_ReturnsLongestIdLength`: `new IDList(new List<string> { "02", "0100" }, store.Object).MaxLengthOfID` is 4 (exercises the zero-cache branch and the `Max` lambda). Acceptance: the test passes when run by name.
+- [x] [P1-T2] In the same file add test `MaxLengthOfID_ColdCacheOnSecondDistinctList_ReturnsItsOwnLongestIdLength`: a second store-injected list `{ "02", "03", "04" }` returns 2, so the compiler-generated cached-lambda arm on the getter's `Max` line executes on more than one list. Acceptance: the test passes when run by name.
+- [x] [P1-T3] In the same file add test `MaxLengthOfID_WarmCacheAfterGetNextToDoID_ReturnsCachedLengthWithoutSaving`: on a store-injected list `{ "02" }` call `GetNextToDoID("ZZ")` (returns `"0100"`, caches 4), then read `MaxLengthOfID` and assert 4 (the non-zero-cache branch), and assert `store.Verify(s => s.Save(), Times.Once())` so the read does not persist. Acceptance: the test passes when run by name.
+- [x] [P1-T4] Confirm the touched test file is at or under 500 lines, uses only non-empty lists in the new tests, contains no `CreateListWithCachedMaxLength`, no `[DoNotParallelize]`, no `Thread.Sleep`, no `Task.Delay`, and no `Properties.Settings.Default`. Acceptance: Grep of the file for each token returns zero matches except the existing XML-doc mention of `MaxLengthOfID`, and `@(Get-Content -LiteralPath <file>).Count` style physical line count is at most 500.
+- [x] [P1-T5] Run the three new tests by name through the repository vstest route with `TaskMaster.cli.runsettings` and `/InIsolation` and record `evidence/regression-testing/maxlengthofid-tests.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the summary reports 3 executed, 3 passed, 0 failed from the trx summary.
+
+### Phase 2 — Final QA loop (restart from P2-T1 on any failure or file change)
+
+- [x] [P2-T1] Run `dotnet tool run csharpier format .` and record `evidence/qa-gates/remediation-format.<timestamp>.md`; the observation is the formatter summary line with a zero changed-file count on the final pass, then `dotnet tool run csharpier check .` exits 0. Acceptance: the artifact records both commands and a clean check.
+- [x] [P2-T2] Run the analyzer `/t:Rebuild` command from `CLAUDE.md` (`EnableNETAnalyzers`, `EnforceCodeStyleInBuild`) and record `evidence/qa-gates/remediation-analyzers.<timestamp>.md`. Acceptance: exit 0 with 0 errors recorded in `Output Summary:`.
+- [x] [P2-T3] Run the warnings-as-errors `/t:Rebuild` command from `CLAUDE.md` (no `/p:Nullable=enable`) and record `evidence/qa-gates/remediation-typecheck.<timestamp>.md`. Acceptance: exit 0 with 0 errors recorded.
+- [x] [P2-T4] Run `scripts/vscode/Invoke-MSTestWithCoverage.ps1` over the full suite and record `evidence/qa-gates/remediation-tests.<timestamp>.md` with the trx-derived pass and fail counts and the first-party line and branch percentages. Acceptance: 0 failed tests; repository line at or above 80% and branch at or above 75%.
+- [x] [P2-T5] Copy `coverage/coverage.cobertura.xml` from the P2-T4 run to `artifacts/csharp/coverage.xml` so the re-audit reads current figures; the file stays untracked. Acceptance: Grep of `artifacts/csharp/coverage.xml` for `name="get_MaxLengthOfID"` shows `line-rate="1" branch-rate="1"` on that method element.
+- [x] [P2-T6] Confirm `IDList.cs` in `artifacts/csharp/coverage.xml` has `line-rate` at or above 0.24359 and `branch-rate` at or above 0.206897. Acceptance: both values read from the `filename="ToDoModel\Data Model\ID\IDList.cs"` class element satisfy the thresholds; if either does not, add tests in P1 for the uncovered line or branch and restart the loop.
+- [x] [P2-T7] Write `evidence/qa-gates/coverage-comparison.<timestamp>.md` (the new file has a timestamp later than `coverage-comparison.2026-10-22T16-36.md`, which stays untouched) with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and a table of `IDList.cs` line and branch rates at the merge base (24.36% line, 20.69% branch), at the reviewed head (26.04% line, 19.35% branch), and now, plus the `get_MaxLengthOfID` member lines and branch lines covered now against the merge-base 7/7 and 4/4, and the package-level JaCoCo projection for any included figure. Acceptance: the artifact reports both rates for all three states, names `get_MaxLengthOfID` as covered again, and contains no absolute host path.
+- [x] [P2-T8] Verify scope: `git diff <merge base of origin/main and HEAD> --stat -- ToDoModel/ UtilitiesCS/ TaskMaster/` plus `git status --porcelain` show no production file changed by this remediation, and only `ToDoModel.Test/Data Model/ID/IDListGetNextToDoIDTests.cs` and files under the feature folder are newly modified; record `evidence/qa-gates/remediation-scope.<timestamp>.md`. Acceptance: the artifact lists zero production changes and no `.trx`, `.coverage`, or Cobertura file as untracked-to-add.
+- [x] [P2-T9] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and write `evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. Acceptance: no FAIL row; a FAIL row is fixed and the loop re-run before rewriting.
+
+## Pre-Mortem
+
+- Review checklists: P2-T9 walks all three audit templates; B-1's cause (an AC-driven deletion removed the only getter caller) is guarded by P2-T5 and P2-T6, which read the getter and the file rates directly.
+- Coverage: the new tests target the getter's zero-cache branch, the warm branch, and the second cold read for the compiler-generated lambda branch; P2-T6 fails the plan if branch rate is below 20.69%, and P2-T7 reports line and branch rates, not line only.
+- Mirror parity: not applicable, no mirrored, bundled, or `.claude` file and no fact in the execution-environment brief changes.
+- File size: P0-T3 and P1-T4 hold the test file at 235 lines plus roughly 60 added, well under 500; a new file with `<Compile Include>` is the fallback if csharpier growth exceeds the ceiling.
+- Test isolation: each new test builds its own `Mock<ISettingsStore>` and list, shares no static state, and never reaches `Properties.Settings.Default`; P2-T4 runs under the repository parallel runsettings with no serialization attribute, and no shuffled-order run is added because the change is one MSTest class with no shared state.
+- CI-only behavior: the TaskMaster CI checks (actionlint, build-analyzers, build-nullable, format-check, hygiene, mstest-coverage, pester) are PR-time gates; P2-T1 through P2-T4 reproduce format-check, build-analyzers, build-nullable, and mstest-coverage locally, and no evidence artifact carries an absolute host path (hygiene).
+- Evidence: every artifact lands under `evidence/<kind>/` with the four fields and a write-time UTC stamp; consumers select the greatest `<name>.*.md`; only Markdown summaries and projections are committed, never raw trx or Cobertura.

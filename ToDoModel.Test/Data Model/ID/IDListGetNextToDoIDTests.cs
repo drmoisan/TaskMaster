@@ -170,6 +170,58 @@ namespace ToDoModel.Test
         }
 
         [TestMethod]
+        public void MaxLengthOfID_ColdCacheOnMixedLengthList_ReturnsLongestIdLength()
+        {
+            // Arrange: a list built from ids never calls GetNextToDoID, so the cache is zero.
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "02", "0100" }, store.Object);
+
+            // Act
+            var result = list.MaxLengthOfID;
+
+            // Assert
+            result.Should().Be(4, "the longest stored id is \"0100\"");
+        }
+
+        [TestMethod]
+        public void MaxLengthOfID_ColdCacheOnSecondDistinctList_ReturnsItsOwnLongestIdLength()
+        {
+            // Arrange: a second list evaluates the same Max lambda independently.
+            var first = new IDList(
+                new List<string> { "02", "0100" },
+                new Mock<ISettingsStore>().Object
+            );
+            var second = new IDList(
+                new List<string> { "02", "03", "04" },
+                new Mock<ISettingsStore>().Object
+            );
+
+            // Act
+            var firstResult = first.MaxLengthOfID;
+            var secondResult = second.MaxLengthOfID;
+
+            // Assert
+            firstResult.Should().Be(4);
+            secondResult.Should().Be(2, "every id in the second list has length 2");
+        }
+
+        [TestMethod]
+        public void MaxLengthOfID_WarmCacheAfterGetNextToDoID_ReturnsCachedLengthWithoutSaving()
+        {
+            // Arrange: GetNextToDoID("ZZ") yields "0100" and caches length 4 (one save).
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "02" }, store.Object);
+            list.GetNextToDoID("ZZ").Should().Be("0100");
+
+            // Act
+            var result = list.MaxLengthOfID;
+
+            // Assert
+            result.Should().Be(4, "the warm cache holds the length of the produced id");
+            store.Verify(s => s.Save(), Times.Once(), "reading the length does not persist");
+        }
+
+        [TestMethod]
         public void Constructor_EnumerableWithNullStore_ThrowsArgumentNullException()
         {
             // Arrange
