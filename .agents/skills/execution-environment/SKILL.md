@@ -83,6 +83,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 
 - `test_push_down_claude_resource_contracts.py` and `test_push_down_codex_and_agents_resource_contracts.py`: every distributable `.claude`, `.agents`, and `.codex` file exists in the bundle with equal text.
 - `test_push_down_claude_pack_manifest_completeness.py` and `test_push_down_codex_and_agents_pack_manifest_completeness.py`: every bundled file is listed in a pack manifest.
+- `test_push_down_pack_manifest_dependency_closure.py`: every `$PSScriptRoot` dependency of a manifested PowerShell file, and every hook script named by `.claude/settings.json`, manifested agent frontmatter, or `.codex/config.toml`, is in core plus the owning pack.
 - The Codex generator check: `scripts/dev_tools/generate_codex_agent_variants.py` run in module form with `--check` (base agents are hand-edited; variants, bundle copies, and the Codex `core.json` are generated).
 - `test_codex_agent_wrapper_contracts.py` and `test_codex_handoff_contract_parity.py`: pinned Codex agent fragments and handoff parity.
 - `test_claude_rules_frontmatter.py`: rule `paths:` scopes and that every preloaded skill exists.

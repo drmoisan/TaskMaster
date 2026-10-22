@@ -36,7 +36,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryValidation.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DiscoveryValidation.psm1' -ErrorRecord $_ }
+$script:DiscoveryValidationImportFailure = $null; try { Import-Module (Join-Path $PSScriptRoot '../lib/discovery-validation/DiscoveryValidation.psm1') -Force -Global -ErrorAction Stop } catch { $script:DiscoveryValidationImportFailure = 'DiscoveryValidation.psm1' }
 function Invoke-DiscoveryValidatorExe {
     <#
     .SYNOPSIS
@@ -201,6 +201,7 @@ function Invoke-DiscoveryArtifactGateDecision {
     if (-not $artifactType) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
+    if ($script:DiscoveryValidationImportFailure) { return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = "DISCOVERY_ARTIFACT_GATE_BLOCKED: the validation module '$($script:DiscoveryValidationImportFailure)' failed to load, so the $artifactType artifact cannot be validated; the gate fails closed." } } }
 
     $requiredDeclaration = & $RequiredArtifactReader
     if (-not $requiredDeclaration.Present) {

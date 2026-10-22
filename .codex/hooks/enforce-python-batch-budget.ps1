@@ -52,7 +52,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # Shared route helpers; this file is byte-identical to the Claude runtime copy.
-try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-batch-budget-route.ps1' -ErrorRecord $_ }
+$script:PythonBatchBudgetRouteImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { $script:PythonBatchBudgetRouteImportFailure = 'enforce-batch-budget-route.ps1' }
 
 function Get-PythonBatchBudgetState {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
@@ -219,6 +219,7 @@ function Invoke-PythonBatchBudgetHook {
     if ($normalized -notmatch '\.py$') {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
+    if ($script:PythonBatchBudgetRouteImportFailure) { return Get-PythonBatchBudgetBlockDecision -Reason "PYTHON_LARGE_PATH_REQUIRED: the route helper '$($script:PythonBatchBudgetRouteImportFailure)' failed to load, so the batch budget for '$normalized' cannot be evaluated; the gate fails closed." }
 
     $stateDir = Join-Path -Path $Root -ChildPath '.codex/state'
     $stateFile = Join-Path -Path $stateDir -ChildPath ("python-batch-budget.$SessionId.json")

@@ -61,7 +61,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
-try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-batch-budget-route.ps1' -ErrorRecord $_ }
+$script:PowerShellBatchBudgetRouteImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { $script:PowerShellBatchBudgetRouteImportFailure = 'enforce-batch-budget-route.ps1' }
 
 function Test-PowerShellBatchBudgetPathInRoot {
     <#
@@ -371,6 +371,7 @@ function Invoke-PowerShellBatchBudgetHook {
     if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
+    if ($script:PowerShellBatchBudgetRouteImportFailure) { return Get-PowerShellBatchBudgetBlockDecision -Reason "POWERSHELL_LARGE_PATH_REQUIRED: the route helper '$($script:PowerShellBatchBudgetRouteImportFailure)' failed to load, so the batch budget for '$normalized' cannot be evaluated; the gate fails closed." }
 
     $stateDir = Join-Path -Path $Root -ChildPath '.claude/state'
 
