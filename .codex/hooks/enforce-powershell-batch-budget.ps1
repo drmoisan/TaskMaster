@@ -52,7 +52,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
 # Shared route helpers; this file is byte-identical to the Claude runtime copy.
-try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-batch-budget-route.ps1' -ErrorRecord $_ }
+$script:PowerShellBatchBudgetRouteImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-batch-budget-route.ps1') } catch { $script:PowerShellBatchBudgetRouteImportFailure = 'enforce-batch-budget-route.ps1' }
 
 function Get-PowerShellBatchBudgetState {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestCap', Justification = 'Accepted and ignored for callers written against the removed test-file cap.')]
@@ -216,6 +216,7 @@ function Invoke-PowerShellBatchBudgetHook {
     if ($normalized -notmatch '\.(ps1|psm1|psd1)$') {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
+    if ($script:PowerShellBatchBudgetRouteImportFailure) { return Get-PowerShellBatchBudgetBlockDecision -Reason "POWERSHELL_LARGE_PATH_REQUIRED: the route helper '$($script:PowerShellBatchBudgetRouteImportFailure)' failed to load, so the batch budget for '$normalized' cannot be evaluated; the gate fails closed." }
 
     $stateDir = Join-Path -Path $Root -ChildPath '.codex/state'
     $stateFile = Join-Path -Path $stateDir -ChildPath ("powershell-batch-budget.$SessionId.json")
