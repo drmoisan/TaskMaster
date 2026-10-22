@@ -35,7 +35,7 @@ namespace UtilitiesCS.Test.Extensions
     ///     restores it in a finally block, and it has no reader on any parallel-phase path.
     /// </summary>
     [TestClass]
-    public class DfDeedle_COM_Tests
+    public partial class DfDeedle_COM_Tests
     {
         // ----------------------------------------------------------------
         // Shared helpers
@@ -485,46 +485,7 @@ namespace UtilitiesCS.Test.Extensions
             mockTable.Verify(x => x.GetNextRow(), Times.Once);
         }
 
-        // ----------------------------------------------------------------
-        // AddQfcColumnsAsync (internal, called directly)
-        // ----------------------------------------------------------------
-
-        [TestMethod]
-        public void AddQfcColumnsAsync_HappyPath_CompletesWithoutThrowing()
-        {
-            // Arrange: table + folder arranged so AddQfcColumns succeeds.
-            var (mockTable, _) = BuildTableMock();
-            var folder = BuildFolderWithUdp("Triage");
-            var cts = new CancellationTokenSource();
-
-            // Act: call the internal method directly and await the returned Task. Reflection is
-            // not usable here: it does not apply C# default parameter values without Type.Missing
-            // plus BindingFlags.OptionalParamBinding, so a four-element argument array against the
-            // widened six-parameter method throws TargetParameterCountException.
-            var task = DfDeedle.AddQfcColumnsAsync(mockTable.Object, folder.Object, cts.Token, 0);
-            System.Action act = () => task.GetAwaiter().GetResult();
-
-            // Assert: completes without exception.
-            act.Should().NotThrow();
-        }
-
-        [TestMethod]
-        public void AddQfcColumnsAsync_PreCancelledToken_CompletesGracefully()
-        {
-            // Arrange: a pre-cancelled token causes the inner Task.Run to be cancelled
-            // immediately; the method's catch block must handle it without re-throwing.
-            var (mockTable, _) = BuildTableMock();
-            var folder = BuildFolderWithUdp("Triage");
-            var cts = new CancellationTokenSource();
-            cts.Cancel();
-
-            // Act
-            var task = DfDeedle.AddQfcColumnsAsync(mockTable.Object, folder.Object, cts.Token, 0);
-
-            // Assert: must not propagate the cancellation as an unhandled exception.
-            System.Action act = () => task.GetAwaiter().GetResult();
-            act.Should().NotThrow();
-        }
+        // AddQfcColumnsAsync tests live in DfDeedle_COM_Tests.QfcColumnsAsync.cs.
 
         // ----------------------------------------------------------------
         // FromDefaultFolder(Store) — null-table branch

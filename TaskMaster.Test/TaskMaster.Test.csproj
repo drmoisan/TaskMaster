@@ -323,6 +323,8 @@
     <Compile Include="AppGlobals\AppQuickFilerSettingsTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsRemainingPropertiesTests.cs" />
     <Compile Include="AppGlobals\AppStagingFilenamesTests.cs" />
+    <Compile Include="AppGlobals\SettingsSaveProbe.cs" />
+    <Compile Include="AppGlobals\InMemorySettingsStore.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsCoverageExpansionTests.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppToDoObjectsTestDoubles.cs" />
