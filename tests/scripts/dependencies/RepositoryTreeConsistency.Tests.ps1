@@ -8,7 +8,7 @@ BeforeAll {
     # other value in memory. Nothing is written to disk. No block or test name in this file
     # matches the regex AC followed by a digit.
     $script:WorkflowPath = Join-Path $script:RepoRoot '.github/workflows/dependabot-repair.yml'
-    $script:RunbookPath = Join-Path $script:RepoRoot 'docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911/runbooks/github-app-installation-token.runbook.md'
+    $script:RunbookPath = Join-Path $script:RepoRoot 'docs/runbooks/github-app-installation-token.runbook.md'
     $script:ClientIdPattern = '^\s+client-id:\s*\$\{\{\s*secrets\.([A-Z0-9_]+)\s*\}\}\s*$'
 
     function Get-TokenStepBlock {
