@@ -111,7 +111,7 @@
 
 ## Closed-issue residuals (lookup only; details in the residuals index)
 - [review-residuals index](project_review-residuals-index.md) — per-issue summaries #442-#968 (#930 host-path PARTIAL; #942 `.csproj` disarms C# hook check)
-- [1002](project_1002-review-residuals.md) — aria-selected with no CSS = blocking; floor split; ratified exemption left AC23 "no exclusion" text false (cycle 1)
+- [1002](project_1002-review-residuals.md) — aria-selected with no CSS = blocking; ratified exemption left AC23 false (cycle 1); cycle 2 PASS; span wrap needs closest() click routing
 - [985](project_985-review-residuals.md) — cycle 1 blocker: account name in encoded scratchpad dir; cycle 2 PASS; hook sim param is `-RawPayload`
 - [973](project_973-review-residuals.md) — AC premise defect = autonomous spec amendment; bundled PoshQC FAIL row + vacuous PASS
 - [438](project_438_cycle1_findings.md) · [440](project_440-review-residuals.md) · [441](project_441-review-residuals-and-494-handoff.md) · [457](project_457-review-residuals.md) · [464](project_464-review-residuals.md) · [489](project_489-review-residuals.md) · [493](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) · [511](project_511-rescope-review-residuals.md) · [553](project_553_ci_split_review_pattern.md) · [565](project_565-review-residuals.md) · [584](project_584-review-residuals.md)

@@ -1,6 +1,6 @@
 ---
 name: 1002-review-residuals
-description: '#1002 (EFC descendant tree, trash preselect, QFC nesting): cycle 0 10-39 4 blocking; cycle-1 re-audit 13-37 REMEDIATION_REQUIRED 1 autonomous (AC23 "no coverage exclusion" text vs ratified [ExcludeFromCodeCoverage]); aria-selected with no CSS; floor split'
+description: "#1002 (EFC descendant tree, trash preselect, QFC nesting): cycle 0 4 blocking; cycle 1 1 autonomous (AC23 vs ratified exemption); cycle 2 14-10 PASS 0 blocking"
 metadata:
   type: project
 ---
@@ -20,4 +20,8 @@ Full-bug review, base 8e4ad1ecb, session cwd = review tree (no mirror). All arti
 - Freshness check that worked: trx `<Counters>` + per-test `outcome=` grep in `coverage/test-results/mstest-coverage-run.trx`, and source mtimes earlier than the trx.
 - Reused scratchpad `filecov.py` (args: repo xml base files...) for per-file + changed-line union.
 
-**Follow-ups owed:** AC23 amendment (cycle 2); manual Outlook check pending.
+**Cycle 2 re-audit (head 54b36112a, 2026-10-22T14-10):** PASS, 0 blocking; 26/26 AC PASS. R-1 resolved by a clause-only AC23 edit plus `## Planner Amendments`. All three artifacts validated on the first try in the same shape.
+- Wrapping JS child text in a span is safe only if every click branch resolves its target with `closest(...)`; grep the handler, not just the test.
+- Orchestrator AC9 ruling: a client-side transient render (bridge `subfolderResult`) is not governed by a "server render unchanged" AC.
+
+**Follow-ups owed:** manual Outlook check pending (AC26, non-blocking).
