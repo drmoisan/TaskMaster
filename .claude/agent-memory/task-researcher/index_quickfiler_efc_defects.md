@@ -7,6 +7,8 @@ metadata:
 
 Sub-index split out of MEMORY.md (2026-10-09) to keep the root index under its read limit. One line per memory file.
 
+- [efc-qfc-separate-breadcrumb-surfaces-1002](project_efc_qfc_separate_breadcrumb_surfaces_1002.md) — EFC and QFC pickers are separate surfaces; bind clears selection; .mjs not in CI
+
 - [sortemail-split-prompt-seam-956](project_sortemail_split_and_prompt_seam_956.md) — per-call prompt session; AsyncLocal breaks stickiness
 - [sortemail-966-consolidation-959](project_sortemail_966_consolidation_959.md) — live path builds helpers with FOLDER NAME; ToDoModel copy uncompiled
 - [sortemail-latent-defects-959](project_sortemail_latent_defects_959.md) — callers discard the bool; L4 has a null-array defect

@@ -108,7 +108,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     AppendTrashRow(sb);
                     break;
                 default:
-                    AppendSuggestionRow(sb, row);
+                    AppendSuggestionRow(sb, row, isSelected);
                     break;
             }
 
@@ -137,7 +137,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
             sb.Append("</div>");
         }
 
-        private static void AppendSuggestionRow(StringBuilder sb, BreadcrumbRow row)
+        private static void AppendSuggestionRow(
+            StringBuilder sb,
+            BreadcrumbRow row,
+            bool isSelected
+        )
         {
             sb.Append("<div class=\"row selectable suggestion\"><div class=\"crumb\">");
 
@@ -169,7 +173,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             sb.Append("</div>");
             AppendPercent(sb, row.Probability);
             sb.Append("</div>");
-            AppendChildren(sb, row);
+            AppendChildren(sb, row, isSelected);
         }
 
         private static void AppendSegment(
@@ -210,10 +214,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 .Append("</span>");
         }
 
-        private static void AppendChildren(StringBuilder sb, BreadcrumbRow row)
+        private static void AppendChildren(StringBuilder sb, BreadcrumbRow row, bool isSelected)
         {
             sb.Append("<div class=\"children\">");
-            if (row.IsLeafExpanded)
+            if (row.IsLeafExpanded && row.DescendantNodes.Count > 0)
+            {
+                // #1002: keyed children render recursively; the selected descendant is marked
+                // only on the selected row.
+                AppendDescendants(
+                    sb,
+                    row.DescendantNodes,
+                    0,
+                    isSelected ? row.SelectedDescendantId : null
+                );
+            }
+            else if (row.IsLeafExpanded)
             {
                 for (int i = 0; i < row.LeafChildren.Count; i++)
                 {
@@ -229,6 +244,55 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             sb.Append("</div>");
+        }
+
+        // Each node keeps the pinned first-level prefix, then its identity and depth. The node
+        // affordance follows the name, and an expanded node's children container is a sibling
+        // after the node element so closest('.child') resolves to the clicked node.
+        private static void AppendDescendants(
+            StringBuilder sb,
+            IReadOnlyList<BreadcrumbDescendantNode> nodes,
+            int depth,
+            string? selectedId
+        )
+        {
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                BreadcrumbDescendantNode node = nodes[i];
+                sb.Append("<div class=\"child\" data-child-index=\"")
+                    .Append(i)
+                    .Append("\" data-node-id=\"")
+                    .Append(WebUtility.HtmlEncode(node.Identity))
+                    .Append("\" data-depth=\"")
+                    .Append(depth)
+                    .Append("\" title=\"")
+                    .Append(WebUtility.HtmlEncode(node.Segment.FolderPath))
+                    .Append('"');
+                if (selectedId != null && node.Identity == selectedId)
+                {
+                    sb.Append(" aria-selected=\"true\"");
+                }
+
+                sb.Append("><span class=\"name\">")
+                    .Append(WebUtility.HtmlEncode(node.Segment.DisplayName))
+                    .Append("</span>");
+                if (node.Segment.HasChildren)
+                {
+                    sb.Append(
+                            "<span class=\"affordance node\" data-role=\"node\" role=\"button\" tabindex=\"0\" aria-expanded=\""
+                        )
+                        .Append(node.Expanded ? "true\">&#8722;" : "false\">+")
+                        .Append("</span>");
+                }
+
+                sb.Append("</div>");
+                if (node.Expanded)
+                {
+                    sb.Append("<div class=\"children\">");
+                    AppendDescendants(sb, node.Children, depth + 1, selectedId);
+                    sb.Append("</div>");
+                }
+            }
         }
     }
 }

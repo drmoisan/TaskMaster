@@ -30,6 +30,18 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <summary>Inbound: confirm the currently selected filing destination.</summary>
         public const string RowConfirmed = "rowConfirmed";
 
+        /// <summary>
+        /// Inbound: expand or collapse a keyed descendant node addressed by its host-issued node
+        /// identity (#1002).
+        /// </summary>
+        public const string DescendantToggle = "descendantToggle";
+
+        /// <summary>
+        /// Inbound: select a keyed descendant node addressed by its host-issued node identity as
+        /// the filing destination (#1002).
+        /// </summary>
+        public const string DescendantActivate = "descendantActivate";
+
         /// <summary>Outbound: render a full document or per-row fragment.</summary>
         public const string Render = "render";
 
@@ -42,8 +54,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
     /// <summary>
     /// Inbound bridge message (JS -&gt; .NET), discriminated by <see cref="Type"/>:
-    /// <c>{ type, rowId, segmentIndex?, childIndex?, key? }</c>. net48-safe plain class (no
-    /// record/init).
+    /// <c>{ type, rowId, segmentIndex?, childIndex?, key?, nodeId? }</c>. net48-safe plain class
+    /// (no record/init).
     /// </summary>
     public sealed class BreadcrumbInboundMessage
     {
@@ -55,13 +67,18 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <param name="segmentIndex">Segment index for segment-scoped messages, or null.</param>
         /// <param name="childIndex">Child index for rendered-child activation messages, or null.</param>
         /// <param name="key">Arrow-key name (<c>Left</c>/<c>Right</c>/<c>Up</c>/<c>Down</c>), or null.</param>
+        /// <param name="nodeId">
+        /// Host-issued descendant node identity for the descendant toggle and activate messages,
+        /// or null for every other type. Optional so existing call sites compile unchanged.
+        /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="rowId"/> is null.</exception>
         public BreadcrumbInboundMessage(
             string type,
             string rowId,
             int? segmentIndex,
             int? childIndex,
-            string? key
+            string? key,
+            string? nodeId = null
         )
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
@@ -69,6 +86,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             SegmentIndex = segmentIndex;
             ChildIndex = childIndex;
             Key = key;
+            NodeId = nodeId;
         }
 
         /// <summary>Message discriminator.</summary>
@@ -85,6 +103,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         /// <summary>Arrow-key name for <see cref="BreadcrumbMessageTypes.ArrowKey"/>; null otherwise.</summary>
         public string? Key { get; }
+
+        /// <summary>
+        /// Host-issued descendant node identity for <see cref="BreadcrumbMessageTypes.DescendantToggle"/>
+        /// and <see cref="BreadcrumbMessageTypes.DescendantActivate"/>; null otherwise.
+        /// </summary>
+        public string? NodeId { get; }
     }
 
     /// <summary>

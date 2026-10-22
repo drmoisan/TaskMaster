@@ -99,11 +99,16 @@ namespace QuickFiler.Controllers
         /// <param name="scores">Score projections joined by presented filing-target equality.</param>
         /// <param name="archiveRootPath">The full Outlook archive root used by the hierarchy provider.</param>
         /// <param name="cancellationToken">Token observed by the provider calls.</param>
+        /// <param name="preferredRowText">
+        /// Presented text of a row to select inside the delivered document (#1002), or null to
+        /// leave the rebuilt rows unselected as before.
+        /// </param>
         internal async Task BindRowsAsync(
             IReadOnlyList<string> presentedRows,
             IEnumerable<FolderScore> scores,
             string archiveRootPath,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            string? preferredRowText = null
         )
         {
             if (presentedRows == null)
@@ -176,6 +181,7 @@ namespace QuickFiler.Controllers
                 SelectedFolderPathChanged?.Invoke(this, null);
             }
 
+            SelectPreferredRow(preferredRowText);
             DeliverDocument();
         }
 
@@ -439,6 +445,12 @@ namespace QuickFiler.Controllers
                     break;
                 case BreadcrumbMessageTypes.RowConfirmed:
                     ConfirmRow(row);
+                    break;
+                case BreadcrumbMessageTypes.DescendantToggle:
+                    await HandleDescendantToggleAsync(row, message.NodeId!);
+                    break;
+                case BreadcrumbMessageTypes.DescendantActivate:
+                    ActivateDescendant(row, message.NodeId!);
                     break;
             }
         }

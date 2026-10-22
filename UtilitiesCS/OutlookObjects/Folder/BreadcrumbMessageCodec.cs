@@ -62,7 +62,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// Deserializes an inbound bridge payload, validating the discriminator and the
         /// per-type required fields (<c>segmentDoubleClick</c> and <c>segmentActivate</c> require
         /// <c>segmentIndex</c>; <c>renderedChildActivate</c> requires <c>childIndex</c>;
-        /// <c>arrowKey</c> requires <c>key</c>; every type requires <c>rowId</c>).
+        /// <c>arrowKey</c> requires <c>key</c>; <c>descendantToggle</c> and
+        /// <c>descendantActivate</c> require a non-empty string <c>nodeId</c>, exposed as
+        /// <see cref="BreadcrumbInboundMessage.NodeId"/>; every type requires <c>rowId</c>).
         /// </summary>
         /// <param name="json">The raw JSON payload from the hosted document.</param>
         /// <returns>The validated inbound message.</returns>
@@ -126,7 +128,20 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 throw Fail("arrowKey requires a non-empty 'key' field.");
             }
 
-            return new BreadcrumbInboundMessage(type, rowId, segmentIndex, childIndex, key);
+            string? nodeId = null;
+            if (
+                type == BreadcrumbMessageTypes.DescendantToggle
+                || type == BreadcrumbMessageTypes.DescendantActivate
+            )
+            {
+                nodeId = OptionalString(root, "nodeId");
+                if (string.IsNullOrEmpty(nodeId))
+                {
+                    throw Fail($"{type} requires a non-empty string 'nodeId' field.");
+                }
+            }
+
+            return new BreadcrumbInboundMessage(type, rowId, segmentIndex, childIndex, key, nodeId);
         }
 
         private static bool IsKnownInboundType(string type)
@@ -137,7 +152,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 || type == BreadcrumbMessageTypes.LeafExpandToggle
                 || type == BreadcrumbMessageTypes.ArrowKey
                 || type == BreadcrumbMessageTypes.RowSelected
-                || type == BreadcrumbMessageTypes.RowConfirmed;
+                || type == BreadcrumbMessageTypes.RowConfirmed
+                || type == BreadcrumbMessageTypes.DescendantToggle
+                || type == BreadcrumbMessageTypes.DescendantActivate;
         }
 
         private static string RequireString(JObject root, string fieldName)

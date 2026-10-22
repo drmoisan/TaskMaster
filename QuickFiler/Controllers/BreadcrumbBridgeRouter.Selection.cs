@@ -82,48 +82,73 @@ namespace QuickFiler.Controllers
 
         private void SelectRow(BreadcrumbRow row)
         {
-            if (row.Kind == BreadcrumbRowKind.Banner)
+            if (!TryGetRowSelection(row, out string selection))
             {
-                return; // Banner rows are never selectable.
+                return;
             }
 
-            string selection =
+            row.TrySelectDescendant(null); // A whole-row selection highlights no descendant.
+            CommitSelection(row, selection);
+        }
+
+        /// <summary>
+        /// Computes the filing value a whole-row selection commits: the trash text or the
+        /// presented filing target, with eligible rooted targets normalized to the archive-relative
+        /// stem (#614 D2). Shared by <see cref="SelectRow"/> and the bind-time preferred row (#1002).
+        /// </summary>
+        /// <returns>False for a banner row and for the two archive-root rejections.</returns>
+        private bool TryGetRowSelection(BreadcrumbRow row, out string selection)
+        {
+            selection = string.Empty;
+            if (row.Kind == BreadcrumbRowKind.Banner)
+            {
+                return false; // Banner rows are never selectable.
+            }
+
+            string value =
                 row.Kind == BreadcrumbRowKind.TrashPseudoRow
                     ? BreadcrumbRowBuilder.TrashRowText
                     : row.FilingTarget;
             // #614 D2: normalize eligible rooted targets, preserving no-bound-root pass-through.
-            if (_boundRoot.Length != 0 && ArchiveStemContract.IsFullOutlookPath(selection))
+            if (_boundRoot.Length != 0 && ArchiveStemContract.IsFullOutlookPath(value))
             {
-                if (
-                    !ArchiveStemContract.TryMakeArchiveRelative(
-                        selection,
-                        _boundRoot,
-                        out string stem
-                    )
-                )
+                if (!ArchiveStemContract.TryMakeArchiveRelative(value, _boundRoot, out string stem))
                 {
                     log.Error("Breadcrumb row rejected: target is outside the archive root.");
-                    return;
+                    return false;
                 }
 
                 if (stem.Length == 0)
                 {
                     log.Error("Breadcrumb row rejected: target is the archive root itself.");
-                    return;
+                    return false;
                 }
 
-                selection = stem;
+                value = stem;
             }
 
-            CommitSelection(row, selection);
+            selection = value;
+            return true;
         }
 
-        private void SelectHierarchyPath(BreadcrumbRow row, string fullPath)
+        /// <summary>
+        /// Commits a hierarchy path under the archive-relative contract. The descendant highlight
+        /// (#1002) is applied only immediately before the commit, so a rejected path leaves both
+        /// the prior selection and the prior highlight unchanged.
+        /// </summary>
+        /// <returns>True when the selection was committed.</returns>
+        private bool SelectHierarchyPath(
+            BreadcrumbRow row,
+            string fullPath,
+            string? descendantId = null
+        )
         {
             if (_boundRoot.Length == 0)
             {
-                CommitSelection(row, fullPath); // Preserved no-archive-root binding mode.
-                return;
+                // Preserved no-archive-root binding mode.
+                row.TrySelectDescendant(descendantId);
+                CommitSelection(row, fullPath);
+                return true;
             }
 
             // #614 D1/D9: a path outside the archive root, and the root itself, are deterministic
@@ -134,10 +159,12 @@ namespace QuickFiler.Controllers
             )
             {
                 log.Error("Breadcrumb selection rejected: not a folder inside the archive root.");
-                return;
+                return false;
             }
 
+            row.TrySelectDescendant(descendantId);
             CommitSelection(row, stem);
+            return true;
         }
 
         private void CommitSelection(BreadcrumbRow row, string selection)
@@ -148,6 +175,48 @@ namespace QuickFiler.Controllers
                 new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
             );
             SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
+        }
+
+        /// <summary>
+        /// #1002 I5: selects the row presenting <paramref name="preferredRowText"/> after a bind,
+        /// before the document is delivered, so the delivered document already marks it. The
+        /// trash pseudo-row presents the trash text and a suggestion presents its filing target
+        /// (ordinal match). Posts no outbound message; raises the change event once.
+        /// </summary>
+        private void SelectPreferredRow(string? preferredRowText)
+        {
+            if (string.IsNullOrEmpty(preferredRowText))
+            {
+                return;
+            }
+
+            foreach (BreadcrumbRow row in _rows)
+            {
+                if (!PresentsText(row, preferredRowText!))
+                {
+                    continue;
+                }
+
+                if (!TryGetRowSelection(row, out string selection))
+                {
+                    return;
+                }
+
+                _selectedRowId = row.RowId;
+                SelectedFolderPath = selection;
+                SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
+                return;
+            }
+        }
+
+        private static bool PresentsText(BreadcrumbRow row, string text)
+        {
+            string presented =
+                row.Kind == BreadcrumbRowKind.TrashPseudoRow
+                    ? BreadcrumbRowBuilder.TrashRowText
+                    : row.FilingTarget;
+            return row.Kind != BreadcrumbRowKind.Banner
+                && string.Equals(presented, text, StringComparison.Ordinal);
         }
 
         private void ConfirmRow(BreadcrumbRow row)

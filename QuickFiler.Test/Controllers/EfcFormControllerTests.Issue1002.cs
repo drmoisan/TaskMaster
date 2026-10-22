@@ -1,0 +1,339 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using QuickFiler.Viewers;
+using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Folder;
+
+namespace QuickFiler.Controllers.Tests
+{
+    /// <summary>
+    /// Issue 1002 delete gesture end to end: <c>ActionDeleteAsync</c> on a controller wired to a
+    /// real router over strict mocks selects the trash row inside the bound document, and a bind
+    /// fault is still reported at the bind boundary.
+    /// </summary>
+    public partial class EfcFormControllerTests
+    {
+        private const string Issue1002ArchiveRoot = @"\Archive";
+        private const string Issue1002Presented = @"Clients\North";
+        private const string Issue1002TrashSelected =
+            "class=\"rowwrap selected\" data-row-id=\"row-0\"";
+
+        [TestMethod]
+        public async Task ActionDeleteAsync_WithRouter_SelectsTrashEntry()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+
+            // Act
+            await controller.ActionDeleteAsync();
+
+            // Assert
+            controller.SelectedFolder.Should().Be(EfcFormController.TrashRowText);
+        }
+
+        [TestMethod]
+        public async Task ActionDeleteAsync_WithRouter_DeliveredDocumentMarksTrashSelected()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+
+            // Act
+            await controller.ActionDeleteAsync();
+
+            // Assert
+            documents.Should().NotBeEmpty("the gesture binds and navigates a document");
+            documents.Last().Should().Contain(Issue1002TrashSelected);
+        }
+
+        [TestMethod]
+        public async Task ActionDeleteAsync_AwaitedTwice_KeepsTrashSelectedAndSingleTrashRow()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+
+            // Act
+            await controller.ActionDeleteAsync();
+            await controller.ActionDeleteAsync();
+
+            // Assert
+            controller.SelectedFolder.Should().Be(EfcFormController.TrashRowText);
+            documents.Last().Should().Contain(Issue1002TrashSelected);
+            var folderRows = (string[])GetPrivateField(controller, "_folderRows");
+            folderRows.Count(row => row == EfcFormController.TrashRowText).Should().Be(1);
+        }
+
+        [TestMethod]
+        public async Task ActionDeleteAsync_BindFault_IsReportedAtBindBoundary()
+        {
+            // Arrange: with _globals unset the bind boundary faults reading the archive root.
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: false);
+            var reported = new List<Exception>();
+            controller.BoundaryErrorSink = (message, exception) => reported.Add(exception);
+
+            // Act
+            Func<Task> act = () => controller.ActionDeleteAsync();
+
+            // Assert
+            await act.Should().NotThrowAsync("the bind boundary contains its own fault");
+            reported.Should().ContainSingle("the fault is reported once at the bind boundary");
+            documents.Should().BeEmpty("no document is delivered by a faulted bind");
+        }
+
+        [TestMethod]
+        public async Task BindSourceFolderRows_WithViewerAndRouter_RetainsRowsAndBindsDocument()
+        {
+            // Arrange
+            var documents = new List<string>();
+            var delivered = new TaskCompletionSource<bool>();
+            EfcFormController controller = CreateIssue1002Controller(
+                documents,
+                withGlobals: true,
+                delivered: delivered
+            );
+            string[] rows = { Issue1002Presented };
+
+            // Act
+            InvokeIssue1002Bind(controller, "BindSourceFolderRows", rows);
+            await delivered.Task;
+
+            // Assert
+            GetPrivateField(controller, "_folderRows").Should().BeSameAs(rows);
+            documents.Should().ContainSingle();
+            documents[0].Should().Contain("North", "the delivered document carries the row");
+        }
+
+        [TestMethod]
+        public async Task BindSourceFolderRows_NullRows_RetainsEmptyArray()
+        {
+            // Arrange
+            var documents = new List<string>();
+            var delivered = new TaskCompletionSource<bool>();
+            EfcFormController controller = CreateIssue1002Controller(
+                documents,
+                withGlobals: true,
+                delivered: delivered
+            );
+
+            // Act
+            InvokeIssue1002Bind(controller, "BindSourceFolderRows", null);
+            await delivered.Task;
+
+            // Assert
+            ((string[])GetPrivateField(controller, "_folderRows"))
+                .Should()
+                .BeEmpty();
+        }
+
+        [TestMethod]
+        public void BindSourceFolderRows_NullViewer_LeavesFolderRowsUnchanged()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+            SetPrivateField(controller, "_formViewer", null);
+            object prior = GetPrivateField(controller, "_folderRows");
+
+            // Act
+            InvokeIssue1002Bind(controller, "BindSourceFolderRows", new[] { "Other" });
+
+            // Assert
+            GetPrivateField(controller, "_folderRows").Should().BeSameAs(prior);
+            documents.Should().BeEmpty("a null viewer delivers no document");
+        }
+
+        [TestMethod]
+        public void BindSourceFolderRows_NullRouter_LeavesFolderRowsUnchanged()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+            SetPrivateField(controller, "_router", null);
+            object prior = GetPrivateField(controller, "_folderRows");
+
+            // Act
+            InvokeIssue1002Bind(controller, "BindSourceFolderRows", new[] { "Other" });
+
+            // Assert
+            GetPrivateField(controller, "_folderRows").Should().BeSameAs(prior);
+            documents.Should().BeEmpty("a null router delivers no document");
+        }
+
+        [TestMethod]
+        public async Task BindFolderRows_NullRows_BindsEmptyDocumentWithoutRetaining()
+        {
+            // Arrange
+            var documents = new List<string>();
+            var delivered = new TaskCompletionSource<bool>();
+            EfcFormController controller = CreateIssue1002Controller(
+                documents,
+                withGlobals: true,
+                delivered: delivered
+            );
+            object prior = GetPrivateField(controller, "_folderRows");
+
+            // Act
+            InvokeIssue1002Bind(controller, "BindFolderRows", null);
+            await delivered.Task;
+
+            // Assert
+            documents.Should().ContainSingle();
+            GetPrivateField(controller, "_folderRows").Should().BeSameAs(prior);
+        }
+
+        [TestMethod]
+        public void BindFolderRows_NullViewer_DoesNotBind()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+            SetPrivateField(controller, "_formViewer", null);
+
+            // Act
+            Action act = () =>
+                InvokeIssue1002Bind(controller, "BindFolderRows", new[] { Issue1002Presented });
+
+            // Assert
+            act.Should().NotThrow();
+            documents.Should().BeEmpty("a null viewer delivers no document");
+        }
+
+        [TestMethod]
+        public void BindFolderRows_NullRouter_DoesNotBind()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+            SetPrivateField(controller, "_router", null);
+
+            // Act
+            Action act = () =>
+                InvokeIssue1002Bind(controller, "BindFolderRows", new[] { Issue1002Presented });
+
+            // Assert
+            act.Should().NotThrow();
+            documents.Should().BeEmpty("a null router delivers no document");
+        }
+
+        [TestMethod]
+        public async Task ApplyDeleteGestureAsync_NullViewer_RetainsTrashRowAndDoesNotBind()
+        {
+            // Arrange
+            var documents = new List<string>();
+            EfcFormController controller = CreateIssue1002Controller(documents, withGlobals: true);
+            SetPrivateField(controller, "_formViewer", null);
+
+            // Act
+            Func<Task> act = () => controller.ApplyDeleteGestureAsync();
+
+            // Assert
+            await act.Should().NotThrowAsync("a null viewer returns before binding");
+            var folderRows = (string[])GetPrivateField(controller, "_folderRows");
+            folderRows.Count(row => row == EfcFormController.TrashRowText).Should().Be(1);
+            documents.Should().BeEmpty("a null viewer delivers no document");
+        }
+
+        [TestMethod]
+        public void BindFolderRows_FaultBeforeDelivery_FaultsDeliveredTaskPromptly()
+        {
+            // Arrange: with _globals unset the bind boundary faults before it delivers a document.
+            var documents = new List<string>();
+            var delivered = new TaskCompletionSource<bool>();
+            EfcFormController controller = CreateIssue1002Controller(
+                documents,
+                withGlobals: false,
+                delivered: delivered
+            );
+
+            // Act
+            InvokeIssue1002Bind(controller, "BindFolderRows", new[] { Issue1002Presented });
+
+            // Assert: the fault is reported synchronously, so no wait is needed.
+            delivered
+                .Task.IsFaulted.Should()
+                .BeTrue("a pre-delivery fault must fail the wait instead of leaving it pending");
+            delivered.Task.Exception.Should().NotBeNull();
+            documents.Should().BeEmpty("no document is delivered by a faulted bind");
+        }
+
+        private static void InvokeIssue1002Bind(
+            EfcFormController controller,
+            string memberName,
+            string[] rows
+        )
+        {
+            MethodInfo member = typeof(EfcFormController).GetMethod(
+                memberName,
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            member.Should().NotBeNull($"{memberName} must remain available for this headless seam");
+            member.Invoke(controller, new object[] { rows });
+        }
+
+        private static EfcFormController CreateIssue1002Controller(
+            List<string> documents,
+            bool withGlobals,
+            TaskCompletionSource<bool> delivered = null
+        )
+        {
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            var host = new Mock<IBreadcrumbWebHost>(MockBehavior.Strict);
+            host.SetupGet(value => value.IsCoreInitialized).Returns(true);
+            host.Setup(value => value.NavigateToString(It.IsAny<string>()))
+                .Callback<string>(document =>
+                {
+                    documents.Add(document);
+                    delivered?.TrySetResult(true);
+                });
+            host.Setup(value => value.PostMessageJson(It.IsAny<string>()));
+            provider
+                .Setup(value =>
+                    value.ResolveLeafKeyAsync(
+                        Issue1002ArchiveRoot + @"\" + Issue1002Presented,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync((FolderTreeNodeKey)null);
+            var router = new BreadcrumbBridgeRouter(
+                provider.Object,
+                host.Object,
+                new BreadcrumbMessageCodec(),
+                new BreadcrumbHtmlRenderer(),
+                new BreadcrumbOutboundQueue(host.Object)
+            );
+
+            EfcFormController controller = CreateMinimalController();
+            // A fault reported at the bind boundary fails the caller's wait instead of leaving it pending.
+            controller.BoundaryErrorSink = (message, exception) =>
+                delivered?.TrySetException(exception);
+            var viewer = (EfcViewer)
+                System.Runtime.Serialization.FormatterServices.GetUninitializedObject(
+                    typeof(EfcViewer)
+                );
+            SetPrivateField(viewer, "_context", new SynchronizationContext());
+            SetPrivateField(controller, "_formViewer", viewer);
+            SetPrivateField(controller, "_router", router);
+            SetPrivateField(controller, "_folderRows", new[] { Issue1002Presented });
+            if (withGlobals)
+            {
+                var ol = new Mock<IOlObjects>(MockBehavior.Strict);
+                var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+                ol.SetupGet(value => value.ArchiveRootPath).Returns(Issue1002ArchiveRoot);
+                globals.SetupGet(value => value.Ol).Returns(ol.Object);
+                SetPrivateField(controller, "_globals", globals.Object);
+            }
+
+            return controller;
+        }
+    }
+}

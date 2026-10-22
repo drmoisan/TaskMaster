@@ -26,18 +26,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
             + ".affordance { cursor: pointer; font-weight: bold; padding: 0 4px; }\n"
             + ".row.banner { justify-content: center; opacity: 0.7; pointer-events: none; }\n"
             + ".children { margin-left: 18px; }\n"
-            + ".child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n";
+            + ".child { display: flex; align-items: center; }\n"
+            + ".child .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n";
 
         /// <summary>Light-theme CSS block.</summary>
         public const string LightThemeCss =
             "body { background: #ffffff; color: #1b1b1b; }\n"
             + ".rowwrap.selected .row { background: #cce8ff; }\n"
+            + ".child[aria-selected=\"true\"] { background: #cce8ff; }\n"
             + ".affordance { color: #005a9e; }\n";
 
         /// <summary>Dark-theme CSS block.</summary>
         public const string DarkThemeCss =
             "body { background: #1e1e1e; color: #e6e6e6; }\n"
             + ".rowwrap.selected .row { background: #264f78; }\n"
+            + ".child[aria-selected=\"true\"] { background: #264f78; }\n"
             + ".affordance { color: #6cb6ff; }\n";
 
         /// <summary>
@@ -76,6 +79,25 @@ namespace UtilitiesCS.OutlookObjects.Folder
             + "      e.stopPropagation();\n"
             + "      return;\n"
             + "    }\n"
+            + "    var node = e.target.closest('.affordance[data-role=\"node\"]');\n"
+            + "    if (node) {\n"
+            + "      var nodeOwner = node.closest('[data-node-id]');\n"
+            + "      var nodeRowId = rowIdOf(node);\n"
+            + "      if (nodeRowId !== null && nodeOwner) {\n"
+            + "        post({ type: 'descendantToggle', rowId: nodeRowId, nodeId: nodeOwner.getAttribute('data-node-id') });\n"
+            + "      }\n"
+            + "      e.stopPropagation();\n"
+            + "      return;\n"
+            + "    }\n"
+            + "    var keyed = e.target.closest('.child[data-node-id]');\n"
+            + "    if (keyed) {\n"
+            + "      var keyedRowId = rowIdOf(keyed);\n"
+            + "      if (keyedRowId !== null) {\n"
+            + "        post({ type: 'descendantActivate', rowId: keyedRowId, nodeId: keyed.getAttribute('data-node-id') });\n"
+            + "      }\n"
+            + "      e.stopPropagation();\n"
+            + "      return;\n"
+            + "    }\n"
             + "    var child = e.target.closest('.child[data-child-index]');\n"
             + "    if (child) {\n"
             + "      var childId = rowIdOf(child);\n"
@@ -99,6 +121,17 @@ namespace UtilitiesCS.OutlookObjects.Folder
             + "    }\n"
             + "  });\n"
             + "  document.addEventListener('keydown', function (e) {\n"
+            + "    var focusedNode = e.target && e.target.closest ? e.target.closest('.affordance[data-role=\"node\"]') : null;\n"
+            + "    if (focusedNode && (e.key === 'Enter' || e.key === ' ')) {\n"
+            + "      e.preventDefault();\n"
+            + "      e.stopPropagation();\n"
+            + "      var focusedOwner = focusedNode.closest('[data-node-id]');\n"
+            + "      var focusedRowId = rowIdOf(focusedNode);\n"
+            + "      if (focusedRowId !== null && focusedOwner) {\n"
+            + "        post({ type: 'descendantToggle', rowId: focusedRowId, nodeId: focusedOwner.getAttribute('data-node-id') });\n"
+            + "      }\n"
+            + "      return;\n"
+            + "    }\n"
             + "    if (e.key === 'Enter') {\n"
             + "      e.preventDefault();\n"
             + "      e.stopPropagation();\n"
@@ -135,7 +168,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
             + "        (msg.children || []).forEach(function (c) {\n"
             + "          var div = document.createElement('div');\n"
             + "          div.className = 'child';\n"
-            + "          div.textContent = c.displayName;\n"
+            + "          var name = document.createElement('span');\n"
+            + "          name.className = 'name';\n"
+            + "          name.textContent = c.displayName;\n"
+            + "          div.appendChild(name);\n"
             + "          div.title = c.fullPath;\n"
             + "          host.appendChild(div);\n"
             + "        });\n"
