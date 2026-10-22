@@ -91,17 +91,26 @@ namespace QuickFiler.Controllers
             return itemList.ToArray();
         }
 
-        /// <summary>Retains the delete-gesture rows, then binds them.</summary>
-        internal void ApplyDeleteGesture()
+        /// <summary>
+        /// Retains the delete-gesture rows, then awaits a bind that selects the trash row inside
+        /// the delivered document (#1002). The bind runs through <see cref="BindBreadcrumbRowsAsync"/>
+        /// so a bind fault is still reported at that boundary.
+        /// </summary>
+        internal async Task ApplyDeleteGestureAsync()
         {
             _folderRows = WithTrashRow(_folderRows);
-            BindFolderRows(_folderRows);
+            if (_formViewer == null || _router == null)
+            {
+                return;
+            }
+
+            await BindBreadcrumbRowsAsync(_folderRows, TrashRowText);
         }
 
         public async Task ActionDeleteAsync()
         {
             await _formViewer.UiSyncContext;
-            ApplyDeleteGesture();
+            await ApplyDeleteGestureAsync();
         }
 
         public async Task CreateFolderAsync()

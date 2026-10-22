@@ -184,10 +184,21 @@ namespace QuickFiler.Controllers
 
                 IReadOnlyList<FolderBreadcrumbSegment> children =
                     await _provider.GetImmediateSubfoldersAsync(key, CancellationToken.None);
+
+                // #1002 I2: row ids are positional and reused across binds, so a completion that
+                // arrives after a rebind must not mutate or render the replaced row.
+                if (!ReferenceEquals(FindRow(row.RowId), row))
+                {
+                    log.Error(
+                        $"Breadcrumb expand {requestId} completed after row '{row.RowId}' was replaced; result discarded."
+                    );
+                    return;
+                }
+
                 IReadOnlyList<BreadcrumbSegment> mapped = BreadcrumbRowBuilder.MapSegments(
                     children
                 );
-                row.SetLeafChildren(mapped);
+                row.SetLeafDescendants(children ?? Array.Empty<FolderBreadcrumbSegment>());
                 row.ToggleLeafExpanded();
                 PostOutbound(new BreadcrumbSubfolderResultMessage(requestId, row.RowId, mapped));
                 PostRowRender(row);

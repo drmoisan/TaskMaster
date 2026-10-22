@@ -186,14 +186,21 @@ namespace QuickFiler.Controllers
         }
 
         // Async bind boundary: joins the feature-324 score projection and delegates to the router.
-        internal async Task BindBreadcrumbRowsAsync(string[] rows)
+        // preferredRowText (#1002) names a presented row to select inside the bound document.
+        internal async Task BindBreadcrumbRowsAsync(string[] rows, string preferredRowText = null)
         {
             try
             {
                 var scores =
                     _dataModel?.FolderHelper?.Suggestions?.ToScoredArray()
                     ?? Array.Empty<FolderScore>();
-                await _router.BindRowsAsync(rows, scores, _globals.Ol.ArchiveRootPath, Token);
+                await _router.BindRowsAsync(
+                    rows,
+                    scores,
+                    _globals.Ol.ArchiveRootPath,
+                    Token,
+                    preferredRowText
+                );
             }
             catch (OperationCanceledException)
             {

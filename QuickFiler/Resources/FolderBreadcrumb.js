@@ -142,7 +142,8 @@
     return rowElement;
   }
 
-  function makeSubfolders(row, children, selectedChildOwnsActive) {
+  function makeSubfolders(row, children, selectedChildOwnsActive, depth) {
+    depth = depth || 0;
     var subs = document.createElement("div");
     subs.className = "subs";
     children.forEach(function (child, index) {
@@ -152,11 +153,14 @@
       subfolderElement.className = active ? "sub selected active" : "sub";
       subfolderElement.setAttribute("role", "option");
       subfolderElement.setAttribute("aria-selected", String(active));
+      subfolderElement.setAttribute("data-depth", String(depth));
+      subfolderElement.setAttribute("style", "padding-left: " + (24 + 16 * depth) + "px");
       subfolderElement.tabIndex = 0;
       var name = document.createElement("span");
       name.className = "seg";
       name.textContent = child.displayName;
       name.title = child.folderPath;
+      subfolderElement.appendChild(name);
       if (child.hasChildren) {
         var toggle = document.createElement("span");
         toggle.className = "aff";
@@ -176,7 +180,6 @@
         });
         subfolderElement.appendChild(toggle);
       }
-      subfolderElement.appendChild(name);
 
       function activateSubfolder(event) {
         event.preventDefault();
@@ -196,7 +199,7 @@
       });
       subs.appendChild(subfolderElement);
       if (child.expanded && Array.isArray(child.children)) {
-        subs.appendChild(makeSubfolders(row, child.children, selectedChildOwnsActive));
+        subs.appendChild(makeSubfolders(row, child.children, selectedChildOwnsActive, depth + 1));
       }
     });
     return subs;

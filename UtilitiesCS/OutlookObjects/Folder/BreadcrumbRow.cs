@@ -31,7 +31,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// Right expands (restores a collapsed breadcrumb, else expands the leaf children), Left
     /// collapses (leaf children first, else hides the trailing segment).
     /// </remarks>
-    public sealed class BreadcrumbRow
+    public sealed partial class BreadcrumbRow
     {
         private readonly List<BreadcrumbSegment> _segments;
         private List<BreadcrumbSegment> _leafChildren = new List<BreadcrumbSegment>();
@@ -167,6 +167,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             ActiveSegmentIndex = segmentIndex;
             _leafChildren = new List<BreadcrumbSegment>();
+            ClearDescendants();
             IsLeafExpanded = false;
             return true;
         }
@@ -225,6 +226,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             CollapsedAfterIndex = segmentIndex;
             IsLeafExpanded = false;
+            ClearDescendants();
             return true;
         }
 
@@ -263,6 +265,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             _leafChildren = new List<BreadcrumbSegment>(children);
+            ClearDescendants(); // Key-less children carry no expandable descendants.
             return true;
         }
 
@@ -279,6 +282,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             IsLeafExpanded = !IsLeafExpanded;
+            if (!IsLeafExpanded)
+            {
+                ClearDescendants();
+            }
+
             return true;
         }
 
@@ -298,6 +306,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             if (IsLeafExpanded)
             {
                 IsLeafExpanded = false;
+                ClearDescendants();
                 return true;
             }
 
