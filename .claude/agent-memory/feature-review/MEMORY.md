@@ -111,7 +111,7 @@
 
 ## Closed-issue residuals (lookup only; details in the residuals index)
 - [review-residuals index](project_review-residuals-index.md) — per-issue summaries #442-#968 (#930 host-path PARTIAL; #942 `.csproj` disarms C# hook check)
-- [1005](project_1005-review-residuals.md) — helper deletion stripped an unchanged member's only caller; covered-count arithmetic exposes it; baseline Cobertura in scratchpad
+- [1005](project_1005-review-residuals.md) — helper deletion stripped an unchanged member's only caller; covered-count arithmetic exposes it; cycle 2 PASS; `git log %cr` gives "now"
 - [1002](project_1002-review-residuals.md) — aria-selected with no CSS = blocking; ratified exemption left AC23 false (cycle 1); cycle 2 PASS; span wrap needs closest() click routing
 - [985](project_985-review-residuals.md) — cycle 1 blocker: account name in encoded scratchpad dir; cycle 2 PASS; hook sim param is `-RawPayload`
 - [973](project_973-review-residuals.md) — AC premise defect = autonomous spec amendment; bundled PoshQC FAIL row + vacuous PASS
