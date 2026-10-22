@@ -23,6 +23,7 @@
 - [svgcontrol-test-418](project_svgcontrol_test_unwired_418.md) — STALE (in .sln since 2026-08-14)
 
 ## Threading / test determinism
+- [settings-save-1005](project_settings_save_shared_user_config_1005.md) — 26 Settings Save() sites share one user.config; ISettingsStore seam; SettingsSaving cancel probe
 - [taskrun-getresult-inlines-900](project_taskrun_getresult_inlines_on_pool_thread_900.md) — Task.Run+GetResult on a pool thread INLINES
 - [taskrun-triage-931](project_taskrun_triage_931.md) — 2/22 Task.Run sites thread-dependent; OpenRead returns FileStream
 - [prime-marker-944](project_prime_marker_register_before_start_944.md) — ContinueWith(None) never inlines; TCS marker before start

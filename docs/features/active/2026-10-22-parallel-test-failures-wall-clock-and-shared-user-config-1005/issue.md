@@ -2,14 +2,14 @@
 
 - Date captured: 2026-10-22
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/parallel-test-failures-wall-clock-and-shared-user-config/ (Issue #1005)
+- Status: Promoted -> docs/features/active/2026-10-22-parallel-test-failures-wall-clock-and-shared-user-config-1005/ (Issue #1005)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
 - Issue: #1005
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/1005
 - Last Updated: 2026-10-22
-- Work Mode: minor-audit
+- Work Mode: full-bug
 
 ## Summary
 
