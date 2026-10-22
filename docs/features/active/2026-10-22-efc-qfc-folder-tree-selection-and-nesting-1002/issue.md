@@ -2,7 +2,7 @@
 
 - Date captured: 2026-10-22
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/efc-qfc-folder-tree-selection-and-nesting/ (Issue #1002)
+- Status: Promoted -> docs/features/active/2026-10-22-efc-qfc-folder-tree-selection-and-nesting-1002/ (Issue #1002)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
