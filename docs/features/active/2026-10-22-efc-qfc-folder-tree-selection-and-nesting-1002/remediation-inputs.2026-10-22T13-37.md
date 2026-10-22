@@ -2,8 +2,10 @@
 
 Review-Verdict: REMEDIATION_REQUIRED
 
-Remediation-Mode: proportionate
+Remediation-Mode: design
 
+- Orchestrator mode note (2026-10-22T13:43Z): the reviewer proposed `proportionate`; the orchestrator set `design` because R-1 changes the text of a spec acceptance criterion (AC23), which the classification rule in `.claude/skills/orchestrate/SKILL.md` assigns to a design cycle. R-1 stays `autonomous`: the amendment records an exemption the maintainer has already ratified and introduces no new decision.
+- Orchestrator scope note: N-1, N-3 and N-5 are in scope for cycle 2. They touch files already in the branch diff (`EfcFormController.Actions.cs`, `EfcFormControllerTests.Issue1002.cs`, `BreadcrumbHtmlRenderer.cs`, `BreadcrumbDocumentAssets.cs`) and are related to this item's changes.
 - Feature folder: `docs/features/active/2026-10-22-efc-qfc-folder-tree-selection-and-nesting-1002`
 - Branch head reviewed: `b72ac1dbbfdb6b45d01a14dde9e91428a6bf41ac`; merge base `8e4ad1ecbf50aae00fe2c092c22ae457f4feb7a7`
 - Source audit artifacts:
