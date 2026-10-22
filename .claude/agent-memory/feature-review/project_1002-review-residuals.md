@@ -1,17 +1,23 @@
 ---
 name: 1002-review-residuals
-description: '#1002 (EFC descendant tree, trash preselect, QFC nesting) review 2026-10-22T10-39 REMEDIATION_REQUIRED 26/26 AC, 4 blocking (3 autonomous, 1 human); aria-selected with no CSS; modified-file floor split; hook sim now -InputText with last_assistant_message'
+description: '#1002 (EFC descendant tree, trash preselect, QFC nesting): cycle 0 10-39 4 blocking; cycle-1 re-audit 13-37 REMEDIATION_REQUIRED 1 autonomous (AC23 "no coverage exclusion" text vs ratified [ExcludeFromCodeCoverage]); aria-selected with no CSS; floor split'
 metadata:
   type: project
 ---
 
-Full-bug review, head e96e65302, base 8e4ad1ecb, session cwd = review tree (no mirror). All 26 AC PASS (pre-checked by executor), verdict REMEDIATION_REQUIRED on findings outside AC text. All three artifacts validated first try with `validate_orchestration_artifacts` using the #985 policy-audit shape (Template Provenance, 7-col metrics table incl. a JavaScript row, checklist bullets, 1.2.1 bullets, 1.2.2 verdict paragraphs).
+Full-bug review, base 8e4ad1ecb, session cwd = review tree (no mirror). All artifacts validated first try with `validate_orchestration_artifacts` using the #985 policy-audit shape (Template Provenance, 7-col metrics table incl. a JavaScript row, checklist bullets, 1.2.1 bullets, 1.2.2 verdict paragraphs).
 
-**Reusable points:**
-- A renderer that marks selection by attribute (`aria-selected="true"`) needs a matching CSS rule; grep the asset CSS for the attribute. Here none existed, so the spec's manual step "confirm it is highlighted" could not pass -> blocking autonomous (B-4).
-- Modified-file floor split that worked: coverage LOWERED by the diff (caller removed -> unchanged lines lost hits) = autonomous; pre-existing residue in MessageBox/WebView2 wiring = human_decision_required (CLAUDE.md UT2 exemption needs maintainer ratification); trivial `?? throw` ctor guards at 50% branch = autonomous. Compute the max attainable % without the wiring member before calling a floor reachable.
-- Per-file union script (class/lines/line by filename + `git diff -U0` new-side hunks) reproduced executor figures exactly; executor baseline/final Cobertura sat in the SAME session scratchpad (`issue-1002/`), and `cmp` proved the canonical `artifacts/csharp/coverage.xml` identical to the final.
-- Hook simulation signature changed: `Invoke-FeatureReviewCoverageValidation -InputText (@{last_assistant_message=$t; stop_hook_active=$false}|ConvertTo-Json)`; `-RawPayload` (see [[985-review-residuals]]) is obsolete. Floors now read from root CLAUDE.md (80/75).
+**Cycle 0 (head e96e65302, 2026-10-22T10-39):** 26/26 AC PASS, 4 blocking (3 autonomous, 1 human).
+- A renderer that marks selection by attribute (`aria-selected="true"`) needs a matching CSS rule; grep the asset CSS for the attribute. None existed -> blocking autonomous (B-4).
+- Modified-file floor split: coverage LOWERED by the diff = autonomous; pre-existing MessageBox/WebView2 residue = human_decision_required (CLAUDE.md UT2 exemption needs maintainer ratification); trivial `?? throw` guards at 50% branch = autonomous.
+- Hook simulation: `Invoke-FeatureReviewCoverageValidation -InputText (@{last_assistant_message=$t; stop_hook_active=$false}|ConvertTo-Json)`.
 - Evidence filename stamps are UTC; local clock is -0400 — use `date -u` for the review stamp.
 
-**Follow-ups owed:** B-3 maintainer decision (exempt vs seam follow-up for EfcFormController Actions/Breadcrumb residue); manual Outlook check pending.
+**Cycle 1 re-audit (head b72ac1dbb, 2026-10-22T13-37):** B-1..B-4 resolved; 1 new blocking R-1 autonomous.
+- Reusable: when a maintainer ratifies an exemption mid-loop, grep the spec AC text for clauses it falsifies ("no coverage exclusion is added"). The decision lifted the plan's Do-Not-Do but nobody amended AC23, which stayed checked -> AC FAIL, autonomous clerical amendment (reclass route to human stated). See [[973-review-residuals]] for the AC-amendment precedent.
+- Member-level `[ExcludeFromCodeCoverage]` on async methods removes the state machine and lambdas from Cobertura too (no residual class nodes); valid-line counts drop (Actions 111->28).
+- net48 `ExcludeFromCodeCoverageAttribute` has no `Justification` (CS0246); comment form is correct.
+- Freshness check that worked: trx `<Counters>` + per-test `outcome=` grep in `coverage/test-results/mstest-coverage-run.trx`, and source mtimes earlier than the trx.
+- Reused scratchpad `filecov.py` (args: repo xml base files...) for per-file + changed-line union.
+
+**Follow-ups owed:** AC23 amendment (cycle 2); manual Outlook check pending.
