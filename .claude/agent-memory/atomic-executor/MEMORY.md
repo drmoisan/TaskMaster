@@ -34,6 +34,7 @@
 - [gh/CI-log traps](project_gh_ci_log_and_download_gotchas.md) (createdAt trips pr-author hook; ANSI in Pester log; gh download never overwrites) · [Abbreviated caller facts](project_caller_supplied_fact_list_can_be_abbreviated_and_look_like_a_plan_defect.md)
 
 - [MSTest summary absent on failure](project_mstest_runner_summary_absent_on_failure_voids_flaky_carveout.md) (flaky carve-out keyed on summary never fires; read the trx)
+- [Per-file token-count gate forbids helpers; scan artifact self-match](project_per_file_token_count_gate_forbids_helper_and_scan_artifact_self_match.md) (keep statements inlined; never quote the forbidden pattern)
 - [Generic seam over embedded interop = CS1769](project_generic_seam_over_embedded_interop_type_cs1769.md) (Func<Attachment,...> seams compile in UtilitiesCS, fail at every test call site)
 ## Sub-indexes (open when the topic is in scope)
 - [Test isolation + C# coverage](index_test_isolation_and_coverage.md) — vstest/MSTest hangs, flakiness, Cobertura/dotnet-coverage/Koverage

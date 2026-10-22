@@ -2,6 +2,8 @@
 
 ## Preflight revision seams (per issue; newest first)
 
+- [#1005 R1](project_1005_r1_jacoco_projection_is_package_level_only.md) — JaCoCo projection is package-level only; per-file coverage ACs read Cobertura
+- [#1005 R0](project_1005_r0_settings_store_seam_and_probe_seams.md) — SettingsSaving probe locks add/remove; "<=500 and smaller" AC contradiction amended; IDList null-ctor ambiguity
 - [#985 R1](project_985_r1_scratchpad_identity_and_double_write_seams.md) — never spell the scratchpad (encoded name holds the account); sweep diff + untracked; reflowed tag forces a double write
 - [#985 R0](project_985_r0_rehearsal_fidelity_and_hygiene_path_seams.md) — merge-into-Dependabot rehearsal needs a simulated nuget update; hygiene guard flags Users paths in tracked plans; Invoke-VSBuild rewrites csproj
 - [#973 R1](project_973_r1_last_task_artifact_only_commit_and_measured_line_length_seams.md) — last task commits its artifact alone; dossier cites no later result; measure line length with `^.{N,}`; Glob zero-gate needs a positive control

@@ -1,48 +1,55 @@
+using System;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TaskMaster.Properties;
+using UtilitiesCS;
 
 namespace TaskMaster.Test.AppGlobals
 {
     /// <summary>
-    /// Unit tests for <see cref="AppStagingFilenames"/>. The class delegates each property to the
-    /// static <see cref="Settings.Default"/> singleton (lazy getter via <c>InitProp</c>, and a
-    /// setter that writes the backing field plus Settings.Default and calls Save() — except
-    /// <c>EmailInfoStagingFile</c>, whose setter writes only the backing field). There is no
-    /// injectable settings type, so the established pattern from <c>AppQuickFilerSettingsTests</c>
-    /// is used: the affected Settings.Default values are snapshotted in <see cref="TestInitialize"/>
-    /// and restored in <see cref="TestCleanup"/> so machine state is not mutated and tests stay
-    /// independent. No filesystem access and no temp files are used.
+    /// Unit tests for <see cref="AppStagingFilenames"/>. Each property has a lazy getter (via
+    /// <c>InitProp</c>) that reads the injected settings store, and a setter that writes the backing
+    /// field plus the store and saves through it, except <c>EmailInfoStagingFile</c>, whose setter
+    /// writes only the backing field. Every test injects its own seeded
+    /// <see cref="InMemorySettingsStore"/>, so no shared settings instance, settings file, or other
+    /// filesystem state is read or written.
     /// </summary>
     [TestClass]
     public class AppStagingFilenamesTests
     {
-        private string _origConditionalReminders;
-        private string _origCommonWords;
-        private string _origEmailInfoStaging;
-
-        [TestInitialize]
-        public void TestInitialize()
+        private static readonly string[] SettingNames =
         {
-            _origConditionalReminders = Settings.Default.File_ConditionalReminders;
-            _origCommonWords = Settings.Default.File_Common_Words;
-            _origEmailInfoStaging = Settings.Default.FileName_EmailInfoStaging;
-        }
+            nameof(Settings.File_ConditionalReminders),
+            nameof(Settings.File_Common_Words),
+            nameof(Settings.File_Subject_Map),
+            nameof(Settings.File_CTF_Inc),
+            nameof(Settings.File_CTF_Map),
+            nameof(Settings.FileName_EmailSessionTmp),
+            nameof(Settings.FileName_EmailSession),
+            nameof(Settings.FileName_MovedEmailsBackup),
+            nameof(Settings.FileName_Recents),
+            nameof(Settings.FileName_EmailInfoStaging),
+        };
 
-        [TestCleanup]
-        public void TestCleanup()
+        private static InMemorySettingsStore CreateSeededStore()
         {
-            Settings.Default.File_ConditionalReminders = _origConditionalReminders;
-            Settings.Default.File_Common_Words = _origCommonWords;
-            Settings.Default.FileName_EmailInfoStaging = _origEmailInfoStaging;
+            var store = new InMemorySettingsStore();
+            foreach (var name in SettingNames)
+            {
+                store[name] = $@"seeded\{name}.txt";
+            }
+
+            return store;
         }
 
         [TestMethod]
         public void ConditionalReminders_Getter_ReturnsPersistedSettingsValue()
         {
-            // Arrange: a fresh instance reads the lazy getter from Settings.Default.
-            Settings.Default.File_ConditionalReminders = @"persisted\reminders.json";
-            var filenames = new AppStagingFilenames();
+            // Arrange: a fresh instance reads the lazy getter from the settings store.
+            var store = CreateSeededStore();
+            store[nameof(Settings.File_ConditionalReminders)] = @"persisted\reminders.json";
+            var filenames = new AppStagingFilenames(store);
 
             // Act
             var result = filenames.ConditionalReminders;
@@ -50,33 +57,43 @@ namespace TaskMaster.Test.AppGlobals
             // Assert
             result
                 .Should()
-                .Be(@"persisted\reminders.json", "the getter lazily reads Settings.Default");
+                .Be(@"persisted\reminders.json", "the getter lazily reads the settings store");
+            store.SaveCount.Should().Be(0);
         }
 
         [TestMethod]
         public void ConditionalReminders_Setter_RoundTripsThroughSettingsDefault()
         {
             // Arrange
-            var filenames = new AppStagingFilenames();
+            var store = CreateSeededStore();
+            var filenames = new AppStagingFilenames(store);
 
             // Act
-            filenames.ConditionalReminders = @"new\reminders.json";
+            var saves = SettingsSaveProbe.CountSavesOnCurrentThread(
+                Settings.Default,
+                () => filenames.ConditionalReminders = @"new\reminders.json"
+            );
 
             // Assert
             filenames
                 .ConditionalReminders.Should()
                 .Be(@"new\reminders.json", "the setter caches the value in the backing field");
-            Settings
-                .Default.File_ConditionalReminders.Should()
-                .Be(@"new\reminders.json", "the setter persists the value to Settings.Default");
+            store[nameof(Settings.File_ConditionalReminders)]
+                .Should()
+                .Be(@"new\reminders.json", "the setter persists the value to the settings store");
+            store.SaveCount.Should().Be(1);
+            saves
+                .Should()
+                .Be(0, "the test persisted settings to the shared per-host settings file");
         }
 
         [TestMethod]
         public void CommonWords_Getter_ReturnsPersistedSettingsValue()
         {
             // Arrange
-            Settings.Default.File_Common_Words = @"persisted\common.txt";
-            var filenames = new AppStagingFilenames();
+            var store = CreateSeededStore();
+            store[nameof(Settings.File_Common_Words)] = @"persisted\common.txt";
+            var filenames = new AppStagingFilenames(store);
 
             // Act
             var result = filenames.CommonWords;
@@ -89,11 +106,12 @@ namespace TaskMaster.Test.AppGlobals
         public void CommonWords_GetterAfterSet_ReturnsCachedValueWithoutReReadingSettings()
         {
             // Arrange: prove the backing field short-circuits the lazy getter once set.
-            var filenames = new AppStagingFilenames();
+            var store = CreateSeededStore();
+            var filenames = new AppStagingFilenames(store);
             filenames.CommonWords = @"cached\value.txt";
 
-            // Act: change Settings.Default underneath; the cached field should win.
-            Settings.Default.File_Common_Words = @"changed\underneath.txt";
+            // Act: change the settings store underneath; the cached field should win.
+            store[nameof(Settings.File_Common_Words)] = @"changed\underneath.txt";
             var result = filenames.CommonWords;
 
             // Assert
@@ -103,14 +121,16 @@ namespace TaskMaster.Test.AppGlobals
                     @"cached\value.txt",
                     "the non-null backing field short-circuits the lazy getter"
                 );
+            store.SaveCount.Should().Be(1);
         }
 
         [TestMethod]
         public void EmailInfoStagingFile_Setter_DoesNotWriteSettingsDefault()
         {
             // Arrange: this setter is the documented exception that updates only the backing field.
-            Settings.Default.FileName_EmailInfoStaging = @"original\staging.json";
-            var filenames = new AppStagingFilenames();
+            var store = CreateSeededStore();
+            store[nameof(Settings.FileName_EmailInfoStaging)] = @"original\staging.json";
+            var filenames = new AppStagingFilenames(store);
 
             // Act
             filenames.EmailInfoStagingFile = @"local-only\staging.json";
@@ -119,20 +139,22 @@ namespace TaskMaster.Test.AppGlobals
             filenames
                 .EmailInfoStagingFile.Should()
                 .Be(@"local-only\staging.json", "the backing field is updated");
-            Settings
-                .Default.FileName_EmailInfoStaging.Should()
+            store[nameof(Settings.FileName_EmailInfoStaging)]
+                .Should()
                 .Be(
                     @"original\staging.json",
-                    "the EmailInfoStagingFile setter does NOT persist to Settings.Default"
+                    "the EmailInfoStagingFile setter does NOT persist to the settings store"
                 );
+            store.SaveCount.Should().Be(0);
         }
 
         [TestMethod]
         public void EmailInfoStagingFile_Getter_LazilyReadsSettingsDefaultWhenUnset()
         {
             // Arrange
-            Settings.Default.FileName_EmailInfoStaging = @"persisted\staging.json";
-            var filenames = new AppStagingFilenames();
+            var store = CreateSeededStore();
+            store[nameof(Settings.FileName_EmailInfoStaging)] = @"persisted\staging.json";
+            var filenames = new AppStagingFilenames(store);
 
             // Act
             var result = filenames.EmailInfoStagingFile;
@@ -140,7 +162,107 @@ namespace TaskMaster.Test.AppGlobals
             // Assert
             result
                 .Should()
-                .Be(@"persisted\staging.json", "the getter lazily reads Settings.Default");
+                .Be(@"persisted\staging.json", "the getter lazily reads the settings store");
+        }
+
+        [TestMethod]
+        public void SavingSetters_EachAssignment_WritesStoreAndSavesOnce()
+        {
+            // Arrange
+            var store = CreateSeededStore();
+            var filenames = new AppStagingFilenames(store);
+
+            // Act: assign all nine persisting properties.
+            filenames.ConditionalReminders = "a";
+            filenames.CommonWords = "b";
+            filenames.SubjectMap = "c";
+            filenames.CtfInc = "d";
+            filenames.CtfMap = "e";
+            filenames.EmailSessionTemp = "f";
+            filenames.EmailSession = "g";
+            filenames.MovedMails = "h";
+            filenames.RecentsFile = "i";
+
+            // Assert
+            store[nameof(Settings.File_ConditionalReminders)].Should().Be("a");
+            store[nameof(Settings.File_Common_Words)].Should().Be("b");
+            store[nameof(Settings.File_Subject_Map)].Should().Be("c");
+            store[nameof(Settings.File_CTF_Inc)].Should().Be("d");
+            store[nameof(Settings.File_CTF_Map)].Should().Be("e");
+            store[nameof(Settings.FileName_EmailSessionTmp)].Should().Be("f");
+            store[nameof(Settings.FileName_EmailSession)].Should().Be("g");
+            store[nameof(Settings.FileName_MovedEmailsBackup)].Should().Be("h");
+            store[nameof(Settings.FileName_Recents)].Should().Be("i");
+            store.SaveCount.Should().Be(9, "each persisting setter saves exactly once");
+        }
+
+        [TestMethod]
+        public void Getters_UnsetFields_ReadSeededStoreValues()
+        {
+            // Arrange
+            var store = CreateSeededStore();
+            var filenames = new AppStagingFilenames(store);
+
+            // Act
+            var values = new[]
+            {
+                filenames.ConditionalReminders,
+                filenames.CommonWords,
+                filenames.SubjectMap,
+                filenames.CtfInc,
+                filenames.CtfMap,
+                filenames.EmailSessionTemp,
+                filenames.EmailSession,
+                filenames.MovedMails,
+                filenames.RecentsFile,
+                filenames.EmailInfoStagingFile,
+            };
+
+            // Assert
+            for (var i = 0; i < SettingNames.Length; i++)
+            {
+                values[i]
+                    .Should()
+                    .Be(
+                        $@"seeded\{SettingNames[i]}.txt",
+                        $"{SettingNames[i]} reads its seeded key"
+                    );
+            }
+
+            store.SaveCount.Should().Be(0, "reading a setting does not persist anything");
+        }
+
+        [TestMethod]
+        public void Constructor_Parameterless_UsesApplicationSettingsStore()
+        {
+            // Arrange
+            var field = typeof(AppStagingFilenames).GetField(
+                "_settingsStore",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            // Act: inspect the default store without reading or writing any setting.
+            var store = field!.GetValue(new AppStagingFilenames());
+
+            // Assert
+            store
+                .Should()
+                .BeOfType<ApplicationSettingsStore>(
+                    "the production constructor persists through TaskMaster's own settings"
+                );
+        }
+
+        [TestMethod]
+        public void Constructor_NullSettingsStore_ThrowsArgumentNullException()
+        {
+            // Arrange
+            Action act = () => _ = new AppStagingFilenames(null!);
+
+            // Act / Assert
+            act.Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("settingsStore");
         }
     }
 }

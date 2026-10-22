@@ -62,7 +62,41 @@ namespace ToDoModel
             _olApp = olApp;
         }
 
+        /// <summary>
+        /// Initializes a list from <paramref name="ids"/> that persists its maximum ID length
+        /// through <paramref name="settingsStore"/> instead of the default per-host settings.
+        /// </summary>
+        /// <param name="ids">The initial IDs.</param>
+        /// <param name="settingsStore">The store that receives <c>MaxLengthOfID</c> updates.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="settingsStore"/> is null.</exception>
+        public IDList(IEnumerable<string> ids, ISettingsStore settingsStore)
+            : base(ids)
+        {
+            _settingsStore =
+                settingsStore ?? throw new ArgumentNullException(nameof(settingsStore));
+        }
+
+        /// <summary>
+        /// Initializes an empty list that persists its maximum ID length through
+        /// <paramref name="settingsStore"/> instead of the default per-host settings.
+        /// </summary>
+        /// <param name="settingsStore">The store that receives <c>MaxLengthOfID</c> updates.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="settingsStore"/> is null.</exception>
+        public IDList(ISettingsStore settingsStore)
+            : base()
+        {
+            _settingsStore =
+                settingsStore ?? throw new ArgumentNullException(nameof(settingsStore));
+        }
+
         #endregion
+
+        // A field initializer, so every existing constructor (including the deserializing and
+        // Outlook-bound ones) persists through ToDoModel's own settings exactly as before; the
+        // store-taking constructors replace it so tests never write the per-host settings file.
+        private readonly ISettingsStore _settingsStore = new ApplicationSettingsStore(
+            Properties.Settings.Default
+        );
 
         private Outlook.Application _olApp;
         private int _maxIDLength = 0;
@@ -101,8 +135,8 @@ namespace ToDoModel
             if (strMaxID.Length > _maxIDLength)
             {
                 _maxIDLength = strMaxID.Length;
-                Properties.Settings.Default.MaxLengthOfID = (int)_maxIDLength;
-                Properties.Settings.Default.Save();
+                _settingsStore[nameof(Properties.Settings.MaxLengthOfID)] = _maxIDLength;
+                _settingsStore.Save();
             }
             if (this.Filepath is not null)
             {

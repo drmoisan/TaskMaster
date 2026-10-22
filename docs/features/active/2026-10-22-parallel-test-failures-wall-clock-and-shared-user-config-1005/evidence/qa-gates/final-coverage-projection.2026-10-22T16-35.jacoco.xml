@@ -1,0 +1,38 @@
+<report name="TaskMaster">
+  <package name="QuickFiler">
+    <counter type="LINE" missed="2182" covered="10662" />
+    <counter type="BRANCH" missed="672" covered="2585" />
+  </package>
+  <package name="UtilitiesCS">
+    <counter type="LINE" missed="4198" covered="40023" />
+    <counter type="BRANCH" missed="1810" covered="9782" />
+  </package>
+  <package name="TaskVisualization">
+    <counter type="LINE" missed="143" covered="1426" />
+    <counter type="BRANCH" missed="67" covered="333" />
+  </package>
+  <package name="SVGControl">
+    <counter type="LINE" missed="977" covered="877" />
+    <counter type="BRANCH" missed="338" covered="300" />
+  </package>
+  <package name="ToDoModel">
+    <counter type="LINE" missed="769" covered="1067" />
+    <counter type="BRANCH" missed="264" covered="248" />
+  </package>
+  <package name="Tags">
+    <counter type="LINE" missed="56" covered="702" />
+    <counter type="BRANCH" missed="16" covered="174" />
+  </package>
+  <package name="TaskMaster">
+    <counter type="LINE" missed="757" covered="2571" />
+    <counter type="BRANCH" missed="196" covered="544" />
+  </package>
+  <package name="TaskTree">
+    <counter type="LINE" missed="11" covered="295" />
+    <counter type="BRANCH" missed="8" covered="94" />
+  </package>
+  <package name="VBFunctions">
+    <counter type="LINE" missed="0" covered="4" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+</report>
