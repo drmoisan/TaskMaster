@@ -68,7 +68,7 @@ namespace QuickFiler.Controllers
         }
 
         // Coverage exemption (#1002, maintainer-ratified CLAUDE.md UT2 COM/VSTO/WinForms exemption):
-        // this handler closes the live WinForms viewer, whose MessageBox-bound form cannot run headless.
+        // this handler awaits the concrete EfcViewer UiSyncContext and calls Close on the live WinForms viewer, which cannot run headless.
         [ExcludeFromCodeCoverage]
         public async Task ActionCancelAsync()
         {

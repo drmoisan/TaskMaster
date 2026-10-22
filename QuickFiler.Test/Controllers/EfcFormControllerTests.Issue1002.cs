@@ -243,6 +243,29 @@ namespace QuickFiler.Controllers.Tests
             documents.Should().BeEmpty("a null viewer delivers no document");
         }
 
+        [TestMethod]
+        public void BindFolderRows_FaultBeforeDelivery_FaultsDeliveredTaskPromptly()
+        {
+            // Arrange: with _globals unset the bind boundary faults before it delivers a document.
+            var documents = new List<string>();
+            var delivered = new TaskCompletionSource<bool>();
+            EfcFormController controller = CreateIssue1002Controller(
+                documents,
+                withGlobals: false,
+                delivered: delivered
+            );
+
+            // Act
+            InvokeIssue1002Bind(controller, "BindFolderRows", new[] { Issue1002Presented });
+
+            // Assert: the fault is reported synchronously, so no wait is needed.
+            delivered
+                .Task.IsFaulted.Should()
+                .BeTrue("a pre-delivery fault must fail the wait instead of leaving it pending");
+            delivered.Task.Exception.Should().NotBeNull();
+            documents.Should().BeEmpty("no document is delivered by a faulted bind");
+        }
+
         private static void InvokeIssue1002Bind(
             EfcFormController controller,
             string memberName,
@@ -290,6 +313,9 @@ namespace QuickFiler.Controllers.Tests
             );
 
             EfcFormController controller = CreateMinimalController();
+            // A fault reported at the bind boundary fails the caller's wait instead of leaving it pending.
+            controller.BoundaryErrorSink = (message, exception) =>
+                delivered?.TrySetException(exception);
             var viewer = (EfcViewer)
                 System.Runtime.Serialization.FormatterServices.GetUninitializedObject(
                     typeof(EfcViewer)

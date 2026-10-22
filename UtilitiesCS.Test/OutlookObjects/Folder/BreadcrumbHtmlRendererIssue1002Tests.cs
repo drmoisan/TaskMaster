@@ -203,6 +203,31 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void BridgeJs_SubfolderResultHandler_WrapsChildNameInNameSpan()
+        {
+            // Arrange
+            string js = BreadcrumbDocumentAssets.BridgeJs;
+            int handler = js.IndexOf(
+                "msg.type === 'subfolderResult'",
+                System.StringComparison.Ordinal
+            );
+
+            // Act
+            string tail = handler < 0 ? string.Empty : js.Substring(handler);
+
+            // Assert
+            handler.Should().BeGreaterThan(-1, "the subfolderResult branch exists");
+            tail.Should().Contain("name.className = 'name';");
+            tail.Should().Contain("name.textContent = c.displayName;");
+            tail.Should().Contain("div.appendChild(name);");
+            tail.Should()
+                .NotContain(
+                    "div.textContent",
+                    "bare text would bypass the .child .name truncation"
+                );
+        }
+
+        [TestMethod]
         public void BridgeJs_NodeAffordanceEnterOrSpace_PrecedesRowConfirmation()
         {
             // Arrange
