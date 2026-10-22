@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Meziantou.Analyzer.3.0.303\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.303\build\Meziantou.Analyzer.props')" />
+  <Import Project="..\packages\Meziantou.Analyzer.3.0.316\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.316\build\Meziantou.Analyzer.props')" />
   <Import Project="..\packages\MSTest.TestAdapter.4.5.1\build\net462\MSTest.TestAdapter.props" Condition="Exists('..\packages\MSTest.TestAdapter.4.5.1\build\net462\MSTest.TestAdapter.props')" />
   <Import Project="..\packages\Microsoft.Testing.Platform.MSBuild.2.5.1\build\Microsoft.Testing.Platform.MSBuild.props" Condition="Exists('..\packages\Microsoft.Testing.Platform.MSBuild.2.5.1\build\Microsoft.Testing.Platform.MSBuild.props')" />
   <Import Project="..\packages\Microsoft.Testing.Extensions.Telemetry.2.5.1\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props" Condition="Exists('..\packages\Microsoft.Testing.Extensions.Telemetry.2.5.1\build\netstandard2.0\Microsoft.Testing.Extensions.Telemetry.props')" />
@@ -347,11 +347,13 @@
     <Reference Include="Microsoft.Extensions.TimeProvider.Testing, Version=10.11.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.TimeProvider.Testing.10.11.0\lib\net462\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Identity.Client, Version=4.91.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Identity.Client.4.91.0\lib\net472\Microsoft.Identity.Client.dll</HintPath>
+    <Reference Include="Microsoft.Identity.Client, Version=4.91.1.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.91.1\lib\net472\Microsoft.Identity.Client.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Identity.Client.Extensions.Msal, Version=4.91.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Identity.Client.Extensions.Msal.4.91.0\lib\netstandard2.0\Microsoft.Identity.Client.Extensions.Msal.dll</HintPath>
+    <Reference Include="Microsoft.Identity.Client.Extensions.Msal, Version=4.91.1.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae">
+      <HintPath>..\packages\Microsoft.Identity.Client.Extensions.Msal.4.91.1\lib\netstandard2.0\Microsoft.Identity.Client.Extensions.Msal.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.23.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.23.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
@@ -422,23 +424,29 @@
     <Reference Include="office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="OpenTelemetry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.1.20.0\lib\net462\OpenTelemetry.dll</HintPath>
+    <Reference Include="OpenTelemetry, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c">
+      <HintPath>..\packages\OpenTelemetry.1.20.1\lib\net462\OpenTelemetry.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTelemetry.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.Api.1.20.0\lib\net462\OpenTelemetry.Api.dll</HintPath>
+    <Reference Include="OpenTelemetry.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c">
+      <HintPath>..\packages\OpenTelemetry.Api.1.20.1\lib\net462\OpenTelemetry.Api.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTelemetry.Api.ProviderBuilderExtensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.Api.ProviderBuilderExtensions.1.20.0\lib\net462\OpenTelemetry.Api.ProviderBuilderExtensions.dll</HintPath>
+    <Reference Include="OpenTelemetry.Api.ProviderBuilderExtensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c">
+      <HintPath>..\packages\OpenTelemetry.Api.ProviderBuilderExtensions.1.20.1\lib\net462\OpenTelemetry.Api.ProviderBuilderExtensions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTelemetry.Extensions.Hosting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.Extensions.Hosting.1.20.0\lib\net462\OpenTelemetry.Extensions.Hosting.dll</HintPath>
+    <Reference Include="OpenTelemetry.Extensions.Hosting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c">
+      <HintPath>..\packages\OpenTelemetry.Extensions.Hosting.1.20.1\lib\net462\OpenTelemetry.Extensions.Hosting.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTelemetry.PersistentStorage.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.PersistentStorage.Abstractions.1.1.2\lib\net462\OpenTelemetry.PersistentStorage.Abstractions.dll</HintPath>
+    <Reference Include="OpenTelemetry.PersistentStorage.Abstractions, Version=1.1.3.1513, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c">
+      <HintPath>..\packages\OpenTelemetry.PersistentStorage.Abstractions.1.1.3\lib\net462\OpenTelemetry.PersistentStorage.Abstractions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTelemetry.PersistentStorage.FileSystem, Version=1.1.2.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.PersistentStorage.FileSystem.1.1.2\lib\net462\OpenTelemetry.PersistentStorage.FileSystem.dll</HintPath>
+    <Reference Include="OpenTelemetry.PersistentStorage.FileSystem, Version=1.1.3.1513, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c">
+      <HintPath>..\packages\OpenTelemetry.PersistentStorage.FileSystem.1.1.3\lib\net462\OpenTelemetry.PersistentStorage.FileSystem.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
@@ -555,7 +563,7 @@
     <Error Condition="!Exists('..\packages\MSTest.TestFramework.4.5.1\build\net462\MSTest.TestFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestFramework.4.5.1\build\net462\MSTest.TestFramework.targets'))" />
     <Error Condition="!Exists('..\packages\MSTest.TestAdapter.4.5.1\build\net462\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.4.5.1\build\net462\MSTest.TestAdapter.props'))" />
     <Error Condition="!Exists('..\packages\MSTest.TestAdapter.4.5.1\build\net462\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.4.5.1\build\net462\MSTest.TestAdapter.targets'))" />
-    <Error Condition="!Exists('..\packages\Meziantou.Analyzer.3.0.303\build\Meziantou.Analyzer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Meziantou.Analyzer.3.0.303\build\Meziantou.Analyzer.props'))" />
+    <Error Condition="!Exists('..\packages\Meziantou.Analyzer.3.0.316\build\Meziantou.Analyzer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Meziantou.Analyzer.3.0.316\build\Meziantou.Analyzer.props'))" />
   </Target>
   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
   <ItemGroup>
