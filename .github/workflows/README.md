@@ -118,7 +118,7 @@ and GitHub restricts it by default from 2026-11-02.
 
 A repository admin provisions both by hand. The procedure — creating the App, granting it contents
 and pull-requests write, installing it on this repository and storing the two secrets — is in
-`docs/features/active/2026-09-19-dependabot-fanout-and-ci-failing-nuget-upgrades-911/runbooks/github-app-installation-token.runbook.md`.
+`docs/runbooks/github-app-installation-token.runbook.md`.
 
 **Degraded mode when the credential is absent.** Until both secrets exist, the token step fails and
 the job stops before it can push, so every Dependabot pull request keeps exactly the behaviour it
