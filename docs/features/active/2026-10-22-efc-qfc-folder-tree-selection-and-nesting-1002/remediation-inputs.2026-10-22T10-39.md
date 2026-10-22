@@ -65,6 +65,15 @@ Remediability-Evidence: the fix is one attribute-selector rule per theme block i
   - Grep of `UtilitiesCS/OutlookObjects/Folder/BreadcrumbDocumentAssets.cs` for `aria-selected`: at least two hits.
   - Update `evidence/other/manual-outlook-check.<timestamp>.md` only if its steps change; the check remains pending human interaction.
 
+### B-3 Maintainer decision (recorded 2026-10-22T10:50Z)
+
+- Decision: option (a), ratify the CLAUDE.md UT2 COM/VSTO/WinForms coverage exemption for the uncovered MessageBox-bound action handlers and WebView2 host wiring in this item, applied through member-level `[ExcludeFromCodeCoverage]` attributes in source so the exemption is reviewable in the PR.
+- Authority: the project maintainer selected "Ratify exemption" in the orchestrating session on 2026-10-22 in answer to the B-3 decision request.
+- Reclassified: B-3 is now `Remediability: autonomous` for cycle 1. The "Do Not Do" prohibition on `ExcludeFromCodeCoverage` is lifted for exactly the members named below and no others.
+- Members in scope: `EfcFormController.ActionOkAsync`, `EfcFormController.CreateFolderAsync`, `EfcFormController.ActionCancelAsync`, `EfcFormController.RefreshSuggestionsAsync` (only if it remains uncovered after the B-1 tests), and `EfcFormController.ConfigureBreadcrumbControl`. Each attribute carries a `Justification` naming the MessageBox or WebView2 host dependency and issue #1002.
+- Not in scope: whole-file or `coverage.config` exclusions, and any member that a unit test can reach.
+- Expected behaviour after the fix: per-file coverage of `QuickFiler/Controllers/EfcFormController.Actions.cs` and `QuickFiler/Controllers/EfcFormController.Breadcrumb.cs` is at least 80% line and 75% branch in the post-change Cobertura document. If compiler-generated async state machines or lambda closures of an attributed member still appear in the Cobertura document, record the residual figures and the generated class names in the coverage-comparison evidence rather than adding further exclusions.
+
 ## Recommended In-Scope Items (non-blocking)
 
 - CR-1: `.child` became a flex container, so `text-overflow: ellipsis` no longer truncates long names; move `min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;` to `.child .name` in `BaseCss`. Same file as B-4.
