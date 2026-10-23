@@ -128,3 +128,38 @@ Scope: EFC and QFC. Rows are visited in visible tree order: top-level rows plus 
 10. QFC with the dropdown closed: Right opens the dropdown with the pending highlight on the committed row. Left does nothing. Up and Down keep today's direct commit of the adjacent top-level row. Home and End commit the first and last top-level row. (Q14, Q16, Q22)
 11. Home and End go to the first and last visible row in tree order. Home does not focus the search box. PageUp and PageDown move by the number of rows fully visible and stop at the first and last row without wrapping. EFC commits, as in rule 3; with the QFC dropdown open only the pending highlight moves. (Q8, Q16, Q17)
 12. Route: large path. The change covers 4 or more production files across both viewers (EFC router and page script, the QFC selection session and router, `FolderBreadcrumb.js`, and shared `UtilitiesCS` row and model types), plus the node tests under `tests/quickfiler-breadcrumb/`.
+
+## Round 4 (2026-10-23, raised by Phase B research)
+
+The research artifact `research/2026-10-23T10-40-arrow-key-subfolder-navigation-research.md` (section `## Open Questions for the Maintainer`) found seven points that rules 1 to 11 do not settle or that conflict with each other. They were relayed to the maintainer as Q23 to Q29 (research Q-A to Q-G).
+
+### Round 4 questions (summary)
+
+- Q23 (research Q-A) Rule 5 versus rule 9 on a shortened row. A: rule 9 governs: Right lists the segment's subfolders, and the rule 5 restore clause is dropped. B: rule 5 governs. Recommended A.
+- Q24 (Q-B) QFC Ctrl+Left with the list open, then Escape. A: the row shape and the committed value are both restored. B: the shortened row stays. Recommended A.
+- Q25 (Q-C) QFC closed-list PageUp/PageDown. A: nothing. B: commit one page away. Recommended A.
+- Q26 (Q-D) EFC keys with no selection. A: Down and Home select the first row; Up and End select the last row. B: unchanged. Recommended A.
+- Q27 (Q-E) QFC single click on a non-leaf segment in the open list. A: the click moves only the pending highlight and does not bubble; a double-click commits the segment folder and closes the list; a click on the leaf segment or the percentage still commits. B: unchanged. Recommended A.
+- Q28 (Q-F) QFC Right on an expanded node whose fetch returned no children. A: nothing. B: pop-out dialog. Recommended A.
+- Q29 (Q-G) QFC closed-list Right when the committed choice is a subfolder (Specs under Archive > Projects > Alpha). A: the pending highlight goes on Specs when it is visible, otherwise on the Alpha row. B: always on the Alpha row. Recommended A.
+
+### Round 4 answers (maintainer, verbatim as relayed)
+
+- "Q23 A; Q24 A; Q25 A; Q26 A; Q27 A; Q28 would be a bug. If there are no sub-folders, there should be no + sign. This case should not exist if code is working properly"
+- "Q29 A"
+
+Resolution:
+- Q23 to Q27 and Q29: option A, as presented.
+- Q23 removes the "first restores the full path" clause from rule 5 (AC5).
+- Q28 becomes an invariant: a `[+]` (expand affordance) is never shown on a folder that has no subfolders. It is recorded as AC14 and is in scope as a defect tied to this item's files.
+
+### Q28 investigation (orchestrator, 2026-10-23)
+
+- `OutlookFolderHierarchyProvider.MapNode` (`UtilitiesCS/OutlookObjects/Folder/OutlookFolderHierarchyProvider.cs`) sets `HasChildren` to `node.ChildKeys.Count > 0`. Both `GetAncestorChainAsync` and `GetImmediateSubfoldersAsync` use it.
+- `FolderTreeSnapshot.GetChildren` (`FolderTreeSnapshot.cs`) returns only the child keys present in the snapshot (`ChildKeys.Where(_nodesByKey.ContainsKey)`).
+- `FolderTreeSnapshotBuilder.BuildSnapshotAsync` tolerates a child key with no node: `lookup.TryGetValue` fails and the key is skipped.
+- Consequence: when the reader reports a child key whose folder is not in the snapshot, the segment carries `HasChildren == true`, every renderer draws `[+]`, and the fetch returns zero children. The expanded state then shows `[−]` with nothing below it, which is the case the maintainer called a bug. The renderers involved are `BreadcrumbHtmlRenderer` (`AppendLeafAffordance` and the descendant toggle), `BreadcrumbRenderProjection`, and `FolderBreadcrumb.js` `makeSubfolders`.
+- Required fix:
+  - Primary: derive `HasChildren` from the children that resolve in the snapshot, the same set `GetChildren` returns.
+  - Defence in depth: a fetch that attaches zero children leaves no expand or collapse affordance on that row or node, in both viewers.
+- Each fix needs a failing regression test first.
