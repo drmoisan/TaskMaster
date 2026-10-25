@@ -36,9 +36,7 @@ namespace TaskMaster
         );
 
         public AppAutoFileObjects(IApplicationGlobals parent)
-        {
-            _parent = parent;
-        }
+            : this(parent, new ApplicationSettingsStore(Properties.Settings.Default)) { }
 
         private T Initialized<T>(T obj, Func<T> initializer)
         {
@@ -108,70 +106,10 @@ namespace TaskMaster
             set => _maximizeQuickFileWindow = value;
         }
 
-        public int LngConvCtPwr
-        {
-            get => _defaults.ConversationExponent;
-            set
-            {
-                _defaults.ConversationExponent = value;
-                _defaults.Save();
-            }
-        }
-
-        public int Conversation_Weight
-        {
-            get => _defaults.ConversationWeight;
-            set
-            {
-                _defaults.ConversationWeight = value;
-                _defaults.Save();
-            }
-        }
-
         public bool SuggestionFilesLoaded
         {
             get => _sugFilesLoaded;
             set => _sugFilesLoaded = value;
-        }
-
-        public int SmithWatterman_MatchScore
-        {
-            get => _defaults.SmithWatterman_MatchScore;
-            set
-            {
-                _defaults.SmithWatterman_MatchScore = value;
-                _defaults.Save();
-            }
-        }
-
-        public int SmithWatterman_MismatchScore
-        {
-            get => _defaults.SmithWatterman_MismatchScore;
-            set
-            {
-                _defaults.SmithWatterman_MismatchScore = value;
-                _defaults.Save();
-            }
-        }
-
-        public int SmithWatterman_GapPenalty
-        {
-            get => _defaults.SmithWatterman_GapPenalty;
-            set
-            {
-                _defaults.SmithWatterman_GapPenalty = value;
-                _defaults.Save();
-            }
-        }
-
-        public int MaxRecents
-        {
-            get => _defaults.MaxRecents;
-            set
-            {
-                _defaults.MaxRecents = value;
-                _defaults.Save();
-            }
         }
 
         private SloStack<IMovedMailInfo> _movedMails;

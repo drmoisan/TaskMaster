@@ -1,69 +1,95 @@
-﻿using TaskMaster.Properties;
+﻿using System;
+using TaskMaster.Properties;
 using UtilitiesCS;
 
 namespace TaskMaster
 {
     public class AppStagingFilenames : IAppStagingFilenames
     {
+        private readonly ISettingsStore _settingsStore;
+
+        /// <summary>
+        /// Initializes file names that read and persist through <see cref="Settings.Default"/>.
+        /// </summary>
+        public AppStagingFilenames()
+            : this(new ApplicationSettingsStore(Settings.Default)) { }
+
+        /// <summary>
+        /// Initializes file names that read and persist through <paramref name="settingsStore"/>.
+        /// </summary>
+        /// <param name="settingsStore">The store that holds the staging file-name settings.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="settingsStore"/> is null.</exception>
+        internal AppStagingFilenames(ISettingsStore settingsStore)
+        {
+            _settingsStore =
+                settingsStore ?? throw new ArgumentNullException(nameof(settingsStore));
+        }
+
         private string _conditionalReminders;
         public string ConditionalReminders
         {
             get =>
                 _conditionalReminders
-                ?? InitProp(ref _conditionalReminders, Settings.Default.File_ConditionalReminders);
+                ?? InitProp(
+                    ref _conditionalReminders,
+                    Read(nameof(Settings.File_ConditionalReminders))
+                );
             set
             {
                 _conditionalReminders = value;
-                Settings.Default.File_ConditionalReminders = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.File_ConditionalReminders)] = value;
+                _settingsStore.Save();
             }
         }
 
         private string _commonWords;
         public string CommonWords
         {
-            get => _commonWords ?? InitProp(ref _commonWords, Settings.Default.File_Common_Words);
+            get =>
+                _commonWords
+                ?? InitProp(ref _commonWords, Read(nameof(Settings.File_Common_Words)));
             set
             {
                 _commonWords = value;
-                Settings.Default.File_Common_Words = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.File_Common_Words)] = value;
+                _settingsStore.Save();
             }
         }
 
         private string _subjectMap;
         public string SubjectMap
         {
-            get => _subjectMap ?? InitProp(ref _subjectMap, Settings.Default.File_Subject_Map);
+            get =>
+                _subjectMap ?? InitProp(ref _subjectMap, Read(nameof(Settings.File_Subject_Map)));
             set
             {
                 _subjectMap = value;
-                Settings.Default.File_Subject_Map = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.File_Subject_Map)] = value;
+                _settingsStore.Save();
             }
         }
 
         private string _ctfInc;
         public string CtfInc
         {
-            get => _ctfInc ?? InitProp(ref _ctfInc, Settings.Default.File_CTF_Inc);
+            get => _ctfInc ?? InitProp(ref _ctfInc, Read(nameof(Settings.File_CTF_Inc)));
             set
             {
                 _ctfInc = value;
-                Settings.Default.File_CTF_Inc = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.File_CTF_Inc)] = value;
+                _settingsStore.Save();
             }
         }
 
         private string _ctfMap;
         public string CtfMap
         {
-            get => _ctfMap ?? InitProp(ref _ctfMap, Settings.Default.File_CTF_Map);
+            get => _ctfMap ?? InitProp(ref _ctfMap, Read(nameof(Settings.File_CTF_Map)));
             set
             {
                 _ctfMap = value;
-                Settings.Default.File_CTF_Map = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.File_CTF_Map)] = value;
+                _settingsStore.Save();
             }
         }
 
@@ -72,12 +98,12 @@ namespace TaskMaster
         {
             get =>
                 _emailSessionTemp
-                ?? InitProp(ref _emailSessionTemp, Settings.Default.FileName_EmailSessionTmp);
+                ?? InitProp(ref _emailSessionTemp, Read(nameof(Settings.FileName_EmailSessionTmp)));
             set
             {
                 _emailSessionTemp = value;
-                Settings.Default.FileName_EmailSessionTmp = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.FileName_EmailSessionTmp)] = value;
+                _settingsStore.Save();
             }
         }
 
@@ -86,12 +112,12 @@ namespace TaskMaster
         {
             get =>
                 _emailSession
-                ?? InitProp(ref _emailSession, Settings.Default.FileName_EmailSession);
+                ?? InitProp(ref _emailSession, Read(nameof(Settings.FileName_EmailSession)));
             set
             {
                 _emailSession = value;
-                Settings.Default.FileName_EmailSession = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.FileName_EmailSession)] = value;
+                _settingsStore.Save();
             }
         }
 
@@ -100,24 +126,25 @@ namespace TaskMaster
         {
             get =>
                 _movedMails
-                ?? InitProp(ref _movedMails, Settings.Default.FileName_MovedEmailsBackup);
+                ?? InitProp(ref _movedMails, Read(nameof(Settings.FileName_MovedEmailsBackup)));
             set
             {
                 _movedMails = value;
-                Settings.Default.FileName_MovedEmailsBackup = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.FileName_MovedEmailsBackup)] = value;
+                _settingsStore.Save();
             }
         }
 
         private string _recentsFile;
         public string RecentsFile
         {
-            get => _recentsFile ?? InitProp(ref _recentsFile, Settings.Default.FileName_Recents);
+            get =>
+                _recentsFile ?? InitProp(ref _recentsFile, Read(nameof(Settings.FileName_Recents)));
             set
             {
                 _recentsFile = value;
-                Settings.Default.FileName_Recents = value;
-                Settings.Default.Save();
+                _settingsStore[nameof(Settings.FileName_Recents)] = value;
+                _settingsStore.Save();
             }
         }
 
@@ -126,7 +153,10 @@ namespace TaskMaster
         {
             get =>
                 _emailInfoStagingFile
-                ?? InitProp(ref _emailInfoStagingFile, Settings.Default.FileName_EmailInfoStaging);
+                ?? InitProp(
+                    ref _emailInfoStagingFile,
+                    Read(nameof(Settings.FileName_EmailInfoStaging))
+                );
             set => _emailInfoStagingFile = value;
         }
 
@@ -135,5 +165,7 @@ namespace TaskMaster
             prop = value;
             return value;
         }
+
+        private string Read(string settingName) => (string)_settingsStore[settingName];
     }
 }

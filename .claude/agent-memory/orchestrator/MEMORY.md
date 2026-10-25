@@ -3,6 +3,7 @@
 ## Lifecycle, promotion, checkpoint
 - [Isolated child: wait via git pickaxe; name the item in Agent prompts](isolated-child-liveness-wait-and-delegation-target-lines.md) — no sleep route; `Canonical issue number` + `branch:` lines
 - [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) · [Small-path = minor-audit](small-path-minor-audit-selection.md) — 1-3 prod files = small path
+- [Small->large reroute flips work mode to full-bug](small-to-large-reroute-flips-work-mode.md) — edit the issue.md marker before prd-feature; restamp future-dated evidence
 - [potential_to_issue creates the issue](potential-to-issue-creates-github-issue.md) · [needs an absolute path](potential-to-issue-needs-absolute-path.md) · [maps sections by heading](potential-to-issue-keeps-only-summary-section.md)
 - [Promotion potential .md may not persist](promotion-potential-md-may-not-persist.md) · [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md)
 - [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — the residual may already be its own issue
