@@ -199,6 +199,7 @@
     <Compile Include="Extensions\CompilerServicesExtensions_Tests.cs" />
     <Compile Include="Extensions\DfDeedle_Tests.cs" />
     <Compile Include="Extensions\DfDeedle_COM_Tests.cs" />
+    <Compile Include="Extensions\DfDeedle_COM_Tests.QfcColumnsAsync.cs" />
     <Compile Include="Extensions\DfDeedleQfcColumnTimeoutTests.cs" />
     <Compile Include="Extensions\DfDeedleEtlTimeoutTests.cs" />
     <Compile Include="Extensions\DfDeedleRequiredColumnValidationTests.cs" />
@@ -231,6 +232,7 @@
     <Compile Include="HelperClasses\ParamArray_Tests.cs" />
     <Compile Include="HelperClasses\ObjectSize_Tests.cs" />
     <Compile Include="HelperClasses\ReflectionHelper_Tests.cs" />
+    <Compile Include="HelperClasses\Settings\ApplicationSettingsStoreTests.cs" />
     <Compile Include="HelperClasses\SegmentStopWatch_Tests.cs" />
     <Compile Include="HelperClasses\GenericBitwise_Tests.cs" />
     <Compile Include="HelperClasses\DeepCompare_Tests.cs" />

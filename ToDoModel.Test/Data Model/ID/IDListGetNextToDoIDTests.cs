@@ -1,28 +1,32 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using ToDoModel;
+using UtilitiesCS;
 
 namespace ToDoModel.Test
 {
     /// <summary>
-    /// Unit tests for <see cref="IDList.GetNextToDoID(string)"/>. The list is constructed only via
-    /// the Outlook-free constructors (<see cref="IDList()"/>, <see cref="IDList(IList{string})"/>,
-    /// <see cref="IDList(IEnumerable{string})"/>), so no live Outlook is required. Only the pure
-    /// base-36 arithmetic path is exercised. Tests that call the successful path initialize the
-    /// list's cached maximum ID length before generating an ID so the method does not persist
-    /// <c>Settings.Default.MaxLengthOfID</c>. No <c>Filepath</c> is set, so the internal
-    /// <c>Serialize()</c> branch is not taken.
+    /// Unit tests for <see cref="IDList.GetNextToDoID(string)"/> and the settings-store seam it
+    /// persists through. Every list under test is built with an injected per-test
+    /// <see cref="Mock{ISettingsStore}"/>, so <c>MaxLengthOfID</c> persistence is observed on the
+    /// mock and never reaches the per-host settings file. No live Outlook is required, and no
+    /// <c>Filepath</c> is set, so the internal <c>Serialize()</c> branch is not taken.
     /// </summary>
     [TestClass]
     public class IDListGetNextToDoIDTests
     {
+        private const string MaxLengthKey = "MaxLengthOfID";
+
         [TestMethod]
         public void GetNextToDoID_NoCollision_ReturnsNextBase36ValueAndAddsIt()
         {
             // Arrange: seed "0001" => base10 1; next id is 2 => base36 padded "02".
-            var list = CreateListWithCachedMaxLength("ZZZZ");
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "ZZZZ" }, store.Object);
 
             // Act
             var result = list.GetNextToDoID("0001");
@@ -36,7 +40,8 @@ namespace ToDoModel.Test
         public void GetNextToDoID_IdAlreadyPresent_AdvancesPastTheCollision()
         {
             // Arrange: seed "0001" => next candidate "02" collides; loop advances to "03".
-            var list = CreateListWithCachedMaxLength("02");
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "02" }, store.Object);
 
             // Act
             var result = list.GetNextToDoID("0001");
@@ -50,7 +55,8 @@ namespace ToDoModel.Test
         public void GetNextToDoID_MultipleConsecutiveCollisions_AdvancesToFirstFreeValue()
         {
             // Arrange: candidates "02","03","04" all present; first free is "05".
-            var list = CreateListWithCachedMaxLength("02", "03", "04");
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "02", "03", "04" }, store.Object);
 
             // Act
             var result = list.GetNextToDoID("0001");
@@ -62,10 +68,10 @@ namespace ToDoModel.Test
         [TestMethod]
         public void GetNextToDoID_LengthBoundaryRollover_ProducesLongerId()
         {
-            // Arrange: seed "ZZ" => base10 (35*36 + 35) = 1295; next is 1296 => base36 "100"
-            // (three digits, padded to even length is still "100" because 3 % 2 == 1 prepends "0"
-            // => "0100"). Assert the produced value and its length to cover the rollover branch.
-            var list = CreateListWithCachedMaxLength("0000");
+            // Arrange: seed "ZZ" => base10 (35*36 + 35) = 1295; next is 1296 => base36 "100",
+            // padded to even length "0100".
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "0000" }, store.Object);
 
             // Act
             var result = list.GetNextToDoID("ZZ");
@@ -81,7 +87,8 @@ namespace ToDoModel.Test
         public void GetNextToDoID_NullSeed_ThrowsArgumentException()
         {
             // Arrange
-            var list = new IDList(new List<string>());
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string>(), store.Object);
 
             // Act
             Action act = () => list.GetNextToDoID(null);
@@ -91,13 +98,15 @@ namespace ToDoModel.Test
                 .Throw<ArgumentException>(
                     "GetNextToDoID guards against a null seed via ThrowIfNullOrEmpty"
                 );
+            store.Verify(s => s.Save(), Times.Never());
         }
 
         [TestMethod]
         public void GetNextToDoID_EmptySeed_ThrowsArgumentException()
         {
             // Arrange
-            var list = new IDList(new List<string>());
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string>(), store.Object);
 
             // Act
             Action act = () => list.GetNextToDoID(string.Empty);
@@ -107,14 +116,172 @@ namespace ToDoModel.Test
                 .Throw<ArgumentException>(
                     "GetNextToDoID guards against an empty seed via ThrowIfNullOrEmpty"
                 );
+            store.Verify(s => s.Save(), Times.Never());
         }
 
-        private static IDList CreateListWithCachedMaxLength(params string[] ids)
+        [TestMethod]
+        public void GetNextToDoID_FirstIdOnFreshList_AssignsLengthAndSavesOnce()
         {
-            var list = new IDList(new List<string>(ids));
-            _ = list.MaxLengthOfID;
+            // Arrange: a fresh list caches a maximum length of zero, so its first id persists.
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string>(), store.Object);
 
-            return list;
+            // Act
+            var result = list.GetNextToDoID("0001");
+
+            // Assert
+            result.Should().Be("02");
+            store.VerifySet(s => s[MaxLengthKey] = 2, Times.Once());
+            store.Verify(s => s.Save(), Times.Once());
+        }
+
+        [TestMethod]
+        public void GetNextToDoID_IdNotLongerThanCachedLength_DoesNotSaveAgain()
+        {
+            // Arrange: the first id "0100" caches length 4 and saves once.
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string>(), store.Object);
+            list.GetNextToDoID("ZZ").Should().Be("0100");
+
+            // Act: the next id "02" is shorter than the cached length.
+            var result = list.GetNextToDoID("0001");
+
+            // Assert
+            result.Should().Be("02");
+            store.VerifySet(s => s[MaxLengthKey] = 2, Times.Never());
+            store.Verify(s => s.Save(), Times.Once(), "a shorter id does not save");
+        }
+
+        [TestMethod]
+        public void GetNextToDoID_LongerIdAfterFirst_SavesAgain()
+        {
+            // Arrange: the first id "02" caches length 2 and saves once.
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string>(), store.Object);
+            list.GetNextToDoID("0001").Should().Be("02");
+
+            // Act: the next id "0100" is longer than the cached length.
+            var result = list.GetNextToDoID("ZZ");
+
+            // Assert
+            result.Should().Be("0100");
+            store.VerifySet(s => s[MaxLengthKey] = 4, Times.Once());
+            store.Verify(s => s.Save(), Times.Exactly(2), "a longer id saves again");
+        }
+
+        [TestMethod]
+        public void MaxLengthOfID_ColdCacheOnMixedLengthList_ReturnsLongestIdLength()
+        {
+            // Arrange: a list built from ids never calls GetNextToDoID, so the cache is zero.
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "02", "0100" }, store.Object);
+
+            // Act
+            var result = list.MaxLengthOfID;
+
+            // Assert
+            result.Should().Be(4, "the longest stored id is \"0100\"");
+        }
+
+        [TestMethod]
+        public void MaxLengthOfID_ColdCacheOnSecondDistinctList_ReturnsItsOwnLongestIdLength()
+        {
+            // Arrange: a second list evaluates the same Max lambda independently.
+            var first = new IDList(
+                new List<string> { "02", "0100" },
+                new Mock<ISettingsStore>().Object
+            );
+            var second = new IDList(
+                new List<string> { "02", "03", "04" },
+                new Mock<ISettingsStore>().Object
+            );
+
+            // Act
+            var firstResult = first.MaxLengthOfID;
+            var secondResult = second.MaxLengthOfID;
+
+            // Assert
+            firstResult.Should().Be(4);
+            secondResult.Should().Be(2, "every id in the second list has length 2");
+        }
+
+        [TestMethod]
+        public void MaxLengthOfID_WarmCacheAfterGetNextToDoID_ReturnsCachedLengthWithoutSaving()
+        {
+            // Arrange: GetNextToDoID("ZZ") yields "0100" and caches length 4 (one save).
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(new List<string> { "02" }, store.Object);
+            list.GetNextToDoID("ZZ").Should().Be("0100");
+
+            // Act
+            var result = list.MaxLengthOfID;
+
+            // Assert
+            result.Should().Be(4, "the warm cache holds the length of the produced id");
+            store.Verify(s => s.Save(), Times.Once(), "reading the length does not persist");
+        }
+
+        [TestMethod]
+        public void Constructor_EnumerableWithNullStore_ThrowsArgumentNullException()
+        {
+            // Arrange
+            Action act = () => new IDList(new List<string>(), null);
+
+            // Act / Assert
+            act.Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("settingsStore");
+        }
+
+        [TestMethod]
+        public void Constructor_NullStoreOnly_ThrowsArgumentNullException()
+        {
+            // Arrange
+            Action act = () => new IDList((ISettingsStore)null);
+
+            // Act / Assert
+            act.Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("settingsStore");
+        }
+
+        [TestMethod]
+        public void Constructor_StoreOnly_SavesThroughInjectedStore()
+        {
+            // Arrange
+            var store = new Mock<ISettingsStore>();
+            var list = new IDList(store.Object);
+
+            // Act
+            var result = list.GetNextToDoID("0001");
+
+            // Assert
+            result.Should().Be("02");
+            list.Should().ContainSingle().Which.Should().Be("02");
+            store.VerifySet(s => s[MaxLengthKey] = 2, Times.Once());
+            store.Verify(s => s.Save(), Times.Once());
+        }
+
+        [TestMethod]
+        public void Constructor_Default_UsesApplicationSettingsStore()
+        {
+            // Arrange
+            var field = typeof(IDList).GetField(
+                "_settingsStore",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+
+            // Act: read the default store without reading or writing any setting.
+            var store = field.GetValue(new IDList());
+
+            // Assert
+            store
+                .Should()
+                .BeOfType<ApplicationSettingsStore>(
+                    "existing constructors persist through ToDoModel's own settings"
+                );
         }
     }
 }

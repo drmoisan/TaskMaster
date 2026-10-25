@@ -12,6 +12,7 @@ using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TaskMaster.Properties;
+using TaskMaster.Test.AppGlobals;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
 
@@ -23,43 +24,39 @@ namespace TaskMaster.Test.Ribbon
     /// concrete <see cref="ApplicationGlobals"/> (<c>Globals</c>). To exercise the helpers without
     /// constructing the full Outlook-backed globals, an uninitialized <see cref="ApplicationGlobals"/>
     /// is created and its <c>_quickFilerSettings</c> field is set to a real
-    /// <see cref="AppQuickFilerSettings"/>; that settings object round-trips through
-    /// <see cref="Settings.Default"/>, which is snapshotted in <see cref="TestInitialize"/> and
-    /// restored in <see cref="TestCleanup"/> so the tests are independent and leave no machine
-    /// state mutated.
+    /// <see cref="AppQuickFilerSettings"/> over a per-test <see cref="InMemorySettingsStore"/>, so the
+    /// helpers read and save the fake and no shared settings instance or settings file is touched.
+    /// The class holds no other process-global state, so it runs in parallel.
     /// </summary>
-    [DoNotParallelize]
     [TestClass]
     public partial class RibbonControllerTests
     {
-        private bool _originalModeEnabled;
-        private double _originalThreshold;
-
-        [TestInitialize]
-        public void TestInitialize()
+        private static InMemorySettingsStore CreateStore(bool modeEnabled, double threshold)
         {
-            _originalModeEnabled = Settings.Default.HighConfidenceModeEnabled;
-            _originalThreshold = Settings.Default.HighConfidenceThreshold;
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            Settings.Default.HighConfidenceModeEnabled = _originalModeEnabled;
-            Settings.Default.HighConfidenceThreshold = _originalThreshold;
+            var store = new InMemorySettingsStore();
+            store[nameof(Settings.HighConfidenceModeEnabled)] = modeEnabled;
+            store[nameof(Settings.HighConfidenceThreshold)] = threshold;
+            return store;
         }
 
         /// <summary>
         /// Builds a RibbonController whose Globals is an uninitialized ApplicationGlobals carrying a
-        /// real AppQuickFilerSettings, so the high-confidence helpers read/write Settings.Default.
+        /// real AppQuickFilerSettings over a store seeded with the declared high-confidence defaults.
         /// </summary>
-        private static RibbonController CreateController()
+        private static RibbonController CreateController() =>
+            CreateController(CreateStore(modeEnabled: false, threshold: 0.9));
+
+        /// <summary>
+        /// Builds a RibbonController whose Globals is an uninitialized ApplicationGlobals carrying a
+        /// real AppQuickFilerSettings over <paramref name="store"/>.
+        /// </summary>
+        private static RibbonController CreateController(InMemorySettingsStore store)
         {
             var globals = (ApplicationGlobals)
                 FormatterServices.GetUninitializedObject(typeof(ApplicationGlobals));
             typeof(ApplicationGlobals)
                 .GetField("_quickFilerSettings", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(globals, new AppQuickFilerSettings());
+                .SetValue(globals, new AppQuickFilerSettings(store));
 
             var controller = new RibbonController();
             typeof(RibbonController)
@@ -76,49 +73,54 @@ namespace TaskMaster.Test.Ribbon
         public void IsHighConfidenceModeActive_ReturnsStoredValue()
         {
             // Arrange
-            Settings.Default.HighConfidenceModeEnabled = true;
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: true, threshold: 0.9);
+            var controller = CreateController(store);
 
             // Act
             var result = controller.IsHighConfidenceModeActive();
 
             // Assert
             result.Should().BeTrue();
+            store.SaveCount.Should().Be(0);
         }
 
         [TestMethod]
         public void ToggleHighConfidenceMode_FlipsStoredValue()
         {
             // Arrange
-            Settings.Default.HighConfidenceModeEnabled = false;
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: false, threshold: 0.9);
+            var controller = CreateController(store);
 
             // Act
             controller.ToggleHighConfidenceMode();
 
             // Assert
             controller.IsHighConfidenceModeActive().Should().BeTrue();
+            store[nameof(Settings.HighConfidenceModeEnabled)].Should().Be(true);
+            store.SaveCount.Should().Be(1);
         }
 
         [TestMethod]
         public void SetHighConfidenceModeForLaunch_True_EnablesMode()
         {
             // Arrange: start from the disabled state.
-            Settings.Default.HighConfidenceModeEnabled = false;
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: false, threshold: 0.9);
+            var controller = CreateController(store);
 
             // Act
             controller.SetHighConfidenceModeForLaunch(true);
 
             // Assert: the high-confidence launch path enables the mode.
             controller.IsHighConfidenceModeActive().Should().BeTrue();
+            store.SaveCount.Should().Be(1);
         }
 
         [TestMethod]
         public void StandardLaunchAfterHighConfidenceLaunch_DoesNotEnableMode()
         {
             // Arrange: simulate a prior high-confidence launch having enabled the mode.
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: false, threshold: 0.9);
+            var controller = CreateController(store);
             controller.SetHighConfidenceModeForLaunch(true);
 
             // Act: a subsequent standard launch (or release) resets the launch-scoped flag.
@@ -127,14 +129,15 @@ namespace TaskMaster.Test.Ribbon
             // Assert: the standard entry point does not inherit high-confidence mode, so it
             // never filters (AC6).
             controller.IsHighConfidenceModeActive().Should().BeFalse();
+            store.SaveCount.Should().Be(2, "each launch-mode assignment saves once");
         }
 
         [TestMethod]
         public void GetHighConfidenceThresholdText_ReturnsPercentageForm()
         {
             // Arrange: stored probability 0.9 should render as "90".
-            Settings.Default.HighConfidenceThreshold = 0.9;
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: false, threshold: 0.9);
+            var controller = CreateController(store);
 
             // Act
             var result = controller.GetHighConfidenceThresholdText();
@@ -147,41 +150,45 @@ namespace TaskMaster.Test.Ribbon
         public void SetHighConfidenceThresholdText_WithValidPercentage_PersistsProbability()
         {
             // Arrange
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: false, threshold: 0.9);
+            var controller = CreateController(store);
 
             // Act
             controller.SetHighConfidenceThresholdText("75");
 
             // Assert
-            Settings.Default.HighConfidenceThreshold.Should().Be(0.75);
+            store[nameof(Settings.HighConfidenceThreshold)].Should().Be(0.75);
+            store.SaveCount.Should().Be(1);
         }
 
         [TestMethod]
         public void SetHighConfidenceThresholdText_WithNonNumericInput_LeavesValueUnchanged()
         {
             // Arrange
-            Settings.Default.HighConfidenceThreshold = 0.9;
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: false, threshold: 0.9);
+            var controller = CreateController(store);
 
             // Act
             controller.SetHighConfidenceThresholdText("not-a-number");
 
             // Assert
-            Settings.Default.HighConfidenceThreshold.Should().Be(0.9);
+            store[nameof(Settings.HighConfidenceThreshold)].Should().Be(0.9);
+            store.SaveCount.Should().Be(0);
         }
 
         [TestMethod]
         public void SetHighConfidenceThresholdText_WithOutOfRangeInput_LeavesValueUnchanged()
         {
             // Arrange: 150% is out of the [0, 100] range.
-            Settings.Default.HighConfidenceThreshold = 0.9;
-            var controller = CreateController();
+            var store = CreateStore(modeEnabled: false, threshold: 0.9);
+            var controller = CreateController(store);
 
             // Act
             controller.SetHighConfidenceThresholdText("150");
 
             // Assert
-            Settings.Default.HighConfidenceThreshold.Should().Be(0.9);
+            store[nameof(Settings.HighConfidenceThreshold)].Should().Be(0.9);
+            store.SaveCount.Should().Be(0);
         }
 
         [TestMethod]

@@ -754,6 +754,8 @@
     <Compile Include="HelperClasses\FileSystem\SysImageListHelper.cs" />
     <Compile Include="HelperClasses\ParamArray.cs" />
     <Compile Include="HelperClasses\ReflectionHelper.cs" />
+    <Compile Include="HelperClasses\Settings\ApplicationSettingsStore.cs" />
+    <Compile Include="HelperClasses\Settings\ISettingsStore.cs" />
     <Compile Include="OutlookObjects\Fields\MAPIFields.cs" />
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapper.cs" />
     <Compile Include="OutlookObjects\Recipient\RecipientStatic.cs" />

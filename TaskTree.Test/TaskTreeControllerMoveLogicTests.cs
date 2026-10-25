@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Reflection;
 using BrightIdeasSoftware;
 using FluentAssertions;
@@ -32,17 +33,69 @@ namespace TaskTree.Test
         private static TaskTreeController MakeController(
             TreeOfToDoItems model,
             List<string> messages = null,
-            IDList idList = null
+            IDList idList = null,
+            Mock<ISettingsStore> settingsStore = null
         )
         {
             var viewer = new Mock<ITaskTreeForm>();
             var mockTD = new Mock<IToDoObjects>();
-            mockTD.Setup(x => x.IDList).Returns(idList ?? new IDList());
+            // A per-call mock store keeps IDList.GetNextToDoID off the per-host settings file.
+            var store = settingsStore ?? new Mock<ISettingsStore>();
+            mockTD
+                .Setup(x => x.IDList)
+                .Returns(idList ?? new IDList(new List<string>(), store.Object));
             var globals = new Mock<IApplicationGlobals>();
             globals.Setup(x => x.TD).Returns(mockTD.Object);
             System.Action<string> seam =
                 messages == null ? null : new System.Action<string>(messages.Add);
             return new TaskTreeController(globals.Object, viewer.Object, model, seam);
+        }
+
+        /// <summary>
+        /// Runs <paramref name="act"/> and counts the saves that
+        /// <c>ToDoModel.Properties.Settings.Default</c> raises on the calling thread. The settings
+        /// class is internal to ToDoModel, so it is resolved by reflection. Each counted save is
+        /// cancelled so nothing is persisted, saves raised by other threads are ignored, and the
+        /// handler is always removed.
+        /// </summary>
+        private static int CountToDoModelSettingsSavesOnCurrentThread(System.Action act)
+        {
+            var settingsType = typeof(IDList).Assembly.GetType("ToDoModel.Properties.Settings");
+            var settings = (ApplicationSettingsBase)
+                settingsType
+                    .GetProperty("Default", BindingFlags.Public | BindingFlags.Static)
+                    .GetValue(null);
+            var threadId = System.Environment.CurrentManagedThreadId;
+            var count = 0;
+            SettingsSavingEventHandler handler = (sender, e) =>
+            {
+                if (System.Environment.CurrentManagedThreadId == threadId)
+                {
+                    System.Threading.Interlocked.Increment(ref count);
+                    e.Cancel = true;
+                }
+            };
+
+            // SettingsSaving add and remove are not atomic; lock only the subscription statements
+            // so concurrent probes cannot lose a subscription while the action runs unserialized.
+            lock (settings)
+            {
+                settings.SettingsSaving += handler;
+            }
+
+            try
+            {
+                act();
+            }
+            finally
+            {
+                lock (settings)
+                {
+                    settings.SettingsSaving -= handler;
+                }
+            }
+
+            return System.Threading.Volatile.Read(ref count);
         }
 
         private static ModelDropEventArgs DropArgs(
@@ -233,19 +286,29 @@ namespace TaskTree.Test
             var messages = new List<string>();
             var model = new TreeOfToDoItems(new List<TreeNode<ToDoItem>> { target });
             var source = new Mock<ITreeVisual>();
-            var controller = MakeController(model, messages);
+            var settingsStore = new Mock<ISettingsStore>();
+            var controller = MakeController(model, messages, settingsStore: settingsStore);
 
             // Act
-            controller.MoveObjectsToChildren(
-                Mock.Of<ITreeVisual>(),
-                source.Object,
-                target,
-                new ArrayList { orphan }
+            var saves = CountToDoModelSettingsSavesOnCurrentThread(() =>
+                controller.MoveObjectsToChildren(
+                    Mock.Of<ITreeVisual>(),
+                    source.Object,
+                    target,
+                    new ArrayList { orphan }
+                )
             );
 
             // Assert
             messages.Should().ContainSingle().Which.Should().Contain("out of sync");
             source.Verify(t => t.RemoveObject(orphan), Times.Once);
+            saves
+                .Should()
+                .Be(
+                    0,
+                    "the test persisted settings to the shared per-host settings file through IDList"
+                );
+            settingsStore.Verify(s => s.Save(), Times.Once());
         }
 
         [TestMethod]

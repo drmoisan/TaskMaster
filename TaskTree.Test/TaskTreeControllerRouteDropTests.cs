@@ -37,7 +37,11 @@ namespace TaskTree.Test
         {
             var v = viewer ?? new Mock<ITaskTreeForm>();
             var mockTD = new Mock<IToDoObjects>();
-            mockTD.Setup(x => x.IDList).Returns(new IDList());
+            // A per-call mock store keeps IDList.GetNextToDoID off the per-host settings file.
+            var settingsStore = new Mock<ISettingsStore>();
+            mockTD
+                .Setup(x => x.IDList)
+                .Returns(new IDList(new List<string>(), settingsStore.Object));
             var globals = new Mock<IApplicationGlobals>();
             globals.Setup(x => x.TD).Returns(mockTD.Object);
             System.Action<string> seam =

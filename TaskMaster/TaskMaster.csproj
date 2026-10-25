@@ -408,6 +408,7 @@
     <Compile Include="AddInUtilities.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjects.cs" />
     <Compile Include="AppGlobals\AppAutoFileObjects.FolderPredictorLoad.cs" />
+    <Compile Include="AppGlobals\AppAutoFileObjects.ScalarSettings.cs" />
     <Compile Include="AppGlobals\AppEvents.cs" />
     <Compile Include="AppGlobals\AppEvents.ReadinessHookup.cs" />
     <Compile Include="AppGlobals\AppEvents.StoreRehook.cs" />
