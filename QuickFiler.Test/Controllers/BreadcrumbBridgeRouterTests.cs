@@ -138,6 +138,7 @@ namespace QuickFiler.Test.Controllers
             _navigated[0].Should().Contain("90%");
         }
 
+        /// <summary>#1007 S10: the double-click also commits the segment, so the last render is read.</summary>
         [TestMethod]
         public void SegmentDoubleClick_OnNonLeafSegment_CollapsesAndReRenders()
         {
@@ -147,8 +148,8 @@ namespace QuickFiler.Test.Controllers
             // Act: double-click the root segment of the suggestion row (row-1).
             Inbound("{\"type\":\"segmentDoubleClick\",\"rowId\":\"row-1\",\"segmentIndex\":0}");
 
-            // Assert: a row-scoped render fragment with the re-expand affordance was posted.
-            string render = _posted.Single(p => p.Contains("\"type\":\"render\""));
+            // Assert: the last render is row-scoped and carries the re-expand affordance.
+            string render = _posted.Last(p => p.Contains("\"type\":\"render\""));
             render.Should().Contain("\"rowId\":\"row-1\"");
             render.Should().Contain(JsonEscaped("data-role=\"reexpand\""));
             render.Should().NotContain(">Alpha<");
@@ -198,10 +199,8 @@ namespace QuickFiler.Test.Controllers
         }
 
         /// <summary>
-        /// #440 Efc Left: on a multi-segment row the Left arrow attempts the tree transition
-        /// first, moving the active segment exactly one step toward the root. The subsequent
-        /// expansion is keyed on the parent segment, which is only true when the active index
-        /// moved from the leaf to the segment immediately below it.
+        /// #1007 AC7: Left never selects a parent. On a non-expanded row it posts no render, and
+        /// the following toggle still expands the leaf, so the active segment did not move.
         /// </summary>
         [TestMethod]
         public void HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment()
@@ -209,72 +208,60 @@ namespace QuickFiler.Test.Controllers
             // Arrange: row-1 carries Inbox -> Projects -> Alpha with the leaf active after bind.
             Bind();
             _provider.Invocations.Clear();
+            int postedBefore = _posted.Count;
 
             // Act
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
+            _posted.Count.Should().Be(postedBefore, "Left on a non-expanded row is a no-op");
             Inbound("{\"type\":\"leafExpandToggle\",\"rowId\":\"row-1\"}");
 
             // Assert
             _provider.Verify(
                 p =>
                     p.GetImmediateSubfoldersAsync(
-                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == "Inbox\\Projects"),
+                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == LeafPath),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Once
             );
-            _provider.Verify(
-                p =>
-                    p.GetImmediateSubfoldersAsync(
-                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == LeafPath),
-                        It.IsAny<CancellationToken>()
-                    ),
-                Times.Never
-            );
         }
 
         /// <summary>
-        /// #440 Efc Left: repeated Left presses walk the active segment to the root, and the
-        /// press that ActivateSegment refuses falls through (decision D1) to the pre-existing
-        /// row.LeftArrow() collapse behavior.
+        /// #1007 AC7: the #440 Left walk and the Left segment hiding are removed, so repeated
+        /// Left presses on a selected non-expanded row post no row render and keep the selection.
         /// </summary>
         [TestMethod]
         public void HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior()
         {
             // Arrange
             Bind();
+            Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-1\"}");
+            string selected = _router.SelectedFolderPath;
 
-            // Act: two presses walk 2 -> 1 -> 0; the third is refused and falls through.
+            // Act
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
 
-            // Assert: only the third render carries the collapse (re-expand) affordance.
-            List<string> renders = _posted
+            // Assert
+            _posted
                 .Where(p => p.Contains("\"type\":\"render\"") && p.Contains("\"rowId\":\"row-1\""))
-                .ToList();
-            renders.Should().HaveCount(3);
-            renders[0].Should().NotContain(JsonEscaped("data-role=\"reexpand\""));
-            renders[1].Should().NotContain(JsonEscaped("data-role=\"reexpand\""));
-            renders[2].Should().Contain(JsonEscaped("data-role=\"reexpand\""));
-            renders[2].Should().NotContain(">Alpha<");
+                .Should()
+                .BeEmpty();
+            _router.SelectedFolderPath.Should().Be(selected);
         }
 
         /// <summary>
-        /// #440 Efc Right on a COLLAPSED row whose activated segment is a non-leaf parent: the
-        /// tree transition is attempted before row.ReExpand(), so exactly one
-        /// GetImmediateSubfoldersAsync call keyed on the active segment is issued and no
-        /// ResolveLeafKeyAsync call is added on the expansion path.
+        /// #1007 AC9: a double-click activates and shortens the row at Projects; Right then lists
+        /// the active segment's children through exactly one GetImmediateSubfoldersAsync call
+        /// keyed on that segment, and no ResolveLeafKeyAsync call is added on the expansion path.
         /// </summary>
         [TestMethod]
         public void HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall()
         {
-            // Arrange: collapse after segment 1, then activate segment 1. ActivateSegment leaves
-            // CollapsedAfterIndex untouched, so the row is still collapsed when Right arrives.
+            // Arrange: the double-click activates segment 1 and shortens the row there.
             Bind();
-            _provider.Invocations.Clear();
             Inbound("{\"type\":\"segmentDoubleClick\",\"rowId\":\"row-1\",\"segmentIndex\":1}");
-            Inbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-1\",\"segmentIndex\":1}");
             _provider.Invocations.Clear();
 
             // Act
@@ -296,10 +283,9 @@ namespace QuickFiler.Test.Controllers
         }
 
         /// <summary>
-        /// #440 Efc Right after the active segment is already expanded: the descent mechanism
-        /// chosen by decision D9 selects child index 0 through BreadcrumbRow.GetActiveChild(0).
-        /// When GetActiveChild(0) returns null the descent is unavailable and the decision-D1
-        /// fall-through runs, leaving the selection unchanged.
+        /// #1007 AC5, AC14: Right on an expanded row selects its first descendant with that
+        /// node's identity (the node is highlighted). When the expansion attached no child, the
+        /// row has no children, so Right leaves the selection unchanged.
         /// </summary>
         [TestMethod]
         public void HandleArrowKey_RightAfterExpansion_DescendsByChildActivation()
@@ -309,11 +295,12 @@ namespace QuickFiler.Test.Controllers
             Inbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-1\",\"segmentIndex\":1}");
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
 
-            // Act: the next Right descends to child index 0.
+            // Act: the next Right selects the first descendant.
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
 
             // Assert
             _router.SelectedFolderPath.Should().Be("Inbox\\Projects\\Alpha\\Kid");
+            _posted.Last().Should().Contain(JsonEscaped("aria-selected=\"true\""));
 
             // Arrange: same gesture where the active segment expands to no children at all.
             _provider
@@ -331,7 +318,7 @@ namespace QuickFiler.Test.Controllers
             // Act
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
 
-            // Assert: GetActiveChild(0) returned null, so the selection is unchanged.
+            // Assert: the zero-children expansion leaves no child to move to.
             _router.SelectedFolderPath.Should().Be("Inbox\\Projects");
         }
 
@@ -368,9 +355,8 @@ namespace QuickFiler.Test.Controllers
         }
 
         /// <summary>
-        /// #440 decision D2 (Efc boundaries): Left at the root and Right on a childless active
-        /// node remain silent no-ops. The childless early return in ExpandLeafAsync now tests the
-        /// ACTIVE segment rather than the leaf, and ActivateSegment's root refusal is unchanged.
+        /// #1007 AC7, AC6: Right on a childless active node and every Left on a non-expanded row
+        /// are silent no-ops (the #440 walk and the Left segment hiding are removed).
         /// </summary>
         [TestMethod]
         public void Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps()
@@ -393,16 +379,12 @@ namespace QuickFiler.Test.Controllers
             );
             _posted.Count.Should().Be(postedBeforeRight);
 
-            // Act: four Lefts walk the active node to the root and then collapse to the root.
-            for (int i = 0; i < 4; i++)
+            // Act + Assert: five Lefts post nothing at all.
+            for (int i = 0; i < 5; i++)
             {
                 Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
             }
-            int postedAfterWalk = _posted.Count;
-
-            // Act + Assert: the fifth Left is refused at the root and posts nothing.
-            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
-            _posted.Count.Should().Be(postedAfterWalk);
+            _posted.Count.Should().Be(postedBeforeRight);
         }
 
         /// <summary>

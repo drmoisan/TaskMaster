@@ -22,14 +22,22 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     {
         // --- State-transition sequences across multiple routed messages ---
 
+        /// <summary>
+        /// #1007 S5, AC9 (D-Q23): toggle open, toggle closed, shorten through the selector
+        /// double-click entry point, then the toggle lists the active segment's children and the row
+        /// stays shortened.
+        /// </summary>
         [TestMethod]
         public async Task Sequence_ExpandCollapseViaMessages_TransitionsDeterministically()
         {
             // Arrange
-            var router = await PopulatedRouterAsync(ProviderMock());
+            var provider = ProviderMock();
+            provider
+                .Setup(p => p.GetImmediateSubfoldersAsync(MidKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { Segment(Key("m1", MidChildPath), "Alpha", false) });
+            var router = await PopulatedRouterAsync(provider);
 
-            // Act + Assert stepwise: toggle open -> toggle closed -> double-click collapse ->
-            // toggle re-expands the collapsed chain.
+            // Act + Assert stepwise.
             (
                 await router.RouteAsync(
                     "{\"type\":\"affordanceToggle\",\"rowIndex\":0}",
@@ -50,17 +58,22 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .ContainSingle();
             router.Model.Rows[0].LeafExpanded.Should().BeFalse();
 
-            await router.RouteAsync(
-                "{\"type\":\"segmentDoubleClick\",\"rowIndex\":0,\"segmentIndex\":1}",
-                CancellationToken.None
-            );
+            router
+                .DoubleClickSelectorSegment(router.Model.Rows[0].Identity, 1)
+                .Handled.Should()
+                .BeTrue();
             router.Model.Rows[0].CollapsedAfterIndex.Should().Be(1);
 
-            await router.RouteAsync(
-                "{\"type\":\"affordanceToggle\",\"rowIndex\":0}",
-                CancellationToken.None
-            );
-            router.Model.Rows[0].CollapsedAfterIndex.Should().BeNull();
+            (
+                await router.RouteAsync(
+                    "{\"type\":\"affordanceToggle\",\"rowIndex\":0}",
+                    CancellationToken.None
+                )
+            )
+                .Should()
+                .HaveCount(2);
+            router.Model.Rows[0].LeafExpanded.Should().BeTrue();
+            router.Model.Rows[0].CollapsedAfterIndex.Should().Be(1);
         }
 
         [TestMethod]

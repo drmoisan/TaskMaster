@@ -71,6 +71,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// Host-issued descendant node identity for the descendant toggle and activate messages,
         /// or null for every other type. Optional so existing call sites compile unchanged.
         /// </param>
+        /// <param name="pageSize">
+        /// Fully visible row count measured by the page for the <c>PageUp</c> and <c>PageDown</c>
+        /// arrow keys (#1007), or null. Optional so existing call sites compile unchanged.
+        /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="rowId"/> is null.</exception>
         public BreadcrumbInboundMessage(
             string type,
@@ -78,7 +82,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             int? segmentIndex,
             int? childIndex,
             string? key,
-            string? nodeId = null
+            string? nodeId = null,
+            int? pageSize = null
         )
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
@@ -87,6 +92,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             ChildIndex = childIndex;
             Key = key;
             NodeId = nodeId;
+            PageSize = pageSize;
         }
 
         /// <summary>Message discriminator.</summary>
@@ -109,6 +115,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// and <see cref="BreadcrumbMessageTypes.DescendantActivate"/>; null otherwise.
         /// </summary>
         public string? NodeId { get; }
+
+        /// <summary>
+        /// Page size for the <c>PageUp</c> and <c>PageDown</c> arrow keys (#1007); null when the
+        /// page sent none. The router treats a missing or non-positive value as a logged no-op.
+        /// </summary>
+        public int? PageSize { get; }
     }
 
     /// <summary>

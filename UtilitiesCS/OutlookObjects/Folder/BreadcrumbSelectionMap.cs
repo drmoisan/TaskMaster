@@ -34,16 +34,40 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     ? value
                     : null;
             }
-            return RowValue(row);
+            return SelectedRowValue(model, row);
+        }
+
+        /// <summary>
+        /// The filing value of the selected row (#1007 S9): the active-segment folder for a
+        /// shortened or parent-activated suggestion row, converted under the same archive-root rule
+        /// as a descendant, or null when that folder is not a valid filing target; otherwise the
+        /// row's <see cref="RowValue"/>.
+        /// </summary>
+        internal static string? SelectedRowValue(BreadcrumbStateModel model, BreadcrumbStateRow row)
+        {
+            int? active = row.ActiveSegmentIndex;
+            if (!active.HasValue || active.Value >= row.Chain.Count - 1)
+            {
+                return RowValue(row);
+            }
+            return TryFolderValue(model, row.Chain[active.Value].FolderPath, out string value)
+                ? value
+                : null;
         }
 
         internal static bool TryDescendantValue(
             BreadcrumbStateModel model,
             BreadcrumbDescendantNode node,
             out string value
+        ) => TryFolderValue(model, node.Segment.FolderPath, out value);
+
+        private static bool TryFolderValue(
+            BreadcrumbStateModel model,
+            string folderPath,
+            out string value
         )
         {
-            value = node.Segment.FolderPath;
+            value = folderPath;
             if (model.ArchiveRoot == null)
             {
                 return true;

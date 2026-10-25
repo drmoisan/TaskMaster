@@ -70,7 +70,11 @@
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue1002Tests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterStaleCompletionIssue1002Tests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterTrashIssue1002Tests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue1007Tests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue1007Tests.Navigation.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue1007Tests.DoubleClick.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinatorIssue1007Tests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorSupersessionTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorLifecycleTests.cs" />
@@ -114,6 +118,7 @@
     <Compile Include="Viewers\BreadcrumbDropDownCoverageThresholdTests.cs" />
     <Compile Include="Controllers\QfcItemControllerBreadcrumbDropDownTests.cs" />
     <Compile Include="Viewers\FolderBreadcrumbAssetContractTests.cs" />
+    <Compile Include="Viewers\FolderBreadcrumbKeysIssue1007Tests.cs" />
     <Compile Include="Viewers\FolderBreadcrumbRecursiveAssetIssue997Tests.cs" />
     <Compile Include="Viewers\FolderBreadcrumbNestingIssue1002Tests.cs" />
     <Compile Include="Viewers\BreadcrumbDescendantActivationIssue997Tests.cs" />

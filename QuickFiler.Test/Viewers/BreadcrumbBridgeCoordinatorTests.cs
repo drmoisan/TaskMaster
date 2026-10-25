@@ -144,16 +144,16 @@ namespace QuickFiler.Test.Viewers
         }
 
         // --- Positive wiring ---
-
+        /// <summary>#1007 S5: the selector segment double-click posts the collapsed render.</summary>
         [TestMethod]
         public void InboundDoubleClick_PostsCollapsedRenderJson()
         {
             // Arrange
             var harness = CreateHarness();
-
+            string row = harness.Coordinator.CommittedIdentity.Replace("\\", "\\\\");
+            string json = "{\"type\":\"selectorSegmentDoubleClick\",\"rowIdentity\":\"" + row;
             // Act
-            harness.Receive("{\"type\":\"segmentDoubleClick\",\"rowIndex\":0,\"segmentIndex\":0}");
-
+            harness.Receive(json + "\",\"segmentIndex\":0}");
             // Assert (FR-3): the posted render payload shows the collapsed row.
             var render = harness.PostedMessages().OfType<RenderMessage>().Single();
             render.Rows[0].Collapsed.Should().BeTrue();
@@ -256,50 +256,50 @@ namespace QuickFiler.Test.Viewers
 
         // --- Edge events ---
 
+        /// <summary>#1007 AC6 (D-Q21): open-list Right on a leaf raises UnhandledArrow(Right) once.</summary>
         [TestMethod]
         public void UnhandledRightArrow_RaisesUnhandledArrowRight()
         {
-            // Arrange: leaf without subfolders -> Right cannot expand (legacy Pop Out fall-through).
+            // Arrange: leaf without subfolders, list open (a closed Right now opens the list, AC10).
             var harness = CreateHarness(leafHasChildren: false);
             var directions = new List<BreadcrumbArrowDirection>();
             harness.Coordinator.UnhandledArrow += (s, d) => directions.Add(d);
-
+            harness.Coordinator.OpenSelector();
             // Act
             harness.Receive("{\"type\":\"arrowKey\",\"direction\":\"right\"}");
-
             // Assert
             directions.Should().Equal(BreadcrumbArrowDirection.Right);
         }
 
+        /// <summary>#1007 AC10 (D-Q14): a closed Left is consumed and raises no UnhandledArrow.</summary>
         [TestMethod]
         public void UnhandledLeftArrow_RaisesUnhandledArrowLeft()
         {
-            // Arrange: nothing expanded -> Left cannot collapse (legacy close fall-through).
+            // Arrange: closed list, nothing expanded.
             var harness = CreateHarness();
             var directions = new List<BreadcrumbArrowDirection>();
             harness.Coordinator.UnhandledArrow += (s, d) => directions.Add(d);
-
-            // Act: the page-side report path is honored identically to the routed arrow path.
+            // Act: the page-side report path is decided identically to the routed arrow path.
             harness.Receive("{\"type\":\"unhandledArrow\",\"direction\":\"left\"}");
-
             // Assert
-            directions.Should().Equal(BreadcrumbArrowDirection.Left);
+            directions.Should().BeEmpty();
         }
 
+        /// <summary>#1007 AC10: a routed open-list Right raises one synthetic key; a closed Left none.</summary>
         [TestMethod]
         public void ArrowMessages_RaiseSyntheticFolderKeyDown()
         {
-            // Arrange
+            // Arrange: the list is open on the expandable leaf row.
             var harness = CreateHarness();
             var keys = new List<BreadcrumbArrowDirection>();
             harness.Coordinator.FolderArrowKeyDown += (s, d) => keys.Add(d);
-
-            // Act: a handled Right (expands) and an unhandled Left report.
+            harness.Coordinator.OpenSelector();
+            // Act: a routed Right (expands the pending row), Escape, then a closed Left report.
             harness.Receive("{\"type\":\"arrowKey\",\"direction\":\"right\"}");
+            harness.Coordinator.CancelSelector();
             harness.Receive("{\"type\":\"unhandledArrow\",\"direction\":\"left\"}");
-
-            // Assert: the synthetic key seam fires for every arrow message (FR-6).
-            keys.Should().Equal(BreadcrumbArrowDirection.Right, BreadcrumbArrowDirection.Left);
+            // Assert: only the routed arrow reaches the synthetic key seam (FR-6).
+            keys.Should().Equal(BreadcrumbArrowDirection.Right);
         }
 
         [TestMethod]

@@ -108,7 +108,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             var snapshot = await AcquireSnapshotAsync(cancellationToken).ConfigureAwait(false);
             var chain = FolderTreeSnapshotQueries.GetAncestorChain(snapshot, leafKey);
-            var mapped = MapNodes(chain);
+            var mapped = MapNodes(snapshot, chain);
 
             // The trim runs AFTER the snapshot walk and BEFORE the caller sees the chain, so row
             // order, banner placement and the trash pseudo-row are all untouched (#799 AC1, AC2).
@@ -178,7 +178,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             var snapshot = await AcquireSnapshotAsync(cancellationToken).ConfigureAwait(false);
             var children = snapshot.GetChildren(segmentKey);
-            return MapNodes(children);
+            return MapNodes(snapshot, children);
         }
 
         /// <inheritdoc />
@@ -283,19 +283,26 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         private static IReadOnlyList<FolderBreadcrumbSegment> MapNodes(
+            FolderTreeSnapshot snapshot,
             IReadOnlyList<FolderTreeSnapshotNode> nodes
         )
         {
-            return nodes.Select(MapNode).ToArray();
+            return nodes.Select(node => MapNode(snapshot, node)).ToArray();
         }
 
-        private static FolderBreadcrumbSegment MapNode(FolderTreeSnapshotNode node)
+        // #1007 AC14: HasChildren counts only the child keys that resolve in the snapshot, which
+        // is the set GetImmediateSubfoldersAsync returns. The raw ChildKeys count can include a
+        // reader-reported key whose folder is absent, which drew an expander with nothing below it.
+        private static FolderBreadcrumbSegment MapNode(
+            FolderTreeSnapshot snapshot,
+            FolderTreeSnapshotNode node
+        )
         {
             return new FolderBreadcrumbSegment(
                 node.Key,
                 node.DisplayName,
                 node.FolderPath,
-                node.ChildKeys.Count > 0
+                snapshot.GetChildren(node.Key).Count > 0
             );
         }
     }

@@ -64,7 +64,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <c>segmentIndex</c>; <c>renderedChildActivate</c> requires <c>childIndex</c>;
         /// <c>arrowKey</c> requires <c>key</c>; <c>descendantToggle</c> and
         /// <c>descendantActivate</c> require a non-empty string <c>nodeId</c>, exposed as
-        /// <see cref="BreadcrumbInboundMessage.NodeId"/>; every type requires <c>rowId</c>).
+        /// <see cref="BreadcrumbInboundMessage.NodeId"/>; every type requires <c>rowId</c>). An
+        /// optional integer <c>pageSize</c> (#1007) is exposed as
+        /// <see cref="BreadcrumbInboundMessage.PageSize"/>; a non-integer value is rejected.
         /// </summary>
         /// <param name="json">The raw JSON payload from the hosted document.</param>
         /// <returns>The validated inbound message.</returns>
@@ -141,7 +143,19 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 }
             }
 
-            return new BreadcrumbInboundMessage(type, rowId, segmentIndex, childIndex, key, nodeId);
+            // #1007: an optional page size for PageUp and PageDown; a non-integer fails through
+            // OptionalInt. Range checks belong to the router, which logs and ignores a bad value.
+            int? pageSize = OptionalInt(root, "pageSize");
+
+            return new BreadcrumbInboundMessage(
+                type,
+                rowId,
+                segmentIndex,
+                childIndex,
+                key,
+                nodeId,
+                pageSize
+            );
         }
 
         private static bool IsKnownInboundType(string type)

@@ -651,10 +651,13 @@
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouter.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouter.Descendants.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouter.SearchPresentation.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouter.Navigation.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionMap.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSession.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSession.Descendants.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSession.Highlight.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSession.Tree.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbVisibleOrder.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectorMessages.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowIdentity.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjection.cs" />

@@ -12,7 +12,8 @@
     viewMode: "collapsed",
     isOpen: false,
     committedIdentity: null,
-    pendingIdentity: null
+    pendingIdentity: null,
+    pendingNodeIdentity: null
   };
 
   function post(msg) {
@@ -72,8 +73,13 @@
     return child && child.folderPath === state.selectedFolder ? child : null;
   }
 
-  function rowHasOpenAffordance(row) {
-    return row.cells.some(function (cell) { return cell.kind === "plus"; });
+  function lastSegmentIndex(row) {
+    // The terminal segment is the row's own folder; clicking it still commits (#1007 D-Q27).
+    var last = -1;
+    row.cells.forEach(function (cell) {
+      if (cell.kind === "segment") { last = cell.segmentIndex; }
+    });
+    return last;
   }
 
   function makeCell(row, cell) {
@@ -83,9 +89,16 @@
       element.className = cell.truncationEligible ? "seg trunc" : "seg";
       element.textContent = cell.text;
       element.title = cell.text;
+      element.addEventListener("click", function (event) {
+        // #1007 D-Q27: in the open list a non-leaf segment moves only the pending highlight.
+        if (state.isOpen && state.viewMode === "expanded" && row.isSelectable && cell.segmentIndex !== lastSegmentIndex(row)) {
+          event.stopPropagation();
+          post({ type: "selectorHighlight", identity: row.identity });
+        }
+      });
       element.addEventListener("dblclick", function (event) {
         event.stopPropagation();
-        post({ type: "segmentDoubleClick", rowIndex: row.rowIndex, segmentIndex: cell.segmentIndex });
+        post({ type: "selectorSegmentDoubleClick", rowIdentity: row.identity, segmentIndex: cell.segmentIndex });
       });
     } else if (cell.kind === "arrow") {
       element = document.createElement("span");
@@ -148,9 +161,12 @@
     subs.className = "subs";
     children.forEach(function (child, index) {
       var subfolderElement = document.createElement("div");
-      var active = selectedChildOwnsActive && child.selected;
+      // #1007 AC1, AC4: a pending descendant named by the host owns the active option.
+      var active = state.pendingNodeIdentity !== null
+        ? row.identity === state.pendingIdentity && child.identity === state.pendingNodeIdentity
+        : selectedChildOwnsActive && child.selected;
       subfolderElement.id = "folder-option-" + row.rowIndex + "-node-" + child.identity;
-      subfolderElement.className = active ? "sub selected active" : "sub";
+      subfolderElement.className = active ? (child.selected ? "sub selected active" : "sub active") : "sub";
       subfolderElement.setAttribute("role", "option");
       subfolderElement.setAttribute("aria-selected", String(active));
       subfolderElement.setAttribute("data-depth", String(depth));
@@ -161,6 +177,7 @@
       name.textContent = child.displayName;
       name.title = child.folderPath;
       subfolderElement.appendChild(name);
+      var loadedEmpty = child.childrenLoaded === true && Array.isArray(child.children) && child.children.length === 0;
       if (child.hasChildren) {
         var toggle = document.createElement("span");
         toggle.className = "aff";
@@ -178,7 +195,10 @@
         toggle.addEventListener("keydown", function (event) {
           if (event.key === "Enter" || event.key === " ") { toggleDescendant(event); }
         });
-        subfolderElement.appendChild(toggle);
+        // #1007 AC14: no affordance on a child whose completed fetch returned zero children.
+        if (!loadedEmpty) {
+          subfolderElement.appendChild(toggle);
+        }
       }
 
       function activateSubfolder(event) {
@@ -220,9 +240,10 @@
     list.removeAttribute("aria-activedescendant");
 
     visibleRows().forEach(function (row) {
-      var selectedChildOwnsActive =
+      var pendingNodeOwnsActive = state.pendingNodeIdentity !== null && row.identity === state.pendingIdentity;
+      var selectedChildOwnsActive = state.pendingNodeIdentity === null &&
         selectedChildForRow(row) !== null && row.identity === state.pendingIdentity && hasSelectedDescendant(row.subfolders);
-      var rowElement = makeRow(row, activeRowIndex, selectedChildOwnsActive);
+      var rowElement = makeRow(row, activeRowIndex, selectedChildOwnsActive || pendingNodeOwnsActive);
       list.appendChild(rowElement);
       if (rowElement.classList.contains("active")) {
         activeRow = rowElement;
@@ -249,15 +270,9 @@
   }
 
   function onArrow(direction) {
-    // #440: the C# router owns the Left/Right tree transitions and reports unhandledArrow itself
-    // when none applies, so the page must not pre-filter a suggestion row by its view state.
-    var row = selectedRow();
-    var can =
-      row !== null &&
-      (row.isSuggestion || row.collapsed || row.leafExpanded || rowHasOpenAffordance(row));
-    post(can
-      ? { type: "arrowKey", direction: direction }
-      : { type: "unhandledArrow", direction: direction });
+    // #1007 S6: C# decides every Left and Right against the pending entry, so the page never
+    // pre-filters by the committed row.
+    post({ type: "arrowKey", direction: direction });
   }
 
   function hasSelectedDescendant(children) {
@@ -266,17 +281,44 @@
     });
   }
 
+  function fullyVisibleCount(rects, top, bottom) {
+    // #1007 S3, D-Q17: a page is the number of rows fully inside the list, at least one.
+    var count = rects.filter(function (rect) { return rect.top >= top && rect.bottom <= bottom; }).length;
+    return Math.max(1, count);
+  }
+
+  function visiblePageSize() {
+    var bounds = list.getBoundingClientRect();
+    var entries = Array.prototype.slice.call(list.querySelectorAll(".row"))
+      .concat(Array.prototype.slice.call(list.querySelectorAll(".sub")));
+    var rects = entries.map(function (entry) { return entry.getBoundingClientRect(); });
+    return fullyVisibleCount(rects, bounds.top, bounds.bottom);
+  }
+
   var selectorKeys = {
     ArrowUp: "up",
     ArrowDown: "down",
     Enter: "enter",
-    Escape: "escape"
+    Escape: "escape",
+    Home: "home",
+    End: "end",
+    PageUp: "pageup",
+    PageDown: "pagedown"
   };
 
   function handleKeyDown(event) {
+    if (event.key === "ArrowLeft" && event.ctrlKey) {
+      event.preventDefault();
+      post({ type: "selectorKey", key: "parent" });
+      return;
+    }
     if (Object.prototype.hasOwnProperty.call(selectorKeys, event.key)) {
       event.preventDefault();
-      post({ type: "selectorKey", key: selectorKeys[event.key] });
+      var message = { type: "selectorKey", key: selectorKeys[event.key] };
+      if (event.key === "PageUp" || event.key === "PageDown") {
+        message.pageSize = visiblePageSize();
+      }
+      post(message);
       return;
     }
 
@@ -331,6 +373,7 @@
         state.isOpen = msg.isOpen === true;
         state.committedIdentity = msg.committedIdentity || null;
         state.pendingIdentity = msg.pendingIdentity || null;
+        state.pendingNodeIdentity = typeof msg.pendingNodeIdentity === "string" ? msg.pendingNodeIdentity : null;
         state.options = Array.isArray(msg.options) ? msg.options : [];
         document.documentElement.setAttribute("data-mode", state.viewMode);
         document.documentElement.setAttribute("data-view-mode", state.viewMode);

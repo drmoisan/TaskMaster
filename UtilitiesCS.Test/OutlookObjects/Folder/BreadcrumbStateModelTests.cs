@@ -320,10 +320,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         // --- #440 Qfc tree navigation ---
 
         /// <summary>
-        /// #440 Qfc Left: on a multi-segment row Left selects the row's parent node before any
-        /// pre-existing view transition is considered (decision D1). The parent is proven to be
-        /// the selected node because a following Right expands it even though the leaf segment
-        /// carries no expansion affordance of its own.
+        /// #1007 AC7: Left never selects a parent. On a non-expanded multi-segment row it is a
+        /// no-op (unhandled), the active segment stays the leaf and the row is not shortened.
         /// </summary>
         [TestMethod]
         public void LeftArrow_QfcMultiSegmentRow_SelectsParentNode()
@@ -334,37 +332,32 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Act
             var handled = model.LeftArrow();
 
-            // Assert: the tree transition handled the key without collapsing the view.
-            handled.Should().BeTrue("Left selects the parent node before the pre-existing path");
+            // Assert
+            handled.Should().BeFalse("the #440 parent walk is removed");
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2, "the leaf stays active");
             model.SelectedRow.CollapsedAfterIndex.Should().BeNull();
             model.SelectedRow.LeafExpanded.Should().BeFalse();
-
-            // Assert: the selected node is the parent, not the leaf.
-            model.RightArrow().Should().BeTrue("the selected parent node carries children");
-            model.SelectedRow.LeafExpanded.Should().BeTrue();
         }
 
         /// <summary>
-        /// #440 Qfc Right: once the selected parent node is expanded and its children are
-        /// attached, the next Right descends into child index 0.
+        /// #1007 AC9 (R3): Right on a row shortened at its active segment (Inbox -&gt; Projects [+])
+        /// expands that segment and keeps the row shortened.
         /// </summary>
         [TestMethod]
         public void RightArrow_QfcSelectedParentNode_ExpandsIntoChildren()
         {
-            // Arrange: select the parent node, expand it, and attach one child.
+            // Arrange: activate Projects and shorten the row there.
             var model = ModelWithSuggestion();
-            model.LeftArrow();
-            model.RightArrow();
-            model.SelectedRow.SetSubfolders(
-                new[] { Segment("kid", "\\Inbox\\Projects\\Kid", "Kid", false) }
-            );
+            model.SelectedRow.ActivateSegment(1).Should().BeTrue();
+            model.SelectedRow.CollapseAfter(1);
 
             // Act
             var handled = model.RightArrow();
 
             // Assert
-            handled.Should().BeTrue("the descent transition selects the first child");
-            model.SelectedSubfolderIndex.Should().Be(0);
+            handled.Should().BeTrue("the anchored segment's children are listed");
+            model.SelectedRow.LeafExpanded.Should().BeTrue();
+            model.SelectedRow.CollapsedAfterIndex.Should().Be(1, "the row stays shortened");
         }
 
         /// <summary>

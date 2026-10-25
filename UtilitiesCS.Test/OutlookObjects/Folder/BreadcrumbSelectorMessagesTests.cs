@@ -54,11 +54,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             Property<string>(parsed, "Type").Should().Be("selectorToggle");
         }
 
+        /// <summary>Every supported selector key round-trips; #1007 AC8 and AC11 add Parent, Home, End and the page keys.</summary>
         [DataTestMethod]
         [DataRow("Up")]
         [DataRow("Down")]
         [DataRow("Enter")]
         [DataRow("Escape")]
+        [DataRow("Parent")]
+        [DataRow("Home")]
+        [DataRow("End")]
+        [DataRow("PageUp")]
+        [DataRow("PageDown")]
         public void SelectorKeyMessage_RoundTripsOnlySupportedKeys(string keyName)
         {
             // Arrange
@@ -73,6 +79,45 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             // Assert
             Property(parsed, "Key").ToString().Should().Be(keyName);
+        }
+
+        /// <summary>#1007 AC11: a page key carries the fully visible row count; other keys carry none.</summary>
+        [TestMethod]
+        public void SelectorKeyMessage_PageSize_RoundTrips()
+        {
+            // Arrange
+            var paged = new BreadcrumbSelectorKeyMessage(BreadcrumbSelectorKey.PageDown, 7);
+            var plain = new BreadcrumbSelectorKeyMessage(BreadcrumbSelectorKey.Home);
+
+            // Act
+            var parsedPaged = (BreadcrumbSelectorKeyMessage)Parse(Serialize(paged));
+            var parsedPlain = (BreadcrumbSelectorKeyMessage)Parse(Serialize(plain));
+
+            // Assert
+            parsedPaged.Key.Should().Be(BreadcrumbSelectorKey.PageDown);
+            parsedPaged.PageSize.Should().Be(7);
+            parsedPlain.PageSize.Should().BeNull();
+        }
+
+        /// <summary>#1007 AC4: the view message carries the pending descendant node identity.</summary>
+        [TestMethod]
+        public void ViewMessage_PendingNodeIdentity_RoundTrips()
+        {
+            // Arrange
+            var message = new BreadcrumbSelectorViewMessage(
+                BreadcrumbSelectorViewMode.Expanded,
+                true,
+                "folder-a",
+                "folder-b",
+                "node-1"
+            );
+
+            // Act
+            var parsed = (BreadcrumbSelectorViewMessage)Parse(Serialize(message));
+
+            // Assert
+            parsed.PendingIdentity.Should().Be("folder-b");
+            parsed.PendingNodeIdentity.Should().Be("node-1");
         }
 
         [TestMethod]
@@ -305,6 +350,63 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             {
                 ex.InnerException!.Message.Should().ContainEquivalentOf(expected);
             }
+        }
+
+        /// <summary>#1007 AC9 (S5): the segment double-click carries the row identity and segment index.</summary>
+        [TestMethod]
+        public void SegmentDoubleClickMessage_RoundTripsRowIdentityAndSegmentIndex()
+        {
+            // Arrange
+            var message = new BreadcrumbSelectorSegmentDoubleClickMessage("row-a", 1);
+
+            // Act
+            var parsed = (BreadcrumbSelectorSegmentDoubleClickMessage)Parse(Serialize(message));
+
+            // Assert
+            parsed.Type.Should().Be("selectorSegmentDoubleClick");
+            parsed.RowIdentity.Should().Be("row-a");
+            parsed.SegmentIndex.Should().Be(1);
+        }
+
+        /// <summary>#1007 AC9 (D-Q27): the open-list highlight carries the row identity.</summary>
+        [TestMethod]
+        public void HighlightMessage_RoundTripsIdentity()
+        {
+            // Arrange
+            var message = new BreadcrumbSelectorHighlightMessage("row-b");
+
+            // Act
+            var parsed = (BreadcrumbSelectorHighlightMessage)Parse(Serialize(message));
+
+            // Assert
+            parsed.Type.Should().Be("selectorHighlight");
+            parsed.Identity.Should().Be("row-b");
+        }
+
+        /// <summary>#1007 S5: invalid double-click and highlight payloads are rejected explicitly.</summary>
+        [TestMethod]
+        public void Parse_SegmentDoubleClickWithNegativeIndex_RejectsExplicitly()
+        {
+            // Arrange
+            const string Negative =
+                "{\"type\":\"selectorSegmentDoubleClick\",\"rowIdentity\":\"row-a\",\"segmentIndex\":-1}";
+            const string Blank =
+                "{\"type\":\"selectorSegmentDoubleClick\",\"rowIdentity\":\" \",\"segmentIndex\":0}";
+            Action blankHighlight = () => new BreadcrumbSelectorHighlightMessage(" ");
+            Action blankRow = () => new BreadcrumbSelectorSegmentDoubleClickMessage(" ", 0);
+            Action negativeIndex = () =>
+                new BreadcrumbSelectorSegmentDoubleClickMessage("row-a", -1);
+
+            // Act / Assert
+            AssertParseFormatException(Negative, "segmentIndex");
+            AssertParseFormatException(Blank, "rowIdentity");
+            AssertParseFormatException(
+                "{\"type\":\"selectorHighlight\",\"identity\":\"\"}",
+                "identity"
+            );
+            blankHighlight.Should().Throw<ArgumentException>();
+            blankRow.Should().Throw<ArgumentException>();
+            negativeIndex.Should().Throw<ArgumentOutOfRangeException>();
         }
 
         private static object Parse(string json) =>

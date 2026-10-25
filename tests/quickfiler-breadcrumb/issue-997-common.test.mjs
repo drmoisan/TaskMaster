@@ -84,7 +84,8 @@ test("row cells retain literal names, title, truncation and host percentage", ()
   assert.equal(browser.list.querySelector(".pct").textContent, "custom 17%");
   const event = browser.dispatch(segment, "dblclick");
   assert.equal(event.propagationStopped, true);
-  assert.deepEqual(browser.messages, [{ type: "segmentDoubleClick", rowIndex: 0, segmentIndex: 0 }]);
+  // Issue 1007 S5: the double-click travels on the selector channel with the row identity.
+  assert.deepEqual(browser.messages, [{ type: "selectorSegmentDoubleClick", rowIdentity: "row-a", segmentIndex: 0 }]);
 });
 
 for (const kind of ["plus", "minus"]) {
@@ -154,7 +155,8 @@ for (const [key, direction] of [["ArrowLeft", "left"], ["ArrowRight", "right"]])
       show(browser, type === "empty" ? [] : [row]);
       const event = browser.dispatch(browser.list, "keydown", { key });
       assert.equal(event.defaultPrevented, true);
-      assert.deepEqual(browser.messages, [{ type: ["plain", "empty"].includes(type) ? "unhandledArrow" : "arrowKey", direction }]);
+      // Issue 1007 S6: the page no longer pre-filters; C# decides for every state.
+      assert.deepEqual(browser.messages, [{ type: "arrowKey", direction }]);
     });
   }
 }

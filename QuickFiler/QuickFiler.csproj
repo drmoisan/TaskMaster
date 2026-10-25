@@ -306,6 +306,7 @@
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Arrows.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Selection.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Descendants.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouter.Navigation.cs" />
     <Compile Include="Controllers\BreadcrumbOutboundQueue.cs" />
     <Compile Include="Controllers\EfcSelectionGuard.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
@@ -425,6 +426,7 @@
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.Descendants.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinator.Keyboard.cs" />
     <Compile Include="Viewers\FolderBreadcrumbDocument.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.Search.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.Suggestions.cs" />

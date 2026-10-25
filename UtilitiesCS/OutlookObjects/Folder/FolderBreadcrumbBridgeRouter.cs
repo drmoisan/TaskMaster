@@ -307,8 +307,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 switch (message)
                 {
                     case SegmentDoubleClickMessage m:
-                        RowAt(m.RowIndex).CollapseAfter(m.SegmentIndex);
-                        return new[] { RenderJson() };
+                        return IgnoreBridgeSegmentDoubleClick(m);
                     case AffordanceToggleMessage m:
                         return await ToggleAsync(m.RowIndex, cancellationToken)
                             .ConfigureAwait(false);
