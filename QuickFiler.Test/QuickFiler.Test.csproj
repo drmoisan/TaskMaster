@@ -75,6 +75,7 @@
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue1007Tests.DoubleClick.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorIssue1007Tests.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinatorIssue1007Tests.Unhandled.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorSupersessionTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorLifecycleTests.cs" />

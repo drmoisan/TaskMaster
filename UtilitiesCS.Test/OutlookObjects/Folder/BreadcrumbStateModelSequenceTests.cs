@@ -87,7 +87,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         /// children and keeps the row shortened; a second Right is unhandled.
         /// </summary>
         [TestMethod]
-        public void RightArrow_OnCollapsedRow_ReExpandsBeforeLeafExpansion()
+        public void RightArrow_OnRowShortenedAtActiveSegment_ExpandsAndStaysShortened()
         {
             // Arrange: Inbox becomes the active segment and the shortened terminal.
             var model = ModelWithSuggestion();
@@ -99,6 +99,28 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             model.SelectedRow.LeafExpanded.Should().BeTrue();
             model.SelectedRow.CollapsedAfterIndex.Should().Be(0);
             model.RightArrow().Should().BeFalse();
+        }
+
+        /// <summary>
+        /// #1007 R3, N-1 (D3): Right on a row collapsed away from its active segment (the leaf
+        /// stays active while the public <c>CollapseAfter</c> hides it) restores the full chain and
+        /// does not open the leaf expansion.
+        /// </summary>
+        [TestMethod]
+        public void RightArrow_OnRowCollapsedAwayFromActiveSegment_RestoresChain()
+        {
+            // Arrange: the leaf (index 2) stays active while the row is collapsed after Inbox.
+            var model = ModelWithSuggestion();
+            model.SelectedRow.CollapseAfter(0);
+
+            // Act
+            bool handled = model.RightArrow();
+
+            // Assert
+            handled.Should().BeTrue();
+            model.SelectedRow.CollapsedAfterIndex.Should().BeNull("the full chain is restored");
+            model.SelectedRow.LeafExpanded.Should().BeFalse("the leaf expansion is not opened");
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2);
         }
 
         [TestMethod]
@@ -162,7 +184,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         /// row. The active index is asserted after every press so the boolean alone cannot pass.
         /// </summary>
         [TestMethod]
-        public void LeftArrow_RepeatedOnThreeSegmentChain_WalksToRootThenReportsUnhandled()
+        public void LeftArrow_RepeatedOnNonExpandedChain_IsUnhandledAndKeepsLeafActive()
         {
             // Arrange
             var model = ModelWithSuggestion();
@@ -182,7 +204,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         /// leaf stays active) and the second Left is unhandled.
         /// </summary>
         [TestMethod]
-        public void LeftArrow_WalkFromAnOpenLeafExpansion_ClearsTheExpansionAndStillReachesTheRoot()
+        public void LeftArrow_FromOpenLeafExpansion_CollapsesThenIsUnhandled()
         {
             // Arrange
             var model = ModelWithSuggestion();

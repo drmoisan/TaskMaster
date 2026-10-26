@@ -18,7 +18,7 @@ namespace QuickFiler.Test.Viewers
     /// Archive &gt; Clients &gt; Beta (no children). Events are recorded in raise order.
     /// </summary>
     [TestClass]
-    public sealed class BreadcrumbBridgeCoordinatorIssue1007Tests
+    public sealed partial class BreadcrumbBridgeCoordinatorIssue1007Tests
     {
         private const string Projects = @"\Archive\Projects";
         private const string Alpha = Projects + @"\Alpha";

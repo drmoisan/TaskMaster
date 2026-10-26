@@ -9,7 +9,8 @@ namespace QuickFiler.Test.Viewers
     /// Issue #1007 string contracts for the QFC page script embedded in
     /// <see cref="FolderBreadcrumbDocument.Html"/>. CI runs no node suite, so each test twins a
     /// test in <c>tests/quickfiler-breadcrumb/issue-1007-keys.test.mjs</c>; these verify the script
-    /// text is present and correctly shaped, not that it executes in a browser.
+    /// text is present and correctly shaped, not that it executes in a browser. The class also pins
+    /// the stylesheet rule that draws the pending descendant the script marks <c>sub active</c>.
     /// </summary>
     [TestClass]
     public sealed class FolderBreadcrumbKeysIssue1007Tests
@@ -136,6 +137,77 @@ namespace QuickFiler.Test.Viewers
                 .MatchRegex(
                     @"(?s)if\s*\(!loadedEmpty\)\s*\{\s*subfolderElement\.appendChild\(toggle\);\s*\}"
                 );
+        }
+
+        /// <summary>
+        /// Issue #1007 AC4, B-1: the QFC stylesheet draws a pending descendant (<c>.sub.active</c>)
+        /// with the selection colours of a committed subfolder (<c>.sub.selected</c>). Without the
+        /// rule, the pending highlight disappears once it moves onto a subfolder. Only the
+        /// <c>style</c> block is searched, so the script's <c>"sub active"</c> string cannot satisfy it.
+        /// </summary>
+        [TestMethod]
+        public void Stylesheet_StylesPendingDescendantLikeSelectedSubfolder()
+        {
+            // Arrange
+            string stylesheet = Stylesheet();
+
+            // Act
+            string selectedRule = RuleDeclarations(
+                stylesheet,
+                ".sub.selected",
+                "the QFC stylesheet must style the committed subfolder (.sub.selected)"
+            );
+            string pendingRule = RuleDeclarations(
+                stylesheet,
+                ".sub.active",
+                "the QFC stylesheet must style the pending descendant (.sub.active)"
+            );
+
+            // Assert: the positive control first, then the pending rule.
+            selectedRule.Should().Contain("var(--bc-sel-back)").And.Contain("var(--bc-sel-fore)");
+            pendingRule
+                .Should()
+                .Contain(
+                    "var(--bc-sel-back)",
+                    "the QFC stylesheet must style the pending descendant (.sub.active)"
+                )
+                .And.Contain(
+                    "var(--bc-sel-fore)",
+                    "the QFC stylesheet must style the pending descendant (.sub.active)"
+                );
+        }
+
+        private static string Stylesheet()
+        {
+            Match match = Regex.Match(Html, @"<style>(?<css>.*?)</style>", Options);
+            match.Success.Should().BeTrue("the QFC document must carry a style block");
+            return match.Groups["css"].Value;
+        }
+
+        // Returns the declaration block of the innermost rule whose selector list names the
+        // selector exactly, or fails with the supplied reason when no rule names it.
+        private static string RuleDeclarations(string stylesheet, string selector, string reason)
+        {
+            string declarations = null;
+            foreach (
+                Match rule in Regex.Matches(
+                    stylesheet,
+                    @"(?<selectors>[^{}]+)\{(?<body>[^{}]*)\}",
+                    Options
+                )
+            )
+            {
+                foreach (string candidate in rule.Groups["selectors"].Value.Split(','))
+                {
+                    if (candidate.Trim() == selector)
+                    {
+                        declarations = rule.Groups["body"].Value;
+                    }
+                }
+            }
+
+            declarations.Should().NotBeNull(reason);
+            return declarations;
         }
 
         private static string FunctionBody(string functionName, string nextFunctionName)

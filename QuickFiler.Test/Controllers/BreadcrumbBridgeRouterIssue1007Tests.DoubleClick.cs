@@ -148,6 +148,32 @@ namespace QuickFiler.Test.Controllers
             VerifyFetched(fixture, Acme, Times.Never());
         }
 
+        /// <summary>
+        /// Issue #1007 R3, N-1: the [+] (<c>leafExpandToggle</c>) on a row collapsed away from its
+        /// active segment restores the full chain without listing children, like Right does.
+        /// </summary>
+        [TestMethod]
+        public async Task LeafExpandToggle_OnRowCollapsedAwayFromActiveSegment_RestoresChain()
+        {
+            // Arrange: the double-click at Acme shortens the row; activating Clients moves the
+            // active segment away from the collapse point.
+            var fixture = await ThreeSegmentAsync();
+            await DoubleClickAsync(fixture, 1);
+            await fixture.Router.ProcessInboundAsync(
+                "{\"type\":\"segmentActivate\",\"rowId\":\"row-0\",\"segmentIndex\":0}"
+            );
+
+            // Act
+            await ExpandAsync(fixture, "row-0");
+
+            // Assert
+            fixture
+                .LatestRender()
+                .Should()
+                .Contain("data-segment-index=\"2\"", "Beta is shown again");
+            VerifyFetched(fixture, Acme, Times.Never());
+        }
+
         // Binds Clients\Acme\Beta with the chain Clients > Acme > Beta and Acme's children.
         private static async Task<EfcDescendantRouterFixture> ThreeSegmentAsync()
         {

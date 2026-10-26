@@ -203,7 +203,7 @@ namespace QuickFiler.Test.Controllers
         /// the following toggle still expands the leaf, so the active segment did not move.
         /// </summary>
         [TestMethod]
-        public void HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment()
+        public void HandleArrowKey_LeftOnNonExpandedMultiSegmentRow_IsNoOpAndKeepsLeafActive()
         {
             // Arrange: row-1 carries Inbox -> Projects -> Alpha with the leaf active after bind.
             Bind();
@@ -231,7 +231,7 @@ namespace QuickFiler.Test.Controllers
         /// Left presses on a selected non-expanded row post no row render and keep the selection.
         /// </summary>
         [TestMethod]
-        public void HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior()
+        public void HandleArrowKey_RepeatedLeftOnNonExpandedRow_PostsNoRenderAndKeepsSelection()
         {
             // Arrange
             Bind();
@@ -288,7 +288,7 @@ namespace QuickFiler.Test.Controllers
         /// row has no children, so Right leaves the selection unchanged.
         /// </summary>
         [TestMethod]
-        public void HandleArrowKey_RightAfterExpansion_DescendsByChildActivation()
+        public void HandleArrowKey_RightOnExpandedRow_SelectsFirstDescendantUnlessNoChildren()
         {
             // Arrange: activate the non-leaf parent, then expand it.
             Bind();
