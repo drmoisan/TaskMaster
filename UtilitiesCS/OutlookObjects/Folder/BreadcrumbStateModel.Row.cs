@@ -197,10 +197,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         /// <summary>
         /// True when the ACTIVE node carries the expansion affordance. Identical to
-        /// <see cref="LeafHasSubfolders"/> while the row is leaf-anchored (#440).
+        /// <see cref="LeafHasSubfolders"/> while the row is leaf-anchored (#440); a row shortened at
+        /// its active segment keeps the affordance (#1007 R3).
         /// </summary>
         public bool ActiveSegmentHasSubfolders =>
-            IsSuggestion && CollapsedAfterIndex == null && ActiveSegment?.HasChildren == true;
+            IsSuggestion
+            && (CollapsedAfterIndex == null || CollapsedAfterIndex == ActiveSegmentIndex)
+            && ActiveSegment?.HasChildren == true;
 
         /// <summary>
         /// Selects the non-leaf node at <paramref name="segmentIndex"/> (#440). Refuses plain

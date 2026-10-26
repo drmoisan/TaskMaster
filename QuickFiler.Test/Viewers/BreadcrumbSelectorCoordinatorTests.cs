@@ -120,11 +120,11 @@ namespace QuickFiler.Test.Viewers
             selections.Should().Be(0);
         }
 
+        /// <summary>#1007 AC10 (D-Q14): a closed Left is consumed and raises neither event.</summary>
         [TestMethod]
         public void ExistingLeftAndRightMessages_StillForwardOnce()
         {
-            // Arrange
-            Harness harness = CreateHarness();
+            Harness harness = CreateHarness(); // Arrange
             int synthetic = 0;
             int unhandled = 0;
             harness.Coordinator.FolderArrowKeyDown += (sender, direction) => synthetic++;
@@ -139,8 +139,8 @@ namespace QuickFiler.Test.Viewers
             harness.Coordinator.LastDispatch.GetAwaiter().GetResult();
 
             // Assert
-            synthetic.Should().Be(1);
-            unhandled.Should().Be(1);
+            synthetic.Should().Be(0);
+            unhandled.Should().Be(0);
         }
 
         [TestMethod]

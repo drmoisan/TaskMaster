@@ -130,6 +130,40 @@ namespace UtilitiesCS.OutlookObjects.Folder
             BreadcrumbRowIdentity.Disambiguate(identity, _rows);
 
         /// <summary>
+        /// The visible order (#1007): each selectable row entry followed by its shown descendant
+        /// nodes in pre-order.
+        /// </summary>
+        internal List<BreadcrumbVisiblePosition> VisiblePositions()
+        {
+            var order = new List<BreadcrumbVisiblePosition>();
+            for (int index = 0; index < _rows.Count; index++)
+            {
+                BreadcrumbStateRow row = _rows[index];
+                if (!row.IsSelectable)
+                {
+                    continue;
+                }
+                var root = row.LeafExpanded ? row.DescendantRoot : null;
+                bool zeroLoaded = root != null && root.Loaded && root.Children.Count == 0;
+                order.Add(
+                    new BreadcrumbVisiblePosition(
+                        index,
+                        null,
+                        null,
+                        -1,
+                        row.ActiveSegmentHasSubfolders && !zeroLoaded,
+                        row.LeafExpanded
+                    )
+                );
+                if (root != null)
+                {
+                    BreadcrumbVisibleOrder.AppendNodes(index, root.Children, null, 0, order);
+                }
+            }
+            return order;
+        }
+
+        /// <summary>
         /// Selects the row at <paramref name="index"/> (or -1 to clear the selection) and resets any
         /// subfolder selection.
         /// </summary>
@@ -178,10 +212,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         /// <summary>
-        /// Right-arrow transition on the selected row: re-expands a collapsed chain, else opens the
-        /// leaf expansion when the affordance is available. Returns false when nothing changed so the
-        /// caller can report an unhandled arrow (FR-6 legacy fall-through). A successful leaf
-        /// expansion still requires the caller to fetch and attach subfolders.
+        /// Right-arrow transition on the selected row (#1007, D-Q4): expands the active segment
+        /// when its affordance is available. A row shortened at its active segment keeps its
+        /// shape and lists that segment's children (R3, D-Q23); a collapse anchored elsewhere is
+        /// restored as before. Returns false when nothing changed so the caller can report an
+        /// unhandled arrow (FR-6 legacy fall-through). A successful expansion still requires the
+        /// caller to fetch and attach subfolders.
         /// </summary>
         public bool RightArrow()
         {
@@ -190,79 +226,39 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 return false;
             }
-            // #440: attempt the tree transition first (decision D1 handling order).
-            if (TryRightTreeTransition(row))
-            {
-                return true;
-            }
-            if (row.CollapsedAfterIndex != null)
-            {
-                row.ReExpand();
-                return true;
-            }
-            return row.TryExpandLeaf();
+            return Expand(row);
         }
 
-        /// <summary>
-        /// #440 Right tree transition. Available only once a non-leaf node has been selected:
-        /// expands that node when its expansion is closed, and otherwise descends into child
-        /// index 0 of the fetched subfolders. Returns false when no transition applies, so the
-        /// caller falls through to the pre-existing behavior.
-        /// </summary>
-        private bool TryRightTreeTransition(BreadcrumbStateRow row)
+        /// <summary>Applies the Right expansion rule to <paramref name="row"/> (#1007 R3).</summary>
+        internal static bool Expand(BreadcrumbStateRow row)
         {
-            int? activeIndex = row.ActiveSegmentIndex;
-            if (!activeIndex.HasValue || activeIndex.Value >= row.Chain.Count - 1)
+            if (
+                row.CollapsedAfterIndex != null
+                && row.CollapsedAfterIndex != row.ActiveSegmentIndex
+            )
             {
-                return false; // Leaf-anchored: no node has been selected yet.
-            }
-            if (!row.LeafExpanded)
-            {
-                // The collapse is cleared as PART of the transition, because the expansion of the
-                // selected node is not visible while downstream segments are hidden.
                 row.ReExpand();
-                return row.TryExpandActiveSegment();
+                return true;
             }
-            if (row.GetActiveChild(0) == null)
-            {
-                return false; // Nothing to descend into.
-            }
-
-            SelectSubfolder(0);
-            return true;
+            return row.TryExpandActiveSegment();
         }
 
         /// <summary>
-        /// Left-arrow transition on the selected row: closes an open leaf expansion. Returns false
-        /// when nothing changed so the caller can report an unhandled arrow (FR-6 legacy fall-through).
+        /// Left-arrow transition on the selected row: closes an open expansion and never selects a
+        /// parent (#1007 AC7, D-Q9). A subfolder selection hidden by the collapse moves to its
+        /// nearest visible ancestor, the row itself. Returns false when nothing changed so the
+        /// caller can report an unhandled arrow (FR-6 legacy fall-through).
         /// </summary>
         public bool LeftArrow()
         {
             var row = SelectedRow;
-            if (row == null)
+            if (row == null || !row.TryCollapseLeaf())
             {
                 return false;
             }
-            // #440: attempt the tree transition first (decision D1 handling order). Each press
-            // selects the parent of the currently active node, so repeated Left walks the ancestor
-            // chain to the root. No index test is needed here: ActivateSegment refuses a negative
-            // index, which is what preserves the root boundary and the pre-existing fall-through.
-            // While a child of the open expansion is selected, no parent-select is available.
-            int? activeIndex = row.ActiveSegmentIndex;
-            if (
-                _selectedSubfolderIndex < 0
-                && activeIndex.HasValue
-                && row.ActivateSegment(activeIndex.Value - 1)
-            )
-            {
-                return true;
-            }
-            if (_selectedSubfolderIndex >= 0)
-            {
-                _selectedSubfolderIndex = -1;
-                SelectedDescendant = null;
-            }
-            return row.TryCollapseLeaf();
+            _selectedSubfolderIndex = -1;
+            SelectedDescendant = null;
+            return true;
         }
     }
 }

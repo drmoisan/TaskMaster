@@ -154,12 +154,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 }
 
                 bool isCollapsedTerminal = row.IsCollapsed && i == visible.Count - 1;
-                if (isCollapsedTerminal)
+                // Plus to the LEFT of the now-terminal segment; #1007 AC9: a row shortened at its
+                // active segment shows minus there while that segment's children are shown, and
+                // AC14: nothing after a fetch that returned no child.
+                bool anchoredOpen = row.IsAnchoredCollapse && row.IsLeafExpanded;
+                if (isCollapsedTerminal && !(anchoredOpen && row.HasNoLoadedChildren))
                 {
-                    // Re-expand plus to the LEFT of the now-terminal segment.
-                    sb.Append(
-                        "<span class=\"affordance reexpand\" data-role=\"reexpand\">+</span>"
-                    );
+                    sb.Append("<span class=\"affordance reexpand\" data-role=\"reexpand\">")
+                        .Append(anchoredOpen ? "&#8722;" : "+")
+                        .Append("</span>");
                 }
 
                 AppendSegment(sb, visible[i], i, i < row.Segments.Count - 1);
@@ -196,7 +199,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
         private static void AppendLeafAffordance(StringBuilder sb, BreadcrumbRow row)
         {
             // Emitted only when the active segment has subfolders: plus collapsed, minus expanded.
-            if (row.ActiveSegment?.HasSubfolders != true)
+            // #1007 AC14: a fetch that stored zero children leaves no affordance.
+            if (row.ActiveSegment?.HasSubfolders != true || row.HasNoLoadedChildren)
             {
                 return;
             }
@@ -276,7 +280,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 sb.Append("><span class=\"name\">")
                     .Append(WebUtility.HtmlEncode(node.Segment.DisplayName))
                     .Append("</span>");
-                if (node.Segment.HasChildren)
+                // #1007 AC14: a loaded node with zero children carries no affordance.
+                if (node.Segment.HasChildren && !(node.Loaded && node.Children.Count == 0))
                 {
                     sb.Append(
                             "<span class=\"affordance node\" data-role=\"node\" role=\"button\" tabindex=\"0\" aria-expanded=\""

@@ -205,6 +205,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
         }
 
+        /// <summary>
+        /// #1007 S5: the bridge-channel segment double-click is a logged no-op; the QFC double-click
+        /// moved to the selector channel so it can commit and close.
+        /// </summary>
         [TestMethod]
         public async Task Route_SegmentDoubleClick_ProducesCollapsedRenderPayload()
         {
@@ -217,21 +221,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 CancellationToken.None
             );
 
-            // Assert (FR-3): collapsed row renders plus + terminal segment only.
-            outputs.Should().ContainSingle();
-            var render = (RenderMessage)BreadcrumbBridgeSerializer.Parse(outputs[0]);
-            render.Rows[0].Collapsed.Should().BeTrue();
-            render
-                .Rows[0]
-                .Cells.Should()
-                .SatisfyRespectively(
-                    plus => plus.Kind.Should().Be(BreadcrumbCellKind.Plus),
-                    segment =>
-                    {
-                        segment.Kind.Should().Be(BreadcrumbCellKind.Segment);
-                        segment.Text.Should().Be("Inbox");
-                    }
-                );
+            // Assert: no output and no shortening.
+            outputs.Should().BeEmpty();
+            router.Model.Rows[0].CollapsedAfterIndex.Should().BeNull();
         }
 
         [TestMethod]
@@ -364,24 +356,20 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Be(BreadcrumbArrowDirection.Right);
         }
 
+        /// <summary>
+        /// #1007 AC7: the #440 walk is removed, so the first Left on a closed list with nothing
+        /// expanded has nothing to collapse and is reported unhandled.
+        /// </summary>
         [TestMethod]
         public async Task Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft()
         {
-            // Arrange: #440 Left walks the ancestor chain, so on this three-segment fixture two
-            // presses are needed to reach the root. Only once the root is active does nothing
-            // remain to collapse and no further tree transition apply.
+            // Arrange
             var router = await PopulatedRouterAsync(ProviderMock());
-            var firstPress = await ArrowAsync(router, "left");
-            var secondPress = await ArrowAsync(router, "left");
 
             // Act
             var outputs = await ArrowAsync(router, "left");
 
             // Assert
-            firstPress.Should().ContainSingle();
-            BreadcrumbBridgeSerializer.Parse(firstPress[0]).Should().BeOfType<RenderMessage>();
-            secondPress.Should().ContainSingle();
-            BreadcrumbBridgeSerializer.Parse(secondPress[0]).Should().BeOfType<RenderMessage>();
             outputs.Should().ContainSingle();
             ((UnhandledArrowMessage)BreadcrumbBridgeSerializer.Parse(outputs[0]))
                 .Direction.Should()
@@ -440,27 +428,27 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
 
         /// <summary>
-        /// #440 Qfc Left is routed as the parent-select tree transition rather than reported as an
-        /// unhandled arrow, and the node the router subsequently expands is the parent.
+        /// #1007 AC7: Qfc Left on a multi-segment row no longer selects the parent; it is reported
+        /// unhandled, and the following Right still expands the LEAF, not the parent.
         /// </summary>
         [TestMethod]
         public async Task ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition()
         {
             // Arrange
-            var provider = ParentSubfolderProviderMock();
+            var provider = ProviderMock();
             var router = await PopulatedRouterAsync(provider);
 
             // Act
             var left = await ArrowAsync(router, "left");
             var right = await ArrowAsync(router, "right");
 
-            // Assert: Left produced a render, not an unhandled-arrow fall-through.
+            // Assert: Left is the unhandled-arrow fall-through.
             left.Should().ContainSingle();
-            BreadcrumbBridgeSerializer.Parse(left[0]).Should().BeOfType<RenderMessage>();
+            BreadcrumbBridgeSerializer.Parse(left[0]).Should().BeOfType<UnhandledArrowMessage>();
 
-            // Assert: the expansion that follows is keyed on the selected PARENT node.
+            // Assert: the expansion that follows is keyed on the leaf.
             provider.Verify(
-                p => p.GetImmediateSubfoldersAsync(MidKey, It.IsAny<CancellationToken>()),
+                p => p.GetImmediateSubfoldersAsync(LeafKey, It.IsAny<CancellationToken>()),
                 Times.Once()
             );
             right.Should().HaveCount(2);
@@ -471,25 +459,28 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         /// <summary>
-        /// #440 Qfc Right on the already-expanded selected parent node descends into child index 0,
-        /// which the router reports through the selected-folder value of its render payload.
+        /// #1007 AC9 (R3): Qfc Right on a row shortened at its active segment (Projects) expands that
+        /// segment through one query keyed on it, and the row stays shortened.
         /// </summary>
         [TestMethod]
         public async Task ArrowAsync_QfcRightOnSelectedParentNode_RoutesChildExpansion()
         {
-            // Arrange: select the parent node and expand it.
+            // Arrange: activate Projects and shorten the row there.
             var provider = ParentSubfolderProviderMock();
             var router = await PopulatedRouterAsync(provider);
-            await ArrowAsync(router, "left");
-            await ArrowAsync(router, "right");
+            router.Model.Rows[0].ActivateSegment(1).Should().BeTrue();
+            router.Model.Rows[0].CollapseAfter(1);
 
             // Act
             var outputs = await ArrowAsync(router, "right");
 
             // Assert
-            outputs.Should().ContainSingle();
-            BreadcrumbBridgeSerializer.Parse(outputs[0]).Should().BeOfType<RenderMessage>();
-            router.GetSelectedFolder().Should().Be(MidChildPath);
+            outputs.Should().HaveCount(2);
+            provider.Verify(
+                p => p.GetImmediateSubfoldersAsync(MidKey, It.IsAny<CancellationToken>()),
+                Times.Once()
+            );
+            router.Model.Rows[0].CollapsedAfterIndex.Should().Be(1);
         }
     }
 }

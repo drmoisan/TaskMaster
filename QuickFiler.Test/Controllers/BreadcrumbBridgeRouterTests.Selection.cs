@@ -154,26 +154,31 @@ namespace QuickFiler.Test.Controllers
             _posted.Should().NotContain(p => p.Contains("\"type\":\"focusSearch\""));
         }
 
+        /// <summary>
+        /// #1007 AC9 (D-Q23): after a double-click shortens the row at Inbox, the [+] lists Inbox's
+        /// children through one provider query keyed on that segment, and the hidden trailing
+        /// segment stays hidden (the former restore of the full breadcrumb is removed).
+        /// </summary>
         [TestMethod]
         public void LeafExpandToggle_OnCollapsedRow_ReExpandsWithoutProviderQuery()
         {
-            // Arrange: collapse the row first.
+            // Arrange: shorten the row at segment 0 first.
             Bind();
             Inbound("{\"type\":\"segmentDoubleClick\",\"rowId\":\"row-1\",\"segmentIndex\":0}");
 
-            // Act: the affordance now re-expands the full breadcrumb.
+            // Act: the affordance lists the shortened segment's children.
             Inbound("{\"type\":\"leafExpandToggle\",\"rowId\":\"row-1\"}");
 
             // Assert
             _provider.Verify(
                 p =>
                     p.GetImmediateSubfoldersAsync(
-                        It.IsAny<FolderTreeNodeKey>(),
+                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == "Inbox"),
                         It.IsAny<CancellationToken>()
                     ),
-                Times.Never
+                Times.Once
             );
-            _posted.Last(p => p.Contains("\"type\":\"render\"")).Should().Contain(">Alpha<");
+            _posted.Last(p => p.Contains("\"type\":\"render\"")).Should().NotContain(">Alpha<");
         }
 
         [TestMethod]
@@ -201,6 +206,10 @@ namespace QuickFiler.Test.Controllers
                 .Contain(JsonEscaped("data-role=\"leaf\">+</span>"));
         }
 
+        /// <summary>
+        /// #1007 AC5, AC9 (D-Q23): Right on a row shortened at Inbox lists Inbox's children through
+        /// one provider query and keeps the trailing segment hidden.
+        /// </summary>
         [TestMethod]
         public void ArrowKeyRight_WhenCollapsed_ReExpandsWithoutProviderQuery()
         {
@@ -215,14 +224,18 @@ namespace QuickFiler.Test.Controllers
             _provider.Verify(
                 p =>
                     p.GetImmediateSubfoldersAsync(
-                        It.IsAny<FolderTreeNodeKey>(),
+                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == "Inbox"),
                         It.IsAny<CancellationToken>()
                     ),
-                Times.Never
+                Times.Once
             );
-            _posted.Last(p => p.Contains("\"type\":\"render\"")).Should().Contain(">Alpha<");
+            _posted.Last(p => p.Contains("\"type\":\"render\"")).Should().NotContain(">Alpha<");
         }
 
+        /// <summary>
+        /// An unknown arrow key is a logged no-op. #1007 AC11 makes Home a supported key, so the
+        /// test uses Insert, which stays unknown.
+        /// </summary>
         [TestMethod]
         public void ArrowKey_UnknownKey_IsLoggedNoOp()
         {
@@ -231,7 +244,7 @@ namespace QuickFiler.Test.Controllers
             int postedBefore = _posted.Count;
 
             // Act
-            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Home\"}");
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Insert\"}");
 
             // Assert: no state change and no outbound payloads.
             _posted.Count.Should().Be(postedBefore);

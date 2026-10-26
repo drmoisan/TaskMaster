@@ -157,27 +157,6 @@ namespace QuickFiler.Viewers
         /// <summary>Starts a pending selector session without changing the committed selection.</summary>
         public bool OpenSelector() => ApplyTransition(_router.OpenSelector());
 
-        /// <summary>
-        /// Applies native combo-box key semantics: closed arrows commit, open arrows move pending,
-        /// Enter commits the pending identity, and Escape restores the opening identity.
-        /// </summary>
-        public bool HandleSelectorKey(BreadcrumbSelectorKey key)
-        {
-            switch (key)
-            {
-                case BreadcrumbSelectorKey.Up:
-                    return MoveSelector(previous: true);
-                case BreadcrumbSelectorKey.Down:
-                    return MoveSelector(previous: false);
-                case BreadcrumbSelectorKey.Enter:
-                    return CommitSelector();
-                case BreadcrumbSelectorKey.Escape:
-                    return CancelSelector();
-                default:
-                    return false;
-            }
-        }
-
         /// <summary>Commits a row activated by stable identity and closes an open session.</summary>
         public bool ActivateSelector(string identity) =>
             ApplyTransition(_router.ActivateSelector(identity));
@@ -263,7 +242,8 @@ namespace QuickFiler.Viewers
                     BreadcrumbSelectorViewMode.Collapsed,
                     state.IsOpen,
                     state.CommittedIdentity,
-                    state.PendingIdentity
+                    state.PendingIdentity,
+                    state.PendingNodeIdentity
                 )
             );
             var options = state
@@ -313,6 +293,10 @@ namespace QuickFiler.Viewers
             if (IsSelectorMessage(json))
             {
                 await _dispatcher.Dispatch(() => HandleSelectorMessage(json)).ConfigureAwait(false);
+                return;
+            }
+            if (await TryDispatchOpenArrowAsync(json).ConfigureAwait(false))
+            {
                 return;
             }
 
@@ -371,7 +355,7 @@ namespace QuickFiler.Viewers
                         }
                         break;
                     case BreadcrumbSelectorKeyMessage key:
-                        HandleSelectorKey(key.Key);
+                        HandleSelectorKeyCore(key.Key, key.PageSize);
                         break;
                     case BreadcrumbSelectorActivationMessage activation:
                         ActivateSelector(activation.Identity);
@@ -383,6 +367,9 @@ namespace QuickFiler.Viewers
                                 subfolderActivation.SubfolderIndex
                             )
                         );
+                        break;
+                    case BreadcrumbSelectorMessage click:
+                        HandleSelectorClick(click);
                         break;
                 }
             }

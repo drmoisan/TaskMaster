@@ -18,9 +18,19 @@ namespace QuickFiler.Controllers
         {
             if (!row.ActivateSegment(segmentIndex))
             {
-                log.Error(
-                    $"Breadcrumb segment activation rejected for row '{row.RowId}' and index '{segmentIndex}'."
-                );
+                // #1007 S10: the first click of a double-click already activated the segment, so
+                // the second click's rejection is expected and logged at debug level only.
+                string message =
+                    $"Breadcrumb segment activation rejected for row '{row.RowId}' and index '{segmentIndex}'.";
+                if (row.ActiveSegmentIndex == segmentIndex)
+                {
+                    log.Debug(message + " The segment is already active.");
+                }
+                else
+                {
+                    log.Error(message);
+                }
+
                 return;
             }
 
@@ -89,6 +99,22 @@ namespace QuickFiler.Controllers
 
             row.TrySelectDescendant(null); // A whole-row selection highlights no descendant.
             CommitSelection(row, selection);
+        }
+
+        /// <summary>
+        /// #1007: selects a row entry of the visible order. A row whose active segment is the leaf
+        /// selects as a click does; a shortened or parent-activated row selects its active segment.
+        /// </summary>
+        private void SelectRowEntry(BreadcrumbRow row)
+        {
+            BreadcrumbSegment? active = row.ActiveSegment;
+            if (active == null || row.ActiveSegmentIndex == row.Segments.Count - 1)
+            {
+                SelectRow(row);
+                return;
+            }
+
+            SelectHierarchyPath(row, active.FullPath);
         }
 
         /// <summary>

@@ -12,6 +12,8 @@ class Element {
     this.parentElement = null;
     this.focusCount = 0;
     this.scrolls = [];
+    // Issue 1007: layout stub for page-size measurement; a test assigns `rect` per element.
+    this.rect = { top: 0, bottom: 0 };
     this._text = "";
     this.classList = { contains: (name) => this.className.split(/\s+/).includes(name) };
   }
@@ -55,6 +57,7 @@ class Element {
   querySelector(selector) { return this.querySelectorAll(selector)[0] || null; }
   focus() { this.focusCount++; this.document.activeElement = this; }
   scrollIntoView(options) { this.scrolls.push(options); }
+  getBoundingClientRect() { return { top: this.rect.top, bottom: this.rect.bottom }; }
 }
 
 export function createBrowser(source, options = {}) {

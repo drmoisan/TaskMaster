@@ -10,13 +10,17 @@ namespace QuickFiler.Controllers
     /// <summary>
     /// Arrow-key and leaf-expansion members of the breadcrumb bridge router, relocated from
     /// <c>BreadcrumbBridgeRouter.cs</c> so that neither part of the type exceeds the 500-line
-    /// file limit. Behavior is unchanged by the relocation.
+    /// file limit. Right and Left follow the #1007 decision table over the visible order: Right
+    /// expands an entry with children or moves to its first child; Left collapses an expanded
+    /// entry and never selects a parent (the #440 walk and the Left segment hiding are removed).
     /// </summary>
     public sealed partial class BreadcrumbBridgeRouter
     {
         private async Task HandleLeafToggleAsync(BreadcrumbRow row)
         {
-            if (row.IsCollapsed)
+            // R3: only a collapse that hides the active segment is restored; a row shortened at
+            // its active segment expands that segment instead (AC9, D-Q23).
+            if (row.IsCollapsed && !row.IsAnchoredCollapse)
             {
                 if (row.ReExpand())
                 {
@@ -28,137 +32,118 @@ namespace QuickFiler.Controllers
 
             if (row.IsLeafExpanded)
             {
-                if (row.ToggleLeafExpanded())
-                {
-                    PostRowRender(row);
-                }
-
+                CollapseRowLeaf(row);
                 return;
             }
 
             await ExpandLeafAsync(row);
         }
 
-        private async Task HandleArrowKeyAsync(BreadcrumbRow row, string key)
+        private async Task HandleArrowKeyAsync(BreadcrumbRow row, string key, int? pageSize)
         {
             switch (key)
             {
                 case "Right":
-                    // #440: attempt the tree transition first. It is available only on a row
-                    // whose ACTIVE segment is an attached non-leaf with subfolders; otherwise the
-                    // decision-D1 fall-through to the pre-existing behavior runs unchanged.
-                    if (await TryRightTreeTransitionAsync(row))
-                    {
-                        break;
-                    }
-
-                    if (row.IsCollapsed)
-                    {
-                        if (row.ReExpand())
-                        {
-                            PostRowRender(row);
-                        }
-                    }
-                    else if (!row.IsLeafExpanded)
-                    {
-                        await ExpandLeafAsync(row);
-                    }
-
+                    await HandleRightAsync(row);
                     break;
                 case "Left":
-                    // #440: attempt the tree transition first — move the active segment exactly
-                    // one step toward the root. ActivateSegment refuses at the root, on a
-                    // non-suggestion row, and where no key is attached, and the decision-D1
-                    // fall-through to the pre-existing collapse behavior then runs unchanged.
-                    if (
-                        row.ActiveSegmentIndex.HasValue
-                        && row.ActivateSegment(row.ActiveSegmentIndex.Value - 1)
-                    )
-                    {
-                        PostRowRender(row);
-                        break;
-                    }
-
-                    if (row.LeftArrow())
-                    {
-                        PostRowRender(row);
-                    }
-
+                    HandleLeft(row);
                     break;
-                case "Up":
-                    HandleUpArrow(row);
-                    break;
-                case "Down":
-                    MoveSelection(row, step: 1);
+                case "ParentLeft":
+                    HandleParentLeft(row);
                     break;
                 default:
-                    log.Error($"Unknown breadcrumb arrow key '{key}' for row '{row.RowId}'.");
+                    // #1007: Up, Down, Home, End and the page keys walk the visible order; the
+                    // Navigation partial logs and ignores every other key.
+                    HandleVerticalKey(row, key, pageSize);
                     break;
             }
         }
 
         /// <summary>
-        /// #440 Right tree transition. Expands the active non-leaf segment when it is not yet
-        /// expanded, clearing any collapse as PART of the transition because
-        /// <see cref="BreadcrumbRow.ToggleLeafExpanded"/> is a no-op while the row is collapsed;
-        /// once expanded, descends by activating child index 0 (decision D9). Returns false when
-        /// no transition is available, in which case the caller runs the pre-existing behavior.
+        /// Right (AC5, AC6): an entry with children that is not expanded is expanded; an expanded
+        /// entry moves to its first child; an entry without children, or a node whose fetch is
+        /// still in flight, is left alone.
         /// </summary>
-        private async Task<bool> TryRightTreeTransitionAsync(BreadcrumbRow row)
+        private async Task HandleRightAsync(BreadcrumbRow row)
         {
-            int? activeIndex = row.ActiveSegmentIndex;
-            if (
-                row.Kind != BreadcrumbRowKind.Suggestion
-                || !activeIndex.HasValue
-                || activeIndex.Value >= row.Segments.Count - 1
-                || row.ActiveSegmentKey == null
-                || row.ActiveSegment?.HasSubfolders != true
-            )
-            {
-                return false;
-            }
-
-            if (!row.IsLeafExpanded)
+            if (row.IsCollapsed && !row.IsAnchoredCollapse)
             {
                 if (row.ReExpand())
                 {
                     PostRowRender(row);
                 }
 
-                await ExpandLeafAsync(row);
-                return true;
-            }
-
-            BreadcrumbSegment? child = row.GetActiveChild(0);
-            if (child == null)
-            {
-                return false; // Nothing to descend into: decision-D1 fall-through.
-            }
-
-            SelectHierarchyPath(row, child.FullPath);
-            return true;
-        }
-
-        private void HandleUpArrow(BreadcrumbRow row)
-        {
-            BreadcrumbRow? previous = FindSelectable(IndexOf(row) - 1, step: -1);
-            if (previous == null)
-            {
-                // Up at the top row: hand focus back to the search box.
-                PostOutbound(new BreadcrumbFocusSearchMessage());
-                FocusSearchRequested?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
-            SelectRow(previous);
+            List<BreadcrumbVisiblePosition> order = VisibleOrder();
+            int index = PositionOf(order, row);
+            if (index < 0 || !order[index].HasChildren)
+            {
+                return;
+            }
+
+            BreadcrumbVisiblePosition position = order[index];
+            if (!position.IsExpanded)
+            {
+                if (position.IsRowEntry)
+                {
+                    await ExpandLeafAsync(row);
+                }
+                else
+                {
+                    await HandleDescendantToggleAsync(row, position.NodeId!);
+                }
+
+                return;
+            }
+
+            // An expanded entry's first child directly follows it in pre-order at a greater
+            // depth; a node whose fetch is in flight has no child there yet.
+            int next = index + 1;
+            if (next < order.Count && order[next].Depth > position.Depth)
+            {
+                CommitPosition(order[next]);
+            }
         }
 
-        private void MoveSelection(BreadcrumbRow row, int step)
+        /// <summary>Left (AC7): collapses an expanded entry; any other entry is a no-op.</summary>
+        private void HandleLeft(BreadcrumbRow row)
         {
-            BreadcrumbRow? next = FindSelectable(IndexOf(row) + step, step);
-            if (next != null)
+            List<BreadcrumbVisiblePosition> order = VisibleOrder();
+            int index = PositionOf(order, row);
+            if (index < 0 || !order[index].IsExpanded)
             {
-                SelectRow(next);
+                return;
+            }
+
+            if (order[index].IsRowEntry)
+            {
+                CollapseRowLeaf(row);
+            }
+            else
+            {
+                CollapseNode(row, order[index].NodeId!);
+            }
+        }
+
+        /// <summary>
+        /// Collapses the row's expansion. When that hides the selected subfolder of the selected
+        /// row, the row entry is re-committed (AC7, S1).
+        /// </summary>
+        private void CollapseRowLeaf(BreadcrumbRow row)
+        {
+            bool hidesSelection = row.RowId == _selectedRowId && row.SelectedDescendantId != null;
+            // Callers collapse only an expanded row, so the toggle closes it; the guard keeps a
+            // refused toggle a silent no-op.
+            if (row.ToggleLeafExpanded())
+            {
+                PostRowRender(row);
+                if (hidesSelection)
+                {
+                    SelectRowEntry(row);
+                }
             }
         }
 
@@ -168,6 +153,15 @@ namespace QuickFiler.Controllers
             if (row.Kind != BreadcrumbRowKind.Suggestion || activeSegment?.HasSubfolders != true)
             {
                 return; // Active segment without subfolders (or non-suggestion row): no-op.
+            }
+
+            // S7: a second Right (key auto-repeat) while the fetch is in flight issues no query.
+            if (!row.TryBeginLeafFetch())
+            {
+                log.Debug(
+                    $"Breadcrumb expand for row '{row.RowId}' ignored: a fetch is in flight."
+                );
+                return;
             }
 
             string requestId = "req-" + (++_requestSequence);
@@ -199,7 +193,7 @@ namespace QuickFiler.Controllers
                     children
                 );
                 row.SetLeafDescendants(children ?? Array.Empty<FolderBreadcrumbSegment>());
-                row.ToggleLeafExpanded();
+                row.ExpandLeaf(); // R4: expand-to-true, never a toggle.
                 PostOutbound(new BreadcrumbSubfolderResultMessage(requestId, row.RowId, mapped));
                 PostRowRender(row);
             }
@@ -216,6 +210,10 @@ namespace QuickFiler.Controllers
                     $"Breadcrumb expand {requestId} failed for row '{row.RowId}': {ex.Message}",
                     ex
                 );
+            }
+            finally
+            {
+                row.EndLeafFetch();
             }
         }
     }

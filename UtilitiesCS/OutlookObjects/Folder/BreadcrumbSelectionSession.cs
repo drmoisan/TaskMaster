@@ -24,12 +24,14 @@ namespace UtilitiesCS.OutlookObjects.Folder
             bool isOpen,
             string? committedIdentity,
             string? pendingIdentity,
-            IReadOnlyList<BreadcrumbSelectorOptionState> options
+            IReadOnlyList<BreadcrumbSelectorOptionState> options,
+            string? pendingNodeIdentity = null
         )
         {
             IsOpen = isOpen;
             CommittedIdentity = committedIdentity;
             PendingIdentity = pendingIdentity;
+            PendingNodeIdentity = pendingNodeIdentity;
             var copy = new BreadcrumbSelectorOptionState[options.Count];
             for (int index = 0; index < options.Count; index++)
             {
@@ -41,6 +43,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public bool IsOpen { get; }
         public string? CommittedIdentity { get; }
         public string? PendingIdentity { get; }
+
+        /// <summary>Pending descendant node identity on the pending row (#1007), or null.</summary>
+        public string? PendingNodeIdentity { get; }
         public IReadOnlyList<BreadcrumbSelectorOptionState> Options { get; }
     }
 
@@ -100,8 +105,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <summary>The committed identity captured when the current open session began.</summary>
         public string? OriginalIdentity { get; private set; }
 
-        /// <summary>The stable identity active in the open selector.</summary>
-        public string? PendingIdentity { get; private set; }
+        private string? _pendingIdentity;
+
+        /// <summary>
+        /// The stable identity active in the open selector. Assigning it moves the pending entry to
+        /// that row entry, so it also clears <see cref="PendingNode"/> (#1007).
+        /// </summary>
+        public string? PendingIdentity
+        {
+            get => _pendingIdentity;
+            private set
+            {
+                _pendingIdentity = value;
+                PendingNode = null;
+            }
+        }
 
         /// <summary>True while an open selection session is active.</summary>
         public bool IsOpen { get; private set; }
@@ -145,6 +163,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 PendingIdentity = CommittedIdentity;
             }
+            ReconcilePendingNode();
         }
 
         /// <summary>Captures immutable selector state from the current model.</summary>
@@ -156,7 +175,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 BreadcrumbStateRow row = _model.Rows[index];
                 options[index] = new BreadcrumbSelectorOptionState(row.Identity, row.IsSelectable);
             }
-            return new BreadcrumbSelectorState(IsOpen, CommittedIdentity, PendingIdentity, options);
+            return new BreadcrumbSelectorState(
+                IsOpen,
+                CommittedIdentity,
+                PendingIdentity,
+                options,
+                PendingNode?.Identity
+            );
         }
 
         public BreadcrumbSelectionEffects ClearSelector()
@@ -281,6 +306,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             CaptureDescendantSelection();
             PendingIdentity = CommittedIdentity;
             IsOpen = true;
+            BeginOpenTree();
             return true;
         }
 
@@ -308,7 +334,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     _model.Rows[index].Identity,
                     StringComparison.Ordinal
                 );
-                if (_model.SelectedIndex != index || _model.SelectedDescendant == null)
+                if (PendingNode != null && CommitPendingNode(index))
+                {
+                    changed = true;
+                }
+                else if (
+                    PendingNode == null
+                    && _model.SelectedIndex == index
+                    && !IsCommittedDescendantHidden()
+                )
+                {
+                    // #1007 AC4: the pending row entry replaces a visible committed descendant.
+                    changed |= _model.SelectedDescendant != null;
+                    _model.SelectRow(index);
+                }
+                else if (_model.SelectedIndex != index)
                 {
                     _model.SelectRow(index);
                 }
@@ -353,6 +393,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return false;
             }
 
+            RestoreOpenShape();
             int originalIndex = IndexOfSelectable(OriginalIdentity);
             if (originalIndex >= 0)
             {
@@ -371,6 +412,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         private bool Move(int step)
         {
+            if (IsOpen)
+            {
+                return MoveOpen(step);
+            }
             string? identity = IsOpen ? PendingIdentity : CommittedIdentity;
             int current = IndexOfSelectable(identity);
             int candidate;
@@ -441,6 +486,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             IsOpen = false;
             OriginalIdentity = null;
             PendingIdentity = null;
+            EndOpenTree();
         }
     }
 }

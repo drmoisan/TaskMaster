@@ -241,6 +241,10 @@ namespace QuickFiler.Test.Viewers
                 );
         }
 
+        /// <summary>
+        /// #1007 AC11: selector keys (now including Home, End, PageUp and PageDown) prevent browser
+        /// scrolling and post one selectorKey message; Left and Right stay off the selector map.
+        /// </summary>
         [TestMethod]
         public void SelectorKeys_PreventBrowserScrollingAndPostNativeKeyMessages()
         {
@@ -249,9 +253,10 @@ namespace QuickFiler.Test.Viewers
             Html.Should().Contain("ArrowDown: \"down\"");
             Html.Should().Contain("Enter: \"enter\"");
             Html.Should().Contain("Escape: \"escape\"");
+            Html.Should().Contain("PageDown: \"pagedown\"");
             Html.Should()
                 .MatchRegex(
-                    @"(?s)if\s*\(Object\.prototype\.hasOwnProperty\.call\(selectorKeys,\s*event\.key\)\)\s*\{.*?event\.preventDefault\(\);.*?post\(\{\s*type:\s*\""selectorKey\"",\s*key:\s*selectorKeys\[event\.key\]\s*\}\);.*?return;\s*\}"
+                    @"(?s)if\s*\(Object\.prototype\.hasOwnProperty\.call\(selectorKeys,\s*event\.key\)\)\s*\{.*?event\.preventDefault\(\);.*?var\s+message\s*=\s*\{\s*type:\s*\""selectorKey\"",\s*key:\s*selectorKeys\[event\.key\]\s*\};.*?post\(message\);.*?return;\s*\}"
                 );
 
             System.Text.RegularExpressions.Match selectorKeys = Find(
@@ -309,11 +314,15 @@ namespace QuickFiler.Test.Viewers
             legacy.RowIdentity.Should().Be("row");
         }
 
+        /// <summary>
+        /// #1007 AC4: the render receiver still owns the selected-child projection, and the pending
+        /// descendant named by the selector view owns the active subfolder option.
+        /// </summary>
         [TestMethod]
         public void RenderReceiver_OwnsSelectedChildExpandedAndCollapsedProjection()
         {
             // Arrange
-            string selectedChildBody = FunctionBody("selectedChildForRow", "rowHasOpenAffordance");
+            string selectedChildBody = FunctionBody("selectedChildForRow", "lastSegmentIndex");
             string makeRowBody = FunctionBody("makeRow", "makeSubfolders");
             string makeSubfoldersBody = FunctionBody("makeSubfolders", "render");
             string renderBody = FunctionBody("render", "onArrow");
@@ -334,6 +343,7 @@ namespace QuickFiler.Test.Viewers
                     "subfolderElement.id = \"folder-option-\" + row.rowIndex + \"-node-\" + child.identity;"
                 );
             makeSubfoldersBody.Should().Contain("selectedChildOwnsActive && child.selected");
+            makeSubfoldersBody.Should().Contain("child.identity === state.pendingNodeIdentity");
             makeSubfoldersBody
                 .Should()
                 .Contain("subfolderElement.setAttribute(\"aria-selected\", String(active));");
@@ -366,6 +376,10 @@ namespace QuickFiler.Test.Viewers
             renderReceiver.Groups["body"].Value.Should().Contain("state.selectedFolder = null;");
         }
 
+        /// <summary>
+        /// #1007 S6: Left and Right are still routed to the host, always as arrowKey; the page-side
+        /// unhandledArrow pre-filter is removed because C# decides against the pending entry.
+        /// </summary>
         [TestMethod]
         public void LeftAndRightBreadcrumbMessages_RemainSupported()
         {
@@ -373,7 +387,7 @@ namespace QuickFiler.Test.Viewers
             Html.Should().MatchRegex(@"(?:event|ev)\.key\s*===\s*\""ArrowRight\""");
             Html.Should().MatchRegex(@"(?:event|ev)\.key\s*===\s*\""ArrowLeft\""");
             Html.Should().Contain("{ type: \"arrowKey\", direction: direction }");
-            Html.Should().Contain("{ type: \"unhandledArrow\", direction: direction }");
+            Html.Should().NotContain("{ type: \"unhandledArrow\", direction: direction }");
         }
 
         [TestMethod]

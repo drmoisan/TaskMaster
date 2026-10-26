@@ -11,7 +11,8 @@ namespace QuickFiler.Controllers
     /// Descendant toggle and activation handlers of the breadcrumb bridge router (#1002). Every
     /// request is addressed by a host-issued node identity that must belong to the addressed
     /// row's current tree (I1); a fetch result is applied only to the same row instance and the
-    /// same request generation that started it (I2); a toggle never changes the selection (I3);
+    /// same request generation that started it (I2); a toggle changes expansion only, unless the
+    /// collapse hides the selected node (I3 as narrowed by #1007 S1);
     /// and an activation commits only through <c>SelectHierarchyPath</c> (I4). Awaits resume on
     /// the captured UI context, so no lock is taken and the provider await keeps the default
     /// context capture (I6).
@@ -20,9 +21,8 @@ namespace QuickFiler.Controllers
     {
         private async Task HandleDescendantToggleAsync(BreadcrumbRow row, string nodeId)
         {
-            if (row.TryCollapseDescendant(nodeId))
+            if (CollapseNode(row, nodeId))
             {
-                PostRowRender(row);
                 return;
             }
 
@@ -85,6 +85,31 @@ namespace QuickFiler.Controllers
             }
 
             PostRowRender(row);
+        }
+
+        /// <summary>
+        /// Collapses a known expanded node. I3 is narrowed by #1007 S1: when the collapse hides
+        /// the selected descendant of the selected row, the collapsed node (its nearest visible
+        /// ancestor) is re-committed through <c>SelectHierarchyPath</c>.
+        /// </summary>
+        /// <returns>True when the node was collapsed.</returns>
+        private bool CollapseNode(BreadcrumbRow row, string nodeId)
+        {
+            bool hidesSelection =
+                row.RowId == _selectedRowId && row.IsSelectedDescendantWithin(nodeId);
+            if (!row.TryCollapseDescendant(nodeId))
+            {
+                return false;
+            }
+
+            PostRowRender(row);
+            string? path = row.GetDescendantPath(nodeId);
+            if (hidesSelection && path != null)
+            {
+                SelectHierarchyPath(row, path, nodeId);
+            }
+
+            return true;
         }
 
         private void ActivateDescendant(BreadcrumbRow row, string nodeId)

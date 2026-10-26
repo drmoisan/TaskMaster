@@ -327,6 +327,13 @@
     <Compile Include="OutlookObjects\Folder\FolderHierarchyProviderAdapterTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeSnapshotQueriesAncestorChainTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderHierarchyProviderTests.cs" />
+    <Compile Include="OutlookObjects\Folder\OutlookFolderHierarchyProviderIssue1007Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbEmptyExpanderIssue1007Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbVisibleOrderTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeJsKeysIssue1007Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSessionTreeIssue1007Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterIssue1007Tests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterIssue1007Tests.Unanchored.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderHierarchyProviderTrimTests.cs" />
     <Compile Include="OutlookObjects\Folder\ArchiveStemProjectionTests.cs" />
     <Compile Include="OutlookObjects\Folder\ArchiveChainProjectionTests.cs" />

@@ -57,6 +57,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             row.TryCollapseLeaf().Should().BeFalse("already collapsed is a reported no-op");
         }
 
+        /// <summary>
+        /// #1007 AC7: Right opens the leaf expansion and a second Right is unhandled; Left closes
+        /// the expansion, and the next Left is unhandled because Left never selects a parent.
+        /// </summary>
         [TestMethod]
         public void Arrows_RightExpandsThenLeftCollapses_UnhandledWhenNothingChanges()
         {
@@ -70,31 +74,53 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Right again: nothing further to expand -> unhandled (legacy fall-through signal).
             model.RightArrow().Should().BeFalse();
 
-            // #440 corrected contract: Left walks the ancestor chain, so the unhandled press comes
-            // only once the root is active. Decision D1: the sequence is extended to the root rather
-            // than re-pointed at a single-segment row, because the single-segment boundary is already
-            // covered by ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath, and re-pointing
-            // would delete the only sequence-level assertion over the three-segment fixture.
+            // Left closes the expansion; the next Left changes nothing and is unhandled.
             model.LeftArrow().Should().BeTrue();
             model.SelectedRow.LeafExpanded.Should().BeFalse();
-            model.SelectedRow.ActiveSegmentIndex.Should().Be(1);
-            model.LeftArrow().Should().BeTrue();
-            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2);
             model.LeftArrow().Should().BeFalse();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2);
         }
 
+        /// <summary>
+        /// #1007 AC9 (D-Q23): Right on a row shortened at its active segment lists that segment's
+        /// children and keeps the row shortened; a second Right is unhandled.
+        /// </summary>
         [TestMethod]
-        public void RightArrow_OnCollapsedRow_ReExpandsBeforeLeafExpansion()
+        public void RightArrow_OnRowShortenedAtActiveSegment_ExpandsAndStaysShortened()
         {
-            // Arrange
+            // Arrange: Inbox becomes the active segment and the shortened terminal.
+            var model = ModelWithSuggestion();
+            model.SelectedRow.ActivateSegment(0).Should().BeTrue();
+            model.SelectedRow.CollapseAfter(0);
+
+            // Act + Assert
+            model.RightArrow().Should().BeTrue();
+            model.SelectedRow.LeafExpanded.Should().BeTrue();
+            model.SelectedRow.CollapsedAfterIndex.Should().Be(0);
+            model.RightArrow().Should().BeFalse();
+        }
+
+        /// <summary>
+        /// #1007 R3, N-1 (D3): Right on a row collapsed away from its active segment (the leaf
+        /// stays active while the public <c>CollapseAfter</c> hides it) restores the full chain and
+        /// does not open the leaf expansion.
+        /// </summary>
+        [TestMethod]
+        public void RightArrow_OnRowCollapsedAwayFromActiveSegment_RestoresChain()
+        {
+            // Arrange: the leaf (index 2) stays active while the row is collapsed after Inbox.
             var model = ModelWithSuggestion();
             model.SelectedRow.CollapseAfter(0);
 
-            // Act + Assert: first Right restores the chain, second opens the leaf.
-            model.RightArrow().Should().BeTrue();
-            model.SelectedRow.CollapsedAfterIndex.Should().BeNull();
-            model.RightArrow().Should().BeTrue();
-            model.SelectedRow.LeafExpanded.Should().BeTrue();
+            // Act
+            bool handled = model.RightArrow();
+
+            // Assert
+            handled.Should().BeTrue();
+            model.SelectedRow.CollapsedAfterIndex.Should().BeNull("the full chain is restored");
+            model.SelectedRow.LeafExpanded.Should().BeFalse("the leaf expansion is not opened");
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2);
         }
 
         [TestMethod]
@@ -128,6 +154,10 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Throw<ArgumentOutOfRangeException>();
         }
 
+        /// <summary>
+        /// #1007 AC7: Left collapses the expansion; the collapse hides the selected subfolder, so
+        /// the selection moves to its nearest visible ancestor, the row itself.
+        /// </summary>
         [TestMethod]
         public void LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses()
         {
@@ -149,53 +179,46 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         /// <summary>
-        /// #440 walk-to-root: on a three-segment chain with the leaf active and no subfolder
-        /// selected, each of the first two Left presses selects the parent of the currently active
-        /// node, and the third press at the root is unhandled. The active segment index is asserted
-        /// after every press so the test cannot pass on the boolean alone.
+        /// #1007 AC7: the #440 walk is removed, so repeated Left presses on a leaf-active,
+        /// non-expanded row are all unhandled and neither move the active segment nor shorten the
+        /// row. The active index is asserted after every press so the boolean alone cannot pass.
         /// </summary>
         [TestMethod]
-        public void LeftArrow_RepeatedOnThreeSegmentChain_WalksToRootThenReportsUnhandled()
+        public void LeftArrow_RepeatedOnNonExpandedChain_IsUnhandledAndKeepsLeafActive()
         {
             // Arrange
             var model = ModelWithSuggestion();
             model.SelectedRow.ActiveSegmentIndex.Should().Be(2, "the row starts leaf-anchored");
 
-            // Act + Assert: press 1 selects the parent.
-            model.LeftArrow().Should().BeTrue();
-            model.SelectedRow.ActiveSegmentIndex.Should().Be(1);
-
-            // Act + Assert: press 2 selects the root of the resolved chain.
-            model.LeftArrow().Should().BeTrue();
-            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
-
-            // Act + Assert: press 3 at the root is unhandled and leaves the root active.
-            model.LeftArrow().Should().BeFalse();
-            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
+            // Act + Assert
+            for (int press = 0; press < 3; press++)
+            {
+                model.LeftArrow().Should().BeFalse();
+                model.SelectedRow.ActiveSegmentIndex.Should().Be(2);
+                model.SelectedRow.CollapsedAfterIndex.Should().BeNull();
+            }
         }
 
         /// <summary>
-        /// #440 walk-to-root from an open leaf expansion: the first Left both clears the expansion,
-        /// because the fetched subfolders belonged to the previous node, and selects the parent. The
-        /// walk then continues to the root with the expansion staying closed.
+        /// #1007 AC7: from an open leaf expansion the first Left only closes the expansion (the
+        /// leaf stays active) and the second Left is unhandled.
         /// </summary>
         [TestMethod]
-        public void LeftArrow_WalkFromAnOpenLeafExpansion_ClearsTheExpansionAndStillReachesTheRoot()
+        public void LeftArrow_FromOpenLeafExpansion_CollapsesThenIsUnhandled()
         {
             // Arrange
             var model = ModelWithSuggestion();
             model.RightArrow().Should().BeTrue();
             model.SelectedRow.LeafExpanded.Should().BeTrue();
 
-            // Act + Assert: press 1 clears the expansion and selects the parent.
+            // Act + Assert: press 1 clears the expansion and keeps the leaf active.
             model.LeftArrow().Should().BeTrue();
-            model.SelectedRow.ActiveSegmentIndex.Should().Be(1);
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2);
             model.SelectedRow.LeafExpanded.Should().BeFalse();
 
-            // Act + Assert: press 2 reaches the root with the expansion still closed.
-            model.LeftArrow().Should().BeTrue();
-            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
-            model.SelectedRow.LeafExpanded.Should().BeFalse();
+            // Act + Assert: press 2 is unhandled.
+            model.LeftArrow().Should().BeFalse();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2);
         }
 
         [TestMethod]

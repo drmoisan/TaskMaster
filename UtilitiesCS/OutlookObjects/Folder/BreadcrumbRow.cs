@@ -27,9 +27,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// <remarks>
     /// No-op rules: <see cref="BreadcrumbRowKind.Banner"/> and
     /// <see cref="BreadcrumbRowKind.TrashPseudoRow"/> rows never collapse or expand; a leaf without
-    /// subfolders is a toggle no-op. Arrow semantics follow the TreeListView parity of the spec —
-    /// Right expands (restores a collapsed breadcrumb, else expands the leaf children), Left
-    /// collapses (leaf children first, else hides the trailing segment).
+    /// subfolders is a toggle no-op. Arrow semantics (#1007): Right expands the active segment
+    /// (restoring a collapse that hides it first), Left collapses the expanded children and never
+    /// hides a segment.
     /// </remarks>
     public sealed partial class BreadcrumbRow
     {
@@ -37,6 +37,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         private List<BreadcrumbSegment> _leafChildren = new List<BreadcrumbSegment>();
         private readonly Dictionary<int, FolderTreeNodeKey> _segmentKeys =
             new Dictionary<int, FolderTreeNodeKey>();
+        private bool _leafFetchInFlight;
 
         /// <summary>
         /// Creates a breadcrumb row.
@@ -120,6 +121,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <summary>Immediate subfolders of the leaf, populated via <see cref="SetLeafChildren"/>.</summary>
         public IReadOnlyList<BreadcrumbSegment> LeafChildren => _leafChildren;
 
+        /// <summary>
+        /// True once a fetch stored the active segment's children (#1007 AC14), so an empty
+        /// <see cref="LeafChildren"/> means "no children" rather than "not fetched yet".
+        /// </summary>
+        internal bool LeafChildrenLoaded { get; private set; }
+
+        /// <summary>True when a fetch stored zero children for the active segment (#1007 AC14).</summary>
+        internal bool HasNoLoadedChildren => LeafChildrenLoaded && _leafChildren.Count == 0;
+
         /// <summary>The anchored predicted leaf segment, or null when the row has no segments.</summary>
         public BreadcrumbSegment? LeafSegment =>
             _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
@@ -167,6 +177,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             ActiveSegmentIndex = segmentIndex;
             _leafChildren = new List<BreadcrumbSegment>();
+            LeafChildrenLoaded = false;
             ClearDescendants();
             IsLeafExpanded = false;
             return true;
@@ -265,18 +276,20 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             _leafChildren = new List<BreadcrumbSegment>(children);
+            LeafChildrenLoaded = true;
             ClearDescendants(); // Key-less children carry no expandable descendants.
             return true;
         }
 
         /// <summary>
-        /// Toggles the leaf expand state. No-op for banner/pseudo rows, for a leaf without
-        /// subfolders, and while the breadcrumb is collapsed (the leaf is hidden).
+        /// Toggles the active segment's expand state. No-op for banner/pseudo rows, for a segment
+        /// without subfolders, and while a collapse hides the active segment. A row shortened at
+        /// its active segment (#1007 R3) can expand that segment.
         /// </summary>
         /// <returns>True when the view state changed.</returns>
         public bool ToggleLeafExpanded()
         {
-            if (!CanExpandActiveSegment() || IsCollapsed)
+            if (!CanExpandActiveSegment())
             {
                 return false;
             }
@@ -291,39 +304,27 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         /// <summary>
-        /// Left-arrow transition: collapses expanded leaf children first; otherwise hides the
-        /// trailing segment (collapse-after the previous segment). No-op for banner/pseudo rows,
-        /// single-segment rows, and rows already collapsed at the root segment.
+        /// Left-arrow transition: collapses the expanded children. Left never hides a segment
+        /// (#1007 AC7), so a row without an expansion is a no-op, as are banner/pseudo rows.
         /// </summary>
         /// <returns>True when the view state changed.</returns>
         public bool LeftArrow()
         {
-            if (Kind != BreadcrumbRowKind.Suggestion || _segments.Count == 0)
+            if (Kind != BreadcrumbRowKind.Suggestion || !IsLeafExpanded)
             {
                 return false;
             }
 
-            if (IsLeafExpanded)
-            {
-                IsLeafExpanded = false;
-                ClearDescendants();
-                return true;
-            }
-
-            int terminalIndex = CollapsedAfterIndex ?? (_segments.Count - 1);
-            if (terminalIndex == 0)
-            {
-                return false; // Only the root segment remains visible.
-            }
-
-            CollapsedAfterIndex = terminalIndex - 1;
+            IsLeafExpanded = false;
+            ClearDescendants();
             return true;
         }
 
         /// <summary>
-        /// Right-arrow transition: restores the full breadcrumb when collapsed; otherwise expands
-        /// the leaf children when the leaf has subfolders. No-op for banner/pseudo rows, for a
-        /// leaf without subfolders, and when already fully expanded.
+        /// Right-arrow transition: restores a collapse that hides the active segment; otherwise
+        /// expands the active segment when it has subfolders, including on a row shortened at its
+        /// active segment (#1007 R3). No-op for banner/pseudo rows, a segment without subfolders,
+        /// and an expanded row.
         /// </summary>
         /// <returns>True when the view state changed.</returns>
         public bool RightArrow()
@@ -333,19 +334,55 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return false;
             }
 
-            if (IsCollapsed)
+            if (IsCollapsed && !IsAnchoredCollapse)
             {
                 return ReExpand();
             }
 
-            if (CanExpandActiveSegment() && !IsLeafExpanded)
+            return ExpandLeaf();
+        }
+
+        /// <summary>
+        /// Idempotent expand-to-true of the active segment (#1007 R4): false when already
+        /// expanded or when the segment cannot expand, so overlapping completions cannot toggle
+        /// the row back to collapsed.
+        /// </summary>
+        /// <returns>True when the view state changed.</returns>
+        public bool ExpandLeaf()
+        {
+            if (!CanExpandActiveSegment() || IsLeafExpanded)
             {
-                IsLeafExpanded = true;
-                return true;
+                return false;
             }
 
-            return false;
+            IsLeafExpanded = true;
+            return true;
         }
+
+        /// <summary>
+        /// Starts the single in-flight fetch of the active segment's children (#1007 S7).
+        /// </summary>
+        /// <returns>False while another fetch for this row is in flight.</returns>
+        public bool TryBeginLeafFetch()
+        {
+            if (_leafFetchInFlight)
+            {
+                return false;
+            }
+
+            _leafFetchInFlight = true;
+            return true;
+        }
+
+        /// <summary>Ends the fetch started by <see cref="TryBeginLeafFetch"/>.</summary>
+        public void EndLeafFetch() => _leafFetchInFlight = false;
+
+        /// <summary>
+        /// True when the row is shortened at its active segment (#1007 R3), as a segment
+        /// double-click or Ctrl+Left leaves it; the active segment is then the visible terminal.
+        /// </summary>
+        public bool IsAnchoredCollapse =>
+            CollapsedAfterIndex.HasValue && CollapsedAfterIndex == ActiveSegmentIndex;
 
         /// <summary>
         /// Projects the currently visible segments: all segments when fully expanded, or the
@@ -362,9 +399,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return _segments.GetRange(0, CollapsedAfterIndex.Value + 1);
         }
 
+        // R3: a collapse hides the active segment unless it is anchored at that segment.
         private bool CanExpandActiveSegment()
         {
-            return Kind == BreadcrumbRowKind.Suggestion && ActiveSegment?.HasSubfolders == true;
+            return Kind == BreadcrumbRowKind.Suggestion
+                && ActiveSegment?.HasSubfolders == true
+                && (!IsCollapsed || IsAnchoredCollapse);
         }
     }
 }

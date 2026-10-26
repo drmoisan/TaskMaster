@@ -42,6 +42,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 if (node.Expanded)
                 {
                     node.Collapse();
+                    // #1007 AC7: a pending node hidden by this collapse moves to its nearest visible ancestor.
+                    _selectionSession.ReconcilePendingNode();
                     return new[] { RenderJsonCore() };
                 }
                 node.Expanded = true;
@@ -59,7 +61,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
             lock (_sync)
             {
                 row = RowAt(rowIndex);
-                if (row.CollapsedAfterIndex != null)
+                // #1007 R3 (D-Q23): a row shortened at its active segment lists that segment's
+                // children and stays shortened; only a collapse anchored elsewhere is restored.
+                if (
+                    row.CollapsedAfterIndex != null
+                    && row.CollapsedAfterIndex != row.ActiveSegmentIndex
+                )
                 {
                     row.ReExpand();
                     return new[] { RenderJsonCore() };
@@ -67,9 +74,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 if (row.LeafExpanded)
                 {
                     row.TryCollapseLeaf();
+                    _selectionSession.ReconcilePendingNode();
                     return new[] { RenderJsonCore() };
                 }
-                if (!row.TryExpandLeaf())
+                if (!row.TryExpandActiveSegment())
                 {
                     return ErrorResponse($"Row {rowIndex} has no expand affordance.");
                 }
@@ -83,6 +91,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
             CancellationToken cancellationToken
         )
         {
+            if (Read(() => _selectionSession.IsOpen))
+            {
+                // #1007: with the list open, Left and Right act on the pending entry.
+                return await PendingArrowAsync(direction, cancellationToken).ConfigureAwait(false);
+            }
             BreadcrumbStateRow row;
             int rowIndex;
             lock (_sync)

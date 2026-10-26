@@ -171,6 +171,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             labelsOnly.SelectedIndex.Should().Be(-1);
         }
 
+        /// <summary>
+        /// The model Right and Left on a single-segment row expand and collapse it without
+        /// touching the selector session. #1007: unchanged on this row; the session-aware open-list
+        /// decisions (AC4, AC5, AC7) live in the router Navigation partial.
+        /// </summary>
         [TestMethod]
         public void BreadcrumbLeftAndRightTransitions_DoNotMutateSelectorSession()
         {

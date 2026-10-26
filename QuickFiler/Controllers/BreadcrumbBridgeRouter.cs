@@ -391,6 +391,12 @@ namespace QuickFiler.Controllers
         public async Task ProcessInboundAsync(string json)
         {
             BreadcrumbInboundMessage message = _codec.DeserializeInbound(json);
+            if (message.Type == BreadcrumbMessageTypes.ArrowKey && message.RowId.Length == 0)
+            {
+                HandleNoSelectionKey(message.Key!); // #1007 D-Q26: nothing is selected yet.
+                return;
+            }
+
             BreadcrumbRow? row = FindRow(message.RowId);
             if (row == null)
             {
@@ -401,33 +407,9 @@ namespace QuickFiler.Controllers
             switch (message.Type)
             {
                 case BreadcrumbMessageTypes.SegmentDoubleClick:
-                {
-                    // #498: the bridge is an untrusted boundary, so the segment index is validated
-                    // here rather than relying on BreadcrumbRow.CollapseAfter to throw. An index
-                    // that escaped this arm reached the async void host-event seam as an unhandled
-                    // exception, which the single catch (BreadcrumbMessageException) cannot contain.
-                    int? requestedIndex = message.SegmentIndex;
-                    if (
-                        !requestedIndex.HasValue
-                        || requestedIndex.Value < 0
-                        || requestedIndex.Value >= row.Segments.Count
-                    )
-                    {
-                        log.Error(
-                            $"Inbound segmentDoubleClick for row '{row.RowId}' carries segment index "
-                                + $"'{requestedIndex}', which is outside the valid range "
-                                + $"[0, {row.Segments.Count - 1}]; rejected without a transition."
-                        );
-                        break;
-                    }
-
-                    if (row.CollapseAfter(requestedIndex.Value))
-                    {
-                        PostRowRender(row);
-                    }
-
+                    // #498 range guard and #1007 S10 atomic commit: Navigation partial.
+                    HandleSegmentDoubleClick(row, message.SegmentIndex);
                     break;
-                }
                 case BreadcrumbMessageTypes.SegmentActivate:
                     ActivateSegment(row, message.SegmentIndex!.Value);
                     break;
@@ -438,7 +420,7 @@ namespace QuickFiler.Controllers
                     await HandleLeafToggleAsync(row);
                     break;
                 case BreadcrumbMessageTypes.ArrowKey:
-                    await HandleArrowKeyAsync(row, message.Key!);
+                    await HandleArrowKeyAsync(row, message.Key!, message.PageSize);
                     break;
                 case BreadcrumbMessageTypes.RowSelected:
                     SelectRow(row);

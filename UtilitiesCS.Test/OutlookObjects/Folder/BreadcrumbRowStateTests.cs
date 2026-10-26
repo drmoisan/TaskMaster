@@ -219,16 +219,27 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             act.Should().Throw<ArgumentNullException>();
         }
 
+        /// <summary>
+        /// #1007 AC9 (R3): a collapse not anchored at the active segment is still restored by
+        /// Right, while a row shortened at its active segment expands that segment and stays
+        /// shortened.
+        /// </summary>
         [TestMethod]
         public void RightArrow_WhenCollapsed_RestoresFullBreadcrumb()
         {
             // Arrange
             var row = SuggestionRow(leafHasSubfolders: false);
             row.CollapseAfter(0);
+            var anchored = AnchoredShortenedRow();
 
-            // Act / Assert
+            // Act / Assert: the non-anchored collapse is restored.
             row.RightArrow().Should().BeTrue();
             row.IsCollapsed.Should().BeFalse();
+
+            // Act / Assert: the anchored row expands its active segment and stays shortened.
+            anchored.RightArrow().Should().BeTrue();
+            anchored.IsLeafExpanded.Should().BeTrue();
+            anchored.CollapsedAfterIndex.Should().Be(1);
         }
 
         [TestMethod]
@@ -265,29 +276,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             row.IsCollapsed.Should().BeFalse();
         }
 
+        /// <summary>
+        /// #1007 AC7: Left never hides the trailing segment. On a fully expanded row it returns
+        /// false and leaves the breadcrumb whole (folds the two former Left-hiding tests).
+        /// </summary>
         [TestMethod]
-        public void LeftArrow_WhenFullyExpanded_HidesTrailingSegment()
+        public void LeftArrow_NeverHidesTrailingSegment()
         {
             // Arrange
             var row = SuggestionRow(leafHasSubfolders: false);
 
-            // Act / Assert: Left hides the leaf (collapse after the previous segment).
-            row.LeftArrow().Should().BeTrue();
-            row.CollapsedAfterIndex.Should().Be(1);
-            row.VisibleSegments().Select(s => s.DisplayName).Should().Equal("Root", "Mid");
-        }
-
-        [TestMethod]
-        public void LeftArrow_AtRootSegment_IsNoOp()
-        {
-            // Arrange: collapse until only the root segment remains.
-            var row = SuggestionRow(leafHasSubfolders: false);
-            row.LeftArrow();
-            row.LeftArrow();
-
-            // Act / Assert: only the root remains; further Left presses are no-ops.
-            row.CollapsedAfterIndex.Should().Be(0);
+            // Act / Assert: repeated presses change nothing.
             row.LeftArrow().Should().BeFalse();
+            row.LeftArrow().Should().BeFalse();
+            row.CollapsedAfterIndex.Should().BeNull();
+            row.VisibleSegments().Select(s => s.DisplayName).Should().Equal("Root", "Mid", "Leaf");
         }
 
         [TestMethod]
@@ -364,16 +367,34 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             row.LeafSegment!.FullPath.Should().Be(@"Inbox\Leaf");
         }
 
+        /// <summary>
+        /// #1007 AC9 (R3): toggling stays a no-op for a collapse not anchored at the active
+        /// segment (the leaf is hidden), but expands a row shortened at its active segment.
+        /// </summary>
         [TestMethod]
         public void ToggleLeafExpanded_WhileCollapsed_IsNoOp()
         {
             // Arrange: the leaf is hidden while the row is collapsed.
             var row = SuggestionRow(leafHasSubfolders: true);
             row.CollapseAfter(0);
+            var anchored = AnchoredShortenedRow();
 
             // Act / Assert
             row.ToggleLeafExpanded().Should().BeFalse();
             row.IsLeafExpanded.Should().BeFalse();
+            anchored.ToggleLeafExpanded().Should().BeTrue("the anchored segment's [+] expands");
+            anchored.IsLeafExpanded.Should().BeTrue();
+            anchored.CollapsedAfterIndex.Should().Be(1);
+        }
+
+        // Root > Mid > Leaf shortened to "Root > Mid [+]" with Mid active (a segment double-click).
+        private static BreadcrumbRow AnchoredShortenedRow()
+        {
+            var row = SuggestionRow(leafHasSubfolders: false);
+            row.SetSegmentKey(1, Key(@"Inbox\Mid"));
+            row.ActivateSegment(1).Should().BeTrue();
+            row.CollapseAfter(1).Should().BeTrue();
+            return row;
         }
     }
 }

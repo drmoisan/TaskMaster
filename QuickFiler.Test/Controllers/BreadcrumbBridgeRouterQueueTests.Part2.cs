@@ -134,7 +134,8 @@ namespace QuickFiler.Test.Controllers
         /// <summary>
         /// #498 / AC-3 valid-index clause: the range guard is a rejection of invalid input only. A
         /// valid non-leaf <c>segmentIndex</c> delivered through the same host-event seam still
-        /// collapses the row and posts exactly one row-scoped render payload.
+        /// collapses the row; #1007 S10 also commits the segment, so the assertion reads the last
+        /// render, which is the row-scoped render.
         /// </summary>
         [TestMethod]
         public void SegmentDoubleClick_ValidIndex_ViaHostEvent_CollapsesRowAndPostsRender()
@@ -151,11 +152,11 @@ namespace QuickFiler.Test.Controllers
                 "{\"type\":\"segmentDoubleClick\",\"rowId\":\"row-0\",\"segmentIndex\":0}"
             );
 
-            // Assert: one new outbound payload, and it is the row-scoped render for row-0.
+            // Assert: at least one new payload, and the last render is row-scoped for row-0.
             _posted
                 .Count.Should()
-                .Be(postedBefore + 1, "a valid segmentIndex still produces a render post");
-            string render = _posted.Single(p => p.Contains("\"type\":\"render\""));
+                .BeGreaterThan(postedBefore, "a valid segmentIndex still produces a render post");
+            string render = _posted.Last(p => p.Contains("\"type\":\"render\""));
             render.Should().Contain("\"rowId\":\"row-0\"");
         }
 

@@ -46,6 +46,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             _leafChildren = new List<BreadcrumbSegment>(BreadcrumbRowBuilder.MapSegments(children));
+            LeafChildrenLoaded = true;
             var nodes = new List<BreadcrumbDescendantNode>(children.Count);
             foreach (FolderBreadcrumbSegment child in children)
             {
@@ -172,6 +173,62 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             SelectedDescendantId = nodeId;
             return true;
+        }
+
+        /// <summary>
+        /// Reports whether the selected descendant is a strict descendant of
+        /// <paramref name="nodeId"/> (#1007 R5), that is, whether collapsing that node hides the
+        /// selection. False for an unknown node or when no descendant is selected.
+        /// </summary>
+        /// <param name="nodeId">Host-issued node identity.</param>
+        public bool IsSelectedDescendantWithin(string nodeId)
+        {
+            BreadcrumbDescendantNode? node = FindDescendant(nodeId);
+            if (
+                node == null
+                || SelectedDescendantId == null
+                || node.Identity == SelectedDescendantId
+            )
+            {
+                return false;
+            }
+
+            return node.Find(SelectedDescendantId) != null;
+        }
+
+        /// <summary>
+        /// Appends this row's visible entries (#1007): nothing for a banner row; otherwise the row
+        /// entry, then the shown descendant nodes in pre-order.
+        /// </summary>
+        /// <param name="rowIndex">The row's index in its list.</param>
+        /// <param name="target">The order being built.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="target"/> is null.</exception>
+        public void AppendVisiblePositions(int rowIndex, List<BreadcrumbVisiblePosition> target)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            if (Kind == BreadcrumbRowKind.Banner)
+            {
+                return;
+            }
+
+            target.Add(
+                new BreadcrumbVisiblePosition(
+                    rowIndex,
+                    null,
+                    null,
+                    -1,
+                    CanExpandActiveSegment() && !HasNoLoadedChildren,
+                    IsLeafExpanded
+                )
+            );
+            if (IsLeafExpanded)
+            {
+                BreadcrumbVisibleOrder.AppendNodes(rowIndex, _descendants, null, 0, target);
+            }
         }
 
         // Called exactly where the first-level children stop being shown or are replaced.

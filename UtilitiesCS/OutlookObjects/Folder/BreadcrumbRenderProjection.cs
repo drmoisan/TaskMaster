@@ -216,9 +216,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 }
                 if (row.CollapsedAfterIndex.HasValue && isTerminal)
                 {
-                    // The re-expand plus sits to the left of the now-terminal segment (FR-3).
+                    // The affordance sits to the left of the now-terminal segment (FR-3); while the
+                    // shortened row lists that segment's children it is the collapse minus (#1007 R3).
                     cells.Add(
-                        new BreadcrumbCellRender(BreadcrumbCellKind.Plus, string.Empty, -1, false)
+                        new BreadcrumbCellRender(
+                            row.LeafExpanded ? BreadcrumbCellKind.Minus : BreadcrumbCellKind.Plus,
+                            string.Empty,
+                            -1,
+                            false
+                        )
                     );
                 }
                 bool interior = s > 0 && !isTerminal;
@@ -227,7 +233,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
             }
 
-            if (row.LeafHasSubfolders)
+            // #1007 AC14: no affordance after a fetch that attached zero children.
+            bool zeroLoaded =
+                row.LeafExpanded
+                && row.DescendantRoot != null
+                && row.DescendantRoot.Loaded
+                && row.DescendantRoot.Children.Count == 0;
+            if (row.LeafHasSubfolders && !zeroLoaded)
             {
                 // Leaf-only affordance: plus when the expansion is closed, minus when open (FR-2).
                 cells.Add(
@@ -270,7 +282,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             new BreadcrumbSubfolderRender(
                 node.Segment.DisplayName,
                 node.Segment.FolderPath,
-                node.Segment.HasChildren,
+                // #1007 AC14: a loaded node with zero children reports no children.
+                node.Segment.HasChildren && !(node.Loaded && node.Children.Count == 0),
                 node.Identity,
                 node.Expanded,
                 node == selected,
